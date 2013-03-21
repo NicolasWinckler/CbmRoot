@@ -42,8 +42,8 @@ const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is include
 const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
-const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
-const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
+const Bool_t IncludeAsics    = false;  // false;  // true, if ASICs are included in geometry
+const Bool_t IncludeSupports = false;  // false;  // true, if support structure is included in geometry
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -84,6 +84,7 @@ const Int_t   NofLayers = 10;   // max layers
 //const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 3, layer 9,10
 //
 //const Int_t    ShowLayer[NofLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
+//const Int_t    ShowLayer[NofLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[NofLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[NofLayers] = { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 };  // SIS300-mu  // 1: plot, 0: hide
 //
@@ -93,8 +94,10 @@ const Int_t    LayerType[NofLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 }
 const Double_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
  
-// 3 station spacing
-const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
+// 3 stations, no gap between TRD stations
+const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // z position in cm of Layer front
+// 3 stations, 25 cm gap
+//const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 // equal spacing
 //const Double_t LayerPosition[NofLayers] = { 500., 550., 600., 650., 700., 750., 800., 850., 900., 950. };  // z position in cm of Layer front
 

@@ -1,6 +1,15 @@
-~/cbm/122/cbmroot_trunk_20130122/macro/trd/geometry/trd.v13#
+#
 ##   Howto generate a digipar file form a .root geometry
 #
+
+# created new official ROOT TRD geomtries (21.03.2013)
+
+- v13c - as v13i, compressed, without 25 cm gaps between stations, z = 4.5m to 9.5m
+- v13d - as v13s - 2 layers, SIS100
+- v13e - as v13r - 3 layers, SIS100
+- v13f - as v13t - 4 layers, SIS100
+
+# develloper's versions
 
 v13c - like v13b, but reduced FEBs: 10 FEBs for 1 cm2 and 5 FEBs for 2 cm2 pad size
 v13d - like v13b, but FEB  0 degree inclination

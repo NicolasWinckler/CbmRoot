@@ -297,8 +297,8 @@ TGeoVolume* create_counter(Int_t modType)
   TGeoBBox* glass_plate = new TGeoBBox("", gdx/2., gdy/2., gdz/2.);
   TGeoVolume* glass_plate_vol = 
     new TGeoVolume("tof_glass", glass_plate, glassPlateVolMed);
-  glass_plate_vol->SetLineColor(kBlue); // set line color for the glass plate
-  glass_plate_vol->SetTransparency(70); // set transparency for the TOF
+  glass_plate_vol->SetLineColor(kMagenta); // set line color for the glass plate
+  glass_plate_vol->SetTransparency(20); // set transparency for the TOF
   TGeoTranslation* glass_plate_trans 
     = new TGeoTranslation("", 0., 0., 0.);
 
@@ -359,8 +359,8 @@ TGeoVolume* create_counter(Int_t modType)
   TGeoBBox* pcb = new TGeoBBox("", dxe/2., dye/2., dze/2.);
   TGeoVolume* pcb_vol = 
     new TGeoVolume("pcb", pcb, electronicsVolMed);
-  pcb_vol->SetLineColor(kBlack); // set line color for the gas gap
-  pcb_vol->SetTransparency(70); // set transparency for the TOF
+  pcb_vol->SetLineColor(kCyan); // set line color for the gas gap
+  pcb_vol->SetTransparency(10); // set transparency for the TOF
   for (Int_t l=0; l<2; l++){
     yele *= -1.;
     TGeoTranslation* pcb_trans 
@@ -427,9 +427,8 @@ TGeoVolume* create_new_counter(Int_t modType)
   TGeoBBox* glass_plate = new TGeoBBox("", gdx/2., gdy/2., gdz/2.);
   TGeoVolume* glass_plate_vol = 
     new TGeoVolume("tof_glass", glass_plate, glassPlateVolMed);
-  glass_plate_vol->SetLineColor(kBlue); // set line color for the glass plate
-  glass_plate_vol->SetTransparency(99); // set transparency for the TOF
-
+  glass_plate_vol->SetLineColor(kMagenta); // set line color for the glass plate
+  glass_plate_vol->SetTransparency(20); // set transparency for the TOF
   // define single gas gap volume
   TGeoBBox* gas_gap = new TGeoBBox("", ggdx/2., ggdy/2., ggdz/2.);
   TGeoVolume* gas_gap_vol = 
@@ -465,8 +464,8 @@ TGeoVolume* create_new_counter(Int_t modType)
   TGeoBBox* pcb = new TGeoBBox("", dxe/2., dye/2., dze/2.);
   TGeoVolume* pcb_vol = 
     new TGeoVolume("pcb", pcb, electronicsVolMed);
-  pcb_vol->SetLineColor(kBlack); // set line color for electronics
-  pcb_vol->SetTransparency(70); // set transparency for the TOF
+  pcb_vol->SetLineColor(kCyan); // set line color for electronics
+  pcb_vol->SetTransparency(10); // set transparency for the TOF
   for (Int_t l=0; l<2; l++){
     yele *= -1.;
     TGeoTranslation* pcb_trans 
@@ -507,7 +506,7 @@ TGeoVolume* create_tof_module(Int_t modType)
   TGeoVolume* alu_box_vol = 
     new TGeoVolume("alu_box", alu_box, boxVolMed);
   alu_box_vol->SetLineColor(kGreen); // set line color for the alu box
-  alu_box_vol->SetTransparency(70); // set transparency for the TOF
+  alu_box_vol->SetTransparency(20); // set transparency for the TOF
   TGeoTranslation* alu_box_trans 
     = new TGeoTranslation("", 0., 0., 0.);
   module->AddNode(alu_box_vol, 0, alu_box_trans);
@@ -567,7 +566,7 @@ TGeoVolume* create_new_tof_module(Int_t modType)
   TGeoVolume* module = 
   new TGeoVolume(moduleName, module_box, boxVolMed);
   module->SetLineColor(kGreen); // set line color for the alu box
-  module->SetTransparency(70); // set transparency for the TOF
+  module->SetTransparency(20); // set transparency for the TOF
 
   TGeoBBox* gas_box = new TGeoBBox("", (dx-(width_aluxl+width_aluxr))/2., (dy-2*width_aluy)/2., (dz-2*width_aluz)/2.);
   TGeoVolume* gas_box_vol = 
@@ -616,7 +615,7 @@ TGeoVolume* create_tof_pole()
   TGeoVolume* pole_alu_vol = 
     new TGeoVolume("pole_alu", pole_alu_box, boxVolMed);
   pole_alu_vol->SetLineColor(kGreen); // set line color for the alu box
-  pole_alu_vol->SetTransparency(70); // set transparency for the TOF
+  pole_alu_vol->SetTransparency(20); // set transparency for the TOF
   TGeoTranslation* pole_alu_trans 
     = new TGeoTranslation("", 0., 0., 0.);
   pole->AddNode(pole_alu_vol, 0, pole_alu_trans);
@@ -648,7 +647,7 @@ TGeoVolume* create_tof_bar(Float_t dx, Float_t dy, Float_t dz)
   TGeoVolume* bar_alu_vol = 
     new TGeoVolume("bar_alu", bar_alu_box, boxVolMed);
   bar_alu_vol->SetLineColor(kGreen); // set line color for the alu box
-  bar_alu_vol->SetTransparency(70); // set transparency for the TOF
+  bar_alu_vol->SetTransparency(20); // set transparency for the TOF
   TGeoTranslation* bar_alu_trans 
     = new TGeoTranslation("", 0., 0., 0.);
   bar->AddNode(bar_alu_vol, 0, bar_alu_trans);

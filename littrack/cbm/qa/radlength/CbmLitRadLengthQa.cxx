@@ -167,12 +167,16 @@ void CbmLitRadLengthQa::ExecDetector(
       TVector3 posOut = point->GetPositionOut();
       TVector3 res = posOut - pos;
       TVector3 middle = (pos + posOut) * 0.5;
-      x = pos.X();
-      y = pos.Y();
+      //x = middle.X();
+      //y = middle.Y();
 
+      TGeoNode* nodeOut = gGeoManager->FindNode(posOut.X(), posOut.Y(), posOut.Z());
+      Bool_t isOutside = gGeoManager->IsOutside();
       TGeoNode* node = gGeoManager->FindNode(middle.X(), middle.Y(), middle.Z());
       TString path = gGeoManager->GetPath();
-      if (path.Contains(TRegexp(pathPattern.c_str()))) {
+      if (!isOutside && path.Contains(TRegexp(pathPattern.c_str()))) {
+         x = posOut.X();
+         y = posOut.Y();
          const Double_t thickness = res.Mag();
          const Double_t radThickness = 100 * thickness / point->GetRadLength();
          const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
@@ -224,8 +228,8 @@ void CbmLitRadLengthQa::ExecDetector(
       TVector3 posOut = point->GetPositionOut();
       TVector3 res = posOut - pos;
       TVector3 middle = (pos + posOut) * 0.5;
-      x = pos.X();
-      y = pos.Y();
+      //x = posOut.X();
+      //y = posOut.Y();
 
       TGeoNode* node = gGeoManager->FindNode(middle.X(), middle.Y(), middle.Z());
       TString path = gGeoManager->GetPath();
@@ -233,6 +237,8 @@ void CbmLitRadLengthQa::ExecDetector(
 
       // Check if node exists in one of the geometry versions
       if (stationId >= 0) {
+         x = posOut.X();
+         y = posOut.Y();
          const Double_t thickness = res.Mag();
          const Double_t radThickness = 100 * thickness / point->GetRadLength();
          const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;

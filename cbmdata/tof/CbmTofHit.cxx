@@ -35,12 +35,22 @@ CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Doub
   SetType(kTOFHIT);
 }
 
+CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time, Int_t flag)
+  : CbmPixelHit(detID, pos, dpos, 0., index),
+    fTime(time),
+    fFlag(flag),
+    fChannel(0)
+{
+  SetType(kTOFHIT);
+}
+
 // -----   Constructor without flag  ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time)
   : CbmPixelHit(detID, pos, dpos, 0., index),
     fTime(time),
-    fFlag(1)    
+    fFlag(1),
+    fChannel(0)    
 {
     SetType(kTOFHIT);
 }

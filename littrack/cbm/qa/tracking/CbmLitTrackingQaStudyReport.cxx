@@ -277,10 +277,10 @@ Double_t CbmLitTrackingQaStudyReport::CalcEfficiency(
    const TH1* histAcc,
    Double_t scale) const
 {
-   if (histAcc->GetEntries() == 0 || histRec->GetEntries() == 0) {
+   if (histAcc->Integral() == 0 || histRec->Integral() == 0) {
       return 0.;
    } else {
-      return scale * Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+      return scale * Double_t(histRec->Integral()) / Double_t(histAcc->Integral());
    }
 }
 

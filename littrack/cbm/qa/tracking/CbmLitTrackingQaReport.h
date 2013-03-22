@@ -140,10 +140,12 @@ protected:
     * \brief Draw Rapidity-Pt histograms.
     * \param[in] canvasName Name of canvas.
     * \param[in] effHistName Name of the efficiency histogram.
+    * \param[in] drawOnlyEfficiency Specify whether you want to draw only efficiency histo or including distributions.
     */
    void DrawYPt(
          const string& canvasName,
-         const string& effHistName);
+         const string& effHistName,
+         Bool_t drawOnlyEfficiency = false);
 
    /**
     * \brief Calculate efficiency for two histograms.

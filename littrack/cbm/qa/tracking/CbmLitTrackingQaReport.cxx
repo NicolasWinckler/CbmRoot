@@ -251,7 +251,7 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	// Draw RICH efficiency in dependence on different parameters
 	DrawEfficiency("tracking_qa_local_tracking_efficiency_Rich_RingNh", "hte_Rich_Rich_Electron_Eff_RingNh", DefaultEfficiencyLabelFormatter);
    DrawEfficiency("tracking_qa_local_tracking_efficiency_Rich_BoA", "hte_Rich_Rich_Electron_Eff_BoA", DefaultEfficiencyLabelFormatter);
-   DrawYPt("tracking_qa_Rich_Rich_Electron_Eff_RingXcYc", "hte_Rich_Rich_Electron_Eff_RingXcYc");
+   DrawYPt("tracking_qa_Rich_Rich_Electron_Eff_RingXcYc", "hte_Rich_Rich_Electron_Eff_RingXcYc", true);
 
 	// Draw local accepted and reconstructed tracks vs number of points
 	HM()->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
@@ -263,8 +263,8 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	}
 
 	//
-   DrawPionSuppression("tracking_qa_pion_suppression_wo_Rich_p", "hps_((?!Rich)).*_PionSup_p", DefaultPionSuppressionLabelFormatter);
-   DrawPionSuppression("tracking_qa_pion_suppression_with_rich_p", "hps_Rich.*_PionSup_p", DefaultPionSuppressionLabelFormatter);
+   DrawPionSuppression("tracking_qa_pion_suppression_wo_Rich_p", "hps_((?!Rich)).*All_PionSup_p", DefaultPionSuppressionLabelFormatter);
+   DrawPionSuppression("tracking_qa_pion_suppression_with_rich_p", "hps_Rich.*All_PionSup_p", DefaultPionSuppressionLabelFormatter);
 
 
    // Draw ghost RICH rings vs position on photodetector plane
@@ -386,29 +386,37 @@ void CbmLitTrackingQaReport::DrawYPtHistos()
 
 void CbmLitTrackingQaReport::DrawYPt(
       const string& canvasName,
-      const string& effHistName)
+      const string& effHistName,
+      Bool_t drawOnlyEfficiency)
 {
    string accHistName = FindAndReplace(effHistName, "_Eff_", "_Acc_");
    string recHistName = FindAndReplace(effHistName, "_Eff_", "_Rec_");
 
    if (!(HM()->Exists(effHistName) && HM()->Exists(accHistName) && HM()->Exists(recHistName))) return;
 
-   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1800, 600);
-   canvas->Divide(3, 1);
-   canvas->SetGrid();
-
    TH2* accHist = HM()->H2(accHistName);
    TH2* recHist = HM()->H2(recHistName);
    TH2* effHist = HM()->H2(effHistName);
 
-   canvas->cd(1);
-   DrawH2(accHist);
+   if (drawOnlyEfficiency){
+      TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 800);
+      //canvas->SetGrid();
+      DrawH2(effHist);
+   } else {
+      TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1800, 600);
+      canvas->Divide(3, 1);
+      canvas->SetGrid();
+      canvas->cd(1);
+      DrawH2(accHist);
 
-   canvas->cd(2);
-   DrawH2(recHist);
+      canvas->cd(2);
+      DrawH2(recHist);
 
-   canvas->cd(3);
-   DrawH2(effHist);
+      canvas->cd(3);
+      DrawH2(effHist);
+   }
+
+
 }
 
 void CbmLitTrackingQaReport::DrawHitsHistos()

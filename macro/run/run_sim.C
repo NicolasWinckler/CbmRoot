@@ -24,16 +24,17 @@ void run_sim(Int_t nEvents = 2)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString magnetGeom = "passive/magnet_v12a.geo";
   TString mvdGeom    = "mvd/mvd_v07a.geo";
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v11c.geo";
-  TString tofGeom    = "tof/tof_v07a.geo";
+  TString trdGeom    = "trd/trd_v13c.root";
+  TString tofGeom    = "tof/tof_v13b.root";
+  TString ecalGeom   = "";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_v10e";   // name of field map
+  TString fieldMap    = "field_v12a";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   
@@ -77,8 +78,6 @@ void run_sim(Int_t nEvents = 2)
   gSystem->Load("libTof");
   // -----------------------------------------------------------------------
 
- 
- 
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -148,12 +147,11 @@ void run_sim(Int_t nEvents = 2)
     fRun->AddModule(tof);
   }
   
-/*
   if ( ecalGeom != "" ) {
     FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
   }
-*/  
+  
   // ------------------------------------------------------------------------
 
 

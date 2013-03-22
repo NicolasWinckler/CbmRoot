@@ -169,5 +169,7 @@ void run()
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
+
+  exit(1);
 }  
   

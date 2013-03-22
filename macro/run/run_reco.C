@@ -43,14 +43,17 @@ void run_reco(Int_t nEvents = 2) {
   // the reconstruction.
   TList *parFileList = new TList();
 
-  TString paramDir = gSystem->Getenv("VMCWORKDIR");
-  paramDir += "/parameters";
+  TString workDir = gSystem->Getenv("VMCWORKDIR");
+  TString paramDir = workDir + "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v11a.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  TObjString trdDigiFile =  paramDir + "/trd/trd_v11c.digi.par";
+  TObjString trdDigiFile =  paramDir + "/trd/trd_v13c.digi.par";
   parFileList->Add(&trdDigiFile);
+
+  TObjString tofDigiFile =  paramDir + "/tof/tof_v13b.digi.par";
+  parFileList->Add(&tofDigiFile);
 
 
   // In general, the following parts need not be touched
@@ -91,7 +94,6 @@ void run_reco(Int_t nEvents = 2) {
   gSystem->Load("libL1");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------
-
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run = new FairRunAna();
@@ -234,8 +236,8 @@ void run_reco(Int_t nEvents = 2) {
 
 
   // ------   TOF hit producer   ---------------------------------------------
-  CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
-  		iVerbose);
+  CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("TOF HitProducerNew",iVerbose); 
+  tofHitProd->SetInitFromAscii(kFALSE);
   run->AddTask(tofHitProd);
   // -------------------------------------------------------------------------
 
@@ -340,9 +342,6 @@ void run_reco(Int_t nEvents = 2) {
 */
 
   // -----  Parameter database   --------------------------------------------
-  //  TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-  // stsDigi += "/parameters/sts/";
-  //  stsDigi += stsDigiFile;
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
@@ -360,7 +359,6 @@ void run_reco(Int_t nEvents = 2) {
   cout << "Starting run" << endl;
   run->Run(0, nEvents);
   // ------------------------------------------------------------------------
-
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

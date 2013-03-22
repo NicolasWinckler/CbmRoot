@@ -45,15 +45,13 @@ void tof_reco100(Int_t nEvents = 1000) {
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters";
 
-  //TObjString stsDigiFile = paramDir + "/sts/sts_v11a.digi.par";
   TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
   TString stsMatBudgetFileName = paramDir + "/sts/sts_matbudget_v12b.root";
 
-  TString TofGeoPar = "/parameters/tof/par_tof_V13-4a.txt";  // 6 m version 
-  TString geoDir  = gSystem->Getenv("VMCWORKDIR");
-  TString geoFile = geoDir + "/geometry/tof/tof_v13a.root";
+  TObjString tofDigiFile = paramDir + "/tof/tof_v13a.digi.par"; // TOF digi file
 
   parFileList->Add(&stsDigiFile);
+  parFileList->Add(&tofDigiFile);
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -93,12 +91,9 @@ void tof_reco100(Int_t nEvents = 1000) {
   gSystem->Load("libMinuit2"); // Needed for rich ellipse fitter
   // ------------------------------------------------------------------------
 
-  //  gLogger->SetLogScreenLevel("DEBUG2");
-
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run = new FairRunAna();
   run->SetInputFile(inFile);
-  run->SetGeomFile(geoFile);
   run->SetOutputFile(outFile);
 
   // ------------------------------------------------------------------------
@@ -184,11 +179,6 @@ void tof_reco100(Int_t nEvents = 1000) {
   // =========================================================================
   // ===                     TOF local reconstruction                      ===
   // =========================================================================
-  // ------   TOF digi producer   ---------------------------------------------
-  
-  CbmTofCreateDigiPar* tofDigiProducer = new CbmTofCreateDigiPar("TOF Digi Producer",
-                                                        "TOF task");
-  run->AddTask(tofDigiProducer);
 
   // ------   TOF hit producer   ---------------------------------------------
   CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("TOF HitProducerNew",iVerbose);
@@ -235,12 +225,12 @@ void tof_reco100(Int_t nEvents = 1000) {
   run->AddTask(produceDst);
   
 
-  CbmHadronAnalysis *HadronAna = new CbmHadronAnalysis(); // in hadron
-  HadronAna->SetBeamMomentum(8.);  // beam momentum
+//  CbmHadronAnalysis *HadronAna = new CbmHadronAnalysis(); // in hadron
+//  HadronAna->SetBeamMomentum(8.);  // beam momentum
   //HadronAna->SetBSelMax(11.);      // maximum impact parameter to be analyzed  
-  HadronAna->SetDY(0.5);           // flow analysis exclusion window  
+//  HadronAna->SetDY(0.5);           // flow analysis exclusion window  
 
-  run->AddTask(HadronAna);
+//  run->AddTask(HadronAna);
 
   // ===                      End of global tracking                       ===
   // =========================================================================

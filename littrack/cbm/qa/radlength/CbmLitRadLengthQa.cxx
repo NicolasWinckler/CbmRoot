@@ -347,6 +347,7 @@ void CbmLitRadLengthQa::SaveDetectorMaterialBudgetToFile(
    vector<TH1*> histos = fHM->H1Vector(pattern);
    if (histos.empty()) return;
    TFile* oldFile = gFile;
+   TDirectory* oldDirectory = gDirectory;
    TFile* file = new TFile(string(fOutputDir + "/" + boost::algorithm::to_lower_copy(detName) + ".silicon.root").c_str(), "RECREATE");
    for (vector<TH1*>::const_iterator it = histos.begin(); it != histos.end(); it++) {
       (*it)->Write();
@@ -354,5 +355,6 @@ void CbmLitRadLengthQa::SaveDetectorMaterialBudgetToFile(
    file->Close();
    delete file;
    gFile = oldFile;
+   gDirectory = oldDirectory;
 }
 ClassImp(CbmLitRadLengthQa);

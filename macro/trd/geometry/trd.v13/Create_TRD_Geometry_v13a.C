@@ -3,6 +3,8 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// 2013-03-26 - DE - put support structure into its own assembly
+// 2013-03-26 - DE - move TRD upstream to z=400m
 // 2013-03-06 - DE - add ASICs on FEBs
 // 2013-03-05 - DE - introduce supports for SIS100 and SIS300
 // 2013-03-05 - DE - replace all Float_t by Double_t
@@ -12,7 +14,8 @@
 // 2012-11-04 - DE - add kapton foil, add FR4 padplane
 // 2012-11-03 - DE - add lattice grid on entrance window as CompositeShape
 
-// TODO: use Silicon as ASICs material
+// TODO: 
+// - use Silicon (or Air) as ASICs material
 
 // in root all sizes are diven in cm
 
@@ -43,7 +46,7 @@ const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is inc
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 const Bool_t IncludeAsics    = false;  // false;  // true, if ASICs are included in geometry
-const Bool_t IncludeSupports = false;  // false;  // true, if support structure is included in geometry
+const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -94,8 +97,10 @@ const Int_t    LayerType[NofLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 }
 const Double_t LayerNrInStation[NofLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
  
+// just behind RICH v13a at z=400
+//const Double_t LayerPosition[NofLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };   // z position in cm of Layer front
 // 3 stations, no gap between TRD stations
-const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // z position in cm of Layer front
+const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // v13c // z position in cm of Layer front
 // 3 stations, 25 cm gap
 //const Double_t LayerPosition[NofLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 // equal spacing
@@ -1018,6 +1023,9 @@ void create_detector_layers(Int_t layerId)
 
 void create_supports()
 {
+  const TString trdSupport = "trd_support";
+  TGeoVolume* trdsupport = new TGeoVolumeAssembly(trdSupport);
+
   TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
 
   const Double_t x[12] = { -15,-15, -1, -1,-15,-15, 15, 15,  1,  1, 15, 15 };  // IPB 400
@@ -1082,18 +1090,18 @@ void create_supports()
       trd1_H_vert1->DefinePolygon(12,x,y);
       trd1_H_vert1->DefineSection( 0,-(AperY[0]+Hhei), 0, 0, 1.0);
       trd1_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);  
-      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
+      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_y_01", trd1_H_vert1, aluminiumVolMed);
       trd1_H_vert_vol1->SetLineColor(kYellow);
       PilPosX = AperX[0];
     
       TGeoCombiTrans* trd1_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[0], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 11, trd1_H_vert_combi01);
+      trdsupport->AddNode(trd1_H_vert_vol1, 11, trd1_H_vert_combi01);
       TGeoCombiTrans* trd1_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[0], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 12, trd1_H_vert_combi02);
+      trdsupport->AddNode(trd1_H_vert_vol1, 12, trd1_H_vert_combi02);
       TGeoCombiTrans* trd1_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[1], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 13, trd1_H_vert_combi03);
+      trdsupport->AddNode(trd1_H_vert_vol1, 13, trd1_H_vert_combi03);
       TGeoCombiTrans* trd1_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[1], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 14, trd1_H_vert_combi04);
+      trdsupport->AddNode(trd1_H_vert_vol1, 14, trd1_H_vert_combi04);
     }
 
   // station 2
@@ -1103,20 +1111,19 @@ void create_supports()
       trd1_H_vert1->DefinePolygon(12,x,y);
       trd1_H_vert1->DefineSection( 0,-(AperY[1]+Hhei), 0, 0, 1.0);
       trd1_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);
-      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
+      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_y_02", trd1_H_vert1, aluminiumVolMed);
       trd1_H_vert_vol1->SetLineColor(kYellow);
       PilPosX = AperX[1];
     
       TGeoCombiTrans* trd1_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[2], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 21, trd1_H_vert_combi01);
+      trdsupport->AddNode(trd1_H_vert_vol1, 21, trd1_H_vert_combi01);
       TGeoCombiTrans* trd1_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[2], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 22, trd1_H_vert_combi02);
+      trdsupport->AddNode(trd1_H_vert_vol1, 22, trd1_H_vert_combi02);
       TGeoCombiTrans* trd1_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[3], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 23, trd1_H_vert_combi03);
+      trdsupport->AddNode(trd1_H_vert_vol1, 23, trd1_H_vert_combi03);
       TGeoCombiTrans* trd1_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[3], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 24, trd1_H_vert_combi04);
+      trdsupport->AddNode(trd1_H_vert_vol1, 24, trd1_H_vert_combi04);
     }
-
 
   // station 3
   if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
@@ -1125,18 +1132,18 @@ void create_supports()
       trd1_H_vert1->DefinePolygon(12,x,y);
       trd1_H_vert1->DefineSection( 0,-(AperY[2]+Hhei), 0, 0, 1.0);
       trd1_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);
-      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_vert01", trd1_H_vert1, aluminiumVolMed);
+      TGeoVolume* trd1_H_vert_vol1 = new TGeoVolume("trd1_H_y_03", trd1_H_vert1, aluminiumVolMed);
       trd1_H_vert_vol1->SetLineColor(kYellow);
       PilPosX = AperX[2];
       
       TGeoCombiTrans* trd1_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[4], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 31, trd1_H_vert_combi01);
+      trdsupport->AddNode(trd1_H_vert_vol1, 31, trd1_H_vert_combi01);
       TGeoCombiTrans* trd1_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[4], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 32, trd1_H_vert_combi02);
+      trdsupport->AddNode(trd1_H_vert_vol1, 32, trd1_H_vert_combi02);
       TGeoCombiTrans* trd1_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[5], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 33, trd1_H_vert_combi03);
+      trdsupport->AddNode(trd1_H_vert_vol1, 33, trd1_H_vert_combi03);
       TGeoCombiTrans* trd1_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[5], rotzx01);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_vert_vol1, 34, trd1_H_vert_combi04);
+      trdsupport->AddNode(trd1_H_vert_vol1, 34, trd1_H_vert_combi04);
     }
 
 
@@ -1151,18 +1158,18 @@ void create_supports()
       trd1_H_hori1->DefinePolygon(12,x,y);
       trd1_H_hori1->DefineSection( 0,-AperX[0], 0, 0, 1.0);
       trd1_H_hori1->DefineSection( 1, AperX[0], 0, 0, 1.0);
-      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
+      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_x_01", trd1_H_hori1, aluminiumVolMed);
       trd1_H_hori_vol1->SetLineColor(kRed);
       BarPosY = AperY[0];
     
       TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[0], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 11, trd1_H_hori_combi01);
+      trdsupport->AddNode(trd1_H_hori_vol1, 11, trd1_H_hori_combi01);
       TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[0], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 12, trd1_H_hori_combi02);
+      trdsupport->AddNode(trd1_H_hori_vol1, 12, trd1_H_hori_combi02);
       TGeoCombiTrans* trd1_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[1], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 13, trd1_H_hori_combi03);
+      trdsupport->AddNode(trd1_H_hori_vol1, 13, trd1_H_hori_combi03);
       TGeoCombiTrans* trd1_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[1], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 14, trd1_H_hori_combi04);
+      trdsupport->AddNode(trd1_H_hori_vol1, 14, trd1_H_hori_combi04);
     }
 
   // station 2
@@ -1172,18 +1179,18 @@ void create_supports()
       trd1_H_hori1->DefinePolygon(12,x,y);
       trd1_H_hori1->DefineSection( 0,-AperX[1], 0, 0, 1.0);
       trd1_H_hori1->DefineSection( 1, AperX[1], 0, 0, 1.0);
-      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
+      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_x_02", trd1_H_hori1, aluminiumVolMed);
       trd1_H_hori_vol1->SetLineColor(kRed);
       BarPosY = AperY[1];
     
       TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[2], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 21, trd1_H_hori_combi01);
+      trdsupport->AddNode(trd1_H_hori_vol1, 21, trd1_H_hori_combi01);
       TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[2], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 22, trd1_H_hori_combi02);
+      trdsupport->AddNode(trd1_H_hori_vol1, 22, trd1_H_hori_combi02);
       TGeoCombiTrans* trd1_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[3], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 23, trd1_H_hori_combi03);
+      trdsupport->AddNode(trd1_H_hori_vol1, 23, trd1_H_hori_combi03);
       TGeoCombiTrans* trd1_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[3], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 24, trd1_H_hori_combi04);
+      trdsupport->AddNode(trd1_H_hori_vol1, 24, trd1_H_hori_combi04);
     }
 
   // station 3
@@ -1193,18 +1200,18 @@ void create_supports()
       trd1_H_hori1->DefinePolygon(12,x,y);
       trd1_H_hori1->DefineSection( 0,-AperX[2], 0, 0, 1.0);
       trd1_H_hori1->DefineSection( 1, AperX[2], 0, 0, 1.0);
-      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_hori01", trd1_H_hori1, aluminiumVolMed);
+      TGeoVolume* trd1_H_hori_vol1 = new TGeoVolume("trd1_H_x_03", trd1_H_hori1, aluminiumVolMed);
       trd1_H_hori_vol1->SetLineColor(kRed);
       BarPosY = AperY[2];
     
       TGeoCombiTrans* trd1_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[4], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 31, trd1_H_hori_combi01);
+      trdsupport->AddNode(trd1_H_hori_vol1, 31, trd1_H_hori_combi01);
       TGeoCombiTrans* trd1_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[4], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 32, trd1_H_hori_combi02);
+      trdsupport->AddNode(trd1_H_hori_vol1, 32, trd1_H_hori_combi02);
       TGeoCombiTrans* trd1_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[5], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 33, trd1_H_hori_combi03);
+      trdsupport->AddNode(trd1_H_hori_vol1, 33, trd1_H_hori_combi03);
       TGeoCombiTrans* trd1_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[5], roty090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_hori_vol1, 34, trd1_H_hori_combi04);
+      trdsupport->AddNode(trd1_H_hori_vol1, 34, trd1_H_hori_combi04);
     }
 
 
@@ -1219,19 +1226,19 @@ void create_supports()
       trd1_H_slope1->DefinePolygon(12,x,y);
       trd1_H_slope1->DefineSection( 0,-(PilPosZ[1]-PilPosZ[0]-Hwid)/2., 0, 0, 1.0);
       trd1_H_slope1->DefineSection( 1,+(PilPosZ[1]-PilPosZ[0]-Hwid)/2., 0, 0, 1.0);
-      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_z_01", trd1_H_slope1, aluminiumVolMed);
       trd1_H_slope_vol1->SetLineColor(kGreen);
       PilPosX = AperX[0];
       BarPosY = AperY[0];
         
       TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 11, trd1_H_slope_combi01);
+      trdsupport->AddNode(trd1_H_slope_vol1, 11, trd1_H_slope_combi01);
       TGeoCombiTrans* trd1_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 12, trd1_H_slope_combi02);
+      trdsupport->AddNode(trd1_H_slope_vol1, 12, trd1_H_slope_combi02);
       TGeoCombiTrans* trd1_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 13, trd1_H_slope_combi03);
+      trdsupport->AddNode(trd1_H_slope_vol1, 13, trd1_H_slope_combi03);
       TGeoCombiTrans* trd1_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 14, trd1_H_slope_combi04);
+      trdsupport->AddNode(trd1_H_slope_vol1, 14, trd1_H_slope_combi04);
     }
 
   // station 2
@@ -1241,19 +1248,19 @@ void create_supports()
       trd1_H_slope1->DefinePolygon(12,x,y);
       trd1_H_slope1->DefineSection( 0,-(PilPosZ[3]-PilPosZ[2]-Hwid)/2., 0, 0, 1.0);
       trd1_H_slope1->DefineSection( 1,+(PilPosZ[3]-PilPosZ[2]-Hwid)/2., 0, 0, 1.0);
-      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_z_02", trd1_H_slope1, aluminiumVolMed);
       trd1_H_slope_vol1->SetLineColor(kGreen);
       PilPosX = AperX[1];
       BarPosY = AperY[1];
         
       TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 21, trd1_H_slope_combi01);
+      trdsupport->AddNode(trd1_H_slope_vol1, 21, trd1_H_slope_combi01);
       TGeoCombiTrans* trd1_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 22, trd1_H_slope_combi02);
+      trdsupport->AddNode(trd1_H_slope_vol1, 22, trd1_H_slope_combi02);
       TGeoCombiTrans* trd1_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 23, trd1_H_slope_combi03);
+      trdsupport->AddNode(trd1_H_slope_vol1, 23, trd1_H_slope_combi03);
       TGeoCombiTrans* trd1_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 24, trd1_H_slope_combi04);
+      trdsupport->AddNode(trd1_H_slope_vol1, 24, trd1_H_slope_combi04);
     }
 
   // station 3
@@ -1263,20 +1270,22 @@ void create_supports()
       trd1_H_slope1->DefinePolygon(12,x,y);
       trd1_H_slope1->DefineSection( 0,-(PilPosZ[5]-PilPosZ[4]-Hwid)/2., 0, 0, 1.0);
       trd1_H_slope1->DefineSection( 1,+(PilPosZ[5]-PilPosZ[4]-Hwid)/2., 0, 0, 1.0);
-      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_slope01", trd1_H_slope1, aluminiumVolMed);
+      TGeoVolume* trd1_H_slope_vol1 = new TGeoVolume("trd1_H_z_03", trd1_H_slope1, aluminiumVolMed);
       trd1_H_slope_vol1->SetLineColor(kGreen);
       PilPosX = AperX[2];
       BarPosY = AperY[2];
         
       TGeoCombiTrans* trd1_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 31, trd1_H_slope_combi01);
+      trdsupport->AddNode(trd1_H_slope_vol1, 31, trd1_H_slope_combi01);
       TGeoCombiTrans* trd1_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 32, trd1_H_slope_combi02);
+      trdsupport->AddNode(trd1_H_slope_vol1, 32, trd1_H_slope_combi02);
       TGeoCombiTrans* trd1_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 33, trd1_H_slope_combi03);
+      trdsupport->AddNode(trd1_H_slope_vol1, 33, trd1_H_slope_combi03);
       TGeoCombiTrans* trd1_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
-      gGeoMan->GetVolume(geoVersion)->AddNode(trd1_H_slope_vol1, 34, trd1_H_slope_combi04);
+      trdsupport->AddNode(trd1_H_slope_vol1, 34, trd1_H_slope_combi04);
     }
+
+  gGeoMan->GetVolume(geoVersion)->AddNode(trdsupport,1);
 
 }
 

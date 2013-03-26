@@ -22,8 +22,10 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using std::vector;
+using std::for_each;
 
 CbmLitFitTracksParallel::CbmLitFitTracksParallel():
    FairTask(),

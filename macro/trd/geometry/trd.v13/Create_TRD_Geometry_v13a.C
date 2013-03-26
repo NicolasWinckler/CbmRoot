@@ -3,6 +3,7 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// 2013-03-26 - DE - use Air as ASICs material
 // 2013-03-26 - DE - put support structure into its own assembly
 // 2013-03-26 - DE - move TRD upstream to z=400m
 // 2013-03-06 - DE - add ASICs on FEBs
@@ -15,7 +16,7 @@
 // 2012-11-03 - DE - add lattice grid on entrance window as CompositeShape
 
 // TODO: 
-// - use Silicon (or Air) as ASICs material
+// - use Silicon as ASIC material
 
 // in root all sizes are diven in cm
 
@@ -45,7 +46,7 @@ const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is include
 const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
-const Bool_t IncludeAsics    = false;  // false;  // true, if ASICs are included in geometry
+const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
 const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
@@ -263,6 +264,7 @@ const TString PadPcbVolumeMedium      = "TRDG10";    // todo - put correct FEB m
 const TString HoneycombVolumeMedium   = "TRDaramide";
 const TString CarbonVolumeMedium      = "TRDcarbon";
 const TString FebVolumeMedium         = "TRDG10";    // todo - put correct FEB material here
+const TString AsicVolumeMedium        = "air";       // todo - put correct ASIC material here
 const TString FrameVolumeMedium       = "TRDG10";
 const TString AluminiumVolumeMedium   = "aluminium";
 //const TString MylarVolumeMedium       = "mylar";
@@ -403,6 +405,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 //  TGeoMedium* electronicsVolMed = gGeoMan->GetMedium(ElectronicsVolumeMedium);
   TGeoMedium* frameVolMed       = gGeoMan->GetMedium(FrameVolumeMedium);
   TGeoMedium* febVolMed         = gGeoMan->GetMedium(FebVolumeMedium);
+  TGeoMedium* asicVolMed        = gGeoMan->GetMedium(AsicVolumeMedium);
 //  TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);
 
   TString name = Form("trd1mod%d", moduleType);
@@ -795,7 +798,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
         // put many ASICs on each inclined FEB
         TGeoBBox* trd_asic = new TGeoBBox("", asic_width/2., asic_thickness/2., asic_width/2.);              // ASIC dimensions
         // TODO: use Silicon as ASICs material
-        TGeoVolume* trdmod1_asic = new TGeoVolume(Form("trd1mod%dasic", moduleType), trd_asic, febVolMed);   // the ASIC made of a certain medium
+        TGeoVolume* trdmod1_asic = new TGeoVolume(Form("trd1mod%dasic", moduleType), trd_asic, asicVolMed);   // the ASIC made of a certain medium
         trdmod1_asic->SetLineColor(kBlue);                                                                   // set blue color for ASICs
   
         Int_t nofAsics   = AsicsPerFeb[ moduleType - 1 ] % 100;

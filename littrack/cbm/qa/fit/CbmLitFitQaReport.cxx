@@ -94,7 +94,7 @@ string CbmLitFitQaReport::PrintResAndPullRow(
 		} else if (propertyName == "rms") {
 		   parameters[parIndex] = NumberToString<Float_t>(histos[iHist]->GetRMS(), 2);
 		} else if (propertyName == "sigma") {
-		   histos[iHist]->Fit("gaus");
+		   histos[iHist]->Fit("gaus", "RQ");
 		   TF1* fit = histos[iHist]->GetFunction("gaus");
 		   parameters[parIndex] = NumberToString<Float_t>((NULL != fit) ? fit->GetParameter(2) : 0., 2);
 		}
@@ -147,7 +147,7 @@ void CbmLitFitQaReport::DrawResidualAndPullHistograms(
 			   DrawH1(hist, kLinear, kLog);
 
 			   if (histId < 10) { // Fit only residual and pull histograms
-				   hist->Fit("gaus");
+				   hist->Fit("gaus", "RQ");
 				   hist->SetMaximum(hist->GetMaximum() * 1.50);
 				   TF1* fit = hist->GetFunction("gaus");
 				   Double_t sigma = (NULL != fit) ? fit->GetParameter(2) : 0.;
@@ -172,7 +172,7 @@ void CbmLitFitQaReport::DrawTrackParamsAtVertex()
    TH1* projY = HM()->H2("htf_MomRes_Mom")->ProjectionY("htf_MomRes_Mom_ProjectionY");
    DrawH1(projY, kLinear, kLinear);
    projY->SetStats(true);
-   projY->Fit("gaus");
+   projY->Fit("gaus", "RQ");
    projY->SetMaximum(projY->GetMaximum() * 1.25);
    gPad->SetGridx(true);
    gPad->SetGridy(true);

@@ -38,13 +38,13 @@ public:
     * \brief Returns Z position of the grid.
     * \return Z position of the grid.
     */
-   fscal GetZ() const { return fZ; }
+ //  fscal GetZ() const { return fZ; }
 
    /**
     * \brief Sets Z position of the grid.
     * \param[in] Z position of the grid.
     */
-   void SetZ(fscal Z) { fZ = Z; }
+ //  void SetZ(fscal Z) { fZ = Z; }
 
    /**
     * \brief Set material thicknesses for the grid.
@@ -156,15 +156,22 @@ public:
    }
 
    /**
+    * \brief Check if material was set.
+    */
+   bool IsEmpty() const {
+      return fMaterial.empty();
+   }
+
+   /**
     * \brief Return string representation of the class.
     * \return String representation of the class.
     */
    string ToString() const {
       stringstream ss;
-      ss << "LitFieldGrid: Z=" << fZ << " Xmin=" << fXMin << " Xmax=" << fXMax
+      ss << "LitMaterialGrid: Z=" /* << fZ*/ << " Xmin=" << fXMin << " Xmax=" << fXMax
          << " Ymin=" << fYMin << " Ymax=" << fYMax << " nofBinsX=" << fNofBinsX
          << " nofBinsY=" << fNofBinsY << " binSizeX=" << fBinSizeX
-         << " binSizeY=" << fBinSizeY << " material.size=" << fMaterial.size() + "\n";
+         << " binSizeY=" << fBinSizeY << " material.size=" << fMaterial.size();
       return ss.str();
    }
 
@@ -180,7 +187,7 @@ public:
 private:
    fscal fXMin, fXMax; // Maximum and minimum grid size in X [cm]
    fscal fYMin, fYMax; // Maximum and minimum grid size in Y [cm]
-   fscal fZ; // Z position of grid slice
+//   fscal fZ; // Z position of grid slice
    unsigned short fNofBinsX; // Number of bins along X
    unsigned short fNofBinsY; // Number of bins along Y
    fscal fBinSizeX; // Bin size along X [cm]

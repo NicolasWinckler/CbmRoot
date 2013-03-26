@@ -14,6 +14,8 @@ using std::stringstream;
 using std::string;
 using std::ostream;
 
+namespace lit {
+namespace parallel {
 /**
  * \class LitPixelHit
  * \brief Base class for pixel hits.
@@ -81,4 +83,6 @@ typedef LitPixelHit<fscal> LitPixelHitScal;
  */
 typedef LitPixelHit<fvec> LitPixelHitVec;
 
+} // namespace parallel
+} // namespace lit
 #endif /* LITPIXELHIT_H_ */

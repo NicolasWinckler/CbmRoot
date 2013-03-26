@@ -14,6 +14,9 @@ using std::stringstream;
 using std::ostream;
 using std::string;
 
+namespace lit {
+namespace parallel {
+
 /**
  * \class LitScalPixelHit
  * \brief Base class for scalar pixel hits.
@@ -74,5 +77,6 @@ public:
    fscal Z; // Z position [cm]
 };
 
-
+} // namespace parallel
+} // namespace lit
 #endif /* LITSCALPIXELHIT_H_ */

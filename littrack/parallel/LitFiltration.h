@@ -10,7 +10,10 @@
 #ifndef LITFILTRATION_H_
 #define LITFILTRATION_H_
 
-#include "LitHit.h"
+#include "LitPixelHit.h"
+#include "LitStripHit.h"
+#include "LitScalPixelHit.h"
+#include "LitTrackParam.h"
 
 namespace lit {
 namespace parallel {
@@ -176,6 +179,28 @@ inline void LitFiltration(
    // Calculate chi-square
    T ru = hit.U - par.X * hit.phiCos - par.Y * hit.phiSin;
    chiSq = (ru * ru) / (duu - phiCosSq * par.C0 - phi2SinCos * par.C1 - phiSinSq * par.C5);
+}
+
+/**
+ * \fn inline void LitFiltration (LitTrackParamScal& par, const LitScalPixelHit &hit, T& chiSq)
+ * \brief Function implements Kalman filter update step for scalar pixel hit. *
+ * \param[in,out] par Reference to track parameters.
+ * \param[in] hit Reference to scalar pixel hit.
+ * \param[out] chiSq Contribution to chi-square.
+ */
+inline void LitFiltration (
+   LitTrackParamScal& par,
+   const LitScalPixelHit &hit,
+   fscal& chiSq)
+{
+   LitPixelHitScal pixelHit;
+   pixelHit.X = hit.X;
+   pixelHit.Y = hit.Y;
+   pixelHit.Z = hit.Z;
+   pixelHit.Dx = hit.Dx;
+   pixelHit.Dy = hit.Dy;
+   pixelHit.Dxy = hit.Dxy;
+   LitFiltration<fscal>(par, pixelHit, chiSq);
 }
 
 } // namespace parallel

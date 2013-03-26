@@ -178,6 +178,13 @@ public:
    }
 
    /**
+    * \brief Check if field was set.
+    */
+   bool IsEmpty() const {
+      return fField.empty();
+   }
+
+   /**
     * \brief Returns string representation of the class.
     * \return String representation of the class.
     */
@@ -186,7 +193,7 @@ public:
       ss << "LitFieldGrid: Z=" << fZ << " Xmin=" << fXMin << " Xmax=" << fXMax
          << " Ymin=" << fYMin << " Ymax=" << fYMax << " nofBinsX=" << fNofBinsX
          << " nofBinsY=" << fNofBinsY << " binSizeX=" << fBinSizeX
-         << " binSizeY=" << fBinSizeY << " field.size=" << fField.size() + "\n";
+         << " binSizeY=" << fBinSizeY << " field.size=" << fField.size();
       return ss.str();
    }
 

@@ -44,6 +44,11 @@ private:
      */
     void ReadDataBranches();
 
+    /**
+     * \brief Performs track fit.
+     */
+    void DoFit();
+
     // Data branches
     TClonesArray* fGlobalTracks;
     TClonesArray* fStsTracks;

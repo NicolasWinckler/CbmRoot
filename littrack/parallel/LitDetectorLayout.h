@@ -100,14 +100,14 @@ public:
     */
    string ToString() const {
       stringstream ss;
-      ss << "LitStation: \n";
-      ss << "   virtual stations: nofVirtualStations=" << (int)GetNofVirtualStations() << "\n";
+      ss << "LitDetectorLayout: \n";
+      ss << "virtual stations: nofVirtualStations=" << (int)GetNofVirtualStations() << "\n";
       for (unsigned char i = 0; i < GetNofVirtualStations(); i++) {
-         ss << "      " << (int)i << " " << GetVirtualStation(i).ToString();
+         ss << (int)i << " " << GetVirtualStation(i).ToString() << "\n";
       }
-      ss << "   station groups: nofStations=" << (int)GetNofStations() << "\n";
+      ss << "stations: nofStations=" << (int)GetNofStations() << "\n";
       for (unsigned char i = 0; i < GetNofStations(); i++) {
-         ss << "      " << (int)i << " " << GetStation(i).ToString();
+         ss << (int)i << " " << GetStation(i).ToString() << "\n";
       }
       return ss.str();
    }

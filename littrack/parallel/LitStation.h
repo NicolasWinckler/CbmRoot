@@ -61,8 +61,8 @@ public:
    string ToString() const {
       stringstream ss;
       ss << "LitStation: Z=" << GetZ() << "\n";
-      ss << "material: " << GetMaterial().ToString();
-      ss << "field: " << GetField().ToString();
+      ss << "   material: " << GetMaterial().ToString() << "\n";
+      ss << "   field: " << GetField().ToString();
       return ss.str();
    }
 

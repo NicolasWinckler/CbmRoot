@@ -23,6 +23,8 @@
 #include "TGeoArb8.h"
 #include "TGeoPgon.h"
 #include "TProfile2D.h"
+#include "TFile.h"
+#include "TDirectory.h"
 
 #include <set>
 #include <map>
@@ -195,7 +197,9 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
    // Read file with TProfile2D containing silicon equivalent of the material
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TString matBudgetFile = parDir + "/littrack/trd.silicon.root";
-   TFile* file = new TFile(matBudgetFile);
+   TFile* oldFile = gFile;
+   TDirectory* oldDirectory = gDirectory;
+   TFile* file = new TFile(matBudgetFile, "READ");
    CbmHistManager hm;
    hm.ReadFromFile(file);
 
@@ -206,7 +210,7 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
    Double_t dZ = 10.; // Distance between neighboring virtual stations
 
    // Virtual stations
-   Int_t nofVirtualStations = 30;
+   Int_t nofVirtualStations = 31;
    for (Int_t iStation = 0; iStation < nofVirtualStations; iStation++) {
       Double_t z = startZPosition + iStation * dZ;
       lit::parallel::LitFieldGrid fieldGrid;
@@ -233,6 +237,11 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
       layout.AddStation(station);
    }
 
+   gFile = oldFile;
+   gDirectory = oldDirectory;
+   delete file;
+
+   cout << layout;
    cout << "Finish getting TRD layout for parallel version of tracking\n";
 }
 

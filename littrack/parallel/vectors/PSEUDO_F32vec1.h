@@ -10,15 +10,15 @@
  *
  **********************************/
 
-const union {
-   int i[1];
-   float m;
-}
-__f32vec1_true_cheat     = {0xFFFFFFFF},
-__f32vec1_false_cheat    = {0x00000000};
+//const union {
+//   int i[1];
+//   float m;
+//}
+//__f32vec1_true_cheat     = {0xFFFFFFFF},
+//__f32vec1_false_cheat    = {0x00000000};
 
-#define _f32vec1_true     ((F32vec1)__f32vec1_true_cheat.m)
-#define _f32vec1_false    ((F32vec1)__f32vec1_false_cheat.m)
+//#define _f32vec1_true     ((F32vec1)__f32vec1_true_cheat.m)
+//#define _f32vec1_false    ((F32vec1)__f32vec1_false_cheat.m)
 
 class F32vec1
 {
@@ -95,8 +95,8 @@ public:
 typedef F32vec1 fvec;
 const int fvecLen = 1;
 typedef float  fscal;
-#define fvec_true  _f32vec1_true
-#define fvec_false _f32vec1_false
+//#define fvec_true  _f32vec1_true
+//#define fvec_false _f32vec1_false
 #define _fvecalignment
 
 #endif

@@ -66,5 +66,5 @@ void CbmLitFieldGridCreator::CreateGrid(
    }
    grid.SetZ(Z);
    grid.SetField(field, -Xmax, Xmax, -Ymax, Ymax, nofCellsX, nofCellsY);
-   std::cout << "Grid created: " << grid;
+   std::cout << "Grid created: " << grid << "\n";
 }

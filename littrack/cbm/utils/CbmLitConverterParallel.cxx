@@ -6,7 +6,11 @@
 
 #include "CbmLitConverterParallel.h"
 #include "parallel/LitTrackParam.h"
+#include "CbmTrack.h"
+#include "CbmPixelHit.h"
 #include "FairTrackParam.h"
+
+#include <cassert>
 
 
 CbmLitConverterParallel::CbmLitConverterParallel()
@@ -77,3 +81,79 @@ void CbmLitConverterParallel::LitTrackParamScalToFairTrackParam(
    par->SetCovMatrix(cov);
 }
 
+void CbmLitConverterParallel::CbmPixelHitToLitScalPixelHit(
+      const CbmPixelHit* hit,
+      lit::parallel::LitScalPixelHit* lhit)
+{
+   assert(hit->GetType() == kTRDHIT || hit->GetType() == kMUCHPIXELHIT || hit->GetType() == kTOFHIT);
+
+   lhit->X = hit->GetX();
+   lhit->Y = hit->GetY();
+   lhit->Z = hit->GetZ();
+   lhit->Dx = hit->GetDx();
+   lhit->Dy = hit->GetDy();
+   lhit->Dxy = hit->GetDxy();
+   lhit->refId = hit->GetRefId();
+
+   if (hit->GetType() == kTRDHIT) {
+      lhit->stationId = hit->GetPlaneId() - 1;
+   } else if (hit->GetType() == kMUCHPIXELHIT) {
+      lhit->stationId = (hit->GetPlaneId() - 1) / 2;
+   } else if (hit->GetType() == kTOFHIT) {
+      lhit->stationId = 0;
+   }
+}
+
+void CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(
+      const TClonesArray* hits,
+      vector<lit::parallel::LitScalPixelHit*>& lhits)
+{
+   Int_t nofHits = hits->GetEntriesFast();
+   for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+      const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(hits->At(iHit));
+      lit::parallel::LitScalPixelHit* lhit = new lit::parallel::LitScalPixelHit();
+      CbmPixelHitToLitScalPixelHit(hit, lhit);
+      lhits.push_back(lhit);
+   }
+}
+
+void CbmLitConverterParallel::CbmTrackToLitScalTrack(
+      const CbmTrack* track,
+      const vector<lit::parallel::LitScalPixelHit*>& lhits,
+      lit::parallel::LitScalTrack* ltrack)
+{
+   // Convert hits
+   Int_t nofHits = track->GetNofHits();
+   for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+      // Now we convert only pixel hits
+      if (track->GetHitType(iHit) != kPIXELHIT && track->GetHitType(iHit) != kTRDHIT && track->GetHitType(iHit) != kMUCHPIXELHIT) continue;
+      Int_t hitId = track->GetHitIndex(iHit);
+      ltrack->AddHit(lhits[hitId]);
+   }
+   // Convert first and last track parameter
+   lit::parallel::LitTrackParamScal lpar;
+   FairTrackParamToLitTrackParamScal(track->GetParamFirst(), &lpar);
+   ltrack->SetParamFirst(lpar);
+   FairTrackParamToLitTrackParamScal(track->GetParamLast(), &lpar);
+   ltrack->SetParamFirst(lpar);
+   // Convert other parameters
+   ltrack->SetChiSq(track->GetChiSq());
+   ltrack->SetNDF(track->GetNDF());
+   ltrack->SetPreviousTrackId(track->GetPreviousTrackId());
+   ltrack->SetNofMissingHits(0);
+   ltrack->IsGood(true);
+}
+
+void CbmLitConverterParallel::CbmTrackArrayToLitScalTrackArray(
+      const TClonesArray* tracks,
+      const vector<lit::parallel::LitScalPixelHit*>& lhits,
+      vector<lit::parallel::LitScalTrack*>& ltracks)
+{
+   Int_t nofTracks = tracks->GetEntriesFast();
+   for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+      const CbmTrack* track = static_cast<const CbmTrack*>(tracks->At(iTrack));
+      lit::parallel::LitScalTrack* ltrack = new lit::parallel::LitScalTrack();
+      CbmTrackToLitScalTrack(track, lhits, ltrack);
+      ltracks.push_back(ltrack);
+   }
+}

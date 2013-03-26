@@ -3,9 +3,11 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
-// 2013-03-26 - DE - use Air as ASICs material
+// 2013-03-26 - DE - use Air as ASIC material
 // 2013-03-26 - DE - put support structure into its own assembly
 // 2013-03-26 - DE - move TRD upstream to z=400m
+// 2013-03-26 - DE - RICH will probably end at z=380 cm, TRD can move to 400 cm
+// 2013-03-25 - DE - shrink active area from 570 to 540 mm and 960 to 910 mm
 // 2013-03-06 - DE - add ASICs on FEBs
 // 2013-03-05 - DE - introduce supports for SIS100 and SIS300
 // 2013-03-05 - DE - replace all Float_t by Double_t
@@ -193,11 +195,17 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 // Parameters defining the layout of the different detector modules
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
-//
-const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 };  // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
-////const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,210,210,108,108,108,108 }; // play version
-//
+
+// ultimate density
+const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  5,  3,  2,  1 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,216,216 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+////
+//const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  3, 10,  5,  3,  3 }; // min (6) module types // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+//// super density
+//const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+//// normal density
 //const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
 //
@@ -206,11 +214,16 @@ const Double_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 // ASIC parameters
 const Double_t asic_thickness = 0.25; // feb_thickness; // * 8.0; // 2.5 mm
 const Double_t asic_width     = 3.0;  // 2.0;  1.0;   // 1 cm
-const Double_t asic_distance  = 0.4;  // 0.40; // a factor of width for ASIC pairs
+//const Double_t asic_distance  = 0.4;  // 0.40; // a factor of width for ASIC pairs
+Double_t asic_distance; //  = 0.40; // for 10 ASICs - a factor of width for ASIC pairs
 
 const Double_t FrameWidth[2]    = { 1.5, 2.0 };   // Width of detector frames in cm
-const Double_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
-const Double_t DetectorSizeY[2] = { 60., 100.};   // quadratic modules
+// mini - production
+const Double_t DetectorSizeX[2] = { 57., 95.};   // => 54 x 54 cm2 & 91 x 91 cm2 active area
+const Double_t DetectorSizeY[2] = { 57., 95.};   // quadratic modules
+//// default
+//const Double_t DetectorSizeX[2] = { 60., 100.};   // => 57 x 57 cm2 & 96 x 96 cm2 active area
+//const Double_t DetectorSizeY[2] = { 60., 100.};   // quadratic modules
 
 // Parameters tor the lattice grid reinforcing the entrance window
 const Double_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice frame in cm
@@ -804,9 +817,14 @@ TGeoVolume* create_trd_module(Int_t moduleType)
         Int_t nofAsics   = AsicsPerFeb[ moduleType - 1 ] % 100;
         Int_t groupAsics = AsicsPerFeb[ moduleType - 1 ] / 100;   // either 1 or 2
 
+        if ((nofAsics == 16) && (activeAreaX < 60))
+          asic_distance = 0.0;  // for 57 cm  // 0.1;  // for 60 cm
+        else
+          asic_distance = 0.4;
+
         for (Int_t iAsic = 0; iAsic < (nofAsics / groupAsics); iAsic++) {
 
-          if (groupAsics == 1)
+          if (groupAsics == 1)   // single ASICs 
 	  {
             asic_pos   = (iAsic + 0.5) / nofAsics - 0.5;   // equal spacing of ASICs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
             asic_pos_x = asic_pos * activeAreaX;
@@ -816,7 +834,7 @@ TGeoVolume* create_trd_module(Int_t moduleType)
             trd_feb_inclined->AddNode(trdmod1_asic, iAsic+1, incline_asic);  // now we have ASICs on the inclined FEB
           }
 
-          if (groupAsics == 2)
+          if (groupAsics == 2)   // pairs of ASICs
 	  {
             asic_pos   = (iAsic + 0.5) / (nofAsics / groupAsics) - 0.5;   // equal spacing of ASICs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
 

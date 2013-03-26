@@ -327,6 +327,8 @@ void CbmRichTrainAnnSelect::Draw()
    }
 
    TCanvas* c1 = new TCanvas("ann_select_ann_output", "ann_select_ann_output", 500, 500);
+   fhAnnOutput[0]->Scale(1./fhAnnOutput[0]->Integral());
+   fhAnnOutput[1]->Scale(1./fhAnnOutput[1]->Integral());
    DrawH1(list_of(fhAnnOutput[0])(fhAnnOutput[1]), list_of("True")("Fake"), kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
    TCanvas* c2 = new TCanvas("ann_select_cum_prob", "ann_select_cum_prob", 500, 500);

@@ -303,7 +303,7 @@ private:
 
 	TH2D* fhHitsXY; // distribution of X and Y position of hits
 	TH2D* fhPointsXY; // distribution of X and Y position of points
-
+	TH1D* fhNofPhotonsPerHit; // Number of photons per hit
 
    // fitting parameters
 	// [0] = hits fit, [1] = MC points fit

@@ -265,7 +265,7 @@ void CbmRichGeoTest::InitHistograms()
       if (i == 0) ss << "_hits";
       if (i == 1) ss << "_points";
       string t = ss.str();
-      fhNofHits[i] = new TH1D(("fhNofHits"+t).c_str(), ("fhNofHits"+t+";Nof hits in ring;Yield").c_str(), 300, 0, 300);
+      fhNofHits[i] = new TH1D(("fhNofHits"+t).c_str(), ("fhNofHits"+t+";Nof hits in ring;Yield").c_str(), 300, -.5, 299.5);
       fHists.push_back(fhNofHits[i]);
       // ellipse fitting parameters
       fhBoverA[i] = new TH1D(("fhBoverA"+t).c_str(), ("fhBoverA"+t+";B/A;Yield").c_str(), 50, 0, 1);
@@ -288,6 +288,9 @@ void CbmRichGeoTest::InitHistograms()
       fhDRVsMom[i] = new TH2D(("fhDRVsMom"+t).c_str(), ("fhDRVsMom"+t+";p [GeV/c];dR [cm];Yield").c_str(), 100, 0, 10, 100, -1., 1.);
       fHists.push_back(fhDRVsMom[i]);
    }
+
+   fhNofPhotonsPerHit = new TH1D("fhNofPhotonsPerHit", "fhNofPhotonsPerHit;Number of photons per hit;Yield", 10, -0.5, 9.5);
+   fHists.push_back(fhNofPhotonsPerHit);
    // Difference between Mc Points and Hits fitting.
    fhDiffAaxis = new TH2D("fhDiffAaxis", "fhDiffAaxis;Nof hits in ring;A_{point}-A_{hit} [cm];Yield", 40, 0., 40., 100, -1.5, 1.5);
    fHists.push_back(fhDiffAaxis);
@@ -629,6 +632,9 @@ void CbmRichGeoTest::HitsAndPoints()
       if (pointInd < 0) continue;
       CbmRichPoint *point = (CbmRichPoint*) fRichPoints->At(pointInd);
       if ( point == NULL ) continue;
+
+      fhNofPhotonsPerHit->Fill(hit->GetNPhotons());
+
       TVector3 inPos(point->GetX(), point->GetY(), point->GetZ());
       TVector3 outPos;
       CbmRichHitProducer::TiltPoint(&inPos, &outPos, fPhi, fTheta, fDetZOrig);
@@ -893,6 +899,10 @@ void CbmRichGeoTest::DrawHist()
       FitH1OneOverX(meanChi2, 0.1, 2.9, 0.0, 3.0, ss.str() + "chi2_circle_mean_vs_mom_fit");
    }
 
+   TCanvas* cNofPhotons = CreateCanvas("richgeo_nof_photons_per_hit", "richgeo_nof_photons_per_hit", 800, 800);
+   fhNofPhotonsPerHit->Scale(1./fhNofPhotonsPerHit->Integral());
+   DrawH1(fhNofPhotonsPerHit);
+
    TCanvas *cDiff2DEllipse = CreateCanvas("richgeo_diff2d_ellipse", "richgeo_diff2d_ellipse", 800, 800);
    cDiff2DEllipse->Divide(2,2);
    cDiff2DEllipse->cd(1);
@@ -1121,9 +1131,12 @@ void CbmRichGeoTest::CreateStudyReport(
 void CbmRichGeoTest::Finish()
 {
    DrawHist();
-   //for (Int_t i = 0; i < fHists.size(); i++){
-   //   fHists[i]->Write();
-   //}
+   for (Int_t i = 0; i < fHists.size(); i++){
+   //   if (NULL != fHists[i]) fHists[i]->Write();
+   }
+   fhNofHits[0]->Write();
+   fhNofHits[1]->Write();
+   fhNofPhotonsPerHit->Write();
    SaveCanvasToImage();
 }
 

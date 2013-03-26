@@ -287,7 +287,7 @@ void CbmRichProtHitProducer::Exec(
    cout << "-I- CbmRichProtHitProducer, event no " << fNEvents << endl;
 
    Double_t lambda_min,lambda_max,lambda_step;
-   Double_t efficiency[46];// 40
+   Double_t efficiency[100];// 40
    SetPhotoDetPar(fDetType,lambda_min,lambda_max,lambda_step,efficiency);
 
    if (fVerbose > 0) cout <<"-I- Number of input MC points: "<< fRichPoints->GetEntries()<<endl;

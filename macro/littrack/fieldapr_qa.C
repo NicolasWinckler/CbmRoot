@@ -49,9 +49,9 @@ void fieldapr_qa(Int_t nEvents = 1)
 
    std::vector<UInt_t> degrees;
 // degrees.push_back(3);
-   degrees.push_back(5);
-   degrees.push_back(7);
-   degrees.push_back(9);
+//   degrees.push_back(5);
+//   degrees.push_back(7);
+//   degrees.push_back(9);
    fieldQa->SetPolynomDegrees(degrees);
 
 	fieldQa->SetAcceptanceAngleX(35.);

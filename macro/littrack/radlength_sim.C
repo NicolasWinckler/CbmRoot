@@ -2,21 +2,21 @@
 using std::cout;
 using std::endl;
 
-void radlength_sim(Int_t nEvents = 100000)
+void radlength_sim(Int_t nEvents = 1000000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir  = "radlen_much";
+   TString dir  = "radlen/trd_v13b";
    TString mcFile = dir + "/radlength.mc.0000.root";
    TString parFile = dir + "/radlength.param.0000.root";
 
    TString caveGeom = "cave.geo";
    TString mvdGeom = "";//"mvd/mvd_v07a.geo";
-   TString stsGeom = "sts/sts_v12b.geo.root";
-   TString richGeom = "rich/rich_v08a.geo";
-   TString trdGeom = "";//"trd/trd_v13b.root";
-   TString muchGeom = "much/much_v11a.geo";
-   TString tofGeom = "tof/tof_v07a.geo";
+   TString stsGeom = "";//"sts/sts_v12b.geo.root";
+   TString richGeom = "";//"rich/rich_v08a.geo";
+   TString trdGeom = "trd/trd_v13b.root";
+   TString muchGeom = "";//"much/much_v11a.geo";
+   TString tofGeom = "";//"tof/tof_v07a.geo";
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
@@ -88,7 +88,7 @@ void radlength_sim(Int_t nEvents = 100000)
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
    run->SetGenerator(primGen);
 
-   const int RMax = 800; // Maximum radius of the station
+   const int RMax = 500; // Maximum radius of the station
 
    FairBoxGenerator* box = new FairBoxGenerator(0, 1);
    box->SetBoxXYZ(-RMax, -RMax, RMax, RMax, 0.);
@@ -119,7 +119,7 @@ void radlength_sim(Int_t nEvents = 100000)
    // ------------------------------------------------------------------------
 
    run->Run(nEvents);
-   run->CreateGeometryFile("data/geofile_full.root");
+ //  run->CreateGeometryFile("data/geofile_full.root");
 
    // -----   Finish   -------------------------------------------------------
    timer.Stop();

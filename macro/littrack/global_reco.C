@@ -12,17 +12,18 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 10, // number of events
+void global_reco(Int_t nEvents = 100, // number of events
 		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
 // if opt == "tracking" global tracking is executed
 {
+   TTree::SetMaxTreeSize(90000000000);
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "trd_v13b/"; // Output directory
+	TString dir = "sts_trd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -35,13 +36,13 @@ void global_reco(Int_t nEvents = 10, // number of events
    TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
-   TString tofDigiFile = "/parameters/tof/par_tof_V13a.txt";//parDir + "/tof/par_tof_V13a.txt";
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";//parDir + "/tof/par_tof_V13a.txt";
 
    // Directory for output results
    TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "nn_new"; // Global tracking type
+   TString globalTrackingType = "nn"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
@@ -86,6 +87,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
+   parFileList->Add(&tofDigiFile);
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
@@ -258,9 +260,9 @@ void global_reco(Int_t nEvents = 10, // number of events
 
 		if (IsTof(parFile)) {
 			// ------ TOF hits --------------------------------------------------------
-			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
-			//tofHitProd->SetParFileName(string(tofDigiFile));
-			run->AddTask(tofHitProd);
+		   CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("TOF HitProducerNew",iVerbose);
+		   tofHitProd->SetInitFromAscii(kFALSE);
+		   run->AddTask(tofHitProd);
 			// ------------------------------------------------------------------------
 		}
 	}

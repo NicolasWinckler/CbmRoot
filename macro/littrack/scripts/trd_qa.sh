@@ -7,11 +7,12 @@ export LIT_SCRIPT=yes
 test_name=$1
 trd_geom=$2
 trd_digi=$3
-#trd_norm=$2
+trd_norm=$4
+collision_energy=$5
 
 create_output_dir events_${test_name}/
 
-nevents=500
+nevents=300
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       10     0  yes   no)
@@ -23,12 +24,12 @@ export LIT_STS_HITPRODUCER_TYPE=real
 export LIT_TRD_GEOM=${trd_geom}
 export LIT_TRD_DIGI=${trd_digi}
 export LIT_GLOBAL_TRACKING_TYPE=branch
-#export LIT_NORM_TRD_POINTS=$trd_norm
-#export LIT_NORM_TRD_HITS=$trd_norm
+export LIT_NORM_TRD_POINTS=$trd_norm
+export LIT_NORM_TRD_HITS=$trd_norm
 
 set_default_file_names ${LIT_DIR} 0000
 
-export LIT_URQMD_FILE=/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14
+export LIT_URQMD_FILE=/Users/andrey/Development/cbm/d/urqmd/auau/${collision_energy}/centr/urqmd.auau.${collision_energy}.centr.0000.ftn14
     
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
 
@@ -40,7 +41,7 @@ function run_reco() {
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"all\")"
 }
 
-run_reco smearing nn
+#run_reco smearing nn
 run_reco smearing branch
 #run_reco clustering nn
 #run_reco clustering branch

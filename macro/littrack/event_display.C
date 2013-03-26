@@ -7,7 +7,7 @@
 
 void event_display()
 {
-	TString dir = "mvd/";
+	TString dir = "commit_tests/events_muon/";
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
 

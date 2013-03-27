@@ -14,7 +14,7 @@ system=${collision_arr[0]}
 energy=${collision_arr[1]}
 collision_type=${collision_arr[2]}
 
-nevents=500
+nevents=5
 
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/
@@ -48,5 +48,6 @@ set_simulation_parameters ${pars}
 
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/mvd_reco.C(${nevents})"
+${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/mvd_reco_qa.C(${nevents}, \"reco\")"
 
 export LIT_SCRIPT=no

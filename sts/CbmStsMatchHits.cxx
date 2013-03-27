@@ -446,6 +446,7 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
     Int_t finalHit = hitStationLimits[1][stationNr];
     
     if ( startHit == -1 && finalHit == -1 ) continue;
+    if ( startHit > fHits->GetEntriesFast() || finalHit > fHits->GetEntriesFast()) continue;
 
    
     Int_t NofMatched = 0;
@@ -453,6 +454,11 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
     Int_t GoodHitIndex[nofStsHits];
     for ( Int_t ihit = startHit ; ihit < finalHit ; ihit++ ) {
       CbmStsHit *stsHit= (CbmStsHit*)fHits->At(ihit);
+      if (NULL == stsHit) {
+         std::cout << "CbmStsMatchHits::ExecReal: CbmStsHit NULL pointer: ihit=" << ihit
+               << " " << "startHit=" << startHit << " finalHit=" << finalHit << std::endl;
+         continue;
+      }
       Double_t xH = stsHit->GetX();
       Double_t yH = stsHit->GetY();
       Double_t xP = stsPoint->GetX(stsHit->GetZ());

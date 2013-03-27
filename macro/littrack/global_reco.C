@@ -36,10 +36,10 @@ void global_reco(Int_t nEvents = 100, // number of events
    TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
-   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";//parDir + "/tof/par_tof_V13a.txt";
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
-   // Directory for output results
-   TString resultDir = "./test/";
+//   // Directory for output results
+//   TString resultDir = "./test/";
 
    // Reconstruction parameters
    TString globalTrackingType = "nn"; // Global tracking type
@@ -47,14 +47,14 @@ void global_reco(Int_t nEvents = 100, // number of events
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
 
-   // Normalization for efficiency
-   Int_t normStsPoints = 4;
-   Int_t normTrdPoints = 6;
-   Int_t normMuchPoints = 16;
-   Int_t normTofPoints = 1;
-   Int_t normTrdHits = 6;
-   Int_t normMuchHits = 16;
-   Int_t normTofHits = 1;
+//   // Normalization for efficiency
+//   Int_t normStsPoints = 4;
+//   Int_t normTrdPoints = 6;
+//   Int_t normMuchPoints = 16;
+//   Int_t normTofPoints = 1;
+//   Int_t normTrdHits = 6;
+//   Int_t normMuchHits = 16;
+//   Int_t normTofHits = 1;
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
@@ -63,7 +63,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		globalHitsFile = TString(gSystem->Getenv("LIT_GLOBAL_HITS_FILE"));
 		globalTracksFile = TString(gSystem->Getenv("LIT_GLOBAL_TRACKS_FILE"));
 
-		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
+//		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 
 		globalTrackingType = TString(gSystem->Getenv("LIT_GLOBAL_TRACKING_TYPE"));
 		stsHitProducerType = TString(gSystem->Getenv("LIT_STS_HITPRODUCER_TYPE"));
@@ -76,13 +76,13 @@ void global_reco(Int_t nEvents = 100, // number of events
 		tofDigiFile = TString(gSystem->Getenv("LIT_TOF_DIGI"));
 		stsMatBudgetFile = TString(gSystem->Getenv("LIT_STS_MAT_BUDGET_FILE"));
 
-		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
-		normTrdPoints = TString(gSystem->Getenv("LIT_NORM_TRD_POINTS")).Atoi();
-		normMuchPoints = TString(gSystem->Getenv("LIT_NORM_MUCH_POINTS")).Atoi();
-		normTofPoints = TString(gSystem->Getenv("LIT_NORM_TOF_POINTS")).Atoi();
-		normTrdHits = TString(gSystem->Getenv("LIT_NORM_TRD_HITS")).Atoi();
-		normMuchHits = TString(gSystem->Getenv("LIT_NORM_MUCH_HITS")).Atoi();
-		normTofHits = TString(gSystem->Getenv("LIT_NORM_TOF_HITS")).Atoi();
+//		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
+//		normTrdPoints = TString(gSystem->Getenv("LIT_NORM_TRD_POINTS")).Atoi();
+//		normMuchPoints = TString(gSystem->Getenv("LIT_NORM_MUCH_POINTS")).Atoi();
+//		normTofPoints = TString(gSystem->Getenv("LIT_NORM_TOF_POINTS")).Atoi();
+//		normTrdHits = TString(gSystem->Getenv("LIT_NORM_TRD_HITS")).Atoi();
+//		normMuchHits = TString(gSystem->Getenv("LIT_NORM_MUCH_HITS")).Atoi();
+//		normTofHits = TString(gSystem->Getenv("LIT_NORM_TOF_HITS")).Atoi();
 	}
 
    parFileList->Add(&stsDigiFile);
@@ -194,9 +194,6 @@ void global_reco(Int_t nEvents = 100, // number of events
 			run->AddTask(digitize);
 			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
 			run->AddTask(findHits);
-//			CbmMuchClustering* findHits = new CbmMuchClustering();
-//			findHits->SetAlgorithmVersion(2);
-//			run->AddTask(findHits);
 
 			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
 			      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
@@ -233,17 +230,6 @@ void global_reco(Int_t nEvents = 100, // number of events
 				run->AddTask(trdHitProd);
 				// ----- End TRD Digitizer -----
 			} else if (trdHitProducerType == "clustering") {
-//				// ----- TRD clustering -----
-//				CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
-//				run->AddTask(trdClustering);
-//
-//				CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
-//				run->AddTask(trdClusterfindingfast);
-//
-//				CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
-//				run->AddTask(trdClusterHitProducer);
-//				// ----- End TRD Clustering -----
-
 				// ----- TRD clustering -----
 				CbmTrdDigitizerPRF* trdClustering = new CbmTrdDigitizerPRF("TRD Clusterizer", "TRD task", radiator, false, true);
 				run->AddTask(trdClustering);
@@ -327,35 +313,35 @@ void global_reco(Int_t nEvents = 100, // number of events
 		// -----------------------------------------------------------------------
 	}
 
-	if (opt == "all" || opt == "tracking") {
-		// ----- Reconstruction QA tasks -----------------------------------------
-		CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
-		trackingQa->SetMinNofPointsSts(normStsPoints);
-		trackingQa->SetMinNofPointsTrd(normTrdPoints);
-		trackingQa->SetMinNofPointsMuch(normMuchPoints);
-		trackingQa->SetMinNofPointsTof(normTofPoints);
-		trackingQa->SetQuota(0.7);
-		trackingQa->SetMinNofHitsTrd(normTrdHits);
-		trackingQa->SetMinNofHitsMuch(normMuchHits);
-		trackingQa->SetMinNofHitsRich(7);
-		trackingQa->SetQuotaRich(0.6);
-		trackingQa->SetVerbose(normTofHits);
-		trackingQa->SetOutputDir(std::string(resultDir));
-		run->AddTask(trackingQa);
-
-		CbmLitFitQa* fitQa = new CbmLitFitQa();
-		fitQa->SetMvdMinNofHits(0);
-		fitQa->SetStsMinNofHits(normStsPoints);
-		fitQa->SetMuchMinNofHits(normMuchPoints);
-		fitQa->SetTrdMinNofHits(normTrdPoints);
-		fitQa->SetOutputDir(std::string(resultDir));
-		run->AddTask(fitQa);
-
-		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-		clusteringQa->SetOutputDir(std::string(resultDir));
-		run->AddTask(clusteringQa);
-		// -----------------------------------------------------------------------
-	}
+//	if (opt == "all" || opt == "tracking") {
+//		// ----- Reconstruction QA tasks -----------------------------------------
+//		CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
+//		trackingQa->SetMinNofPointsSts(normStsPoints);
+//		trackingQa->SetMinNofPointsTrd(normTrdPoints);
+//		trackingQa->SetMinNofPointsMuch(normMuchPoints);
+//		trackingQa->SetMinNofPointsTof(normTofPoints);
+//		trackingQa->SetQuota(0.7);
+//		trackingQa->SetMinNofHitsTrd(normTrdHits);
+//		trackingQa->SetMinNofHitsMuch(normMuchHits);
+//		trackingQa->SetMinNofHitsRich(7);
+//		trackingQa->SetQuotaRich(0.6);
+//		trackingQa->SetVerbose(normTofHits);
+//		trackingQa->SetOutputDir(std::string(resultDir));
+//		run->AddTask(trackingQa);
+//
+//		CbmLitFitQa* fitQa = new CbmLitFitQa();
+//		fitQa->SetMvdMinNofHits(0);
+//		fitQa->SetStsMinNofHits(normStsPoints);
+//		fitQa->SetMuchMinNofHits(normMuchPoints);
+//		fitQa->SetTrdMinNofHits(normTrdPoints);
+//		fitQa->SetOutputDir(std::string(resultDir));
+//		run->AddTask(fitQa);
+//
+//		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+//		clusteringQa->SetOutputDir(std::string(resultDir));
+//		run->AddTask(clusteringQa);
+//		// -----------------------------------------------------------------------
+//	}
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

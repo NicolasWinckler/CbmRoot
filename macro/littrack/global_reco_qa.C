@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_reco_qa(Int_t nEvents = 500,
+void global_reco_qa(Int_t nEvents = 5,
       TString opt = "reco")
 // opt == "reco" in case of one input file with all reconstructed data
 // opt == "ht" (hitas and tracks) in case of two input files with reconstructed hits and tracks
@@ -17,7 +17,7 @@ void global_reco_qa(Int_t nEvents = 500,
    TTree::SetMaxTreeSize(90000000000);
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-	TString dir = "sts_trd/"; // Output directory
+	TString dir = "events/test/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
@@ -64,11 +64,13 @@ void global_reco_qa(Int_t nEvents = 500,
 	FairRunAna *run = new FairRunAna();
    if (opt == "reco") {
       run->SetInputFile(mcFile);
-      run->SetOutputFile(globalRecoFile);
+      run->AddFriend(globalRecoFile);
+      run->SetOutputFile(qaFile);
    } else if (opt == "ht") {
       run->SetInputFile(mcFile);
       run->AddFriend(globalHitsFile);
-      run->SetOutputFile(globalTracksFile);
+      run->AddFriend(globalTracksFile);
+      run->SetOutputFile(qaFile);
    } else {
       std::cout << "-E- Incorrect opt parameter" << std::endl;
       exit(0);

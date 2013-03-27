@@ -53,21 +53,21 @@ $ROOTSYS/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents
 # Branching algorithm
 export LIT_GLOBAL_TRACKING_TYPE=branch
 export LIT_GLOBAL_TRACKS_FILE=${LIT_DIR}/global.tracks.branch.0000.root
-export LIT_QA_FILE=${LIT_DIR}/qa.branch.0000.root
+export LIT_QA_FILE=${test_name}_${LIT_GLOBAL_TRACKING_TYPE}/qa.root
 create_result_dir ${test_name}_${LIT_GLOBAL_TRACKING_TYPE}/
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"tracking\")"
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"ht\")"
 # Nearest neighbor algorithm
 export LIT_GLOBAL_TRACKING_TYPE=nn
 export LIT_GLOBAL_TRACKS_FILE=${LIT_DIR}/global.tracks.nn.0000.root
-export LIT_QA_FILE=${LIT_DIR}/qa.nn.0000.root
+export LIT_QA_FILE=${test_name}_${LIT_GLOBAL_TRACKING_TYPE}/qa.root
 create_result_dir ${test_name}_${LIT_GLOBAL_TRACKING_TYPE}/
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"tracking\")"
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"ht\")"
 # Nearest neighbor parallel algorithm
 #export LIT_GLOBAL_TRACKING_TYPE=nn_parallel
 #export LIT_GLOBAL_TRACKS_FILE=${LIT_DIR}/global.tracks.nn_parallel.0000.root
-#export LIT_QA_FILE=${LIT_DIR}/qa.nn_parallel.0000.root
+#export LIT_QA_FILE=${test_name}_${LIT_GLOBAL_TRACKING_TYPE}/qa.root
 #create_result_dir ${test_name}_${LIT_GLOBAL_TRACKING_TYPE}/
 #${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"tracking\")"
 #${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"ht\")"
@@ -78,11 +78,11 @@ rm -rf ${LIT_STUDY_OUTPUT_DIR}
 mkdir ${LIT_STUDY_OUTPUT_DIR}
 export LIT_NOF_STUDIES=2
 export LIT_STUDY_NAME1=branch
-export LIT_FILE_NAME1=${LIT_DIR}/qa.branch.0000.root
+export LIT_FILE_NAME1=${test_name}_branch/qa.root
 export LIT_STUDY_NAME2=nn
-export LIT_FILE_NAME2=${LIT_DIR}/qa.nn.0000.root
+export LIT_FILE_NAME2=${test_name}_nn/qa.root
 #export LIT_STUDY_NAME3=nn_parallel
-#export LIT_FILE_NAME3=${LIT_DIR}/qa.nn_parallel.0000.root
+#export LIT_FILE_NAME3=${test_name}_nn_parallel/qa.root
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/qa_study_report.C"
 
 export LIT_SCRIPT=no

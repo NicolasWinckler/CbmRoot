@@ -9,14 +9,14 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 3)
+void global_sim(Int_t nEvents = 5)
 {
    TTree::SetMaxTreeSize(90000000000);
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
 	// Specify "electron" or "muon" setup of CBM
-	TString setup = "muon";
-//	TString setup = "electron";
+//	TString setup = "muon";
+	TString setup = "electron";
 
 	// Event parameters
 	Int_t nofMuonsPlus = 0; // number of embedded muons from FairBoxGenerator
@@ -26,14 +26,14 @@ void global_sim(Int_t nEvents = 3)
 	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
-	Int_t nofJPsiToElectrons = 3; // number of embedded J/Psi particles decaying to e+ and e-
+	Int_t nofJPsiToElectrons = 10; // number of embedded J/Psi particles decaying to e+ and e-
 	Int_t nofAuIons = 0; // number of generated Au ions
 	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
    TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "display_much/"; // Directory for output simulation files
+	TString dir = "events/test/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -57,11 +57,11 @@ void global_sim(Int_t nEvents = 3)
 		caveGeom   = "cave.geo";
 		targetGeom = "target_au_250mu.geo";
 		pipeGeom   = "pipe_standard.geo";
-		mvdGeom    = "mvd/mvd_v07a.geo";
+		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
 		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v13b.root";
-		tofGeom    = "tof/tof_v13-3b.root";
+		trdGeom    = "trd/trd_v13c.root";
+		tofGeom    = "tof/tof_v13b.root";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";
 		magnetGeom = "passive/magnet_v12a.geo";
@@ -109,92 +109,92 @@ void global_sim(Int_t nEvents = 3)
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
 	loadlibs();
 
-	FairRunSim* fRun = new FairRunSim();
-	fRun->SetName("TGeant3"); // Transport engine
-	fRun->SetOutputFile(mcFile); // Output file
-	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+	FairRunSim* run = new FairRunSim();
+	run->SetName("TGeant3"); // Transport engine
+	run->SetOutputFile(mcFile); // Output file
+	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
-	fRun->SetMaterials("media.geo"); // Materials
-	fRun->SetStoreTraj(kTRUE);
+	run->SetMaterials("media.geo"); // Materials
+	//run->SetStoreTraj(kTRUE);
 
 	if ( caveGeom != "" ) {
 		FairModule* cave = new CbmCave("CAVE");
 		cave->SetGeometryFileName(caveGeom);
-		fRun->AddModule(cave);
+		run->AddModule(cave);
 		cout << "    --- " << caveGeom << endl;
 	}
 
 	if ( pipeGeom != "" ) {
 		FairModule* pipe = new CbmPipe("PIPE");
 		pipe->SetGeometryFileName(pipeGeom);
-		fRun->AddModule(pipe);
+		run->AddModule(pipe);
 		cout << "    --- " << pipeGeom << endl;
 	}
 
 	if ( shieldGeom != "" ) {
 		FairModule* shield = new CbmShield("SHIELD");
 		shield->SetGeometryFileName(shieldGeom);
-		fRun->AddModule(shield);
+		run->AddModule(shield);
 		cout << "    --- " << shieldGeom << endl;
 	}
 
 	if ( targetGeom != "" ) {
 		FairModule* target = new CbmTarget("Target");
 		target->SetGeometryFileName(targetGeom);
-		fRun->AddModule(target);
+		run->AddModule(target);
 		cout << "    --- " << targetGeom << endl;
 	}
 
 	if ( magnetGeom != "" ) {
 		FairModule* magnet = new CbmMagnet("MAGNET");
 		magnet->SetGeometryFileName(magnetGeom);
-		fRun->AddModule(magnet);
+		run->AddModule(magnet);
 		cout << "    --- " << magnetGeom << endl;
 	}
 
 	if ( mvdGeom != "" ) {
 		FairDetector* mvd = new CbmMvd("MVD", kTRUE);
 		mvd->SetGeometryFileName(mvdGeom);
-		fRun->AddModule(mvd);
+		run->AddModule(mvd);
 	}
 
 	if ( stsGeom != "" ) {
 		FairDetector* sts = new CbmSts("STS", kTRUE);
 		sts->SetGeometryFileName(stsGeom);
-		fRun->AddModule(sts);
+		run->AddModule(sts);
 		cout << "    --- " << stsGeom << endl;
 	}
 
 	if ( richGeom != "" ) {
 		FairDetector* rich = new CbmRich("RICH", kTRUE);
 		rich->SetGeometryFileName(richGeom);
-		fRun->AddModule(rich);
+		run->AddModule(rich);
 	}
 
 	if ( muchGeom != "" ) {
 		FairDetector* much = new CbmMuch("MUCH", kTRUE);
 		much->SetGeometryFileName(muchGeom);
-		fRun->AddModule(much);
+		run->AddModule(much);
 		cout << "    --- " << muchGeom << endl;
 	}
 
 	if ( trdGeom != "" ) {
 		FairDetector* trd = new CbmTrd("TRD",kTRUE );
 		trd->SetGeometryFileName(trdGeom);
-		fRun->AddModule(trd);
+		run->AddModule(trd);
 		cout << "    --- " << trdGeom << endl;
 	}
 
 	if ( tofGeom != "" ) {
 		FairDetector* tof = new CbmTof("TOF", kTRUE);
 		tof->SetGeometryFileName(tofGeom);
-		fRun->AddModule(tof);
+		run->AddModule(tof);
 		cout << "    --- " << tofGeom << endl;
 	}
 
 	if ( ecalGeom != "" ) {
 		FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
-		fRun->AddModule(ecal);
+		run->AddModule(ecal);
 	}
 	// ------------------------------------------------------------------------
 
@@ -202,7 +202,7 @@ void global_sim(Int_t nEvents = 3)
    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
    magField->SetPosition(0., 0., fieldZ);
    magField->SetScale(fieldScale);
-   fRun->SetField(magField);
+   run->SetField(magField);
    // ------------------------------------------------------------------------
 
 	// ------------------------------------------------------------------------
@@ -318,14 +318,14 @@ void global_sim(Int_t nEvents = 3)
 	}
 
 
-	fRun->SetGenerator(primGen);
-	fRun->Init();
+	run->SetGenerator(primGen);
+	run->Init();
 
 	// -----   Runtime database   ---------------------------------------------
 	CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
 	fieldPar->SetParameters(magField);
 	fieldPar->setChanged();
-	fieldPar->setInputVersion(fRun->GetRunId(),1);
+	fieldPar->setInputVersion(run->GetRunId(),1);
 	Bool_t kParameterMerged = kTRUE;
 	FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
 	parOut->open(parFile.Data());
@@ -335,7 +335,7 @@ void global_sim(Int_t nEvents = 3)
 	// ------------------------------------------------------------------------
 
 	// -----   Start run   ----------------------------------------------------
-	fRun->Run(nEvents);
+	run->Run(nEvents);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------

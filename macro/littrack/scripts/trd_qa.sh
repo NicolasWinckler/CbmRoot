@@ -12,7 +12,7 @@ collision_energy=$5
 
 create_output_dir events_${test_name}/
 
-nevents=300
+nevents=5
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       10     0  yes   no)
@@ -37,8 +37,10 @@ function run_reco() {
    export LIT_TRD_HITPRODUCER_TYPE=$1
    export LIT_GLOBAL_TRACKING_TYPE=$2
    export LIT_GLOBAL_RECO_FILE=${LIT_DIR}/global.reco.${LIT_TRD_HITPRODUCER_TYPE}.${LIT_GLOBAL_TRACKING_TYPE}.0000.root
+   export LIT_QA_FILE=${LIT_DIR}/qa.${LIT_TRD_HITPRODUCER_TYPE}.${LIT_GLOBAL_TRACKING_TYPE}.0000.root
    create_result_dir ${test_name}_${LIT_TRD_HITPRODUCER_TYPE}_${LIT_GLOBAL_TRACKING_TYPE}/
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"all\")"
+   ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"reco\")"
 }
 
 #run_reco smearing nn

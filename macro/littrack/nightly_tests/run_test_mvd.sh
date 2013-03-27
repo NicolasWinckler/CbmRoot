@@ -14,7 +14,7 @@ system=${collision_arr[0]}
 energy=${collision_arr[1]}
 collision_type=${collision_arr[2]}
 
-nevents=5
+nevents=500
 
 create_output_dir events_${test_name}/
 create_result_dir ${test_name}/

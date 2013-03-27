@@ -214,27 +214,27 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 void CbmLitFindGlobalTracks::ConvertInputData()
 {
    CbmLitConverter::StsTrackArrayToTrackVector(fStsTracks, fLitStsTracks);
-   std::cout << "-I- Number of STS tracks: " << fLitStsTracks.size() << std::endl;
+   std::cout << "-I- CbmLitFindGlobalTracks: Number of STS tracks: " << fLitStsTracks.size() << std::endl;
 
-   // Temporary solution
-   // Propagate STS tracks to the last STS station for
-   // parallel tracking!!!
-   for (Int_t iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
-      CbmLitTrack* track = fLitStsTracks[iTrack];
-      CbmLitTrackParam par = *track->GetParamLast();
-//      std::cout << "Zin=" << par.GetZ() << " ";
-      LitStatus propStatus;
-      if (par.GetZ() < 99.9) {
-         propStatus = fPropagator->Propagate(&par, 100.0, 13, NULL);
-      }
-//      if (propStatus != kLITSUCCESS) {
-//         std::cout << "ERROR in propagation to STS!" << par.ToString();
-//      } else {
-//         std::cout << par.ToString();
+//   // Temporary solution
+//   // Propagate STS tracks to the last STS station for
+//   // parallel tracking!!!
+//   for (Int_t iTrack = 0; iTrack < fLitStsTracks.size(); iTrack++) {
+//      CbmLitTrack* track = fLitStsTracks[iTrack];
+//      CbmLitTrackParam par = *track->GetParamLast();
+////      std::cout << "Zin=" << par.GetZ() << " ";
+//      LitStatus propStatus;
+//      if (par.GetZ() < 99.9) {
+//         propStatus = fPropagator->Propagate(&par, 100.0, 13, NULL);
 //      }
-      track->SetParamLast(&par);
-   }
-   //
+////      if (propStatus != kLITSUCCESS) {
+////         std::cout << "ERROR in propagation to STS!" << par.ToString();
+////      } else {
+////         std::cout << par.ToString();
+////      }
+//      track->SetParamLast(&par);
+//   }
+//   //
 
    if (fMuchPixelHits) { CbmLitConverter::HitArrayToHitVector(fMuchPixelHits, fLitHits); }
    if (fMuchStrawHits) { CbmLitConverter::HitArrayToHitVector(fMuchStrawHits, fLitHits); }
@@ -249,11 +249,11 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 //         }
 //      }
    }
-   std::cout << "-I- Number of hits: " << fLitHits.size() << std::endl;
+   std::cout << "-I- CbmLitFindGlobalTracks: Number of hits: " << fLitHits.size() << std::endl;
 
    if (fTofHits) {
       CbmLitConverter::HitArrayToHitVector(fTofHits, fLitTofHits);
-      std::cout << "-I- Number of TOF hits: " << fLitTofHits.size() << std::endl;
+      std::cout << "-I- CbmLitFindGlobalTracks: Number of TOF hits: " << fLitTofHits.size() << std::endl;
    }
 }
 

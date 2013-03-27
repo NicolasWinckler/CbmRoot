@@ -142,6 +142,7 @@ void CbmLitHitData::Clear()
 void CbmLitHitData::Arrange()
 {
    for (Int_t iStation = 0; iStation < fNofStations; iStation++) {
+      if (fZPosSet[iStation].empty()) continue;
       Double_t minZ = *fZPosSet[iStation].begin();
       Double_t maxZ = *fZPosSet[iStation].rbegin();
       set<Int_t> binSet;

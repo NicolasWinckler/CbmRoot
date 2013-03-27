@@ -15,8 +15,8 @@ void global_sim(Int_t nEvents = 5)
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
 	// Specify "electron" or "muon" setup of CBM
-//	TString setup = "muon";
-	TString setup = "electron";
+	TString setup = "muon";
+//	TString setup = "electron";
 
 	// Event parameters
 	Int_t nofMuonsPlus = 0; // number of embedded muons from FairBoxGenerator
@@ -25,15 +25,15 @@ void global_sim(Int_t nEvents = 5)
 	Int_t nofPositrons = 0; // number of embedded positrons from FairBoxGenerator
 	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
-	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
-	Int_t nofJPsiToElectrons = 10; // number of embedded J/Psi particles decaying to e+ and e-
+	Int_t nofJPsiToMuons = 10; // number of embedded J/Psi particles decaying to mu+ and mu-
+	Int_t nofJPsiToElectrons = 0; // number of embedded J/Psi particles decaying to e+ and e-
 	Int_t nofAuIons = 0; // number of generated Au ions
 	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
    TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "events/test/"; // Directory for output simulation files
+	TString dir = "events/test_muon/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -50,7 +50,7 @@ void global_sim(Int_t nEvents = 5)
 		stsGeom    = "sts/sts_v12b.geo.root";
 		muchGeom   = "much/much_v12b.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
-		tofGeom    = "tof/tof_v13-3b.root";
+		tofGeom    = "tof/tof_v13b.root";
 		fieldMap   = "field_v12a";
 		magnetGeom = "passive/magnet_v12a.geo";
 	} else if (setup == "electron") {

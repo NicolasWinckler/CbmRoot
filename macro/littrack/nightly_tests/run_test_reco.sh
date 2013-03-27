@@ -73,7 +73,7 @@ ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${ne
 #${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"ht\")"
 
 # Run summary report generator
-export LIT_STUDY_OUTPUT_DIR=${test_name}_summary
+export LIT_STUDY_OUTPUT_DIR=${test_name}_summary/
 rm -rf ${LIT_STUDY_OUTPUT_DIR}
 mkdir ${LIT_STUDY_OUTPUT_DIR}
 export LIT_NOF_STUDIES=2

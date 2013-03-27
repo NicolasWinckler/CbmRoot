@@ -16,8 +16,9 @@ void global_reco_qa(Int_t nEvents = 5,
 {
    TTree::SetMaxTreeSize(90000000000);
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "events/test/"; // Output directory
+	TString dir = "events/test_muon/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
@@ -25,6 +26,13 @@ void global_reco_qa(Int_t nEvents = 5,
    TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
    TString globalTracksFile = dir + "global.tracks.0000.root";// Output file with global tracks
 	TString qaFile = dir + "qa.0000.root"; // Output file with histograms
+
+   TList* parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
+   TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
+   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
    // Normalization for efficiency
    Int_t normStsPoints = 4;
@@ -52,7 +60,17 @@ void global_reco_qa(Int_t nEvents = 5,
       normTrdHits = TString(gSystem->Getenv("LIT_NORM_TRD_HITS")).Atoi();
       normMuchHits = TString(gSystem->Getenv("LIT_NORM_MUCH_HITS")).Atoi();
       normTofHits = TString(gSystem->Getenv("LIT_NORM_TOF_HITS")).Atoi();
+
+      stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
+      trdDigiFile = TString(gSystem->Getenv("LIT_TRD_DIGI"));
+      muchDigiFile = TString(gSystem->Getenv("LIT_MUCH_DIGI"));
+      tofDigiFile = TString(gSystem->Getenv("LIT_TOF_DIGI"));
+      stsMatBudgetFile = TString(gSystem->Getenv("LIT_STS_MAT_BUDGET_FILE"));
    }
+
+   parFileList->Add(&stsDigiFile);
+   parFileList->Add(&trdDigiFile);
+   parFileList->Add(&tofDigiFile);
 
 	TStopwatch timer;
 	timer.Start();
@@ -81,6 +99,7 @@ void global_reco_qa(Int_t nEvents = 5,
 	CbmKF* kalman = new CbmKF();
 	run->AddTask(kalman);
 	CbmL1* l1 = new CbmL1();
+	l1->SetMaterialBudgetFileName(stsMatBudgetFile);
 	run->AddTask(l1);
 
    // ----- Reconstruction QA tasks -----------------------------------------
@@ -107,18 +126,22 @@ void global_reco_qa(Int_t nEvents = 5,
    run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+   clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
    run->AddTask(clusteringQa);
    // -----------------------------------------------------------------------
 
-	// -----  Parameter database   --------------------------------------------
-	FairRuntimeDb* rtdb = run->GetRuntimeDb();
-	FairParRootFileIo* parIo1 = new FairParRootFileIo();
-	parIo1->open(parFile.Data());
-	rtdb->setFirstInput(parIo1);
-	rtdb->setOutput(parIo1);
-	rtdb->saveOutput();
-	// ------------------------------------------------------------------------
+   // -----  Parameter database   --------------------------------------------
+   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+   FairParRootFileIo* parIo1 = new FairParRootFileIo();
+   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+   parIo1->open(parFile.Data());
+   parIo2->open(parFileList, "in");
+   rtdb->setFirstInput(parIo1);
+   rtdb->setSecondInput(parIo2);
+   rtdb->setOutput(parIo1);
+   rtdb->saveOutput();
+   // ------------------------------------------------------------------------
 
 	// -----   Initialize and run   --------------------------------------------
 	run->Init();

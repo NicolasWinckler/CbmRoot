@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/test/"; // Output directory
+	TString dir = "events/test_muon/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -34,7 +34,7 @@ void global_reco(Int_t nEvents = 5, // number of events
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v11a.digi.root"; // MUCH digi file
+   TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
@@ -42,7 +42,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 //   TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "nn"; // Global tracking type
+   TString globalTrackingType = "branch"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced

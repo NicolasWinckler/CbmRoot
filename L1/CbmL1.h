@@ -114,7 +114,7 @@ class CbmL1 : public FairTask
   ~CbmL1( /*if (targetFieldSlice) delete;*/ );
 
   void SetMaterialBudgetFileName( TString s ){ fMatBudgetFileName = s; }
-  
+  void SetExtrapolateToTheEndOfSTS( bool b ){ fExtrapolateToTheEndOfSTS = b; }
   void Finish();
 
 //   void SetTrackingLevel( Int_t iLevel ){ fTrackingLevel = iLevel; }
@@ -215,6 +215,7 @@ class CbmL1 : public FairTask
   int fFindParticlesMode;
 
   TString fMatBudgetFileName;
+  bool fExtrapolateToTheEndOfSTS;
   
    ClassDef(CbmL1,1);
 };

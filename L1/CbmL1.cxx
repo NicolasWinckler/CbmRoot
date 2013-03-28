@@ -93,7 +93,8 @@ MCtoRParticleId(),
 RtoMCParticleId(),
 histodir(0),
     fFindParticlesMode(),
-  fMatBudgetFileName("")
+  fMatBudgetFileName(""),
+  fExtrapolateToTheEndOfSTS(false)
 {
   if( !fInstance ) fInstance = this;
   PF = new CbmL1ParticlesFinder();
@@ -137,7 +138,8 @@ MCtoRParticleId(),
 RtoMCParticleId(),
 histodir(0),
     fFindParticlesMode(findParticleMode_),
-  fMatBudgetFileName("")
+  fMatBudgetFileName(""),
+  fExtrapolateToTheEndOfSTS(false)
 {
   if( !fInstance ) fInstance = this;
   PF = new CbmL1ParticlesFinder();
@@ -617,7 +619,7 @@ void CbmL1::Reconstruct()
   algo->CATrackFinder();
 //  IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-  algo->L1KFTrackFitter();
+  algo->L1KFTrackFitter( fExtrapolateToTheEndOfSTS );
 //  algo->KFTrackFitter_simple();
   if( fVerbose>1 ) cout<<"L1 Track fitter  ok"<<endl;
   
@@ -734,7 +736,7 @@ void CbmL1::IdealTrackFinder()
     L1Track algoTr;
     algoTr.NHits = 0;
     int lastStation = -1;
-    for (int iH = 0; iH < MC.StsHits.size(); iH++){
+    for (unsigned int iH = 0; iH < MC.StsHits.size(); iH++){
       const int hitI = MC.StsHits[iH];
       const CbmL1StsHit& hit = vStsHits[hitI];
       if ( vMCPoints[hit.mcPointIds[0]].iStation <= lastStation ) { // one hit per station

@@ -321,7 +321,7 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
   } // for(int itrack
 }
 
-void L1Algo::L1KFTrackFitter()
+void L1Algo::L1KFTrackFitter( bool extrapolateToTheEndOfSTS )
 {
 //  cout << " Start L1 Track Fitter " << endl;
   int start_hit = 0; // for interation in vRecoHits[]
@@ -554,34 +554,84 @@ void L1Algo::L1KFTrackFitter()
         fz1 = fz0;
       }
       // L1AddHalfMaterial( T, sta[i].materialInfo, qp0 );
-      
-      for(iVec=0; iVec<nTracks_SIMD; iVec++)
-      {
-        t[iVec]->TLast[0] = T.x[iVec];
-        t[iVec]->TLast[1] = T.y[iVec];
-        t[iVec]->TLast[2] = T.tx[iVec];
-        t[iVec]->TLast[3] = T.ty[iVec];
-        t[iVec]->TLast[4] = T.qp[iVec];
-        t[iVec]->TLast[5] = T.z[iVec];
-      
-        t[iVec]->CLast[0] = T.C00[iVec];
-        t[iVec]->CLast[1] = T.C10[iVec];
-        t[iVec]->CLast[2] = T.C11[iVec];
-        t[iVec]->CLast[3] = T.C20[iVec];
-        t[iVec]->CLast[4] = T.C21[iVec];
-        t[iVec]->CLast[5] = T.C22[iVec];
-        t[iVec]->CLast[6] = T.C30[iVec];
-        t[iVec]->CLast[7] = T.C31[iVec];
-        t[iVec]->CLast[8] = T.C32[iVec];
-        t[iVec]->CLast[9] = T.C33[iVec];
-        t[iVec]->CLast[10] = T.C40[iVec];
-        t[iVec]->CLast[11] = T.C41[iVec];
-        t[iVec]->CLast[12] = T.C42[iVec];
-        t[iVec]->CLast[13] = T.C43[iVec];
-        t[iVec]->CLast[14] = T.C44[iVec];
 
-        t[iVec]->chi2 = T.chi2[iVec];
-        t[iVec]->NDF = (int)T.NDF[iVec];
+      { // extrapolate to 1 m
+        L1TrackPar Tout = T;
+        if ( extrapolateToTheEndOfSTS ) {
+            // extrapolate to the last station
+          i = 0;
+          fz1 = z[i];
+          sta[i].fieldSlice.GetFieldValue( T.x, Tout.y, fB1 );
+          fB1.Combine( fB[i], w[i] );
+
+          fz2 = z[i+2];
+          dz = fz2-Tout.z;
+          sta[i].fieldSlice.GetFieldValue( Tout.x + Tout.tx*dz, Tout.y + Tout.ty*dz, fB2 );
+          fB2.Combine( fB[i+2], w[i+2] );
+          fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+
+          for( ++i; i<NStations; i++ )
+          {
+            fz0 = z[i];
+            dz = (Tout.z-fz0);
+            sta[i].fieldSlice.GetFieldValue( Tout.x - Tout.tx*dz, Tout.y - Tout.ty*dz, fB0 );
+            fB0.Combine( fB[i], w[i] );
+            fld.Set( fB0, fz0, fB1, fz1, fB2, fz2 );
+
+            fvec zero = ZERO;
+            fvec initialised = fvec(z[i] > z_end);
+            fvec wIn = (ONE  & (initialised));
+            
+            L1Extrapolate( Tout, z[i], qp0, fld,&wIn );
+            if(i == NMvdStations) L1AddPipeMaterial( Tout, qp0, wIn );
+#ifdef USE_RL_TABLE
+            L1AddMaterial( Tout, fRadThick[i].GetRadThick(Tout.x, Tout.y), qp0, wIn );
+#else
+            L1AddMaterial( Tout, sta[i].materialInfo, qp0, wIn );
+#endif
+
+            fB2 = fB1; 
+            fz2 = fz1;
+            fB1 = fB0; 
+            fz1 = fz0;
+          }
+            // extrapolate to 1m
+          {
+            const fvec zFinal = 100.f;
+            i = NStations - 1;
+            fvec initialised = fvec(zFinal > Tout.z); // 3cm safe distance, needed because of diff position of sensors
+            L1Extrapolate( Tout, zFinal, qp0, fld, &initialised ); // extra with old field
+          }
+          
+        }
+        for(iVec=0; iVec<nTracks_SIMD; iVec++)
+        {
+          t[iVec]->TLast[0] = Tout.x[iVec];
+          t[iVec]->TLast[1] = Tout.y[iVec];
+          t[iVec]->TLast[2] = Tout.tx[iVec];
+          t[iVec]->TLast[3] = Tout.ty[iVec];
+          t[iVec]->TLast[4] = Tout.qp[iVec];
+          t[iVec]->TLast[5] = Tout.z[iVec];
+      
+          t[iVec]->CLast[0] = Tout.C00[iVec];
+          t[iVec]->CLast[1] = Tout.C10[iVec];
+          t[iVec]->CLast[2] = Tout.C11[iVec];
+          t[iVec]->CLast[3] = Tout.C20[iVec];
+          t[iVec]->CLast[4] = Tout.C21[iVec];
+          t[iVec]->CLast[5] = Tout.C22[iVec];
+          t[iVec]->CLast[6] = Tout.C30[iVec];
+          t[iVec]->CLast[7] = Tout.C31[iVec];
+          t[iVec]->CLast[8] = Tout.C32[iVec];
+          t[iVec]->CLast[9] = Tout.C33[iVec];
+          t[iVec]->CLast[10] = Tout.C40[iVec];
+          t[iVec]->CLast[11] = Tout.C41[iVec];
+          t[iVec]->CLast[12] = Tout.C42[iVec];
+          t[iVec]->CLast[13] = Tout.C43[iVec];
+          t[iVec]->CLast[14] = Tout.C44[iVec];
+
+          t[iVec]->chi2 = Tout.chi2[iVec];
+          t[iVec]->NDF = (int)Tout.NDF[iVec];
+        }
       }
     } // iter
   }

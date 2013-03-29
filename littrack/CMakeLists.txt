@@ -52,7 +52,8 @@ set(LITTRACK_SRCS_RULECHECKER
    
    cbm/elid/CbmLitGlobalElectronId.cxx
    
-   cbm/finder/CbmLitFindMvdTracks.cxx
+   cbm/reco/CbmLitFindMvdTracks.cxx
+   cbm/reco/CbmLitFitTracksParallel.cxx
    
    cbm/generators/CbmLitPolarizedGenerator.cxx
    
@@ -63,16 +64,14 @@ set(LITTRACK_SRCS_RULECHECKER
    cbm/qa/mc/CbmLitMCTrackCreator.cxx
    cbm/qa/CbmLitCreateStandaloneData.cxx
    cbm/qa/CbmLitTestMatrixMath.cxx
-   
-   cbm/parallel/CbmLitFitTracksParallel.cxx
 )
 
 set(LITTRACK_HEADERS
    cbm/elid/CbmLitGlobalElectronId.h
-   cbm/finder/CbmLitFindGlobalTracks.h
-   cbm/finder/CbmLitFindMvdTracks.h
-   cbm/finder/CbmLitFindGlobalTracksIdeal.h
-   cbm/parallel/CbmLitFitTracksParallel.h
+   cbm/reco/CbmLitFindGlobalTracks.h
+   cbm/reco/CbmLitFindMvdTracks.h
+   cbm/reco/CbmLitFindGlobalTracksIdeal.h
+   cbm/reco/CbmLitFitTracksParallel.h
    cbm/generators/CbmLitPolarizedGenerator.h
    cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
    cbm/qa/material/CbmLitCheckBrem.h 
@@ -102,8 +101,8 @@ SET(LITTRACK_SRCS
    cbm/base/CbmLitFieldFitter.cxx
    cbm/base/CbmLitToolFactory.cxx
    cbm/base/CbmLitTrackingGeometryConstructor.cxx
-   cbm/finder/CbmLitFindGlobalTracks.cxx 
-   cbm/finder/CbmLitFindGlobalTracksIdeal.cxx 
+   cbm/reco/CbmLitFindGlobalTracks.cxx 
+   cbm/reco/CbmLitFindGlobalTracksIdeal.cxx 
    cbm/utils/CbmLitConverter.cxx
    cbm/utils/CbmLitConverterParallel.cxx
    cbm/qa/tracking/CbmLitTrackingQa.cxx

@@ -4,7 +4,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2011
  */
-#include "finder/CbmLitFindMvdTracks.h"
+#include "CbmLitFindMvdTracks.h"
 #include "base/CbmLitTrackingGeometryConstructor.h"
 #include "base/CbmLitToolFactory.h"
 #include "data/CbmLitHit.h"

@@ -3,8 +3,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  */
-#include "finder/CbmLitFindGlobalTracksIdeal.h"
-
+#include "CbmLitFindGlobalTracksIdeal.h"
 #include "CbmTrackMatch.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"

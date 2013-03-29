@@ -125,10 +125,10 @@ void global_reco_qa(Int_t nEvents = 5,
    fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 
-   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-   clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
-   clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);
+//   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+//   clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
+//   clusteringQa->SetOutputDir(std::string(resultDir));
+//   run->AddTask(clusteringQa);
    // -----------------------------------------------------------------------
 
    // -----  Parameter database   --------------------------------------------

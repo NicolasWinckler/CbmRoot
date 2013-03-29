@@ -33,7 +33,7 @@ CbmClusteringWard::CbmClusteringWard():
 		padsInClusters(),
 		fS(),
 		fClustersInBlock(),
-		clustersInMethod_2(),
+		clustersInMethod_2(0),
 		wardActivePads(),
 		fClusters(),
 		firstBlockElement(),
@@ -520,7 +520,7 @@ void CbmClusteringWard::WardProcessingData(Float_t maxDistance)
 			cluster1 = cluster2;
 			cluster2 = k;
 		}
-		std::cout<<">>>Connect Cl "<<cluster2<<" to Cl "<<cluster1<<"\n";
+//		std::cout<<">>>Connect Cl "<<cluster2<<" to Cl "<<cluster1<<"\n";
 		//Sbros aktivnosti prisoedin9emogo klastera,
 		//Esli oni dubliryut sv9zi glavnogo klastera
 		for(Int_t iCl = 0; iCl < fClustersInBlock[cluster1].nofNeighbors; iCl++)	//0 <> 1 - ???
@@ -642,13 +642,18 @@ void CbmClusteringWard::WardProcessingData(Float_t maxDistance)
 
 void CbmClusteringWard::GetClustersFromBlock()
 {
-	std::cout<<"-===-clInMethod: "<<clustersInMethod<<"\n";
+//	std::cout<<"-===-clInMethod: "<<clustersInMethod<<"\n";
+   Int_t nc = fNofClusters;
 	for(Int_t iCl = 0; iCl < /*clustersInMethod*/fNofClusters; iCl++)	//0 <> 1 - ???
 	{
+	   if(fClustersInBlock[iCl].nofPads == 0){
+	      nc--;
+	      continue;
+	   }
 		fClusters[clustersInMethod_2 + iCl].sumClCharge = fClustersInBlock[iCl].clCharge;
 		//fClusters[clustersInMethod_2 + iCl].linkToDesignation = fClustersInBlock[iCl].linkToDesignation;	//linkToDesignation - ???
 		fClusters[clustersInMethod_2 + iCl].nofCluster = fClustersInBlock[iCl].nofCluster;
-		std::cout<<"-=-nofPads: "<<fClustersInBlock[iCl].nofPads<<"\n";
+//		std::cout<<"-=-nofPads: "<<fClustersInBlock[iCl].nofPads<<"\n";
 		fClusters[clustersInMethod_2 + iCl].nofPads = fClustersInBlock[iCl].nofPads;
 		fClusters[clustersInMethod_2 + iCl].xc = fClustersInBlock[iCl].xc;
 		fClusters[clustersInMethod_2 + iCl].yc = fClustersInBlock[iCl].yc;
@@ -658,18 +663,22 @@ void CbmClusteringWard::GetClustersFromBlock()
 		}
 		//WARNING net zapolneni9 massiva sosedei - ?!
 	}
+	fNofClusters = nc;
 	clustersInMethod_2 += clustersInMethod;
-	std::cout<<"-===-clInMethod_2: "<<clustersInMethod_2<<"\n";
+//	std::cout<<"-===-clInMethod_2: "<<clustersInMethod_2<<"\n";
 	//std::cout<<"clustersInMethod: "<<clustersInMethod<<"\n";
 }
 
 void CbmClusteringWard::WardMainFunction(CbmClusteringGeometry* moduleGeo, Float_t maxDistance)
 {
-	//WardCreate(moduleGeo);
+	WardCreate(moduleGeo);
+	std::cout<<"---Ward block created\n";
 	//WardBlockCreate(moduleGeo);
-	//WardProcessingData(maxDistance);
-	//GetClustersFromBlock();
-	do{
+	WardProcessingData(maxDistance);
+	std::cout<<"---Ward data processed\n";
+	GetClustersFromBlock();
+	std::cout<<"---Ward clustering finished\n";
+	/*do{
 		Int_t TEMP = firstBlockElement;
 		WardBlockCreate(moduleGeo);
 		if(TEMP == firstBlockElement)
@@ -679,7 +688,7 @@ void CbmClusteringWard::WardMainFunction(CbmClusteringGeometry* moduleGeo, Float
 		}
 		WardProcessingData(maxDistance);
 		GetClustersFromBlock();
-	}while(firstBlockElement < fNofPads);
+	}while(firstBlockElement < fNofPads);*/
 }
 
 Int_t CbmClusteringWard::GetCluster(Int_t iCluster)

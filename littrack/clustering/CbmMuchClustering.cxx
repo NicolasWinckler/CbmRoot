@@ -325,7 +325,7 @@ void CbmMuchClustering::ClusteringMainFunction()
 {
 	Int_t nHit = 0;
 	Int_t nCluster = 0;
-	for(Int_t iMod = 0; iMod < fNofModules; iMod++)
+	for(Int_t iMod = 0; iMod < 10/*fNofModules*/; iMod++)
 	{
 		CbmMuchModuleGem* module = (CbmMuchModuleGem*)fScheme->GetModuleByDetId(
 				fModulesGeometryArray[iMod]->GetDetId());
@@ -352,18 +352,9 @@ void CbmMuchClustering::ClusteringMainFunction()
 		}
 		case 5:
 		{//Ward
+		   std::cout<<"Module started > "<<iMod<<"\n";
 			ClusteringWard(fModulesGeometryArray[iMod], module/*, 2, nHit, nCluster*/);
-			/*fClustersWard = new CbmClusteringWard(fModulesGeometryArray[iMod], 1000);
-			fClustersWard->WardMainFunction(fModulesGeometryArray[iMod], 100);
-			std::cout<<"Module:"<<module->GetDetectorId()<<" - Ward: nofClusters: "<<fClustersWard->GetNofClusters()<<"\n";
-//					for(Int_t iCl = 0; iCl < fClustersWard->GetNofClusters(); iCl++)
-//					{
-//						new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersWard->GetX0(iCl),
-//								fClustersWard->GetY0(iCl), fClustersWard->GetClCharge(iCl),
-//								fClustersWard->GetNofPads(iCl), 0,
-//								layerSideF->GetDetectorId(), moduleF->GetDetId());
-//					}
-			delete fClustersWard;*/
+			std::cout<<"Module finished > "<<iMod<<"\n\n";
 			break;
 		}
 		default: std::cout<<"Wrong version of the algorithm.\n"; break;
@@ -759,29 +750,20 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 	for(Int_t iCl = 0; iCl < fClustersSL->GetNofClusters(); iCl++)
 	{
 		vector<Int_t> digiIndices;
-		//---
 		Int_t detId = m2->GetDetectorId();
 		Double_t sumq=0, sumx=0, sumy=0, sumt=0, sumdx2=0, sumdy2=0, sumdxy2=0, sumdt2=0;
 		Double_t q=0,x=0,y=0,t=0,z=0,dx=0,dy=0,dxy=0,dt=0;
 		x = fClustersSL->GetX0(iCl);
 		y = fClustersSL->GetY0(iCl);
 		z = m2->GetPosition()[2];
-		//Double_t dx = std::numeric_limits<Double_t>::max();
-		//Double_t dy = std::numeric_limits<Double_t>::max();
 		CbmMuchPad* pad = NULL;
-		//std::cout<<"->iCl: "<<iCl<<"; Npads: "<<fClustersA1->GetNofPads(iCl);
 		for(Int_t iPad = 0; iPad < fClustersSL->GetNofPads(iCl); iPad++)
 		{
 			Int_t iDigi = fClustersSL->GetPadInCluster(iCl, iPad);
 			const CbmMuchDigi* muchDigi = static_cast<const CbmMuchDigi*>(fMuchDigi->At(iDigi));
 			digiIndices.push_back(iDigi);
-			//std::cout<<"-"<<a<<"-";
 			Long64_t channelId = muchDigi->GetChannelId();
 			pad = m2->GetPad(channelId);
-			//if (dx > pad->GetDx()) dx = pad->GetDx();
-			//if (dy > pad->GetDy()) dy = pad->GetDy();
-			//x   = pad->GetX();
-			//y   = pad->GetY();
 			t   = muchDigi->GetTime();
 			q   = muchDigi->GetADCCharge();
 			dx  = pad->GetDx();
@@ -789,8 +771,6 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 			dxy = pad->GetDxy();
 			dt = muchDigi->GetDTime();
 			sumq    += q;
-			//sumx    += q*x;
-			//sumy    += q*y;
 			sumt    += q*t;
 			sumdx2  += q*q*dx*dx;
 			sumdy2  += q*q*dy*dy;
@@ -802,120 +782,90 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 		dy  = sqrt(sumdy2/12)/sumq;
 		dxy = sqrt(sumdxy2/12)/sumq;
 		dt = sqrt(sumdt2)/sumq;
-		//std::cout<<"; qMax: "<<qMax<<"; SumCharge; "<<sumCharge<<"; Size: "<<digiIndices.size()<<"\n";
 		Int_t nCluster = fCluster->GetEntriesFast();
 		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
-		//---
-		//Double_t sigmaX = dx / TMath::Sqrt(12.);
-		//Double_t sigmaY = dy / TMath::Sqrt(12.);
 		Int_t planeId = fScheme->GetLayerSideNr(detId);
 		Int_t nHit = fHit->GetEntriesFast();
-		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, dx, dy, 0, dxy, nCluster/*fClustersSL->GetCluster(iCl)*/, planeId, t, dt);
+		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, dx, dy, 0, dxy, nCluster, planeId, t, dt);
 	}
-	delete fClustersSL;
+	if(fClustersSL) delete fClustersSL;
 }
 
 void CbmMuchClustering::ClusteringWard(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2)
 {
 	fClustersWard = new CbmClusteringWard(m1, 1000);
-	fClustersWard->WardMainFunction(m1, 5000);
-	//if(fClustersA1->GetNofClusters() != 0)std::cout<<"Module:"<<m2->GetDetectorId()<<" - A1.v"<<Ver<<": nofClusters: "<<fClustersA1->GetNofClusters()<<"\n";
+	fClustersWard->WardMainFunction(m1, 100000);
 	fNofClusters += fClustersWard->GetNofClusters();
 	for(Int_t iCl = 0; iCl < fClustersWard->GetNofClusters(); iCl++)
 	{
+//	   std::cout<<">Start "<<iCl<<"\n";
 		vector<Int_t> digiIndices;
 		//---
-		std::cout<<"=>Cluster "<<iCl<<"\n";
+		//std::cout<<"=>Cluster "<<iCl<<"\n";
 		Int_t detId = m2->GetDetectorId();
 		Double_t sumq=0, sumx=0, sumy=0, sumt=0, sumdx2=0, sumdy2=0, sumdxy2=0, sumdt2=0;
 		Double_t q=0,x=0,y=0,t=0,z=0,dx=0,dy=0,dxy=0,dt=0;
+//		std::cout<<">Values created\n";
 		x = fClustersWard->GetX0(iCl);
 		y = fClustersWard->GetY0(iCl);
 		z = m2->GetPosition()[2];
-		//Double_t dx = std::numeric_limits<Double_t>::max();
-		//Double_t dy = std::numeric_limits<Double_t>::max();
+//		std::cout<<">Center - ok; x: "<<x<<"; y: "<<y<<"; z: "<<z<<"\n";
 		CbmMuchPad* pad = NULL;
-		//std::cout<<"->iCl: "<<iCl<<"; Npads: "<<fClustersA1->GetNofPads(iCl);
 		fhDigisInCluster->Fill(fClustersWard->GetNofPads(iCl));
-		/*if(fClustersWard->GetNofPads(iCl) > 4)
-		{
-			std::cout<<"Cl: "<<iCl<<"; Pads: "<<fClustersWard->GetNofPads(iCl)<<"\n";
-			for(Int_t i = 0; i < fClustersWard->GetNofPads(iCl); i++)
-			{
-				const CbmMuchDigi* muchDigi1 = static_cast<const CbmMuchDigi*>(fMuchDigi->At(fClustersWard->GetPadInCluster(iCl, i)));
-				Long64_t channelId = muchDigi1->GetChannelId();
-				CbmMuchPad* pad1 = m2->GetPad(channelId);
-				CbmMuchPadRadial* pad2 = (CbmMuchPadRadial*)m2->GetPad(channelId);
-				//std::cout<<muchDigi1->GetADCCharge();//pad2->GetY();
-				std::cout<<"->Pad: "<<fClustersWard->GetPadInCluster(iCl, i)<<"; charge: "<<muchDigi1->GetADCCharge()<<"; chID: "<<channelId
-						<<"; X: "<<pad2->GetX()<<"; Y: "<<pad2->GetY();
-				Int_t nPad = m1->GetPadByChannelId(channelId);
-				//std::cout<<"; nPad: "<<nPad<<"; nn: "<<m1->GetGoodNeighborsNum(nPad)<<" >>> ";
-				for(Int_t j = 0; j < m1->GetGoodNeighborsNum(nPad); nPad++)
-				{
-					//Int_t nb = m1->GetNeighbor(nPad, j);
-					//std::cout<<" - "<<m1->GetNeighbor(nPad, j);
-				}
-				std::cout<<"\n";
-			}
-		}*/
+//		std::cout<<">Start calculations... \n";
 		for(Int_t iPad = 0; iPad < fClustersWard->GetNofPads(iCl); iPad++)
 		{
 			Int_t iDigi = fClustersWard->GetPadInCluster(iCl, iPad);
-			std::cout<<"iDigi: "<<iDigi<<"\n";
+//			std::cout<<">>iDigi: "<<iDigi;
 			const CbmMuchDigi* muchDigi = static_cast<const CbmMuchDigi*>(fMuchDigi->At(iDigi));
+//			std::cout<<" - ok";
 			digiIndices.push_back(iDigi);
-			//std::cout<<"-"<<a<<"-";
+//			std::cout<<" - ok\n";
 			Long64_t channelId = muchDigi->GetChannelId();
+//			std::cout<<">>channelId: "<<channelId<<"\n";
 			pad = m2->GetPad(channelId);
-			//if (dx > pad->GetDx()) dx = pad->GetDx();
-			//if (dy > pad->GetDy()) dy = pad->GetDy();
-			//x   = pad->GetX();
-			//y   = pad->GetY();
+//			std::cout<<">>Pad - ok\n";
 			t   = muchDigi->GetTime();
 			q   = muchDigi->GetADCCharge();
-			dx  = pad->GetDx();
-			dy  = pad->GetDy();
+//			std::cout<<">>t, q - ok\n";
+			dx  = 1;//pad->GetDx();
+//			std::cout<<">>dx - ok\n";
+			dy  = 1;//pad->GetDy();
+//			std::cout<<">>dy - ok\n";
 			dxy = pad->GetDxy();
+//			std::cout<<">>dxy - ok\n";
 			dt = muchDigi->GetDTime();
+//			std::cout<<">>dt - ok\n";
 			sumq    += q;
-			//sumx    += q*x;
-			//sumy    += q*y;
 			sumt    += q*t;
 			sumdx2  += q*q*dx*dx;
 			sumdy2  += q*q*dy*dy;
 			sumdxy2 += q*q*dxy*dxy;
 			sumdt2  += q*q*dt*dt;
+//			std::cout<<">>sum - ok\n";
 		}
+//		std::cout<<" ...finished\n";
 		t   = sumt/sumq;
 		dx  = sqrt(sumdx2/12)/sumq;
 		dy  = sqrt(sumdy2/12)/sumq;
 		dxy = sqrt(sumdxy2/12)/sumq;
 		dt = sqrt(sumdt2)/sumq;
-		//std::cout<<"; qMax: "<<qMax<<"; SumCharge; "<<sumCharge<<"; Size: "<<digiIndices.size()<<"\n";
+//		std::cout<<"-----Data calculated for Cl "<<iCl<<"\n";
 		Int_t nCluster = fCluster->GetEntriesFast();
+//		std::cout<<"-------Add cluster "<<nCluster<<"; nDigis: "<<digiIndices.size();
 		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
+//		std::cout<<" - ok\n";
 		//---
-		//Double_t sigmaX = dx / TMath::Sqrt(12.);
-		//Double_t sigmaY = dy / TMath::Sqrt(12.);
 		Int_t planeId = fScheme->GetLayerSideNr(detId);
 		Int_t nHit = fHit->GetEntriesFast();
-		/*std::cout<<"\nCluster: "<<nHit<<"; detId: "<<detId<<"\n";
+		std::cout<<"\nCluster: "<<nHit<<"; detId: "<<detId<<"; NofPads: "<<fClustersWard->GetNofPads(iCl)<<"\n";
 		std::cout<<"x: "<<x<<"; y: "<<y<<"; z: "<<z<<"\n";
 		std::cout<<"dx: "<<dx<<"; dy: "<<dy<<"; dxy: "<<dxy<<"\n";
 		std::cout<<"planeId: "<<planeId<<"; t: "<<t<<"; dt: "<<dt<<"\n";
-		std::cout<<"-------\n";*/
-		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, dx, dy, 0, dxy, nCluster/*fClustersA1->GetCluster(iCl)*/, planeId, t, dt);
-		//---
-		/*TVector3 pos, dpos;
-		pos.SetXYZ(x, y, z);
-		dpos.SetXYZ(sigmaX, sigmaY, 0.);
-		new ((*fStrawHit)[nHit]) CbmMuchStrawHit(detId, pos, dpos, 0);*/
-		//---
-		/*new ((*fClusters)[nClusters++]) CbmMuchClFull(fClustersA1->GetX0(iCl),
-				fClustersA1->GetY0(iCl), fClustersA1->GetClCharge(iCl),
-				fClustersA1->GetNofPads(iCl), fClustersA1->GetPads(iCl),
-				layerSideF->GetDetectorId(), m1->GetDetId());*/
+		std::cout<<"-------\n";
+//		std::cout<<"-------Add Hit "<<nHit;
+		new ((*fHit)[nHit]) CbmMuchPixelHit(detId, x, y, z, dx, dy, 0, dxy, nCluster, planeId, t, dt);
+//		std::cout<<" - ok\n";
 	}
 	delete fClustersWard;
 }

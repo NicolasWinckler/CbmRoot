@@ -36,6 +36,8 @@ class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;
 
+class CbmHistManager;
+
 class TH1F;
 
 class CbmMvdClustering: public FairTask
@@ -80,6 +82,8 @@ public:
 private:
 
    void ReadDataBranches();
+
+   CbmHistManager* fHM; // Histogram manager
 
    //
    TClonesArray* fMCTracks;
@@ -139,6 +143,17 @@ private:
    TH1F* fhMaxDigiCharges;
    TH1F* fhMaxDigiChargesStation1;
    TH1F* fhMaxDigiChargesStation2;
+
+   TH1F* fhResidual_X_St1;
+   TH1F* fhResidual_Y_St1;
+   TH1F* fhResidual_X_St2;
+   TH1F* fhResidual_Y_St2;
+   TH1F* fhResidual_X;
+   TH1F* fhResidual_Y;
+   TH1F* fhPull_X_St1;
+   TH1F* fhPull_Y_St1;
+   TH1F* fhPull_X_St2;
+   TH1F* fhPull_Y_St2;
 
    Int_t fNofEvents;
    Float_t fEfficiency;

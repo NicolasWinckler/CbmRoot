@@ -29,10 +29,10 @@ using std::cout;
 using std::endl;
 
 CbmClusteringSL::CbmClusteringSL():
-		fS(),
-		fNumbersOfPads(),
-		fA1(),
-		fClusters()
+		fS(NULL),
+		fNumbersOfPads(NULL),
+		fA1(NULL),
+		fClusters(NULL)
 {
 	fNofPads = 0;
 	fNofActivePads = 0;
@@ -40,13 +40,17 @@ CbmClusteringSL::CbmClusteringSL():
 }
 
 CbmClusteringSL::CbmClusteringSL(CbmClusteringGeometry* moduleGeo):
-		fClusters()
+      fS(NULL),
+      fNumbersOfPads(NULL),
+      fA1(NULL),
+      fClusters(NULL)
 {
 	fNofPads = moduleGeo->GetNPads();
 	fNofActivePads = moduleGeo->GetAPadsNom();
 	fNofClusters = fNofActivePads;
 	fA1 = new UInt_t [fNofPads];
 	fS = new Bool_t [fNofPads];
+	fClusters = new Cluster [fNofActivePads];
 	fNumbersOfPads = new Int_t [fNofPads];
 	Int_t nom = 0;
 	for(Int_t iPad = 0; iPad < fNofPads; iPad++)
@@ -65,10 +69,10 @@ CbmClusteringSL::CbmClusteringSL(CbmClusteringGeometry* moduleGeo):
 
 CbmClusteringSL::~CbmClusteringSL()
 {
-	delete fA1;
-	delete fS;
-	delete fNumbersOfPads;
-	delete fClusters;
+	/*if(fA1 != NULL)*/ delete [] fA1;
+	/*if(fS != NULL)*/ delete [] fS;
+	/*if(fNumbersOfPads != NULL)*/ delete [] fNumbersOfPads;
+	/*if(fClusters != NULL)*/ delete [] fClusters;
 }
 
 void CbmClusteringSL::SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad)
@@ -132,8 +136,6 @@ void CbmClusteringSL::MainClusteringSL(CbmClusteringGeometry* moduleGeo, Int_t a
 			fS[iPad] = 1;
 		}
 	}
-
-	fClusters = new Cluster[fNofActivePads];
 	for(Int_t iPad = 0; iPad < fNofActivePads; iPad++)
 	{
 		//fClusters[iPad].nofCluster = 0;

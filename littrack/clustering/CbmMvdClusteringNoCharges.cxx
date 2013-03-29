@@ -39,6 +39,7 @@
 #include "TVector3.h"
 #include "TMath.h"
 #include "TH1.h"
+#include "TF1.h"
 #include "TH2.h"
 #include "TH1F.h"
 
@@ -68,6 +69,16 @@ CbmMvdClusteringNoCharges::CbmMvdClusteringNoCharges():
 		/*fhErrPoint_Hit(NULL),
 		fhErrPoint_Pixel(NULL),
 		fhErrHit_Pixel(NULL),*/
+      fhResidual_X_St1(NULL),
+            fhResidual_Y_St1(NULL),
+            fhResidual_X_St2(NULL),
+            fhResidual_Y_St2(NULL),
+            fhResidual_X(NULL),
+            fhResidual_Y(NULL),
+            fhPull_X_St1(NULL),
+            fhPull_Y_St1(NULL),
+            fhPull_X_St2(NULL),
+            fhPull_Y_St2(NULL),
 		fhErrorsHit_MCPoint(NULL),
 		fhErrorsHit_Pixel(NULL),
 		fhErrorsPixel_MCPoint(NULL),
@@ -183,6 +194,17 @@ InitStatus CbmMvdClusteringNoCharges::Init()
    fhDigisInClusterPDG3222 = new TH1F("fhDigisInClusterPDG3222", "hDigisInClusterPDG3222;nofDigis;nofClusters_3222", 100, 0, 100);
    fhDigisInClusterPDG3112 = new TH1F("fhDigisInClusterPDG3112", "hDigisInClusterPDG3112;nofDigis;nofClusters_3112", 100, 0, 100);
    fhDigisInClusterPDG13 = new TH1F("fhDigisInClusterPDG13", "hDigisInClusterPDG13;nofDigis;nofClusters_13_Muon", 100, 0, 100);
+
+   fhResidual_X_St1 = new TH1F("fhResidual_X_St1", "fhResidual_X_St1;Residual[cm];Counter", 100, -0.0015, 0.0015);
+   fhResidual_Y_St1 = new TH1F("fhResidual_Y_St1", "fhResidual_Y_St1;Residual[cm];Counter", 100, -0.0015, 0.0015);
+   fhResidual_X_St2 = new TH1F("fhResidual_X_St2", "fhResidual_X_St2;Residual[cm];Counter", 100, -0.0015, 0.0015);
+   fhResidual_Y_St2 = new TH1F("fhResidual_Y_St2", "fhResidual_Y_St2;Residual[cm];Counter", 100, -0.0015, 0.0015);
+   fhResidual_X = new TH1F("fhResidual_X", "fhResidual_X;Residual[cm];Counter", 100, -0.0015, 0.0015);
+   fhResidual_Y = new TH1F("fhResidual_Y", "fhResidual_Y;Residual[cm];Counter", 100, -0.0015, 0.0015);
+   fhPull_X_St1 = new TH1F("fhPull_X_St1", "fhPull_X_St1;Pull[cm];Counter", 100, -0.0015, 0.0015);
+   fhPull_Y_St1 = new TH1F("fhPull_Y_St1", "fhPull_Y_St1;Pull[cm];Counter", 100, -0.0015, 0.0015);
+   fhPull_X_St2 = new TH1F("fhPull_X_St2", "fhPull_X_St2;Pull[cm];Counter", 100, -0.0015, 0.0015);
+   fhPull_Y_St2 = new TH1F("fhPull_Y_St2", "fhPull_Y_St2;Pull[cm];Counter", 100, -0.0015, 0.0015);
 
    //TString fname = "/u/gkozlov/cbm/events/cc.25gev.centr_draw10.txt";
    //TString fname = "/u/gkozlov/cbm/events/pc.25gev.centr_draw10.txt";
@@ -379,6 +401,80 @@ void CbmMvdClusteringNoCharges::Finish()
 
    TCanvas* canvasPDG13 = new TCanvas("fhDigisInClusterByParticlesMuon", "fhDigisInClusterByParticlesMuon", 1000, 500);
    DrawH1(fhDigisInClusterPDG13);
+
+   fhResidual_X_St1->Fit("gaus");
+   fhResidual_Y_St1->Fit("gaus");
+   fhResidual_X_St2->Fit("gaus");
+   fhResidual_Y_St2->Fit("gaus");
+   fhResidual_X->Fit("gaus");
+   fhResidual_Y->Fit("gaus");
+   Double_t vol = 0;
+   vol = fhResidual_X_St1->GetRMS() * 100000;
+   std::cout<<"Res X St 1 RMS: "<<vol<<"\n";
+   vol = fhResidual_X_St2->GetRMS() * 100000;
+   std::cout<<"Res X St 2 RMS: "<<vol<<"\n";
+   vol = fhResidual_Y_St1->GetRMS() * 100000;
+   std::cout<<"Res Y St 1 RMS: "<<vol<<"\n";
+   vol = fhResidual_Y_St2->GetRMS() * 100000;
+   std::cout<<"Res Y St 2 RMS: "<<vol<<"\n";
+   vol = fhResidual_X->GetRMS() * 100000;
+   std::cout<<"Res X RMS: "<<vol<<"\n";
+   vol = fhResidual_Y->GetRMS() * 100000;
+   std::cout<<"Res Y RMS: "<<vol<<"\n";
+   vol = fhResidual_X_St1->GetMean() * 100000;
+   std::cout<<"Res X St 1 Mean: "<<vol<<"\n";
+   vol = fhResidual_X_St2->GetMean() * 100000;
+   std::cout<<"Res X St 2 Mean: "<<vol<<"\n";
+   vol = fhResidual_Y_St1->GetMean() * 100000;
+   std::cout<<"Res Y St 1 Mean: "<<vol<<"\n";
+   vol = fhResidual_Y_St2->GetMean() * 100000;
+   std::cout<<"Res Y St 2 Mean: "<<vol<<"\n";
+   vol = fhResidual_X->GetMean() * 100000;
+   std::cout<<"Res X Mean: "<<vol<<"\n";
+   vol = fhResidual_Y->GetMean() * 100000;
+   std::cout<<"Res Y Mean: "<<vol<<"\n";
+   TF1* fitX1 = fhResidual_X_St1->GetFunction("gaus");
+   vol = fitX1->GetParameter(2) * 100000;
+   std::cout<<"Res X St 1 Sigma: "<<vol<<"\n";
+   TF1* fitX2 = fhResidual_X_St2->GetFunction("gaus");
+   vol = fitX2->GetParameter(2) * 100000;
+   std::cout<<"Res X St 2 Sigma: "<<vol<<"\n";
+   TF1* fitY1 = fhResidual_Y_St1->GetFunction("gaus");
+   vol = fitY1->GetParameter(2) * 100000;
+   std::cout<<"Res Y St 1 Sigma: "<<vol<<"\n";
+   TF1* fitY2 = fhResidual_Y_St2->GetFunction("gaus");
+   vol = fitY2->GetParameter(2) * 100000;
+   std::cout<<"Res Y St 2 Sigma: "<<vol<<"\n";
+   TF1* fitX = fhResidual_X->GetFunction("gaus");
+   vol = fitX->GetParameter(2) * 100000;
+   std::cout<<"Res X Sigma: "<<vol<<"\n";
+   TF1* fitY = fhResidual_Y->GetFunction("gaus");
+   vol = fitY->GetParameter(2) * 100000;
+   std::cout<<"Res Y Sigma: "<<vol<<"\n";
+   fhResidual_X_St1->Write();
+   fhResidual_Y_St1->Write();
+   fhResidual_X_St2->Write();
+   fhResidual_Y_St2->Write();
+   fhResidual_X->Write();
+   fhResidual_Y->Write();
+   fhPull_X_St1->Write();
+   fhPull_Y_St1->Write();
+   fhPull_X_St2->Write();
+   fhPull_Y_St2->Write();
+   TCanvas* canvasRes = new TCanvas("fhResidual", "fhResidual", 1000, 1000);
+   canvasRes->Divide(2, 2);
+   canvasRes->cd(1);
+   DrawH1(fhResidual_X_St1, kLinear, kLog);
+   canvasRes->cd(2);
+   DrawH1(fhResidual_Y_St1, kLinear, kLog);
+   canvasRes->cd(3);
+   DrawH1(fhResidual_X_St2, kLinear, kLog);
+   canvasRes->cd(4);
+   DrawH1(fhResidual_Y_St2, kLinear, kLog);
+   TCanvas* canvasResX = new TCanvas("fhResidual_X", "fhResidual_X", 600, 600);
+   DrawH1(fhResidual_X, kLinear, kLog);
+   TCanvas* canvasResY = new TCanvas("fhResidual_Y", "fhResidual_Y", 600, 600);
+   DrawH1(fhResidual_Y, kLinear, kLog);
 }
 
 Int_t CbmMvdClusteringNoCharges::GetMvdGeometry() {
@@ -1079,6 +1175,8 @@ void CbmMvdClusteringNoCharges::PrintClusters()
 		CbmMvdPoint* point = (CbmMvdPoint*) fPoints->At(fClusters[iCl].nMCPoint);
 		Float_t xP = 0.5 * (point->GetX() + point->GetXOut());
 		Float_t yP = 0.5 * (point->GetY() + point->GetYOut());
+		Float_t eX = fClusters[iCl].xc - xP;
+        Float_t eY = fClusters[iCl].yc - yP;
 		Float_t errPoint_Pixel = sqrt(((Xdigi - xP) * (Xdigi - xP)) +
 				((Ydigi - yP) * (Ydigi - yP)));
 		Float_t errHit_Point = sqrt(((fClusters[iCl].xc - xP) *
@@ -1198,18 +1296,24 @@ void CbmMvdClusteringNoCharges::PrintClusters()
 		default:
 			break;
 		}
-		if(fClusters[iCl].nofDidis == 64)
-		{
+//		if(fClusters[iCl].nofDidis == 64)
+//		{
 		fhMaxDigiCharges->Fill(digi->GetCharge());
 		if(digi->GetStationNr() == 1)
 		{
 			fhMaxDigiChargesStation1->Fill(digi->GetCharge());
+			fhResidual_X_St1->Fill(eX);
+            fhResidual_Y_St1->Fill(eY);
 		}
 		if(digi->GetStationNr() == 2)
 		{
 			fhMaxDigiChargesStation2->Fill(digi->GetCharge());
+			fhResidual_X_St2->Fill(eX);
+            fhResidual_Y_St2->Fill(eY);
 		}
-		}
+//		}
+		fhResidual_X->Fill(eX);
+        fhResidual_Y->Fill(eY);
 		/*std::cout<<"Cl: "<<iCl<<"; Station: "<<digi->GetStationNr()<<"\n-Xc: "<<
 				fClusters[iCl].xc<<"; Yc: "<<fClusters[iCl].yc<<"; Charge: "<<
 				fClusters[iCl].sumClCharge<<"; nDigis: "<<fClusters[iCl].nofDidis<<

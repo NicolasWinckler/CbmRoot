@@ -17,7 +17,7 @@ collision_type=${collision_arr[2]}
 
 create_output_dir events_${test_name}/
 
-nevents=500
+nevents=300
 
 if [ "${detector_setup}" = "electron" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN

@@ -133,7 +133,7 @@ void CbmAnaDielectronTaskDraw::RebinMinvHist()
       for (int iP = 0; iP < CbmAnaLmvmNames::fNofBgPairSources; iP++){
          stringstream ss;
          ss << "fh_source_bg_minv_" << iP << "_" << CbmAnaLmvmNames::fAnaSteps[i];
-         H1(ss.str())->Rebin(4*nRebin);
+         H1(ss.str())->Rebin(8*nRebin);
       }
    }
 }
@@ -646,6 +646,12 @@ void CbmAnaDielectronTaskDraw::Draw2DCut(
    c->cd(6);
    DrawH1(projY, CbmAnaLmvmNames::fSourceTypesLatex, kLinear, kLog, true, 0.8, 0.8, 0.99, 0.99);
 
+   TCanvas* c2 = CreateCanvas(("lmvm_" + hist+"_signal").c_str(), ("lmvm_" + hist+"_signal").c_str(), 800, 800);
+   DrawH2(H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[kSignal] ));
+   Draw2DCutTriangle(cutCrossX, cutCrossY);
+   TCanvas* c3 = CreateCanvas(("lmvm_" + hist+"_gamma").c_str(), ("lmvm_" + hist+"_gamma").c_str(), 800, 800);
+   DrawH2(H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[kGamma] ));
+   Draw2DCutTriangle(cutCrossX, cutCrossY);
    //c->cd(9);
   //TH2D* fh_significance = CalculateSignificance2D(fh_stcut_signal, fh_stcut_bg, "stcut_2dsignificance", "significance");
   //fh_significance->Draw("COLZ");
@@ -887,13 +893,23 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
    }
 
    // Draw minv after PtCut
+   double trueMatch = H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut])->GetEntries();
+   double trueMatchEl = H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut])->GetEntries();
+   double trueMatchNotEl = H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut])->GetEntries();
+   double misMatch = H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut])->GetEntries();
+   double nofBg = H1("fh_bg_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut])->GetEntries();
+
    TCanvas *cPtCut = CreateCanvas("lmvm_minv_mismatches_" + CbmAnaLmvmNames::fAnaSteps[kPtCut],
             "lmvm_minv_mismatches_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 700, 700);
    DrawH1(list_of( H1("fh_bg_truematch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
          ( H1("fh_bg_truematch_el_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
          ( H1("fh_bg_truematch_notel_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) )
          ( H1("fh_bg_mismatch_minv_" + CbmAnaLmvmNames::fAnaSteps[kPtCut]) ),
-         list_of("true match")("true match (e^{#pm})")("true match (not e^{#pm})")("mismatch"), kLinear, kLinear, true, 0.5, 0.7, 0.99, 0.99);
+         list_of("true match (" + lit::NumberToString(100. * trueMatch / nofBg, 1) + "%)")
+         ("true match (e^{#pm}) (" + lit::NumberToString(100. * trueMatchEl / nofBg, 1)+ "%)")
+         ("true match (not e^{#pm}) (" + lit::NumberToString(100. * trueMatchNotEl / nofBg, 1)+ "%)")
+         ("mismatch (" + lit::NumberToString(100. * misMatch / nofBg)+ "%)"),
+         kLinear, kLinear, true, 0.4, 0.7, 0.99, 0.99);
    }
 }
 

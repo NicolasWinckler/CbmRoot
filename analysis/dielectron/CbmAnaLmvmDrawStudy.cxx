@@ -139,22 +139,23 @@ void CbmAnaLmvmDrawStudy::DrawMinv()
    vector<TH1*> hPtCut, hTtCut;
    hPtCut.resize(fMeanFiles.size());
    hTtCut.resize(fMeanFiles.size());
+   int nRebin = 20;
    for (int i = 0; i < fMeanFiles.size(); i++){
       TFile* f = new TFile(fMeanFiles[i].c_str(), "READ");
 
       hPtCut[i] = (TH1D*)f->Get("fh_bg_minv_ptcut")->Clone();
-      hPtCut[i]->Rebin(10);
+      hPtCut[i]->Rebin(nRebin);
       hPtCut[i]->SetMinimum(1e-6);
       hTtCut[i] = (TH1D*)f->Get("fh_bg_minv_ttcut")->Clone();
-      hTtCut[i]->Rebin(10);
+      hTtCut[i]->Rebin(nRebin);
       hPtCut[i]->SetMinimum(1e-6);
       //f->Close();
    }
    TCanvas *c1 = CreateCanvas("lmvm_study_minv_bg_ttcut", "lmvm_study_minv_bg_ttcut", 600, 600);
-   DrawH1(hTtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.65, 0.99, 0.99, "");
+   DrawH1(hTtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.55, 0.99, 0.99, "");
 
    TCanvas *c2 = CreateCanvas("lmvm_study_minv_bg_ptcut", "lmvm_study_minv_bg_ptcut", 600, 600);
-   DrawH1(hPtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.65, 0.99, 0.99, "");
+   DrawH1(hPtCut, fStudyNames, kLinear, kLog, true, 0.70, 0.55, 0.99, 0.99, "");
 
 
   /* TCanvas *c1 = CreateCanvas("lmvm_study_minv_urqmd", "lmvm_study_minv_urqmd", 900, 900);

@@ -29,6 +29,7 @@
 #include "TEllipse.h"
 #include "TStyle.h"
 #include "TSystem.h"
+#include "TLatex.h"
 
 #include "CbmAnaPTree.h"
 
@@ -124,32 +125,12 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
       AnalysisSteps step)
 {
    TH1D* sRho = (TH1D*) H1(kRho0, "fh_signal_minv_" + CbmAnaLmvmNames::fAnaSteps[step])->Clone();
-   sRho->SetFillColor(kMagenta-3);
-   sRho->SetLineColor(kBlack);
-
    TH1D* sOmega = (TH1D*) H1(kOmega, "fh_signal_minv_" + CbmAnaLmvmNames::fAnaSteps[step])->Clone();
-   sOmega->SetFillColor(kOrange+7);
-   sOmega->SetLineColor(kBlack);
-
    TH1D* sPhi = (TH1D*) H1(kPhi, "fh_signal_minv_" + CbmAnaLmvmNames::fAnaSteps[step])->Clone();
-   sPhi->SetFillColor(kRed+1);
-   sPhi->SetLineColor(kBlack);
-
    TH1D* bg = fh_mean_bg_minv[step];
-   bg->SetFillColor(kYellow-10);
-   bg->SetLineColor(kBlack);
-
    TH1D* sEta = fh_mean_eta_minv[step];
-   sEta->SetFillColor(kAzure+2);
-   sEta->SetLineColor(kBlack);
-
    TH1D* sPi0 = fh_mean_pi0_minv[step];
-   sPi0->SetFillColor(kGreen-3);
-   sPi0->SetLineColor(kBlack);
-
    TH1D* sOmegaDalitz = (TH1D*) H1(kOmegaD, "fh_signal_minv_" + CbmAnaLmvmNames::fAnaSteps[step])->Clone();
-   sOmegaDalitz->SetFillColor(kCyan+2);
-   sOmegaDalitz->SetLineColor(kBlack);
 
    TH1D* coctail = (TH1D*)sRho->Clone();
    coctail->Add(sOmega);
@@ -159,8 +140,6 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    coctail->Add(sOmegaDalitz);
 
    TH1D* sbg = (TH1D*)bg->Clone();
-   sbg->SetFillColor(kBlack);
-   sbg->SetLineColor(kBlack);
    sbg->Add(sRho);
    sbg->Add(sOmega);
    sbg->Add(sPhi);
@@ -180,19 +159,30 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    sOmega->Rebin(nRebin);
    sRho->Rebin(nRebin);
    sPhi->Rebin(nRebin);
+
    DrawH1(list_of(sbg)(bg)(coctail)(sPi0)(sEta)(sOmegaDalitz)(sOmega)(sRho)(sPhi),
          list_of("")("")("")("")("")("")("")("")(""), kLinear, kLog, false, 0.8, 0.8, 0.99, 0.99);
+
+   TLatex latex;
+  // latex.SetTextSize(0.08);
+
+   latex.SetTextColor(kMagenta-3);
+   latex.DrawLatex(0.85, sRho->GetMaximum() * 1.1, "#rho^{0}");
    sRho->SetFillColor(kMagenta-3);
    sRho->SetLineColor(kMagenta-2);
    sRho->SetLineStyle(0);
    sRho->SetLineWidth(2);
    sRho->SetFillStyle(3112);
 
+   latex.SetTextColor(kOrange+7);
+   latex.DrawLatex(0.83, sOmega->GetMaximum() * 1.1, "#omega");
    sOmega->SetFillColor(kOrange+7);
    sOmega->SetLineColor(kOrange+4);
    sOmega->SetLineStyle(0);
    sOmega->SetLineWidth(2);
 
+   latex.SetTextColor(kAzure+2);
+   latex.DrawLatex(1.05, sPhi->GetMaximum() * 1.1, "#phi");
    sPhi->SetFillColor(kAzure+2);
    sPhi->SetLineColor(kAzure+3);
    sPhi->SetLineStyle(0);
@@ -206,16 +196,22 @@ void CbmAnaDielectronTaskDrawAll::DrawMinv(
    bg->SetLineStyle(0);
    bg->SetLineWidth(1);
 
+   latex.SetTextColor(kRed-4);
+   latex.DrawLatex(0.15, sEta->GetMaximum() * 1.1, "#eta");
    sEta->SetFillColor(kRed-4);
    sEta->SetLineColor(kRed+2);
    sEta->SetLineStyle(0);
    sEta->SetLineWidth(2);
 
+   latex.SetTextColor(kGreen-3);
+   latex.DrawLatex(0.1, sPi0->GetMaximum() * 1.1, "#pi^{0}");
    sPi0->SetFillColor(kGreen-3);
    sPi0->SetLineColor(kGreen+3);
    sPi0->SetLineStyle(0);
    sPi0->SetLineWidth(2);
 
+   latex.SetTextColor(kCyan+2);
+   latex.DrawLatex(0.2, sOmegaDalitz->GetMaximum() * 1.1, "#omega-Dalitz");
    sOmegaDalitz->SetFillColor(kCyan+2);
    sOmegaDalitz->SetLineColor(kCyan+4);
    sOmegaDalitz->SetLineStyle(0);

@@ -30,6 +30,7 @@ void cbmrootlibs()
    gSystem->Load("libL1");
    gSystem->Load("libMvd");
 
+   gSystem->Load("libLittrackparallel");
    gSystem->Load("libLittrack");
 
    gSystem->Load("libRich");
@@ -40,7 +41,6 @@ void cbmrootlibs()
    gSystem->Load("libGlobal");
 //   gSystem->Load("libcudalittrack");
 
-   gSystem->Load("libLittrackparallel");
    gSystem->Load("libMinuit2"); // Needed for field fitter
 
    gSystem->Load("libClustering");

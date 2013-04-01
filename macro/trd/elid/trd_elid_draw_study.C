@@ -21,22 +21,26 @@ void trd_elid_draw_study()
 
    vector<string> detectors;
    vector<string> leg;
-   detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus02.root"); leg.push_back("02/G10");
-   detectors.push_back("Spectra_Be_run2310008_Rad_A_Sus02.root"); leg.push_back("02/A");
-   detectors.push_back("Spectra_Be_run2310003_Rad_B_Sus02.root"); leg.push_back("02/B");
-   detectors.push_back("Spectra_Be_run2410003_Rad_H++_Sus02.root"); leg.push_back("02/H++");
+  // detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus02.root"); leg.push_back("02/G10");
+  // detectors.push_back("Spectra_Be_run2310008_Rad_A_Sus02.root"); leg.push_back("02/A");
+  // detectors.push_back("Spectra_Be_run2310003_Rad_B_Sus02.root"); leg.push_back("02/B");
+   detectors.push_back("Spectra_Be_run2410003_Rad_H++_Sus02.root"); leg.push_back("H++/02");
 
-   detectors.push_back("Spectra_Be_run2310013_Rad_G30_Sus06.root"); leg.push_back("06/G30");
-   detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus06.root");leg.push_back("06/G10");
-   detectors.push_back("Spectra_Be_run2310010_Rad_A_Sus06.root"); leg.push_back("06/A");
+   detectors.push_back("Spectra_Be_run2310013_Rad_G30_Sus06.root"); leg.push_back("G30/06");
+  // detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus06.root");leg.push_back("06/G10");
+  // detectors.push_back("Spectra_Be_run2310010_Rad_A_Sus06.root"); leg.push_back("06/A");
 
-   detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus12.root"); leg.push_back("12/G10");
-   detectors.push_back("Spectra_Be_run2310007_Rad_G20_Sus12.root"); leg.push_back("12/G20");
+  // detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus12.root"); leg.push_back("12/G10");
+  // detectors.push_back("Spectra_Be_run2310007_Rad_G20_Sus12.root"); leg.push_back("12/G20");
 
-   detectors.push_back("Spectra_Be_run2310004_Rad_F_Sus18.root"); leg.push_back("18/F");
-   detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus18.root"); leg.push_back("18/G10");
-   detectors.push_back("Spectra_Be_run2310014_Rad_B_Sus18.root"); leg.push_back("18/B");
-   detectors.push_back("Spectra_Be_run2310010_Rad_G20_Sus18.root"); leg.push_back("18/G20");
+   detectors.push_back("Spectra_Be_run2310004_Rad_F_Sus18.root"); leg.push_back("F/18");
+  // detectors.push_back("Spectra_Be_run2210010_Rad_G10_Sus18.root"); leg.push_back("18/G10");
+   detectors.push_back("Spectra_Be_run2310014_Rad_B_Sus18.root"); leg.push_back("B/18");
+  // detectors.push_back("Spectra_Be_run2310010_Rad_G20_Sus18.root"); leg.push_back("18/G20");
+
+   detectors.push_back("4mm_foam"); leg.push_back("4mm_foam");
+   detectors.push_back("5mm_fibre"); leg.push_back("5mm_fibre");
+   detectors.push_back("4mm_f350"); leg.push_back("4mm_f350");
 
    vector<vector<vector<double> > > piSupp;
    piSupp.resize(detectors.size());
@@ -56,12 +60,12 @@ void trd_elid_draw_study()
       }
    }
 
-/*   int nofTrdLayers = 11;
+   int nofTrdLayers = 10;
    vector<TH1*> result_hist;
    result_hist.resize(5);
    for (int iM = 0; iM < 5; iM++){
       stringstream ss;
-      ss << "pisupp_method_" << iM << ";SusiboId/Radiator;Pion suppression";
+      ss << "pisupp_method_" << iM << ";Radiator;Pion suppression";
       result_hist[iM] = new TH1D(ss.str().c_str(), ss.str().c_str(), detectors.size(), 0, detectors.size());
       for (int iF = 0; iF < detectors.size(); iF++){
          result_hist[iM]->SetBinContent(iF+1, piSupp[iF][iM][nofTrdLayers]);
@@ -70,9 +74,9 @@ void trd_elid_draw_study()
       }
       result_hist[iM]->GetXaxis()->SetLabelSize(0.01);
       result_hist[iM]->SetTitle("");
-   }*/
+   }
 
-   int radiatorInd = 4;
+ /*  int radiatorInd = 4;
    vector<TH1*> result_hist;
    result_hist.resize(5);
    for (int iM = 0; iM < 5; iM++){
@@ -85,7 +89,7 @@ void trd_elid_draw_study()
       }
       result_hist[iM]->GetXaxis()->SetLabelSize(0.01);
       result_hist[iM]->SetTitle("");
-   }
+   }*/
 
 
    vector<string> legM;
@@ -96,11 +100,18 @@ void trd_elid_draw_study()
    legM.push_back("Mean");
   // result_hist[0]->Draw();
    stringstream ss;
-   ss << "trd_elid_pisupp_results_hits_sus06_g30";
-   TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1200, 1200);
-   DrawH1(result_hist, legM, 1, 0, true, 0.9, 0.70, 1.0, 1.0);
+  // ss << detectors[radiatorInd] << "_results";
+   ss << "trd_elid_radiators_results";
+   TCanvas* c = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1200, 1000);
+   DrawH1(result_hist, legM, 1, 0, true, 0.91, 0.70, 1.0, 1.0);
    result_hist[0]->GetXaxis()->SetLabelSize(0.04);
 
-
+   for (int iM = 0; iM < 5; iM++){
+      result_hist[iM]->SetLabelSize(0.05);
+      result_hist[iM]->SetMinimum(9);
+      result_hist[iM]->SetMaximum(3e3);
+      result_hist[iM]->SetLineWidth(4);
+      result_hist[iM]->SetMarkerSize(2);
+   }
 
 }

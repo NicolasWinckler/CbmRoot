@@ -18,9 +18,9 @@ void trd_elid_train()
 
 
    int nofTrdLayers = 12;
-   string outputDir = "results/";
-   int idMethod = 0; //kANN = 0, kBDT = 1, kMEDIANA = 2, kLIKELIHOOD = 3, kMeanCut = 4
-   string radiatorName = "Spectra_Be_run2210010_Rad_G10_Sus02.root";
+   string outputDir = "results/temp/";
+   int idMethod = 4; //kANN = 0, kBDT = 1, kMEDIANA = 2, kLIKELIHOOD = 3, kMeanCut = 4
+   string radiatorName = "4mm_foam";
 
    TString script = TString(gSystem->Getenv("SCRIPT"));
    if (script == "yes"){
@@ -31,8 +31,9 @@ void trd_elid_train()
    }
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn(nofTrdLayers);
-	trainer->SetBeamDataFile("cern_oct_11_munster/"+radiatorName);
- /*  trainer->SetBeamDataFile("cern_oct_11_munster/Spectra_Be_run2210010_Rad_G10_Sus02.root");
+
+ /*	trainer->SetBeamDataFile("cern_oct_11_munster/"+radiatorName);
+  trainer->SetBeamDataFile("cern_oct_11_munster/Spectra_Be_run2210010_Rad_G10_Sus02.root");
    trainer->SetBeamDataFile("cern_oct_11_munster/Spectra_Be_run2310008_Rad_A_Sus02.root");
    trainer->SetBeamDataFile("cern_oct_11_munster/Spectra_Be_run2310003_Rad_B_Sus02.root");
    trainer->SetBeamDataFile("cern_oct_11_munster/Spectra_Be_run2410003_Rad_H++_Sus02.root");
@@ -67,11 +68,14 @@ void trd_elid_train()
    //Spectra_Be_run2410003_Rad_B_Sus18.root
    //Spectra_Be_run2310011_Rad_G20_Sus18.root
    //Spectra_Be_run2310013_Rad_B_Sus18.root
-*/
 
    trainer->SetBeamDataPiHist("pionSpectrum");
    trainer->SetBeamDataElHist("electronSpectrum");
-	//trainer->SetBeamDataFile("cern_oct_11_fra/qplots_andrey.root");
+*/
+
+	trainer->SetBeamDataFile("cern_oct_11_fra/qplots_andrey.root");
+   trainer->SetBeamDataPiHist("pi_" + radiatorName);
+   trainer->SetBeamDataElHist("el_" + radiatorName);
 	//trainer->SetBeamDataPiHist("pi_4mm_foam");
 	//trainer->SetBeamDataElHist("el_4mm_foam");
    //trainer->SetBeamDataPiHist("pi_5mm_fibre");

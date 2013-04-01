@@ -1,29 +1,22 @@
-void trd_elid_sim(Int_t nEvents = 20)
+void trd_elid_sim(Int_t nEvents = 1000)
 {
-   Double_t momentum = 1.5;
+   Double_t minMomentum = 1.0; //minimum momentum
+   Double_t maxMomentum = 8.0; //maximum momentum
+   Double_t  thetaMin = 2.5;
+   Double_t thetaMax = 25.;
 
-   Double_t thetaMin, thetaMax;
-   thetaMin = 2.5;
-   thetaMax = 25.;
-
-   TString inFile = "", parFile = "", outFile ="";
-   TString caveGeom = "", targetGeom = "", pipeGeom   = "", magnetGeom = "", mvdGeom = "",
-           mvdGeom = "",stsGeom = "", richGeom= "", trdGeom = "";
-   TString fieldMap = "";
-
-	TString outFile = "/d/cbm06/user/slebedev/trd/piel.0000.mc.root";
-	TString parFile = "/d/cbm06/user/slebedev/trd/piel.0000.params.root";
+	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/trd/elid/piel.0000.mc.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/trd/elid/piel.0000.params.root";
 
 	// -----  Geometries  -----------------------------------------------------
-   caveGeom = "cave.geo";
-   targetGeom = "target_au_250mu.geo";
-   pipeGeom = "pipe_standard.geo";
-   mvdGeom = "";//"mvd_v08a.geo";
-   stsGeom = "sts/sts_v11a.geo";
-   richGeom = "rich/rich_v08a.geo";
-   trdGeom = "trd/trd_v10b.geo";
-   fieldMap = "field_v10e";
-   magnetGeom = "passive/magnet_v09e.geo";
+   TString caveGeom = "cave.geo";
+   TString targetGeom = "target_au_250mu.geo";
+   TString pipeGeom = "pipe_standard.geo";
+   TString stsGeom = "";//"sts/sts_v12b.geo.root";
+   TString richGeom = "";// "rich/rich_v08a.geo";
+   TString trdGeom = "trd/trd_v13c.root";
+   TString fieldMap = "field_v12a";
+   TString magnetGeom = "passive/magnet_v12a.geo";
 	Double_t fieldZ = 50.; // field center z position
 	Double_t fieldScale = 1.; // field scaling factor
 
@@ -70,12 +63,6 @@ void trd_elid_sim(Int_t nEvents = 20)
       fRun->AddModule(magnet);
    }
 
-   if ( mvdGeom != "" ) {
-      FairDetector* mvd = new CbmMvd("MVD", kTRUE);
-      mvd->SetGeometryFileName(mvdGeom);
-      fRun->AddModule(mvd);
-   }
-
    if ( stsGeom != "" ) {
       FairDetector* sts = new CbmSts("STS", kTRUE);
       sts->SetGeometryFileName(stsGeom);
@@ -95,30 +82,17 @@ void trd_elid_sim(Int_t nEvents = 20)
    }
 
    // -----   Create magnetic field   ----------------------------------------
-   CbmFieldMap* magField = NULL;
-   if (fieldMap == "field_electron_standard" || fieldMap == "field_v10e")
-      magField = new CbmFieldMapSym2(fieldMap);
-   else if (fieldMap == "field_muon_standard" )
-      magField = new CbmFieldMapSym2(fieldMap);
-   else if (fieldMap == "FieldMuonMagnet" )
-      magField = new CbmFieldMapSym3(fieldMap);
-   else {
-      cout << "===> ERROR: Unknown field map " << fieldMap << endl;
-      exit;
-   }
+   CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
    magField->SetPosition(0., 0., fieldZ);
    magField->SetScale(fieldScale);
    fRun->SetField(magField);
-
 
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	Int_t kfCode1 = 11; // electrons
 	Int_t kfCode2 = -11; // positrons
-	Double_t minMomentum = momentum; //minimum momentum
-	Double_t maxMomentum = momentum; //maximum momentum
 
-	FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 60);
+	FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 50);
 	boxGen1->SetPRange(minMomentum, maxMomentum);
 //	boxGen1->SetXYZ(50., 50., 450.);
 	boxGen1->SetPhiRange(0., 360.);
@@ -127,7 +101,7 @@ void trd_elid_sim(Int_t nEvents = 20)
 	boxGen1->Init();
 	primGen->AddGenerator(boxGen1);
 
-	FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 60);
+	FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 50);
 	boxGen2->SetPRange(minMomentum, maxMomentum);
 //	boxGen2->SetXYZ(50., 50., 450.);
 	boxGen2->SetPhiRange(0., 360.);
@@ -136,7 +110,7 @@ void trd_elid_sim(Int_t nEvents = 20)
 	boxGen2->Init();
 	primGen->AddGenerator(boxGen2);
 
-	FairBoxGenerator* boxGen3 = new FairBoxGenerator(211, 60);
+	FairBoxGenerator* boxGen3 = new FairBoxGenerator(211, 50);
 	boxGen3->SetPRange(minMomentum, maxMomentum);
 //	boxGen3->SetXYZ(50., 50., 450.);
 	boxGen3->SetPhiRange(0., 360.);
@@ -145,7 +119,7 @@ void trd_elid_sim(Int_t nEvents = 20)
 	boxGen3->Init();
 	primGen->AddGenerator(boxGen3);
 
-	FairBoxGenerator* boxGen4 = new FairBoxGenerator(-211, 60);
+	FairBoxGenerator* boxGen4 = new FairBoxGenerator(-211, 50);
 	boxGen4->SetPRange(minMomentum, maxMomentum);
 //	boxGen4->SetXYZ(50., 50., 450.);
 	boxGen4->SetPhiRange(0., 360.);
@@ -156,19 +130,18 @@ void trd_elid_sim(Int_t nEvents = 20)
 
 	fRun->SetGenerator(primGen);
 
-
 	fRun->Init();
 
-	CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
-	fieldPar->SetParameters(magField);
-	fieldPar->setChanged();
-	fieldPar->setInputVersion(fRun->GetRunId(), 1);
-	Bool_t kParameterMerged = kTRUE;
-	FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-	parOut->open(parFile.Data());
-	rtdb->setOutput(parOut);
-	rtdb->saveOutput();
-	rtdb->print();
+   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
+   fieldPar->SetParameters(magField);
+   fieldPar->setChanged();
+   fieldPar->setInputVersion(fRun->GetRunId(),1);
+   Bool_t kParameterMerged = kTRUE;
+   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
+   parOut->open(parFile.Data());
+   rtdb->setOutput(parOut);
+   rtdb->saveOutput();
+   rtdb->print();
 
 	fRun->Run(nEvents);
 
@@ -180,8 +153,5 @@ void trd_elid_sim(Int_t nEvents = 20)
 	cout << "Output file is " << outFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl;
-
-
-	exit(0);
 }
 

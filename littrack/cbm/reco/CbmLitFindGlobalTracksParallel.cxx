@@ -20,10 +20,12 @@
 
 #include <iostream>
 #include <set>
+#include <algorithm>
 
 using std::cout;
 using std::endl;
 using std::set;
+using std::for_each;
 
 CbmLitFindGlobalTracksParallel::CbmLitFindGlobalTracksParallel() :
       FairTask(),

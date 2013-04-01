@@ -30,7 +30,7 @@ CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN()
     fANNPar1(-1.),
     fANNPar2(-1.), 
     fNN(),
-    fTRDGeometryType("v10b")
+    fTRDGeometryType("h++")
 {
 }
 
@@ -44,7 +44,7 @@ CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN(
     fANNPar1(-1.),
     fANNPar2(-1.), 
     fNN(),
-    fTRDGeometryType("v10b")
+    fTRDGeometryType("h++")
 {
 }
 

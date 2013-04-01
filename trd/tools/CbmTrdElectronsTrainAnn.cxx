@@ -468,7 +468,9 @@ void CbmTrdElectronsTrainAnn::DoTrain()
       cout << "-I- Number of training epochs = " << fNofAnnEpochs << endl;
       fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
       fNN->Train(fNofAnnEpochs, "+text,update=10");
-      fNN->DumpWeights((fOutputDir+"/trd_elid_ann_weights.txt").c_str());
+      stringstream ss;
+      ss<< fOutputDir+"/ann_weights_" <<fNofTrdLayers << ".txt";
+      fNN->DumpWeights(ss.str().c_str());
    } else if (fIdMethod == kBDT) {
       TMVA::Factory* factory = CreateFactory(simu);
       (TMVA::gConfig().GetIONames()).fWeightFileDir = fOutputDir;
@@ -508,7 +510,9 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		TTree* simu = CreateTree();
 		TString mlpString = CreateAnnString();
 		fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-		fNN->LoadWeights((fOutputDir+"/trd_elid_ann_weights.txt").c_str());
+      stringstream ss;
+      ss<< fOutputDir+"/ann_weights_" <<fNofTrdLayers << ".txt";
+      fNN->LoadWeights(ss.str().c_str());
 	}
 
 	for (Int_t i = 0; i < 2; i++){
@@ -559,7 +563,9 @@ void CbmTrdElectronsTrainAnn::DoTest()
 		TTree* simu = CreateTree();
 		TString mlpString = CreateAnnString();
 		fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-		fNN->LoadWeights((fOutputDir+"/trd_elid_ann_weights.txt").c_str());
+		stringstream ss;
+		ss<< fOutputDir+"/ann_weights_" <<fNofTrdLayers << ".txt";
+		fNN->LoadWeights(ss.str().c_str());
 	}
 
 	int nofPiLikeEl = 0;

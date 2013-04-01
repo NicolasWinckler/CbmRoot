@@ -9,15 +9,15 @@ void run_train_ann(
 {
    gRandom->SetSeed(10);
 
-   TString inFile1 ="/Users/slebedev/Development/cbm/data/simulations/mc.0000.root";
-   TString inFile2 ="/Users/slebedev/Development/cbm/data/simulations/reco.0000.root";
-   TString parFile ="/Users/slebedev/Development/cbm/data/simulations/param.0000.root";
-   TString outFile ="/Users/slebedev/Development/cbm/data/simulations/richselect.0000.root";
+   TString inFile1 ="/Users/slebedev/Development/cbm/data/simulations/richreco/25gev.mc.0000.root";
+   TString inFile2 ="/Users/slebedev/Development/cbm/data/simulations/richreco/25gev.reco.0000.root";
+   TString parFile ="/Users/slebedev/Development/cbm/data/simulations/richreco/25gev.param.0000.root";
+   TString outFile ="/Users/slebedev/Development/cbm/data/simulations/richreco/richselect.0000.root";
 
    // please specify what you want to run
    // select = train ANN for fake rejection algorithm
    // electron = train ANN for electron identification algorithm
-   TString option = "select"; // or electron
+   TString option = "select";
 
    gDebug = 0;
 

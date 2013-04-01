@@ -106,7 +106,7 @@ void run_sim_geotest(Int_t nEvents = 10)
       primGen->AddGenerator(asciiGen);
    } else if (richDetectorType == "standard"){
       // e+/-
-      FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 10);
+      FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 1);
       boxGen1->SetPtRange(0.,3.);
       boxGen1->SetPhiRange(0.,360.);
       boxGen1->SetThetaRange(2.5,25.);
@@ -114,7 +114,7 @@ void run_sim_geotest(Int_t nEvents = 10)
       boxGen1->Init();
       primGen->AddGenerator(boxGen1);
 
-      FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 10);
+      FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 1);
       boxGen2->SetPtRange(0.,3.);
       boxGen2->SetPhiRange(0.,360.);
       boxGen2->SetThetaRange(2.5,25.);
@@ -123,7 +123,7 @@ void run_sim_geotest(Int_t nEvents = 10)
       primGen->AddGenerator(boxGen2);
 
       // pi+/-
-      FairBoxGenerator* boxGen1 = new FairBoxGenerator(211, 10);
+ /*     FairBoxGenerator* boxGen1 = new FairBoxGenerator(211, 1);
       boxGen1->SetPtRange(0.,3.);
       boxGen1->SetPhiRange(0.,360.);
       boxGen1->SetThetaRange(2.5,25.);
@@ -131,13 +131,13 @@ void run_sim_geotest(Int_t nEvents = 10)
       boxGen1->Init();
       primGen->AddGenerator(boxGen1);
 
-      FairBoxGenerator* boxGen2 = new FairBoxGenerator(-211, 10);
+      FairBoxGenerator* boxGen2 = new FairBoxGenerator(-211, 1);
       boxGen2->SetPtRange(0.,3.);
       boxGen2->SetPhiRange(0.,360.);
       boxGen2->SetThetaRange(2.5,25.);
       boxGen2->SetCosTheta();
       boxGen2->Init();
-      primGen->AddGenerator(boxGen2);
+      primGen->AddGenerator(boxGen2);*/
    }
 
    fRun->SetGenerator(primGen);

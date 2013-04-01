@@ -8,10 +8,10 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    gRandom->SetSeed(10);
 
    TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/";
-   TString inFile = outDir + "mc.0000.root";
-   TString parFile = outDir + "param.0000.root";
-   TString outFile = outDir + "reco.0000.root";
-   std::string resultDir = "results/";
+   TString inFile = outDir + "8gev.mc.0000.root";
+   TString parFile = outDir + "8gev.param.0000.root";
+   TString outFile = outDir + "8gev.reco.0000.root";
+   std::string resultDir = "results_urqmd_8gev/";
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
@@ -48,7 +48,7 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    stsDigitize->SetStripDeadTime  (StripDeadTime);
    run->AddTask(stsDigitize);
 
-   FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",0);
+   FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder", 0);
    run->AddTask(stsClusterFinder);
 
    FairTask* stsFindHits = new CbmStsFindHits(0);
@@ -75,11 +75,7 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, 0);
    run->AddTask(stsFitTracks);
 
-
-
    CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
-   //finder->SetTrackingType(std::string("branch"));
-   //finder->SetMergerType("nearest_hit");
    run->AddTask(finder);
 
 
@@ -96,7 +92,6 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    richReco->SetRunTrackAssign(false);
    richReco->SetFinderName("ideal");
    run->AddTask(richReco);
-
 
    CbmRichMatchRings* matchRings = new CbmRichMatchRings();
    run->AddTask(matchRings);

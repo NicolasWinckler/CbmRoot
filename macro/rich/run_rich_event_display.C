@@ -12,10 +12,10 @@ void run_rich_event_display()
    gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
    cbmlibs();
 
-   TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/test.mc.root";
-   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/test.reco.root";
-   TString paramFile = "/Users/slebedev/Development/cbm/data/simulations/test.params.root";
-   TString outFile = "/Users/slebedev/Development/cbm/data/simulations/test.ed.root";
+   TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/8gev.mc.0000.root";
+   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/8gev.reco.0000.root";
+   TString paramFile = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/8gev.param.0000.root";
+   TString outFile = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/8gev.test.ed.root";
 
    FairRunAna *run= new FairRunAna();
    run->SetInputFile(mcFile);
@@ -27,6 +27,7 @@ void run_rich_event_display()
    ed->SetDrawRings(true);
    ed->SetDrawHits(true);
    ed->SetDrawPoints(false);
+   ed->SetDrawProjections(true);
    run->AddTask(ed);
 
 
@@ -40,5 +41,5 @@ void run_rich_event_display()
 
    run->Init();
    cout << "Starting run" << endl;
-   run->Run(0, 1);
+   run->Run(0, 10);
 }

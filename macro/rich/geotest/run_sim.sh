@@ -22,7 +22,7 @@ export MAGNET_GEOM=passive/magnet_v12a.geo
 export FIELD_MAP_SCALE=1.0
 
 #number of events for each thread
-export NEVENTS=10000
+export NEVENTS=30000
 
 for Z in 0; do
    export DIR=/Users/slebedev/Development/cbm/data/simulations/richgeotest/
@@ -32,7 +32,7 @@ for Z in 0; do
 
    export MC_FILE=${DIR}/tdr.mc.000${Z}.root
    export PAR_FILE=${DIR}/tdr.param.000${Z}.root
-   export RECO_FILE=${DIR}/tdr.reco.000${Z}.root  
+   export RECO_FILE=${DIR}/tdr.reco.0001.root  
    
    ./sim.sh
   # xterm -hold -e ". ./sim.sh"&

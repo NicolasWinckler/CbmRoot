@@ -1,14 +1,14 @@
-void run_sim_urqmdtest(Int_t nEvents = 10)
+void run_sim_urqmdtest(Int_t nEvents = 1000)
 {
    TTree::SetMaxTreeSize(90000000000);
 
    TString script = TString(gSystem->Getenv("SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/8gev/centr/urqmd.auau.8gev.centr.0000.ftn14";
+   TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/35gev/mbias/urqmd.auau.35gev.mbias.0000.ftn14";
    TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/";
-   TString parFile =  outDir + "8gev.param.0000.root";
-   TString outFile = outDir + "8gev.mc.0000.root";
+   TString parFile =  outDir + "35gev.mbias.param.0000.root";
+   TString outFile = outDir + "35gev.mbias.mc.0000.root";
 
    TString caveGeom = "cave.geo";
    TString targetGeom = "target_au_250mu.geo";

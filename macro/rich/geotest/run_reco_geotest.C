@@ -62,7 +62,7 @@ void run_reco_geotest(Int_t nEvents = 1000)
       richHitProd->SetNofNoiseHits(220);
       richHitProd->SetCollectionEfficiency(1.0);
       richHitProd->SetSigmaMirror(0.06);
-      //richHitProd->SetCrossTalkHitProb(0.02);
+      richHitProd->SetCrossTalkHitProb(0.0);
       run->AddTask(richHitProd);
 
       CbmRichReconstruction* richReco = new CbmRichReconstruction();

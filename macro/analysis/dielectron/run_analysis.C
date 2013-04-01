@@ -11,15 +11,15 @@ void run_analysis(Int_t nEvents = 1000)
 
    //gRandom->SetSeed(10);
 
-	TString dir = "/hera/cbm/users/slebedev/mc/dielectron/dec12/25gev/mirrors/6mm/1.0field/nomvd/rho0/";
+	TString dir = "/hera/cbm/users/slebedev/mc/dielectron/jan13/25gev/1.0field/nomvd/rho0/";
 	TString mcFile = dir + "mc.auau.25gev.centr.00001.root";
 	TString parFile = dir + "/params.auau.25gev.centr.00001.root";
 	TString recoFile = dir + "/reco.auau.25gev.centr.00001.root";
 	TString analysisFile = dir + "/analysis.test.auau.25gev.centr.00001.root";
 	TString energy = "25gev";
 	TString plutoParticle = "rho0";
-	Double_t pionMisidLevel = -1;
-       // Double_t momentumCut = -1.;
+	Double_t pionMisidLevel = -1.;
+        Double_t trdAnnCut = 0.85;
 
 	TString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
 
@@ -32,7 +32,7 @@ void run_analysis(Int_t nEvents = 1000)
       energy = TString(gSystem->Getenv("ENERGY"));
       plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
       stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
-     // momentumCut = TString(gSystem->Getenv("MOMENTUM_CUT")).Atof();
+      trdAnnCut = TString(gSystem->Getenv("TRD_ANN_CUT")).Atof();
    }
 
    // load libraries
@@ -55,7 +55,7 @@ void run_analysis(Int_t nEvents = 1000)
    fRun->AddTask(kf);
 
    CbmAnaDielectronTask *task = new CbmAnaDielectronTask();
-   if (energy == "10gev") {
+   if (energy == "8gev") {
       // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy
       if (plutoParticle == "rho0") task->SetWeight(0.000423);
       // weight omega = Multiplicity * Branching Ratio = 19 * 7.07e-5 for 10 AGeV beam energy
@@ -84,6 +84,7 @@ void run_analysis(Int_t nEvents = 1000)
    task->SetUseTrd(IsTrd(parFile));
    task->SetUseTof(true);
    task->SetPionMisidLevel(pionMisidLevel);
+   task->SetTrdAnnCut(trdAnnCut);
 
    fRun->AddTask(task);
 

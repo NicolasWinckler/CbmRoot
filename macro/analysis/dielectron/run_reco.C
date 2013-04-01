@@ -20,6 +20,8 @@ void run_reco(Int_t nEvents = 1000)
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
    TString resultDir = "recqa/";
+   Double_t trdAnnCut = 0.85;
+   Int_t minNofPointsTrd = 6;
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("MC_FILE"));
@@ -34,6 +36,8 @@ void run_reco(Int_t nEvents = 1000)
                 resultDir = TString(gSystem->Getenv("RESULT_DIR"));
 
 		stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
+		trdAnnCut = TString(gSystem->Getenv("TRD_ANN_CUT")).Atof();
+                minNofPointsTrd = TString(gSystem->Getenv("MIN_NOF_POINTS_TRD")).Atof();
 	}
 
    parFileList->Add(&stsDigiFile);
@@ -168,7 +172,8 @@ void run_reco(Int_t nEvents = 1000)
 		Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
 		Bool_t simpleTR = kTRUE; // use fast and simple version for TR production
 
-		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
+	       // CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
+                CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , "H++");
 
                 CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
                 run->AddTask(trdHitProd);
@@ -202,17 +207,17 @@ void run_reco(Int_t nEvents = 1000)
 		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
 		run->AddTask(trdMatchTracks);
 
-		CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
-				new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
-		run->AddTask(trdSetTracksPidTask);
+		//CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
+		//		new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
+		//run->AddTask(trdSetTracksPidTask);
 
-		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask =
-				new	CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
+		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
+                trdSetTracksPidAnnTask->SetTRDGeometryType("h++");
 		run->AddTask(trdSetTracksPidAnnTask);
 
-		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
-				new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
-		run->AddTask(trdSetTracksPidLikeTask);
+		//CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
+		//		new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
+		//run->AddTask(trdSetTracksPidLikeTask);
 	}//isTrd
 
     // =========================================================================
@@ -240,24 +245,33 @@ void run_reco(Int_t nEvents = 1000)
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
    trackingQa->SetMinNofPointsSts(4);
    trackingQa->SetUseConsecutivePointsInSts(true);
-   trackingQa->SetMinNofPointsTrd(8);
+   trackingQa->SetMinNofPointsTrd(minNofPointsTrd);
    trackingQa->SetMinNofPointsMuch(10);
    trackingQa->SetMinNofPointsTof(1);
    trackingQa->SetQuota(0.7);
-   trackingQa->SetMinNofHitsTrd(8);
+   trackingQa->SetMinNofHitsTrd(minNofPointsTrd);
    trackingQa->SetMinNofHitsMuch(10);
    trackingQa->SetVerbose(0);
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
-   trackingQa->SetPRange(30, 0., 3.);
+   trackingQa->SetPRange(30, 0., 6.);
    trackingQa->SetOutputDir(std::string(resultDir));
+   std::vector<std::string> trackCat, richCat;
+   trackCat.push_back("All");
+   trackCat.push_back("Electron");
+   richCat.push_back("All");
+   richCat.push_back("Electron");
+   richCat.push_back("ElectronReference");
+   trackingQa->SetTrackCategories(trackCat);
+   trackingQa->SetRingCategories(richCat);
+   trackingQa->SetTrdAnnCut(trdAnnCut);
    run->AddTask(trackingQa);
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();
    fitQa->SetMvdMinNofHits(0);
    fitQa->SetStsMinNofHits(4);
    fitQa->SetMuchMinNofHits(10);
-   fitQa->SetTrdMinNofHits(8);
+   fitQa->SetTrdMinNofHits(minNofHitsTrd);
    fitQa->SetPRange(30, 0., 3.);
    fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);

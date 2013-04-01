@@ -44,10 +44,16 @@ void hadd() {
    // root > .L hadd.C
    // root > hadd()
 
-   string particle = "";
+    string particle = "";
 
+    string fileArray[8] = {"analysis.pisupp0.01.25gev.centr.", "analysis.pisupp0.002.25gev.centr.", "analysis.pisupp0.001.25gev.centr.",
+    "analysis.pisupp0.0004.25gev.centr.","analysis.pisupp0.0002.25gev.centr.",
+    "analysis.pisupp0.0001.25gev.centr.", "analysis.pisupp0.0.25gev.centr.", "reco.auau.8gev.centr."};
 
-   for (int iF = 3; iF < 4; iF++){
+    for (int iPs = 7; iPs < 8; iPs++){
+       cout << "-I- " << fileArray[iPs] << endl;
+
+   for (int iF = 0; iF < 4; iF++){
 
       if (iF == 0) {
          particle = "omegaepem";
@@ -61,8 +67,9 @@ void hadd() {
 	  particle = "urqmd";
       }
 
-      std::string dir = "/hera/cbm/users/slebedev/mc/dielectron/jan13/25gev/1.0field/nomvd/" + particle + "/";
-      std::string fileName = dir + "analysis.25gev.centr.";
+      std::string dir = "/hera/cbm/users/slebedev/mc/dielectron/jan13/8gev/trd/1.0field/nomvd/" + particle + "/";
+      std::string fileName = dir + fileArray[iPs];
+      //std::string fileName = dir + "analysis.25gev.centr.";
      // std::string fileName = dir + "reco.auau.8gev.centr.";
      // std::string outputDir = dir + "results/all/";
 
@@ -71,11 +78,11 @@ void hadd() {
      // string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/100field/nomvd/"+particle+"/";
       cout << "-I- " << dir << endl;
 
-      Target = TFile::Open( string(fileName+"all.root").c_str(), "RECREATE" );
+      TFile* Target = TFile::Open( string(fileName+"all.root").c_str(), "RECREATE" );
 
       int count = 0;
-      FileList = new TList();
-      for (int i = 1; i < 101; i++){
+      TList* FileList = new TList();
+      for (int i = 1; i < 201; i++){
          stringstream ss;
          ss << fileName ;
          ss.fill('0');
@@ -85,13 +92,30 @@ void hadd() {
          if ( file != NULL && file->GetEND() > 4000){
             FileList->Add( file );
 	    count++;
-            cout<< count<<endl;
-         }
+            //cout<< count<<endl;
+	 } else {
+	     if (file != NULL) {
+                 file->Close();
+	     }
+	 }
       }
       cout << endl<< "-I- number of files to merge = " << count << endl << endl;
 
       MergeRootfile( Target, FileList );
-   }
+
+      Target->Close();
+      int nFL = FileList->GetEntries();
+      for (int iFL = 0; iFL < nFL; iFL++){
+	  TFile* f = (TFile*)FileList->At(iFL);
+	  f->Close();
+          delete f;
+      }
+      delete Target;
+      delete FileList;
+   }//iF
+
+
+    } //iPs
 
 }
 

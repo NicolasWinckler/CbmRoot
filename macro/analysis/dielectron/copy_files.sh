@@ -1,9 +1,9 @@
 #####!/bin/sh
 
-dirFrom=/hera/cbm/users/slebedev/mc/dielectron/jan13/25gev/
-dirTo=/u/slebedev/Baykal/copytemp/25gev/
+dirFrom=/hera/cbm/users/slebedev/mc/dielectron/jan13/8gev/trd/
+dirTo=/u/slebedev/Baykal/copytemp/8gev/trd/
 
-filename=analysis.25gev.centr.all.root
+filename=reco.auau.8gev.centr.all.root
 
 function copy_func() {
    mkdir -p ${dirTo}/${2}/${1}/

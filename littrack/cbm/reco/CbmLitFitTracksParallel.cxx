@@ -26,6 +26,8 @@
 
 using std::vector;
 using std::for_each;
+using std::cout;
+using std::endl;
 
 CbmLitFitTracksParallel::CbmLitFitTracksParallel():
    FairTask(),
@@ -49,7 +51,8 @@ InitStatus CbmLitFitTracksParallel::Init()
 {
    ReadDataBranches();
 
-
+   fFitWatch.Reset();
+   fFitWithIOWatch.Reset();
 
    return kSUCCESS;
 }
@@ -58,14 +61,14 @@ void CbmLitFitTracksParallel::Exec(
     Option_t* opt)
 {
    static Int_t eventNo = 0;
-   std::cout << "CbmLitFitTracksParallel::Exec : eventNo=" << eventNo++ << std::endl;
+   std::cout << "CbmLitFitTracksParallel::Exec: eventNo=" << eventNo++ << std::endl;
 
    DoFit();
 }
 
 void CbmLitFitTracksParallel::Finish()
 {
-
+   PrintStopwatchStatistics();
 }
 
 void CbmLitFitTracksParallel::ReadDataBranches()
@@ -91,6 +94,8 @@ void CbmLitFitTracksParallel::DoFit()
       firstTime = false;
    }
 
+   fFitWithIOWatch.Start(kFALSE);
+
    // Convert input data
    vector<lit::parallel::LitScalTrack*> ltracks;
    vector<lit::parallel::LitScalPixelHit*> lhits;
@@ -108,11 +113,13 @@ void CbmLitFitTracksParallel::DoFit()
       track.SetParamFirst(lpar);
    }
 
+   fFitWatch.Start(kFALSE);
   // Int_t nofTracks = ltracks.size();
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
       lit::parallel::LitScalTrack& track = *ltracks[iTrack];
       LitTrackFitter(track, layout);
    }
+   fFitWatch.Stop();
 
    // Replace first and last track parameters for the fitted track
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
@@ -130,6 +137,22 @@ void CbmLitFitTracksParallel::DoFit()
    for_each(lhits.begin(), lhits.end(), DeleteObject());
    ltracks.clear();
    lhits.clear();
+
+   fFitWithIOWatch.Stop();
 }
 
+void CbmLitFitTracksParallel::PrintStopwatchStatistics()
+{
+   cout << "CbmLitFitTracksParallel::PrintStopwatchStatistics: " << endl;
+   cout << "tracking without IO: counts=" << fFitWatch.Counter()
+        << ", real=" << fFitWatch.RealTime() / fFitWatch.Counter()
+        << "/" << fFitWatch.RealTime()
+        << " s, cpu=" << fFitWatch.CpuTime() / fFitWatch.Counter()
+        << "/" << fFitWatch.CpuTime() << endl;
+   cout << "tracking with IO: counts=" << fFitWithIOWatch.Counter()
+        << ", real=" << fFitWithIOWatch.RealTime() / fFitWithIOWatch.Counter()
+        << "/" << fFitWithIOWatch.RealTime()
+        << " s, cpu=" << fFitWithIOWatch.CpuTime() / fFitWithIOWatch.Counter()
+        << "/" << fFitWithIOWatch.CpuTime() << endl;
+}
 ClassImp(CbmLitFitTracksParallel);

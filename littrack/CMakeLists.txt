@@ -26,8 +26,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
-${CBMROOT_SOURCE_DIR}/trackbase
-${CBMROOT_SOURCE_DIR}/geane
+${CBMROOT_SOURCE_DIR}/trackbase      
 ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
@@ -72,6 +71,7 @@ set(LITTRACK_HEADERS
    cbm/reco/CbmLitFindMvdTracks.h
    cbm/reco/CbmLitFindGlobalTracksIdeal.h
    cbm/reco/CbmLitFitTracksParallel.h
+   cbm/reco/CbmLitFindGlobalTracksParallel.h
    cbm/generators/CbmLitPolarizedGenerator.h
    cbm/qa/material/CbmLitCheckEnergyLossMuons.h 
    cbm/qa/material/CbmLitCheckBrem.h 
@@ -103,6 +103,7 @@ SET(LITTRACK_SRCS
    cbm/base/CbmLitTrackingGeometryConstructor.cxx
    cbm/reco/CbmLitFindGlobalTracks.cxx 
    cbm/reco/CbmLitFindGlobalTracksIdeal.cxx 
+   cbm/reco/CbmLitFindGlobalTracksParallel.cxx
    cbm/utils/CbmLitConverter.cxx
    cbm/utils/CbmLitConverterParallel.cxx
    cbm/qa/tracking/CbmLitTrackingQa.cxx

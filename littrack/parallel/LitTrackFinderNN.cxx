@@ -6,12 +6,20 @@
 
 #include "LitTrackFinderNN.h"
 
-LitTrackFinderNN::LitTrackFinderNN()
+lit::parallel::LitTrackFinderNN::LitTrackFinderNN()
 {
 
 }
 
-LitTrackFinderNN::~LitTrackFinderNN()
+lit::parallel::LitTrackFinderNN::~LitTrackFinderNN()
+{
+
+}
+
+void lit::parallel::LitTrackFinderNN::DoFind(
+   const vector<lit::parallel::LitScalPixelHit*>& hits,
+   const vector<lit::parallel::LitScalTrack*>& trackSeeds,
+   vector<lit::parallel::LitScalTrack*>& tracks)
 {
 
 }

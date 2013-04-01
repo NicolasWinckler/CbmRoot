@@ -42,6 +42,21 @@ class LitFieldGrid
 public:
 
    /**
+    * \brief Constructor
+    */
+   LitFieldGrid() :
+      fXMin(0.),
+      fXMax(0.),
+      fYMin(0.),
+      fYMax(0.),
+      fZ(0.),
+      fNofBinsX(0),
+      fNofBinsY(0),
+      fBinSizeX(0.),
+      fBinSizeY(0.),
+      fField() { }
+
+   /**
     * \brief Returns Z position of the grid.
     * \return Z position of the grid.
     */

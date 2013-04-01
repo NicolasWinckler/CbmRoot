@@ -86,6 +86,24 @@ public:
          const TClonesArray* tracks,
          const vector<lit::parallel::LitScalPixelHit*>& lhits,
          vector<lit::parallel::LitScalTrack*>& ltracks);
+
+   /**
+    * \brief Convert LitScalTrack to CbmTrack.
+    * \param[in] ltrack Pointer to LitScalTrack.
+    * \param[out] track Pointer to CbmTrack.
+    */
+   static void LitScalTrackToCbmTrack(
+         const lit::parallel::LitScalTrack* ltrack,
+         CbmTrack* track);
+
+   /**
+    * \brief Convert array of LitScalTrack to array of CbmTrack.
+    * \param[in] ltracks Vector of LitScalTrack.
+    * \param[out] tracks TClonesArray of CbmTrack.
+    */
+   static void LitScalTrackArrayToCbmTrdTrackArray(
+         const vector<lit::parallel::LitScalTrack*>& ltracks,
+         TClonesArray* tracks);
 };
 
 #endif /* CBMLITCONVERTERPARALLEL_H_ */

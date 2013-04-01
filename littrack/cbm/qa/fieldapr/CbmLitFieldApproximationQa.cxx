@@ -40,8 +40,8 @@
 
 using lit::ToString;
 using lit::SaveCanvasAsImage;
-using lit::parallel::LitFieldSlice;
-using lit::parallel::LitFieldValue;
+using lit::parallel::LitFieldSliceScal;
+using lit::parallel::LitFieldValueScal;
 using lit::parallel::LitFieldGrid;
 using boost::assign::list_of;
 using std::cout;
@@ -305,7 +305,7 @@ void CbmLitFieldApproximationQa::FillBHistos()
 
 void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
 {
-   vector<vector<LitFieldSlice<float> > > slices;
+   vector<vector<LitFieldSliceScal > > slices;
    slices.resize(fNofPolynoms);
    for (UInt_t i = 0; i < fNofPolynoms; i++) {slices[i].resize(fNofSlices);}
 
@@ -336,7 +336,7 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
             if (fUseEllipseAcc && el > 1.) { continue; }
 
             for (Int_t p = 0; p < fNofPolynoms; p++) {
-               LitFieldValue<float> v;
+               LitFieldValueScal v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
                Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
                string s = ToString<Int_t>(fZSlicePosition[iSlice]) + "_" + ToString<Int_t>(fPolynomDegrees[p]);
@@ -374,7 +374,7 @@ void CbmLitFieldApproximationQa::FillFieldApproximationHistos()
             Double_t Bmod = sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
             for (Int_t p = 0; p < fNofPolynoms; p++) {
-               LitFieldValue<float> v;
+               LitFieldValueScal v;
                slices[p][iSlice].GetFieldValue(X, Y, v);
                Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 
@@ -428,7 +428,7 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
          Double_t X = -fXSlicePosition[iSlice] + (iX + 0.5) * HX;
          for (Int_t iY = 0; iY < fNofBinsY; iY++) { // loop over y position
             Double_t Y = -fYSlicePosition[iSlice] + (iY + 0.5)  * HY;
-            LitFieldValue<float> v;
+            LitFieldValueScal v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
             string s = ToString<Int_t>(fZSlicePosition[iSlice]);
@@ -460,7 +460,7 @@ void CbmLitFieldApproximationQa::FillGridCreatorHistos()
 
             Double_t Bmod = sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]);
 
-            LitFieldValue<float> v;
+            LitFieldValueScal v;
             grids[iSlice].GetFieldValue(X, Y, v);
             Double_t mod = sqrt(v.Bx * v.Bx + v.By * v.By + v.Bz * v.Bz);
 

@@ -9,6 +9,7 @@
 #define CBMLITFITTRACKSPARALLEL_H_
 
 #include "FairTask.h"
+#include "TStopwatch.h"
 
 class CbmLitFitTracksParallel : public FairTask {
 public:
@@ -49,6 +50,11 @@ private:
      */
     void DoFit();
 
+    /**
+     * \brief Print stopwatch statistics.
+     */
+    void PrintStopwatchStatistics();
+
     // Data branches
     TClonesArray* fGlobalTracks;
     TClonesArray* fStsTracks;
@@ -57,6 +63,10 @@ private:
     TClonesArray* fTrdHits;
     TClonesArray* fMuchPixelHits;
     TClonesArray* fMuchStrawHits;
+
+    // stopwatches
+    TStopwatch fFitWatch; // stopwatch for track fit without IO
+    TStopwatch fFitWithIOWatch; // stopwatch for track fit including IO
 
     ClassDef(CbmLitFitTracksParallel, 1);
 };

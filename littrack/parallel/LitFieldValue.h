@@ -29,6 +29,15 @@ template<class T>
 class LitFieldValue
 {
 public:
+
+   /**
+    * \brief Constructor
+    */
+   LitFieldValue() :
+      Bx(0.),
+      By(0.),
+      Bz(0.) { }
+
    /**
     * \brief Return string representation of the class.
     * \return String representation of the class.
@@ -51,6 +60,18 @@ public:
 public:
    T Bx, By, Bz; // components of the magnetic field
 } _fvecalignment;
+
+/**
+ * \typedef LitFieldValue<fscal> LitFieldValueScal
+ * \brief Scalar version of LitFieldValue.
+ */
+typedef LitFieldValue<fscal> LitFieldValueScal;
+
+/**
+ * \typedef LitFieldValue<fvec> LitFieldValueVec
+ * \brief Vector version of LitFieldValue.
+ */
+typedef LitFieldValue<fvec> LitFieldValueVec;
 
 } // namespace parallel
 } // namespace lit

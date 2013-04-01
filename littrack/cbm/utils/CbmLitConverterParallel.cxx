@@ -6,7 +6,10 @@
 
 #include "CbmLitConverterParallel.h"
 #include "parallel/LitTrackParam.h"
+#include "parallel/LitScalTrack.h"
+#include "parallel/LitScalPixelHit.h"
 #include "CbmTrack.h"
+#include "CbmTrdTrack.h"
 #include "CbmPixelHit.h"
 #include "FairTrackParam.h"
 
@@ -155,5 +158,39 @@ void CbmLitConverterParallel::CbmTrackArrayToLitScalTrackArray(
       lit::parallel::LitScalTrack* ltrack = new lit::parallel::LitScalTrack();
       CbmTrackToLitScalTrack(track, lhits, ltrack);
       ltracks.push_back(ltrack);
+   }
+}
+
+void CbmLitConverterParallel::LitScalTrackToCbmTrack(
+      const lit::parallel::LitScalTrack* ltrack,
+      CbmTrack* track)
+{
+   // Convert hits
+   Int_t nofHits = ltrack->GetNofHits();
+   for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+      Int_t hitId = ltrack->GetHit(iHit)->refId;
+      track->AddHit(hitId, kTRDHIT);
+   }
+   // Convert first and last track parameter
+   FairTrackParam par;
+   LitTrackParamScalToFairTrackParam(&ltrack->GetParamFirst(), &par);
+   track->SetParamFirst(&par);
+   LitTrackParamScalToFairTrackParam(&ltrack->GetParamLast(), &par);
+   track->SetParamLast(&par);
+   // Convert other parameters
+   track->SetChiSq(ltrack->GetChiSq());
+   track->SetNDF(ltrack->GetNDF());
+   track->SetPreviousTrackId(ltrack->GetPreviousTrackId());
+}
+
+void CbmLitConverterParallel::LitScalTrackArrayToCbmTrdTrackArray(
+      const vector<lit::parallel::LitScalTrack*>& ltracks,
+      TClonesArray* tracks)
+{
+   Int_t nofTracks = ltracks.size();
+   for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+      lit::parallel::LitScalTrack* ltrack = ltracks[iTrack];
+      CbmTrdTrack* track = new ((*tracks)[iTrack]) CbmTrdTrack();
+      LitScalTrackToCbmTrack(ltrack, track);
    }
 }

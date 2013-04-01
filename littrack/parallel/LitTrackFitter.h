@@ -61,6 +61,9 @@ inline void LitTrackFitter(
 
       LitLineExtrapolation(par, hit->Z);
 
+     // lit::parallel::LitFieldGrid field1, field2, field3;
+     // LitRK4Extrapolation(par, hit->Z, field1, field2, field3);
+
       // Add material taking into account missing hits
       for (unsigned char iStation = prevStationId + 1; iStation <= hit->stationId; iStation++) {
          const LitStationScal& station = layout.GetStation(iStation);

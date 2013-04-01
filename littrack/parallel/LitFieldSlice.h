@@ -372,6 +372,18 @@ private:
    T fZ; // Z position of the slice
 } _fvecalignment;
 
+/**
+ * \typedef LitFieldSlice<fscal> LitFieldSliceScal
+ * \brief Scalar version of LitFieldSlice.
+ */
+typedef LitFieldSlice<fscal> LitFieldSliceScal;
+
+/**
+ * \typedef LitFieldSlice<fvec> LitFieldSliceVec
+ * \brief Vector version of LitFieldSlice.
+ */
+typedef LitFieldSlice<fvec> LitFieldSliceVec;
+
 } // namespace parallel
 } // namespace lit
 

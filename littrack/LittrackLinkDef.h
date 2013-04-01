@@ -8,6 +8,8 @@
 
 #pragma link C++ class CbmLitGlobalElectronId+;
 #pragma link C++ class CbmLitFindGlobalTracks+;
+#pragma link C++ class CbmLitFindGlobalTracksParallel+;
+#pragma link C++ class CbmLitFitTracksParallel+;
 #pragma link C++ class CbmLitFindMvdTracks+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 

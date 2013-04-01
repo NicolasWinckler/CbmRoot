@@ -1,17 +1,17 @@
-/** CbmLitFindGlobalTracks.h
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
- **
- ** CBM task class for global track reconstruction.
- ** Output is reconstructed global tracks CbmGlobalTrack and
- ** local track segments CbmMuchTrack, CbmTrdTrack.
- ** The task automatically determines the setup based on the
- ** geometry stored in the MC transport file.
- ** The tracking is performed in the MUCH and TRD detectors, than
- ** the hit-to-track merger attaches the TOF hit finally the track is refitted.
- ** If TRD detector presences in the muon detector setup,
- ** than the tracking is done in MUCH+TRD detectors in one goal.
+/**
+ * \file CbmLitFindGlobalTracks.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ * \brief CBM task for global track reconstruction.
+ *
+ * Output is reconstructed global tracks CbmGlobalTrack and
+ * local track segments CbmMuchTrack, CbmTrdTrack.
+ * The task automatically determines the setup based on the
+ * geometry stored in the MC transport file.
+ * The tracking is performed in the MUCH and TRD detectors, than
+ * the hit-to-track merger attaches the TOF hit finally the track is refitted.
+ * If TRD detector presences in the muon detector setup,
+ * than the tracking is done in MUCH+TRD detectors in one goal.
  **/
 
 #ifndef CBMLITFINDGLOBALTRACKS_H_
@@ -31,104 +31,92 @@
 
 class TClonesArray;
 
+using std::string;
+using std::vector;
+
 class CbmLitFindGlobalTracks : public FairTask
 {
 public:
-   /** Default constructor */
+   /**
+    * \brief Constructor.
+    */
    CbmLitFindGlobalTracks();
 
-   /** Destructor */
+   /**
+    * \brief Destructor.
+    */
    virtual ~CbmLitFindGlobalTracks();
 
    /**
-    * Derived from FairTask. Executed before starting event-by-event execution.
+    * \brief Inherited from FairTask.
     */
    virtual InitStatus Init();
 
    /**
-     * Derived from FairTask. Executed on each event.
-     * @param opt Options
-     */
+    * \brief Inherited from FairTask.
+    */
    virtual void Exec(Option_t* opt);
 
    /**
-     * Derived from FairTask. Set parameter containers.
-     */
-   virtual void SetParContainers();
-
-   /**
-     * Sets the tracking algorithm to be used.
-     * @param trackingType Name of the tracking algorithm.
-     * "branch" - branching tracking
-     * "nn" - nearest neighbor tracking
-     * "weight" - weighting tracking
-     */
-   void SetTrackingType(const std::string& trackingType) { fTrackingType = trackingType;}
-
-   /**
-     * Sets the hit-to-track merger algorithm to be used.
-     * @param mergerType Name of the hit-to-track algorithm.
-     * "nearest_hit" - attaches hit-to-track based on the closest statistical distance
-     */
-   void SetMergerType(const std::string& mergerType) { fMergerType = mergerType;}
-
-   /**
-     * Sets track fitter algorithm to be used for the final track fit.
-     * @param fitterType Name fitter algorithm.
-     * "lit_kalman" - forward Kalman filter track fit with TGeo geometry
-     */
-   void SetFitterType(const std::string& fitterType) { fFitterType = fitterType;}
-
-private:
-   /**
-    * Derived from FairTask. Executed after all events are processed.
+    * \brief Inherited from FairTask.
     */
    virtual void Finish();
 
    /**
-    * Reads necessary data branches from the input data files and
+    * \brief Inherited from FairTask.
+    */
+   virtual void SetParContainers();
+
+   /* Setters */
+   void SetTrackingType(const string& trackingType) { fTrackingType = trackingType;}
+   void SetMergerType(const string& mergerType) { fMergerType = mergerType;}
+   void SetFitterType(const string& fitterType) { fFitterType = fitterType;}
+
+private:
+
+   /**
+    * \brief Reads necessary data branches from the input data files and
     * creates branches for CbmGlobalTrack, CbmTrdTrack, CbmMuchTrack
     */
    void ReadAndCreateDataBranches();
 
    /**
-    * Create and initializes track finder and track merger objects.
+    * \breif Create and initializes track finder and track merger objects.
     */
    void InitTrackReconstruction();
 
    /**
-    * Converts input data from CBMROOT data classes to LIT data classes.
+    * \brief Convert input data from CBMROOT data classes to LIT data classes.
     */
    void ConvertInputData();
 
    /**
-    * Converts output data LIT data classes to CBMROOT data classes.
+    * \brief Convert output data LIT data classes to CBMROOT data classes.
     */
    void ConvertOutputData();
 
    /*
-    * Calculate length of the global track
+    * \brief Calculate length of the global track
     */
    void CalculateLength();
 
    /**
-    * Clear arrays and frees the memory.
+    * \brief Clear arrays and frees the memory.
     */
    void ClearArrays();
 
    /**
-    * Runs the track reconstruction
+    * \brief Run the track reconstruction
     */
    void RunTrackReconstruction();
 
    /**
-    * Prints output stopwatch statistics for track-finder and hit-to-track merger.
+    * \brief Print output stopwatch statistics for track-finder and hit-to-track merger.
     */
    void PrintStopwatchStatistics();
 
    /**
-    * Selects tracks for further merging with TOF.
-    * Track has to have at least one hit in the last station group.
+    * \brief Select tracks for further merging with TOF.
     */
    void SelectTracksForTofMerging();
 
@@ -165,16 +153,15 @@ private:
    // Tracking method to be used
    // "branch" - branching method
    // "nn" - nearest neighbor method
-   // "weight" - weighting method
-   std::string fTrackingType;
+   string fTrackingType;
 
    // Merger method to be used
    // "nearest_hit" - assigns nearest hit to the track
-   std::string fMergerType;
+   string fMergerType;
 
    // Track fitter to be used for the final track fit
    // "lit_kalman" - forward Kalman track fit with LIT propagation and TGeo navigation
-   std::string fFitterType;
+   string fFitterType;
 
    // stopwatches
    TStopwatch fTrackingWatch; // stopwatch for tracking

@@ -37,7 +37,7 @@ CbmLitFieldQa::CbmLitFieldQa():
    fAcceptanceAngleY(35.),
    fNofBinsX(30),
    fNofBinsY(30),
-   fMinZFieldInt(160.),
+   fMinZFieldInt(180.),
    fMaxZFieldInt(330.),
    fHM(NULL),
    fOutputDir("./")

@@ -71,6 +71,16 @@ public:
 	      Int_t globalTrackIndex,
 	      Double_t momentum);
 
+	/**
+	 * \brief Set cut on TRD ANN output value.
+	 */
+	void SetTrdAnnCut(Double_t par){fTrdAnnCut = par;}
+
+	/**
+	 * \brief Set cut on RICH ANN output value.
+	 */
+	void SetRichAnnCut(Double_t par){fRichAnnCut = par;}
+
 private:
     Double_t fRichAnnCut;
     Bool_t fRichUseAnn;

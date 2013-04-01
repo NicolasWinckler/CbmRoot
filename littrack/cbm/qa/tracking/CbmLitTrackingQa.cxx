@@ -268,7 +268,9 @@ CbmLitTrackingQa::CbmLitTrackingQa():
    fTrdMatches(NULL),
    fTofPoints(NULL),
    fTofHits(NULL),
-   fElectronId(NULL)
+   fElectronId(NULL),
+   fRichAnnCut(0.0),
+   fTrdAnnCut(0.85)
 {
 }
 
@@ -303,6 +305,8 @@ InitStatus CbmLitTrackingQa::Init()
    }
 
    fElectronId = new CbmLitGlobalElectronId();
+   fElectronId->SetTrdAnnCut(fTrdAnnCut);
+   fElectronId->SetRichAnnCut(fRichAnnCut);
    fElectronId->Init();
 
    return kSUCCESS;

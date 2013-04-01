@@ -98,6 +98,9 @@ public:
    void SetTrackCategories(const vector<string>& trackCategories) { fTrackCategories = trackCategories; }
    void SetRingCategories(const vector<string>& ringCategories) { fRingCategories = ringCategories; }
 
+   void SetRichAnnCut(Double_t par){fRichAnnCut = par;}
+   void SetTrdAnnCut(Double_t par){fTrdAnnCut = par;}
+
 private:
    /**
     * \brief Read data branches from input data files.
@@ -346,6 +349,8 @@ private:
 
 
    CbmLitGlobalElectronId* fElectronId; // Electron identification tool
+   Double_t fTrdAnnCut;
+   Double_t fRichAnnCut;
 
    ClassDef(CbmLitTrackingQa, 1);
 };

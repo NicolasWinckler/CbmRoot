@@ -1,4 +1,4 @@
-void run_sim(Int_t nEvents = 10)
+void run_sim(Int_t nEvents = 2)
 {
    TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
@@ -9,8 +9,8 @@ void run_sim(Int_t nEvents = 10)
 	//gRandom->SetSeed(10);
 
 	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
-	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.param.root";
-	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.mc.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/eventdisplay.param.root";
+	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/eventdisplay.mc.root";
 	TString caveGeom = "cave.geo";
 	TString targetGeom = "target_au_250mu.geo";
 	TString pipeGeom   = "pipe_standard.geo";
@@ -19,7 +19,7 @@ void run_sim(Int_t nEvents = 10)
 	TString stsGeom = "sts/sts_v12b.geo.root";
 	TString richGeom= "rich/rich_v08a.geo";
 	TString trdGeom = "trd/trd_v10b.geo";
-	TString tofGeom = "tof/tof_v07a.geo";
+	TString tofGeom = "tof/tof_v13a.geo";
 	TString ecalGeom = "";
 	TString fieldMap = "field_v12a";
 
@@ -74,6 +74,7 @@ void run_sim(Int_t nEvents = 10)
 	fRun->SetName("TGeant3"); // Transport engine
 	fRun->SetOutputFile(outFile);
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+	//fRun->SetStoreTraj(kTRUE);
 
 	fRun->SetMaterials("media.geo"); // Materials
 

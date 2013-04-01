@@ -17,17 +17,25 @@ void run_reco(Int_t nEvents = 10)
 	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.param.root";
 	TString outFile ="/Users/slebedev/Development/cbm/data/simulations/richreco/test.reco.root";
 	std::string resultDir = "recqa/";
+	int nofNoiseHitsInRich = 220;
+	double collectionEff = 1.0;
+	double sigmaErrorRich = 0.06;
+	double crosstalkRich = 0.02;
 	if (script == "yes") {
 		inFile = TString(gSystem->Getenv("MC_FILE"));
 		outFile = TString(gSystem->Getenv("RECO_FILE"));
 		parFile = TString(gSystem->Getenv("PAR_FILE"));
 		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
+		nofNoiseHitsInRich = TString(gSystem->Getenv("NOF_NOISE_HITS_IN_RICH")).Atoi();
+		collectionEff = TString(gSystem->Getenv("RICH_COLLECTION_EFF")).Atof();
+      sigmaErrorRich = TString(gSystem->Getenv("SIGMA_ERROR_RICH")).Atof();
+      crosstalkRich = TString(gSystem->Getenv("CROSSTALK_RICH")).Atof();
 	}
 
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13c.digi.par"; // TRD digi file
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
    gDebug = 0;
@@ -141,10 +149,10 @@ void run_reco(Int_t nEvents = 10)
 		Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
 		Bool_t simpleTR = kTRUE; // use fast and simple version for TR production
 
-		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
-
-                CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
-                run->AddTask(trdHitProd);
+		//CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
+		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , "H++");
+      CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
+      run->AddTask(trdHitProd);
 	}// isTRD
 
 	// =========================================================================
@@ -174,17 +182,17 @@ void run_reco(Int_t nEvents = 10)
 		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
 		run->AddTask(trdMatchTracks);
 
-		CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
-				new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
-		run->AddTask(trdSetTracksPidTask);
+		//CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
+		//		new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
+		//run->AddTask(trdSetTracksPidTask);
 
-		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask =
-				new	CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
+		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
+		trdSetTracksPidAnnTask->SetTRDGeometryType("h++");
 		run->AddTask(trdSetTracksPidAnnTask);
 
-		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
-				new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
-		run->AddTask(trdSetTracksPidLikeTask);
+		//CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
+		//		new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
+		//run->AddTask(trdSetTracksPidLikeTask);
 	}//isTrd
 
     // =========================================================================
@@ -193,15 +201,15 @@ void run_reco(Int_t nEvents = 10)
 	if (IsRich(parFile)){
 		CbmRichHitProducer* richHitProd	= new CbmRichHitProducer();
 		richHitProd->SetDetectorType(4);
-		richHitProd->SetNofNoiseHits(220);
-		richHitProd->SetCollectionEfficiency(1.0);
-		richHitProd->SetSigmaMirror(0.06);
+		richHitProd->SetNofNoiseHits(nofNoiseHitsInRich);
+		richHitProd->SetCollectionEfficiency(collectionEff);
+		richHitProd->SetSigmaMirror(sigmaErrorRich);
+		richHitProd->SetCrossTalkHitProb(crosstalkRich);
 		run->AddTask(richHitProd);
 
 		CbmRichReconstruction* richReco = new CbmRichReconstruction();
 		run->AddTask(richReco);
 
-		// ------------------- RICH Ring matching  ---------------------------------
 		CbmRichMatchRings* matchRings = new CbmRichMatchRings();
 		run->AddTask(matchRings);
 	}//isRich
@@ -220,7 +228,18 @@ void run_reco(Int_t nEvents = 10)
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir(resultDir);
-   trackingQa->SetPRange(10, 0., 3.);
+   trackingQa->SetPRange(24, 0., 12.);
+
+   std::vector<std::string> trackCat, richCat;
+// trackCat.push_back("All");
+   trackCat.push_back("Electron");
+//   richCat.push_back("All");
+   richCat.push_back("Electron");
+   richCat.push_back("ElectronReference");
+   trackingQa->SetTrackCategories(trackCat);
+   trackingQa->SetRingCategories(richCat);
+  // richCat.push_back("Pion");
+  // richCat.push_back("PionReference");
    run->AddTask(trackingQa);
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();

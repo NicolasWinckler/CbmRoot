@@ -20,7 +20,7 @@ function build_cbmroot
     build_dir=$2
     simpath=$3
     export SIMPATH=${simpath}
-    mkdir ${build_dir}
+    mkdir -p ${build_dir}
     cd ${build_dir}
     cmake ${src_dir}
     . ${build_dir}/config.sh
@@ -33,7 +33,7 @@ function copy_results_to_web
     web_dir=/u/andrey/web-docs/tests
     day=`date +%y-%m-%d`
     rm -rf ${web_dir}/${day}
-    mkdir ${web_dir}/${day}
+    mkdir -p ${web_dir}/${day}
     cp -R ${src_dir} ${web_dir}/${day}/
     chmod -R u+rwX,g+rx,o+rx ${web_dir}/${DAY}/
 }

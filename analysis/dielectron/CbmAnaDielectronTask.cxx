@@ -1097,8 +1097,8 @@ void CbmAnaDielectronTask::SignalAndBgReco()
    for (Int_t i = 0; i < ncand; i++){
       Int_t pdg = 0;
       if (fCandidates[i].stsMcTrackId > 0){
-	  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
-	  pdg = mcTrack->GetPdgCode();
+         CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
+         if (NULL != mcTrack) pdg = mcTrack->GetPdgCode();
       }
 
       Bool_t isChi2Prim = (fCandidates[i].chi2Prim < fChiPrimCut);

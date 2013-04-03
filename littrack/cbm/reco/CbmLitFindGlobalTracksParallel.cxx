@@ -22,6 +22,9 @@
 #include <set>
 #include <algorithm>
 
+#include <boost/assign/list_of.hpp>
+
+using boost::assign::list_of;
 using std::cout;
 using std::endl;
 using std::set;
@@ -105,11 +108,17 @@ void CbmLitFindGlobalTracksParallel::ReadAndCreateDataBranches()
 void CbmLitFindGlobalTracksParallel::DoTracking()
 {
    static Bool_t firstTime = true;
-   static lit::parallel::LitDetectorLayoutVec layout;
+   static lit::parallel::LitDetectorLayoutScal layout;
    static lit::parallel::LitTrackFinderNN finder;
    if (firstTime) {
-      CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutVec(layout);
+      CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutScal(layout);
       finder.SetDetectorLayout(layout);
+      finder.SetNofIterations(1);
+      finder.SetMaxNofMissingHits(list_of(4));
+      finder.SetPDG(list_of(211));
+      finder.SetChiSqStripHitCut(list_of(9.));
+      finder.SetChiSqPixelHitCut(list_of(25.));
+      finder.SetSigmaCoef(list_of(5.));
       firstTime = false;
    }
 
@@ -130,6 +139,7 @@ void CbmLitFindGlobalTracksParallel::DoTracking()
       CbmLitConverterParallel::FairTrackParamToLitTrackParamScal(stsTrack->GetParamLast(), &lpar);
       lseed->SetParamFirst(lpar);
       lseeds.push_back(lseed);
+      lseed->SetPreviousTrackId(iSeed);
    }
 
    fTrackingWatch.Start(kFALSE);

@@ -43,7 +43,8 @@ public:
       fNDF(1),
       fNofMissingHits(0),
       fPreviousTrackId(0),
-      fIsGood(true) {
+      fIsGood(true),
+      fLastStationId(0) {
       fHits.reserve(30);
    }
 
@@ -56,7 +57,7 @@ public:
     * \brief Adds hit to track.
     * @param hit Pointer to hit.
     */
-   void AddHit(LitScalPixelHit* hit) {
+   void AddHit(const LitScalPixelHit* hit) {
       fHits.push_back(hit);
    }
 
@@ -177,6 +178,22 @@ public:
    }
 
    /**
+    * \brief Returns last station ID.
+    * \return Last station ID.
+    */
+   unsigned short GetLastStationId() const {
+      return fLastStationId;
+   }
+
+   /**
+    * \brief Set last station ID.
+    * \param[in] lastStationId Last station ID.
+    */
+   void SetLastStationId(unsigned short lastStationId) {
+      fLastStationId = lastStationId;
+   }
+
+   /**
     * \brief Increases number of missing hits by dNofMissingHits.
     * \param[in] dNofMissingHits Value of dNofMissingHits.
     */
@@ -239,14 +256,86 @@ public:
    }
 
 private:
-   vector<LitScalPixelHit*> fHits; // Array of hits
+   vector<const LitScalPixelHit*> fHits; // Array of hits
    LitTrackParamScal fParamFirst; // First track parameter
    LitTrackParamScal fParamLast; // Last track parameter
    fscal fChiSq; // Chi-square of the track
    unsigned short fNDF; // Number of degrees of freedom
    unsigned short fNofMissingHits; // Number of missing hits
    unsigned short fPreviousTrackId; // Id of the track seed
+   unsigned char fLastStationId; // ID of last station
    bool fIsGood; // true id track is "good"
+};
+
+
+/**
+* \class CompareLitScalTrackChiSqOverNdfLess
+* \brief Comparator class used in STL algorithms for \c LitScalTrack class.
+* \author Andrey Lebedev <andrey.lebedev@gsi.de>
+* \date 2013
+*
+* This comparator class can be used in STL sort and find algorithms
+* to sort in \a ascending order \c LitScalTracks objects by its
+* (chi-square / NDF) value.
+*/
+class CompareLitScalTrackChiSqOverNdfLess :
+   public std::binary_function<
+   const LitScalTrack*,
+   const LitScalTrack*,
+   bool>
+{
+public:
+   bool operator()(const LitScalTrack* track1, const LitScalTrack* track2) const {
+      return ( (track1->GetChiSq() / track1->GetNDF()) < (track2->GetChiSq() / track2->GetNDF()) );
+   }
+};
+
+
+
+/**
+* \class CompareLitScalTrackNofHitsMore
+* \brief Comparator class used in STL algorithms for \c LitScalTrack class.
+* \author Andrey Lebedev <andrey.lebedev@gsi.de>
+* \date 2013
+*
+* This comparator class can be used in STL sort and find algorithms
+* to sort in \a descending order \c LitScalTracks objects by a
+* number of hits.
+*/
+class CompareLitScalTrackNofHitsMore :
+   public std::binary_function<
+   const LitScalTrack*,
+   const LitScalTrack*,
+   bool>
+{
+public:
+   bool operator()(const LitScalTrack* track1, const LitScalTrack* track2) const {
+      return track1->GetNofHits() > track2->GetNofHits();
+   }
+};
+
+
+
+/**
+* \class CompareLitScalTrackLastStationIdMore
+* \brief Comparator class used in STL algorithms for \c LitScalTrack class.
+* \author Andrey Lebedev <andrey.lebedev@gsi.de>
+* \date 2013
+*
+* This comparator class can be used in STL sort and find algorithms
+* to sort in \a descending order \c LitScalTracks objects by a
+* last station ID.
+*/
+class CompareLitScalTrackLastStationIdMore :
+   public std::binary_function<
+   const LitScalTrack*,
+   const LitScalTrack*,
+   bool>
+{
+public:
+   bool operator()(const LitScalTrack* track1, const LitScalTrack* track2) const {
+      return track1->GetLastStationId() > track2->GetLastStationId();
+   }
 };
 
 } // namespace parallel

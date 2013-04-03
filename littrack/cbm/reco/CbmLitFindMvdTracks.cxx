@@ -130,7 +130,7 @@ void CbmLitFindMvdTracks::ConvertOutputData()
       track->SortMvdHits();
 
       FairTrackParam parFirst;
-      CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parFirst);
+      CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetParamLast(), &parFirst);
       track->SetParamFirst(parFirst);
    }
 }

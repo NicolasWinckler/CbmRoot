@@ -53,6 +53,7 @@ set(LITTRACK_SRCS_RULECHECKER
    
    cbm/reco/CbmLitFindMvdTracks.cxx
    cbm/reco/CbmLitFitTracksParallel.cxx
+   cbm/reco/CbmLitFitTracks.cxx
    
    cbm/generators/CbmLitPolarizedGenerator.cxx
    
@@ -71,6 +72,7 @@ set(LITTRACK_HEADERS
    cbm/reco/CbmLitFindMvdTracks.h
    cbm/reco/CbmLitFindGlobalTracksIdeal.h
    cbm/reco/CbmLitFitTracksParallel.h
+   cbm/reco/CbmLitFitTracks.h
    cbm/reco/CbmLitFindGlobalTracksParallel.h
    cbm/generators/CbmLitPolarizedGenerator.h
    cbm/qa/material/CbmLitCheckEnergyLossMuons.h 

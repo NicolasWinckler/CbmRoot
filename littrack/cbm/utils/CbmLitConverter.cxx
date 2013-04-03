@@ -39,7 +39,7 @@ CbmLitConverter::~CbmLitConverter()
 
 }
 
-void CbmLitConverter::TrackParamToLitTrackParam(
+void CbmLitConverter::FairTrackParamToCbmLitTrackParam(
    const FairTrackParam* par,
    CbmLitTrackParam* litPar)
 {
@@ -56,7 +56,7 @@ void CbmLitConverter::TrackParamToLitTrackParam(
    litPar->SetCovMatrix(covVec);
 }
 
-void CbmLitConverter::LitTrackParamToTrackParam(
+void CbmLitConverter::CbmLitTrackParamToFairTrackParam(
    const CbmLitTrackParam* litPar,
    FairTrackParam* par)
 {
@@ -72,7 +72,7 @@ void CbmLitConverter::LitTrackParamToTrackParam(
    par->SetCovMatrix(cov);
 }
 
-void CbmLitConverter::PixelHitToLitPixelHit(
+void CbmLitConverter::CbmPixelHitToCbmLitPixelHit(
    const CbmPixelHit* hit,
    Int_t index,
    CbmLitPixelHit* litHit)
@@ -97,7 +97,7 @@ void CbmLitConverter::PixelHitToLitPixelHit(
    }
 }
 
-void CbmLitConverter::StripHitToLitStripHit(
+void CbmLitConverter::CbmStripHitToCbmLitStripHit(
    const CbmStripHit* hit,
    Int_t index,
    CbmLitStripHit* litHit)
@@ -120,7 +120,7 @@ void CbmLitConverter::StripHitToLitStripHit(
    }
 }
 
-void CbmLitConverter::CbmHitToLitPixelHit(
+void CbmLitConverter::CbmHitToCbmLitPixelHit(
    const CbmHit* hit,
    Int_t index,
    CbmLitPixelHit* litHit,
@@ -140,7 +140,7 @@ void CbmLitConverter::CbmHitToLitPixelHit(
    litHit->SetDetectorId(sysId, hit->GetStationNr() - 1);
 }
 
-void CbmLitConverter::StsTrackToLitTrack(
+void CbmLitConverter::CbmStsTrackToCbmLitTrack(
    const CbmStsTrack* stsTrack,
    CbmLitTrack* litTrack)
 {
@@ -152,48 +152,52 @@ void CbmLitConverter::StsTrackToLitTrack(
    litTrack->SetPreviousTrackId(-1);
    CbmLitTrackParam paramFirst, paramLast;
    //TODO remove this const typecasting
-   CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamFirst(), &paramFirst);
-   CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamLast(), &paramLast);
+   CbmLitConverter::FairTrackParamToCbmLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamFirst(), &paramFirst);
+   CbmLitConverter::FairTrackParamToCbmLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamLast(), &paramLast);
    litTrack->SetParamFirst(&paramFirst);
    litTrack->SetParamLast(&paramLast);
 }
 
-void CbmLitConverter::TrackToLitTrack(
+void CbmLitConverter::CbmTrackToCbmLitTrack(
    const CbmTrack* track,
-   CbmLitTrack* litTrack,
-   const TClonesArray* pixelHits,
-   const TClonesArray* stripHits)
+   const HitPtrVector& lhits,
+   CbmLitTrack* ltrack)
 {
    for (Int_t iHit = 0; iHit < track->GetNofHits(); iHit++) {
-      Int_t index = track->GetHitIndex(iHit);
-      Int_t type = track->GetHitType(iHit);
-      if (type == kMUCHSTRAWHIT) {
-         CbmStripHit* stripHit = (CbmStripHit*) stripHits->At(index);
-         CbmLitStripHit litHit;
-         StripHitToLitStripHit(stripHit, index, &litHit);
-         litTrack->AddHit(&litHit);
-      } else {
-         CbmPixelHit* pixelHit = (CbmPixelHit*) pixelHits->At(index);
-         CbmLitPixelHit litHit;
-         PixelHitToLitPixelHit(pixelHit, index, &litHit);
-         litTrack->AddHit(&litHit);
-      }
+      // Now we convert only pixel hits
+      if (track->GetHitType(iHit) != kPIXELHIT && track->GetHitType(iHit) != kTRDHIT && track->GetHitType(iHit) != kMUCHPIXELHIT) continue;
+      Int_t hitId = track->GetHitIndex(iHit);
+      ltrack->AddHit(lhits[hitId]);
    }
 
-   litTrack->SetQuality(kLITGOOD);
-   litTrack->SetChi2(track->GetChiSq());
-   litTrack->SetNDF(track->GetNDF());
-   litTrack->SetPreviousTrackId(track->GetPreviousTrackId());
-   litTrack->SetLastStationId(track->GetFlag());
-   litTrack->SetPDG(track->GetPidHypo());
+   ltrack->SetQuality(kLITGOOD);
+   ltrack->SetChi2(track->GetChiSq());
+   ltrack->SetNDF(track->GetNDF());
+   ltrack->SetPreviousTrackId(track->GetPreviousTrackId());
+   ltrack->SetLastStationId(track->GetFlag());
+   ltrack->SetPDG(track->GetPidHypo());
    CbmLitTrackParam paramFirst, paramLast;
-   CbmLitConverter::TrackParamToLitTrackParam(track->GetParamFirst(), &paramFirst);
-   CbmLitConverter::TrackParamToLitTrackParam(track->GetParamLast(), &paramLast);
-   litTrack->SetParamFirst(&paramFirst);
-   litTrack->SetParamLast(&paramLast);
+   CbmLitConverter::FairTrackParamToCbmLitTrackParam(track->GetParamFirst(), &paramFirst);
+   CbmLitConverter::FairTrackParamToCbmLitTrackParam(track->GetParamLast(), &paramLast);
+   ltrack->SetParamFirst(&paramFirst);
+   ltrack->SetParamLast(&paramLast);
 }
 
-void CbmLitConverter::LitTrackToTrack(
+void CbmLitConverter::CbmTrackArrayToCbmLitTrackArray(
+   const TClonesArray* tracks,
+   const HitPtrVector& lhits,
+   TrackPtrVector& ltracks)
+{
+   Int_t nofTracks = tracks->GetEntriesFast();
+   for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+      const CbmTrack* track = static_cast<const CbmTrack*>(tracks->At(iTrack));
+      CbmLitTrack* ltrack = new CbmLitTrack();
+      CbmTrackToCbmLitTrack(track, lhits, ltrack);
+      ltracks.push_back(ltrack);
+   }
+}
+
+void CbmLitConverter::CbmLitTrackToCbmTrack(
    const CbmLitTrack* litTrack,
    CbmTrack* track)
 {
@@ -211,8 +215,8 @@ void CbmLitConverter::LitTrackToTrack(
    track->SetPreviousTrackId(litTrack->GetPreviousTrackId());
    track->SetFlag(litTrack->GetQuality());
    FairTrackParam parLast, parFirst;
-   CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parLast);
-   CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamFirst(), &parFirst);
+   CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetParamLast(), &parLast);
+   CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetParamFirst(), &parFirst);
    track->SetParamLast(&parLast);
    track->SetParamFirst(&parFirst);
 }
@@ -245,14 +249,14 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 		if (stsId > -1) {
 		   CbmStsTrack* stsTrack = static_cast<CbmStsTrack*>(stsTracks->At(stsId));
 		   CbmLitTrackParam par;
-		   CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamFirst(), &par);
+		   CbmLitConverter::FairTrackParamToCbmLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamFirst(), &par);
 		   litTrack->SetParamFirst(&par);
 
 		   for (Int_t iHit = 0; iHit < stsTrack->GetNMvdHits(); iHit++) {
 			  Int_t index = stsTrack->GetMvdHitIndex(iHit);
 		      CbmHit* hit = static_cast<CbmHit*>(mvdHits->At(iHit));
 		      CbmLitPixelHit* litHit = new CbmLitPixelHit();
-		      CbmHitToLitPixelHit(hit, iHit, litHit, kLITMVD);
+		      CbmHitToCbmLitPixelHit(hit, iHit, litHit, kLITMVD);
 			  litTrack->AddHit(litHit);
 		   }
 
@@ -260,7 +264,7 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 			  Int_t index = stsTrack->GetStsHitIndex(iHit);
 		      CbmHit* hit = static_cast<CbmHit*>(stsHits->At(iHit));
 		      CbmLitPixelHit* litHit = new CbmLitPixelHit();
-		      CbmHitToLitPixelHit(hit, iHit, litHit, kLITSTS);
+		      CbmHitToCbmLitPixelHit(hit, iHit, litHit, kLITSTS);
 			  litTrack->AddHit(litHit);
 		   }
 		}
@@ -272,7 +276,7 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 			  Int_t index = trdTrack->GetHitIndex(iHit);
 			  const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(trdHits->At(index));
 			  CbmLitPixelHit* litHit = new CbmLitPixelHit();
-			  PixelHitToLitPixelHit(hit, index, litHit);
+			  CbmPixelHitToCbmLitPixelHit(hit, index, litHit);
 			  litTrack->AddHit(litHit);
 		   }
 		}
@@ -286,12 +290,12 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 			  if (type == kMUCHSTRAWHIT) {
 					CbmLitStripHit* litHit = new CbmLitStripHit();
 					const CbmStripHit* stripHit = static_cast<const CbmStripHit*>(muchStrawHits->At(index));
-					StripHitToLitStripHit(stripHit, index, litHit);
+					CbmStripHitToCbmLitStripHit(stripHit, index, litHit);
 					litTrack->AddHit(litHit);
 			  } else {
 					CbmLitPixelHit* litHit = new CbmLitPixelHit();
 					const CbmPixelHit* pixelHit = static_cast<const CbmPixelHit*>(muchPixelHits->At(index));
-					PixelHitToLitPixelHit(pixelHit, index, litHit);
+					CbmPixelHitToCbmLitPixelHit(pixelHit, index, litHit);
 					litTrack->AddHit(litHit);
 			  }
 		   }
@@ -301,7 +305,7 @@ void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
 		if (tofId > -1) {
 			  const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(tofHits->At(tofId));
 			  CbmLitPixelHit* litHit = new CbmLitPixelHit();
-			  PixelHitToLitPixelHit(hit, tofId, litHit);
+			  CbmPixelHitToCbmLitPixelHit(hit, tofId, litHit);
 			  litTrack->AddHit(litHit);
 		}
 
@@ -338,7 +342,7 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 
       // Set last parameter of the CbmGlobal track to be last parameter of CbmLitTrack
       FairTrackParam parLast;
-      CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parLast);
+      CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetParamLast(), &parLast);
       globalTrack->SetParamLast(&parLast);
 
       Bool_t isCreateMuchTrack = false, isCreateTrdTrack = false;
@@ -416,8 +420,8 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
          muchTrack->SetNDF(ndfMuch);
 
          FairTrackParam parLast, parFirst;
-         CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(muchLast)->GetUpdatedParam(), &parLast);
-         CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(muchFirst)->GetUpdatedParam(), &parFirst);
+         CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetFitNode(muchLast)->GetUpdatedParam(), &parLast);
+         CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetFitNode(muchFirst)->GetUpdatedParam(), &parFirst);
          muchTrack->SetParamLast(&parLast);
          muchTrack->SetParamFirst(&parFirst);
       }
@@ -428,8 +432,8 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
          trdTrack->SetNDF(ndfTrd);
 
          FairTrackParam parLast, parFirst;
-         CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(trdLast)->GetUpdatedParam(), &parLast);
-         CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(trdFirst)->GetUpdatedParam(), &parFirst);
+         CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetFitNode(trdLast)->GetUpdatedParam(), &parLast);
+         CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetFitNode(trdFirst)->GetUpdatedParam(), &parFirst);
          trdTrack->SetParamLast(&parLast);
          trdTrack->SetParamFirst(&parFirst);
       }
@@ -457,12 +461,12 @@ void CbmLitConverter::HitArrayToHitVector(
       if (hit->GetType() == kMUCHSTRAWHIT) {
          CbmLitStripHit* litHit = new CbmLitStripHit();
          CbmStripHit* stripHit = static_cast<CbmStripHit*>(hit);
-         StripHitToLitStripHit(stripHit, iHit, litHit);
+         CbmStripHitToCbmLitStripHit(stripHit, iHit, litHit);
          litHits.push_back(litHit);
       } else {
          CbmLitPixelHit* litHit = new CbmLitPixelHit();
          CbmPixelHit* pixelHit = static_cast<CbmPixelHit*>(hit);
-         PixelHitToLitPixelHit(pixelHit, iHit, litHit);
+         CbmPixelHitToCbmLitPixelHit(pixelHit, iHit, litHit);
          litHits.push_back(litHit);
       }
    }
@@ -477,7 +481,7 @@ void CbmLitConverter::MvdHitArrayToHitVector(
       CbmHit* hit = static_cast<CbmHit*>(hits->At(iHit));
       if(NULL == hit) { continue; }
       CbmLitPixelHit* litHit = new CbmLitPixelHit();
-      CbmHitToLitPixelHit(hit, iHit, litHit, kLITMVD);
+      CbmHitToCbmLitPixelHit(hit, iHit, litHit, kLITMVD);
       litHits.push_back(litHit);
    }
 }
@@ -492,7 +496,7 @@ void CbmLitConverter::StsTrackArrayToTrackVector(
       if (track == NULL) { continue; }
       if (track->GetParamLast()->GetQp() == 0) { continue; }
       CbmLitTrack* litTrack = new CbmLitTrack;
-      StsTrackToLitTrack(track, litTrack);
+      CbmStsTrackToCbmLitTrack(track, litTrack);
       litTrack->SetPreviousTrackId(iTrack);
       litTrack->SetRefId(iTrack);
       litTracks.push_back(litTrack);
@@ -506,7 +510,7 @@ void CbmLitConverter::TrackVectorToMuchTrackArray(
    Int_t trackNo = muchTracks->GetEntriesFast();
    for(TrackPtrIterator iTrack = tracks.begin(); iTrack != tracks.end(); iTrack++) {
       CbmMuchTrack track;
-      LitTrackToTrack(*iTrack, &track);
+      CbmLitTrackToCbmTrack(*iTrack, &track);
       new ((*muchTracks)[trackNo++]) CbmMuchTrack(track);
    }
 }
@@ -518,7 +522,7 @@ void CbmLitConverter::TrackVectorToTrdTrackArray(
    Int_t trackNo = trdTracks->GetEntriesFast();
    for(TrackPtrIterator iTrack = tracks.begin(); iTrack != tracks.end(); iTrack++) {
       CbmTrdTrack track;
-      LitTrackToTrack(*iTrack, &track);
+      CbmLitTrackToCbmTrack(*iTrack, &track);
       new ((*trdTracks)[trackNo++]) CbmTrdTrack(track);
    }
 }

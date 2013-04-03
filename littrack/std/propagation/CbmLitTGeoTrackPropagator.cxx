@@ -57,7 +57,6 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
    litfloat* length)
 
 {
-//   std::cout << "PAR=" << par->ToString();
    if (!IsParCorrect(par)) { return kLITERROR; }
 
    litfloat zIn = par->GetZ();
@@ -83,8 +82,6 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
    if (nofSteps == 0) { stepSize = std::abs(dz); }
    else { stepSize = CbmLitTGeoTrackPropagator::MAXIMUM_PROPAGATION_STEP_SIZE; }
    litfloat z = zIn;
-//   cout << "zIn=" << zIn << " zOut=" << zOut << " dz=" << dz << " nofSteps=" << nofSteps
-//         << " stepSize=" << stepSize << endl;
 
    if (length) *length = 0;
 
@@ -106,7 +103,6 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
          return kLITERROR;
       }
 
-//      cout << "iStep=" << iStep << " z=" << z << " inter.size()=" << inter.size() << endl;
       // Loop over material layers
       for(unsigned int  iMat = 0; iMat < inter.size() ; iMat++) {
          CbmLitMaterialInfo mat = inter[iMat];
@@ -131,8 +127,6 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
          fMaterial->Update(par, &mat, pdg, downstream);
 
          if (length) *length += mat.GetLength();
-
-//         cout << "iMat=" << iMat << " mat=" << mat.ToString();
       }
    }
 

@@ -68,6 +68,10 @@ LitStatus CbmLitTrackFitterImp::Fit(
       nodes[iHit].SetUpdatedParam(&par);
       nodes[iHit].SetChiSqFiltered(chi2Hit);
       track->SetChi2(track->GetChi2() + chi2Hit);
+      if (iHit == 0) {
+         if (downstream) { track->SetParamFirst(&par); }
+         else { track->SetParamLast(&par); }
+      }
    }
    if (downstream) { track->SetParamLast(&par); }
    else { track->SetParamFirst(&par); }

@@ -1,21 +1,20 @@
 /**
- * \file CbmLitFitTracksParallel.cxx
+ * \file CbmLitFitTracks.cxx
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2013
  */
 
-#include "CbmLitFitTracksParallel.h"
-#include "cbm/base/CbmLitTrackingGeometryConstructor.h"
-#include "cbm/utils/CbmLitConverterParallel.h"
+#include "CbmLitFitTracks.h"
+#include "base/CbmLitToolFactory.h"
+#include "cbm/utils/CbmLitConverter.h"
 #include "std/utils/CbmLitMemoryManagment.h"
-#include "parallel/LitDetectorLayout.h"
-#include "parallel/LitScalTrack.h"
-#include "parallel/LitScalPixelHit.h"
-#include "parallel/LitTrackFitter.h"
+#include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitTypes.h"
 #include "FairRootManager.h"
 #include "CbmTrack.h"
 #include "CbmStsTrack.h"
 #include "FairTrackParam.h"
+#include "std/data/CbmLitTrack.h"
 
 #include "TClonesArray.h"
 
@@ -29,7 +28,7 @@ using std::for_each;
 using std::cout;
 using std::endl;
 
-CbmLitFitTracksParallel::CbmLitFitTracksParallel():
+CbmLitFitTracks::CbmLitFitTracks():
    FairTask(),
    fGlobalTracks(NULL),
    fStsTracks(NULL),
@@ -42,12 +41,12 @@ CbmLitFitTracksParallel::CbmLitFitTracksParallel():
 
 }
 
-CbmLitFitTracksParallel::~CbmLitFitTracksParallel()
+CbmLitFitTracks::~CbmLitFitTracks()
 {
 
 }
 
-InitStatus CbmLitFitTracksParallel::Init()
+InitStatus CbmLitFitTracks::Init()
 {
    ReadDataBranches();
 
@@ -57,21 +56,21 @@ InitStatus CbmLitFitTracksParallel::Init()
    return kSUCCESS;
 }
 
-void CbmLitFitTracksParallel::Exec(
+void CbmLitFitTracks::Exec(
     Option_t* opt)
 {
    static Int_t eventNo = 0;
-   std::cout << "CbmLitFitTracksParallel::Exec: eventNo=" << eventNo++ << std::endl;
+   std::cout << "CbmLitFitTracks::Exec: eventNo=" << eventNo++ << std::endl;
 
    DoFit();
 }
 
-void CbmLitFitTracksParallel::Finish()
+void CbmLitFitTracks::Finish()
 {
    PrintStopwatchStatistics();
 }
 
-void CbmLitFitTracksParallel::ReadDataBranches()
+void CbmLitFitTracks::ReadDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
    assert(ioman != NULL);
@@ -85,49 +84,49 @@ void CbmLitFitTracksParallel::ReadDataBranches()
    fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
 }
 
-void CbmLitFitTracksParallel::DoFit()
+void CbmLitFitTracks::DoFit()
 {
    static Bool_t firstTime = true;
-   static lit::parallel::LitDetectorLayoutScal layout;
+   static TrackFitterPtr fitter;
    if (firstTime) {
-      CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutScal(layout);
+      fitter = CbmLitToolFactory::Instance()->CreateTrackFitter("lit_kalman");
       firstTime = false;
    }
 
    fFitWithIOWatch.Start(kFALSE);
 
    // Convert input data
-   vector<lit::parallel::LitScalTrack*> ltracks;
-   vector<lit::parallel::LitScalPixelHit*> lhits;
-   CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fTrdHits, lhits);
-   CbmLitConverterParallel::CbmTrackArrayToLitScalTrackArray(fTrdTracks, lhits, ltracks);
+   TrackPtrVector ltracks;
+   HitPtrVector lhits;
+   CbmLitConverter::HitArrayToHitVector(fTrdHits, lhits);
+   CbmLitConverter::CbmTrackArrayToCbmLitTrackArray(fTrdTracks, lhits, ltracks);
 
    // Replace first track parameter of the converted tracks with the last STS track parameter
    Int_t nofTracks = ltracks.size();
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
-      lit::parallel::LitScalTrack& track = *ltracks[iTrack];
-      Int_t stsTrackId = track.GetPreviousTrackId();
+      CbmLitTrack* track = ltracks[iTrack];
+      Int_t stsTrackId = track->GetPreviousTrackId();
       CbmStsTrack* stsTrack = static_cast<CbmStsTrack*>(fStsTracks->At(stsTrackId));
-      lit::parallel::LitTrackParamScal lpar;
-      CbmLitConverterParallel::FairTrackParamToLitTrackParamScal(stsTrack->GetParamLast(), &lpar);
-      track.SetParamFirst(lpar);
+      CbmLitTrackParam lpar;
+      CbmLitConverter::FairTrackParamToCbmLitTrackParam(stsTrack->GetParamLast(), &lpar);
+      track->SetParamFirst(&lpar);
+      track->SetPDG(211);
    }
 
    fFitWatch.Start(kFALSE);
-  // Int_t nofTracks = ltracks.size();
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
-      lit::parallel::LitScalTrack& track = *ltracks[iTrack];
-      LitTrackFitter(track, layout);
+      CbmLitTrack* track = ltracks[iTrack];
+      fitter->Fit(track);
    }
    fFitWatch.Stop();
 
    // Replace first and last track parameters for the fitted track
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
-      lit::parallel::LitScalTrack& track = *ltracks[iTrack];
+      CbmLitTrack* track = ltracks[iTrack];
       CbmTrack* trdTrack = static_cast<CbmTrack*>(fTrdTracks->At(iTrack));
       FairTrackParam firstParam, lastParam;
-      CbmLitConverterParallel::LitTrackParamScalToFairTrackParam(&track.GetParamFirst(), &firstParam);
-      CbmLitConverterParallel::LitTrackParamScalToFairTrackParam(&track.GetParamLast(), &lastParam);
+      CbmLitConverter::CbmLitTrackParamToFairTrackParam(track->GetParamFirst(), &firstParam);
+      CbmLitConverter::CbmLitTrackParamToFairTrackParam(track->GetParamLast(), &lastParam);
       trdTrack->SetParamFirst(&firstParam);
       trdTrack->SetParamLast(&lastParam);
    }
@@ -141,9 +140,9 @@ void CbmLitFitTracksParallel::DoFit()
    fFitWithIOWatch.Stop();
 }
 
-void CbmLitFitTracksParallel::PrintStopwatchStatistics()
+void CbmLitFitTracks::PrintStopwatchStatistics()
 {
-   cout << "CbmLitFitTracksParallel::PrintStopwatchStatistics: " << endl;
+   cout << "CbmLitFitTracks::PrintStopwatchStatistics: " << endl;
    cout << "fit without IO: counts=" << fFitWatch.Counter()
         << ", real=" << fFitWatch.RealTime() / fFitWatch.Counter()
         << "/" << fFitWatch.RealTime()
@@ -155,4 +154,4 @@ void CbmLitFitTracksParallel::PrintStopwatchStatistics()
         << " s, cpu=" << fFitWithIOWatch.CpuTime() / fFitWithIOWatch.Counter()
         << "/" << fFitWithIOWatch.CpuTime() << endl;
 }
-ClassImp(CbmLitFitTracksParallel);
+ClassImp(CbmLitFitTracks);

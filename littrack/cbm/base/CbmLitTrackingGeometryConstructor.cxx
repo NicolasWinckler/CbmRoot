@@ -41,9 +41,11 @@ CbmLitTrackingGeometryConstructor::CbmLitTrackingGeometryConstructor():
    fNofTrdStations(-1),
    fNofMuchStations(-1),
    fNofMvdStations(-1),
-   fNofStsStations(-1)
+   fNofStsStations(-1),
+   fDet()
 {
 	fGeo = gGeoManager;
+	fDet.DetermineSetup();
 }
 
 CbmLitTrackingGeometryConstructor::~CbmLitTrackingGeometryConstructor()
@@ -209,6 +211,9 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
 //   Double_t detectorZPosition = 400.; // We want to extrapolate up to here using virtual stations
    Double_t dZ = 10.; // Distance between neighboring virtual stations
 
+   lit::parallel::LitMaterialGrid richMaterial;
+   GetRichMaterial(&richMaterial);
+
    // Virtual stations
    Int_t nofVirtualStations = 31;
    for (Int_t iStation = 0; iStation < nofVirtualStations; iStation++) {
@@ -219,6 +224,7 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
       lit::parallel::LitStation<T> station;
       station.SetZ(z);
       station.SetField(fieldGrid);
+      if (iStation == 10) station.SetMaterial(richMaterial);
 
       layout.AddVirtualStation(station);
    }
@@ -239,15 +245,39 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
 
    gFile = oldFile;
    gDirectory = oldDirectory;
+   file->Close();
    delete file;
 
    cout << layout;
    cout << "Finish getting TRD layout for parallel version of tracking\n";
 }
 
+void CbmLitTrackingGeometryConstructor::GetRichMaterial(
+      lit::parallel::LitMaterialGrid* material)
+{
+   if (!fDet.GetDet(kRICH)) return;
+   // Read file with TProfile2D containing silicon equivalent of the material
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TString matBudgetFile = parDir + "/littrack/rich.silicon.root";
+   TFile* oldFile = gFile;
+   TDirectory* oldDirectory = gDirectory;
+   TFile* file = new TFile(matBudgetFile, "READ");
+   CbmHistManager hm;
+   hm.ReadFromFile(file);
+
+   TProfile2D* profile = hm.P2("hrl_ThicknessSilicon_Rich_P2");
+   ConvertTProfile2DToLitMaterialGrid(profile, material, 3.);
+
+   gFile = oldFile;
+   gDirectory = oldDirectory;
+   file->Close();
+   delete file;
+}
+
 void CbmLitTrackingGeometryConstructor::ConvertTProfile2DToLitMaterialGrid(
       const TProfile2D* profile,
-      lit::parallel::LitMaterialGrid* grid)
+      lit::parallel::LitMaterialGrid* grid,
+      Double_t maximumValue)
 {
    Int_t nofBinsX = profile->GetNbinsX();
    Int_t nofBinsY = profile->GetNbinsY();
@@ -256,6 +286,7 @@ void CbmLitTrackingGeometryConstructor::ConvertTProfile2DToLitMaterialGrid(
    for (Int_t iX = 1; iX <= nofBinsX; iX++) {
       for (Int_t iY = 1; iY <= nofBinsY; iY++) {
          Double_t content = profile->GetBinContent(iX, iY);
+         if (maximumValue > 0 && content > maximumValue) content = maximumValue;
          material[iX - 1][iY - 1] = content;
       }
    }

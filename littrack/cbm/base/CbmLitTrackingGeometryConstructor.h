@@ -9,7 +9,7 @@
 #define CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_
 
 #include "TObject.h"
-
+#include "cbm/base/CbmLitDetectorSetup.h"
 #include "parallel/LitDetectorLayout.h"
 #include "parallel/LitMaterialGrid.h"
 
@@ -64,9 +64,13 @@ public:
     */
    template<class T> void GetTrdLayout(lit::parallel::LitDetectorLayout<T>& layout);
 
+   void GetRichMaterial(
+         lit::parallel::LitMaterialGrid* material);
+
    void ConvertTProfile2DToLitMaterialGrid(
          const TProfile2D* profile,
-         lit::parallel::LitMaterialGrid* grid);
+         lit::parallel::LitMaterialGrid* grid,
+         Double_t maximumValue = 0);
 
    /**
     * \brief Return number of stations in TRD.
@@ -140,6 +144,7 @@ private:
    Int_t fNofMuchStations; // Number of MUCH stations
    Int_t fNofMvdStations; // Number of MVD stations
    Int_t fNofStsStations; // Number of STS stations
+   CbmLitDetectorSetup fDet; //
 };
 
 #endif /* CBMLITTRACKINGGEOMETRYCONSTRUCTOR_H_ */

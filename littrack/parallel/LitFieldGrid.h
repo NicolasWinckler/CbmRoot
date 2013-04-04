@@ -11,11 +11,15 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 using std::vector;
 using std::string;
 using std::stringstream;
 using std::ostream;
+using std::right;
+using std::setfill;
+using std::setw;
 
 namespace lit {
 namespace parallel {
@@ -209,6 +213,18 @@ public:
          << " Ymin=" << fYMin << " Ymax=" << fYMax << " nofBinsX=" << fNofBinsX
          << " nofBinsY=" << fNofBinsY << " binSizeX=" << fBinSizeX
          << " binSizeY=" << fBinSizeY << " field.size=" << fField.size();
+//      if (fNofBinsX > 0 && fNofBinsY > 0) {
+//         ss << "\nGrid:\n";
+//         unsigned int stepX = fNofBinsX / 10;
+//         unsigned int stepY = fNofBinsY / 10;
+//         for (unsigned int i = 0; i < 10; i++) {
+//            for (unsigned int j = 0; j < 10; j++) {
+//               const LitFieldValue<fscal>& v = fField[i * stepX][j * stepY];
+//               ss << right << setfill(' ') << setw(15) << v.Bx;
+//            }
+//            ss << "\n";
+//         }
+//      }
       return ss.str();
    }
 

@@ -41,15 +41,18 @@ inline void LitTrackFitter(
       }
 
       if (!vsFront.GetMaterial().IsEmpty()) {
-         LitAddMaterial<fscal>(par, vsFront.GetMaterial().GetMaterial(par.X, par.Y));
+         fscal thickness = vsFront.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
       }
 
       if (!vsMiddle.GetMaterial().IsEmpty()) {
-         LitAddMaterial<fscal>(par, vsMiddle.GetMaterial().GetMaterial(par.X, par.Y));
+         fscal thickness = vsMiddle.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
       }
 
       if (!vsBack.GetMaterial().IsEmpty()) {
-         LitAddMaterial<fscal>(par, vsBack.GetMaterial().GetMaterial(par.X, par.Y));
+         fscal thickness = vsBack.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
       }
    }
 
@@ -68,7 +71,8 @@ inline void LitTrackFitter(
       for (unsigned char iStation = prevStationId + 1; iStation <= hit->stationId; iStation++) {
          const LitStationScal& station = layout.GetStation(iStation);
          if (!station.GetMaterial().IsEmpty()) {
-            LitAddMaterial<fscal>(par, station.GetMaterial().GetMaterial(par.X, par.Y));
+            fscal thickness = station.GetMaterial().GetMaterial(par.X, par.Y);
+            if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
          }
       }
       prevStationId = hit->stationId;

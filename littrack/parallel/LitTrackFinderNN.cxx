@@ -122,15 +122,18 @@ void lit::parallel::LitTrackFinderNN::PropagateVirtualStations(
       }
 
       if (!vsFront.GetMaterial().IsEmpty()) {
-         LitAddMaterial<fscal>(par, vsFront.GetMaterial().GetMaterial(par.X, par.Y));
+         fscal thickness = vsFront.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
       }
 
       if (!vsMiddle.GetMaterial().IsEmpty()) {
-         LitAddMaterial<fscal>(par, vsMiddle.GetMaterial().GetMaterial(par.X, par.Y));
+         fscal thickness = vsMiddle.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
       }
 
       if (!vsBack.GetMaterial().IsEmpty()) {
-         LitAddMaterial<fscal>(par, vsBack.GetMaterial().GetMaterial(par.X, par.Y));
+         fscal thickness = vsBack.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
       }
    }
 }
@@ -167,7 +170,8 @@ void lit::parallel::LitTrackFinderNN::FollowTracks()
             LitTrackParamScal& tpar = (*itMap).second;
             LitLineExtrapolation(tpar, z);
             if (!station.GetMaterial().IsEmpty()) {
-               LitAddMaterial<fscal>(tpar, station.GetMaterial().GetMaterial(tpar.X, tpar.Y));
+               fscal thickness = station.GetMaterial().GetMaterial(tpar.X, tpar.Y);
+               if (thickness > 0) LitAddMaterial<fscal>(tpar, thickness);
             }
          }
 

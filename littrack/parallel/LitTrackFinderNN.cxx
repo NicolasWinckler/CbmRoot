@@ -11,8 +11,15 @@
 #include "LitMath.h"
 #include "LitTrackSelection.h"
 
+#include <iostream>
+#include <limits>
+#include <algorithm>
 #include <map>
 using std::map;
+using std::for_each;
+using std::cout;
+using std::endl;
+using std::numeric_limits;
 
 lit::parallel::LitTrackFinderNN::LitTrackFinderNN() :
    fTracks(),
@@ -47,9 +54,9 @@ void lit::parallel::LitTrackFinderNN::DoFind(
    fHitData.SetNofStations(fLayout.GetNofStations());
 
    for (fIteration = 0; fIteration < fNofIterations; fIteration++) {
-     // std::cout << "LitTrackFinderNN::DoFind: iteration=" << fIteration << std::endl;
+     // cout << "LitTrackFinderNN::DoFind: iteration=" << fIteration << endl;
       ArrangeHits(hits);
-    //  std::cout << fHitData.ToString();
+    //  cout << fHitData.ToString();
 
       InitTrackSeeds(trackSeeds);
       FollowTracks();
@@ -63,7 +70,7 @@ void lit::parallel::LitTrackFinderNN::DoFind(
    }
 
    static int eventNo = 0;
-   std::cout << "LitTrackFinderNN::DoFind: " << eventNo++ << " events processed" << std::endl;
+   cout << "LitTrackFinderNN::DoFind: " << eventNo++ << " events processed" << endl;
 }
 
 void lit::parallel::LitTrackFinderNN::ArrangeHits(
@@ -165,7 +172,7 @@ void lit::parallel::LitTrackFinderNN::FollowTracks()
          }
 
          // Loop over hits
-         fscal minChiSq = std::numeric_limits<fscal>::max(); // minimum chi-square of hit
+         fscal minChiSq = numeric_limits<fscal>::max(); // minimum chi-square of hit
          const LitScalPixelHit* minHit = NULL; // Pointer to hit with minimum chi-square
          LitTrackParamScal minPar; // Track parameters for closest hit
          const vector<LitScalPixelHit*>& hits = fHitData.GetHits(iStation);
@@ -174,7 +181,7 @@ void lit::parallel::LitTrackFinderNN::FollowTracks()
             const LitScalPixelHit* hit = hits[iHit];
             int bin = fHitData.GetBinByZPos(iStation, hit->Z);
             if (binParamMap.find(bin) == binParamMap.end()) { // This should never happen
-               std::cout << "-E- LitTrackFinderNN::FollowTracks: Z position " << hit->Z << " not found in map. Something is wrong.\n";
+               cout << "-E- LitTrackFinderNN::FollowTracks: Z position " << hit->Z << " not found in map. Something is wrong.\n";
             }
             LitTrackParamScal tpar(binParamMap[bin]);
 
@@ -190,7 +197,7 @@ void lit::parallel::LitTrackFinderNN::FollowTracks()
                   && (hit->Y < (tpar.Y + devY)) && (hit->Y > (tpar.Y - devY));
             if (!hitInside) continue;
 
-            fscal chi = std::numeric_limits<fscal>::max();
+            fscal chi = numeric_limits<fscal>::max();
             LitFiltration(tpar, *hit, chi);
             bool hitInValidationGate = chi < fChiSqStripHitCut[fIteration];
             if (hitInValidationGate && chi < minChiSq) { // Check if hit is inside validation gate and closer to the track.

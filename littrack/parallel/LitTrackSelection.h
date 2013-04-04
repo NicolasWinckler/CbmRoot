@@ -16,9 +16,12 @@
 #include <set>
 #include <utility>
 #include <functional>
+#include <algorithm>
 
 using std::sort;
 using std::pair;
+using std::set;
+using std::equal_range;
 
 namespace lit {
 namespace parallel {
@@ -81,7 +84,7 @@ void DoSelectSharedHits(
 
    DoSortNofHits(tracks);
 
-   std::set<int> hitsId;
+   set<int> hitsId;
 //   const int STRIPSTART = 100000;
 //   const int TRDSTART = 1000000;
 

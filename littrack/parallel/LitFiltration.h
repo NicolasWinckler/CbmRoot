@@ -102,7 +102,7 @@ inline void LitFiltration (
    T norm = dxx * dyy - dxx * par.C5 - dyy * par.C0 + par.C0 * par.C5
               - dxy * dxy + TWO * dxy * par.C1 - par.C1 * par.C1;
    chiSq = ((xmx * (dyy - par.C5) - ymy * (dxy - par.C1)) * xmx
-            +(-xmx * (dxy - par.C1) + ymy * (dxx - par.C0)) * ymy) / norm;
+            + (-xmx * (dxy - par.C1) + ymy * (dxx - par.C0)) * ymy) / norm;
 }
 
 /**

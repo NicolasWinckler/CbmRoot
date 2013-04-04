@@ -1,5 +1,5 @@
 /**
- * \file LitUtils.h
+  * \file LitUtils.h
  *
  * \brief Useful classes and functions.
  *

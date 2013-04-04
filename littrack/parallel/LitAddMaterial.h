@@ -18,7 +18,6 @@
 #define LITADDMATERIAL_H_
 
 #include "LitTrackParam.h"
-#include "LitMaterialInfo.h"
 #include "LitMath.h"
 
 namespace lit {

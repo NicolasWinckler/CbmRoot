@@ -21,7 +21,6 @@ namespace parallel {
 /**
  * \fn void inline void PackFieldValue(const LitFieldValue<fscal> value[], LitFieldValue<fvec>& lvalue)
  * \brief Packs \c LitFieldValue.
- *
  * \param[in] value Array of fvecLen length of LitFieldValue<fscal> objects to be packed into a vector.
  * \param[out] lvalue Packed LitFieldValue.
  */
@@ -41,7 +40,6 @@ inline void PackFieldValue(
 /**
  * \fn inline void PackTrackParam(const LitTrackParam<fscal> par[], LitTrackParam<fvec>& lpar)
  * \brief Packs \c LitTrackParam.
- *
  * \param[in] par Array of fvecLen length of LitTrackParam<fscal> objects to be packed into a vector.
  * \param[out] lpar Packed LitTrackParam.
  */
@@ -79,7 +77,6 @@ inline void PackTrackParam(
 /**
  * \fn inline void UnpackTrackParam(const LitTrackParam<fvec>& lpar, LitTrackParam<fscal> par[])
  * \brief Unpacks \c LitTrackParam.
- *
  * \param[in] lpar Packed LitTrackParam to be unpacked.
  * \param[out] par Array of fvecLen length to store unpacked scalar objects.
  */
@@ -117,7 +114,6 @@ inline void UnpackTrackParam(
 /**
  * \fn inline void UnpackTrackParam(unsigned int i, const LitTrackParam<fvec>& lpar, LitTrackParam<fscal>& par)
  * \brief Unpacks \c LitTrackParam.
- *
  * \param[in] i Index of vector LitTrackParam to be unpacked to scalar.
  * \param[in] lpar Packed LitTrackParam to be unpacked.
  * \param[out] par Array of fvecLen length to store unpacked scalar objects.

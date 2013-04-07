@@ -446,7 +446,7 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
     Int_t finalHit = hitStationLimits[1][stationNr];
     
     if ( startHit == -1 && finalHit == -1 ) continue;
-    if ( startHit > fHits->GetEntriesFast() || finalHit > fHits->GetEntriesFast()) continue;
+    if ( startHit < 0 || finalHit < 0 || startHit > fHits->GetEntriesFast() || finalHit > fHits->GetEntriesFast()) continue;
 
    
     Int_t NofMatched = 0;

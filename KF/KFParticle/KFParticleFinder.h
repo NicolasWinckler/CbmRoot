@@ -98,6 +98,15 @@ class KFParticleFinder
                            const float *cuts = 0,
                            int startIndex=0);
 
+  static void CombinePartPart(std::vector<KFParticle>& particles1,
+                              std::vector<KFParticle>& particles2,
+                              std::vector<KFParticle>& Particles,
+                              KFParticleSIMD& PrimVtx,
+                              const float* cuts=0,
+                              bool isPrimary=0,
+                              const int MotherPDG=0,
+                              bool isSameInputPart=0);
+
     static void FindDMesLambdac(std::vector<CbmKFTrack>& vTracks,
                                 const std::vector<L1FieldRegion>& vField,
                                 std::vector<KFParticle>& Particles,

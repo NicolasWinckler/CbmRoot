@@ -42,6 +42,7 @@ class CbmKFParticlesFinderQA :public FairTask
   ~CbmKFParticlesFinderQA();
 
   void SetOutFile(TString outname) {outfileName = outname;}
+  void SetEffFileName(TString effname) {fEfffileName = effname;}
 
   virtual InitStatus ReInit();
   virtual InitStatus Init();
@@ -89,6 +90,8 @@ class CbmKFParticlesFinderQA :public FairTask
 
 // Names of files
   TString outfileName;
+  TString fEfffileName;
+
   TDirectory* histodir;
 
   std::vector<int> vStsHitMatch;

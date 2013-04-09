@@ -386,7 +386,8 @@ KFParticleSIMD::KFParticleSIMD(KFParticle* parts[], const int nPart)
     KFParticle &part = *(parts[ie]);
 
     fId[ie] = part.Id();
-    fDaughterIds.back()[ie] = part.Id();
+    for(int iD=0; iD<(parts[0])->NDaughters(); iD++)
+      fDaughterIds[iD][ie] = part.DaughterIds()[iD];
 
     fPDG = part.GetPDG();
     

@@ -24,7 +24,7 @@ static const fvec Zero = 0;
 static const fvec One = 1;
 static const fvec small = 1.e-20;
 
-KFParticleBaseSIMD::KFParticleBaseSIMD() :fQ(0), fNDF(-3), fChi2(0), fSFromDecay(0), fAtProductionVertex(0), fIsLinearized(0), fConstructMethod(0), SumDaughterMass(0), fMassHypo(-1), fId(-1), fDaughterIds(), fPDG(0)
+KFParticleBaseSIMD::KFParticleBaseSIMD() :fQ(0), fNDF(-3), fChi2(0), fSFromDecay(0), fAtProductionVertex(0), fIsLinearized(0), fConstructMethod(2), SumDaughterMass(0), fMassHypo(-1), fId(-1), fDaughterIds(), fPDG(0)
 { 
   //* Constructor 
 
@@ -158,10 +158,11 @@ fvec KFParticleBaseSIMD::GetPt( fvec &pt, fvec &error )  const
   fvec pt2 = px2+py2;
   pt = sqrt(pt2);
   error = (px2*fC[9] + py2*fC[14] + 2*px*py*fC[13] );
-  const fvec LocalSmall = 1.e-4;
+  const fvec LocalSmall = 1.e-8;
   fvec mask = fvec( fvec(Zero < error) & fvec(LocalSmall < fabs(pt)));
   error = (mask & error);
   error = sqrt(error);
+  error = error/pt;
   error += ((!mask) & fvec(1.e10));
   ret = (!mask);
   return ret;
@@ -1440,6 +1441,7 @@ void KFParticleBaseSIMD::Construct( const KFParticleBaseSIMD* vDaughters[], Int_
                                     Bool_t isAtVtxGuess  )
 { 
   //* Full reconstruction in one go
+
 
   Int_t maxIter = 1;
   bool wasLinearized = fIsLinearized;

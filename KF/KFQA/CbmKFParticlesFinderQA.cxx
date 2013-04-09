@@ -78,6 +78,7 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   flistStsDigi(0),
   fPrimVtx(0),
   outfileName("CbmParticlesFinderQA.root"),
+  fEfffileName("Efficiency.txt"),
   histodir(0),
   vStsHitMatch(),
   vStsPointMatch(),
@@ -458,7 +459,7 @@ void CbmKFParticlesFinderQA::Finish()
   {
     WriteHistosCurFile(histodir);
   }
-  std::fstream eff("Efficiency.txt",fstream::out);
+  std::fstream eff(fEfffileName.Data(),fstream::out);
   eff << fParteff;
   eff.close();
 }

@@ -78,6 +78,7 @@ void QAreco_monolithic_trd(Int_t nEvents = 2)
   gSystem->Load("libGlobal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
+  gSystem->Load("libLittrackparallel");
   gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------

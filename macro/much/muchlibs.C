@@ -21,6 +21,7 @@ void muchlibs(){
   gSystem->Load("libL1");
   gSystem->Load("libMvd");
 
+  gSystem->Load("libLittrackparallel");
   gSystem->Load("libLittrack");
 
   gSystem->Load("libRich");

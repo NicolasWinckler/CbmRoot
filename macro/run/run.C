@@ -36,6 +36,7 @@ void run()
   gSystem->Load("libEcal");
   gSystem->Load("libKF");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrackparallel");
   gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

@@ -10,6 +10,7 @@
 #include "CbmTrdCreateDigiPar.h"
 
 #include "CbmTrdPads.h"
+#include "CbmTrdPadsMap.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdGeoHandler.h"
 #include "CbmTrdDigiPar.h"

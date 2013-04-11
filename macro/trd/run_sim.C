@@ -92,6 +92,7 @@ void run_sim(Int_t nEvents = 1)
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrackparallel");
   gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

@@ -237,7 +237,7 @@ MapOfVectorMap GetModuleInfoMap()
 
   map<Int_t, VectorMap > moduleTypeStationMap;
 
-  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(1, moduleTypeMapStation1) );
+  moduleTypeStationMap.insert( pair<Int_t, VectorMap >(1, moduleTypeMapStation1));
   moduleTypeStationMap.insert( pair<Int_t, VectorMap >(2, moduleTypeMapStation2));
   moduleTypeStationMap.insert( pair<Int_t, VectorMap >(3, moduleTypeMapStation3));
 

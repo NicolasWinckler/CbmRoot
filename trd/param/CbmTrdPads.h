@@ -93,10 +93,5 @@
         // 12.0 cm2
         //  2 x 160 mm +  2 x 160 mm +  2 x 160 mm,  128 *  6 =  768 pads
 
-//  Int_t fst2_sect_count = 3;        // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
-//  Float_t fst2_pad_type[1][1][4];   // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
-//  Int_t fst3_sect_count = 3;	    // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
-//  Float_t fst3_pad_type[1][1][4];   // keep for historical reasons - used in CbmTrdCreateDigiPar.cxx
-
 #endif
 

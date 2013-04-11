@@ -66,11 +66,11 @@ private:
     void FillModuleMapSegmentedSquaredOneKeepingVolume();
     void FillPadInfoSegmentedSquaredOneKeepingVolume();
 
-    void FillModuleMapSegmentedSquared();
-    void FillPadInfoSegmentedSquared();
-
-    void FillModuleMapSegmentedRectangular();
-    void FillPadInfoSegmentedRectangular();
+//    void FillModuleMapSegmentedSquared();
+//    void FillPadInfoSegmentedSquared();
+//
+//    void FillModuleMapSegmentedRectangular();
+//    void FillPadInfoSegmentedRectangular();
 
     Int_t fStation;    //station number
     Int_t fLayer;      //layer number

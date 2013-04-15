@@ -40,7 +40,7 @@ public:
   /**
    * Inherited from CbmRichRingFinder.
    */
-   virtual Int_t DoFind(
+   virtual int DoFind(
        TClonesArray* hitArray,
        TClonesArray* projArray,
 		 TClonesArray* ringArray);

@@ -20,6 +20,7 @@
 #include "CbmRichRingFinderIdeal.h"
 #include "CbmL1RichENNRingFinder.h"
 #include "CbmL1RichENNRingFinderParallel.h"
+#include "prototype/CbmRichProtRingFinderHough.h"
 
 #include "CbmRichRingFitterCircle.h"
 #include "CbmRichRingFitterTAU.h"
@@ -163,6 +164,8 @@ void CbmRichReconstruction::InitFinder()
       fRingFinder = new CbmL1RichENNRingFinder(0);
    } else if ((fFinderName == "enn_parallel")){
       fRingFinder = new CbmL1RichENNRingFinderParallel(0);
+   } else if (fFinderName == "hough_prototype") {
+      fRingFinder = new CbmRichProtRingFinderHough();
    } else {
       Fatal("CbmRichReconstruction::InitFinder",
             (fFinderName + string(" is not correct name for ring finder algorithm.")).c_str());

@@ -1,93 +1,97 @@
-// --------------------------------------------------------------------------------------
-// -----                 CbmRichProtRingFinderHough source file                         -----
-// ----- Algorithm idea: G.A. Ososkov (ososkov@jinr.ru) and Semen Lebedev (s.lebedev@gsi.de)                            -----
-// ----- Implementation: Semen Lebedev (s.lebedev@gsi.de)-----
+/**
+* \file CbmRichProtRingFinderHough.h
+*
+* \brief Main class for ring finder based on Hough Transform implementation.
+*
+* \author Semen Lebedev
+* \date 2008
+**/
 
-#ifndef CBM_RICH_PROT_RING_FINDER_HOUGH_H
-#define CBM_RICH_PROT_RING_FINDER_HOUGH_H
+#ifndef CBM_RICH_PROT_RING_FINDER_HOUGH_H_
+#define CBM_RICH_PROT_RING_FINDER_HOUGH_H_
 
 #include "CbmRichRingFinder.h"
-#include "CbmRichRingLight.h"
-#include "TString.h"
-#include "CbmRichProtRingFinderHoughImpl.h"
-
-
 #include <vector>
-#include <map>
-#include <functional>
-
-class TClonesArray;
 
 class CbmRichRingFinderHoughImpl;
-class CbmRichProtRingFinderHoughSimd;
+class CbmRichRingFinderHoughSimd;
 class CbmRichRing;
-class CbmRichRingFitter;
+class CbmRichRingLight;
 
 #define HOUGH_SERIAL
 //#define HOUGH_SIMD
 
+using std::vector;
 
-class CbmRichProtRingFinderHough : public CbmRichRingFinder {
-
+/**
+* \class CbmRichProtRingFinderHough
+*
+* \brief Main class for ring finder based on Hough Transform implementation.
+*
+* \author Semen Lebedev
+* \date 2008
+**/
+class CbmRichProtRingFinderHough : public CbmRichRingFinder
+{
 protected:
-	Int_t fNEvent; /// event number
-	Bool_t fIsFindOptPar;
-	Int_t fVerbose; /// Verbosity level
-	TString fGeometryType;
-	Int_t fRingCount;
+	Int_t fNEvent; // event number
+	Int_t fRingCount; // number of found rings
+
+// choose between serial and SIMD implementation of the ring finder
 #ifdef HOUGH_SERIAL
-	CbmRichProtRingFinderHoughImpl *fHTImpl;
+	CbmRichRingFinderHoughImpl *fHTImpl;
 #endif
 
 #ifdef HOUGH_SIMD
-	CbmRichProtRingFinderHoughSimd *fHTImpl;
+	CbmRichRingFinderHoughSimd *fHTImpl;
 #endif
 
-
-	Double_t fExecTime;//evaluate execution time
-        CbmRichRingFitter *fFitter;
-	TClonesArray *rNewArray;
-
 public:
+
+	/**
+    * \brief Standard constructor.
+    */
   	CbmRichProtRingFinderHough ();
 
-  	/** Standard constructor **/
-  	CbmRichProtRingFinderHough ( Int_t verbose, TString geometry);
-
+   /**
+    * \brief Destructor.
+    */
 	virtual ~CbmRichProtRingFinderHough();
-	void SetParameters(Int_t nofParts,
-			Float_t maxDistance, Float_t minDistance,
-			Float_t minRadius, Float_t maxRadius,
-			Int_t HTCut, Int_t hitCut,
-			Int_t HTCutR, Int_t hitCutR,
-			Int_t nofBinsX, Int_t nofBinsY,
-			Int_t nofBinsR, Float_t annCut,
-			Float_t usedHitsCut, Float_t usedHitsAllCut,
-			Float_t rmsCoeffEl, Float_t maxCutEl,
-			Float_t rmsCoeffCOP, Float_t maxCutCOP);
 
-    void AddRingsToOutputArray(TClonesArray *rRingArray,std::vector<CbmRichRingLight*>& rings);
-
+	/**
+	 * \brief Inherited from CbmRichRingFinder.
+	 */
 	virtual void Init();
 
-	virtual void Finish();
-
-	virtual Int_t DoFind(TClonesArray* rHitArray,
-	 		      		 TClonesArray* rProjArray,
-		       	      	 TClonesArray* rRingArray);
-
-	Int_t DoFind(const std::vector<CbmRichProtHoughHit>& data);
-
-	void SetFindOptPar(Bool_t findOptPar){fIsFindOptPar = findOptPar;}
-
-	void SetFitter(CbmRichRingFitter *fitter) { fFitter = fitter; }
+	/**
+	 * \brief Inherited from CbmRichRingFinder.
+	 */
+	virtual Int_t DoFind(
+	      TClonesArray* rHitArray,
+	 		TClonesArray* rProjArray,
+		   TClonesArray* rRingArray);
 
 private:
-      CbmRichProtRingFinderHough(const CbmRichProtRingFinderHough&);
-      CbmRichProtRingFinderHough operator=(const CbmRichProtRingFinderHough&);
-      
-      
-	ClassDef(CbmRichProtRingFinderHough,1)
+	/**
+	 * \brief Add found rings to the output TClonesArray.
+	 * \param[out] rRingArray Output array of CbmRichRing.
+	 * \param[in] rings Found rings.
+	 */
+	void AddRingsToOutputArray(
+	      TClonesArray *rRingArray,
+	      const vector<CbmRichRingLight*>& rings);
 
+	/**
+	 * \brief Copy constructor.
+	 */
+	CbmRichProtRingFinderHough(const CbmRichProtRingFinderHough&);
+
+   /**
+    * \brief Assignment operator.
+    */
+	CbmRichProtRingFinderHough& operator=(const CbmRichProtRingFinderHough&);
+
+	ClassDef(CbmRichProtRingFinderHough, 1);
 };
-#endif // CBM_RICH_RING_FINDER_HOUGH_H
+
+#endif

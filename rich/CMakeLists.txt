@@ -68,9 +68,6 @@ CbmRichTrainAnnElectrons.cxx
 CbmRichReconstruction.cxx
 CbmRichConverter.cxx
 finder/CbmRichRingFinderIdeal.cxx 
-#finder/CbmRichRingFinderHoughSimd.cxx
-finder/CbmRichRingFinderHough.cxx
-finder/CbmRichRingFinderHoughImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx  
 fitter/CbmRichRingFitterCOP.cxx  
 fitter/CbmRichRingFitterRobustCOP.cxx 
@@ -122,12 +119,11 @@ qa/CbmRichTestSim.h
 qa/CbmRichTestHits.h 
 qa/CbmRichRingFitterQa.h 
 #qa/CbmRichParallelQa.h  
+finder/CbmRichRingFinderHough.cxx
 prototype/CbmRichProt.h
 prototype/CbmRichProtHitProducer.h
 prototype/CbmRichProtPrepareExtrapolation.h
 prototype/CbmRichProtProjectionProducer.h
-prototype/CbmRichProtRingFinderHough.h
-prototype/CbmRichProtRingFinderHoughImpl.h
 qa/CbmRichGeoTest.h 
 qa/CbmRichUrqmdTest.h
 )

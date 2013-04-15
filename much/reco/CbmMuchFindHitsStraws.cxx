@@ -35,7 +35,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws()
     fEffic(0),
     fMerge(0),
     fMirror(0),
-    fBinary(0),
+    fBinary(1),
     fPhis()
 {
   SetPhis(0., 10., -10.);
@@ -54,7 +54,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
     fEffic(0),
     fMerge(0),
     fMirror(0),
-    fBinary(0),
+    fBinary(1),
     fPhis()
 {
   SetPhis(0., 10., -10.);
@@ -73,7 +73,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiF
     fEffic(0),
     fMerge(0),
     fMirror(0),
-    fBinary(0),
+    fBinary(1),
     fPhis()
 {
   SetPhis(0., 10, -10.);

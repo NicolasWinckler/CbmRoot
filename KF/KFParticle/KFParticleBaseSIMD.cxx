@@ -1442,6 +1442,25 @@ void KFParticleBaseSIMD::Construct( const KFParticleBaseSIMD* vDaughters[], Int_
 { 
   //* Full reconstruction in one go
 
+  //* Parameters: array of pointers to the input daughter particles (vDaughters), a number of daughters (nDaughters),
+  //* pointer to the production vertex or particle (Parent), if the pointer is set - a constraint on the production
+  //* is set on the reconstructed particle, if 0 - will not be set, a mass hypothesis (Mass), if Mass>0 - a mass constraint
+  //* will be set, a flag (IsConstrained), which indicates whether daughters are constrained on the production region,
+  //* a flag (isAtVtxGuess), which indicates whether daughters are already transported to the vertex guess or not,
+  //* if it is set to 1, a vertex guess should be provided, by default is set to 0.
+
+  //* examples:
+  //* 1) construction of a secondary particle with no vertex guess:
+  //*    const KFParticleSIMD* vDaughtersPointer[2] = {&vDaughters[0], &vDaughters[1]};
+  //*    mother.Construct(vDaughtersPointer, 2, 0);
+  //* 2) construction of the primary particle with a vertex guess
+  //*    fvec errGuess[3] = {100*sqrt(PrimVtx.CovarianceMatrix()[0]),
+  //*                        100*sqrt(PrimVtx.CovarianceMatrix()[2]),
+  //*                        100*sqrt(PrimVtx.CovarianceMatrix()[5])};
+  //*    mother.SetVtxGuess(PrimVtx.X(), PrimVtx.Y(), PrimVtx.Z());
+  //*    mother.SetVtxErrGuess(errGuess[0], errGuess[1], errGuess[2]);
+  //*    const KFParticleSIMD* vDaughtersPointer[2] = {&vDaughters[0], &vDaughters[1]};
+  //*    mother.Construct(vDaughtersPointer, 2, 0, -1, 0, 1);
 
   Int_t maxIter = 1;
   bool wasLinearized = fIsLinearized;

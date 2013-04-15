@@ -157,6 +157,10 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
 
   vector<float> vGammaTopoChi2Ndf;
   vector<KFParticle> vGammaPrim;
+  vector<KFParticle> vGammaSec;
+
+  vector<KFParticle> vPi0Prim;
+  vector<KFParticle> vPi0Sec;
 
   vector<KFParticle> vXiPrim;
   vector<KFParticle> vXiSec;
@@ -202,19 +206,19 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   //gamma -> e+ e-
 
   float SecCutsGamma[3] = {3,3,-100};
-  float gammaCuts[3] = {3,3, -100};
+  float gammaCuts[3] = {3,100000, -100};
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[0], pdgPos[0], 22,
                      idNegPrim[0], idPosPrim[0], PrimVtx, gammaCuts, 1, &vGammaTopoChi2Ndf,
-                     SecCutsGamma, 0, 0.006, &vGammaPrim, 0);
+                     SecCutsGamma, 0, 0.006, &vGammaPrim, &vGammaSec);
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[0], pdgPos[0], 22,
                      idNegSec[0], idPosSec[0], PrimVtx, gammaCuts, 0, &vGammaTopoChi2Ndf,
-                     SecCutsGamma, 0, 0.006, &vGammaPrim, 0);
+                     SecCutsGamma, 0, 0.006, &vGammaPrim, &vGammaSec);
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[0], pdgPos[0], 22,
                      idNegSec[0], idPosPrim[0], PrimVtx, gammaCuts, 0, &vGammaTopoChi2Ndf,
-                     SecCutsGamma, 0, 0.006, &vGammaPrim, 0);
+                     SecCutsGamma, 0, 0.006, &vGammaPrim, &vGammaSec);
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[0], pdgPos[0], 22,
                      idNegPrim[0], idPosSec[0], PrimVtx, gammaCuts, 0, &vGammaTopoChi2Ndf,
-                     SecCutsGamma, 0, 0.006, &vGammaPrim, 0);
+                     SecCutsGamma, 0, 0.006, &vGammaPrim, &vGammaSec);
   //JPsi-> e+ e-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[0], pdgPos[0], 443,
                      idNegPrim[0], idPosPrim[0], PrimVtx, cuts[1], 1, 1.f);
@@ -236,10 +240,39 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
 
   float cutSigma0[3] = {-100, 3, 3};
   //Sigma0 -> Lambda Gamma
-
   CombinePartPart(vGammaPrim, vLambdaPrim, Particles, PrimVtx, cutSigma0, 1, 3212, 0);
+
   //Sigma0_bar -> Lambda_bar Gamma
   CombinePartPart(vGammaPrim, vLambdaBarPrim, Particles, PrimVtx, cutSigma0, 1, -3212, 0);
+
+  //pi0 -> gamma gamma
+  float cutPi0[3] = {-100, 1000000, 3};
+  float cutPi0Sec[2] = {3,3};
+  CombinePartPart(vGammaPrim, vGammaPrim, Particles, PrimVtx, cutPi0, 1, 111, 1,
+                  &vPi0Prim, &vPi0Sec, cutPi0Sec, 0.13498, 0.006);
+  CombinePartPart(vGammaPrim, vGammaSec, Particles, PrimVtx, cutPi0, 0, 111, 0,
+                  &vPi0Prim, &vPi0Sec, cutPi0Sec, 0.13498, 0.006);
+  CombinePartPart(vGammaSec, vGammaPrim, Particles, PrimVtx, cutPi0, 0, 111, 0,
+                  &vPi0Prim, &vPi0Sec, cutPi0Sec, 0.13498, 0.006);
+  CombinePartPart(vGammaSec, vGammaSec, Particles, PrimVtx, cutPi0, 0, 111, 1,
+                  &vPi0Prim, &vPi0Sec, cutPi0Sec, 0.13498, 0.006);
+
+  // Find Sigma+ -> p pi0
+  float cutSigmaPlus[3] = {-100.,3.,3.};
+  FindTrackV0Decay(3222, Particles, vPi0Sec, vRTracks, vField, pdgPos[4], idPosSec[4],
+                   PrimVtx, cutSigmaPlus, 0, 0);
+  // Find Sigma+ -> p pi0
+  float cutSigmaPlusBar[3] = {-100.,3.,3.};
+  FindTrackV0Decay(-3222, Particles, vPi0Sec, vRTracks, vField, pdgNeg[4], idNegSec[4],
+                   PrimVtx, cutSigmaPlusBar, 0, 0);
+  //Sigma*0 -> Lambda pi0
+  CombinePartPart(vPi0Prim, vLambdaPrim, Particles, PrimVtx, cutSigma0, 1, 3214, 0);
+  //Sigma*0_bar -> Lambda_bar pi0
+  CombinePartPart(vPi0Prim, vLambdaBarPrim, Particles, PrimVtx, cutSigma0, 1, -3214, 0);
+  //Xi0 -> Lambda pi0
+  CombinePartPart(vPi0Sec, vLambdaSec, Particles, PrimVtx, cutSigma0, 0, 3322, 0);
+  //Xi0_bar -> Lambda_bar pi0
+  CombinePartPart(vPi0Sec, vLambdaBarSec, Particles, PrimVtx, cutSigma0, 0, -3322, 0);
 
   // Find Xi-
    float cutXi[3] = {10.,5.,6.};
@@ -270,11 +303,11 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   FindTrackV0Decay(-3334, Particles, vLambdaBarSec, vRTracks, vField, pdgPos[6], idPosSec[6],
                    PrimVtx, cutOmegaPlus, 0, &ChiToPrimVtx);
   //Find Xi*-
-  float cutXiStarMinus[3] = {-100.,10000.,3.};
+  float cutXiStarMinus[3] = {-100.,3.,3.};
   FindTrackV0Decay(1003314, Particles, vLambdaPrim, vRTracks, vField, pdgNeg[3], idNegPrim[3],
                    PrimVtx, cutXiStarMinus, 1);
   //Find Xi*+
-  float cutXiStarPlus[3] = {-100.,10000.,3.};
+  float cutXiStarPlus[3] = {-100.,3.,3.};
   FindTrackV0Decay(-1003314, Particles, vLambdaBarPrim, vRTracks, vField, pdgPos[3], idPosPrim[3],
                    PrimVtx, cutXiStarPlus, 1);
 
@@ -282,13 +315,21 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   ExtrapolateToPV(vXiBarPrim,PrimVtx);
 
   //Find Xi*0
-  float cutXiStar0[3] = {-100.,10000.,3.};
+  float cutXiStar0[3] = {-100.,3.,3.};
   FindTrackV0Decay(3324, Particles, vXiPrim, vRTracks, vField, pdgPos[5], idPosPrim[5],
                    PrimVtx, cutXiStar0, 1, 0, &vXiStarPrim);
   //Find Xi*0 bar
-  float cutXiBarStar0[3] = {-100.,10000.,3.};
+  float cutXiBarStar0[3] = {-100.,3.,3.};
   FindTrackV0Decay(-3324, Particles, vXiBarPrim, vRTracks, vField, pdgNeg[5], idNegPrim[5],
                    PrimVtx, cutXiBarStar0, 1, 0, &vXiStarBarPrim);
+
+  //Xi*- -> Xi- pi0
+  float cutXiStarMinusXiPi[3] = {-100.,3.,3.};
+  CombinePartPart(vPi0Prim, vXiPrim, Particles, PrimVtx, cutXiStarMinusXiPi, 1, 3314, 0);
+  //Xi*+ -> Xi+ pi0
+  float cutXiStarPlusXiPi[3] = {-100.,3.,3.};
+  CombinePartPart(vPi0Prim, vXiBarPrim, Particles, PrimVtx, cutXiStarPlusXiPi, 1, -3314, 0);
+
   //Find Omega*-
   const float cutOmegaStar[2] = {-100., 3.};
   for(unsigned int iPart=0; iPart<vXiStarPrim.size(); iPart++)
@@ -441,6 +482,34 @@ void KFParticleFinder::Find2DaughterDecay(vector<CbmKFTrack>& vTracks,
                                           vector<KFParticle>* vMotherSec )
 {
   //* The function combines 2 tracks into a mother particle
+  //* parameters: array of input tracks (vTracks), array with field approximation for the input tracks
+  //* (vField), array of output particles (Particles), PDG hypothesis for tracks (DaughterNegPDG and DaughterPosPDG),
+  //* PDG hypothesis of mother particles (MotherPDG), indexes of the first and second group of tracks (idNeg and idPos),
+  //* a primary vertex (PrimVtx), 
+  //* a set of cuts (cuts): 0 - doesn't used, 1 - cut on reconstructed Chi2/NDF, 2 - cut on l/dl;
+  //* a flag (isPrimary), which indicates, that the moter particles decay in the primary vertex region, 
+  //* if 1 - daughter tracks should be already transported to the primary vertex,
+  //* an array (vMotherTopoChi2Ndf) to store the chi2/ndf of the particles with a production point constraint,
+  //* a set of cuts (secCuts) for primary and secondary particles separation: 0 - cut on mass of the reconstructed particles:
+  //* mass should be within secCuts[0] sigmas with respect to the PDG mass, 1 - cut on topo chi2/ndf, if chi2ndf_topo< secCuts[1]
+  //* particle is considered as primary, if not - secondary, 2 - cut on l/dl of the reconstructed particle,
+  //* pdg value of mass of the reconstructed particle (massMotherPDG) and expected width of the peak (massMotherPDGSigma),
+  //* arrays to store selected according to secCuts primary (vMotherPrim) and secondary (vMotherSec) particles, if the pointers
+  //* sre equal to 0, corresponding set of particles is not stored.
+
+  //* examples of usage:
+  //* 1) reconstruction of K0s from secondary tracks with selection and storage of primary K0s:
+  //* Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[5], pdgPos[5], 310,
+  //*                    idNegSec[5], idPosSec[5], PrimVtx, cuts[0], 0, &vK0sTopoChi2Ndf,
+  //*                    SecCuts, massK0sPDG, 0.0022, &vK0sPrim, 0);
+  //* 2) reconstruction of Lambda from secondary tracks with selection and storage of primary and secondary Lambdas:
+  //*   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[5], pdgPos[5], 310,
+  //*                      idNegSec[5], idPosSec[5], PrimVtx, cuts[0], 0, &vK0sTopoChi2Ndf,
+  //*                      SecCuts, massK0sPDG, 0.0022, &vK0sPrim, 0);
+  //* 3) reconstruction of K*0 from primary tracks with no selection and storage of primary and secondary particles:
+  //* Find2DaughterDecay(vRTracks, vField, Particles, pdgPos[3], pdgNeg[2], 313,
+  //*                    idPosPrim[3], idNegPrim[2], PrimVtx, cuts[1], 1);
+
   const int NPositive = idPos.size();
   KFParticle mother_temp;
 
@@ -959,7 +1028,12 @@ void KFParticleFinder::CombinePartPart(vector<KFParticle>& particles1,
                                        const float* cuts,
                                        bool isPrimary,
                                        const int MotherPDG,
-                                       bool isSameInputPart)
+                                       bool isSameInputPart,
+                                       vector<KFParticle>* vMotherPrim,
+                                       vector<KFParticle>* vMotherSec,
+                                       float* secCuts,
+                                       float massMotherPDG,
+                                       float massMotherPDGSigma)
 {
   KFParticle mother_temp;
   KFParticleSIMD mother;
@@ -974,7 +1048,7 @@ void KFParticleFinder::CombinePartPart(vector<KFParticle>& particles1,
     KFParticleSIMD vDaughters[2] = {KFParticleSIMD(particles1[iP1]), KFParticleSIMD()};
 
     unsigned short startIndex=0;
-    if(isSameInputPart) startIndex=iP1;
+    if(isSameInputPart) startIndex=iP1+1;
     for(unsigned short iP2=startIndex; iP2 < nPart2; iP2 += fvecLen)
     {
       unsigned int nEntries = (iP2 + fvecLen < nPart2) ? fvecLen : (nPart2 - iP2);
@@ -1027,6 +1101,7 @@ void KFParticleFinder::CombinePartPart(vector<KFParticle>& particles1,
           if(!(isParticleFromVertex[iv])) continue;
         }
 
+        float motherTopoChi2Ndf = motherTopo.GetChi2()[iv]/motherTopo.GetNDF()[iv];
         if(motherTopo.GetChi2()[iv]/motherTopo.GetNDF()[iv] > cuts[1] ) continue;
 
         if( mother.GetChi2()[iv]/mother.GetNDF()[iv] > cuts[2] ) continue;
@@ -1034,6 +1109,25 @@ void KFParticleFinder::CombinePartPart(vector<KFParticle>& particles1,
 
         mother_temp.SetId(Particles.size());
         Particles.push_back(mother_temp);
+
+        if(vMotherPrim)
+        {
+          Double_t mass, errMass;
+
+          mother_temp.GetMass(mass, errMass);
+          if( (fabs(mass - massMotherPDG)/massMotherPDGSigma) > secCuts[0] ) continue;
+
+          mother_temp.SetNonlinearMassConstraint(massMotherPDG);
+
+          if( motherTopoChi2Ndf < secCuts[1] )
+          {
+            vMotherPrim->push_back(mother_temp);
+          }
+          else if(vMotherSec)
+          {
+             vMotherSec->push_back(mother_temp);
+          }
+        }
       }
     }
   }

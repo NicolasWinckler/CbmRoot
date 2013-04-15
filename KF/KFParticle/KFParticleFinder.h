@@ -105,7 +105,12 @@ class KFParticleFinder
                               const float* cuts=0,
                               bool isPrimary=0,
                               const int MotherPDG=0,
-                              bool isSameInputPart=0);
+                              bool isSameInputPart=0,
+                              std::vector<KFParticle>* vMotherPrim=0,
+                              std::vector<KFParticle>* vMotherSec=0,
+                              float* SecCuts=0,
+                              float massMotherPdg=0,
+                              float massMotherPdgSigma=0);
 
     static void FindDMesLambdac(std::vector<CbmKFTrack>& vTracks,
                                 const std::vector<L1FieldRegion>& vField,

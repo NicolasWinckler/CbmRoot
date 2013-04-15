@@ -84,6 +84,7 @@ void sts_reco_all(Int_t nEvents, Float_t energy, Int_t index) {
   gSystem->Load("libKF");
   gSystem->Load("libMvd");
   gSystem->Load("libSts");
+  gSystem->Load("libLittrackparallel");
   gSystem->Load("libLittrack");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

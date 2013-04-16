@@ -68,6 +68,8 @@ CbmRichTrainAnnElectrons.cxx
 CbmRichReconstruction.cxx
 CbmRichConverter.cxx
 finder/CbmRichRingFinderIdeal.cxx 
+#finder/CbmRichRingFinderHough.cxx
+finder/CbmRichRingFinderHoughImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx  
 fitter/CbmRichRingFitterCOP.cxx  
 fitter/CbmRichRingFitterRobustCOP.cxx 

@@ -107,5 +107,3 @@ void CbmRichProtRingFinderHough::AddRingsToOutputArray(
 		fRingCount++;
 	}
 }
-
-ClassImp(CbmRichProtRingFinderHough);

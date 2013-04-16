@@ -90,8 +90,6 @@ private:
     * \brief Assignment operator.
     */
 	CbmRichProtRingFinderHough& operator=(const CbmRichProtRingFinderHough&);
-
-	ClassDef(CbmRichProtRingFinderHough, 1);
 };
 
 #endif

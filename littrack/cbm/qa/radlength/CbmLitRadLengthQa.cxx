@@ -160,6 +160,7 @@ void CbmLitRadLengthQa::ExecDetector(
    map<Int_t, Double_t> thicknessSiliconOnTrack; // track ID -> sum of track lengthens on track in silicon equivalent
 
    Double_t x, y;
+   Double_t r2max = std::numeric_limits<Double_t>::min();
    for (Int_t iRL = 0; iRL < fRadLen->GetEntriesFast(); iRL++) {
       FairRadLenPoint* point = (FairRadLenPoint*) fRadLen->At(iRL);
 
@@ -175,8 +176,12 @@ void CbmLitRadLengthQa::ExecDetector(
       TGeoNode* node = gGeoManager->FindNode(middle.X(), middle.Y(), middle.Z());
       TString path = gGeoManager->GetPath();
       if (!isOutside && path.Contains(TRegexp(pathPattern.c_str()))) {
-         x = posOut.X();
-         y = posOut.Y();
+         Double_t r2 = posOut.X() * posOut.X() + posOut.Y() * posOut.Y();
+         if (r2 > r2max) {
+            x = posOut.X();
+            y = posOut.Y();
+            r2max = r2;
+         }
          const Double_t thickness = res.Mag();
          const Double_t radThickness = 100 * thickness / point->GetRadLength();
          const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
@@ -219,6 +224,7 @@ void CbmLitRadLengthQa::ExecDetector(
    map<Int_t, map<Int_t, Double_t> > thicknessSiliconOnTrack; // track ID -> sum of thickness on track
 
    Double_t x, y;
+   Double_t r2max = std::numeric_limits<Double_t>::min();
    for (Int_t iRL = 0; iRL < fRadLen->GetEntriesFast(); iRL++) {
       FairRadLenPoint* point = (FairRadLenPoint*) fRadLen->At(iRL);
       Int_t trackId = point->GetTrackID();
@@ -237,8 +243,12 @@ void CbmLitRadLengthQa::ExecDetector(
 
       // Check if node exists in one of the geometry versions
       if (stationId >= 0) {
-         x = posOut.X();
-         y = posOut.Y();
+         Double_t r2 = posOut.X() * posOut.X() + posOut.Y() * posOut.Y();
+         if (r2 > r2max) {
+            x = posOut.X();
+            y = posOut.Y();
+            r2max = r2;
+         }
          const Double_t thickness = res.Mag();
          const Double_t radThickness = 100 * thickness / point->GetRadLength();
          const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;

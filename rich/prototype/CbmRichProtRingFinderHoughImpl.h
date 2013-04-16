@@ -11,7 +11,7 @@
 #define CBM_RICH_PROT_RING_FINDER_HOUGH_IMPL_H_
 
 #include "CbmRichRingLight.h"
-#include "CbmRichRingFinderHoughImpl.h"
+#include "CbmRichRingFinderData.h"
 
 #include <vector>
 #include <map>

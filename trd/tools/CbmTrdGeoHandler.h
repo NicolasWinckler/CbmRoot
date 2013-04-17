@@ -14,8 +14,9 @@
 #ifndef CBMTRDGEOHANDLER_H
 #define CBMTRDGEOHANDLER_H 1
 
-enum TrdGeometryVersions {kRootGeom,
-			  kOldMonolithic,
+enum TrdGeometryVersions {kRootGeomWithLayers,
+                          kRootGeom,
+                          kOldMonolithic,
                           kNewMonolithic,
                           kQuasiMonolithic,
                           kSegmentedRectangular,

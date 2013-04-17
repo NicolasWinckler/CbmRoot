@@ -187,6 +187,10 @@ InitStatus CbmTrdCreateDigiPar::Init(){
 //    FillModuleMapSegmentedSquared();
   }
 
+  if (kRootGeomWithLayers == geoVersion) {
+    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
+    FillModuleMapRootGeometryWithLayers();
+  }
   if (kRootGeom == geoVersion) {
     fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
     FillModuleMapRootGeometry();
@@ -218,7 +222,7 @@ void CbmTrdCreateDigiPar::Exec(Option_t * option)
 }
 
 // --------------------------------------------------------------------
-void CbmTrdCreateDigiPar::FillModuleMapRootGeometry(){
+void CbmTrdCreateDigiPar::FillModuleMapRootGeometryWithLayers(){
  
   // The geometry structure is treelike with cave as
   // the top node. For the TRD there are keeping volumes
@@ -246,6 +250,86 @@ void CbmTrdCreateDigiPar::FillModuleMapRootGeometry(){
       TString StationNode = node->GetName();
       TGeoNode* station = node;
 
+      TObjArray* layers = station->GetNodes();
+      for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
+        TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
+        TString LayerNode = layer->GetName();
+
+	TObjArray* modules = layer->GetNodes();
+	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
+          TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
+          TString ModuleNode = module->GetName();
+
+          TObjArray* parts = module->GetNodes();
+	  for (Int_t iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
+            TGeoNode* part = (TGeoNode*) parts->At(iPart);
+            if (TString(part->GetName()).Contains("gas")) {
+              TString PartNode = part->GetName();
+
+              // Put together the full path to the interesting volume, which
+	      // is needed to navigate with the geomanager to this volume.
+              // Extract the geometry information (size, global position)
+              // from this volume.;
+
+              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
+                                 LayerNode + "/" + ModuleNode + "/" + PartNode;
+
+              FillModuleInfoFromGeoHandler(FullPath);
+
+              // Get Information about the padstructure for a
+              // given trd module defined by the station and
+              // layer numbers, the module type and the copy
+              // number
+              FillPadInfoSegmentedSquaredOneKeepingVolume();
+
+              CorrectOrientationOfPadPlane();
+
+              nmodules++;
+
+              // Create new CbmTrdModule and add it to the map
+	      fModuleMap[fModuleID] = 
+                new CbmTrdModule(fModuleID, fX, fY, fZ, fSizex, fSizey, fSizez,
+				 fMaxSectors, fSectorSizex, fSectorSizey, 
+				 fpadsizex, fpadsizey);
+	    }
+	  }
+        }
+      }
+    }
+  }
+
+  FillDigiPar();
+}
+
+// --------------------------------------------------------------------
+void CbmTrdCreateDigiPar::FillModuleMapRootGeometry(){
+ 
+  // The geometry structure is treelike with cave as
+  // the top node. For the TRD there are keeping volumes
+  // trd1-trd4 for each station which are only containers 
+  // for the different layers of one station. The trdlayer
+  // is again only a container for all volumes of this layer.   
+  // Loop over all nodes below the top node (cave). If one of
+  // the nodes containes a string trd it must be one of the
+  // stations. Now loop over the layers of this station and 
+  // then over all modules of the layer to extract in the end
+  // all active regions (gas) of the complete TRD. For each
+  // of the gas volumes get the information about size and
+  // position from the geomanager and the sizes of the sectors
+  // and pads from the definitions in CbmTrdPads. This info
+  // is then stored in a TrdModule object for each of the
+  // TRD modules.
+
+  Int_t nmodules = 0;
+  TString TopNode = gGeoManager->GetTopNode()->GetName();
+
+  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+    TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+    if (TString(node->GetName()).Contains("trd")) {   // trd_vXXy top node, e.g. trd_v13a, trd_v14b
+      TString StationNode = node->GetName();
+      TGeoNode* station = node;
+       
 	TObjArray* modules = station->GetNodes();
 	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
           TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);

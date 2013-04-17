@@ -24,6 +24,11 @@ class CbmRichProjectionProducerBase
 {
 public:
    /**
+    * brief Default constructor.
+    */
+   CbmRichProjectionProducerBase() : fZflag(300.) { }
+
+   /**
     * brief Standard constructor.
     */
    CbmRichProjectionProducerBase(int flag) : fZflag(flag) { }

@@ -98,6 +98,26 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
         // strings returned are e.g. trd_v13a_0, need to chopped the first 8 characters with (0,8)
         fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(node->GetName())(0,8)) );  
 	if (fm) {
+
+          // maybe there are layers, then it is a kRootGeomWithLayers                                                                 
+          TGeoNode* station = node;
+          TObjArray* layers = station->GetNodes();
+          for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
+            TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
+
+            if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...
+	      fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,9)) );
+              if (fm) {
+                cout<<"Found Root geometry version long:    "<< TString(layer->GetName()) <<endl;
+                cout<<"Found Root geometry with layers:     "<< TString(TString(layer->GetName())(0,9)) <<endl;
+                fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
+                fGeoVersion = kRootGeomWithLayers;
+                return fGeoVersion;
+              }
+            }
+          }
+
+          // otherwise it is a kRootGeom
 // 	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
 //	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
           fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
@@ -197,7 +217,7 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
       layer=temp_mod/1000;
       modnumber=temp_mod%1000;
       station = fStationMap.find(id2)->second;
-    } else if (kRootGeom == fGeoVersion) {
+    } else if ((kRootGeom == fGeoVersion) || (kRootGeomWithLayers == fGeoVersion)) {
       station=temp_mod/10000;
       layer=(temp_mod%10000)/1000;
       modnumber=temp_mod%1000;
@@ -255,6 +275,25 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
         // strings returned are e.g. trd_v13a_0, need to chopped the first 8 characters with (0,8)
         fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(node->GetName())(0,8)) );  
 	if (fm) {
+
+          // maybe there are layers, then it is a kRootGeomWithLayers                                                                 
+          TGeoNode* station = node;
+          TObjArray* layers = station->GetNodes();
+          for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
+            TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
+
+            cout<<"Layer name:   "<< TString(layer->GetName()) <<endl;
+
+            if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...         
+	      TGeoVolume *lm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd_layer01");
+              if (lm) {
+                cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
+                cout<<"Found Root geometry with layers:     "<< TString(TString(layer->GetName())(0,9)) <<endl;
+                return GetLayerInfoFromRootGeometryWithLayers(layersBeforeStation);                                                 
+              }
+            }
+          }
+
 	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
 	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
           return GetLayerInfoFromRootGeometry(layersBeforeStation);
@@ -530,6 +569,174 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t
 
 }
 
+Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_t> &layersBeforeStation)
+{
+
+  TGeoVolume *fm=NULL;
+  TGeoNode *node = NULL;
+  
+
+  Int_t stationNr = 1;
+  Int_t totalNrOfLayers = 0;
+  Int_t totalNrOfStations = 0;
+  layersBeforeStation.push_back(totalNrOfLayers);
+  char volumeName[20];
+
+  // Now extract first the number of stations
+  // If a geometry without keeping volumes for the TRD station is
+  // found the execution of the program is stopped
+
+  // find the trd geometry top node in trd_v* notation
+  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+    node = (TGeoNode*) nodes->At(iNode);
+    if (TString(node->GetName()).Contains("trd_v")) {   // check for strings like: trd_v13a, trd_v14b, trd_v15x
+
+      // Since there is only one trd top node we check for full node name
+      // In new geometries the node name is trd_v<year><version> eg. trd_v13a
+      // With this naming scheme the geometry version is completely qualified
+
+        // strings returned are e.g. trd_v13a_0, need to chopped the first 8 characters with (0,8)
+        fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(node->GetName())(0,8)) );  
+	if (fm) {
+//	  cout<<"Found Local geometry version long:    "<< TString(node->GetName()) <<endl;
+//	  cout<<"Found Local geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
+          break;
+        }
+     }
+  }
+  
+  // we now have a trd_v* trd top node
+
+  Int_t maxModuleType = 8;  // max number of different modules
+  Int_t maxLayer      = 4;  // max number of different layers in a station
+  Int_t maxStation    = 3;  // max number of different stations
+
+  // find the number of stations by looping over all possible module names
+  if (fm) {
+
+    TGeoNode* station = node;
+    TObjArray* layers = station->GetNodes();
+    for (Int_t jLayer = 0; jLayer < layers->GetEntriesFast(); jLayer++) {
+      TGeoNode* layer = (TGeoNode*) layers->At(jLayer);
+      if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...
+        cout<<"Search layer name:   "<< TString(layer->GetName()) <<endl;
+	TGeoVolume *lm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,9)) );
+
+	if (lm) {
+
+          cout<<"Found  layer name:   "<< TString(layer->GetName()) <<endl;
+          for ( Int_t iStation=1; iStation<=maxStation; iStation++) {   // start from the front
+            for ( Int_t iLayer=1; iLayer<=maxLayer; iLayer++) {       // start from the front
+              for ( Int_t iModuleType=1; iModuleType<=maxModuleType; iModuleType++) {
+          
+          	  sprintf(volumeName, "trd1mod%d_%d%d001", iModuleType, iStation, iLayer);
+                  node = (TGeoNode *) lm->GetNodes()->FindObject(volumeName);
+      
+//                cout << node << " " << volumeName << endl;
+          
+                  if (node) {   // found module
+//                cout << node << " " << volumeName << endl;
+                    if (totalNrOfStations < iStation) {
+                      totalNrOfStations = iStation;
+//                cout << "********** found max station ... "<< totalNrOfStations <<endl;
+                  }
+                }
+              }
+            }
+          }
+
+        }
+      }
+    }
+
+    fLogger->Info(MESSAGE_ORIGIN,"Number of TRD stations: %d", totalNrOfStations);
+  } else {
+    cout << "***************************************" <<endl;
+    cout << "                                       " <<endl;
+    cout << " - FATAL ERROR Unknown geometry version" <<endl;
+    cout << "   in GetLayerInfoFromRootGeometry     " <<endl;
+    cout << " No TRD stations found in the geometry " <<endl;
+    cout << "                                       " <<endl;
+    cout << "***************************************" <<endl;
+    return kFALSE;
+  }
+
+
+  Int_t layersPerStation[totalNrOfStations];
+
+  // Now loop over the stations and extract the number of layers
+  // for each station. Get a pointer to the station volume. With
+  // this get all nodes which belong to this volume. Loop for all
+  // possible differnt module types over all theoratically possible 
+  // layers. The highest found layer number is the number of layers
+  // for a station.     
+  
+  // trd1mod1_11001
+  // trd1mod2_12001
+  // trd1mod3_13001
+  // trd1mod4_14001
+  // trd1mod1_21001
+  // trd1mod2_22001
+  // trd1mod3_23001
+  // trd1mod4_24001
+  // trd1mod5_31001
+  // trd1mod6_32001
+
+
+//  sprintf(volumeName, "trd_v13x");  // set top volume name here
+//  fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
+
+  // we still have the fm node here
+
+  // Check if a volume trd1modY_X1001 exists (first copy of trd 
+  // module type Y in trd station X). Start with the highest
+  // possible layer number. The layer of the first found module
+  // is the number of layers in this station
+
+  Bool_t foundModule=kFALSE;
+
+  for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {   // start from the front
+    for ( Int_t iLayer=maxLayer; iLayer>=1; iLayer--) {                // start from the back
+      for ( Int_t iModuleType=1; iModuleType<=maxModuleType; iModuleType++) {
+
+//	sprintf(volumeName, "trd%dmod%d_%d001", iStation, iModuleType, iLayer);
+	sprintf(volumeName, "trd1mod%d_%d%d001", iModuleType, iStation, iLayer);
+        node = (TGeoNode *) fm->GetNodes()->FindObject(volumeName);
+	//          cout << node << " " << volumeName << endl;
+
+        if (node) {
+	    //            cout << node << " *** " << volumeName << endl;
+	    foundModule=kTRUE;
+	    break;
+        }
+
+      }
+
+      if (foundModule){
+	  //          cout << "adding station *** " << volumeName << endl;
+        totalNrOfLayers += iLayer;   // add number of layers in this station
+        layersBeforeStation.push_back(totalNrOfLayers);
+	//        cout << "Root Geo iLayer "<< iLayer <<" and layersBeforeStation "<< totalNrOfLayers << endl;
+        layersPerStation[iStation-1]=iLayer;
+        foundModule=kFALSE; 
+        break;
+      }
+    }
+  }
+
+  
+  for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
+    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+  }
+  for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
+    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
+  }
+
+  return kTRUE;
+
+}
+
 Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometry(std::vector<Int_t> &layersBeforeStation)
 {
 
@@ -722,7 +929,7 @@ void CbmTrdGeoHandler::FillInternalStructures()
 
   } else {
 
-    if (fGeoVersion != kRootGeom) {
+    if ((fGeoVersion != kRootGeom) && (fGeoVersion != kRootGeomWithLayers)) {
       do {
 	sprintf(volumeName, "trd%d", stationNr);
 	MCid = VolId(volumeName);
@@ -734,12 +941,15 @@ void CbmTrdGeoHandler::FillInternalStructures()
       while ( 0 != MCid); 
 
       maxStationNr = --stationNr; 
+
     } else {
+
       maxStationNr = 2; 
+
     }
     
     Int_t maxModuleTypes;
-    if ((fGeoVersion == kSegmentedSquaredOneKeepingVolume)||(fGeoVersion == kRootGeom)) { 
+    if ((fGeoVersion == kSegmentedSquaredOneKeepingVolume)||(fGeoVersion == kRootGeom)||(fGeoVersion == kRootGeomWithLayers)) {
       maxModuleTypes = 8;
     } else {
       maxModuleTypes = 3;

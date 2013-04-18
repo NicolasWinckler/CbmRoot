@@ -188,15 +188,15 @@ InitStatus CbmTrdCreateDigiPar::Init(){
   }
 
   if (kRootGeomWithLayers == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
+    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kRootGeomWithLayers).");
     FillModuleMapRootGeometryWithLayers();
   }
   if (kRootGeom == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
+    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kRootGeom).");
     FillModuleMapRootGeometry();
   }
   if (kSegmentedSquaredOneKeepingVolume == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
+    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kSegmentedSquaredOneKeepingVolume).");
     FillModuleMapSegmentedSquaredOneKeepingVolume();
   }
 
@@ -253,6 +253,10 @@ void CbmTrdCreateDigiPar::FillModuleMapRootGeometryWithLayers(){
       TObjArray* layers = station->GetNodes();
       for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
         TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
+        if (TString(layer->GetName()).Contains("trd_support")) { 
+	  LOG(INFO)<< "skipping support: " << layer->GetName() << FairLogger::endl;
+          continue;
+        }
         TString LayerNode = layer->GetName();
 
 	TObjArray* modules = layer->GetNodes();
@@ -275,7 +279,6 @@ void CbmTrdCreateDigiPar::FillModuleMapRootGeometryWithLayers(){
                                  LayerNode + "/" + ModuleNode + "/" + PartNode;
 
               FillModuleInfoFromGeoHandler(FullPath);
-
               // Get Information about the padstructure for a
               // given trd module defined by the station and
               // layer numbers, the module type and the copy
@@ -291,13 +294,13 @@ void CbmTrdCreateDigiPar::FillModuleMapRootGeometryWithLayers(){
                 new CbmTrdModule(fModuleID, fX, fY, fZ, fSizex, fSizey, fSizez,
 				 fMaxSectors, fSectorSizex, fSectorSizey, 
 				 fpadsizex, fpadsizey);
+
 	    }
 	  }
         }
       }
     }
   }
-
   FillDigiPar();
 }
 
@@ -525,10 +528,10 @@ void CbmTrdCreateDigiPar::FillModuleMapSegmentedSquaredOneKeepingVolume(){
 
 void CbmTrdCreateDigiPar::FillModuleInfoFromGeoHandler(TString FullPath) 
 {
-  fModuleID = fGeoHandler->GetUniqueDetectorId(FullPath);	      
+  fModuleID   = fGeoHandler->GetUniqueDetectorId(FullPath);	      
   
-  fStation = fGeoHandler->GetStation(fModuleID);
-  fLayer = fGeoHandler->GetLayer(fModuleID);
+  fStation    = fGeoHandler->GetStation(fModuleID);
+  fLayer      = fGeoHandler->GetLayer(fModuleID);
   fModuleType = fGeoHandler->GetModuleType(fModuleID);
   fModuleCopy = fGeoHandler->GetModuleCopyNr(fModuleID);
 	    
@@ -595,9 +598,8 @@ void CbmTrdCreateDigiPar::FillPadInfoSegmentedSquaredOneKeepingVolume(){
 
   Int_t moduleType;
 
-
-  LOG(INFO)<< "Station: "<<fStation<<FairLogger::endl;
-  LOG(INFO)<<  "Type: "<<fModuleType<<FairLogger::endl;
+  LOG(INFO)<< "Station: "    <<fStation   <<FairLogger::endl;
+  LOG(INFO)<< "Type: "       <<fModuleType<<FairLogger::endl;
   LOG(INFO)<< "fModuleCopy: "<<fModuleCopy<<FairLogger::endl;
 
   fModTypeMap = fModInfoMap.find(fStation)->second;

@@ -106,11 +106,12 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
             TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
 
             if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...
-	      fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,9)) );
+	      fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,11)) );
               if (fm) {
-                cout<<"Found Root geometry version long:    "<< TString(layer->GetName()) <<endl;
-                cout<<"Found Root geometry with layers:     "<< TString(TString(layer->GetName())(0,9)) <<endl;
-                fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
+//                cout<<"Found Root geometry version long:    "<< TString(layer->GetName()) <<endl;
+//                cout<<"Found Root geometry with layers:     "<< TString(TString(layer->GetName())(0,11)) <<endl;
+//                fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
+                fLogger->Info(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
                 fGeoVersion = kRootGeomWithLayers;
                 return fGeoVersion;
               }
@@ -118,9 +119,10 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
           }
 
           // otherwise it is a kRootGeom
-// 	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
-//	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
-          fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
+// 	    cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
+//          cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
+//          fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
+          fLogger->Info(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
           fGeoVersion = kRootGeom;
           return fGeoVersion;
         }
@@ -1160,7 +1162,7 @@ void CbmTrdGeoHandler::NavigateTo(TString volName)
     fVolumeShape = (TGeoBBox*)fCurrentVolume->GetShape(); 
     Double_t local[3] = {0., 0., 0.};  // Local centre of volume
     gGeoManager->LocalToMaster(local, fGlobal);
-    cout<<"Pos: "<<fGlobal[0]<<" , "<<fGlobal[1]<<" , "<<fGlobal[2]<<" , "<<endl;
+    LOG(INFO) << "Pos: x " << fGlobal[0] << ", y " << fGlobal[1] << ", z " << fGlobal[2] << FairLogger::endl;
     fGlobalMatrix = gGeoManager->GetCurrentMatrix(); 
   }	      
 }

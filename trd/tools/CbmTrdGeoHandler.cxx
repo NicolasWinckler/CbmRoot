@@ -194,7 +194,6 @@ Int_t CbmTrdGeoHandler::GetUniqueDetectorId(TString volName)
   return GetUniqueDetectorId();
 }
 
-
 Int_t CbmTrdGeoHandler::GetUniqueDetectorId()
 {
   Int_t temp_station;
@@ -282,20 +281,20 @@ Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
           for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
             TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
 
-            cout<<"Layer name:   "<< TString(layer->GetName()) <<endl;
+	    //            cout<<"Layer name:   "<< TString(layer->GetName()) <<endl;
 
             if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...         
 	      TGeoVolume *lm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd_layer01");
               if (lm) {
-                cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
-                cout<<"Found Root geometry with layers:     "<< TString(TString(layer->GetName())(0,9)) <<endl;
+                cout << "Found Root geometry with layers:     " << TString(node->GetName()) << endl;
+		//                cout << "Found Root geometry with layers:     " << TString(TString(layer->GetName())(0,9)) << endl;
                 return GetLayerInfoFromRootGeometryWithLayers(layersBeforeStation);                                                 
               }
             }
           }
 
-	  cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
-	  cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
+	  cout << "Found Root geometry version:         " << TString(node->GetName()) << endl;
+	  //	  cout << "Found Root geometry version chopped: " << TString(TString(node->GetName())(0,8)) << endl;
           return GetLayerInfoFromRootGeometry(layersBeforeStation);
         }
      }
@@ -365,7 +364,6 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromOldGeometry(std::vector<Int_t> &layersB
 
     return kTRUE;
 }
-
 
 Bool_t CbmTrdGeoHandler::GetLayerInfoFromStationKVolumeGeometry(std::vector<Int_t> &layersBeforeStation)
 {
@@ -464,7 +462,6 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromStationKVolumeGeometry(std::vector<Int_
     return kTRUE;
 
 }
-
 
 Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t> &layersBeforeStation)
 {
@@ -572,8 +569,9 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t
 Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_t> &layersBeforeStation)
 {
 
-  TGeoVolume *fm=NULL;
+  TGeoVolume *fm = NULL;
   TGeoNode *node = NULL;
+  TGeoNode *modnode = NULL;
   
 
   Int_t stationNr = 1;
@@ -612,6 +610,8 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_
   Int_t maxLayer      = 4;  // max number of different layers in a station
   Int_t maxStation    = 3;  // max number of different stations
 
+  TGeoVolume *lm = NULL;
+
   // find the number of stations by looping over all possible module names
   if (fm) {
 
@@ -620,32 +620,31 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_
     for (Int_t jLayer = 0; jLayer < layers->GetEntriesFast(); jLayer++) {
       TGeoNode* layer = (TGeoNode*) layers->At(jLayer);
       if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...
-        cout<<"Search layer name:   "<< TString(layer->GetName()) <<endl;
-	TGeoVolume *lm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,9)) );
+//        cout << endl;
+//        cout<<"Search layer name:   "<< TString(layer->GetName()) <<endl;
+        lm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,11)) );
 
 	if (lm) {
-
-          cout<<"Found  layer name:   "<< TString(layer->GetName()) <<endl;
+//          cout << "Scanning layer:   " << TString(layer->GetName())(0,11) << endl;
           for ( Int_t iStation=1; iStation<=maxStation; iStation++) {   // start from the front
-            for ( Int_t iLayer=1; iLayer<=maxLayer; iLayer++) {       // start from the front
+            for ( Int_t iLayer=1; iLayer<=maxLayer; iLayer++) {         // start from the front
               for ( Int_t iModuleType=1; iModuleType<=maxModuleType; iModuleType++) {
           
           	  sprintf(volumeName, "trd1mod%d_%d%d001", iModuleType, iStation, iLayer);
-                  node = (TGeoNode *) lm->GetNodes()->FindObject(volumeName);
+                  modnode = (TGeoNode *) lm->GetNodes()->FindObject(volumeName);
       
-//                cout << node << " " << volumeName << endl;
+//                cout << modnode << " " << volumeName << endl;
           
-                  if (node) {   // found module
-//                cout << node << " " << volumeName << endl;
-                    if (totalNrOfStations < iStation) {
+                  if (modnode) {   // found module
+//                  cout << modnode << " " << volumeName << endl;
+                    if (totalNrOfStations < iStation) { // if new station is found, increase counter
                       totalNrOfStations = iStation;
-//                cout << "********** found max station ... "<< totalNrOfStations <<endl;
+//                      cout << "********** found max station ... "<< totalNrOfStations <<endl;
                   }
                 }
               }
             }
           }
-
         }
       }
     }
@@ -662,6 +661,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_
     return kFALSE;
   }
 
+  // totalNrOfStations is now correctly set
 
   Int_t layersPerStation[totalNrOfStations];
 
@@ -699,19 +699,40 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_
   for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {   // start from the front
     for ( Int_t iLayer=maxLayer; iLayer>=1; iLayer--) {                // start from the back
       for ( Int_t iModuleType=1; iModuleType<=maxModuleType; iModuleType++) {
-
-//	sprintf(volumeName, "trd%dmod%d_%d001", iStation, iModuleType, iLayer);
 	sprintf(volumeName, "trd1mod%d_%d%d001", iModuleType, iStation, iLayer);
-        node = (TGeoNode *) fm->GetNodes()->FindObject(volumeName);
-	//          cout << node << " " << volumeName << endl;
+	TGeoNode* station = node;
+	TObjArray* layers = station->GetNodes();
+	for (Int_t jLayer = 0; jLayer < layers->GetEntriesFast(); jLayer++) {
+	  TGeoNode* layer = (TGeoNode*) layers->At(jLayer);
+	  if (TString(layer->GetName()).Contains("trd_layer")) {   // check for strings like: trd_layer01, trd_layer02, ...
 
-        if (node) {
-	    //            cout << node << " *** " << volumeName << endl;
-	    foundModule=kTRUE;
-	    break;
-        }
+//        cout << endl;
+//        cout<<"Search layer name:   "<< TString(layer->GetName()) <<endl;
+	    lm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject( TString(TString(layer->GetName())(0,11)) );
+	    if (lm) {
 
-      }
+              modnode = (TGeoNode *) lm->GetNodes()->FindObject(volumeName);
+	      //              cout << modnode << " " << volumeName << endl;
+
+              if (modnode) {
+    	        foundModule=kTRUE;
+
+		//                cout << modnode << " *** " << volumeName << endl;
+		//                cout << "got it, will break" << endl;
+
+		// break;  // break is to much encapsulated to work fine
+                // now exit the iModuleType loop ASAP
+                jLayer = layers->GetEntriesFast();
+                iModuleType = maxModuleType+1;
+              }  // if
+
+            }  // if
+          }  // if
+        }  // for jLayer
+
+      }  // for iModuleType
+
+      //      cout << "end out of loop" << endl << endl;
 
       if (foundModule){
 	  //          cout << "adding station *** " << volumeName << endl;

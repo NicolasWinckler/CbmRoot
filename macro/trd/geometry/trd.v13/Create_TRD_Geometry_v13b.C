@@ -3,7 +3,7 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
-// 2013-04-17 - DE - introduce keeping volumes for layers, e.g. trd_layer03
+// 2013-04-17 - DE - introduce volume assembly for layers, e.g. trd_layer03
 // 2013-03-26 - DE - use Air as ASIC material
 // 2013-03-26 - DE - put support structure into its own assembly
 // 2013-03-26 - DE - move TRD upstream to z=400m
@@ -40,7 +40,7 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13x";
+const TString geoVersion = "trd_v13g";
 const TString FileNameSim = geoVersion + ".root";
 const TString FileNameGeo = geoVersion + "_geo.root";
 
@@ -88,14 +88,15 @@ const Int_t   MaxLayers = 10;   // max layers
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // Station 1, layer 1, 2
 //const Int_t    ShowLayer[MaxLayers] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 2, layer 5, 6
 //const Int_t    ShowLayer[MaxLayers] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 };  // Station 3, layer 9,10
-const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 3, layer 9,10
+//const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 1, 1, 0, 0, 0, 0 };  // Station 1 and 2
+//const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 1, 2 and 3
 //
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 };  // SIS300-mu  // 1: plot, 0: hide
 //
-//const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
+const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
 Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
 
@@ -104,9 +105,9 @@ const Double_t LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
  
 // just behind RICH v13a at z=400
-//const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };   // z position in cm of Layer front
+const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };   // z position in cm of Layer front
 // 3 stations, no gap between TRD stations
-const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // v13c // z position in cm of Layer front
+//const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // v13c // z position in cm of Layer front
 // 3 stations, 25 cm gap
 //const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
 // equal spacing
@@ -200,14 +201,14 @@ const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 
 // ultimate density
-const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  5,  3,  2,  1 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,216,216 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+//const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  5,  3,  2,  1 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,216,216 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 ////
 //const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  3, 10,  5,  3,  3 }; // min (6) module types // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //// super density
-//const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-//const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
 //// normal density
 //const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping

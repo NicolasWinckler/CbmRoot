@@ -16,291 +16,147 @@
 #include "FairBaseParSet.h"
 
 #include "TRandom.h"
-#include "TMath.h"
 #include "TVector3.h"
 #include "TClonesArray.h"
-#include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMaterial.h"
-#include "TGeoNode.h"
-#include "TGeoMatrix.h"
-#include "TGeoBBox.h"
-#include "TPRegexp.h"
 
 #include <iostream>
 #include <iomanip>
 using std::cout;
 using std::endl;
 using std::pair;
-using std::setprecision;
+using std::make_pair;
+using std::map;
+using std::vector;
 
-
-// ---- Default constructor -------------------------------------------
-CbmTrdDigitizer::CbmTrdDigitizer()
-  : FairTask("TrdDigitizer",1),
-    fCol(-1),
-    fRow(-1),
-    fModuleID(-1),
-    fMCindex(-1),
-    fELoss(-1.),
-    fTime(-1.),
+CbmTrdDigitizer::CbmTrdDigitizer(
+      CbmTrdRadiator* radiator):
+    FairTask("CbmTrdDigitizer"),
     fEfficiency(1.),
     fTrdPoints(NULL),
-    fDigiCollection(NULL),
-    fDigiMatchCollection(NULL),
-    fMCStack(NULL),
-    fDigiPar(NULL),
-    fModuleInfo(NULL),
-    fRadiator(new CbmTrdRadiator),
-    fGeoHandler(new CbmTrdGeoHandler()),
-    fDigiMap(),
-    fDigiMapIt()
-{
-}
-// --------------------------------------------------------------------
-
-// ---- Constructor ----------------------------------------------------
-CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title,
-                 CbmTrdRadiator *radiator, Int_t iVerbose)
-  : FairTask(name, iVerbose),
-    fCol(-1),
-    fRow(-1),
-    fModuleID(-1),
-    fMCindex(-1),
-    fELoss(-1.),
-    fTime(-1.),
-    fEfficiency(1.),
-    fTrdPoints(NULL),
-    fDigiCollection(NULL),
-    fDigiMatchCollection(NULL),
-    fMCStack(NULL),
+    fTrdDigis(NULL),
+    fTrdDigiMatches(NULL),
+    fMCTracks(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiator(radiator),
     fGeoHandler(new CbmTrdGeoHandler()),
-    fDigiMap(),
-    fDigiMapIt()
+    fDigiMap()
 {
 }
-// --------------------------------------------------------------------
 
-// ---- Destructor ----------------------------------------------------
 CbmTrdDigitizer::~CbmTrdDigitizer()
 {
-  //    FairRootManager *ioman =FairRootManager::Instance();
-  //ioman->Write();
-  fDigiCollection->Clear("C");
-  delete fDigiCollection;
-  fDigiMatchCollection->Clear("C");
-  delete fDigiMatchCollection;
-
+   fTrdDigis->Clear("C");
+   delete fTrdDigis;
+   fTrdDigiMatches->Clear("C");
+   delete fTrdDigiMatches;
 }
-// --------------------------------------------------------------------
 
-// ----  Initialisation  ----------------------------------------------
 void CbmTrdDigitizer::SetParContainers()
 {
-    cout<<" * CbmTrdDigitizer * :: SetParContainers() "<<endl;
-
-
-    // Get Base Container
-    FairRunAna* ana = FairRunAna::Instance();
-    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-    fDigiPar = (CbmTrdDigiPar*)
-               (rtdb->getContainer("CbmTrdDigiPar"));
-
+   fDigiPar = static_cast<CbmTrdDigiPar*>(FairRunAna::Instance()->GetRuntimeDb()->getContainer("CbmTrdDigiPar"));
 }
-// --------------------------------------------------------------------
 
-// ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdDigitizer::ReInit(){
-
-  cout<<" * CbmTrdDigitizer * :: ReInit() "<<endl;
-
-
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-  fDigiPar = (CbmTrdDigiPar*)
-      (rtdb->getContainer("CbmTrdDigiPar"));
-  
-  return kSUCCESS;
-}
-// --------------------------------------------------------------------
-
-// ---- Init ----------------------------------------------------------
 InitStatus CbmTrdDigitizer::Init()
 {
+   FairRootManager* ioman = FairRootManager::Instance();
 
-    cout<<" * CbmTrdDigitizer * :: Init() "<<endl;
+   fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
+   Fatal("CbmTrdDigitizer::Init()", "No TrdPoint array!");
 
-    FairRootManager *ioman = FairRootManager::Instance();
-    if ( ! ioman ) Fatal("Init", "No FairRootManager");
-    
-    fTrdPoints=(TClonesArray *)  
-      ioman->GetObject("TrdPoint");
- 
-    if ( ! fTrdPoints ) {
-      cout << "-W CbmTrdDigitizer::Init: No TrdPoints array!" << endl;
-      cout << "                            Task will be inactive" << endl;
-      return kERROR;
-    }
+   fMCTracks = (TClonesArray*)ioman->GetObject("MCTrack");
+   Fatal("CbmTrdDigitizer::Init()", "No MCTrack array!");
 
-    fMCStack = (TClonesArray*)ioman->GetObject("MCTrack");
+   fTrdDigis = new TClonesArray("CbmTrdDigi", 100);
+   ioman->Register("TrdDigi", "TRD Digis", fTrdDigis, kTRUE);
 
-    fDigiCollection = new TClonesArray("CbmTrdDigi", 100);
-    ioman->Register("TrdDigi","TRD Digis",fDigiCollection,kTRUE);
+   fTrdDigiMatches = new TClonesArray("CbmTrdDigiMatch", 100);
+   ioman->Register("TrdDigiMatch", "TRD Digis", fTrdDigiMatches, kTRUE);
 
-    fDigiMatchCollection = new TClonesArray("CbmTrdDigiMatch", 100);
-    ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchCollection,kTRUE);
+   fGeoHandler->Init();
 
-    fGeoHandler->Init();
+   fRadiator->Init();
 
-    fRadiator->Init();
-
-    return kSUCCESS;
-
+   return kSUCCESS;
 }
-// --------------------------------------------------------------------
 
-
-// ---- Exec ----------------------------------------------------------
 void CbmTrdDigitizer::Exec(Option_t * option)
 {
+   fDigiMap.clear();
+   fTrdDigis->Clear();
+   fTrdDigiMatches->Clear();
 
-  CbmTrdPoint *pt=NULL;
-  
-  TVector3 mom;
-  Double_t ELoss;
-  Double_t ELossTR;     // TR energy loss for e- & e+
-  Double_t ELossdEdX;   // ionization energy loss
-  
-  for (int j=0; j <  fTrdPoints->GetEntriesFast() ; j++ ) {
+   Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
+   for (Int_t iPoint = 0; iPoint < nofTrdPoints ; iPoint++ ) {
+      // If random value above fEfficency reject point
+      if (gRandom->Rndm() > fEfficiency ) continue;
 
-    // if random value above fEfficency reject point
-    if (gRandom->Rndm() > fEfficiency ) continue;
- 
-    pt = (CbmTrdPoint*) fTrdPoints->At(j);
-  
-    if(NULL == pt) continue;
+      AddDigi(iPoint);
+   }
 
-    pt->Momentum(mom);
-    fMCindex=pt->GetTrackID();
+   // Fill data from internally used stl map into output TClonesArray
+   Int_t iDigi=0;
+   map<pair< Int_t, pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator it;
+   for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
+      CbmTrdDigi* digi = it->second;
+      new ((*fTrdDigis)[iDigi]) CbmTrdDigi(digi->GetDetId(), digi->GetCol(), digi->GetRow(), digi->GetCharge(), digi->GetTime());
 
-    CbmMCTrack *p= (CbmMCTrack*) fMCStack->At(fMCindex);
-    if(NULL == p) continue;
+      CbmTrdDigiMatch* digiMatch = new ((*fTrdDigiMatches)[iDigi]) CbmTrdDigiMatch();
 
-    Int_t pdgCode = p->GetPdgCode();
-
-    ELossdEdX = pt->GetEnergyLoss();
-    ELoss     = ELossdEdX;
-
-    // Calculate TR
-    // Sorry, Electrons & Positrons only
-    //	if(TMath::Abs(pdgCode) == 11 && mom.Z() > 0.5){  //0.5
-    if(TMath::Abs(pdgCode) == 11){ 
-
-       ELossTR = fRadiator->GetTR(mom);
-
-       ELoss += ELossTR;
-    }
-    fELoss = ELoss;
-
-    fTime = pt->GetTime();
-
-    Int_t Sector;
-
-    // Get pointer to the correct TRD module 
-    // Extract the information which digi
-    // Row/Col/Sector has fired for the TrdPoint
-    // Encode the Sector info into the detector ID and
-    // finally add the digi to the map
-    fModuleInfo = fDigiPar->GetModule(pt->GetDetectorID());
-    fModuleInfo->GetPadInfo(pt, fCol, fRow, Sector);
-    fModuleID = fGeoHandler->SetSector(pt->GetDetectorID(), Sector);
-
-    AddDigi(j);
-
-  }
-
-  // Fill data from internaly used stl map into output TClonesArray
-  // Fill also the DigiMatch output which holds for each digi the MC indexes
-  // which give a contribution to the digi
-  Int_t iDigi=0; 
-  for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++ ) {
-    new ((*fDigiCollection)[iDigi]) 
-        CbmTrdDigi(fDigiMapIt->second->GetDetId(), 
-        fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), 
-        fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
-
-    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
-
-    std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
-    std::vector<int>::iterator it;
-
-    for (it=arr.begin() ; it <arr.end(); it++  ) {
-      Int_t bla = p->AddPoint((Int_t)*it);
-    }
-
-    iDigi++;
-  }
+      vector<Int_t> arr = digi->GetMCIndex();
+      vector<Int_t>::iterator itvec;
+      for (itvec = arr.begin() ; itvec <arr.end(); itvec++  ) {
+         Int_t bla = digiMatch->AddPoint((Int_t)*itvec);
+      }
+      iDigi++;
+   }
 }
-// --------------------------------------------------------------------
 
-// ---- FinishTask-----------------------------------------------------
-void CbmTrdDigitizer::FinishEvent()
+void CbmTrdDigitizer::Finish()
 {
-  fDigiMap.clear();
-  if ( fDigiCollection ) fDigiCollection->Clear();
-  if ( fDigiMatchCollection ) fDigiMatchCollection->Clear();
+
 
 }
-// --------------------------------------------------------------------
 
+void CbmTrdDigitizer::AddDigi(
+      Int_t pointId)
+{
+   CbmTrdPoint* mcPoint = static_cast<CbmTrdPoint*>(fTrdPoints->At(pointId));
+   if(NULL == mcPoint) return;
 
-// --------------------------------------------------------------------
+   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcPoint->GetTrackID());
+   if(NULL == mcTrack) return;
 
-void CbmTrdDigitizer::AddDigi(const Int_t pointID) {
-  // Add digi for pixel(x,y) in module to map for intermediate storage
-  // In case the pixel for this pixel/module combination does not exists
-  // it is added to the map.
+   TVector3 mom;
+   mcPoint->Momentum(mom);
+
+   Bool_t isElectron = abs(mcTrack->GetPdgCode()) == 11;
+   Double_t energyLoss = (isElectron) ? mcPoint->GetEnergyLoss() + fRadiator->GetTR(mom) :  mcPoint->GetEnergyLoss();
+   Int_t time = mcPoint->GetTime();
+
+   Int_t col, row, sector;
+   fModuleInfo = fDigiPar->GetModule(mcPoint->GetDetectorID());
+   fModuleInfo->GetPadInfo(mcPoint, col, row, sector);
+   Int_t detectorId = fGeoHandler->SetSector(mcPoint->GetDetectorID(), sector);
+
+  // Add digi for pixel(x,y) in module to map for intermediate storage.
+  // In case the pixel for this pixel/module combination does not exists it is added to the map.
   // In case it exists already the information about another hit in this
   // pixel is added. Also the additional energy loss is added to the pixel.
 
+   // Look for pixel in charge map
+   pair<Int_t, pair<Int_t,Int_t> > b(detectorId, make_pair(col, row));
+   map<pair< Int_t, pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator it = fDigiMap.find(b);
 
-    // Look for pixel in charge map
-    pair<Int_t, Int_t> a(fCol, fRow);
-    pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
-    fDigiMapIt = fDigiMap.find(b);
-
-    //    cout<<"DetID: "<<fModuleID<<endl;
-
-    // Pixel not yet in map -> Add new pixel
-    if ( fDigiMapIt == fDigiMap.end() ) {
-      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol, fRow, fELoss, 
-                                        fTime, pointID);
-      fDigiMap[b] = digi;
-    }
-
-    // Pixel already in map -> Add charge
-    else {
-        CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
-        if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
-        digi->AddCharge(fELoss);
-        digi->AddMCIndex(pointID);
-        if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
-    }
+   if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
+      fDigiMap[b] = new CbmTrdDigi(detectorId, col, row, energyLoss, time, pointId);
+   } else { // Pixel already in map -> Add charge
+      CbmTrdDigi* digi = (CbmTrdDigi*) it->second;
+      if (NULL == digi) Fatal("CbmTrdDigitizer::AddDigi", "Zero pointer in digi map!");
+      digi->AddCharge(energyLoss);
+      digi->AddMCIndex(pointId);
+      if (time > (digi->GetTime())) digi->SetTime(time);
+   }
 }
-
-
-// ---- Register ------------------------------------------------------
-void CbmTrdDigitizer::Register(){
-
-  FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
-  FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
-
-}
-// --------------------------------------------------------------------
 
 ClassImp(CbmTrdDigitizer)

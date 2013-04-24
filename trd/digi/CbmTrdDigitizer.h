@@ -1,15 +1,20 @@
-// --------------------------------------------------------------------------
-// -----          Header for the CbmTrdDigitizer               ------
-// -----              Created 06.06.08 by F.Uhlig                      ------
-// --------------------------------------------------------------------------
+/**
+ * \file CbmTrdDigitizer.h
+ * \author Florian Uhlig <f.uhlig@gsi.de>
+ * \date 2008
+ * \brief Simple TRD digitizer.
+ * Update 24.04.2013 by Andrey Lebedev
+ **/
 
-#ifndef CBMTRDDIGITIZER_H
-#define CBMTRDDIGITIZER_H
+#ifndef CBMTRDDIGITIZER_H_
+#define CBMTRDDIGITIZER_H_
 
 #include "FairTask.h"
 
 #include <map>
-#include <list>
+
+using std::map;
+using std::pair;
 
 class TClonesArray;
 
@@ -19,71 +24,67 @@ class CbmTrdModule;
 class CbmTrdRadiator;
 class CbmTrdGeoHandler;
 
-class CbmTrdDigitizer : public FairTask {
+class CbmTrdDigitizer : public FairTask
+{
+public:
 
-  public:
+    /**
+     * \brief Constructor.
+     * \param[in] raiator TRD radiator to be used in digitization.
+     */
+    CbmTrdDigitizer(
+          CbmTrdRadiator* radiator = NULL);
 
-    /** Default constructor **/
-    CbmTrdDigitizer();
-
-    /** Standard constructor **/
-    CbmTrdDigitizer(const char *name, const char *title="CBM Task",
-                    CbmTrdRadiator *radiator=NULL, Int_t iVerbose=1);
-
-    /** Destructor **/
+    /**
+     * \brief Destructor.
+     **/
     virtual ~CbmTrdDigitizer();
 
-    /** Initialisation **/
-    virtual InitStatus ReInit();
+    /**
+     * \brief Inherited from FairTask.
+     */
     virtual InitStatus Init();
+
+    /**
+     * \brief Inherited from FairTask.
+     */
     virtual void SetParContainers();
 
-    /** Executed task **/
+    /**
+     * \brief Inherited from FairTask.
+     */
     virtual void Exec(Option_t * option);
 
-    /** Finish (called after each event) **/
-    virtual void FinishEvent();
- 
-   /** Finish task (called after all event) **/
-    virtual void FinishTask(){;}
-
-    void Register();
+    /**
+     * \brief Inherited from FairTask.
+     */
+    virtual void Finish();
 
 private:
    
-    void AddDigi(const Int_t pointID);
+    void AddDigi(
+          Int_t pointId);
 
-    Int_t   fCol; //Calculated pixel column were the hit is in
-    Int_t   fRow; //Calculated pixel row were the hit is in
-    Int_t   fModuleID;//Unique number for detector module
-    Int_t   fMCindex;// index to MCPoint
-    Float_t fELoss;//energy loss from MCPoint 
-    Float_t fTime;//time from MCPoint
     Float_t fEfficiency; // Digi production efficiency (0-100%)
-    //    Double_t fthreshold; //pixel threshold in electrons
-    //    Double_t fnoise; //pixel noise in electrons
 
-    TClonesArray *fTrdPoints; //! Trd MC points
-    TClonesArray *fDigiCollection; //! TRD digis
-    TClonesArray *fDigiMatchCollection; //! Corresponding MCPoints to TRD digis
-    TClonesArray *fMCStack;  //! MC Track information
+    TClonesArray* fTrdPoints; //! Trd MC points
+    TClonesArray* fTrdDigis; //! TRD digis
+    TClonesArray* fTrdDigiMatches; //! Corresponding MCPoints to TRD digis
+    TClonesArray* fMCTracks;  //! MC Track information
 
-    CbmTrdDigiPar  *fDigiPar;
-    CbmTrdModule   *fModuleInfo;
-    CbmTrdRadiator *fRadiator; 
+    CbmTrdDigiPar* fDigiPar;
+    CbmTrdModule* fModuleInfo;
+    CbmTrdRadiator* fRadiator;
 
     CbmTrdGeoHandler* fGeoHandler; //!
     
-    /**  map to store digis for pair of x,y position in module **/
+    // map to store digis for pair of x,y position in module
     // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
-    std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* > fDigiMap; 
-    /**  iterator over map to store digis for pair of x,y position in module **/
-    std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
+    map<pair< Int_t, pair< Int_t, Int_t > >, CbmTrdDigi* > fDigiMap;
 
     CbmTrdDigitizer(const CbmTrdDigitizer&);
     CbmTrdDigitizer& operator=(const CbmTrdDigitizer&);
 
-    ClassDef(CbmTrdDigitizer,3)
-
-    };
-#endif //CBMTRDDIGITIZER_H
+    ClassDef(CbmTrdDigitizer, 4)
+};
+#endif // CBMTRDDIGITIZER_H_

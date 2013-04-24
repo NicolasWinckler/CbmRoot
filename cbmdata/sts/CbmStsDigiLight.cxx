@@ -63,7 +63,7 @@ CbmStsDigiLight::CbmStsDigiLight()
 // -------------------------------------------------------------------------
 CbmStsDigiLight::CbmStsDigiLight(Int_t station, Int_t sector, Int_t side, 
 		       Int_t channel, Int_t adc, Int_t time) 
-  : CbmDigi(kSTS, channel),
+  : CbmDigi(),
     CbmStsDetectorId(),
     fData(0) 
 {

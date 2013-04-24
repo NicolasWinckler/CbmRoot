@@ -30,7 +30,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(CBMBASE_SRCS
 CbmDetectorList.cxx
 
-CbmDigiManager.cxx
+#CbmDigiManager.cxx
 CbmPropagator.cxx
 
 CbmTrdTrackFinder.cxx  

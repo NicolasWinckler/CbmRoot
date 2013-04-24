@@ -16,7 +16,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMvdDigi::CbmMvdDigi()
-  : CbmDigi(0, 0),
+  : CbmDigi(),
     CbmMvdDetectorId(),
     fCharge(0.),
     fChannelNrX(0),
@@ -41,7 +41,7 @@ CbmMvdDigi::CbmMvdDigi()
 // -----   Constructor with parameters   -----------------------------------
 CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Float_t charge,
                        Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Float_t maxChargeContribution, Int_t pointID, Int_t trackID)
-  : CbmDigi(kMVD, 0),
+  : CbmDigi(),
     CbmMvdDetectorId(),
     fCharge(charge),
     fChannelNrX(iChannelNrX),

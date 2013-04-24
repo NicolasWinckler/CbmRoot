@@ -4,54 +4,46 @@
 // -------------------------------------------------------------------------
 #include "CbmDigi.h"
 
-#include <iostream>
 
-using std::cout;
-using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmDigi::CbmDigi() 
-  : TObject(),
-    fDetectorId(0),
-    fChannelNr(0)
-{
+CbmDigi::CbmDigi() : fLinks(NULL) {
 }
 // -------------------------------------------------------------------------
 
 
-
-// -----   Standard constructor   ------------------------------------------
-CbmDigi::CbmDigi(Int_t iSystem, Int_t iChannel) 
-  : TObject(),
-    fDetectorId(0),
-    fChannelNr(0)
-{
-
-  // Check range for system ID
-  if ( ! ( iSystem >=0 && iSystem <=31 ) ) {
-    cout << "-E- CbmDigi: Illegal system identifier " << iSystem << endl;
-    Fatal("", "Illegal system identifier");
-  }
-
-  fDetectorId = iSystem;            // system on bits 0-3
-  fChannelNr  = iChannel;
-  
+// -----   Copy constructor   -------------------------------------------
+CbmDigi::CbmDigi(const CbmDigi& digi) : fLinks(NULL) {
+  if ( digi.GetLinkObject() )
+    fLinks = new FairMultiLinkedData(digi.GetLinkObject()->GetLinks(),
+                                     digi.GetLinkObject()->GetPersistanceCheck());
 }
 // -------------------------------------------------------------------------
-
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmDigi::~CbmDigi() { }
-// -------------------------------------------------------------------------
-
-
-
-// -----   Get time (virtual)  ---------------------------------------------
-Int_t CbmDigi::GetTime() const {
-   return 0.;
+CbmDigi::~CbmDigi() {
+  if ( fLinks ) delete fLinks;
 }
 // -------------------------------------------------------------------------
+
+
+// -----   Assignment operator   -------------------------------------------
+CbmDigi& CbmDigi::operator= (const CbmDigi& digi) {
+
+  if ( this != &digi) {                    // Protect against self-assignment
+
+    if ( digi.GetLinkObject() )                  // Other digi has FairLinks
+      fLinks = new FairMultiLinkedData(digi.GetLinkObject()->GetLinks(),
+                                       digi.GetLinkObject()->GetPersistanceCheck());
+    else fLinks = NULL;
+
+  }
+
+  return *this;
+}
+// -------------------------------------------------------------------------
+
 
 
 

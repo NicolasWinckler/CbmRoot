@@ -51,6 +51,15 @@ public:
     Int_t    GetStationNr() { return StationNr(fDetectorId); }
     Int_t    GetTrackID(){return fTrackID;}
     Int_t    GetPointID(){return fPointID;}
+
+    /** Abstract methods from base class **/
+    Int_t GetAddress() const { return fDetectorId; }
+    Double_t GetTime() const { return 0.; }
+
+    /** Former methods from base class **/
+    Int_t GetDetectorId() const { return fDetectorId; }
+    Int_t GetChannelNr() const { return fChannelNr; }
+    Int_t GetSystemId() const { return kMVD; }
    
  
 
@@ -63,6 +72,9 @@ public:
     void SetFlag(Int_t flag)             { fDigiFlag   = flag;       }
 
 private:
+
+    Int_t fDetectorId;
+    Int_t fChannelNr;
 
 
     Float_t fCharge;

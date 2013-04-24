@@ -129,7 +129,7 @@ void CbmDaqBuffer::InsertData(CbmDigi* digi) {
   fData[iDet].insert(value);
 
   LOG(DEBUG2) << "DaqBuffer: Inserting digi, detectorID "
-              << digi->GetDetectorId() << ", time " << digi->GetTime()
+              << digi->GetAddress() << ", time " << digi->GetTime()
               << FairLogger::endl;
 
 }

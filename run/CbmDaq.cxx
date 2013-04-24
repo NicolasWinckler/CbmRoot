@@ -91,8 +91,8 @@ void CbmDaq::FillTimeSlice() {
     CbmDigi* digi = fBuffer->GetNextData(iDet, fTimeSlice->GetEndTime());
     while ( digi ) {
       LOG(DEBUG2) << fName << ": Inserting digi with detector ID "
-                  << digi->GetDetectorId() << " at time " << digi->GetTime()
-                  << " into timslice [" << fixed << setprecision(3)
+                  << digi->GetAddress() << " at time " << digi->GetTime()
+                  << " into timeslice [" << fixed << setprecision(3)
                   << fTimeSlice->GetStartTime() << ", "
                   << fTimeSlice->GetEndTime() << ") ns"
                   << FairLogger::endl;

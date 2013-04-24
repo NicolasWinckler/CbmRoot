@@ -68,19 +68,24 @@ class CbmStsDigiLight : public CbmDigi, public CbmStsDetectorId
 // 			SetLinks(FairMultiLinkedData(kStsPoint, index));
 // 		}
 
+  /**   System ID    **/
+  Int_t GetSystemId() const { return kSTS; }
+
+
   /**   Station number   **/
-  Int_t GetStationNr() const { return StationNr(GetDetectorId()); }
+  Int_t GetStationNr() const { return StationNr(GetAddress()); }
+
 
   /**   Sector number   **/
-  Int_t GetSectorNr() const { return SectorNr(GetDetectorId()); }
+  Int_t GetSectorNr() const { return SectorNr(GetAddress()); }
 
 
   /**   Side ( 0 = front, 1 = back )   **/
-  Int_t GetSide() const { return Side(GetDetectorId()); }
+  Int_t GetSide() const { return Side(GetAddress()); }
 
 
   /**   Channel number   **/
-  Int_t GetChannelNr() const { return ChannelNr(GetDetectorId()); }
+  Int_t GetChannelNr() const { return ChannelNr(GetAddress()); }
 
 
   /**   Charge   **/
@@ -88,11 +93,11 @@ class CbmStsDigiLight : public CbmDigi, public CbmStsDetectorId
 
 
   /**   Time   **/
-  Int_t GetTime() const { return ( (fData >> fgkTimeShift) & fgkTimeMask ); }
+  Double_t GetTime() const { return Double_t( (fData >> fgkTimeShift) & fgkTimeMask ); }
 
 
   /**   Unique detector ID   **/
-  Int_t GetDetectorId() const { 
+  Int_t GetAddress() const {
     return ( kSTS | ( (fData & fgkAddrMask) << 4) );
   }
 

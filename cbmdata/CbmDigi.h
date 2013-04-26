@@ -4,16 +4,19 @@
  */
 
 
-// -------------------------------------------------------------------------
-// -----                         CbmDigi header file                   -----
-// -----                  Created 09/05/07  by V. Friese               -----
-// -------------------------------------------------------------------------
+#ifndef CBMDIGI_H
+#define CBMDIGI_H 1
+
+#include <iostream>
+
+#include "TObject.h"
+#include "FairMultiLinkedData.h"
+
 
 /** @class CbmDigi
- ** @author V.Friese <v.friese@gsi.de>
- ** @since 09.05.07
- ** @version 2.0
  ** @brief Base class for persistent representation of digital information.
+ ** @author V.Friese <v.friese@gsi.de>
+ ** @version 2.0
  **
  ** CbmDigi is an abstract base class for the ROOT representation of
  ** the smallest information unit delivered by the detector front-ends.
@@ -29,85 +32,78 @@
  ** where the link information to MCPoints can be stored and retrieved.
  ** If there is no such information, the pointer will be NULL.
  **/
-
-
-#ifndef CBMDIGI_H
-#define CBMDIGI_H 1
-
-#include <iostream>
-
-#include "TObject.h"
-#include "FairMultiLinkedData.h"
-
-
-
 class CbmDigi : public TObject
 {
 
  public:
 
-  //* Default constructor
+  /** Default constructor  **/
   CbmDigi();
 
 
-  //* Copy constructor
+  /** Copy constructor  **/
   CbmDigi(const CbmDigi& digi);
 
 
-  //* Destructor
+  /** Destructor  **/
   virtual ~CbmDigi();
 
 
-  //* Add a link to MCPoint
-  void AddLink(Int_t file, Int_t entry, TString branch,
+  /** Add a link to MCPoint
+   *
+   * @param file     Input file number
+   * @param entry    Entry number in tree
+   * @param branch   Branch name
+   * @param index    Index in branch
+   * @param weight   Weight
+   */
+  void AddLink(Int_t file, Int_t entry, const TString& branch,
                Int_t index, Float_t weight) {
     if ( ! fLinks ) fLinks = new FairMultiLinkedData();
     fLinks->AddLink(FairLink(file, entry, branch, index, weight));
   }
 
 
-  //* Unique channel address
+  /** Unique channel address  **/
   virtual Int_t    GetAddress() const = 0;
 
 
-  //* Charge (optional)
+  /** Charge (optional)  **/
   virtual Double_t GetCharge()  const { return 0.; }
 
 
   /** Get a link to MCPoint
    ** @param iLink  Number of link in list
-   ** @value Pointer to FairLink object. If iLink is out of range,
-   ** a new, empty FairLink is created.
+   ** @value Pointer to FairLink object. NULL if iLink is out of range,
+   ** or if no link object is present.
    **/
-  FairLink GetLink(Int_t iLink) {
-    if ( ! fLinks ) {
-      FairLink link;
-      return link;
-    }
-    return fLinks->GetLink(iLink);
+  FairLink* GetLink(Int_t iLink) {
+    if ( ! fLinks ) return NULL;
+    if ( iLink < fLinks->GetNLinks() ) return &(fLinks->GetLink(iLink));
+    return NULL;
   }
 
 
-  //* Monte-Carlo link
+  /** Monte-Carlo link collection **/
   FairMultiLinkedData* GetLinkObject() const { return fLinks; }
 
 
-  //* System (enum DetectorId)
+  /** System (enum DetectorId) **/
   virtual Int_t    GetSystemId() const = 0;
 
 
-  //* Absolute time [ns]
+  /** Absolute time [ns]  **/
   virtual Double_t GetTime()    const = 0;
 
 
-  //* Assignment operator
+  /** Assignment operator  **/
   CbmDigi& operator=(const CbmDigi& digi);
 
   
 
  protected:
 
-  FairMultiLinkedData* fLinks;
+  FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
 
 
 

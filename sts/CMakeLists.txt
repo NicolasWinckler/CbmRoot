@@ -3,18 +3,21 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
+${BASE_INCLUDE_DIRECTORIES} 
 ${CBMROOT_SOURCE_DIR}/sts
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase 
-${CBMROOT_SOURCE_DIR}/field 
-${CBMROOT_SOURCE_DIR}/base 
+
+# needed by MatchHits???
 ${CBMROOT_SOURCE_DIR}/passive 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+
 ${CBMROOT_SOURCE_DIR}/run 
+
 ${CBMROOT_SOURCE_DIR}/cbmdata 
-${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts 
+
+# needed by run/FairMCBuffer.h
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich 
 ${CBMROOT_SOURCE_DIR}/cbmdata/much 
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd 
@@ -31,7 +34,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(STS_SRCS
+set(SRCS
 CbmGeoSts.cxx 
 CbmGeoStsPar.cxx 
 CbmSts.cxx 
@@ -67,27 +70,10 @@ CbmStsFindHitsQa.cxx
 CbmStsReconstructionQa.cxx
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${STS_SRCS}" "${INCLUDE_DIRECTORIES}" STS_RULES)
-endif(RULE_CHECKER_FOUND)
+set(LINKDEF StsLinkDef.h)
+Set(LIBRARY_NAME Sts)
+Set(DEPENDENCIES
+    Passive Run CbmBase CbmData Base 
+)
 
-
-# fill list of header files from list of source files
-# by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h STS_HEADERS "${STS_SRCS}")
-
-set(STS_LINKDEF  StsLinkDef.h)
-set(STS_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmStsDict.cxx) 
-
-ROOT_GENERATE_DICTIONARY("${STS_HEADERS}" "${STS_LINKDEF}" "${STS_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-
-set(STS_SRCS ${STS_SRCS}  ${STS_DICTIONARY})
-
-
-add_library(Sts SHARED ${STS_SRCS})
-target_link_libraries(Sts ${ROOT_LIBRARIES})
-set_target_properties(Sts PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS Sts DESTINATION ${CMAKE_BINARY_DIR}/lib)
+GENERATE_LIBRARY()

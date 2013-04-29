@@ -3,20 +3,16 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase
-${CBMROOT_SOURCE_DIR}/base 
+${BASE_INCLUDE_DIRECTORIES} 
 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
-#${CBMROOT_SOURCE_DIR}/cbmdata/much
-#${CBMROOT_SOURCE_DIR}/cbmdata/stt
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
 ${CBMROOT_SOURCE_DIR}/rich/fitter
@@ -25,12 +21,14 @@ ${CBMROOT_SOURCE_DIR}/L1
 ${CBMROOT_SOURCE_DIR}/L1/L1Algo
 ${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
 ${CBMROOT_SOURCE_DIR}/L1/ParticleFinder
-${CBMROOT_SOURCE_DIR}/sts
-${CBMROOT_SOURCE_DIR}/trd/param
+
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/KFQA
 ${CBMROOT_SOURCE_DIR}/KF/KFParticlesFinder
 ${CBMROOT_SOURCE_DIR}/KF/Interface
+
+${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/trd/param
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -42,7 +40,7 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 
-set(L1RULECHECKER_SRCS
+set(SRCS
 #L1Algo/L1CATrackFinder.cxx 
 #CbmL1Performance.cxx 
 #CbmL1ReadEvent.cxx 
@@ -53,10 +51,6 @@ CbmL1.cxx
 CbmL1TrdTrackFinderSts.cxx 
 CbmL1TrackMerger.cxx 
 CbmL1TofMerger.cxx 
-
-)
-set(L1_SRCS
-${L1RULECHECKER_SRCS}
 OffLineInterface/CbmL1RichENNRingFinder.cxx
 OffLineInterface/CbmL1RichENNRingFinderParallel.cxx 
 OffLineInterface/CbmL1StsTrackFinder.cxx 
@@ -85,12 +79,7 @@ ParticleFinder/CbmL1PFFitter.cxx
 ParticleFinder/CbmL1PFMCParticle.cxx
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${L1RULECHECKER_SRCS}" "${INCLUDE_DIRECTORIES}" L1_RULES)
-endif(RULE_CHECKER_FOUND)
-
-
-set(L1_HEADERS
+set(HEADERS
 CbmL1CATrdTrackFinderSA.h
 CbmL1.h
 CbmL1MCTrack.h
@@ -132,16 +121,12 @@ ELSE (SSE_FOUND)
   "-O3")
 ENDIF (SSE_FOUND)
 
-set(L1_LINKDEF L1LinkDef.h)
-set(L1_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/L1Dict.cxx) 
+set(LINKDEF L1LinkDef.h)
+Set(LIBRARY_NAME L1)
+Set(DEPENDENCIES
+    #Rich 
+    Trd Sts CbmBase CbmData Base 
+)
 
-ROOT_GENERATE_DICTIONARY("${L1_HEADERS}" "${L1_LINKDEF}" "${L1_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-set(L1_SRCS ${L1_SRCS} ${L1_DICTIONARY})
-
-add_library(L1 SHARED ${L1_SRCS})
-target_link_libraries(L1 ${ROOT_LIBRARIES})
-set_target_properties(L1 PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS L1 DESTINATION ${CMAKE_BINARY_DIR}/lib)

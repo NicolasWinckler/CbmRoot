@@ -2,22 +2,22 @@
 
 add_subdirectory(clustering)
 add_subdirectory(parallel)
-#add_subdirectory(std)
+
 INCLUDE(std/CMakeLists.txt)
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES}
-${GEANT3_INCLUDE_DIR}
+${BASE_INCLUDE_DIRECTORIES}
+
 ${Boost_INCLUDE_DIR}
+
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/std
 ${CBMROOT_SOURCE_DIR}/littrack/cbm
-${CBMROOT_SOURCE_DIR}/geobase
-${CBMROOT_SOURCE_DIR}/parbase
-${CBMROOT_SOURCE_DIR}/base
+
 ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmbase/report
 ${CBMROOT_SOURCE_DIR}/cbmbase/draw
+
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
@@ -26,13 +26,13 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
-${CBMROOT_SOURCE_DIR}/trackbase      
-${CBMROOT_SOURCE_DIR}/field
-${CBMROOT_SOURCE_DIR}/much
+
 ${CBMROOT_SOURCE_DIR}/much/geo
-${CBMROOT_SOURCE_DIR}/global
+
 ${CBMROOT_SOURCE_DIR}/sts
+
 ${CBMROOT_SOURCE_DIR}/rich
+
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
 )
@@ -45,7 +45,7 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(LITTRACK_SRCS_RULECHECKER
+set(SRCS
 
    cbm/base/CbmLitDetectorSetup.cxx
    
@@ -64,9 +64,34 @@ set(LITTRACK_SRCS_RULECHECKER
    cbm/qa/mc/CbmLitMCTrackCreator.cxx
    cbm/qa/CbmLitCreateStandaloneData.cxx
    cbm/qa/CbmLitTestMatrixMath.cxx
+   ${LITTRACKSTD_SRCS}
+   cbm/base/CbmLitFieldGridCreator.cxx
+   cbm/base/CbmLitFieldFitter.cxx
+   cbm/base/CbmLitToolFactory.cxx
+   cbm/base/CbmLitTrackingGeometryConstructor.cxx
+   cbm/reco/CbmLitFindGlobalTracks.cxx 
+   cbm/reco/CbmLitFindGlobalTracksIdeal.cxx 
+   cbm/reco/CbmLitFindGlobalTracksParallel.cxx
+   cbm/utils/CbmLitConverter.cxx
+   cbm/utils/CbmLitConverterParallel.cxx
+   cbm/qa/tracking/CbmLitTrackingQa.cxx
+   cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
+   cbm/qa/tracking/CbmLitTrackingQaReport.cxx
+   cbm/qa/clustering/CbmLitClusteringQa.cxx
+   cbm/qa/clustering/CbmLitClusteringQaReport.cxx
+   cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
+   cbm/qa/fit/CbmLitFitQa.cxx
+   cbm/qa/fit/CbmLitFitQaReport.cxx
+   cbm/qa/fit/CbmLitFitQaStudyReport.cxx
+   cbm/qa/field/CbmLitFieldQa.cxx
+   cbm/qa/field/CbmLitFieldQaReport.cxx
+   cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
+   cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
+   cbm/qa/radlength/CbmLitRadLengthQa.cxx
+   cbm/qa/radlength/CbmLitRadLengthQaReport.cxx
 )
 
-set(LITTRACK_HEADERS
+set(HEADERS
    cbm/elid/CbmLitGlobalElectronId.h
    cbm/reco/CbmLitFindGlobalTracks.h
    cbm/reco/CbmLitFindMvdTracks.h
@@ -96,38 +121,8 @@ set(LITTRACK_HEADERS
    cbm/qa/radlength/CbmLitRadLengthQaReport.h
 )
 
-SET(LITTRACK_SRCS 
-   ${LITTRACK_SRCS_RULECHECKER}
-   ${LITTRACKSTD_SRCS}
-   cbm/base/CbmLitFieldGridCreator.cxx
-   cbm/base/CbmLitFieldFitter.cxx
-   cbm/base/CbmLitToolFactory.cxx
-   cbm/base/CbmLitTrackingGeometryConstructor.cxx
-   cbm/reco/CbmLitFindGlobalTracks.cxx 
-   cbm/reco/CbmLitFindGlobalTracksIdeal.cxx 
-   cbm/reco/CbmLitFindGlobalTracksParallel.cxx
-   cbm/utils/CbmLitConverter.cxx
-   cbm/utils/CbmLitConverterParallel.cxx
-   cbm/qa/tracking/CbmLitTrackingQa.cxx
-   cbm/qa/tracking/CbmLitTrackingQaStudyReport.cxx            
-   cbm/qa/tracking/CbmLitTrackingQaReport.cxx
-   cbm/qa/clustering/CbmLitClusteringQa.cxx
-   cbm/qa/clustering/CbmLitClusteringQaReport.cxx
-   cbm/qa/clustering/CbmLitClusteringQaStudyReport.cxx
-   cbm/qa/fit/CbmLitFitQa.cxx
-   cbm/qa/fit/CbmLitFitQaReport.cxx
-   cbm/qa/fit/CbmLitFitQaStudyReport.cxx
-   cbm/qa/field/CbmLitFieldQa.cxx
-   cbm/qa/field/CbmLitFieldQaReport.cxx
-   cbm/qa/fieldapr/CbmLitFieldApproximationQa.cxx
-   cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
-   cbm/qa/radlength/CbmLitRadLengthQa.cxx
-   cbm/qa/radlength/CbmLitRadLengthQaReport.cxx
-)
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)
-endif(RULE_CHECKER_FOUND)
+
 
 IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
@@ -138,27 +133,15 @@ ELSE (SSE_FOUND)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS "-O3 -w")
 ENDIF (SSE_FOUND)
 
-
-#set(LITTRACK_LINKDEF  LittrackLinkDef.h)
-#set(LITTRACK_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmLittrackDict.cxx) 
-
-set(LINKDEF  LittrackLinkDef.h)
-set(DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmLittrackDict.cxx) 
-set(HDRS ${LITTRACK_HEADERS})
 If (Boost_FOUND)
   set(DEFINITIONS BOOST_FOUND)
 EndIf (Boost_FOUND)
 
-ROOT_GENERATE_DICTIONARY()
+set(LINKDEF  LittrackLinkDef.h)
+Set(LIBRARY_NAME Littrack)
+Set(DEPENDENCIES
+    KF Much Sts Rich CbmBase CbmData Base 
+)
 
-#SET(LITTRACK_SRCS ${LITTRACK_SRCS} ${LITTRACK_DICTIONARY})
-SET(LITTRACK_SRCS ${LITTRACK_SRCS} ${DICTIONARY})
+GENERATE_LIBRARY()
 
-add_library(Littrack SHARED ${LITTRACK_SRCS})
-target_link_libraries(Littrack ${ROOT_LIBRARIES})
-set_target_properties(Littrack PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)
-
-#add_subdirectory(parallel)
-#add_subdirectory(cuda)

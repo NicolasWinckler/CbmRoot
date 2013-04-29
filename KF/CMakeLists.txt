@@ -3,13 +3,9 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase 
-${CBMROOT_SOURCE_DIR}/base 
+${BASE_INCLUDE_DIRECTORIES} 
 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
-${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
@@ -24,20 +20,22 @@ ${CBMROOT_SOURCE_DIR}/KF/Interface
 ${CBMROOT_SOURCE_DIR}/KF/KFQA
 ${CBMROOT_SOURCE_DIR}/KF/KFParticle
 ${CBMROOT_SOURCE_DIR}/KF/KFParticlesFinder
+
+${CBMROOT_SOURCE_DIR}/sts 
+
+${CBMROOT_SOURCE_DIR}/L1
+${CBMROOT_SOURCE_DIR}/L1/L1Algo
+${CBMROOT_SOURCE_DIR}/L1/ParticleFinder
+
+${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/mvd 
-${CBMROOT_SOURCE_DIR}/sts 
 ${CBMROOT_SOURCE_DIR}/rich 
-${CBMROOT_SOURCE_DIR}/much 
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/trd/param
 ${CBMROOT_SOURCE_DIR}/tof/TofParam
 ${CBMROOT_SOURCE_DIR}/ecal
 ${CBMROOT_SOURCE_DIR}/stt
-
-${CBMROOT_SOURCE_DIR}/L1
-${CBMROOT_SOURCE_DIR}/L1/L1Algo
-${CBMROOT_SOURCE_DIR}/L1/ParticleFinder
 
 )
 
@@ -49,7 +47,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(KF_SRCS
+set(SRCS
 CbmKF.cxx 
 CbmKFFieldMath.cxx 
 CbmKFHit.cxx 
@@ -86,15 +84,8 @@ KFParticlesFinder/CbmKFParticlesFinder.cxx
 KFParticlesFinder/CbmKFParticleDatabase.cxx
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${KF_SRCS}" "${INCLUDE_DIRECTORIES}" KF_RULES)
-endif(RULE_CHECKER_FOUND)
 
-
-# fill list of header files from list of source files
-# by exchanging the file extension
-#CHANGE_FILE_EXTENSION(*.cxx *.h KF_HEADERS "${KF_SRCS}")
-set(KF_HEADERS
+set(HEADERS
 CbmKF.h 
 CbmKFFieldMath.h
 CbmKFHit.h
@@ -140,18 +131,10 @@ ELSE (SSE_FOUND)
   "-O3")
 ENDIF (SSE_FOUND)
 
-set(KF_LINKDEF KFLinkDef.h)
-set(KF_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/KFDict.cxx) 
+set(LINKDEF KFLinkDef.h)
+Set(LIBRARY_NAME KF)
+Set(DEPENDENCIES
+    L1 Ecal CbmBase CbmData Base 
+)
 
-ROOT_GENERATE_DICTIONARY("${KF_HEADERS}" "${KF_LINKDEF}" "${KF_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-
-set(KF_SRCS ${KF_SRCS} ${KF_DICTIONARY})
-
-
-add_library(KF SHARED ${KF_SRCS})
-target_link_libraries(KF ${ROOT_LIBRARIES})
-set_target_properties(KF PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS KF DESTINATION ${CMAKE_BINARY_DIR}/lib)
+GENERATE_LIBRARY()

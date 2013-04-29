@@ -5,17 +5,16 @@
 
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
+${BASE_INCLUDE_DIRECTORIES} 
 ${CBMROOT_SOURCE_DIR}/tof
 ${CBMROOT_SOURCE_DIR}/tof/TofMC
 ${CBMROOT_SOURCE_DIR}/tof/TofParam
 ${CBMROOT_SOURCE_DIR}/tof/TofReco
 ${CBMROOT_SOURCE_DIR}/tof/TofTools
 ${CBMROOT_SOURCE_DIR}/tof/TofData
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase 
-${CBMROOT_SOURCE_DIR}/base 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 )
@@ -28,7 +27,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(TOF_SRCS
+set(SRCS
 TofMC/CbmGeoTof.cxx 
 TofMC/CbmTof.cxx 
 
@@ -46,26 +45,10 @@ TofTools/CbmTofGeoHandler.cxx
 TofData/CbmTofCell.cxx
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${TOF_SRCS}" "${INCLUDE_DIRECTORIES}" TOF_RULES)
-endif(RULE_CHECKER_FOUND)
+set(LINKDEF TofLinkDef.h)
+Set(LIBRARY_NAME Tof)
+Set(DEPENDENCIES
+    CbmBase CbmData Base 
+)
 
-# fill list of header files from list of source files
-# by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h TOF_HEADERS "${TOF_SRCS}")
-
-set(TOF_LINKDEF TofLinkDef.h)
-set(TOF_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmTofDict.cxx) 
-
-ROOT_GENERATE_DICTIONARY("${TOF_HEADERS}" "${TOF_LINKDEF}" "${TOF_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-
-set(TOF_SRCS ${TOF_SRCS} ${TOF_DICTIONARY})
-
-
-add_library(Tof SHARED ${TOF_SRCS})
-target_link_libraries(Tof ${ROOT_LIBRARIES})
-set_target_properties(Tof PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS Tof DESTINATION ${CMAKE_BINARY_DIR}/lib)
+GENERATE_LIBRARY()

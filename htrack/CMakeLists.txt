@@ -1,18 +1,24 @@
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES}
+${BASE_INCLUDE_DIRECTORIES}
+
 ${GEANT3_INCLUDE_DIR}
+
 ${CBMROOT_SOURCE_DIR}/cbmbase
+
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
-${CBMROOT_SOURCE_DIR}/geobase
-${CBMROOT_SOURCE_DIR}/parbase
+
 ${CBMROOT_SOURCE_DIR}/field
+
 ${CBMROOT_SOURCE_DIR}/sts
+
 ${CBMROOT_SOURCE_DIR}/mvd
+
 ${CBMROOT_SOURCE_DIR}/trackbase
+
 ${CBMROOT_SOURCE_DIR}/geane
-${CBMROOT_SOURCE_DIR}/base
+
 ${CBMROOT_SOURCE_DIR}/htrack
 )
 
@@ -24,7 +30,7 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SOURCES
+set(SRCS
 MiscLIB/src/conversionRoutines.cxx MiscLIB/src/errorHandling.cxx MiscLIB/src/globalWarningMsg.cxx MiscLIB/src/miscError.cxx MiscLIB/src/miscWarningMsg.cxx MiscLIB/src/terminal.cxx
 FileioLIB/src/configuration.cxx FileioLIB/src/fileio.cxx FileioLIB/src/fileioError.cxx FileioLIB/src/fileioWarningMsg.cxx FileioLIB/src/io.cxx
 DataObjectLIB/src/analyticFormula.cxx DataObjectLIB/src/bitfield.cxx DataObjectLIB/src/bytefield.cxx DataObjectLIB/src/dataObjectError.cxx DataObjectLIB/src/dataObjectWarningMsg.cxx DataObjectLIB/src/histogramCellSignatures.cxx DataObjectLIB/src/histogramSpace.cxx DataObjectLIB/src/houghBorderCommand.cxx DataObjectLIB/src/houghBorderPosition.cxx DataObjectLIB/src/lutAccessFile.cxx DataObjectLIB/src/lutDefinition.cxx DataObjectLIB/src/lutHoughBorder.cxx DataObjectLIB/src/magneticFieldValue.cxx DataObjectLIB/src/peakfindingGeometryElement.cxx DataObjectLIB/src/peakfindingGeometryFile.cxx DataObjectLIB/src/peakToTrack.cxx DataObjectLIB/src/prelutAccessFile.cxx DataObjectLIB/src/prelutDefinition.cxx DataObjectLIB/src/prelutHoughBorder.cxx DataObjectLIB/src/table.cxx DataObjectLIB/src/tableEntry.cxx DataObjectLIB/src/tableFile.cxx DataObjectLIB/src/tableStringEntry.cxx DataObjectLIB/src/trackCoordinates.cxx DataObjectLIB/src/trackFrameworkMomentum.cxx DataObjectLIB/src/trackMomentum.cxx DataObjectLIB/src/trackParameter.cxx DataObjectLIB/src/trackToPeak.cxx
@@ -39,10 +45,6 @@ OutputResultLIB/src/outputFTrack.cxx OutputResultLIB/src/outputResultWarningMsg.
 AnalysisLIB/src/analysis.cxx AnalysisLIB/src/analysisError.cxx AnalysisLIB/src/analysisWarningMsg.cxx AnalysisLIB/src/hardwareAnalysis.cxx AnalysisLIB/src/histogramAnalysis.cxx AnalysisLIB/src/houghPictures.cxx AnalysisLIB/src/magnetfieldAnalysis.cxx AnalysisLIB/src/magnetfieldDirectionAnalysis.cxx AnalysisLIB/src/magnetfieldFactorAnalysis.cxx AnalysisLIB/src/magnetfieldXAnalysis.cxx AnalysisLIB/src/magnetfieldYAnalysis.cxx AnalysisLIB/src/magnetfieldZAnalysis.cxx AnalysisLIB/src/momentumAnalysis.cxx AnalysisLIB/src/momentumEFGCAnalysis.cxx AnalysisLIB/src/momentumEFGCEventPtAnalysis.cxx AnalysisLIB/src/momentumEFGCEventPzAnalysis.cxx AnalysisLIB/src/momentumEFGCTotalPtAnalysis.cxx AnalysisLIB/src/momentumEFGCTotalPzAnalysis.cxx AnalysisLIB/src/peakfindingGeometryAnalysis.cxx AnalysisLIB/src/prelutRangeAnalysis.cxx AnalysisLIB/src/prelutRangeCorrectLayerAnalysis.cxx AnalysisLIB/src/prelutRangeLayerAnalysis.cxx AnalysisLIB/src/prelutRangeMainLayerAnalysis.cxx AnalysisLIB/src/projectionAnalysis.cxx AnalysisLIB/src/projectionEFGCNAnalysis.cxx AnalysisLIB/src/projectionEFGCNEvent12Analysis.cxx AnalysisLIB/src/projectionEFGCNEvent13Analysis.cxx AnalysisLIB/src/projectionEFGCNEvent32Analysis.cxx AnalysisLIB/src/projectionEFGCNTotal12Analysis.cxx AnalysisLIB/src/projectionEFGCNTotal13Analysis.cxx AnalysisLIB/src/projectionEFGCNTotal32Analysis.cxx AnalysisLIB/src/qualityAnalysis.cxx AnalysisLIB/src/qualityEFGCAnalysis.cxx AnalysisLIB/src/qualityEFGCEventAnalysis.cxx AnalysisLIB/src/qualityEFGCTotalAnalysis.cxx AnalysisLIB/src/showAnalysis.cxx AnalysisLIB/src/totalAnalysis.cxx AnalysisLIB/src/trackPropagationAnalysis.cxx AnalysisLIB/src/trackPropagationDAnalysis.cxx AnalysisLIB/src/trackPropagationEventHitAnalysis.cxx AnalysisLIB/src/trackPropagationEventPointAnalysis.cxx AnalysisLIB/src/trackPropagationTotalHitAnalysis.cxx AnalysisLIB/src/trackPropagationTotalPointAnalysis.cxx AnalysisLIB/src/visualAnalysis.cxx
 CbmHoughStsTrackFinder/src/CbmHoughStsTrackFinder.cxx CbmHoughStsTrackFinder/src/inf.cxx
 )
-
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${SOURCES}" "${INCLUDE_DIRECTORIES}" HTRACK_RULES "../include")
-endif(RULE_CHECKER_FOUND)
 
 set(HEADERS
 MiscLIB/include/bitArray.h MiscLIB/include/conversionRoutines.h MiscLIB/include/coordinateSystem.h MiscLIB/include/defs.h MiscLIB/include/errorHandling.h MiscLIB/include/globalWarningMsg.h MiscLIB/include/hitArray.h MiscLIB/include/memoryDef.h MiscLIB/include/miscError.h MiscLIB/include/miscWarningMsg.h MiscLIB/include/projects.h MiscLIB/include/terminal.h
@@ -63,26 +65,10 @@ CbmHoughStsTrackFinder/include/CbmHoughStsTrackFinder.h CbmHoughStsTrackFinder/i
 set(LINKDEF
 CbmHoughStsTrackFinder/include/CbmHoughStsTrackFinderLinkDef.h
 )
-
-set(DICTIONARY
-${CMAKE_CURRENT_BINARY_DIR}/CbmHoughStsTrackFinderDict.cxx
+Set(LIBRARY_NAME HTrack)
+Set(DEPENDENCIES
+    Mvd Sts Field CbmBase CbmData Geane TrkBase Base 
 )
 
-ROOT_GENERATE_DICTIONARY(
-"${HEADERS}"
-"${LINKDEF}"
-"${DICTIONARY}"
-"${INCLUDE_DIRECTORIES}"
-)
-set(SOURCES
-${SOURCES}
-${DICTIONARY}
-)
+GENERATE_LIBRARY()
 
-add_library(HTrack SHARED ${SOURCES})
-
-target_link_libraries(HTrack ${ROOT_LIBRARIES})
-
-set_target_properties(HTrack PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-install(TARGETS HTrack DESTINATION ${CMAKE_BINARY_DIR}/lib)

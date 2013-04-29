@@ -126,6 +126,28 @@ else(CBMROOT_MINIMAL)
 
 endif(CBMROOT_MINIMAL)
 
+# set a variable which should be used in all CMakeLists.txt
+# Defines all basic include directories from fairbase
+# When CBM switch to the new release we could use the variable defined
+# by a macro in FairMacros.cmake 
+Set(BASE_INCLUDE_DIRECTORIES
+    ${ROOT_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/fairtools
+    ${CMAKE_SOURCE_DIR}/geobase
+    ${CMAKE_SOURCE_DIR}/parbase
+    ${CMAKE_SOURCE_DIR}/base
+    ${CMAKE_SOURCE_DIR}/base/steer
+    ${CMAKE_SOURCE_DIR}/base/event
+    ${CMAKE_SOURCE_DIR}/base/field
+    ${CMAKE_SOURCE_DIR}/base/sim
+    ${CMAKE_SOURCE_DIR}/base/source
+    ${CMAKE_SOURCE_DIR}/dbase
+    ${CMAKE_SOURCE_DIR}/dbase/dbInterface
+    ${CMAKE_SOURCE_DIR}/dbase/dbValidation
+    ${CMAKE_SOURCE_DIR}/dbase/dbUtils
+    ${CMAKE_SOURCE_DIR}/dbase/dbInput
+  ) 
+ 
 
 # Set the library version in the main CMakeLists.txt
 SET(CBMROOT_MAJOR_VERSION 0)
@@ -141,10 +163,6 @@ SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
 SET(CBMLIBDIR ${CMAKE_BINARY_DIR}/lib)  
 SET(LD_LIBRARY_PATH  ${CBMLIBDIR} ${Boost_LIBRARY_DIRS} ${LD_LIBRARY_PATH})
 
-Set(INCLUDE_DIRECTORIES 
-  ${ROOT_INCLUDE_DIR}
-  ${CBMROOT_SOURCE_DIR}/fairtools
-)
 
 Generate_Version_Info()
 
@@ -189,6 +207,7 @@ add_subdirectory (cbmgenerators)
 add_subdirectory (run)
 add_subdirectory (hadron)
 add_subdirectory (analysis)
+#add_subdirectory (vis)
 
 Option(BUILD_UNITTESTS "Build all unittests and add them as new tests" OFF)
 If(BUILD_UNITTESTS)

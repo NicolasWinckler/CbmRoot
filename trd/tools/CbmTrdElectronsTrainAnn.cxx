@@ -11,7 +11,7 @@
 #include "TLine.h"
 #include "TClonesArray.h"
 #include "TSystem.h"
-
+#include "TGraph.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrackMatch.h"

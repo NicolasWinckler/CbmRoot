@@ -3,11 +3,7 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
-${CBMROOT_SOURCE_DIR}/base 
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase 
-${CBMROOT_SOURCE_DIR}/cbmbase 
+${BASE_INCLUDE_DIRECTORIES} 
 ${CBMROOT_SOURCE_DIR}/cbmdata 
 )
 
@@ -19,7 +15,9 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(CBMDATA_SRCS
+set(SRCS
+CbmDetectorList.cxx
+
 CbmBaseHit.cxx
 CbmDigi.cxx
 CbmHit.cxx
@@ -100,26 +98,12 @@ global/CbmGlobalTrack.cxx
 global/CbmVertex.cxx
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${CBMDATA_SRCS}" "${INCLUDE_DIRECTORIES}" CBMDATA_RULES)
-endif(RULE_CHECKER_FOUND)
- 
-# fill list of header files from list of source files
-# by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h CBMDATA_HEADERS "${CBMDATA_SRCS}")
+set(LINKDEF  DataLinkDef.h)
+Set(LIBRARY_NAME CbmData)
+Set(DEPENDENCIES
+    Base
+)
 
-set(CBMDATA_LINKDEF  DataLinkDef.h)
-set(CBMDATA_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmDataDict.cxx) 
-
-ROOT_GENERATE_DICTIONARY("${CBMDATA_HEADERS}" "${CBMDATA_LINKDEF}" "${CBMDATA_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
 
-set(CBMDATA_SRCS ${CBMDATA_SRCS} ${CBMDATA_DICTIONARY})
-
-
-add_library(CbmData SHARED ${CBMDATA_SRCS})
-target_link_libraries(CbmData ${ROOT_LIBRARIES})
-set_target_properties(CbmData PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS CbmData DESTINATION ${CMAKE_BINARY_DIR}/lib)

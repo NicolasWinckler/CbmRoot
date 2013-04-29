@@ -3,33 +3,32 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES} 
+${BASE_INCLUDE_DIRECTORIES} 
 ${Boost_INCLUDE_DIR}
+
 ${CBMROOT_SOURCE_DIR}/rich
 ${CBMROOT_SOURCE_DIR}/rich/fitter
 ${CBMROOT_SOURCE_DIR}/rich/finder
-${CBMROOT_SOURCE_DIR}/rich/qa
+#${CBMROOT_SOURCE_DIR}/rich/qa
 ${CBMROOT_SOURCE_DIR}/rich/tracks
 ${CBMROOT_SOURCE_DIR}/rich/selection
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase 
-${CBMROOT_SOURCE_DIR}/base 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmbase/report
 ${CBMROOT_SOURCE_DIR}/cbmbase/draw
+
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
-${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
+
 ${CBMROOT_SOURCE_DIR}/littrack
+
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
+
 ${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
-${CBMROOT_SOURCE_DIR}/L1
-#/u/slebedev/Baykal/tbb21_017oss/include
-#/u/andrey/soft/tbb/tbb22_009oss/include
 )
 
 If(TBB_FOUND)
@@ -54,7 +53,7 @@ EndIf(TBB_FOUND)
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(RICH_SRCS
+set(SRCS
 CbmGeoRich.cxx 
 CbmRich.cxx 
 CbmRichHitProducer.cxx   
@@ -106,7 +105,7 @@ If(TBB_FOUND)
 EndIf(TBB_FOUND)
 
 
-set(RICH_HEADERS
+set(HEADERS
 CbmGeoRich.h
 CbmRich.h
 CbmRichHitProducer.h  
@@ -131,20 +130,11 @@ qa/CbmRichUrqmdTest.h
 )
 
 If(TBB_FOUND)
-  Set(RICH_HEADERS 
-      ${RICH_HEADERS}
+  Set(HEADERS 
+      ${HEADERS}
       finder/CbmRichRingFinderHoughParallel.h
      )
 EndIf(TBB_FOUND)
-
-
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${RICH_SRCS}" "${INCLUDE_DIRECTORIES}" RICH_RULES)
-endif(RULE_CHECKER_FOUND)
-
-# fill list of header files from list of source files
-# by exchanging the file extension
-#CHANGE_FILE_EXTENSION(*.cxx *.h RICH_HEADERS "${RICH_SRCS}")
 
 IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
@@ -158,29 +148,21 @@ ENDIF (SSE_FOUND)
 # END SSE
 
 If(TBB_FOUND)
-  set(RICH_LINKDEF  RichLinkDef_tbb.h)
+  set(LINKDEF  RichLinkDef_tbb.h)
 Else(TBB_FOUND)
-  set(RICH_LINKDEF  RichLinkDef.h)
+  set(LINKDEF  RichLinkDef.h)
 EndIf(TBB_FOUND)
 
-set(RICH_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmRichDict.cxx) 
-
-ROOT_GENERATE_DICTIONARY("${RICH_HEADERS}" "${RICH_LINKDEF}" "${RICH_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-
-set(RICH_SRCS ${RICH_SRCS} ${RICH_DICTIONARY})
-
-
-add_library(Rich SHARED ${RICH_SRCS})
-target_link_libraries(Rich ${ROOT_LIBRARIES})
-set_target_properties(Rich PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
+Set(LIBRARY_NAME Rich)
+Set(DEPENDENCIES
+    # KF L1 ????
+    KF CbmBase CbmData Base 
+)
 
 If(TBB_FOUND)
-  target_link_libraries(Rich
-                        ${TBB_LIBRARIES}
-                       )
-
+  Set(DEPENDENCIES
+      ${DEPENDENCIES} ${TBB_LIBRARIES}
+  )    
 EndIf(TBB_FOUND)
 
-################ install ###################
-install(TARGETS Rich DESTINATION ${CMAKE_BINARY_DIR}/lib)
+GENERATE_LIBRARY()

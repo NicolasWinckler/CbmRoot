@@ -43,6 +43,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
 
  	# -- CLHEP and Pluto warnings
         "/include/CLHEP/"
+        "include/Geant4/CLHEP"
         "PParticle.h"
         "PDataBase.h"
         "PMesh.h"

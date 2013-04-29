@@ -49,39 +49,12 @@ class CbmDigi : public TObject
   virtual ~CbmDigi();
 
 
-  /** Add a link to MCPoint
-   *
-   * @param file     Input file number
-   * @param entry    Entry number in tree
-   * @param branch   Branch name
-   * @param index    Index in branch
-   * @param weight   Weight
-   */
-  void AddLink(Int_t file, Int_t entry, const TString& branch,
-               Int_t index, Float_t weight) {
-    if ( ! fLinks ) fLinks = new FairMultiLinkedData();
-    fLinks->AddLink(FairLink(file, entry, branch, index, weight));
-  }
-
-
   /** Unique channel address  **/
   virtual Int_t    GetAddress() const = 0;
 
 
   /** Charge (optional)  **/
   virtual Double_t GetCharge()  const { return 0.; }
-
-
-  /** Get a link to MCPoint
-   ** @param iLink  Number of link in list
-   ** @value Pointer to FairLink object. NULL if iLink is out of range,
-   ** or if no link object is present.
-   **/
-  FairLink* GetLink(Int_t iLink) {
-    if ( ! fLinks ) return NULL;
-    if ( iLink < fLinks->GetNLinks() ) return &(fLinks->GetLink(iLink));
-    return NULL;
-  }
 
 
   /** Monte-Carlo link collection **/

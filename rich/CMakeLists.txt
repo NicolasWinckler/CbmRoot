@@ -98,8 +98,8 @@ qa/CbmRichGeoTestStudyReport.cxx
 )
 
 If(TBB_FOUND)
-  Set(RICH_SRCS 
-      ${RICH_SRCS}
+  Set(SRCS 
+      ${SRCS}
       finder/CbmRichRingFinderHoughParallel.cxx
      )
 EndIf(TBB_FOUND)
@@ -138,11 +138,11 @@ EndIf(TBB_FOUND)
 
 IF (SSE_FOUND)
   ADD_DEFINITIONS(-DHAVE_SSE)
-  SET_SOURCE_FILES_PROPERTIES(${RICH_SRCS} PROPERTIES COMPILE_FLAGS "-msse -O3")
+  SET_SOURCE_FILES_PROPERTIES(${SRCS} PROPERTIES COMPILE_FLAGS "-msse -O3")
   Message(STATUS "Rich will be compiled with SSE support")
 ELSE (SSE_FOUND)
   Message(STATUS "Rich will be compiled without SSE support")
-  SET_SOURCE_FILES_PROPERTIES(${RICH_SRCS} PROPERTIES COMPILE_FLAGS "-O3")
+  SET_SOURCE_FILES_PROPERTIES(${SRCS} PROPERTIES COMPILE_FLAGS "-O3")
 ENDIF (SSE_FOUND)
 
 # END SSE

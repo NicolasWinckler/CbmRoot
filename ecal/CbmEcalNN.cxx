@@ -318,7 +318,6 @@ void CbmEcalNN::ComputeDeDs()
   dn2=dn-fStr[fN-2];
   ss=ds=fNSynapses-fStr[fN-2]*fStr[fN-1];
 
-//  cout << fCurrent[0] << " " << fCurrent[1] << " " << fCurrent[2]  << " " << fCurrent[3] << " " << fCurrent[4] << " " << fCurrent[5] << endl;
   //Last layer threated separately
   {
     dn1=dn+fStr[i];
@@ -327,16 +326,11 @@ void CbmEcalNN::ComputeDeDs()
     for(j=dn;j<dn1;j++)
     {
       fDeDNeurons[j]=fNeurons[j]-fCurrent[j-dn+fStr[0]];
-//      cout << "->" << j << " " << fDeDNeurons[j] << ": " << fNeurons[j] << ":" << fCurrent[j-dn+fStr[0]] << endl;
       ds1=ds+ds2;
       tmp=dn2-ds;
       //Loop over synapses
       for(k=dn2;k<dn;k++)
-      {
 	fDeDSynapses[k-tmp]=fNeurons[k]*fDeDNeurons[j];
-//        cout << "fDeDSynapses[" << k << "]=" << fDeDSynapses[k] << endl;
-      }
-//      cout << "ds=" << ds << ",ds1=" << ds1 << endl;
       ds=ds1;
     }
   }
@@ -345,9 +339,7 @@ void CbmEcalNN::ComputeDeDs()
   for(i=fN-2;i>0;i--)
   {
     dn1=dn; dn-=fStr[i];
-//    dn2=dn-fStr[i-1];
     ds=ss;
-//    cout << "ds=" << ds << ", ss=" << ss << "," << fStr[i+1] << endl;
     ds2=fStr[i+1];
     //For all neurons in layer
     for(j=dn;j<dn1;j++)
@@ -355,17 +347,13 @@ void CbmEcalNN::ComputeDeDs()
       t=0;
       ds1=ds+ds2;
       tmp=dn1+ds-ds1;
-//      cout <<  i << ": " << j << " :dn2=" << dn2 << ", ds="<< ds << endl;
       //Loop over synapses
-//      for(k=ds;k<ds1;k++)
       for(k=0;k<ds1-ds;k++)
       {
 	t+=fWSynapses[k*fStr[i]+ds]*fDeDNeurons[k+dn1];
-//	cout << k << "[" << k*fStr[i]+ds << "] : " << fWSynapses[k*fStr[i]+ds] << " " << fDeDNeurons[k+dn1] << " " << t*fDNeurons[j] << endl;
       }
 
       fDeDNeurons[j]=t*fDNeurons[j];
-//      cout << "j=" <<j << ",ded=" << fDeDNeurons[j] << ", ds=" << ds << ",ds1=" << ds1 << ",ds2=" << ds2 << ",dn2=" << dn2 << ",dn=" << dn << ",dn1=" << dn1 << ", tmp=" << tmp << endl;
       ds++;
     }
     ss-=fStr[i]*fStr[i-1];
@@ -377,7 +365,6 @@ void CbmEcalNN::ComputeDeDs()
   {
     dn1=dn; dn-=fStr[i];
     dn2=dn-fStr[i-1];
-//    cout << "ds=" << ds << ", ss=" << ss << "," << fStr[i+1] << endl;
     ds=ss=ss-fStr[i]*fStr[i-1];
     ds2=fStr[i-1];
     //For all neurons in layer
@@ -388,10 +375,7 @@ void CbmEcalNN::ComputeDeDs()
       tmp=dn2-ds;
       //Loop over synapses
       for(k=dn2;k<dn;k++)
-      {
 	fDeDSynapses[k-tmp]=fNeurons[k]*fDeDNeurons[j];
-//        cout << "fDeDSynapses[" << k << "]=" << fDeDSynapses[k] << endl;
-      }
       ds=ds1;
     }
   }
@@ -453,7 +437,6 @@ void CbmEcalNN::TrainStochastic(Int_t epochs, Int_t n, Double_t* dta)
   for(i=0;i<fMS;i++) buf[i]=0.0;
   for(i=0;i<n;i++) idx[i]=i;
 
-//  cout.precision(20);
   cout << "Train: Starting error is " <<  GetError(n, dta) << endl << flush;
   for(ie=0;ie<epochs;ie++)
   {
@@ -464,20 +447,13 @@ void CbmEcalNN::TrainStochastic(Int_t epochs, Int_t n, Double_t* dta)
       ComputeDeDs();
       for(j=0;j<fNNeurons;j++)
       {
-//	if (i%1000==0) cout << "DeDNeuron " << j << "=" << fDeDNeurons[j] << " : " << fDNeurons[j];
 	buf[j]=(-fEta)*(fDelta+fDeDNeurons[j])+fEpsilon*buf[j];
-//	if (i%1000==0) cout << ", buf=" << buf[j];
 	fWNeurons[j]+=buf[j];
-//	if (i%1000==0) cout << ", wneuron=" << fWNeurons[j];
-//	if (i%1000==0) cout << ", ev=" << i << endl;
       }
       for(k=0;k<fNSynapses;k++)
       {
-//	if (i%1000==0) cout << "DeDSynapse " << k << "=" << fDeDSynapses[k];
 	buf[j]=(-fEta)*(fDelta+fDeDSynapses[k])+fEpsilon*buf[j];
-//	if (i%1000==0) cout << ", buf=" << buf[j];
 	fWSynapses[k]+=buf[j++];
-//	if (i%1000==0) cout << ", wsynapse=" << fWSynapses[k] << endl; 
       }
     }
     fEta*=fEtaDecay;

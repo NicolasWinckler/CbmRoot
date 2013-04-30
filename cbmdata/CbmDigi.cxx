@@ -1,7 +1,8 @@
-// -------------------------------------------------------------------------
-// -----                        CbmDigi source file                    -----
-// -----                  Created 09/05/07  by V. Friese               -----
-// -------------------------------------------------------------------------
+/** @file CbmDigi.cxx
+ ** @author Volker Friese <v.friese@gsi.de>
+ ** @date 30.04.2013
+ **/
+
 #include "CbmDigi.h"
 
 
@@ -12,37 +13,7 @@ CbmDigi::CbmDigi() : fLinks(NULL) {
 // -------------------------------------------------------------------------
 
 
-// -----   Copy constructor   -------------------------------------------
-CbmDigi::CbmDigi(const CbmDigi& digi) : fLinks(NULL) {
-  if ( digi.GetLinkObject() )
-    fLinks = new FairMultiLinkedData(digi.GetLinkObject()->GetLinks(),
-                                     digi.GetLinkObject()->GetPersistanceCheck());
-}
-// -------------------------------------------------------------------------
 
-
-// -----   Destructor   ----------------------------------------------------
-CbmDigi::~CbmDigi() {
-  if ( fLinks ) delete fLinks;
-}
-// -------------------------------------------------------------------------
-
-
-// -----   Assignment operator   -------------------------------------------
-CbmDigi& CbmDigi::operator= (const CbmDigi& digi) {
-
-  if ( this != &digi) {                    // Protect against self-assignment
-
-    if ( digi.GetLinkObject() )                  // Other digi has FairLinks
-      fLinks = new FairMultiLinkedData(digi.GetLinkObject()->GetLinks(),
-                                       digi.GetLinkObject()->GetPersistanceCheck());
-    else fLinks = NULL;
-
-  }
-
-  return *this;
-}
-// -------------------------------------------------------------------------
 
 
 

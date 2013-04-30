@@ -1,16 +1,18 @@
 /** @file CbmDigi.h
- * @author Volker Friese <v.friese@gsi.de>
- * @date 26.03.2013
- */
+ ** @author Volker Friese <v.friese@gsi.de>
+ ** @date 30.04.2013
+ **/
 
 
 #ifndef CBMDIGI_H
 #define CBMDIGI_H 1
 
-#include <iostream>
 
 #include "TObject.h"
-#include "FairMultiLinkedData.h"
+
+
+class FairMultiLinkedData;
+
 
 
 /** @class CbmDigi
@@ -30,7 +32,13 @@
  **
  ** The class contains a pointer to an object of type FairMultiLinkedData,
  ** where the link information to MCPoints can be stored and retrieved.
- ** If there is no such information, the pointer will be NULL.
+ ** If there is no such information (as in case of real data), the pointer
+ ** will be NULL.
+ **
+ ** Note that the Digi class is not responsible for the validity of the
+ ** pointer. Copy constructor and assignment operator will perform a
+ ** shallow copy only. It is the user's responsibility to ensure the validity
+ ** of the pointer and to delete the FairMultiLinkedData wherever appropriate.
  **/
 class CbmDigi : public TObject
 {
@@ -41,12 +49,8 @@ class CbmDigi : public TObject
   CbmDigi();
 
 
-  /** Copy constructor  **/
-  CbmDigi(const CbmDigi& digi);
-
-
   /** Destructor  **/
-  virtual ~CbmDigi();
+  virtual ~CbmDigi() { };
 
 
   /** Unique channel address  **/
@@ -57,8 +61,8 @@ class CbmDigi : public TObject
   virtual Double_t GetCharge()  const { return 0.; }
 
 
-  /** Monte-Carlo link collection **/
-  FairMultiLinkedData* GetLinkObject() const { return fLinks; }
+  /** Get pointer to link collection **/
+  FairMultiLinkedData* GetLinks() const { return fLinks; }
 
 
   /** System (enum DetectorId) **/
@@ -69,8 +73,8 @@ class CbmDigi : public TObject
   virtual Double_t GetTime()    const = 0;
 
 
-  /** Assignment operator  **/
-  CbmDigi& operator=(const CbmDigi& digi);
+  /** Set pointer to link collection **/
+ void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
 
   
 

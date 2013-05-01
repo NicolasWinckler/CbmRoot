@@ -36,6 +36,8 @@ public:
   void SetEtaDecay(Double_t etadecay=1.0) {fEtaDecay=etadecay;}
   Double_t GetEtaDecay() const {return fEtaDecay;} 
 
+  void SetTau(Double_t tau=3.0) {fTau=tau;}
+  Double_t GetTau() const {return fTau;}
   ~CbmEcalNN();
 private:
   CbmEcalNN()
@@ -52,9 +54,20 @@ private:
   Int_t fNNeurons;		//Number of neurons
   Int_t fNSynapses;		//Number of synapses
 // Other used for training
-  void ComputeDeDs();		//Compute derivative of the error for current data set
-  void Shuffle(Int_t n, Int_t* idx);    //Shuffle indexes
-  void SetGammaDelta(TMatrixD& gamma, TMatrixD& delta, Double_t* buf);
+  void ComputeDeDs();		//Compute derivative of the error for current data
+  void ComputeDEDs(Int_t n, Double_t* dta);	//Compute summ of derivatives of the error for whole data set
+  void Shuffle(Int_t n, Int_t* idx);		//Shuffle indexes
+  void SteepestDir(Double_t* dir);		//Steepest descent search direction
+  Bool_t GetBFGSH(TMatrixD& bfgsh, TMatrixD& gamma, TMatrixD& delta);
+  Double_t DerivDir(Double_t* dir);		//Scalar product between gradient and direction
+  void MLP_Line(Double_t* old, Double_t* dir, Double_t dst);
+  void BFGSDir(TMatrixD& bfgsh, Double_t* dir);	//direction=Hessian estimate x dir
+
+  //Search along the line defined by direction
+  Bool_t LineSearch(Double_t* dir, Double_t* buf, Int_t n, Double_t* dta);
+
+  void SetGammaDelta(TMatrixD& gamma, TMatrixD& delta, Double_t* buf, Int_t n, Double_t* dta);
+
 
   Int_t fMS;			//Size of matrixes: fNNeurons+fNSynapses
   Double_t* fCurrent;		//!Current training set
@@ -63,12 +76,15 @@ private:
   Double_t* fDeDSynapses;	//!Current DeDs of synapses
   Double_t* fDEDNeurons;	//!Sum of DeDs over all events for neurons
   Double_t* fDEDSynapses;	//!Sum of DeDs over all events for synapses
+  Double_t* fOld;		//!Old weights
 
   Int_t fReset;			//Number of epochs between of the search of new steepest descent
   Double_t fEta;		//Used in stochastic training (0.1)
   Double_t fEpsilon;		//Used in stochastic training (0.0)
   Double_t fDelta;		//Used in stochastic training (0.0)
   Double_t fEtaDecay;		//Used in stochastic training (1.0)
+  Double_t fLastAlpha;		//Used in line search
+  Double_t fTau;		//Used in line search
   ClassDef(CbmEcalNN, 1)
 };
 

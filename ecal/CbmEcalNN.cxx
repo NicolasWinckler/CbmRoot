@@ -14,7 +14,9 @@ CbmEcalNN::CbmEcalNN(const char* str)
   : fN(-1111), fStr(NULL), fNeurons(NULL), fWNeurons(NULL), fWSynapses(NULL),
     fNNeurons(-1111), fNSynapses(-1111), fMS(-1111), fCurrent(NULL), fDNeurons(NULL),
     fDeDNeurons(NULL), fDeDSynapses(NULL), fDEDNeurons(NULL), fDEDSynapses(NULL),
-    fReset(50), fEta(0.1), fEpsilon(0.0), fDelta(0.0), fEtaDecay(1.0)
+    fOld(NULL),
+    fReset(50), fEta(0.1), fEpsilon(0.0), fDelta(0.0), fEtaDecay(1.0),
+    fLastAlpha(0.0), fTau(3.0)
 {
   Int_t i;
   Int_t n=1;
@@ -66,6 +68,7 @@ CbmEcalNN::CbmEcalNN(const char* str)
   fMS=fNSynapses+fNNeurons;
 
   fCurrent=new Double_t[fStr[0]+fStr[fN-1]];
+  fOld=new Double_t[fMS];
 }
 
 void CbmEcalNN::LoadWeights(const char* filename)
@@ -394,9 +397,46 @@ void CbmEcalNN::Train(Int_t epochs, Int_t n, Double_t* dta)
 
   buf=new Double_t[fMS];
   dir=new Double_t[fMS];
+
+  cout << "Train: Starting error is " <<  GetError(n, dta) << endl << flush;
+
   for(ie=0;ie<epochs;ie++)
   {
-    ;
+    SetGammaDelta(gamma, delta, buf, n, dta);
+    if (ie%fReset==0)
+    {
+      SteepestDir(dir);
+      bfgsh.UnitMatrix();
+    }
+    else
+    {
+      if (GetBFGSH(bfgsh, gamma, delta))
+      {
+	SteepestDir(dir);
+	bfgsh.UnitMatrix();
+      }
+      else
+      {
+	BFGSDir(bfgsh, dir);
+      }
+    }
+    if (DerivDir(dir)>0)
+    {
+      SteepestDir(dir);
+      bfgsh.UnitMatrix();
+    }
+    if (LineSearch(dir, buf, n, dta))
+    {
+	SteepestDir(dir);
+	bfgsh.UnitMatrix();
+	if (LineSearch(dir, buf, n, dta))
+	{
+	  Error("Train()", "Line search failed :(");
+	  ie=epochs;
+	}
+    }
+    cout << "Epoch: "<< ie << " (Root Error: " << TMath::Sqrt(GetError(n, dta)/n) << ")" << endl << flush;
+//    cout << "Epoch: " << ie << endl;
   }
 
   delete [] buf;
@@ -404,7 +444,56 @@ void CbmEcalNN::Train(Int_t epochs, Int_t n, Double_t* dta)
   //TODO
 }
 
-void CbmEcalNN::SetGammaDelta(TMatrixD& gamma, TMatrixD& delta, Double_t* buf)
+Bool_t CbmEcalNN::GetBFGSH(TMatrixD& bfgsh, TMatrixD& gamma, TMatrixD& delta)
+//From ROOT:
+//Computes the hessian matrix using the BFGS update algorithm.
+//from gamma (g_{(t+1)}-g_{(t)}) and delta (w_{(t+1)}-w_{(t)}).
+//Returns true if such a direction could not be found
+//(gamma and delta are orthogonal).
+{
+  TMatrixD gd(gamma, TMatrixD::kTransposeMult, delta);
+  if (gd[0][0]==0.0) return kTRUE;
+  TMatrixD aHg(bfgsh, TMatrixD::kMult, gamma);
+  TMatrixD tmp(gamma, TMatrixD::kTransposeMult, bfgsh);
+  TMatrixD gHg(gamma, TMatrixD::kTransposeMult, aHg);
+  Double_t a=1.0/gd[0][0];
+  Double_t f=1.0+(gHg[0][0]*a);
+//  TMatrixD res(TMatrixD(delta, TMatrixD::kMult, TMatrixD(TMatrixD::kTransposed, delta)));
+  TMatrixD res(delta, TMatrixD::kMult, TMatrixD(TMatrixD::kTransposed, delta));
+  res*=f;
+  res-=(TMatrixD(delta,TMatrixD::kMult,tmp)+TMatrixD(aHg,TMatrixD::kMult,TMatrixD(TMatrixD::kTransposed, delta)));
+  res*=a;
+  bfgsh+=res;
+/*
+   Int_t i;
+   Int_t j;
+   for(i=0;i<bfgsh.GetNrows();i++)
+   {
+     for(j=0;j<bfgsh.GetNrows();j++)
+       cout << bfgsh[i][j] << " ";
+     cout << endl << flush;
+   }
+*/  
+  return kFALSE;
+}
+
+void CbmEcalNN::BFGSDir(TMatrixD& bfgsh, Double_t* dir)	//direction=Hessian estimate x dir
+{
+  Int_t i;
+  Int_t j;
+  TMatrixD dedw(fMS, 1);
+
+  for(i=0;i<fNNeurons;i++)
+    dedw[i][0]=fDEDNeurons[i];
+  j=i;
+  for(i=0;i<fNSynapses;i++)
+    dedw[j++][0]=fDEDSynapses[i];
+  TMatrixD direction(bfgsh, TMatrixD::kMult, dedw);
+   for (i=0;i<fMS;i++)
+      dir[i]=-direction[i][0];
+}
+
+void CbmEcalNN::SetGammaDelta(TMatrixD& gamma, TMatrixD& delta, Double_t* buf, Int_t n, Double_t* dta)
 {
   Int_t i;
   Int_t j;
@@ -415,7 +504,56 @@ void CbmEcalNN::SetGammaDelta(TMatrixD& gamma, TMatrixD& delta, Double_t* buf)
   j=i;
   for(i=0;i<fNSynapses;i++)
     gamma[j++][0]=-fDEDSynapses[i];
-  //TODO
+
+  ComputeDEDs(n, dta);
+  for(i=0;i<fNNeurons;i++)
+    gamma[i][0]+=fDEDNeurons[i];
+  j=i;
+  for(i=0;i<fNSynapses;i++)
+    gamma[j++][0]+=fDEDSynapses[i];
+
+//  for(i=0;i<fNNeurons+fNSynapses;i++) cout << "gamma[" << i << "][0]" << gamma[i][0] << endl;
+}
+
+void CbmEcalNN::ComputeDEDs(Int_t n, Double_t* dta)
+//Compute summ of derivatives of the error for whole data set
+{
+  Int_t i;
+  Int_t j;
+  Int_t n2=fStr[0]+fStr[fN-1];
+
+  for(i=0;i<fNNeurons;i++)  fDEDNeurons[i]=0.0;
+  for(i=0;i<fNSynapses;i++) fDEDSynapses[i]=0.0;
+
+  for(j=0;j<n;j++)
+  {
+    fCurrent=&(dta[j*n2]);
+    ComputeDeDs();
+    for(i=0;i<fNNeurons;i++)  fDEDNeurons[i]+=fDeDNeurons[i];
+    for(i=0;i<fNSynapses;i++) fDEDSynapses[i]+=fDeDSynapses[i];
+  }
+
+  for(i=0;i<fNNeurons;i++)  fDEDNeurons[i]/=n;
+  for(i=0;i<fNSynapses;i++) fDEDSynapses[i]/=n;
+/*
+  for(i=0;i<fNSynapses;i++) cout << "fDEDSynapses[" << i << "]=" << fDEDSynapses[i] << endl;
+  for(i=0;i<fNNeurons;i++)  cout << "fDEDNeurons[" << i << "]=" << fDEDNeurons[i] << endl;
+*/
+}
+
+void CbmEcalNN::SteepestDir(Double_t * dir)
+//Steepest descent search direction
+{
+  Int_t i;
+  Int_t j;
+
+  for(i=0;i<fNNeurons;i++)
+    dir[i]=-fDEDNeurons[i];
+  j=i;
+  for(i=0;i<fNSynapses;i++)
+    dir[j++]=-fDEDSynapses[i];
+
+//  for(i=0;i<fNNeurons+fNSynapses;i++) cout << "dir[" << i << "]=" << dir[i] << endl;
 }
 
 void CbmEcalNN::TrainStochastic(Int_t epochs, Int_t n, Double_t* dta)
@@ -437,7 +575,7 @@ void CbmEcalNN::TrainStochastic(Int_t epochs, Int_t n, Double_t* dta)
   for(i=0;i<fMS;i++) buf[i]=0.0;
   for(i=0;i<n;i++) idx[i]=i;
 
-  cout << "Train: Starting error is " <<  GetError(n, dta) << endl << flush;
+  cout << "TrainStochastic: Starting error is " <<  GetError(n, dta) << endl << flush;
   for(ie=0;ie<epochs;ie++)
   {
     Shuffle(n, idx);
@@ -458,11 +596,139 @@ void CbmEcalNN::TrainStochastic(Int_t epochs, Int_t n, Double_t* dta)
     }
     fEta*=fEtaDecay;
 
-    cout << "Epoch: "<< ie << " (Error: " <<  GetError(n, dta) << ")" << endl << flush;
+//    cout << "Epoch: "<< ie << " (Error: " <<  GetError(n, dta) << ")" << endl << flush;
+    cout << "Epoch: " << ie << endl;
   }
 
   delete [] buf;
   delete [] idx;
+}
+
+void CbmEcalNN::MLP_Line(Double_t* old, Double_t* dir, Double_t dst)
+{
+  Int_t i;
+  Int_t j;
+
+  for(i=0;i<fNNeurons;i++)
+//  {
+    fWNeurons[i]=old[i]+dir[i]*dst;
+//    cout << "fWNeurons[" << i << "]=" << fWNeurons[i] << endl;
+//  }
+  for(j=0;j<fNSynapses;j++)
+  {
+    fWSynapses[j]=old[i]+dir[i]*dst;
+//    cout << "fWSynapses[" << i << "]=" << fWSynapses[j] << endl;
+    i++;
+  }
+}
+
+Bool_t CbmEcalNN::LineSearch(Double_t* dir, Double_t* buf, Int_t n, Double_t* dta)
+//Search along the line defined by direction
+{
+  Int_t i;
+  Int_t j;
+  Double_t err1;
+  Double_t err2;
+  Double_t err3;
+  Double_t a1=0.0;
+  Double_t a2=fLastAlpha;
+  Double_t a3;
+  Bool_t done=kFALSE;
+
+  //Store weights
+  for(i=0;i<fNNeurons;i++)
+    fOld[i]=fWNeurons[i];
+  for(j=0;j<fNSynapses;j++)
+    fOld[i++]=fWSynapses[j];
+  err1=GetError(n, dta);
+
+  //Add some magic!!!
+  if (a2>2.0) a2=2.0;
+  if (a2<0.01) a2=0.01;
+  a3=a2;
+  MLP_Line(fOld, dir, a2);
+  err3=err2=GetError(n, dta);
+  if (err1>err2)
+  {
+    for(i=0;i<100;i++)
+    {
+      a3*=fTau;
+      MLP_Line(fOld, dir, a3);
+      err3=GetError(n, dta);
+      if (err3>err2)
+      {
+	done=kTRUE;
+        break;
+      }
+      a1=a2; a2=a3;
+      err1=err2; err2=err3;
+    }
+    if (done==kFALSE)
+    {
+      //Set weights back
+      MLP_Line(fOld, dir, 0.0);
+      return kTRUE;
+    }
+  }
+  else
+  {
+    for(i=0;i<100;i++)
+    {
+      a2/=fTau;
+      MLP_Line(fOld, dir, a2);
+      err2=GetError(n, dta);
+      if (err1>err2)
+      {
+	done=kTRUE;
+        break;
+      }
+      a3=a2; err3=err2;
+    }
+    if (done==kFALSE)
+    {
+      MLP_Line(fOld, dir, 0.);
+      fLastAlpha = 0.05;
+      return kTRUE;
+    }
+  }
+  fLastAlpha=0.5*(a1+a3-(err3-err1)/((err3-err2)/(a3-a2)-(err2-err1)/(a2-a1)));
+  if (fLastAlpha>10000) fLastAlpha=10000;
+  MLP_Line(fOld, dir, fLastAlpha);
+  GetError(n, dta);
+
+  for(i=0;i<fNNeurons;i++)
+//  {
+    buf[i]=fWNeurons[i]-fOld[i];
+//    cout << "buf[" << i << "]=" << buf[i] << endl;
+//  }
+  for(j=0;j<fNSynapses;j++)
+  {
+    buf[i]=fWSynapses[j]-fOld[i];
+//    cout << "buf[" << i << "]=" << buf[i] << endl;
+    i++;
+  }
+
+  return kFALSE;
+}
+
+Double_t CbmEcalNN::DerivDir(Double_t* dir)
+//Scalar product between gradient and direction
+{
+  Int_t i;
+  Int_t j;
+  Double_t res=0.0;
+
+  for(i=0;i<fNNeurons;i++)
+    res+=fDEDNeurons[i]*dir[i];
+  j=i;
+  for(i=0;i<fNSynapses;i++)
+  {
+    res+=fDEDSynapses[i]*dir[j];
+    j++;
+  }
+
+//  cout << "DerivDir: " << res << endl;
+  return res;
 }
 
 void CbmEcalNN::Shuffle(Int_t n, Int_t* idx)
@@ -494,6 +760,7 @@ CbmEcalNN::~CbmEcalNN()
   delete [] fDeDSynapses;
   delete [] fDEDNeurons;
   delete [] fDEDSynapses;
+  delete [] fOld;
 }
 
 ClassImp(CbmEcalNN)

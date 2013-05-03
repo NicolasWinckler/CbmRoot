@@ -34,7 +34,14 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
+set(SRCS_SETUP
+setup/CbmStsSensorType.cxx
+setup/CbmStsSensorTypeDssd.cxx
+)
+
+
 set(SRCS
+${SRCS_SETUP}
 CbmGeoSts.cxx 
 CbmGeoStsPar.cxx 
 CbmSts.cxx 

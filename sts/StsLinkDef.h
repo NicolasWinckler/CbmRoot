@@ -38,6 +38,10 @@
 #pragma link C++ class CbmStsFindHitsQa+;
 #pragma link C++ class CbmStsReconstructionQa+;
 
+// Setup
+#pragma link C++ class CbmStsSensorType;
+#pragma link C++ class CbmStsSensorTypeDssd;
+
 
 
 #endif

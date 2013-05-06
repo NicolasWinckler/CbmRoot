@@ -25,6 +25,7 @@
 #include "TProfile2D.h"
 #include "TFile.h"
 #include "TDirectory.h"
+#include "TRegexp.h"
 
 #include <set>
 #include <map>

@@ -128,26 +128,7 @@ endif(CBMROOT_MINIMAL)
 
 # set a variable which should be used in all CMakeLists.txt
 # Defines all basic include directories from fairbase
-# When CBM switch to the new release we could use the variable defined
-# by a macro in FairMacros.cmake 
-Set(BASE_INCLUDE_DIRECTORIES
-    ${ROOT_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/fairtools
-    ${CMAKE_SOURCE_DIR}/geobase
-    ${CMAKE_SOURCE_DIR}/parbase
-    ${CMAKE_SOURCE_DIR}/base
-    ${CMAKE_SOURCE_DIR}/base/steer
-    ${CMAKE_SOURCE_DIR}/base/event
-    ${CMAKE_SOURCE_DIR}/base/field
-    ${CMAKE_SOURCE_DIR}/base/sim
-    ${CMAKE_SOURCE_DIR}/base/source
-    ${CMAKE_SOURCE_DIR}/dbase
-    ${CMAKE_SOURCE_DIR}/dbase/dbInterface
-    ${CMAKE_SOURCE_DIR}/dbase/dbValidation
-    ${CMAKE_SOURCE_DIR}/dbase/dbUtils
-    ${CMAKE_SOURCE_DIR}/dbase/dbInput
-  ) 
- 
+SetBasicVariables()
 
 # Set the library version in the main CMakeLists.txt
 SET(CBMROOT_MAJOR_VERSION 0)
@@ -171,6 +152,7 @@ Generate_Version_Info()
 # the project's entire directory structure.
 
 add_subdirectory (fairtools)
+add_subdirectory (MbsAPI)
 add_subdirectory (base)
 add_subdirectory (dbase)
 add_subdirectory (geobase)

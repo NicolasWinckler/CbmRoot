@@ -42,13 +42,15 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
 #	"has a brief description"
 
  	# -- CLHEP and Pluto warnings
-        "/include/CLHEP/"
-        "include/Geant4/CLHEP"
+#        "/include/CLHEP/"
+        "CLHEP"
         "PParticle.h"
         "PDataBase.h"
         "PMesh.h"
         "PStaticData.h"
         "PUtils.h"
+        "PDistribution.h"
+        "/pluto/"
 
  	# -- htrack warnings
         # should be switched on, but there are so many
@@ -114,8 +116,8 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/TMVA/Types.h:"
 
         # -- Geant3 warnings
-        "/geant3/TGeant3/TGeant3.h:"
-        "/geant3/TGeant3/TGeant3TGeo.h:"
+        "TGeant3.h"
+        "TGeant3TGeo.h"
 
         # -- Errors which are filtered for the time being
         # -- MbsAPI is only a copy from elsewhere so don't know what to do
@@ -126,6 +128,8 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "FairDbTableRow.h"
         "FairDbResult.h"
         "FairDbValidityRec.h"
+        "Fair"
+        "base/source"
   )
 
 # -----------------------------------------------------------

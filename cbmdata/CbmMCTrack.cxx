@@ -4,6 +4,8 @@
 // -------------------------------------------------------------------------
 #include "CbmMCTrack.h"
 
+#include "FairLogger.h"
+
 #include "TParticle.h"
 #ifndef ROOT_TParticlePDG
  #include "TParticlePDG.h"
@@ -12,10 +14,6 @@
  #include "TDatabasePDG.h"
 #endif
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
@@ -107,14 +105,18 @@ CbmMCTrack::~CbmMCTrack() { }
 
 // -----   Public method Print   -------------------------------------------
 void CbmMCTrack::Print(Int_t trackId) const {
-  cout << "Track " << trackId << ", mother : " << fMotherId << ", Type "
-       << fPdgCode << ", momentum (" << fPx << ", " << fPy << ", " << fPz
-       << ") GeV" << endl;
-  cout << "       Ref " << GetNPoints(kREF) << ", MVD " << GetNPoints(kMVD)
-       << ", STS " << GetNPoints(kSTS) << ", RICH " << GetNPoints(kRICH)
-       << ", MUCH " << GetNPoints(kMUCH) << ", TRD " << GetNPoints(kTRD)
-       << ", TOF " << GetNPoints(kTOF) << ", ECAL " << GetNPoints(kECAL) 
-       << ", PSD " << GetNPoints(kPSD) << endl;
+  LOG(DEBUG) << "Track " << trackId << ", mother : " << fMotherId 
+	     << ", Type " << fPdgCode << ", momentum (" << fPx << ", " 
+	     << fPy << ", " << fPz << ") GeV" << FairLogger::endl;
+  LOG(DEBUG) << "       Ref " << GetNPoints(kREF) 
+	     << ", MVD " << GetNPoints(kMVD) 
+	     << ", STS " << GetNPoints(kSTS) 
+	     << ", RICH " << GetNPoints(kRICH)
+	     << ", MUCH " << GetNPoints(kMUCH) 
+	     << ", TRD " << GetNPoints(kTRD)
+	     << ", TOF " << GetNPoints(kTOF) 
+	     << ", ECAL " << GetNPoints(kECAL) 
+	     << ", PSD " << GetNPoints(kPSD) << FairLogger::endl;
 }
 // -------------------------------------------------------------------------
 
@@ -157,8 +159,8 @@ Int_t CbmMCTrack::GetNPoints(DetectorId detId) const {
   else if ( detId == kECAL ) return ( (fNPoints & ( 1 << 24) ) >> 24);
   else if ( detId == kPSD  ) return ( (fNPoints & ( 1 << 25) ) >> 25);
   else {
-    cout << "-E- CbmMCTrack::GetNPoints: Unknown detector ID "
-	 << detId << endl;
+    LOG(ERROR) << "GetNPoints: Unknown detector ID "
+	       << detId << FairLogger::endl;
     return 0;
   }
 }
@@ -223,8 +225,8 @@ void CbmMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
     fNPoints = ( fNPoints & ( ~ (  1 << 25 ) ) )  |  ( nPoints << 25 );
   }
 
-  else cout << "-E- CbmMCTrack::SetNPoints: Unknown detector ID "
-	    << iDet << endl;
+  else LOG(ERROR) << "Unknown detector ID "
+		  << iDet << FairLogger::endl;
 
 }
 // -------------------------------------------------------------------------

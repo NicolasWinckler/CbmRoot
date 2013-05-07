@@ -134,9 +134,7 @@ private:
           const string& parameter,
           const string& xTitle);
 
-    //void SetMuchDigiArray();
     void SetMuchClustersArray();
-    //void CalculateMuchAcuracy();
 
     void CreateMuchHistograms();
     void CreateSingleLayerHistogram(Int_t nStation, Int_t nLayer,
@@ -153,9 +151,6 @@ private:
     void FillMuchResidualHistograms();
 
     void FillMuchAccuracyHistograms();
-    //void FillMuchRMSHistogram();
-    //void FillMuchMeanHistogram();
-    //void FillMuchSigmaHistogram();
 
     void FillMuchPixelHitsHistogram();
     void FillMuchPointsHistogram();
@@ -219,38 +214,8 @@ private:
     Int_t fNofMuchPoints;
     Int_t fNofMuchLayers;
 
-    //Int_t* fMuchDigisByPoint;
-
-    /*struct AccuracyStruct{
-    	Float_t fErrorX;
-    	Float_t fErrorY;
-    	Float_t fErrorXY;
-    	Int_t fHit;
-    	Int_t fPoint;
-    };
-    AccuracyStruct* fAccuracyArray;*/
-
     std::map<Int_t, Int_t> fBestPoints;
     std::map<Int_t, Int_t> fBestPointsForHits;
-
-    /*struct ClusterInformation{
-    	//Int_t nofCluster;
-    	Int_t fDetId;
-   		Int_t fBestPoint;
-   	   	Int_t fNofDigis;
-   	   	std::vector<Int_t> fPointsInCluster;
-   	   	std::vector<Int_t> fDigisByPoint;
-   	   	std::vector<Float_t> fClusterToPointRatio;
-   	   	std::vector<Float_t> fNDigisToClusterRatio;
-    };
-    ClusterInformation* fClustersArray;*/
-
-    /*struct ActiveDigi{
-	   Int_t fDigi;
-	   Int_t fDetId;
-	   std::vector<Int_t> fPoints;
-    };
-    ActiveDigi* fDigiArray;*/
 
     ClassDef(CbmLitClusteringQa, 1);
 };

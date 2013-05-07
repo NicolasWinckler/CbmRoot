@@ -72,25 +72,32 @@ string CbmLitClusteringQaReport::PrintMuchAcuracy() const
    string str = R()->TableBegin("Efficiency of clustering", list_of("Layer")("Muon Points")("Muon Hits")("Muon Efficiency (%)")
          ("Total Points")("Total Hits")("Total Efficiency (%)"));
    for (Int_t i = 1; i <= HM()->H2("hsh_Much_Muon_Points")->GetXaxis()->GetNbins(); i++){
-      Float_t muonEff = (100. * (Float_t)(HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i))) /
-            (Float_t)(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i));
-      Float_t eff = (100. * (Float_t)(HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i))) /
-            (Float_t)(HM()->H1("hsh_Much_Points")->GetBinContent(i));
+      Float_t muonEff = 0;
+      if(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i) != 0){
+         muonEff = (100. * (Float_t)(HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i))) /
+               (Float_t)(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i));
+      }
+      Float_t eff = 0;
+      if(HM()->H1("hsh_Much_Points")->GetBinContent(i) != 0){
+         eff = (100. * (Float_t)(HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i))) /
+               (Float_t)(HM()->H1("hsh_Much_Points")->GetBinContent(i));
+      }
       nofMuonPoints += HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i);
       nofPoints += HM()->H1("hsh_Much_Points")->GetBinContent(i);
       nofMuonHits += HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i);
       nofHits += HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i);
-      //totalEff += allEff;
-      //totalMuonEff += muonEff;
       str += R()->TableRow(list_of(NumberToString<Int_t>(i))(NumberToString<Float_t>(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i)))
             (NumberToString<Float_t>(HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i)))(NumberToString<Float_t>(muonEff))
             (NumberToString<Float_t>(HM()->H1("hsh_Much_Points")->GetBinContent(i)))
             (NumberToString<Float_t>(HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i)))
             (NumberToString<Float_t>(eff)));
    }
-   //totalMuonEff = totalMuonEff / (HM()->H2("hsh_Much_Muon_Points")->GetXaxis()->GetNbins());
-   totalMuonEff = (100. * nofMuonHits) / nofMuonPoints;
-   totalEff = (100. * nofHits) / nofPoints;
+   if(nofMuonPoints != 0){
+      totalMuonEff = (100. * nofMuonHits) / nofMuonPoints;
+   }
+   if(nofPoints != 0){
+      totalEff = (100. * nofHits) / nofPoints;
+   }
    std::stringstream stream1;
    stream1 << "Total";
    str += R()->TableRow(list_of(stream1.str())(NumberToString<Float_t>(nofMuonPoints))
@@ -139,55 +146,16 @@ void CbmLitClusteringQaReport::Draw()
       DrawHistogramsByPattern("hss_Much_NofDigisByPoint");
 
       DrawH2HistogramsByPattern("hsc_Much_.*_2D");
-  //  DrawH2HistogramsByPattern("hsc_Much_ClusterQuality_2D");
-  //  DrawH2HistogramsByPattern("hsc_Much_ClusterToPointRatio_2D");
-  //  DrawH2HistogramsByPattern("hsc_Much_NofPointsInCluster_2D");
-  //  DrawH2HistogramsByPattern("hsc_Much_NofPointsInDigi_2D");
 
       DrawLogYHistogramsByPattern("hss_Much_.*_Total");
-  //  DrawLogYHistogramsByPattern("hss_Much_NofDigisByPoint_Total");
-  //  DrawLogYHistogramsByPattern("hss_Much_NofPointsInDigi_Total");
-  //  DrawLogYHistogramsByPattern("hss_Much_NofDigisInCluster_Total");
 
       DrawH2HistogramsByPattern("hr_Much_.*_2D");
-      /*DrawH2HistogramsByPattern("hr_Much_ResidualX_2D");
-      DrawH2HistogramsByPattern("hr_Much_ResidualY_2D");
-      DrawH2HistogramsByPattern("hr_Much_PullX_2D");
-      DrawH2HistogramsByPattern("hr_Much_PullY_2D");
 
-      DrawH2HistogramsByPattern("hr_Much_Muon_ResidualX_2D");
-      DrawH2HistogramsByPattern("hr_Much_Muon_ResidualY_2D");*/
       DrawResidualHistogrms();
 
       DrawHistogramsByPattern("h_Much_.*RMS.*");
       DrawHistogramsByPattern("h_Much_.*Mean.*");
       DrawHistogramsByPattern("h_Much_.*Sigma.*");
-      /*DrawHistogramsByPattern("h_Much_RMS_X");
-      DrawHistogramsByPattern("h_Much_RMS_Y");
-
-      DrawHistogramsByPattern("h_Much_PullRMS_X");
-      DrawHistogramsByPattern("h_Much_PullRMS_Y");
-
-      DrawHistogramsByPattern("h_Much_Mean_X");
-      DrawHistogramsByPattern("h_Much_Mean_Y");
-
-      DrawHistogramsByPattern("h_Much_PullMean_X");
-      DrawHistogramsByPattern("h_Much_PullMean_Y");
-
-      DrawHistogramsByPattern("h_Much_Sigma_X");
-      DrawHistogramsByPattern("h_Much_Sigma_Y");
-
-      DrawHistogramsByPattern("h_Much_PullSigma_X");
-      DrawHistogramsByPattern("h_Much_PullSigma_Y");
-
-      DrawHistogramsByPattern("h_Much_Muon_PullRMS_X");
-      DrawHistogramsByPattern("h_Much_Muon_PullRMS_Y");
-
-      DrawHistogramsByPattern("h_Much_Muon_PullMean_X");
-      DrawHistogramsByPattern("h_Much_Muon_PullMean_Y");
-
-      DrawHistogramsByPattern("h_Much_Muon_PullSigma_X");
-      DrawHistogramsByPattern("h_Much_Muon_PullSigma_Y");*/
    }
 }
 
@@ -238,7 +206,7 @@ void CbmLitClusteringQaReport::DrawHistogramsByLayer(const string& histNamePatte
 	vector<TH1*> histos = HM()->H1Vector(histNamePattern);
 	if (histos.size() == 0) return;
 	Int_t nofHistos = histos.size();
-	string canvasName = GetReportName() + histName;//"he_MuchErrorsByRadius";
+	string canvasName = GetReportName() + histName;
 	TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1600, 900);
 	Int_t nColumns = 6;
 	Int_t nRows = (Int_t)(nofHistos / nColumns);
@@ -354,46 +322,6 @@ void CbmLitClusteringQaReport::ScaleHistogramsByNofEvents()
       HM()->ScaleByPattern("(hss_Much_|hsc_Much_).+", 1. / nofEvents);
       HM()->ShrinkEmptyBinsByPattern("(hss_Much_|hsh_Much_).+");
    }
-
-   /*HM()->ScaleByPattern("hss_Much_ClusterToPointRatio", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_ClusterToPointRatio");
-
-   HM()->ScaleByPattern("hss_Much_ClusterQuality", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_ClusterQuality");
-
-   HM()->ScaleByPattern("hss_Much_NofPointsInCluster", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_NofPointsInCluster");
-
-   HM()->ScaleByPattern("hss_Much_NofPointsInDigi", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_NofPointsInDigi");
-
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_PixelHits");
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Points");
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Clusters");
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Digis");
-
-   HM()->ScaleByPattern("hss_Much_NofDigisByPoint", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_NofDigisByPoint");
-
-   HM()->ScaleByPattern("hsc_Much_ClusterQuality_2D", 1. / nofEvents);
-
-   HM()->ScaleByPattern("hsc_Much_ClusterToPointRatio_2D", 1. / nofEvents);
-
-   HM()->ScaleByPattern("hsc_Much_NofPointsInCluster_2D", 1. / nofEvents);
-
-   HM()->ScaleByPattern("hsc_Much_NofPointsInDigi_2D", 1. / nofEvents);
-
-   HM()->ScaleByPattern("hss_Much_NofDigisByPoint_Total", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_NofDigisByPoint_Total");
-   HM()->ScaleByPattern("hss_Much_NofPointsInDigi_Total", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_NofPointsInDigi_Total");
-   HM()->ScaleByPattern("hss_Much_NofDigisInCluster_Total", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hss_Much_NofDigisInCluster_Total");
-
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Muon_PixelHits");
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Muon_Digis");
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Muon_Points");
-   HM()->ShrinkEmptyBinsByPattern("hsh_Much_Muon_Clusters");*/
 }
 
 ClassImp(CbmLitClusteringQaReport)

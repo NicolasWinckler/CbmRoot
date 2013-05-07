@@ -30,7 +30,6 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fStationMap(),
     fModuleTypeMap(),
     fLayersBeforeStation(),
-    fLogger(FairLogger::GetLogger()),
     fIsSimulation(kFALSE),
     fGeoPathHash(0),
     fCurrentVolume(NULL),
@@ -110,8 +109,8 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
               if (fm) {
 //                cout<<"Found Root geometry version long:    "<< TString(layer->GetName()) <<endl;
 //                cout<<"Found Root geometry with layers:     "<< TString(TString(layer->GetName())(0,11)) <<endl;
-//                fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
-                fLogger->Info(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
+//                gLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
+                gLogger->Info(MESSAGE_ORIGIN,"Found Root TRD geometry with layers, v13g or later.");
                 fGeoVersion = kRootGeomWithLayers;
                 return fGeoVersion;
               }
@@ -121,8 +120,8 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
           // otherwise it is a kRootGeom
 // 	    cout<<"Found Root geometry version long:    "<< TString(node->GetName()) <<endl;
 //          cout<<"Found Root geometry version chopped: "<< TString(TString(node->GetName())(0,8)) <<endl;
-//          fLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
-          fLogger->Info(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
+//          gLogger->Debug(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
+          gLogger->Info(MESSAGE_ORIGIN,"Found Root TRD geometry v13a or later.");
           fGeoVersion = kRootGeom;
           return fGeoVersion;
         }
@@ -132,11 +131,11 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
   // Only the old monolithic geometry version has a volume trd11
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd11");
   if (fm) {
-    fLogger->Error(MESSAGE_ORIGIN,"Old implementation of simple TRD geometry ('PGON') found");
-    fLogger->Error(MESSAGE_ORIGIN,"This version does not work with newer ROOT versions and is obsolete.");
-    fLogger->Error(MESSAGE_ORIGIN,"If you see this version you're using a rather old version of CbmRoot. Please update to a new version.");
-    fLogger->Error(MESSAGE_ORIGIN,"Stop execution at this point.");
-    fLogger->Fatal(MESSAGE_ORIGIN,"See error message above.");
+    gLogger->Error(MESSAGE_ORIGIN,"Old implementation of simple TRD geometry ('PGON') found");
+    gLogger->Error(MESSAGE_ORIGIN,"This version does not work with newer ROOT versions and is obsolete.");
+    gLogger->Error(MESSAGE_ORIGIN,"If you see this version you're using a rather old version of CbmRoot. Please update to a new version.");
+    gLogger->Error(MESSAGE_ORIGIN,"Stop execution at this point.");
+    gLogger->Fatal(MESSAGE_ORIGIN,"See error message above.");
     fGeoVersion = kOldMonolithic; 
     return fGeoVersion;
   }  
@@ -144,7 +143,7 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
   // Only the new monolithic geometry has a volume trd1gas
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1gas");
   if (fm) {
-    fLogger->Debug(MESSAGE_ORIGIN,"Found new monolithic TRD geometry.");
+    gLogger->Debug(MESSAGE_ORIGIN,"Found new monolithic TRD geometry.");
     fGeoVersion = kNewMonolithic; 
     return fGeoVersion;
   }
@@ -158,11 +157,11 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
       // Only the normal rectangular geometry has frames     
       fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1mod1carbon1");
       if (fm){
-	fLogger->Debug(MESSAGE_ORIGIN,"Found rectangular segmented TRD geometry.");
+	gLogger->Debug(MESSAGE_ORIGIN,"Found rectangular segmented TRD geometry.");
 	fGeoVersion = kSegmentedRectangular; 
 	return fGeoVersion;
       } else {
-	fLogger->Debug(MESSAGE_ORIGIN,"Found quasi monolithic TRD geometry.");
+	gLogger->Debug(MESSAGE_ORIGIN,"Found quasi monolithic TRD geometry.");
 	fGeoVersion = kQuasiMonolithic; 
 	return fGeoVersion;
       }
@@ -171,19 +170,19 @@ Int_t CbmTrdGeoHandler::CheckGeometryVersion()
       if (fm) {
         // Only the normal old squared geometry has a separate keeping volume
         // for the second station    
-	fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
+	gLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry.");
         fGeoVersion = kSegmentedSquared; 
         return fGeoVersion;
       } else {
         // The new squared geometry has only one keeping volume
         // for all layers    
-        fLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry with only one keeping volume.");
+        gLogger->Debug(MESSAGE_ORIGIN,"Found squared segmented TRD geometry with only one keeping volume.");
         fGeoVersion = kSegmentedSquaredOneKeepingVolume; 
         return fGeoVersion;
       }
     }
   }
-  fLogger->Fatal(MESSAGE_ORIGIN,"Found an unknown TRD geometry.");
+  gLogger->Fatal(MESSAGE_ORIGIN,"Found an unknown TRD geometry.");
   fGeoVersion = -1; 
   return fGeoVersion;  
 }
@@ -455,10 +454,10 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromStationKVolumeGeometry(std::vector<Int_
     }
     
     for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-      fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+      gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
     }
     for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-      fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
+      gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
     }
     
     return kTRUE;
@@ -558,10 +557,10 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromSingleKVolumeGeometry(std::vector<Int_t
     }
     
     for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-      fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+      gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
     }
     for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-      fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
+      gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
     }
 
     return kTRUE;
@@ -651,7 +650,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_
       }
     }
 
-    fLogger->Info(MESSAGE_ORIGIN,"Number of TRD stations: %d", totalNrOfStations);
+    gLogger->Info(MESSAGE_ORIGIN,"Number of TRD stations: %d", totalNrOfStations);
   } else {
     cout << "***************************************" <<endl;
     cout << "                                       " <<endl;
@@ -750,10 +749,10 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometryWithLayers(std::vector<Int_
 
   
   for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+    gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
   }
   for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
+    gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
   }
 
   return kTRUE;
@@ -823,7 +822,7 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometry(std::vector<Int_t> &layers
         }
       }
     }
-    fLogger->Info(MESSAGE_ORIGIN,"Number of TRD stations: %d", totalNrOfStations);
+    gLogger->Info(MESSAGE_ORIGIN,"Number of TRD stations: %d", totalNrOfStations);
   } else {
     cout << "***************************************" <<endl;
     cout << "                                       " <<endl;
@@ -900,10 +899,10 @@ Bool_t CbmTrdGeoHandler::GetLayerInfoFromRootGeometry(std::vector<Int_t> &layers
 
   
   for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
+    gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers.", iStation, layersPerStation[iStation-1]);
   }
   for ( Int_t iStation=1; iStation<=totalNrOfStations; iStation++) {
-    fLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
+    gLogger->Info(MESSAGE_ORIGIN,"TRD Station %d has %2d layers upstream.", iStation, layersBeforeStation[iStation-1]);
   }
 
   return kTRUE;
@@ -1154,7 +1153,7 @@ Float_t CbmTrdGeoHandler::GetX(TString volName)
 void CbmTrdGeoHandler::NavigateTo(TString volName) 
 {
   if (fIsSimulation) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"This methode is not supported in simulation mode");
+    gLogger->Fatal(MESSAGE_ORIGIN,"This methode is not supported in simulation mode");
   } else {
     gGeoManager->cd(volName.Data());
     fGeoPathHash = volName.Hash();

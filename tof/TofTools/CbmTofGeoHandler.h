@@ -24,7 +24,6 @@ enum TofGeometryVersions {k07a,
 
 #include <map>
 
-class FairLogger;
 class TGeoBBox;
 class TGeoVolume;
 class TGeoHMatrix;

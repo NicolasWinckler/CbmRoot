@@ -231,7 +231,7 @@ InitStatus CbmStsDigitizeTb::Init() {
 
   // Check for presence of MCBuffer and DaqBuffer
   if ( ! ( CbmMCBuffer::Instance() && CbmDaqBuffer::Instance() ) ) {
-    fLogger->Fatal(MESSAGE_ORIGIN, "No MCBuffer or DaqBuffer present!");
+    gLogger->Fatal(MESSAGE_ORIGIN, "No MCBuffer or DaqBuffer present!");
     return kFATAL;
   }
 
@@ -246,7 +246,7 @@ InitStatus CbmStsDigitizeTb::Init() {
 
   // Build digitisation scheme
   if ( ! fDigiScheme->Init(fGeoPar, fDigiPar) ) {
-    fLogger->Error(MESSAGE_ORIGIN,
+    gLogger->Error(MESSAGE_ORIGIN,
                    "Error in building STS digitisation scheme");
     return kFATAL;
   }

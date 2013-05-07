@@ -30,8 +30,8 @@ CbmTrdDigiWriteoutBuffer::~CbmTrdDigiWriteoutBuffer()
 //std::vector<std::pair<double, FairTimeStamp*> > Modify(std::pair<double, FairTimeStamp*> oldData, std::pair<double, FairTimeStamp*> newData) 
 //std::vector<std::pair<double, CbmTrdDigi*> > CbmTrdDigiWriteoutBuffer::Modify(std::pair<double, CbmTrdDigi*> oldData, std::pair<double, CbmTrdDigi*> newData)
 //{
-//  FairLogger* fLogger = FairLogger::GetLogger();
-//  fLogger->Debug(MESSAGE_ORIGIN,"Inside Modify:");
+//  FairLogger* gLogger = FairLogger::GetLogger();
+//  gLogger->Debug(MESSAGE_ORIGIN,"Inside Modify:");
 //  std::vector<std::pair<double, CbmTrdDigi*> > result;
 //  result.push_back(oldData);
 //  return result;
@@ -58,8 +58,8 @@ CbmTrdDigiWriteoutBuffer::~CbmTrdDigiWriteoutBuffer()
 
 //std::vector<std::pair<double, FairTimeStamp*> > Modify(std::pair<double, FairTimeStamp*> oldData, std::pair<double, FairTimeStamp*> newData) 
 //{
-//  FairLogger* fLogger = FairLogger::GetLogger();
-//  fLogger->Debug(MESSAGE_ORIGIN,"Inside Modify:");
+//  FairLogger* gLogger = FairLogger::GetLogger();
+//  gLogger->Debug(MESSAGE_ORIGIN,"Inside Modify:");
 //  std::vector<std::pair<double, FairTimeStamp*> > result;
 //  result.push_back(oldData);
 //  return result;
@@ -69,7 +69,7 @@ void CbmTrdDigiWriteoutBuffer::AddNewDataToTClonesArray(FairTimeStamp* data)
 {
   FairRootManager* ioman = FairRootManager::Instance();
   TClonesArray* myArray = ioman->GetTClonesArray(fBranchName);
-  fLogger->Debug(MESSAGE_ORIGIN,"Data Inserted: ");
+  gLogger->Debug(MESSAGE_ORIGIN,"Data Inserted: ");
   CbmTrdDigi* bla =(CbmTrdDigi*)(data);
   bla->Print();
   new ((*myArray)[myArray->GetEntries()]) CbmTrdDigi(*(CbmTrdDigi*)(data));

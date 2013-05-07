@@ -173,30 +173,30 @@ InitStatus CbmTrdCreateDigiPar::Init(){
   
 
   if (kNewMonolithic == geoVersion) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+    gLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
   }
   if (kQuasiMonolithic == geoVersion) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+    gLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
   }
   if (kSegmentedRectangular == geoVersion) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+    gLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
   }
   if (kSegmentedSquared == geoVersion) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
-//    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
+    gLogger->Fatal(MESSAGE_ORIGIN,"There is no support to create digitization parameters for this geometry.");
+//    gLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry.");
 //    FillModuleMapSegmentedSquared();
   }
 
   if (kRootGeomWithLayers == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kRootGeomWithLayers).");
+    gLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kRootGeomWithLayers).");
     FillModuleMapRootGeometryWithLayers();
   }
   if (kRootGeom == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kRootGeom).");
+    gLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kRootGeom).");
     FillModuleMapRootGeometry();
   }
   if (kSegmentedSquaredOneKeepingVolume == geoVersion) {
-    fLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kSegmentedSquaredOneKeepingVolume).");
+    gLogger->Info(MESSAGE_ORIGIN,"Will now create digitization parameters for this geometry (kSegmentedSquaredOneKeepingVolume).");
     FillModuleMapSegmentedSquaredOneKeepingVolume();
   }
 

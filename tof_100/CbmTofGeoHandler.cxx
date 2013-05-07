@@ -381,7 +381,7 @@ Float_t CbmTofGeoHandler::GetX(TString volName)
 void CbmTofGeoHandler::NavigateTo(TString volName) 
 {
   if (fIsSimulation) {
-    fLogger->Fatal(MESSAGE_ORIGIN,"This methode is not supported in simulation mode");
+    gLogger->Fatal(MESSAGE_ORIGIN,"This methode is not supported in simulation mode");
   } else {
     gGeoManager->cd(volName.Data());
     fGeoPathHash = volName.Hash();

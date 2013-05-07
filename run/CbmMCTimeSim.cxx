@@ -21,7 +21,7 @@ using namespace std;
 
 // -----   Default constructor   ---------------------------------------------
 CbmMCTimeSim::CbmMCTimeSim() { 
-  fLogger->Fatal(MESSAGE_ORIGIN, 
+  gLogger->Fatal(MESSAGE_ORIGIN, 
 		 "Default constructor should not be used; specify interaction rate!");
 }
 // ---------------------------------------------------------------------------
@@ -64,7 +64,7 @@ Double_t CbmMCTimeSim::CreateEventTime() {
     deltaT = gRandom->Exp(tau);
     break;
   default :
-    fLogger->Error(MESSAGE_ORIGIN, 
+    gLogger->Error(MESSAGE_ORIGIN, 
 		   "Beam profile type %d not defined!", fBeamProfile);
   }
 
@@ -83,7 +83,7 @@ void CbmMCTimeSim::Exec(Option_t* opt) {
 
   // Check for overflow
   if ( buffer->GetSize() > fMaxBufferSize ) 
-    fLogger->Fatal(MESSAGE_ORIGIN, 
+    gLogger->Fatal(MESSAGE_ORIGIN, 
 		   "Buffer size %.2f MB exceeds maximum (%.2f)",
 		   buffer->GetSize(), fMaxBufferSize);
 
@@ -150,13 +150,13 @@ InitStatus CbmMCTimeSim::Init() {
   // Get FairRootManager
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) 
-    fLogger->Fatal(MESSAGE_ORIGIN, "No FairRootManager");
+    gLogger->Fatal(MESSAGE_ORIGIN, "No FairRootManager");
 
   // Get event header
   fEvent = (CbmMCEventHeader*) ioman->GetObject("MCEventHeader.");
 
   //CbmMCEventHeader* event = (CbmMCEventHeader*) ioman->GetObject("MCEventHeader.");
-  //if ( ! event ) fLogger->Fatal(MESSAGE_ORIGIN, "No MC event header!");
+  //if ( ! event ) gLogger->Fatal(MESSAGE_ORIGIN, "No MC event header!");
 
   // Get MCPoint arrays
   fPointArrays[kMVD]  = (TClonesArray*) ioman->GetObject("MvdPoint");
@@ -177,7 +177,7 @@ InitStatus CbmMCTimeSim::Init() {
       config += " " + sysName;
     }
   }
-  fLogger->Info(MESSAGE_ORIGIN, "Configuration %s", config.Data()); 
+  gLogger->Info(MESSAGE_ORIGIN, "Configuration %s", config.Data()); 
 
   // Clear CbmMCBuffer
   CbmMCBuffer::Instance()->Clear();

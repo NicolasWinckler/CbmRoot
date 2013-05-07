@@ -361,7 +361,7 @@ Bool_t CbmTrd::CheckIfSensitive(std::string name)
 {
   TString tsname = name; 
   if (tsname.Contains("gas")){
-    fLogger->Debug(MESSAGE_ORIGIN, "*** Register %s as active volume.",tsname.Data());
+    gLogger->Debug(MESSAGE_ORIGIN, "*** Register %s as active volume.",tsname.Data());
     return kTRUE;
   }
   return kFALSE;

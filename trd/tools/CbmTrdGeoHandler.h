@@ -29,7 +29,6 @@ enum TrdGeometryVersions {kRootGeomWithLayers,
 
 #include <map>
 
-class FairLogger;
 class TGeoBBox;
 class TGeoVolume;
 class TGeoHMatrix;
@@ -104,7 +103,6 @@ class CbmTrdGeoHandler : public TObject {
   std::map<Int_t, Int_t> fModuleTypeMap;  //!
   std::vector<Int_t> fLayersBeforeStation; //!
 
-  FairLogger* fLogger;  //!                                                  
   Bool_t fIsSimulation; //!
 
   UInt_t fGeoPathHash;        //!

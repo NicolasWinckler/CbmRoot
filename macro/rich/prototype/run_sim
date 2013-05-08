@@ -1,8 +1,0 @@
-#!/bin/bash
-
-root -l << EOF
-.L run_sim.C
-run_sim(100000)
-.q
-EOF
-

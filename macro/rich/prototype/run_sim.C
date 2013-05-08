@@ -1,21 +1,29 @@
-void run_sim(Int_t nEvents = 20)
+void run_sim(Int_t nEvents = 100000)
 {
-   TString outDir = "/d/cbm06/user/slebedev/rich_prot/";
+   TString script = TString(gSystem->Getenv("SCRIPT"));
+
+   TString asciiInput = "/Users/slebedev/Development/cbm/data/simulations/richprototype/epi.ascii.dat";
+   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richprototype/";
    TString outFile = outDir + "/mc.root";
    TString parFile = outDir + "/params.root";
 
-   TString caveGeom   = "cave.geo";
-   TString richGeom   = "rich/rich_prototype_standard.geo";
+   TString caveGeom = "cave.geo";
+   TString richGeom = "rich/prototype/RichPrototype-1Mir-Standard.geo";
+
+   if (script == "yes") {
+      asciiInput = TString(gSystem->Getenv("IN_ASCII_FILE"));
+      outFile = TString(gSystem->Getenv("MC_FILE"));
+      parFile = TString(gSystem->Getenv("PAR_FILE"));
+      caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
+      richGeom = TString(gSystem->Getenv("RICH_GEOM"));
+   }
 
    gDebug = 0;
 
    TStopwatch timer;
    timer.Start();
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-
-   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-   cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 
    // Create simulation run
    FairRunSim* fRun = new FairRunSim();
@@ -40,11 +48,12 @@ void run_sim(Int_t nEvents = 20)
 
    // Create PrimaryGenerator
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-   FairAsciiGenerator* asciiGen = new FairAsciiGenerator("/d/cbm02/kresan/rich_prot/may11/epi.CERNPST9.dat");
-   primGen->AddGenerator(asciiGen);
-   fRun->SetGenerator(primGen);
 
-   //fRun->SetStoreTraj(kTRUE);
+   FairAsciiGenerator* asciiGen = new FairAsciiGenerator(asciiInput);
+   primGen->AddGenerator(asciiGen);
+
+   fRun->SetGenerator(primGen);
+  // fRun->SetStoreTraj(kTRUE);
    fRun->Init();
 
 

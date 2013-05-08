@@ -8,7 +8,7 @@
 
 #include "FairLogger.h"
 
-#include "CbmStsPoint.h"
+#include "CbmStsSensorPoint.h"
 #include "CbmStsSensorTypeDssd.h"
 
 
@@ -21,8 +21,10 @@ const double kPairEnergy = 3.6e-9;
 
 
 // -----   Constructor   ---------------------------------------------------
-CbmStsSensorTypeDssd::CbmStsSensorTypeDssd(const char* name)
-    : CbmStsSensorType(name) {
+CbmStsSensorTypeDssd::CbmStsSensorTypeDssd()
+    : CbmStsSensorType(), fDx(-1.), fDy(-1.), fDz(-1.),
+      fPitchF(-1.), fPitchB(-1.), fStereoF(0.), fStereoB(0.),
+      fIsSet(kFALSE) {
 }
 // -------------------------------------------------------------------------
 
@@ -50,9 +52,8 @@ void CbmStsSensorTypeDssd::Print(Option_t* opt) const {
 
 
 // -----   Process an MC Point  --------------------------------------------
-void CbmStsSensorTypeDssd::ProcessPoint(CbmStsPoint* point) {
+void CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point) {
 
-  // Produce charge on front and back sides
   ProduceCharge(point, 0);
   ProduceCharge(point, 1);
 
@@ -62,25 +63,32 @@ void CbmStsSensorTypeDssd::ProcessPoint(CbmStsPoint* point) {
 
 
 // -----   Produce charge on the strips   ----------------------------------
-void CbmStsSensorTypeDssd::ProduceCharge(CbmStsPoint* point,
+void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
                                          Int_t side) const {
+
+  // --- Protect against being called without parameters being set
+  if ( ! fIsSet ) LOG(FATAL) << "Parameters of sensor " << fName
+                             << " are not set!" << FairLogger::endl;
 
   // This implementation assumes a straight trajectory in the sensor
   // and a constant charge distribution along it.
 
   // Total produced charge
-  Double_t qtot = point->GetEnergyLoss() / kPairEnergy;
+  Double_t qtot = point->GetELoss() / kPairEnergy;
 
   // Stereo angle and strip pitch
   Double_t tanphi = 0.;     // tangent of stereo angle
   Double_t pitch  = 0.;     // strip pitch
+  Int_t nStrips;            // number of strips
   if ( side == 0 ) {        // front side
-    tanphi = fSinStereoF / fCosStereoF;
-    pitch  = fPitchF;
+    tanphi  = fSinStereoF / fCosStereoF;
+    pitch   = fPitchF;
+    nStrips = fNofStripsF;
   }
   else if ( side == 1 ) {   // back side
-    tanphi = fSinStereoB / fCosStereoB;
-    pitch  = fPitchB;
+    tanphi  = fSinStereoB / fCosStereoB;
+    pitch   = fPitchB;
+    nStrips = fNofStripsB;
   }
   else {
     LOG(ERROR) << "Illegal side qualifier!" << FairLogger::endl;
@@ -89,8 +97,8 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsPoint* point,
 
 
   // Project point coordinates (in / out) to readout (top) edge
-  Double_t x1 = point->GetXIn()  - ( fDy - point->GetYIn()  ) * tanphi;
-  Double_t x2 = point->GetXOut() - ( fDy - point->GetYOut() ) * tanphi;
+  Double_t x1 = point->GetX1() - ( fDy - point->GetY1() ) * tanphi;
+  Double_t x2 = point->GetX2() - ( fDy - point->GetY2() ) * tanphi;
 
 
   // Calculate corresponding strip numbers
@@ -100,14 +108,14 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsPoint* point,
   Int_t i2 = TMath::FloorNint( x2 / pitch );
 
 
-  // If everything is in but one strip: register entire charge
+  // --- If everything is in but one strip: register entire charge
   if ( i1 == i2 ) {
     RegisterCharge(side, i1, qtot, point->GetTime());
     return;
   }
 
 
-  // More than one strip: sort strips
+  // --- More than one strip: sort strips
   if ( i1 > i2 ) {
     Int_t tempI = i1;
     i1 = i2;
@@ -118,14 +126,24 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsPoint* point,
   }
 
 
-  // Fractional charges in strips
+  // --- Loop over fired strips
   for (Int_t iStrip = i1; iStrip <= i2; iStrip++) {
+
+    // --- Calculate charge in strip
     Double_t d = pitch;    // Width of strip covered by trajectory
     if ( iStrip == i1 ) d = Double_t(i1+1) * pitch - x1;
     else if ( iStrip == i2 ) d = x2 - Double_t(i2) * pitch;
     Double_t charge = d * qtot / ( x2 - x1 );
-    RegisterCharge(side, iStrip, charge, point->GetTime());
-  }
+
+    // --- Account for cross-connection (double metal)
+    Int_t jStrip = iStrip;
+    if      ( jStrip < 0 ) jStrip += nStrips;
+    else if ( jStrip >= nStrips ) jStrip -= nStrips;
+
+    // --- Register charge to module
+    RegisterCharge(side, jStrip, charge, point->GetTime());
+
+  } // Loop over fired strips
 
 }
 // -------------------------------------------------------------------------
@@ -139,6 +157,7 @@ void CbmStsSensorTypeDssd::RegisterCharge(Int_t side, Int_t strip,
 
   // Dummy implementation for the time being
   // TODO: Deliver charge to corresponding module.
+
 
   LOG(INFO) << "Registering charge: side " << side << ", strip " << strip
             << ", charge " << charge << ", time " << time
@@ -185,6 +204,8 @@ void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
   fSinStereoF = TMath::Sin( fStereoF * TMath::DegToRad() );
   fCosStereoB = TMath::Cos( fStereoB * TMath::DegToRad() );
   fSinStereoB = TMath::Sin( fStereoB * TMath::DegToRad() );
+
+  fIsSet = kTRUE;
 
 }
 // -------------------------------------------------------------------------

@@ -11,7 +11,7 @@
 
 
 /** @class CbmStsSensorTypeDssd
- ** @brief Base class for double-sided silicon strip sensors.
+ ** @brief Class describing double-sided silicon strip sensors.
  ** @author V.Friese <v.friese@gsi.de>
  ** @version 1.0
  **
@@ -20,6 +20,12 @@
  ** of the sensor, the strip pitches and stereo angles on front
  ** and back side, and the width of the inactive area at the
  ** sensor borders.
+ **
+ ** Charge is created uniformly along the particle trajectory
+ ** in the sensor and is projected to the read-out edge (top edge).
+ ** Strips not reaching the top edge are cross-connected
+ ** horizontally (double metal layer or cable) to a
+ ** corresponding strip.
  **/
 
 
@@ -30,7 +36,7 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
   public:
 
     /** Constructor  **/
-    CbmStsSensorTypeDssd(const char* name = "");
+    CbmStsSensorTypeDssd();
 
 
     /** Destructor  **/
@@ -41,14 +47,8 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     virtual void Print(Option_t* opt = "") const;
 
 
-    /** Produce charge in the sensor
-     **
-     ** @param point:  pointer to CbmStsPoint
-     **
-     ** Perform the appropriate action for a particle trajectory in the
-     ** sensor characterised by the CbmStsPoint.
-     **/
-    virtual void ProcessPoint(CbmStsPoint* point);
+    /** Process a point **/
+    virtual void ProcessPoint(CbmStsSensorPoint*);
 
 
     /** Set the parameters
@@ -70,22 +70,22 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     Double_t fPitchB;   ///< Strip pitch back side [cm]
     Double_t fStereoF;  ///< Stereo angle front side [degrees]
     Double_t fStereoB;  ///< Stereo angle back side [degrees]
+    Bool_t   fIsSet;    ///< Flag whether parameters are set
 
 
     /** Temporary variables to avoid frequent calculations **/
     Double_t fNofStripsF;   //! Number of strips on front side
     Double_t fNofStripsB;   //! Number of strips on back side
-    Double_t fCosStereoF;   //!
-    Double_t fSinStereoF;   //!
-    Double_t fCosStereoB;   //!
-    Double_t fSinStereoB;   //!
+    Double_t fCosStereoF;   //! cos of stereo angle front side
+    Double_t fSinStereoF;   //! sin if stereo angle front side
+    Double_t fCosStereoB;   //! cos of stereo angle back side
+    Double_t fSinStereoB;   //! sin of stereo angle back side
 
 
     /** Produce charge on front or back side from a CbmStsPoint
-     ** @param point  Pointer to CbmStsPoint
      ** @param side   0 = front, 1 = back side
      **/
-    void ProduceCharge(CbmStsPoint* point, Int_t side) const;
+    void ProduceCharge(CbmStsSensorPoint* point, Int_t side) const;
 
 
     /** Register produced charge in one strip

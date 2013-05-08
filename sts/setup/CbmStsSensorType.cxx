@@ -8,11 +8,6 @@
 #include "CbmStsSensorType.h"
 
 
-// -----   Constructor   ---------------------------------------------------
-CbmStsSensorType::CbmStsSensorType(const char* name) : TNamed(name, "") {
-}
-// -------------------------------------------------------------------------
-
 
 
 ClassImp(CbmStsSensorType)

@@ -35,6 +35,8 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS_SETUP
+setup/CbmStsSenzor.cxx
+setup/CbmStsSensorPoint.cxx
 setup/CbmStsSensorType.cxx
 setup/CbmStsSensorTypeDssd.cxx
 )

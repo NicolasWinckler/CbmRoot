@@ -9,19 +9,19 @@
 
 #include "TNamed.h"
 
-class CbmStsPoint;
+class CbmStsSensorPoint;
 
 
 /** @class CbmStsSensorType
- ** @brief Base class for description of the functional behavior of
- ** sensors in the STS.
+ ** @brief Abstract base class for description of the functional
+ ** behaviour of sensors in the STS.
  ** @author V.Friese <v.friese@gsi.de>
  ** @version 1.0
  **
  ** Concrete classes deriving from CbmStsSensorType describe the
- ** production of charge by a CbmStsPoint (charged particle
+ ** production of charge by a CbmStsSensorPoint (charged particle
  ** traversing the sensor). The must implement the abstract
- ** method ProduceCharge.
+ ** method ProcessPoint.
  **/
 
 
@@ -32,7 +32,7 @@ class CbmStsSensorType : public TNamed
   public:
 
     /** Constructor  **/
-    CbmStsSensorType(const char* name = "");
+    CbmStsSensorType() : fTypeId(-1) { };
 
 
     /** Destructor  **/
@@ -41,15 +41,12 @@ class CbmStsSensorType : public TNamed
 
     /** Produce charge in the sensor
      **
-     ** @param x,y,z:  coordinates in the internal coordinate system [cm]
-     ** @param tx,ty:  direction of particle (dx/dz, dy/dz) in internal
-     **                coordinate system
-     ** @param eloss:  total energy loss of particle in the sensor [GeV]
+     ** @param point   Pointer to CbmStsSensorPoint with relevant parameters
      **
      ** Perform the appropriate action for a particle trajectory in the
-     ** sensor characterised by the arguments.
+     ** sensor characterised by the CbmStsSensorPoint object.
      **/
-    virtual void ProcessPoint(CbmStsPoint* point) = 0;
+    virtual void ProcessPoint(CbmStsSensorPoint* point) = 0;
 
 
   private:

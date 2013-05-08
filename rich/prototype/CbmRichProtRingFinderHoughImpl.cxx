@@ -112,7 +112,7 @@ void CbmRichProtRingFinderHoughImpl::DoFind()
 
 void CbmRichProtRingFinderHoughImpl::SetParameters()
 {
-	fMaxDistance = 11.5;
+	fMaxDistance = 2 * 11.5;
 	fMinDistance = 3.;
 	fMinDistanceSq = fMinDistance*fMinDistance;
 	fMaxDistanceSq = fMaxDistance*fMaxDistance;
@@ -124,8 +124,8 @@ void CbmRichProtRingFinderHoughImpl::SetParameters()
 	fHTCutR = 5;
 	fMinNofHitsInArea = 4;
 
-	fNofBinsX = 25;
-	fNofBinsY = 25;
+	fNofBinsX = 2 * 25;
+	fNofBinsY = 2 * 25;
 	fNofBinsR = 32;
 
 	fAnnCut = 0.6;
@@ -337,7 +337,6 @@ void CbmRichProtRingFinderHoughImpl::FindPeak(
 		if (dr > 0.6f) continue;
 		ring1->AddHit(fData[j].fHit, fData[j].fId);
 	}
-
 	if (ring1->GetNofHits() < 7) {
 	   delete ring1;
 	   return;

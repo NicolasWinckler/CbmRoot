@@ -92,6 +92,7 @@ prototype/CbmRichProtPrepareExtrapolation.cxx
 prototype/CbmRichProtProjectionProducer.cxx
 prototype/CbmRichProtRingFinderHough.cxx
 prototype/CbmRichProtRingFinderHoughImpl.cxx
+prototype/CbmRichPrototypeQa.cxx
 qa/CbmRichGeoTest.cxx 
 qa/CbmRichUrqmdTest.cxx
 qa/CbmRichGeoTestStudyReport.cxx 
@@ -125,6 +126,7 @@ prototype/CbmRichProt.h
 prototype/CbmRichProtHitProducer.h
 prototype/CbmRichProtPrepareExtrapolation.h
 prototype/CbmRichProtProjectionProducer.h
+prototype/CbmRichPrototypeQa.h
 qa/CbmRichGeoTest.h 
 qa/CbmRichUrqmdTest.h
 )

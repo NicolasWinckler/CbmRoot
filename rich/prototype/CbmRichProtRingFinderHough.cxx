@@ -6,7 +6,7 @@
 **/
 
 #include "CbmRichProtRingFinderHough.h"
-#include "CbmRichRingFinderHoughImpl.h"
+#include "CbmRichProtRingFinderHoughImpl.h"
 //#include "CbmRichRingFinderHoughSimd.h"
 //#include "../../littrack/utils/CbmLitMemoryManagment.h"
 #include "CbmRichHit.h"
@@ -26,7 +26,7 @@ CbmRichProtRingFinderHough::CbmRichProtRingFinderHough():
     fHTImpl(NULL)
 {
 #ifdef HOUGH_SERIAL
-	fHTImpl = new CbmRichRingFinderHoughImpl();
+	fHTImpl = new CbmRichProtRingFinderHoughImpl();
 #endif
 
 #ifdef HOUGH_SIMD

@@ -26,10 +26,13 @@
 #pragma link C++ class CbmRichUrqmdTest+;
 #pragma link C++ class CbmRichRingFitterQa+;
 
+
+
 #pragma link C++ class CbmRichProt+;
 #pragma link C++ class CbmRichProtHitProducer+;
 #pragma link C++ class CbmRichProtPrepareExtrapolation+;
 #pragma link C++ class CbmRichProtProjectionProducer+;
+#pragma link C++ class CbmRichPrototypeQa+;
 
 #endif
 

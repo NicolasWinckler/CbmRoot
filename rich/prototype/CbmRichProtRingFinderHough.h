@@ -13,7 +13,7 @@
 #include "CbmRichRingFinder.h"
 #include <vector>
 
-class CbmRichRingFinderHoughImpl;
+class CbmRichProtRingFinderHoughImpl;
 class CbmRichRingFinderHoughSimd;
 class CbmRichRing;
 class CbmRichRingLight;
@@ -39,7 +39,7 @@ protected:
 
 // choose between serial and SIMD implementation of the ring finder
 #ifdef HOUGH_SERIAL
-	CbmRichRingFinderHoughImpl *fHTImpl;
+	CbmRichProtRingFinderHoughImpl *fHTImpl;
 #endif
 
 #ifdef HOUGH_SIMD

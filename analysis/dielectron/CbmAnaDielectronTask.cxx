@@ -752,7 +752,7 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
           }
        }
 
-       if (!isGamma && !isPi0) continue;
+       //if (!isGamma && !isPi0) continue;
 
        int richInd = gTrack->GetRichRingIndex();
        int trdInd = gTrack->GetTrdTrackIndex();
@@ -799,9 +799,9 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
       }
    }
    double nEv = fh_event_number->GetEntries();
-
-   cout << "fh_nof_rec_pi0 " << fh_nof_rec_pi0->GetBinContent(1) / nEv << endl;;
-   cout << "fh_nof_rec_gamma " << fh_nof_rec_gamma->GetBinContent(1) / nEv << endl;;
+   cout << "nEv = " << nEv << endl;
+   cout << "fh_nof_rec_pi0 = " << fh_nof_rec_pi0->GetBinContent(1) / nEv << endl;;
+   cout << "fh_nof_rec_gamma = " << fh_nof_rec_gamma->GetBinContent(1) / nEv << endl;;
 
    cout << "trGG_gamma = " << trG[0].size() << endl;
    cout << "trGS_gamma = " << trG[1].size() << endl;
@@ -810,8 +810,6 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
    cout << "trGG_pi0 = " << trPi0[0].size() << endl;
    cout << "trGS_pi0 = " << trPi0[1].size() << endl;
    cout << "trGP_pi0 = " << trPi0[2].size() << endl;
-
-
 
    cout << "nofGG_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(1) / nEv << endl;
    cout << "nofGP_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(2) / nEv << endl;
@@ -1140,8 +1138,6 @@ void CbmAnaDielectronTask::TrackSource(
 		fh_source_pt[kBg][step]->Fill(pt);
 		if (cand->isMcGammaElectron) {
 		   fh_source_tracks->Fill(binNum, 0.5);
-		   cout << "fh_source_tracks = " << fh_source_tracks->GetBinContent(kReco + 0.5, 0.5)/ (double)fh_event_number->GetEntries() << endl;
-
 		   fh_source_mom[kGamma][step]->Fill(mom);
 		   fh_source_pt[kGamma][step]->Fill(pt);
 

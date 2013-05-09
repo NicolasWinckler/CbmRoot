@@ -631,8 +631,10 @@ void CbmAnaDielectronTaskDraw::Draw2DCut(
    for (int i = 0; i < CbmAnaLmvmNames::fNofSourceTypes; i++){
       c->cd(i+1);
       DrawH2(H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] ));
-      cout << hist << "_" << CbmAnaLmvmNames::fSourceTypes[i] << " = " << H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] )->GetEntries()/(double)fNofEvents << endl;
-      DrawTextOnHist(CbmAnaLmvmNames::fSourceTypesLatex[i], 0.5, 0.89, 0.6, 0.99);
+      double nofPerEvent = H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] )->GetEntries()/(double)fNofEvents;
+      cout << hist << "_" << CbmAnaLmvmNames::fSourceTypes[i] << " = " << nofPerEvent << endl;
+      DrawTextOnHist( ( lit::NumberToString(nofPerEvent, 2) + "/ev."), 0.1, 0.9, 0.5, 0.99);
+      DrawTextOnHist(CbmAnaLmvmNames::fSourceTypesLatex[i], 0.6, 0.89, 0.7, 0.99);
       Draw2DCutTriangle(cutCrossX, cutCrossY);
       projX.push_back( H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] )->ProjectionX() );
       projY.push_back( H2( hist + "_"+ CbmAnaLmvmNames::fSourceTypes[i] )->ProjectionY() );
@@ -824,35 +826,22 @@ void CbmAnaDielectronTaskDraw::DrawMinvSource(
       int step,
       bool drawAnaStep)
 {
+   double nofBg = H1("fh_bg_minv_" + CbmAnaLmvmNames::fAnaSteps[step])->GetEntries();
+
    vector<TH1*> hists;
    for (int i = 0; i < CbmAnaLmvmNames::fNofBgPairSources; i++){
       stringstream ss;
       ss << "fh_source_bg_minv_" <<i << "_" << CbmAnaLmvmNames::fAnaSteps[step];
-      TH1D* h = H1(ss.str());
-//      TH1D* hs = NULL;
-//      if (i > 0){
-//         hs = (TH1D*)hists[i-1]->Clone();
-//         hs->Add(h);
-//      } else {
-//         hs = h;
-//      }
-//      hists.push_back(hs);
-      hists.push_back(h);
+      hists.push_back( H1(ss.str()) );
    }
-   vector<TH1*> hists2;
-   for (int i = 0; i < CbmAnaLmvmNames::fNofBgPairSources; i++){
-      hists2.push_back(hists[CbmAnaLmvmNames::fNofBgPairSources - i - 1]);
-   }
-   DrawH1(hists2, CbmAnaLmvmNames::fBgPairSourceLatex, kLinear, kLinear, false, 0.85, 0.15, 0.99, 0.80);
 
-   TLegend* legend = new TLegend(0.85, 0.15, 0.99, 0.90);
+   DrawH1(hists, CbmAnaLmvmNames::fBgPairSourceLatex, kLinear, kLinear, false, 0.85, 0.15, 0.99, 0.80);
+
+   TLegend* legend = new TLegend(0.78, 0.15, 0.99, 0.90);
    for (int i = 0; i < CbmAnaLmvmNames::fNofBgPairSources; i++){
       hists[i]->SetMinimum(1e-8);
-      //hists[i]->SetFillColor(i+1);
-      //hists[i]->SetLineWidth(1);
-      //hists[i]->SetLineColor(kBlack);
-      //hists[i]->SetLineStyle(CbmDrawingOptions::MarkerStyle(1));
-      legend->AddEntry(hists[i], CbmAnaLmvmNames::fBgPairSourceLatex[i].c_str(), "f");
+      legend->AddEntry(hists[i],
+            (CbmAnaLmvmNames::fBgPairSourceLatex[i]  + "(" +lit::NumberToString(100. * hists[i]->GetEntries() / nofBg, 1)+ "%)").c_str(), "f");
    }
    legend->SetFillColor(kWhite);
    legend->Draw();
@@ -875,6 +864,7 @@ void CbmAnaDielectronTaskDraw::DrawMinvSourceAll()
    TCanvas *cPtCut = CreateCanvas("lmvm_minv_source_" + CbmAnaLmvmNames::fAnaSteps[kPtCut],
          "lmvm_minv_source_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 600, 600);
    DrawMinvSource(kPtCut, false);
+
    }
 
    // Draw mismatches and true matches minv

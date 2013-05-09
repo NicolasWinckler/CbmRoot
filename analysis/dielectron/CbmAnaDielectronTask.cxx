@@ -360,6 +360,11 @@ void CbmAnaDielectronTask::InitHists()
    fHistoList.push_back(fh_pi_mom_rec_sts_rich_trd);
    fh_pi_mom_rec_sts_rich_trd_tof = new TH1D("fh_pi_mom_rec_sts_rich_trd_tof", "fh_pi_mom_rec_sts_rich_trd_tof;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
    fHistoList.push_back(fh_pi_mom_rec_sts_rich_trd_tof);
+
+   fh_nof_rec_pairs_gamma = new TH1D("fh_nof_rec_pairs_gamma", "fh_nof_rec_pairs_gamma;Pair category; Number per event", 3, -0.5, 2.5);
+   fHistoList.push_back(fh_nof_rec_pairs_gamma);
+   fh_nof_rec_pairs_pi0 = new TH1D("fh_nof_rec_pairs_pi0", "fh_nof_rec_pairs_pi0;Pair category; Number per event", 3, -0.5, 2.5);
+   fHistoList.push_back(fh_nof_rec_pairs_pi0);
 }
 
 InitStatus CbmAnaDielectronTask::Init()
@@ -473,6 +478,7 @@ void CbmAnaDielectronTask::Exec(
     MCPairs();   
     SingleParticleAcceptance();
     PairAcceptance();
+    NofGammaAndPi0Pairs();
     FillSegmentCandidatesArray();
     FillCandidateArray();
     DifferenceSignalAndBg();
@@ -697,6 +703,133 @@ void CbmAnaDielectronTask::FillElPiMomHist()
           }
        }
    }//gTracks
+}
+
+void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
+{
+   Int_t ngTracks = fGlobalTracks->GetEntriesFast();
+
+   // first index : [0] - G, [1] - S, [2] - P
+   // G - global tracks which pass through all detectors
+   // S - tracks reconstructed only in sts
+   // P - partially reconstructed tracks at least STS + one ID detector but not all
+   vector<vector<int> > trG, trPi0;
+   trG.resize(3);
+   trPi0.resize(3);
+   for (Int_t i = 0; i < ngTracks; i++) {
+
+       CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
+       if(NULL == gTrack) continue;
+
+       int stsInd = gTrack->GetStsTrackIndex();
+       if (stsInd < 0) continue;
+       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsInd);
+       if (stsTrack == NULL) continue;
+       CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+       if (stsMatch == NULL) continue;
+       int stsMcTrackId = stsMatch->GetMCTrackId();
+       if (stsMcTrackId < 0) continue;
+       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
+       if (mcTrack1 == NULL) continue;
+       int pdg = TMath::Abs(mcTrack1->GetPdgCode());
+       int motherId = mcTrack1->GetMotherId();
+
+       bool isPi0 = false;
+       bool isGamma = false;
+       if (motherId >=0){
+          CbmMCTrack* mct1 = (CbmMCTrack*) fMCTracks->At(motherId);
+          int motherPdg = mct1->GetPdgCode();
+          if (mct1 != NULL && motherPdg == 111 && pdg == 11) { // pi0
+             isPi0 = true;
+          }
+          if (mct1 != NULL && motherPdg == 22 && pdg == 11){ // gamma
+             isGamma = true;
+          }
+       }
+
+       if (!isGamma && !isPi0) continue;
+
+       int richInd = gTrack->GetRichRingIndex();
+       int trdInd = gTrack->GetTrdTrackIndex();
+       int tofInd = gTrack->GetTofHitIndex();
+
+       if (richInd >= 0 && trdInd >= 0 && tofInd >=0){
+          if (isGamma) trG[0].push_back(motherId);
+          if (isPi0) trPi0[0].push_back(motherId);
+       } else {
+          if (richInd >=0 || trdInd >= 0 || tofInd >= 0){
+             if (isGamma) trG[2].push_back(motherId);
+             if (isPi0) trPi0[2].push_back(motherId);
+          }
+          if (richInd < 0 && trdInd < 0 && tofInd < 0){
+             if (isGamma) trG[1].push_back(motherId);
+             if (isPi0) trPi0[1].push_back(motherId);
+          }
+       }
+   }//gTracks
+
+   //calculate number of pairs for Gamma
+   for(int i = 0; i < trG[0].size(); i++) {
+      for (int j = 0; j < trG[0].size(); j++) {
+         if (i == j) continue;
+         if (trG[0][i] == trG[0][j]) {
+            fh_nof_rec_pairs_gamma->Fill(0);
+            break;
+         }
+      }
+      for (int j = 0; j < trG[1].size(); j++) {
+         if (trG[0][i] == trG[1][j]) {
+            fh_nof_rec_pairs_gamma->Fill(1);
+            break;
+         }
+      }
+      for (int j = 0; j < trG[2].size(); j++) {
+         if (trG[0][i] == trG[2][j]) {
+            fh_nof_rec_pairs_gamma->Fill(2);
+            break;
+         }
+      }
+   }
+
+
+   //calculate number of pairs for Gamma
+   for(int i = 0; i < trPi0[0].size(); i++) {
+      for (int j = 0; j < trPi0[0].size(); j++) {
+         if (i == j) continue;
+         if (trPi0[0][i] == trPi0[0][j]) {
+            fh_nof_rec_pairs_pi0->Fill(0);
+            break;
+         }
+      }
+      for (int j = 0; j < trPi0[1].size(); j++) {
+         if (trPi0[0][i] == trPi0[1][j]) {
+            fh_nof_rec_pairs_pi0->Fill(1);
+            break;
+         }
+      }
+      for (int j = 0; j < trPi0[2].size(); j++) {
+         if (trPi0[0][i] == trPi0[2][j]) {
+            fh_nof_rec_pairs_pi0->Fill(2);
+            break;
+         }
+      }
+   }
+
+   cout << "trGG_gamma = " << trG[0].size() << endl;
+   cout << "trGS_gamma = " << trG[1].size() << endl;
+   cout << "trGP_gamma = " << trG[2].size() << endl;
+
+   cout << "trGG_pi0 = " << trPi0[0].size() << endl;
+   cout << "trGS_pi0 = " << trPi0[1].size() << endl;
+   cout << "trGP_pi0 = " << trPi0[2].size() << endl;
+
+   cout << "nofGG_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(1) << endl;
+   cout << "nofGP_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(2)<< endl;
+   cout << "nofGS_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(3) << endl;
+
+   cout << "nofGG_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(1) << endl;
+   cout << "nofGP_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(2)<< endl;
+   cout << "nofGS_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(3) << endl;
 }
 
 void CbmAnaDielectronTask::FillSegmentCandidatesArray()

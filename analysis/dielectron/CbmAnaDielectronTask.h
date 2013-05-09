@@ -260,6 +260,9 @@ public:
 
     void DifferenceSignalAndBg();
 
+
+    void NofGammaAndPi0Pairs();
+
     void SetDefaultIdParameters();
 
     /*
@@ -490,6 +493,10 @@ private:
    TH1D* fh_nof_bg_tracks;
    TH1D* fh_nof_el_tracks;
    TH2D* fh_source_tracks;
+
+   //nof gamma and pi0 pairs for different track categories : global, only STS or partially reconstructed
+   TH1D* fh_nof_rec_pairs_gamma;
+   TH1D* fh_nof_rec_pairs_pi0;
 
    TH1D* fh_nof_mismatches;
    TH1D* fh_nof_mismatches_rich;

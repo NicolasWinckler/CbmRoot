@@ -365,6 +365,11 @@ void CbmAnaDielectronTask::InitHists()
    fHistoList.push_back(fh_nof_rec_pairs_gamma);
    fh_nof_rec_pairs_pi0 = new TH1D("fh_nof_rec_pairs_pi0", "fh_nof_rec_pairs_pi0;Pair category; Number per event", 3, -0.5, 2.5);
    fHistoList.push_back(fh_nof_rec_pairs_pi0);
+
+   fh_nof_rec_gamma = new TH1D("fh_nof_rec_gamma", "fh_nof_rec_gamma;Track category; Number per event", 3, -0.5, 2.5);
+   fHistoList.push_back(fh_nof_rec_gamma);
+   fh_nof_rec_pi0 = new TH1D("fh_nof_rec_pi0", "fh_nof_rec_pi0;Track category; Number per event", 3, -0.5, 2.5);
+   fHistoList.push_back(fh_nof_rec_pi0);
 }
 
 InitStatus CbmAnaDielectronTask::Init()
@@ -754,16 +759,16 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
        int tofInd = gTrack->GetTofHitIndex();
 
        if (richInd >= 0 && trdInd >= 0 && tofInd >=0){
-          if (isGamma) trG[0].push_back(motherId);
-          if (isPi0) trPi0[0].push_back(motherId);
+          if (isGamma){fh_nof_rec_gamma->Fill(0); trG[0].push_back(motherId);}
+          if (isPi0){fh_nof_rec_pi0->Fill(0); trPi0[0].push_back(motherId);}
        } else {
           if (richInd >=0 || trdInd >= 0 || tofInd >= 0){
-             if (isGamma) trG[2].push_back(motherId);
-             if (isPi0) trPi0[2].push_back(motherId);
+             if (isGamma){fh_nof_rec_gamma->Fill(2); trG[2].push_back(motherId);}
+             if (isPi0){fh_nof_rec_pi0->Fill(2); trPi0[2].push_back(motherId);}
           }
           if (richInd < 0 && trdInd < 0 && tofInd < 0){
-             if (isGamma) trG[1].push_back(motherId);
-             if (isPi0) trPi0[1].push_back(motherId);
+             if (isGamma){fh_nof_rec_gamma->Fill(1); trG[1].push_back(motherId);}
+             if (isPi0){fh_nof_rec_pi0->Fill(1); trPi0[1].push_back(motherId);}
           }
        }
    }//gTracks
@@ -814,6 +819,10 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
          }
       }
    }
+   double nEv = fh_event_number->GetEntries();
+
+   cout << "fh_nof_rec_pi0 " << fh_nof_rec_pi0->GetEntries() / nEv << endl;;
+   cout << "fh_nof_rec_gamma " << fh_nof_rec_gamma->GetEntries() / nEv << endl;;
 
    cout << "trGG_gamma = " << trG[0].size() << endl;
    cout << "trGS_gamma = " << trG[1].size() << endl;
@@ -823,7 +832,7 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
    cout << "trGS_pi0 = " << trPi0[1].size() << endl;
    cout << "trGP_pi0 = " << trPi0[2].size() << endl;
 
-   double nEv = fh_event_number->GetEntries();
+
 
    cout << "nofGG_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(1) / nEv << endl;
    cout << "nofGP_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(2) / nEv << endl;

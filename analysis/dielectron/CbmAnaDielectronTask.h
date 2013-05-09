@@ -498,6 +498,10 @@ private:
    TH1D* fh_nof_rec_pairs_gamma;
    TH1D* fh_nof_rec_pairs_pi0;
 
+   //nof gamma and pi0 tracks for different track categories : global, only STS or partially reconstructed
+   TH1D* fh_nof_rec_gamma;
+   TH1D* fh_nof_rec_pi0;
+
    TH1D* fh_nof_mismatches;
    TH1D* fh_nof_mismatches_rich;
    TH1D* fh_nof_mismatches_trd;

@@ -800,8 +800,8 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
    }
    double nEv = fh_event_number->GetEntries();
 
-   cout << "fh_nof_rec_pi0 " << fh_nof_rec_pi0->GetBinContent(0) / nEv << endl;;
-   cout << "fh_nof_rec_gamma " << fh_nof_rec_gamma->GetBinContent(0) / nEv << endl;;
+   cout << "fh_nof_rec_pi0 " << fh_nof_rec_pi0->GetBinContent(1) / nEv << endl;;
+   cout << "fh_nof_rec_gamma " << fh_nof_rec_gamma->GetBinContent(1) / nEv << endl;;
 
    cout << "trGG_gamma = " << trG[0].size() << endl;
    cout << "trGS_gamma = " << trG[1].size() << endl;

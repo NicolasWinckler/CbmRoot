@@ -723,54 +723,65 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
    trPi0.resize(3);
    for (Int_t i = 0; i < ngTracks; i++) {
 
-       CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
-       if(NULL == gTrack) continue;
+      CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
+      if(NULL == gTrack) continue;
 
-       int stsInd = gTrack->GetStsTrackIndex();
-       if (stsInd < 0) continue;
-       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsInd);
-       if (stsTrack == NULL) continue;
-       CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
-       if (stsMatch == NULL) continue;
-       int stsMcTrackId = stsMatch->GetMCTrackId();
-       if (stsMcTrackId < 0) continue;
-       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
-       if (mcTrack1 == NULL) continue;
-       int pdg = TMath::Abs(mcTrack1->GetPdgCode());
-       int motherId = mcTrack1->GetMotherId();
+      int stsInd = gTrack->GetStsTrackIndex();
+      if (stsInd < 0) continue;
+      CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsInd);
+      if (stsTrack == NULL) continue;
+      CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+      if (stsMatch == NULL) continue;
+      int stsMcTrackId = stsMatch->GetMCTrackId();
+      if (stsMcTrackId < 0) continue;
+      CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
+      if (mcTrack1 == NULL) continue;
+      int pdg = TMath::Abs(mcTrack1->GetPdgCode());
+      int motherId = mcTrack1->GetMotherId();
 
-       bool isPi0 = false;
-       bool isGamma = false;
-       if (motherId >=0){
-          CbmMCTrack* mct1 = (CbmMCTrack*) fMCTracks->At(motherId);
-          int motherPdg = mct1->GetPdgCode();
-          if (mct1 != NULL && motherPdg == 111 && pdg == 11) { // pi0
-             isPi0 = true;
-          }
-          if (mct1 != NULL && motherPdg == 22 && pdg == 11){ // gamma
-             isGamma = true;
-          }
-       }
+      bool isPi0 = false;
+      bool isGamma = false;
+      if (motherId >=0){
+         CbmMCTrack* mct1 = (CbmMCTrack*) fMCTracks->At(motherId);
+         int motherPdg = mct1->GetPdgCode();
+         if (mct1 != NULL && motherPdg == 111 && pdg == 11) { // pi0
+            isPi0 = true;
+         }
+         if (mct1 != NULL && motherPdg == 22 && pdg == 11){ // gamma
+            isGamma = true;
+         }
+      }
 
-       //if (!isGamma && !isPi0) continue;
+      //if (!isGamma && !isPi0) continue;
 
-       int richInd = gTrack->GetRichRingIndex();
-       int trdInd = gTrack->GetTrdTrackIndex();
-       int tofInd = gTrack->GetTofHitIndex();
+      int richInd = gTrack->GetRichRingIndex();
+      int trdInd = gTrack->GetTrdTrackIndex();
+      int tofInd = gTrack->GetTofHitIndex();
 
-       if (richInd >= 0 && trdInd >= 0 && tofInd >=0){
-          if (isGamma){fh_nof_rec_gamma->Fill(0); trG[0].push_back(motherId);}
-          if (isPi0){fh_nof_rec_pi0->Fill(0); trPi0[0].push_back(motherId);}
-       } else {
-          if (richInd >=0 || trdInd >= 0 || tofInd >= 0){
-             if (isGamma){fh_nof_rec_gamma->Fill(2); trG[2].push_back(motherId);}
-             if (isPi0){fh_nof_rec_pi0->Fill(2); trPi0[2].push_back(motherId);}
-          }
-          if (richInd < 0 && trdInd < 0 && tofInd < 0){
-             if (isGamma){fh_nof_rec_gamma->Fill(1); trG[1].push_back(motherId);}
-             if (isPi0){fh_nof_rec_pi0->Fill(1); trPi0[1].push_back(motherId);}
-          }
-       }
+      if (richInd >= 0 && trdInd >= 0 && tofInd >=0){
+         fKFFitter.DoFit(stsTrack,11);
+         double chi2Prim = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
+         DielectronCandidate cand;
+         CbmRichRing* richRing = (CbmRichRing*) fRichRings->At(richInd);
+         CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdInd);
+         if (richRing!= NULL && trdTrack != NULL) {
+            IsElectron(richRing, cand.momentum.Mag(), trdTrack, gTrack, &cand);
+
+            if (cand.isElectron && chi2Prim < fChiPrimCut) {
+               if (isGamma){fh_nof_rec_gamma->Fill(0); trG[0].push_back(motherId);}
+               if (isPi0){fh_nof_rec_pi0->Fill(0); trPi0[0].push_back(motherId);}
+            }
+         }
+      } else {
+         if (richInd >=0 || trdInd >= 0 || tofInd >= 0){
+            if (isGamma){fh_nof_rec_gamma->Fill(2); trG[2].push_back(motherId);}
+            if (isPi0){fh_nof_rec_pi0->Fill(2); trPi0[2].push_back(motherId);}
+         }
+         if (richInd < 0 && trdInd < 0 && tofInd < 0){
+            if (isGamma){fh_nof_rec_gamma->Fill(1); trG[1].push_back(motherId);}
+            if (isPi0){fh_nof_rec_pi0->Fill(1); trPi0[1].push_back(motherId);}
+         }
+      }
    }//gTracks
 
    //calculate number of pairs for Gamma
@@ -800,16 +811,14 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
    }
    double nEv = fh_event_number->GetEntries();
    cout << "nEv = " << nEv << endl;
-   cout << "fh_nof_rec_pi0 = " << fh_nof_rec_pi0->GetBinContent(1) / nEv << endl;;
-   cout << "fh_nof_rec_gamma = " << fh_nof_rec_gamma->GetBinContent(1) / nEv << endl;;
+   cout << "fh_nof_rec_pi0_G = " << fh_nof_rec_pi0->GetBinContent(1) / nEv << endl;;
+   cout << "fh_nof_rec_gamma_G = " << fh_nof_rec_gamma->GetBinContent(1) / nEv << endl;
 
-   cout << "trGG_gamma = " << trG[0].size() << endl;
-   cout << "trGS_gamma = " << trG[1].size() << endl;
-   cout << "trGP_gamma = " << trG[2].size() << endl;
+   cout << "fh_nof_rec_pi0_S = " << fh_nof_rec_pi0->GetBinContent(2) / nEv << endl;;
+   cout << "fh_nof_rec_gamma_S = " << fh_nof_rec_gamma->GetBinContent(2) / nEv << endl;;
 
-   cout << "trGG_pi0 = " << trPi0[0].size() << endl;
-   cout << "trGS_pi0 = " << trPi0[1].size() << endl;
-   cout << "trGP_pi0 = " << trPi0[2].size() << endl;
+   cout << "fh_nof_rec_pi0_P = " << fh_nof_rec_pi0->GetBinContent(3) / nEv << endl;;
+   cout << "fh_nof_rec_gamma_P = " << fh_nof_rec_gamma->GetBinContent(3) / nEv << endl;;
 
    cout << "nofGG_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(1) / nEv << endl;
    cout << "nofGP_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(2) / nEv << endl;

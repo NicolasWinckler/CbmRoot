@@ -1140,6 +1140,8 @@ void CbmAnaDielectronTask::TrackSource(
 		fh_source_pt[kBg][step]->Fill(pt);
 		if (cand->isMcGammaElectron) {
 		   fh_source_tracks->Fill(binNum, 0.5);
+		   cout << "fh_source_tracks = " << fh_source_tracks->GetBinContent(kReco + 0.5, 0.5)/ (double)fh_event_number->GetEntries() << endl;
+
 		   fh_source_mom[kGamma][step]->Fill(mom);
 		   fh_source_pt[kGamma][step]->Fill(pt);
 

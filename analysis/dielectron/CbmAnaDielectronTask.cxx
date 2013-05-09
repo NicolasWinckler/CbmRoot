@@ -775,54 +775,33 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
 
    //calculate number of pairs for Gamma
    for(int i = 0; i < trG[0].size(); i++) {
-      for (int j = 0; j < trG[0].size(); j++) {
-         if (i == j) continue;
-         if (trG[0][i] == trG[0][j]) {
-            fh_nof_rec_pairs_gamma->Fill(0);
-            break;
-         }
-      }
-      for (int j = 0; j < trG[1].size(); j++) {
-         if (trG[0][i] == trG[1][j]) {
-            fh_nof_rec_pairs_gamma->Fill(1);
-            break;
-         }
-      }
-      for (int j = 0; j < trG[2].size(); j++) {
-         if (trG[0][i] == trG[2][j]) {
-            fh_nof_rec_pairs_gamma->Fill(2);
-            break;
+      for (int tk = 0; tk < 3; tk++){
+         for (int j = 0; j < trG[tk].size(); j++) {
+            if (tk == 0 && i == j) continue;
+            if (trG[0][i] == trG[tk][j]) {
+               fh_nof_rec_pairs_gamma->Fill(tk);
+               break;
+            }
          }
       }
    }
 
-
    //calculate number of pairs for Gamma
    for(int i = 0; i < trPi0[0].size(); i++) {
-      for (int j = 0; j < trPi0[0].size(); j++) {
-         if (i == j) continue;
-         if (trPi0[0][i] == trPi0[0][j]) {
-            fh_nof_rec_pairs_pi0->Fill(0);
-            break;
-         }
-      }
-      for (int j = 0; j < trPi0[1].size(); j++) {
-         if (trPi0[0][i] == trPi0[1][j]) {
-            fh_nof_rec_pairs_pi0->Fill(1);
-            break;
-         }
-      }
-      for (int j = 0; j < trPi0[2].size(); j++) {
-         if (trPi0[0][i] == trPi0[2][j]) {
-            fh_nof_rec_pairs_pi0->Fill(2);
-            break;
+      for (int tk = 0; tk < 3; tk++){
+         for (int j = 0; j < trPi0[tk].size(); j++) {
+            if (tk == 0 && i == j) continue;
+            if (trPi0[0][i] == trPi0[tk][j]) {
+               fh_nof_rec_pairs_pi0->Fill(tk);
+               break;
+            }
          }
       }
    }
    double nEv = fh_event_number->GetEntries();
 
-   cout << "fh_nof_rec_pi0 " << fh_nof_rec_pi0->GetEntries() / nEv << endl;;
-   cout << "fh_nof_rec_gamma " << fh_nof_rec_gamma->GetEntries() / nEv << endl;;
+   cout << "fh_nof_rec_pi0 " << fh_nof_rec_pi0->GetBinContent(0) / nEv << endl;;
+   cout << "fh_nof_rec_gamma " << fh_nof_rec_gamma->GetBinContent(0) / nEv << endl;;
 
    cout << "trGG_gamma = " << trG[0].size() << endl;
    cout << "trGS_gamma = " << trG[1].size() << endl;

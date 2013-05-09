@@ -823,13 +823,15 @@ void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
    cout << "trGS_pi0 = " << trPi0[1].size() << endl;
    cout << "trGP_pi0 = " << trPi0[2].size() << endl;
 
-   cout << "nofGG_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(1) << endl;
-   cout << "nofGP_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(2)<< endl;
-   cout << "nofGS_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(3) << endl;
+   double nEv = fh_event_number->GetEntries();
 
-   cout << "nofGG_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(1) << endl;
-   cout << "nofGP_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(2)<< endl;
-   cout << "nofGS_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(3) << endl;
+   cout << "nofGG_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(1) / nEv << endl;
+   cout << "nofGP_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(2) / nEv << endl;
+   cout << "nofGS_gamma = " << fh_nof_rec_pairs_gamma->GetBinContent(3) / nEv << endl;
+
+   cout << "nofGG_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(1) / nEv << endl;
+   cout << "nofGP_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(2) / nEv << endl;
+   cout << "nofGS_pi0 = " << fh_nof_rec_pairs_pi0->GetBinContent(3) / nEv << endl;
 }
 
 void CbmAnaDielectronTask::FillSegmentCandidatesArray()

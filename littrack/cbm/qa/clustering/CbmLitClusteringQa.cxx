@@ -116,10 +116,6 @@ void CbmLitClusteringQa::Exec(
    fBestPointsForHits.clear();
 
    if(fDet.GetDet(kMUCH)){
-      fNofMuchClusters = fMuchClusters->GetEntriesFast();
-      fNofMuchHits = fMuchPixelHits->GetEntriesFast();
-      fNofMuchDigis = fMuchDigis->GetEntriesFast();
-      fNofMuchPoints = fMuchPoints->GetEntriesFast();
       SetMuchClustersArray();
       FillMuchHistograms();
    }
@@ -318,152 +314,6 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
    }
 }
 
-void CbmLitClusteringQa::SetMuchClustersArray()
-{
-   vector<Int_t> totalDigisByPoint;
-   for(Int_t iPoint = 0; iPoint < fNofMuchPoints; iPoint++){
-      totalDigisByPoint.push_back(0);
-   }
-   for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
-      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*)fMuchDigiMatches->At(iDigi);
-      for(Int_t iRef = 0; iRef < digiMatch->GetNPoints(); iRef++){
-         totalDigisByPoint[digiMatch->GetRefIndex(iRef)]++;
-      }
-   }
-   vector<Int_t> pointsInCluster;
-   vector<Int_t> digisByPoint;
-   vector<Int_t> clusterToPointRatio;
-   for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
-      CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
-      for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-         Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-         if(isnan(digiIndex))continue;
-         CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
-         for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
-            Int_t refIndex = digiMatch->GetRefIndex(iPoint);
-            if(pointsInCluster.size() == 0){
-               pointsInCluster.push_back(refIndex);
-               clusterToPointRatio.push_back(0);
-               digisByPoint.push_back(1);
-            }
-            else{
-               Bool_t pointExist = 0;
-               for(Int_t i = 0; i < pointsInCluster.size(); i++){
-                  if(pointsInCluster[i] == refIndex){
-                     pointExist = 1;
-                     digisByPoint[i]++;
-                  }
-               }
-               if(pointExist == 0){
-                  pointsInCluster.push_back(refIndex);
-                  clusterToPointRatio.push_back(0);
-                  digisByPoint.push_back(1);
-               }
-            }
-         }
-      }
-      Int_t bp = 0;
-      for(Int_t iPoint = 0; iPoint < pointsInCluster.size(); iPoint++){
-         clusterToPointRatio.push_back(100.0 * (Float_t)digisByPoint[iPoint] /
-               (Float_t)totalDigisByPoint[pointsInCluster[iPoint]]);
-         if(clusterToPointRatio[iPoint] > 100) clusterToPointRatio[iPoint] = 100;
-         if(digisByPoint[iPoint] > bp){
-            bp = digisByPoint[iPoint];
-            fBestPoints[iCl] = pointsInCluster[iPoint];
-         }
-      }
-      if(fNofMuchClusters == fNofMuchHits){
-         fBestPointsForHits[iCl] = fBestPoints[iCl];
-      }
-      else{
-         Float_t minDist = 100000;
-         for(Int_t iHit = 0; iHit < fNofMuchHits; iHit++){
-            CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
-            minDist = 100000;
-            if(hit->GetRefId() == iCl){
-               for(Int_t iPoint = 0; iPoint < pointsInCluster.size(); iPoint++){
-                  CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(pointsInCluster[iPoint]);
-                  Float_t xP = (point->GetXIn() + point->GetXOut()) / 2;
-                  Float_t yP = (point->GetYIn() + point->GetYOut()) / 2;
-                  Float_t dist = sqrt((xP - hit->GetX()) * (xP - hit->GetX()) + (yP - hit->GetY()) * (yP - hit->GetY()));
-                  if(dist < minDist){
-                     bp = digisByPoint[iPoint];
-                     fBestPointsForHits[iHit/*iCl*/] = pointsInCluster[iPoint];
-                     minDist = dist;
-                  }
-               }
-            }
-         }
-      }
-      pointsInCluster.clear();
-      digisByPoint.clear();
-      clusterToPointRatio.clear();
-   }
-}
-
-Float_t CbmLitClusteringQa::CalculateMuchClusterToPointRatio(Int_t nCluster, Int_t nPoint)
-{
-   Int_t nofDigisInCluster = 0;
-   Int_t nofDigisInPoint = 0;
-   for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
-      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*)fMuchDigiMatches->At(iDigi);
-      for(Int_t iRef = 0; iRef < digiMatch->GetNPoints(); iRef++){
-         if(digiMatch->GetRefIndex(iRef) == nPoint)nofDigisInPoint++;
-      }
-   }
-   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
-   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-      if(isnan(digiIndex))continue;
-      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
-      for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
-         if(digiMatch->GetRefIndex(iPoint) == nPoint)nofDigisInCluster++;
-      }
-   }
-   Float_t clusterToPointRatio = 100.0 * (Float_t)nofDigisInCluster / (Float_t)nofDigisInPoint;
-   if(clusterToPointRatio > 100)clusterToPointRatio = 100;
-   return clusterToPointRatio;
-}
-
-Float_t CbmLitClusteringQa::CalculateMuchDigisToClusterRatio(Int_t nCluster, Int_t nPoint)
-{
-   Int_t nofDigisInCluster = 0;
-   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
-   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-      if(isnan(digiIndex))continue;
-      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
-      for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
-         if(digiMatch->GetRefIndex(iPoint) == nPoint)nofDigisInCluster++;
-      }
-   }
-   Float_t clusterToPointRatio = 100.0 * (Float_t)nofDigisInCluster / (Float_t)(cluster->GetNDigis());
-   if(clusterToPointRatio > 100)clusterToPointRatio = 100;
-   return clusterToPointRatio;
-}
-
-Int_t CbmLitClusteringQa::GetNofPointsInCluster(Int_t nCluster)
-{
-   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
-   vector<Int_t> pointsInCluster;
-   Int_t nofPoints = 0;
-   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++)
-   {
-      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-      if(isnan(digiIndex))continue;
-      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
-      for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
-         std::sort(pointsInCluster.begin(), pointsInCluster.end());
-         if(!std::binary_search(pointsInCluster.begin(), pointsInCluster.end(), digiMatch->GetRefIndex(iPoint))){
-            pointsInCluster.push_back(digiMatch->GetRefIndex(iPoint));
-            nofPoints++;
-         }
-      }
-   }
-   pointsInCluster.clear();
-   return nofPoints;
-}
-
 void CbmLitClusteringQa::CreateMuchHistograms()
 {
 	fHM->Create1<TH1F>("hss_Much_ClusterToPointRatio", "hss_Much_ClusterToPointRatio;Layer number;Quality per event", 100, -0.5, 99.5);
@@ -544,6 +394,158 @@ void CbmLitClusteringQa::CreateMuchHistograms()
 	fHM->Create1<TH1F>("h_Much_Muon_PullSigma_Y", "h_Much_Muon_PullSigma_Y;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
 }
 
+
+void CbmLitClusteringQa::SetMuchClustersArray()
+{
+   vector<Int_t> totalDigisByPoint;
+   Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+   for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
+      totalDigisByPoint.push_back(0);
+   }
+   Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+   for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
+      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*)fMuchDigiMatches->At(iDigi);
+      for(Int_t iRef = 0; iRef < digiMatch->GetNPoints(); iRef++){
+         totalDigisByPoint[digiMatch->GetRefIndex(iRef)]++;
+      }
+   }
+   vector<Int_t> pointsInCluster;
+   vector<Int_t> digisByPoint;
+   vector<Int_t> clusterToPointRatio;
+   Int_t nofMuchHits = fMuchClusters->GetEntriesFast();
+   Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+   for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++) {
+      CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
+      for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
+         Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+         if(isnan(digiIndex))continue;
+         CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
+         for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
+            Int_t refIndex = digiMatch->GetRefIndex(iPoint);
+            if(pointsInCluster.size() == 0){
+               pointsInCluster.push_back(refIndex);
+               clusterToPointRatio.push_back(0);
+               digisByPoint.push_back(1);
+            }
+            else{
+               Bool_t pointExist = 0;
+               for(Int_t i = 0; i < pointsInCluster.size(); i++){
+                  if(pointsInCluster[i] == refIndex){
+                     pointExist = 1;
+                     digisByPoint[i]++;
+                  }
+               }
+               if(pointExist == 0){
+                  pointsInCluster.push_back(refIndex);
+                  clusterToPointRatio.push_back(0);
+                  digisByPoint.push_back(1);
+               }
+            }
+         }
+      }
+      Int_t bp = 0;
+      for(Int_t iPoint = 0; iPoint < pointsInCluster.size(); iPoint++){
+         clusterToPointRatio.push_back(100.0 * (Float_t)digisByPoint[iPoint] /
+               (Float_t)totalDigisByPoint[pointsInCluster[iPoint]]);
+         if(clusterToPointRatio[iPoint] > 100) clusterToPointRatio[iPoint] = 100;
+         if(digisByPoint[iPoint] > bp){
+            bp = digisByPoint[iPoint];
+            fBestPoints[iCl] = pointsInCluster[iPoint];
+         }
+      }
+      if (nofMuchClusters == nofMuchHits) {
+         fBestPointsForHits[iCl] = fBestPoints[iCl];
+      } else {
+         Float_t minDist = 100000;
+         for(Int_t iHit = 0; iHit < nofMuchHits; iHit++){
+            CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
+            minDist = 100000;
+            if(hit->GetRefId() == iCl){
+               for(Int_t iPoint = 0; iPoint < pointsInCluster.size(); iPoint++){
+                  CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(pointsInCluster[iPoint]);
+                  Float_t xP = (point->GetXIn() + point->GetXOut()) / 2;
+                  Float_t yP = (point->GetYIn() + point->GetYOut()) / 2;
+                  Float_t dist = sqrt((xP - hit->GetX()) * (xP - hit->GetX()) + (yP - hit->GetY()) * (yP - hit->GetY()));
+                  if(dist < minDist){
+                     bp = digisByPoint[iPoint];
+                     fBestPointsForHits[iHit/*iCl*/] = pointsInCluster[iPoint];
+                     minDist = dist;
+                  }
+               }
+            }
+         }
+      }
+      pointsInCluster.clear();
+      digisByPoint.clear();
+      clusterToPointRatio.clear();
+   }
+}
+
+Float_t CbmLitClusteringQa::CalculateMuchClusterToPointRatio(Int_t nCluster, Int_t nPoint)
+{
+   Int_t nofDigisInCluster = 0;
+   Int_t nofDigisInPoint = 0;
+   Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+   for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
+      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*)fMuchDigiMatches->At(iDigi);
+      for(Int_t iRef = 0; iRef < digiMatch->GetNPoints(); iRef++){
+         if(digiMatch->GetRefIndex(iRef) == nPoint)nofDigisInPoint++;
+      }
+   }
+   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
+   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
+      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+      if(isnan(digiIndex))continue;
+      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
+      for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
+         if(digiMatch->GetRefIndex(iPoint) == nPoint)nofDigisInCluster++;
+      }
+   }
+   Float_t clusterToPointRatio = 100.0 * (Float_t)nofDigisInCluster / (Float_t)nofDigisInPoint;
+   if(clusterToPointRatio > 100)clusterToPointRatio = 100;
+   return clusterToPointRatio;
+}
+
+Float_t CbmLitClusteringQa::CalculateMuchDigisToClusterRatio(Int_t nCluster, Int_t nPoint)
+{
+   Int_t nofDigisInCluster = 0;
+   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
+   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
+      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+      if(isnan(digiIndex))continue;
+      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
+      for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
+         if(digiMatch->GetRefIndex(iPoint) == nPoint)nofDigisInCluster++;
+      }
+   }
+   Float_t clusterToPointRatio = 100.0 * (Float_t)nofDigisInCluster / (Float_t)(cluster->GetNDigis());
+   if(clusterToPointRatio > 100)clusterToPointRatio = 100;
+   return clusterToPointRatio;
+}
+
+Int_t CbmLitClusteringQa::GetNofPointsInCluster(Int_t nCluster)
+{
+   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
+   vector<Int_t> pointsInCluster;
+   Int_t nofPoints = 0;
+   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++)
+   {
+      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+      if(isnan(digiIndex))continue;
+      CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
+      for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
+         std::sort(pointsInCluster.begin(), pointsInCluster.end());
+         if(!std::binary_search(pointsInCluster.begin(), pointsInCluster.end(), digiMatch->GetRefIndex(iPoint))){
+            pointsInCluster.push_back(digiMatch->GetRefIndex(iPoint));
+            nofPoints++;
+         }
+      }
+   }
+   pointsInCluster.clear();
+   return nofPoints;
+}
+
+
 void CbmLitClusteringQa::FillMuchHistograms()
 {
 	FillMuchClusterQualityHistogram();
@@ -584,7 +586,8 @@ void CbmLitClusteringQa::FillMuchPixelHitsHistogram()
       }
       vector<Int_t> muonPoints;
       vector<Int_t> trueHits;
-      for(Int_t iHit = 0; iHit < fNofMuchHits; iHit++){
+      Int_t nofMuchHits = fMuchPixelHits->GetEntriesFast();
+      for(Int_t iHit = 0; iHit < nofMuchHits; iHit++){
          CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
          if(isnan(hit->GetX()) || (isnan(hit->GetY())))continue;
          Int_t nStation = fMuchGeoScheme->GetStationIndex(hit->GetDetectorId());
@@ -637,7 +640,8 @@ void CbmLitClusteringQa::FillMuchClustersHistogram()
          }
       }
       vector<Int_t> muonPoints;
-      for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
+      Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+      for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
          CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
          if(cluster->GetNDigis() < 1)continue;
          CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
@@ -683,7 +687,8 @@ void CbmLitClusteringQa::FillMuchPointsHistogram()
             nofPoints_Muon.push_back(0);
          }
       }
-      for(Int_t iPoint = 0; iPoint < fNofMuchPoints; iPoint++){
+      Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+      for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(iPoint);
          Int_t nStation = fMuchGeoScheme->GetStationIndex(point->GetDetectorId());
          if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
@@ -721,7 +726,8 @@ void CbmLitClusteringQa::FillMuchDigisHistogram()
             nofDigis_Muon.push_back(0);
          }
       }
-      for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
+      Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+      for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
          CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
          Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
          if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
@@ -764,17 +770,19 @@ void CbmLitClusteringQa::FillDigiByPointHistogrm()
          }
       }
       vector<Int_t> digisInPoint;
-      for(Int_t iPoint = 0; iPoint < fNofMuchPoints; iPoint++){
+      Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+      for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          digisInPoint.push_back(0);
       }
-      for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
+      Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+      for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
          CbmMuchDigiMatch* digi = (CbmMuchDigiMatch*) fMuchDigiMatches->At(iDigi);
          if(isnan(digi->GetNPoints()))continue;
          for(Int_t iRef = 0; iRef < digi->GetNPoints(); iRef++){
             digisInPoint[digi->GetRefIndex(iRef)]++;
          }
       }
-      for(Int_t iPoint = 0; iPoint < fNofMuchPoints; iPoint++){
+      for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(iPoint);
          Int_t nStation = fMuchGeoScheme->GetStationIndex(point->GetDetectorId());
          if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
@@ -821,7 +829,8 @@ void CbmLitClusteringQa::FillMuchClusterQualityHistogram()
 			digiToClPerLayer.push_back(0);
 			hitsPerLayer.push_back(0);
 		}
-		for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
+		Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+		for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
 		   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
 		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
 			Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
@@ -870,7 +879,8 @@ void CbmLitClusteringQa::FillMuchClusterQuality2DHistogram()
             qualityDigisInClusterByRadiusStep.push_back(0);
             clustersByRadiusStep.push_back(0);
          }
-         for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
+         Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+         for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
             CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(fBestPoints[iCl]);
             if((iStation == fMuchGeoScheme->GetStationIndex(point->GetDetectorId())) &&
                   (iLayer == fMuchGeoScheme->GetLayerIndex(point->GetDetectorId()))){
@@ -933,7 +943,8 @@ void CbmLitClusteringQa::FillMuchMCPointsInClusterHistogrm()
 			pointsInClustersPerLayer.push_back(0);
 			clustersPerLayer.push_back(0);
 		}
-		for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
+		Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+		for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
 		   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
 		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
 			Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
@@ -975,7 +986,8 @@ void CbmLitClusteringQa::FillMuchMCPointsInCluster2DHistogrm()
             pointsInClustersByRadiusStep.push_back(0);
             clustersByRadiusStep.push_back(0);
          }
-         for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
+         Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+         for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
             CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(fBestPoints[iCl]);
             if((iStation == fMuchGeoScheme->GetStationIndex(point->GetDetectorId())) &&
                   (iLayer == fMuchGeoScheme->GetLayerIndex(point->GetDetectorId()))){
@@ -1048,7 +1060,8 @@ void CbmLitClusteringQa::FillMuchMCPointsByDigiHistogram()
 			pointsByDigiPerLayer.push_back(0);
 			digisPerLayer.push_back(0);
 		}
-		for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
+		Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+		for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
 			CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
 			Int_t detId = digi->GetDetectorId();
 			Int_t nStation = fMuchGeoScheme->GetStationIndex(detId);
@@ -1091,7 +1104,8 @@ void CbmLitClusteringQa::FillMuchMCPointsByDigi2DHistogram()
             pointsByDigiByRadiusStep.push_back(0);
             digisByRadiusStep.push_back(0);
          }
-         for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
+         Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+         for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
             CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
             Int_t detId = digi->GetDetectorId();
             if((iStation == fMuchGeoScheme->GetStationIndex(detId)) &&
@@ -1128,17 +1142,19 @@ void CbmLitClusteringQa::FillDigiByPointDistributionHistogrm()
 {
    if (NULL != fMuchDigis && NULL != fMuchPoints && fHM->Exists("hss_Much_NofDigisByPoint_Total")){
       vector<Int_t> digisInPoint;
-      for(Int_t iPoint = 0; iPoint < fNofMuchPoints; iPoint++){
+      Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+      for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          digisInPoint.push_back(0);
       }
-      for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
+      Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+      for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
          CbmMuchDigiMatch* digi = (CbmMuchDigiMatch*) fMuchDigiMatches->At(iDigi);
          if(isnan(digi->GetNPoints()))continue;
          for(Int_t iRef = 0; iRef < digi->GetNPoints(); iRef++){
             digisInPoint[digi->GetRefIndex(iRef)]++;
          }
       }
-      for(Int_t iPoint = 0; iPoint < fNofMuchPoints; iPoint++){
+      for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          fHM->H1("hss_Much_NofDigisByPoint_Total")->Fill(digisInPoint[iPoint], 1);
       }
    }
@@ -1147,7 +1163,8 @@ void CbmLitClusteringQa::FillDigiByPointDistributionHistogrm()
 void CbmLitClusteringQa::FillPointsInDigiDistributionHistogrm()
 {
    if (NULL != fMuchDigis && NULL != fMuchPoints && fHM->Exists("hss_Much_NofPointsInDigi_Total")){
-      for(Int_t iDigi = 0; iDigi < fNofMuchDigis; iDigi++){
+	  Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
+      for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
          CbmMuchDigiMatch* digi = (CbmMuchDigiMatch*) fMuchDigiMatches->At(iDigi);
          if(isnan(digi->GetNPoints()))continue;
          fHM->H1("hss_Much_NofPointsInDigi_Total")->Fill(digi->GetNPoints(), 1);
@@ -1158,7 +1175,8 @@ void CbmLitClusteringQa::FillPointsInDigiDistributionHistogrm()
 void CbmLitClusteringQa::FillDigisInClusterDistributionHistogrm()
 {
    if (NULL != fMuchDigis && NULL != fMuchClusters && fHM->Exists("hss_Much_NofDigisInCluster_Total")){
-      for(Int_t iCl = 0; iCl < fNofMuchClusters; iCl++){
+      Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
+	  for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
          CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
          if(isnan(cluster->GetNDigis()))continue;
          fHM->H1("hss_Much_NofDigisInCluster_Total")->Fill(cluster->GetNDigis(), 1);
@@ -1169,7 +1187,8 @@ void CbmLitClusteringQa::FillDigisInClusterDistributionHistogrm()
 void CbmLitClusteringQa::FillMuchResidualHistograms()
 {
    if (NULL != fMuchPixelHits && NULL != fMuchPoints && fHM->Exists("hr_Much_ResidualX_2D") && fHM->Exists("hr_Much_ResidualY_2D")){
-      for(Int_t iHit = 0; iHit < fNofMuchHits; iHit++){
+     Int_t nofMuchHits = fMuchPixelHits->GetEntriesFast();
+	 for(Int_t iHit = 0; iHit < nofMuchHits; iHit++){
          CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
          if(isnan(hit->GetX()) || (isnan(hit->GetY())))continue;
          const CbmMuchPoint* muchPoint = static_cast<const CbmMuchPoint*>(fMuchPoints->At(fBestPointsForHits[/*hit->GetRefId()*/iHit]));

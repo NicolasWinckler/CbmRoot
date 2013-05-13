@@ -166,11 +166,6 @@ private:
 
     CbmMuchGeoScheme* fMuchGeoScheme;
     TString fMuchDigiFile;
-    Int_t fNofMuchClusters;
-    Int_t fNofMuchHits;
-    Int_t fNofMuchDigis;
-    Int_t fNofMuchPoints;
-    Int_t fNofMuchLayers;
 
     std::map<Int_t, Int_t> fBestPoints;
     std::map<Int_t, Int_t> fBestPointsForHits;

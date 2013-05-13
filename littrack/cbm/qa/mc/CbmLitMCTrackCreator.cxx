@@ -30,6 +30,7 @@
 
 #include "TDatabasePDG.h"
 #include "TGeoManager.h"
+#include "TClonesArray.h"
 
 CbmLitMCTrackCreator::CbmLitMCTrackCreator():
    fMCTracks(NULL),

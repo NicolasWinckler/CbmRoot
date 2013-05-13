@@ -19,6 +19,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairBaseParSet.h"
+#include "FairLogger.h"
 
 #include <iostream>
 using std::cout;

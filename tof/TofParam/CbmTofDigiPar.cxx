@@ -3,6 +3,7 @@
 #include "CbmTofCell.h"
 
 #include "FairParamList.h"
+#include "FairLogger.h"
 
 #include <iostream>
 

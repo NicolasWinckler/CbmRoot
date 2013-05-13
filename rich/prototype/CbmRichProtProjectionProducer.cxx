@@ -19,6 +19,7 @@
 #include "TVector3.h"
 #include "TClonesArray.h"
 #include "TGeoManager.h"
+#include "TMatrixFSym.h"
 
 #include <iostream>
 

@@ -13,6 +13,8 @@
 #include "CbmPixelHit.h"
 #include "FairTrackParam.h"
 
+#include "TClonesArray.h"
+
 #include <cassert>
 
 

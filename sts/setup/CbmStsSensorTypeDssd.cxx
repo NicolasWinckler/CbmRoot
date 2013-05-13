@@ -11,6 +11,7 @@
 #include "CbmStsSensorPoint.h"
 #include "CbmStsSensorTypeDssd.h"
 
+#include <iomanip>
 
 using namespace std;
 

@@ -3,6 +3,9 @@
 
 #include "CbmModule.h"
 
+class TGeoRotation;
+class  TGeoCombiTrans;
+
 class CbmMagnet : public CbmModule {
   public:
     CbmMagnet(const char *name, const char *title="CBM Magnet", 

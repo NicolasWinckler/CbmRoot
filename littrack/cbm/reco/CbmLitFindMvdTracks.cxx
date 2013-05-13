@@ -20,6 +20,8 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "TClonesArray.h"
+
 #include <iostream>
 #include <algorithm>
 

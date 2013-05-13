@@ -28,7 +28,7 @@
 #include "FairRootManager.h"
 
 //#include "TCanvas.h"
-//#include "TClonesArray.h"
+#include "TClonesArray.h"
 #include "TMath.h"
 
 #include "draw/CbmDrawHist.h"

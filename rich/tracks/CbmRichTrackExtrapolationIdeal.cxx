@@ -16,6 +16,7 @@
 #include "FairRootManager.h"
 
 #include "TClonesArray.h"
+#include "TMatrixFSym.h"
 
 #include <iostream>
 

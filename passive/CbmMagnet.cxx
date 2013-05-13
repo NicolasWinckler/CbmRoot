@@ -14,6 +14,7 @@
 
 #include "TList.h"
 #include "TObjArray.h"
+#include "TGeoMatrix.h"
 
 CbmMagnet::CbmMagnet()
   : CbmModule("CbmMagnet", "CbmMagnet"),

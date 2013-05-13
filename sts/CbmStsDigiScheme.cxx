@@ -20,6 +20,7 @@
 #include "FairGeoNode.h"
 #include "FairGeoTransform.h"
 #include "FairGeoVector.h"
+#include "FairLogger.h"
 
 #include "TArrayD.h"
 #include "TGeoManager.h"

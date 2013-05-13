@@ -9,6 +9,7 @@
 
 // Includes from base
 #include "FairRootManager.h"
+#include "FairLogger.h"
 
 // Includes from TRD
 #include "CbmTrdHitProducerIdeal.h"

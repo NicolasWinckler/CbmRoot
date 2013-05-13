@@ -110,31 +110,6 @@ vector<TProfile2D*> CbmHistManager::P2Vector(
    return ObjectVector<TProfile2D*>(pattern);
 }
 
-template<class T> void CbmHistManager::Create1(
-      const string& name,
-      const string& title,
-      Int_t nofBins,
-      Double_t minBin,
-      Double_t maxBin)
-{
-	T* h = new T(name.c_str(), title.c_str(), nofBins, minBin, maxBin);
-	Add(name, h);
-}
-
-template<class T> void CbmHistManager::Create2(
-      const string& name,
-      const string& title,
-      Int_t nofBinsX,
-      Double_t minBinX,
-      Double_t maxBinX,
-      Int_t nofBinsY,
-      Double_t minBinY,
-      Double_t maxBinY)
-{
-	T* h = new T(name.c_str(), title.c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
-	Add(name, h);
-}
-
 void CbmHistManager::WriteToFile()
 {
    map<string, TNamed*>::iterator it;

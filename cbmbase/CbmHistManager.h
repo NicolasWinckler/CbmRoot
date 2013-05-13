@@ -75,7 +75,10 @@ public:
          const string& title,
          Int_t nofBins,
          Double_t minBin,
-         Double_t maxBin);
+         Double_t maxBin) {
+		T* h = new T(name.c_str(), title.c_str(), nofBins, minBin, maxBin);
+		Add(name, h);
+	}
 
    /**
     * \brief Helper function for creation of 2-dimensional histograms and profiles.
@@ -98,7 +101,10 @@ public:
          Double_t maxBinX,
          Int_t nofBinsY,
          Double_t minBinY,
-         Double_t maxBinY);
+         Double_t maxBinY) {
+   	T* h = new T(name.c_str(), title.c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
+   	Add(name, h);
+   }
 
    /**
     * \brief Return pointer to TH1 histogram.

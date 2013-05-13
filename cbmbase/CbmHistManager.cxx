@@ -121,7 +121,7 @@ template<class T> void CbmHistManager::Create1(
 	Add(name, h);
 }
 
-template<class T> void Create2(
+template<class T> void CbmHistManager::Create2(
       const string& name,
       const string& title,
       Int_t nofBinsX,

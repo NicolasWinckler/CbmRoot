@@ -127,7 +127,6 @@ void CbmLitClusteringQa::Exec(
 
 void CbmLitClusteringQa::Finish()
 {
-
    if(fDet.GetDet(kMUCH)){
       FillMuchAccuracyHistograms();
    }
@@ -275,63 +274,7 @@ void CbmLitClusteringQa::CreateHistograms()
    CreateNofObjectsHistograms(kRICH, "Rich");
 
    // Histogram stores number of events
-   CreateH1F("hen_EventNo_ClusteringQa", "", "", 1, 0, 1.);
-}
-
-void CbmLitClusteringQa::CreateH1F(
-      const string& name,
-      const string& xTitle,
-      const string& yTitle,
-      Int_t nofBins,
-      Double_t minBin,
-      Double_t maxBin)
-{
-   TH1F* h = new TH1F(name.c_str(), (name + ";" + xTitle + ";" + yTitle).c_str(), nofBins, minBin, maxBin);
-   fHM->Add(name, h);
-}
-
-void CbmLitClusteringQa::CreateP1(
-      const string& name,
-      const string& xTitle,
-      const string& yTitle,
-      Int_t nofBins,
-      Double_t minBin,
-      Double_t maxBin)
-{
-   TProfile* h = new TProfile(name.c_str(), (name + ";" + xTitle + ";" + yTitle).c_str(), nofBins, minBin, maxBin);
-   fHM->Add(name, h);
-}
-
-void CbmLitClusteringQa::CreateH2F(
-      const string& name,
-      const string& xTitle,
-      const string& yTitle,
-      const string& zTitle,
-      Int_t nofBinsX,
-      Double_t minBinX,
-      Double_t maxBinX,
-      Int_t nofBinsY,
-      Double_t minBinY,
-      Double_t maxBinY)
-{
-   TH2F* h = new TH2F(name.c_str(), (name + ";" + xTitle + ";" + yTitle + ";" + zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
-   fHM->Add(name, h);
-}
-
-void CbmLitClusteringQa::CreateP2(
-      const string& name,
-      const string& xTitle,
-      const string& yTitle,
-      const string& zTitle,
-      Int_t nofBinsX,
-      Double_t minBinX,
-      Double_t maxBinX,
-      Int_t nofBinsY,
-      Double_t minBinY,
-      Double_t maxBinY)
-{
-   TProfile2D* h = new TProfile2D(name.c_str(), (name + ";" + xTitle + ";" + yTitle + ";" + zTitle).c_str(), nofBinsX, minBinX, maxBinX, nofBinsY, minBinY, maxBinY);
-   fHM->Add(name, h);
+   fHM->Create1<TH1F>("hen_EventNo_ClusteringQa", "hen_EventNo_ClusteringQa", 1, 0, 1.);
 }
 
 void CbmLitClusteringQa::CreateNofObjectsHistograms(
@@ -344,14 +287,14 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
    Double_t maxX = 100000.;
    if (fDet.GetDet(detId)) {
       string name = "hno_NofObjects_" + detName;
-      CreateH1F(name + "Points_Event", "Points per event", "Counter", nofBins, minX, maxX);
-      CreateH1F(name + "Digis_Event", "Digis per event", "Counter", nofBins, minX, maxX);
-      CreateH1F(name + "Clusters_Event", "Clusters per event", "Counter", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Points_Event", name + "Points_Event;Points per event;Counter", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Digis_Event", name + "Digis_Event;Digis per event;Counter", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Clusters_Event", name + "Clusters_Event;Clusters per event;Counter", nofBins, minX, maxX);
       if (detId == kMUCH) {
-         CreateH1F(name + "PixelHits_Event", "Hits per event", "Counter", nofBins, minX, maxX);
-         CreateH1F(name + "StrawHits_Event", "Hits per event", "Counter", nofBins, minX, maxX);
+         fHM->Create1<TH1F>(name + "PixelHits_Event", name + "PixelHits_Event;Hits per event;Counter", nofBins, minX, maxX);
+         fHM->Create1<TH1F>(name + "StrawHits_Event", name + "StrawHits_Event;Hits per event;Counter", nofBins, minX, maxX);
       } else {
-         CreateH1F(name + "Hits_Event", "Hits per event", "Counter", nofBins, minX, maxX);
+         fHM->Create1<TH1F>(name + "Hits_Event", name + "Hits_Event;Hits per event;Counter", nofBins, minX, maxX);
       }
    }
 }
@@ -368,10 +311,10 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
    Double_t maxX = 100.;
    if (fDet.GetDet(detId)) {
       string name = "hno_NofObjects_" + detName;
-      CreateH1F(name + "Points_" + parameter, xTitle, "Points per event", nofBins, minX, maxX);
-      CreateH1F(name + "Digis_" + parameter, xTitle, "Digis per event", nofBins, minX, maxX);
-      CreateH1F(name + "Clusters_" + parameter, xTitle, "Clusters per event", nofBins, minX, maxX);
-      CreateH1F(name + "Hits_" + parameter, xTitle, "Hits per event", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Points_" + parameter, name + "Points_" + parameter + ";" + xTitle + ";Points per event", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Digis_" + parameter, name + "Digis_" + parameter + ";" + xTitle + ";Digis per event", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Clusters_" + parameter, name + "Clusters_" + parameter + ";" + xTitle + ";Clusters per event", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "Hits_" + parameter, name + "Hits_" + parameter + ";" + xTitle + ";Hits per event", nofBins, minX, maxX);
    }
 }
 
@@ -523,17 +466,17 @@ Int_t CbmLitClusteringQa::GetNofPointsInCluster(Int_t nCluster)
 
 void CbmLitClusteringQa::CreateMuchHistograms()
 {
-	CreateH1F("hss_Much_ClusterToPointRatio", "Layer number", "Quality per event", 100, -0.5, 99.5);
-	CreateH1F("hss_Much_ClusterQuality", "Layer number", "Quality per event", 100, -0.5, 99.5);
-	CreateH1F("hss_Much_NofPointsInCluster", "Layer number", "MCPoints in clusters per event", 100, -0.5, 99.5);
-	CreateH1F("hss_Much_NofPointsInDigi", "Layer number", "MCPoints by digi per event", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_ClusterToPointRatio", "hss_Much_ClusterToPointRatio;Layer number;Quality per event", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_ClusterQuality", "hss_Much_ClusterQuality;Layer number;Quality per event", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_NofPointsInCluster", "hss_Much_NofPointsInCluster;Layer number;MCPoints in clusters per event", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_NofPointsInDigi", "hss_Much_NofPointsInDigi;Layer number;MCPoints by digi per event", 100, -0.5, 99.5);
 
-	CreateP1("hsh_Much_PixelHits", "Layer number", "Hits", 100, -0.5, 99.5);
-	CreateP1("hsh_Much_Digis", "Layer number", "Digis", 100, -0.5, 99.5);
-	CreateP1("hsh_Much_Points", "Layer number", "Points", 100, -0.5, 99.5);
-	CreateP1("hsh_Much_Clusters", "Layer number", "Clusters", 100, -0.5, 99.5);
+	fHM->Create1<TProfile>("hsh_Much_PixelHits", "hsh_Much_PixelHits;Layer number;Hits", 100, -0.5, 99.5);
+	fHM->Create1<TProfile>("hsh_Much_Digis", "hsh_Much_Digis;Layer number;Digis", 100, -0.5, 99.5);
+	fHM->Create1<TProfile>("hsh_Much_Points", "hsh_Much_Points;Layer number;Points", 100, -0.5, 99.5);
+	fHM->Create1<TProfile>("hsh_Much_Clusters", "hsh_Much_Clusters;Layer number;Clusters", 100, -0.5, 99.5);
 
-	CreateH1F("hss_Much_NofDigisByPoint", "Layer number", "Clusters", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_NofDigisByPoint", "hss_Much_NofDigisByPoint;Layer number;Clusters", 100, -0.5, 99.5);
 
 	//---
 	Int_t nofLayers = 0;
@@ -546,59 +489,59 @@ void CbmLitClusteringQa::CreateMuchHistograms()
 	   if(iStation == 0)rMin = station->GetRmin();
 	   if(iStation == (fMuchGeoScheme->GetNStations() - 1))rMax = station->GetRmax();
 	}
-	CreateH2F("he_MuchPixelHitsH2", "Layer", "Radius", "nofHits", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
-	CreateH2F("hsc_Much_ClusterQuality_2D", "Layer", "Radius", "Quality", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
-	CreateH2F("hsc_Much_ClusterToPointRatio_2D", "Layer", "Radius", "ClusterToPointRatio", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
-	CreateH2F("hsc_Much_NofPointsInCluster_2D", "Layer", "Radius", "MCPointsInCluster", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
-	CreateH2F("hsc_Much_NofPointsInDigi_2D", "Layer", "Radius", "MCPointsInDigi", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
+	fHM->Create2<TH2F>("he_MuchPixelHitsH2", "he_MuchPixelHitsH2;Layer;Radius;nofHits", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
+	fHM->Create2<TH2F>("hsc_Much_ClusterQuality_2D", "hsc_Much_ClusterQuality_2D;Layer;Radius;Quality", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
+	fHM->Create2<TH2F>("hsc_Much_ClusterToPointRatio_2D", "hsc_Much_ClusterToPointRatio_2D;Layer;Radius;ClusterToPointRatio", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
+	fHM->Create2<TH2F>("hsc_Much_NofPointsInCluster_2D", "hsc_Much_NofPointsInCluster_2D;Layer;Radius;MCPointsInCluster", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
+	fHM->Create2<TH2F>("hsc_Much_NofPointsInDigi_2D", "hsc_Much_NofPointsInDigi_2D;Layer;Radius;MCPointsInDigi", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
 
 	//Distributions
-	CreateH1F("hss_Much_NofDigisByPoint_Total", "Number of digis", "Points counter", 100, -0.5, 99.5);
-	CreateH1F("hss_Much_NofPointsInDigi_Total", "Number of points", "Digis counter", 100, -0.5, 99.5);
-	CreateH1F("hss_Much_NofDigisInCluster_Total", "Number of digis", "Clusters counter", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_NofDigisByPoint_Total", "hss_Much_NofDigisByPoint_Total;Number of digis;Points counter", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_NofPointsInDigi_Total", "hss_Much_NofPointsInDigi_Total;Number of points;Digis counter", 100, -0.5, 99.5);
+	fHM->Create1<TH1F>("hss_Much_NofDigisInCluster_Total", "hss_Much_NofDigisInCluster_Total;Number of digis;Clusters counter", 100, -0.5, 99.5);
 
 	//---
-	CreateH2F("hr_Much_ResidualX_2D", "Layer", "Residual X", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
-	CreateH2F("hr_Much_ResidualY_2D", "Layer", "Residual Y", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
-	CreateH2F("hr_Much_PullX_2D", "Layer", "Pull X", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
-	CreateH2F("hr_Much_PullY_2D", "Layer", "Pull Y", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_ResidualX_2D", "hr_Much_ResidualX_2D;Layer;Residual X;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_ResidualY_2D", "hr_Much_ResidualY_2D;Layer;Residual Y;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_PullX_2D", "hr_Much_PullX_2D;Layer;Pull X;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_PullY_2D", "hr_Much_PullY_2D;Layer;Pull Y;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
 	//---
-	CreateH1F("h_Much_RMS_X", "Layer", "RMS", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_RMS_Y", "Layer", "RMS", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_PullRMS_X", "Layer", "RMS", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_PullRMS_Y", "Layer", "RMS", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_RMS_X", "h_Much_RMS_X;Layer;RMS", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_RMS_Y", "h_Much_RMS_Y;Layer;RMS", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_PullRMS_X", "h_Much_PullRMS_X;Layer;RMS", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_PullRMS_Y", "h_Much_PullRMS_Y;Layer;RMS", nofLayers, 0.5, (nofLayers + 0.5));
 
-	CreateH1F("h_Much_Mean_X", "Layer", "Mean", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_Mean_Y", "Layer", "Mean", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_PullMean_X", "Layer", "Mean", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_PullMean_Y", "Layer", "Mean", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Mean_X", "h_Much_Mean_X;Layer;Mean", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Mean_Y", "h_Much_Mean_Y;Layer;Mean", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_PullMean_X", "h_Much_PullMean_X;Layer;Mean", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_PullMean_Y", "h_Much_PullMean_Y;Layer;Mean", nofLayers, 0.5, (nofLayers + 0.5));
 
-	CreateH1F("h_Much_Sigma_X", "Layer", "Sigma", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_Sigma_Y", "Layer", "Sigma", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_PullSigma_X", "Layer", "Sigma", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_PullSigma_Y", "Layer", "Sigma", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Sigma_X", "h_Much_Sigma_X;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Sigma_Y", "h_Much_Sigma_Y;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_PullSigma_X", "h_Much_PullSigma_X;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_PullSigma_Y", "h_Much_PullSigma_Y;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
 
-	CreateP1("hsh_Much_True_PixelHits", "Layer number", "Hits", nofLayers, -0.5, (nofLayers - 0.5));
+	fHM->Create1<TProfile>("hsh_Much_True_PixelHits", "hsh_Much_True_PixelHits;Layer number;Hits", nofLayers, -0.5, (nofLayers - 0.5));
 
 	//---Muon only---
-	CreateP1("hsh_Much_Muon_PixelHits", "Layer number", "Hits", nofLayers, -0.5, (nofLayers - 0.5));
-	CreateP1("hsh_Much_Muon_Digis", "Layer number", "Digis", nofLayers, -0.5, (nofLayers - 0.5));
-	CreateP1("hsh_Much_Muon_Points", "Layer number", "Points", nofLayers, -0.5, (nofLayers - 0.5));
-	CreateP1("hsh_Much_Muon_Clusters", "Layer number", "Clusters", nofLayers, -0.5, (nofLayers - 0.5));
+	fHM->Create1<TProfile>("hsh_Much_Muon_PixelHits", "hsh_Much_Muon_PixelHits;Layer number;Hits", nofLayers, -0.5, (nofLayers - 0.5));
+	fHM->Create1<TProfile>("hsh_Much_Muon_Digis", "hsh_Much_Muon_Digis;Layer number;Digis", nofLayers, -0.5, (nofLayers - 0.5));
+	fHM->Create1<TProfile>("hsh_Much_Muon_Points", "hsh_Much_Muon_Points;Layer number;Points", nofLayers, -0.5, (nofLayers - 0.5));
+	fHM->Create1<TProfile>("hsh_Much_Muon_Clusters", "hsh_Much_Muon_Clusters;Layer number;Clusters", nofLayers, -0.5, (nofLayers - 0.5));
 
-	CreateH2F("hr_Much_Muon_ResidualX_2D", "Layer", "Residual X", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
-	CreateH2F("hr_Much_Muon_ResidualY_2D", "Layer", "Residual Y", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
-	CreateH2F("hr_Much_Muon_PullX_2D", "Layer", "Residual X", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
-	CreateH2F("hr_Much_Muon_PullY_2D", "Layer", "Residual Y", "Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_Muon_ResidualX_2D", "hr_Much_Muon_ResidualX_2D;Layer;Residual X;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_Muon_ResidualY_2D", "hr_Much_Muon_ResidualY_2D;Layer;Residual Y;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_Muon_PullX_2D", "hr_Much_Muon_PullX_2D;Layer;Residual X;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
+	fHM->Create2<TH2F>("hr_Much_Muon_PullY_2D", "hr_Much_Muon_PullY_2D;Layer;Residual Y;Counter", nofLayers, 0., nofLayers, 50, -5., 5.);
 
-	CreateH1F("h_Much_Muon_PullRMS_X", "Layer", "RMS", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_Muon_PullRMS_Y", "Layer", "RMS", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Muon_PullRMS_X", "h_Much_Muon_PullRMS_X;Layer;RMS", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Muon_PullRMS_Y", "h_Much_Muon_PullRMS_Y;Layer;RMS", nofLayers, 0.5, (nofLayers + 0.5));
 
-	CreateH1F("h_Much_Muon_PullMean_X", "Layer", "Mean", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_Muon_PullMean_Y", "Layer", "Mean", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Muon_PullMean_X", "h_Much_Muon_PullMean_X;Layer;Mean", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Muon_PullMean_Y", "h_Much_Muon_PullMean_Y;Layer;Mean", nofLayers, 0.5, (nofLayers + 0.5));
 
-	CreateH1F("h_Much_Muon_PullSigma_X", "Layer", "Sigma", nofLayers, 0.5, (nofLayers + 0.5));
-	CreateH1F("h_Much_Muon_PullSigma_Y", "Layer", "Sigma", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Muon_PullSigma_X", "h_Much_Muon_PullSigma_X;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
+	fHM->Create1<TH1F>("h_Much_Muon_PullSigma_Y", "h_Much_Muon_PullSigma_Y;Layer;Sigma", nofLayers, 0.5, (nofLayers + 0.5));
 }
 
 void CbmLitClusteringQa::FillMuchHistograms()
@@ -1084,7 +1027,8 @@ void CbmLitClusteringQa::CreateSingleLayerHistogram(Int_t nStation, Int_t nLayer
     stream.clear();
     stream<<nLayer;
     stream>>nL;
-	CreateH1F(histName + "Station_" + nSt + "_Layer_" + nL + "_Radius", histNameX, histNameY, nofBins, minX, maxX);
+    string name = histName + "Station_" + nSt + "_Layer_" + nL + "_Radius";
+	fHM->Create1<TH1F>(name, name + ";" + histNameX + ";" + histNameY, nofBins, minX, maxX);
 }
 
 void CbmLitClusteringQa::FillMuchMCPointsByDigiHistogram()

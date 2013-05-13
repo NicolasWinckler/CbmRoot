@@ -79,48 +79,6 @@ private:
     /**
      *
      */
-    void CreateH1F(
-          const string& name,
-          const string& xTitle,
-          const string& yTitle,
-          Int_t nofBins,
-          Double_t minBin,
-          Double_t maxBin);
-
-    void CreateP1(
-          const string& name,
-          const string& xTitle,
-          const string& yTitle,
-          Int_t nofBins,
-          Double_t minBin,
-          Double_t maxBin);
-
-    void CreateH2F(
-          const string& name,
-          const string& xTitle,
-          const string& yTitle,
-          const string& zTitle,
-          Int_t nofBinsX,
-          Double_t minBinX,
-          Double_t maxBinX,
-          Int_t nofBinsY,
-          Double_t minBinY,
-          Double_t maxBinY);
-
-    void CreateP2(
-          const string& name,
-          const string& xTitle,
-          const string& yTitle,
-          const string& zTitle,
-          Int_t nofBinsX,
-          Double_t minBinX,
-          Double_t maxBinX,
-          Int_t nofBinsY,
-          Double_t minBinY,
-          Double_t maxBinY);
-    /**
-     *
-     */
     void CreateNofObjectsHistograms(
           DetectorId detId,
           const string& detName);

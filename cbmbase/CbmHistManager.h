@@ -61,6 +61,46 @@ public:
    }
 
    /**
+    * \brief Helper function for creation of 1-dimensional histograms and profiles.
+    * Template argument is a real object type that has to be created, for example,
+    * Create1<TH1F>("name", "title", 100, 0, 100);
+    * \param[in] name Object name.
+    * \param[in] title Object title.
+    * \param[in] nofBins Number of bins.
+    * \param[in] minBin Low axis limit.
+    * \param[in] maxBin Upper axis limit.
+    */
+   template<class T> void Create1(
+         const string& name,
+         const string& title,
+         Int_t nofBins,
+         Double_t minBin,
+         Double_t maxBin);
+
+   /**
+    * \brief Helper function for creation of 2-dimensional histograms and profiles.
+    * Template argument is a real object type that has to be created, for example,
+    * Create2<TH2F>("name", "title", 100, 0, 100, 200, 0, 200);
+    * \param[in] name Object name.
+    * \param[in] title Object title.
+    * \param[in] nofBinsX Number of bins for X axis.
+    * \param[in] minBinX Low X axis limit.
+    * \param[in] maxBinX Upper X axis limit.
+    * \param[in] nofBinsY Number of bins for Y axis.
+    * \param[in] minBinY Low Y axis limit.
+    * \param[in] maxBinY Upper Y axis limit.
+    */
+   template<class T> void Create2(
+         const string& name,
+         const string& title,
+         Int_t nofBinsX,
+         Double_t minBinX,
+         Double_t maxBinX,
+         Int_t nofBinsY,
+         Double_t minBinY,
+         Double_t maxBinY);
+
+   /**
     * \brief Return pointer to TH1 histogram.
     * \param[in] name Name of histogram.
     * \return pointer to TH1 histogram.

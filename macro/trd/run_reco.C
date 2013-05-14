@@ -100,11 +100,8 @@ void run_reco(Int_t nEvents = 1)
   gSystem->Load("libTof");
   gSystem->Load("libGlobal");
   gSystem->Load("libL1");
-  //  gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------
-
-
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
@@ -132,15 +129,20 @@ void run_reco(Int_t nEvents = 1)
   Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
   Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",
-                                                  "TRD task", radiator);
-  run->AddTask(trdDigitizer);
-
-
-  CbmTrdHitProducerDigi* trdHitProd =
-                   new CbmTrdHitProducerDigi("TRD Hit Producer","TRD task");
-
+// from marco/run to keep reco alive - 20130514
+  CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
   run->AddTask(trdHitProd);
+
+//// fails in Rev 19311 - 20130514
+//  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",
+//                                                  "TRD task", radiator);
+//  run->AddTask(trdDigitizer);
+//
+//
+//  CbmTrdHitProducerDigi* trdHitProd =
+//                   new CbmTrdHitProducerDigi("TRD Hit Producer","TRD task");
+//
+//  run->AddTask(trdHitProd);
 
 /*
   CbmTrdHitProducerQa* trdHitProdQa =
@@ -189,5 +191,3 @@ void run_reco(Int_t nEvents = 1)
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
 }
-  // Output file
-  TString outFile = "data/test.esd.root";

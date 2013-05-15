@@ -588,7 +588,7 @@ void CbmTrdQa::Exec(Option_t * option)
     for (Int_t iHit=0; iHit < nEntries; iHit++ ) {
       hit = (CbmTrdHit*) fHits->At(iHit);
       fdEdxHit->Fill(hit->GetELoss());
-      moduleId = hit->GetDetectorId();//hit->GetDetId();     
+      moduleId = hit->GetAddress();//hit->GetDetId();
       Station  = fGeoHandler->GetStation(moduleId);
       Layer    = fGeoHandler->GetLayer(moduleId);
       //printf ("H det: %i S%i L%i  \n",moduleId,Station,Layer);//GetDetId()); 

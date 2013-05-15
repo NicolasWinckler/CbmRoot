@@ -18,7 +18,7 @@ void global_reco_qa(Int_t nEvents = 5,
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "events/test_muon/"; // Output directory
+	TString dir = "commit_tests/events_muon/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
@@ -125,10 +125,10 @@ void global_reco_qa(Int_t nEvents = 5,
    fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 
-//   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-//   clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
-//   clusteringQa->SetOutputDir(std::string(resultDir));
-//   run->AddTask(clusteringQa);
+   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+   clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
+   clusteringQa->SetOutputDir(std::string(resultDir));
+   run->AddTask(clusteringQa);
    // -----------------------------------------------------------------------
 
    // -----  Parameter database   --------------------------------------------

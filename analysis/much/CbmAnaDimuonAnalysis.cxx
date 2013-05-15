@@ -222,7 +222,7 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
       if      (hitType==kMUCHPIXELHIT) hit = (CbmBaseHit*) fMuchPixelHits->At(hitIndex);
       else if (hitType==kMUCHSTRAWHIT) hit = (CbmBaseHit*) fMuchStrawHits->At(hitIndex);
       else Fatal("Exec","%i - wrong hit type, must be %i for pixel and %i for straw",hitType,kMUCHPIXELHIT,kMUCHSTRAWHIT);
-      Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetDetectorId());
+      Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetAddress());
       if (stationIndex==fTriggerStationIndex) nTriggerHits++;
       nHits++;
     }
@@ -301,7 +301,7 @@ Int_t CbmAnaDimuonAnalysis::GetMCTrackId(Int_t iMuchTrack){
     if      (hitType==kMUCHPIXELHIT) hit = (CbmBaseHit*) fMuchPixelHits->At(hitIndex);
     else if (hitType==kMUCHSTRAWHIT) hit = (CbmBaseHit*) fMuchStrawHits->At(hitIndex);
     else Fatal("Exec","%i - wrong hit type, must be 6 for pixel and 7 for straw",hitType);
-    Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetDetectorId());
+    Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetAddress());
     if (stationIndex!=fTriggerStationIndex) continue;
     if (hitType==kMUCHPIXELHIT) {
       CbmMuchPixelHit* phit = (CbmMuchPixelHit*) hit;

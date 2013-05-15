@@ -1,31 +1,35 @@
-// -------------------------------------------------------------------------
-// -----                      CbmRichHit source file                 -----
-// -----               Created 28/04/04  by B. Polichtchouk            -----
-// -------------------------------------------------------------------------
+/**
+ * \file CbmRichHit.cxx
+ * \author B. Polichtchouk
+ **/
 
 #include "CbmRichHit.h"
+#include <sstream>
+using std::stringstream;
+using std::endl;
 
-// -----   Default constructor   -------------------------------------------
 CbmRichHit::CbmRichHit()
   : CbmPixelHit(), 
     fPmtId(0),
     fNPhotons(0),
     fAmplitude(0.)
 {
+   SetType(kRICHHIT);
 }
-// -------------------------------------------------------------------------
 
-
-// -----   Destructor   ----------------------------------------------------
-CbmRichHit::~CbmRichHit(){}
-// -------------------------------------------------------------------------
-
-
-// -----   Public method Print   -------------------------------------------
-void CbmRichHit::Print() const {
-  printf("RICH hit: PMT=%d, XY=(%.2f,%.2f) cm, Nphot=%d, Amp=%f\n",
-	 fPmtId, GetX(), GetY(), fNPhotons, fAmplitude);
+CbmRichHit::~CbmRichHit()
+{
 }
-// -------------------------------------------------------------------------
+
+string CbmRichHit::ToString() const {
+   stringstream ss;
+   ss << "CbmRichHit: address=" << GetAddress()
+       << " pos=(" << GetX() << "," << GetY() << "," << GetZ()
+       << ") err=(" << GetDx() << "," << GetDy() << "," << GetDz()
+       << ") dxy=" << GetDxy() << " refId=" << GetRefId()
+       << " pmtId=" << GetPmtId() << " nofPhotons=" << GetNPhotons()
+       << " amplitude=" << GetAmplitude() << endl;
+   return ss.str();
+}
 
 ClassImp(CbmRichHit)

@@ -1043,8 +1043,8 @@ void CbmMuchHitFinderQa::PullsQa(){
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
     CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(i);
     // Select hits from the first station only
-    Int_t iStation = CbmMuchGeoScheme::GetStationIndex(hit->GetDetectorId());
-    Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(hit->GetDetectorId());
+    Int_t iStation = CbmMuchGeoScheme::GetStationIndex(hit->GetAddress());
+    Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(hit->GetAddress());
     if(!(iStation == 0)) continue;
 //    if(!(iStation == 3 && iLayer == 0)) continue;
     if (verbose) printf("   Hit %i, station %i, layer %i ",i,iStation, iLayer);

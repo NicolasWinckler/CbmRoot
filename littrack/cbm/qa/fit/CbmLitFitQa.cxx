@@ -200,7 +200,7 @@ void CbmLitFitQa::ProcessTrdTrack(
 
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(0)));
-   Int_t firstStation = 10 * CbmTrdDetectorId::GetStationNr(firstHit->GetDetectorId()) + CbmTrdDetectorId::GetLayerNr(firstHit->GetDetectorId());
+   Int_t firstStation = 10 * CbmTrdDetectorId::GetStationNr(firstHit->GetAddress()) + CbmTrdDetectorId::GetLayerNr(firstHit->GetAddress());
    if (mcTrack.GetNofPointsAtStation(kTRD, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kTRD, firstStation, 0);
       FillResidualsAndPulls(firstParam, &firstPoint, "htf_Trd_FirstParam_", nofHits, kTRD);
@@ -208,7 +208,7 @@ void CbmLitFitQa::ProcessTrdTrack(
 
    // Fill histograms for last track parameters
    const CbmBaseHit* lastHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(nofHits - 1)));
-   Int_t lastStation = 10 * CbmTrdDetectorId::GetStationNr(lastHit->GetDetectorId()) + CbmTrdDetectorId::GetLayerNr(lastHit->GetDetectorId());
+   Int_t lastStation = 10 * CbmTrdDetectorId::GetStationNr(lastHit->GetAddress()) + CbmTrdDetectorId::GetLayerNr(lastHit->GetAddress());
    if (mcTrack.GetNofPointsAtStation(kTRD, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kTRD, lastStation, 0);
       FillResidualsAndPulls(lastParam, &lastPoint, "htf_Trd_LastParam_", nofHits, kTRD);
@@ -241,9 +241,9 @@ void CbmLitFitQa::ProcessMuchTrack(
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fMuchPixelHits->At(track->GetHitIndex(0)));
 //   Int_t firstStation = firstHit->GetPlaneId();
-   Int_t firstStation = 100 * CbmMuchGeoScheme::GetStationIndex(firstHit->GetDetectorId())
-            + 10 * CbmMuchGeoScheme::GetLayerIndex(firstHit->GetDetectorId())
-            + CbmMuchGeoScheme::GetLayerSideIndex(firstHit->GetDetectorId());
+   Int_t firstStation = 100 * CbmMuchGeoScheme::GetStationIndex(firstHit->GetAddress())
+            + 10 * CbmMuchGeoScheme::GetLayerIndex(firstHit->GetAddress())
+            + CbmMuchGeoScheme::GetLayerSideIndex(firstHit->GetAddress());
    if (mcTrack.GetNofPointsAtStation(kMUCH, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kMUCH, firstStation, 0);
       FillResidualsAndPulls(firstParam, &firstPoint, "htf_Much_FirstParam_", nofHits, kMUCH);
@@ -252,9 +252,9 @@ void CbmLitFitQa::ProcessMuchTrack(
    // Fill histograms for last track parameters
    const CbmBaseHit* lastHit = static_cast<const CbmBaseHit*>(fMuchPixelHits->At(track->GetHitIndex(nofHits - 1)));
 //   Int_t lastStation = lastHit->GetPlaneId();
-   Int_t lastStation = 100 * CbmMuchGeoScheme::GetStationIndex(lastHit->GetDetectorId())
-              + 10 * CbmMuchGeoScheme::GetLayerIndex(lastHit->GetDetectorId())
-              + CbmMuchGeoScheme::GetLayerSideIndex(lastHit->GetDetectorId());
+   Int_t lastStation = 100 * CbmMuchGeoScheme::GetStationIndex(lastHit->GetAddress())
+              + 10 * CbmMuchGeoScheme::GetLayerIndex(lastHit->GetAddress())
+              + CbmMuchGeoScheme::GetLayerSideIndex(lastHit->GetAddress());
    if (mcTrack.GetNofPointsAtStation(kMUCH, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kMUCH, lastStation, 0);
       FillResidualsAndPulls(lastParam, &lastPoint, "htf_Much_LastParam_", nofHits, kMUCH);

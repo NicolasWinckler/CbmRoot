@@ -1,20 +1,19 @@
-/*
- * CbmStripHit.cxx
- *
- *  Created on: Mar 18, 2009
- *      Author: andrey
- */
+/**
+ * \file CbmStripHit.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
+ **/
 
 #include "CbmStripHit.h"
 
 #include "TVector3.h"
 
-#include <iostream>
-using std::cout;
+#include <sstream>
+using std::stringstream;
 using std::endl;
 
 CbmStripHit::CbmStripHit():
-	CbmBaseHit(-1, 0., 0., -1),
+	CbmBaseHit(),
 	fU(0.),
 	fPhi(0.),
 	fDu(0.),
@@ -24,7 +23,7 @@ CbmStripHit::CbmStripHit():
 }
 
 CbmStripHit::CbmStripHit(
-		Int_t detectorId,
+		Int_t address,
 		Double_t u,
 		Double_t phi,
 		Double_t z,
@@ -32,39 +31,49 @@ CbmStripHit::CbmStripHit(
 		Double_t dphi,
 		Double_t dz,
 		Int_t refId):
-	CbmBaseHit(detectorId, z, dz, refId),
+	CbmBaseHit(),
 	fU(u),
 	fPhi(phi),
 	fDu(du),
 	fDphi(dphi)
 {
 	SetType(kSTRIPHIT);
+   SetAddress(address);
+   SetZ(z);
+   SetDz(dz);
+   SetRefId(refId);
 }
 
 CbmStripHit::CbmStripHit(
-		Int_t detectorId,
+		Int_t address,
 		const TVector3& pos,
 		const TVector3& err,
 		Int_t refId):
-	CbmBaseHit(detectorId, pos.Z(), err.Z(), refId),
+	CbmBaseHit(),
 	fU(pos.X()),
 	fPhi(pos.Y()),
 	fDu(err.X()),
 	fDphi(err.Y())
 {
 	SetType(kSTRIPHIT);
+   SetAddress(address);
+   SetZ(pos.Z());
+   SetDz(err.Z());
+   SetRefId(refId);
 }
 
 CbmStripHit::~CbmStripHit()
 {
 }
 
-void CbmStripHit::Print() const
+string CbmStripHit::ToString() const
 {
-	cout << "CbmStripHit: detectorId=" << GetDetectorId()
+   stringstream ss;
+	ss << "CbmStripHit: address=" << GetAddress()
 		<< " pos=(" << GetU() << "," << GetPhi() << "," << GetZ()
 		<< ") err=(" << GetDu() << "," << GetDphi() << "," << GetDz()
 		<< ") refId=" << GetRefId() << endl;
+	return ss.str();
 }
 
 ClassImp(CbmStripHit);

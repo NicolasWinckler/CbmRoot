@@ -100,7 +100,7 @@ public:
     * \brief Adds a RichHit to the HitCollection.
     * \param posHit Hit position.
     * \param posHitErr Hit errors.
-    * \param detID Detector ID.
+    * \param address Detector ID.
     * \param pmtID PMT ID.
     * \param ampl Hit amplitude.
     * \param index Index.
@@ -108,7 +108,7 @@ public:
    void AddHit(
          TVector3 &posHit,
          TVector3 &posHitErr,
-         Int_t detID,
+         Int_t address,
          Int_t pmtID,
          Double_t ampl,
          Int_t index);

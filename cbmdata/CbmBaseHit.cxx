@@ -1,30 +1,18 @@
-/** CbmBaseHit.cxx
- * @author Andrey Lebedev <andrey.lebedev@gsi.de>
- * @since 2009
- * @version 1.0
+/**
+ * \file CbmBaseHit.cxx
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 2009
  **/
 #include "CbmBaseHit.h"
 
 CbmBaseHit::CbmBaseHit():
-    FairMultiLinkedData(),
+    TObject(),
 	fType(kHIT),
-	fDetectorId(-1),
+	fAddress(-1),
 	fZ(0.),
 	fDz(0.),
-	fRefId(-1)
-{
-}
-
-CbmBaseHit::CbmBaseHit(
-		Int_t detectorId,
-		Double_t z,
-		Double_t dz,
-		Int_t refId):
-	fType(kHIT),
-	fDetectorId(detectorId),
-	fZ(z),
-	fDz(dz),
-	fRefId(refId)
+	fRefId(-1),
+	fLinks(NULL)
 {
 }
 

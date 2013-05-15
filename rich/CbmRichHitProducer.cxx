@@ -358,12 +358,12 @@ void CbmRichHitProducer::Exec(
          TVector3 posHit(xHit,yHit,zHit);
 
          if (fDetection == 1){
-            Int_t detID = pt->GetDetectorID();
-            if (RichDetID == 0) RichDetID = detID;
-            if (RichDetID != detID)
-               cout << "-E- RichDetID changed from " << RichDetID << " to " << detID << endl;
+            Int_t address = pt->GetDetectorID();
+            if (RichDetID == 0) RichDetID = address;
+            if (RichDetID != address)
+               cout << "-E- RichDetID changed from " << RichDetID << " to " << address << endl;
             Double_t ampl = GetAmplitude();
-            AddHit(posHit,posHitErr,detID,pmtID,ampl,j);
+            AddHit(posHit,posHitErr,address,pmtID,ampl,j);
 
             AddCrossTalkHits(posHit.X(), posHit.Y(), j, RichDetID);
          } // photon detected?
@@ -460,7 +460,7 @@ void CbmRichHitProducer::TiltPoint(
 void CbmRichHitProducer::AddHit(
       TVector3 &posHit,
       TVector3 &posHitErr,
-		Int_t detID,
+		Int_t address,
 		Int_t pmtID,
 		Double_t ampl,
 		Int_t index)
@@ -472,7 +472,7 @@ void CbmRichHitProducer::AddHit(
    // Check if there was any hit in the same PMT
    for (Int_t iHit = 0; iHit < fNHits; iHit++) {
       hit = (CbmRichHit*) fRichHits->At(iHit);
-      if (pmtID == hit->GetPmtId() && detID==hit->GetDetectorId()) {
+      if (pmtID == hit->GetPmtId() && address==hit->GetAddress()) {
          hit->SetNPhotons(hit->GetNPhotons()+1);
          hit->SetAmplitude(GetAmplitude()+ampl);
          hitMerged = kTRUE;
@@ -487,7 +487,7 @@ void CbmRichHitProducer::AddHit(
       hit = (CbmRichHit*)fRichHits->At(fNHits);
       hit->SetPosition(posHit);
       hit->SetPositionError(posHitErr);
-      hit->SetDetectorId(detID);
+      hit->SetAddress(address);
       hit->SetPmtId(pmtID);
       hit->SetNPhotons(1);
       hit->SetAmplitude(GetAmplitude());

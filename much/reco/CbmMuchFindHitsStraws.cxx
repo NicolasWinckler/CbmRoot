@@ -286,7 +286,7 @@ void CbmMuchFindHitsStraws::Merge()
       if (hit1 == 0x0) continue;
 
       if (hit1->GetTube() != hit->GetTube()) continue; // different tubes
-      if (hit1->GetDetectorId() != hit->GetDetectorId()) continue; // different layers
+      if (hit1->GetAddress() != hit->GetAddress()) continue; // different layers
       if (hit1->GetSegment() != hit->GetSegment()) continue; // upper and lower tubes
 
       Double_t drift1 = TMath::Abs (hit1->GetDouble()[1]);

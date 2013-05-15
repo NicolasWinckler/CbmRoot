@@ -1,57 +1,71 @@
-//CbmTofHit
-//Author E. Cordier
-//Modified by D. Gonzalez-Diaz 06/09/06
-//Modified by A.Lebedev 26/05/09
-//Modified by nh 16/12/12
-//From CbmTofPoint to smeared hits
+/**
+ * \file CbmTofHit.h
+ * \author E. Cordier
+ * Modified by D. Gonzalez-Diaz 06/09/06
+ * Modified by A.Lebedev 26/05/09
+ * Modified by nh 16/12/12
+ * Modified by A.Lebedev 15/05/13
+**/
 
-#ifndef CBMTOFHIT_H
-#define CBMTOFHIT_H
+#ifndef CBMTOFHIT_H_
+#define CBMTOFHIT_H_
 
 #include "CbmPixelHit.h"
 
 class CbmTofHit : public CbmPixelHit
 {
 public:
-  /** Default constructor **/
+  /**
+   * \brief Default constructor.
+   **/
   CbmTofHit();
 
-  /** Constructor with hit parameters (1a)**/
-  CbmTofHit(Int_t detectorID, TVector3 pos, TVector3 dpos, Int_t refIndex, Double_t tof, Int_t flag, Int_t channel);
+  /**
+   * \brief Constructor with hit parameters (1a).
+   **/
+  CbmTofHit(Int_t address, TVector3 pos, TVector3 dpos, Int_t refIndex, Double_t tof, Int_t flag, Int_t channel);
 
-  /** Constructor with hit parameters (1)**/
-  CbmTofHit(Int_t detectorID, TVector3 pos, TVector3 dpos, Int_t refIndex, Double_t tof, Int_t flag);
+  /**
+   * \brief Constructor with hit parameters (1).
+   **/
+  CbmTofHit(Int_t address, TVector3 pos, TVector3 dpos, Int_t refIndex, Double_t tof, Int_t flag);
 
-  /** Constructor with hit parameters (2) [not the flag]**/
-  CbmTofHit(Int_t detectorID, TVector3 pos, TVector3 dpos, Int_t refIndex, Double_t tof);
+  /**
+   * \brief Constructor with hit parameters (2) [not the flag]
+   **/
+  CbmTofHit(Int_t address, TVector3 pos, TVector3 dpos, Int_t refIndex, Double_t tof);
 
-  /** Destructor **/
+  /**
+   * \brief Destructor.
+   **/
   virtual ~CbmTofHit();
 
-  void Print() const;
+  /**
+   * \brief Inherited from CbmBaseHit.
+   */
+  virtual string ToString() const;
 
-  /** Accessors **/
-  Double_t GetTime()       const { return fTime; };
-  Int_t    GetFlag()       const { return fFlag; };
-  Int_t    GetCh()         const { return fChannel; };
-
-  //Int_t GetCell()   const   {return ((GetDetectorId()>>4) & 1023);};
-  //Int_t GetModule() const   {return ((GetDetectorId()>>14) & 1023);};
-  //Int_t GetRegion() const   {return GetDetectorId()>>24;};
-
+  /**
+   * \brief Inherited from CbmBaseHit.
+   */
   Int_t GetPlaneId() const { return 0; }
 
+  /** Accessors **/
+  Double_t GetTime() const { return fTime; }
+  Int_t GetFlag() const { return fFlag; }
+  Int_t GetCh() const { return fChannel; }
+
   /** Modifiers **/
-  void SetTime(Double_t time)        { fTime = time; };
-  void SetFlag(Int_t flag)           { fFlag = flag; };
+  void SetTime(Double_t time) { fTime = time; };
+  void SetFlag(Int_t flag) { fFlag = flag; };
 
-protected:
+private:
 
-  Double32_t fTime;              // Time since event start [ns]
-  Int_t      fFlag;              // Flag for general purposes [TDC, event tagging...]
-  Int_t      fChannel;           // Channel identifier
+  Double32_t fTime; ///< Time since event start [ns]
+  Int_t fFlag; ///< Flag for general purposes [TDC, event tagging...]
+  Int_t fChannel; ///< Channel identifier
 
-  ClassDef(CbmTofHit,2)
+  ClassDef(CbmTofHit, 2)
 };
 
 #endif

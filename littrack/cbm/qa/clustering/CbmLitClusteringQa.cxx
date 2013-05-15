@@ -589,11 +589,11 @@ void CbmLitClusteringQa::FillMuchPixelHitsHistogram()
       for(Int_t iHit = 0; iHit < nofMuchHits; iHit++){
          CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
          if(isnan(hit->GetX()) || (isnan(hit->GetY())))continue;
-         Int_t nStation = fMuchGeoScheme->GetStationIndex(hit->GetDetectorId());
+         Int_t nStation = fMuchGeoScheme->GetStationIndex(hit->GetAddress());
          if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(hit->GetDetectorId());
+         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(hit->GetAddress());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(hit->GetDetectorId());
+         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(hit->GetAddress());
          if((nLayer < 0) || (nLayer > nofLayers))continue;
          Int_t iLayer = (nStation * nofLayers) + nLayer;
          nofPixelHits[iLayer]++;
@@ -1195,10 +1195,10 @@ void CbmLitClusteringQa::FillMuchResidualHistograms()
          Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
          Float_t residualX =  xPoint - hit->GetX();
          Float_t residualY =  yPoint - hit->GetY();
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(hit->GetDetectorId());
+         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(hit->GetAddress());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = (fMuchGeoScheme->GetStationIndex(hit->GetDetectorId())) * nofLayers +
-               fMuchGeoScheme->GetLayerIndex(hit->GetDetectorId());
+         Int_t nLayer = (fMuchGeoScheme->GetStationIndex(hit->GetAddress())) * nofLayers +
+               fMuchGeoScheme->GetLayerIndex(hit->GetAddress());
          fHM->H2("hr_Much_ResidualX_2D")->Fill(nLayer, residualX, 1);
          fHM->H2("hr_Much_ResidualY_2D")->Fill(nLayer, residualY, 1);
          //---

@@ -460,7 +460,7 @@ Bool_t CbmAnaMuch::IsReconstructed(CbmMuchTrack* track){
   
   for (Int_t i=0;i<nHits;i++){
     CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchHits->At(track->GetHitIndex(i));
-    Int_t iStation = fGeoScheme->GetStationIndex(hit->GetDetectorId());
+    Int_t iStation = fGeoScheme->GetStationIndex(hit->GetAddress());
     hitsInStations[iStation]++;
   }
   

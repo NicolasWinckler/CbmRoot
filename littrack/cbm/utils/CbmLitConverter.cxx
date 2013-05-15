@@ -115,7 +115,7 @@ void CbmLitConverter::CbmStripHitToCbmLitStripHit(
 
    if (hit->GetType() == kMUCHSTRAWHIT) {
       litHit->SetSegment((static_cast<const CbmMuchStrawHit*>(hit))->GetSegment());
-      Int_t detId = hit->GetDetectorId();
+      Int_t address = hit->GetAddress();
       litHit->SetDetectorId(kLITMUCH, (hit->GetPlaneId() - 1) / 2);
    }
 }

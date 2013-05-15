@@ -86,7 +86,7 @@ CbmTrdCreatePidLike.cxx
 set(LINKDEF TrdLinkDef.h)
 Set(LIBRARY_NAME Trd)
 Set(DEPENDENCIES
-    CbmBase CbmData Base 
+    CbmBase CbmData Base TMVA
 )
 
 GENERATE_LIBRARY()

@@ -125,7 +125,7 @@ set(LINKDEF L1LinkDef.h)
 Set(LIBRARY_NAME L1)
 Set(DEPENDENCIES
     #Rich 
-    Trd Sts CbmBase CbmData Base 
+    KF Trd Sts CbmBase CbmData Base 
 )
 
 GENERATE_LIBRARY()

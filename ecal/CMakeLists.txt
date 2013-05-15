@@ -66,7 +66,7 @@ set(LINKDEF EcalLinkDef.h)
 Set(LIBRARY_NAME Ecal)
 Set(DEPENDENCIES
     #KF ????
-    CbmBase CbmData Base 
+    CbmBase CbmData Base MLP
 )
 
 GENERATE_LIBRARY()

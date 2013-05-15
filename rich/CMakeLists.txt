@@ -158,7 +158,7 @@ EndIf(TBB_FOUND)
 Set(LIBRARY_NAME Rich)
 Set(DEPENDENCIES
     # KF L1 ????
-    KF CbmBase CbmData Base 
+    KF CbmBase CbmData Base MLP
 )
 
 If(TBB_FOUND)

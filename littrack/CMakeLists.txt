@@ -140,7 +140,7 @@ EndIf (Boost_FOUND)
 set(LINKDEF  LittrackLinkDef.h)
 Set(LIBRARY_NAME Littrack)
 Set(DEPENDENCIES
-    KF Much Sts Rich CbmBase CbmData Base 
+    Littrackparallel KF Much Sts Rich CbmBase CbmData Base 
 )
 
 GENERATE_LIBRARY()

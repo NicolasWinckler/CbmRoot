@@ -7,8 +7,10 @@
 #include "CbmCluster.h"
 
 CbmCluster::CbmCluster()
- : FairMultiLinkedData(),
-   fDigis()
+ : TObject(),
+   fDigis(),
+   fAddress(0),
+   fLinks(NULL)
 {
 
 }

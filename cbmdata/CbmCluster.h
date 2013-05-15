@@ -8,7 +8,8 @@
 #ifndef CBMCLUSTER_H_
 #define CBMCLUSTER_H_
 
-#include "FairMultiLinkedData.h"
+#include "TObject.h"
+class FairMultiLinkedData;
 
 /**
  * \class CbmCluster
@@ -16,7 +17,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2012
  */
-class CbmCluster : public FairMultiLinkedData {
+class CbmCluster : public TObject {
 public:
 	/**
 	 * \brief Constructor.
@@ -70,8 +71,18 @@ public:
 	 */
 	void Clear() { fDigis.clear(); }
 
+   /** Accessors **/
+   Int_t GetAddress() const { return fAddress; }
+   FairMultiLinkedData* GetLinks() const { return fLinks; }
+
+   /** Modifiers **/
+   void SetAddress(Int_t address) { fAddress = address; }
+   void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
+
 private:
-	std::vector<Int_t> fDigis; // Array of digi indices
+	std::vector<Int_t> fDigis; ///< Array of digi indices
+	Int_t fAddress; ///< Unique detector ID
+	FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
 
 	ClassDef(CbmCluster, 1);
 };

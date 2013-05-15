@@ -55,30 +55,6 @@ void run_sim(Int_t nEvents = 2)
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libCbmGenerators");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrackparallel");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  // -----------------------------------------------------------------------
-
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -185,7 +161,7 @@ void run_sim(Int_t nEvents = 2)
   // eventdisplay.
   // This is normally switch off, because of the huge files created
   // when it is switched on. 
-  // fRun->SetStoreTraj(kTRUE);
+  fRun->SetStoreTraj(kTRUE);
 
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
@@ -196,13 +172,13 @@ void run_sim(Int_t nEvents = 2)
   // Choose this cuts according to your needs, but be aware
   // that the file size of the output file depends on these cuts
 
-  // FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-  // trajFilter->SetStepSizeCut(0.01); // 1 cm
-  // trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
-  // trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
-  // trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
-  // trajFilter->SetStorePrimaries(kTRUE);
-  // trajFilter->SetStoreSecondaries(kTRUE);
+   FairTrajFilter* trajFilter = FairTrajFilter::Instance();
+   trajFilter->SetStepSizeCut(0.01); // 1 cm
+   trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
+   trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
+   trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
+   trajFilter->SetStorePrimaries(kTRUE);
+   trajFilter->SetStoreSecondaries(kTRUE);
 
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");

@@ -20,27 +20,6 @@ void run()
   TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
 
-  // Load basic libraries
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-
-  // Load all needed libraries
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libGen");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrackparallel");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
 
   FairLogger *logger = FairLogger::GetLogger();
   logger->SetLogFileName("MyLog.log");

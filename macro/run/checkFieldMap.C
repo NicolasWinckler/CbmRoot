@@ -6,10 +6,11 @@
 //
 // --------------------------------------------------------------------------
 
+checkFieldMap()
 {
 
   // Choose field map
-  TString fieldName = "FieldMuonMagnet";
+  TString fieldName = "field_v12b";
   TString psFile = "check." + fieldName + ".ps";
   Double_t fzref1 =   0.;        // Origin plane
   Double_t fzref2 = 170.;        // RICH entrance
@@ -26,26 +27,11 @@
   Double_t targY = 0.;
   Double_t targZ = 0.;
 
-  
-  // -----   Load libraries   ---------------------------------------------
-  // Load libraries
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libPostscript.so");
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libField");
-  // ----------------------------------------------------------------------
-
-  
-
-
-  // -------  Get magnetic field  -----------------------------------------
+    // -------  Get magnetic field  -----------------------------------------
   CbmFieldMap* field = NULL;
-  if ( fieldName == "FieldActive" || fieldName == "FieldIron" || fieldName == "FieldMuonMagnet") 
+  if ( fieldName == "field_v12b" ) 
     field = new CbmFieldMapSym3(fieldName.Data());
-  else if (fieldName == "FieldAlligator" || fieldName == "FieldDipole")
+  else if ( fieldName == "field_v12a" )
     field = new CbmFieldMapSym2(fieldName.Data());
   else {
     cout << "=====> ERROR: Field map " << fieldName << " unknown!" << endl;
@@ -83,8 +69,7 @@
   // -------  Get field and fill graphs and histograms  -------------------
   cout << endl;
   cout << "=====>  Filling histograms..." << endl;
-  Double_t x, y, z;
-  Double_t bx, by, bz, bt, b;
+  Double_t x, y, z;  Double_t bx, by, bz, bt, b;
   Double_t fdx = (fxmax-fxmin) / Double_t(fnx);
   Double_t fdy = (fymax-fymin) / Double_t(fny);
   Double_t fdz = (fzmax-fzmin) / Double_t(fnz);

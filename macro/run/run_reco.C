@@ -70,32 +70,6 @@ void run_reco(Int_t nEvents = 2) {
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrackparallel");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libL1");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
-  // ------------------------------------------------------------------------
-
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run = new FairRunAna();
   run->SetInputFile(inFile);

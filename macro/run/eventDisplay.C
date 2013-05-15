@@ -4,28 +4,6 @@ eventDisplay()
   TString  InputFile     ="data/test.mc.root";
   TString  ParFile       ="data/params.root";
 
-
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();  
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libEve");
-  gSystem->Load("libEventDisplay");
-                                     
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
 

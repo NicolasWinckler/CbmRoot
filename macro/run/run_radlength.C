@@ -17,7 +17,7 @@ void run_radlength(Int_t nEvents = 10000)
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
   TString outDir  = "data";
-  TString outFile = outDir + "/test.mc.root";
+  TString outFile = outDir + "/radlengthtest.mc.root";
   TString parFile = outDir + "/params.root";
   
   // -----  Geometries  -----------------------------------------------------
@@ -30,7 +30,6 @@ void run_radlength(Int_t nEvents = 10000)
   TString richGeom   = "";
   TString trdGeom    = "";
   TString tofGeom    = "";
-//  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "field_v10e";   // name of field map
@@ -54,30 +53,6 @@ void run_radlength(Int_t nEvents = 10000)
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libCbmGenerators");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  // -----------------------------------------------------------------------
-
- 
  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
@@ -125,7 +100,6 @@ void run_radlength(Int_t nEvents = 10000)
 
   if ( stsGeom != "" ) {
     FairDetector* sts = new CbmSts("STS", kTRUE);
-//    FairDetector* sts = new CbmSts("STS", kFALSE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
   }
@@ -149,12 +123,6 @@ void run_radlength(Int_t nEvents = 10000)
     fRun->AddModule(tof);
   }
   
-/*
-  if ( ecalGeom != "" ) {
-    FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
-    fRun->AddModule(ecal);
-  }
-*/  
   // ------------------------------------------------------------------------
 
 
@@ -168,29 +136,10 @@ void run_radlength(Int_t nEvents = 10000)
   
   fRun->SetField(magField);
 
-/*
-  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  magField->SetPosition(0., 0., fieldZ);
-  magField->SetScale(fieldScale);
-  fRun->SetField(magField);
-*/
-  // ------------------------------------------------------------------------
-
-  // Use theexperiment specific MC Event header instead of the default one
-  // This one stores additional information about the reaction plane
-//  CbmMCEventHeader* mcHeader = new CbmMCEventHeader();
-//  fRun->SetMCEventHeader(mcHeader);
-
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   fRun->SetGenerator(primGen);
-  // Use the CbmUrqmdGenrator which calculates a reaction plane and
-  // rotate all particles accordingly
-/*
-  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
-  urqmdGen->SetEventPlane(0. , 360.);
-  primGen->AddGenerator(urqmdGen);
-*/
+
   //ROOTino
   FairBoxGenerator *fBox1 = new FairBoxGenerator(0, 1);
      fBox1->SetBoxXYZ(-10.,-10.,10.,10.,0.);
@@ -199,38 +148,14 @@ void run_radlength(Int_t nEvents = 10000)
      fBox1->SetPhiRange(0.,360.);
      primGen->AddGenerator(fBox1);
 
-
-
-   //fRun->SetStoreTraj(kTRUE);
    fRun->SetStoreTraj(kFALSE);
    fRun->SetRadLenRegister(kTRUE);
-//  // ------------------------------------------------------------------------
-
- 
-  // -Trajectories Visualization (TGeoManager Only )
-  // Switch this on if you want to visualize tracks in the
-  // eventdisplay.
-  // This is normally switch off, because of the huge files created
-  // when it is switched on. 
-  // fRun->SetStoreTraj(kTRUE);
+  // ------------------------------------------------------------------------
 
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
   // ------------------------------------------------------------------------
   
-  // Set cuts for storing the trajectories.
-  // Switch this on only if trajectories are stored.
-  // Choose this cuts according to your needs, but be aware
-  // that the file size of the output file depends on these cuts
-
-  // FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-  // trajFilter->SetStepSizeCut(0.01); // 1 cm
-  // trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
-  // trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
-  // trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
-  // trajFilter->SetStorePrimaries(kTRUE);
-  // trajFilter->SetStoreSecondaries(kTRUE);
-
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
   fieldPar->SetParameters(magField);
@@ -248,7 +173,7 @@ void run_radlength(Int_t nEvents = 10000)
   // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
-  fRun->CreateGeometryFile("data/geofile_full.root");
+  fRun->CreateGeometryFile("data/geo_rad_full.root");
 
 
   // -----   Finish   -------------------------------------------------------

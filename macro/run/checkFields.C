@@ -12,7 +12,7 @@
 //    .x checkFields.C ("FieldDipole",    0,150,0) - map     field, centre in Z= 0 sm, fixed z=150, 6 pads B(y),B(x)
 // ----------------------------------------------------------------------------------
 
-int checkFields (const char *field_basename, double field_Z_origin=0, double fixed_coord=170, int flag_yx_zx_z=0)
+int checkFields (const char *field_basename="field_v12a", double field_Z_origin=0, double fixed_coord=170, int flag_yx_zx_z=0)
 {
 
   TString fieldName = field_basename;
@@ -27,54 +27,23 @@ int checkFields (const char *field_basename, double field_Z_origin=0, double fix
 
   char big_title[200],stored_pdf_filename[200],*ext_add[3]={"xy","xz","z"};
 
-  
-  // -----   Load libraries   ---------------------------------------------
-  // Load libraries
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libPostscript.so");
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libField");
-  
-
-
   // -------  Get magnetic field  -----------------------------------------
 
   CbmFieldMap* field = NULL;
 
   //  Possible magnetic fields:
 
-  //  FieldActive                  - default magnetic field map               (cvs)
-  //  FieldIron                    - not available now   (May2006)
-  //      FieldAlligator_v04       - former  FIELD.v04_pavel
-  //      FieldAlligator           - former  FIELD.v05_pavel                  (cvs)
-  //      FieldAlligator_v06       - updated alligator field map 
-  //  FieldActive_Bs               - B-splined default magnetic field         (cvs)
-  //      FieldAlligator_v06_Bs    - B-splined updated alligator field
+  //  field_v12a
+  //  field_v12b
 
-  if ( fieldName == "FieldActive" || fieldName == "FieldMuonMagnet" ) 
-    {
+  if ( fieldName == "field_v12b" ) {
     field = new CbmFieldMapSym3(field_basename);
-    }
-  else 
-    {   
-
-      if ( fieldName == "FieldAlligator" || fieldName == "FieldDipole" || 
-	   fieldName == "FieldAlligator_v06"|| fieldName == "FieldAlligator_v04" )
+  } else if ( fieldName == "field_v12a" ) {
 	field = new CbmFieldMapSym2(field_basename);
-      else 
-	{
-	  if ( fieldName == "FieldActive_Bs" || fieldName == "FieldAlligator_v06_Bs"  )
-	    field = new CbmBsField(field_basename);
-	  else 
-	    {
-	      cout << "=====> ERROR: Field map " << fieldName << " unknown!" << endl;
-	      exit;
-	    }
-	}
-    }
+  } else { 
+	out << "=====> ERROR: Field map " << fieldName << " unknown!" << endl;
+	exit;
+  }
   field->Init();
   field->Print();
   Int_t type = field->GetType();
@@ -327,7 +296,7 @@ int checkFields (const char *field_basename, double field_Z_origin=0, double fix
 
    master->SaveAs(stored_pdf_filename);
 
-   return 1; 
+   return 0; 
 }
 
 

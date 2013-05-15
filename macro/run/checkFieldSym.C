@@ -6,10 +6,11 @@
 //
 // --------------------------------------------------------------------------
 
+checkFieldSym()
 {
 
   // Choose field map
-  TString fieldName = "FieldActive";
+  TString fieldName = "field_v12b";
   TString psFile = "checksym." + fieldName + ".ps";
   Double_t fzref1 =   0.;        // Target plane
   Double_t fzref2 = 170.;        // RICH entrance and PM
@@ -25,27 +26,11 @@
   Double_t targY = 0.;
   Double_t targZ = 0.;
 
-  
-  // -----   Load libraries   ---------------------------------------------
-  // Load libraries
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libPostscript.so");
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-
-  gSystem->Load("libField");
-  // ----------------------------------------------------------------------
-
-  
-
-
   // -------  Get magnetic field  -----------------------------------------
   CbmFieldMap* field = NULL;
-  if ( fieldName == "FieldActive" || fieldName == "FieldIron") 
+  if ( fieldName == "field_v12b" ) 
     field = new CbmFieldMapSym3(fieldName.Data());
-  else if (fieldName == "FieldAlligator" )
+  else if (fieldName == "field_v12a" )
     field = new CbmFieldMapSym2(fieldName.Data());
   else {
     cout << "=====> ERROR: Field map " << fieldName << " unknown!" << endl;

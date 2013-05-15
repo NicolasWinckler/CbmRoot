@@ -39,7 +39,7 @@ void run_digi(Int_t nEvents = 10) {
   
   // Specify log level (INFO, DEBUG, DEBUG1, ...)
   TString logLevel = "INFO";
-  
+  FairLogger* log;  
 
   //  Digitisation files.
   // Add TObjectString containing the different file names to
@@ -70,33 +70,6 @@ void run_digi(Int_t nEvents = 10) {
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
-
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libL1");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
-  gSystem->Load("libRun");
-   // ------------------------------------------------------------------------
-
 
   // -----   Reconstruction run   -------------------------------------------
   CbmRunAna *run = new CbmRunAna();

@@ -152,7 +152,6 @@ private:
     TClonesArray* fMuchClusters; // CbmMuchCluster array
     TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
     TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
-    TClonesArray* fMuchTrackMatches;
 
     TClonesArray* fTrdPoints; // CbmTrdPoint array
     TClonesArray* fTrdDigis; // CbmTrdDigi array

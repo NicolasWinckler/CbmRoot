@@ -40,7 +40,7 @@
 #include "TProfile2D.h"
 
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <sstream>
 using std::cout;
 using std::vector;
@@ -172,7 +172,6 @@ void CbmLitClusteringQa::ReadDataBranches()
       fMuchClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
       fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
       fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
-      fMuchTrackMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
    }
 
    fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
@@ -279,8 +278,8 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
 {
    assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
    Int_t nofBins = 100000;
-   Double_t minX = 0.;
-   Double_t maxX = 100000.;
+   Double_t minX = -0.5;
+   Double_t maxX = 99999.5;
    if (fDet.GetDet(detId)) {
       string name = "hno_NofObjects_" + detName;
       fHM->Create1<TH1F>(name + "Points_Event", name + "Points_Event;Points per event;Counter", nofBins, minX, maxX);
@@ -303,8 +302,8 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
 {
    assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
    Int_t nofBins = 100;
-   Double_t minX = 0.;
-   Double_t maxX = 100.;
+   Double_t minX = -0.5;
+   Double_t maxX = 99.5;
    if (fDet.GetDet(detId)) {
       string name = "hno_NofObjects_" + detName;
       fHM->Create1<TH1F>(name + "Points_" + parameter, name + "Points_" + parameter + ";" + xTitle + ";Points per event", nofBins, minX, maxX);

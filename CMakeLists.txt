@@ -92,6 +92,7 @@ else(CBMROOT_MINIMAL)
   find_package(CLHEP)
   find_package(TBB)
   find_package(SSE)
+  find_package(IWYU)
 # switch of the checking for the RuleChecker, since there is a problem
 # with JAVA on some systems which resulting in endless hanging of CMake 
 #  find_package(RuleChecker)
@@ -240,6 +241,14 @@ if(RULE_CHECKER_FOUND)
      DEPENDS $ENV{ALL_RULES})
 
 endif(RULE_CHECKER_FOUND)
+
+if(IWYU_FOUND)
+
+  ADD_CUSTOM_TARGET(checkHEADERS
+     DEPENDS $ENV{ALL_HEADER_RULES}
+  )
+
+endif(IWYU_FOUND)
 
 if(NOT CBMROOT_MINIMAL)
   WRITE_CONFIG_FILE(config.sh)

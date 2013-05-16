@@ -360,6 +360,27 @@ void CbmAnaDielectronTask::InitHists()
    fHistoList.push_back(fh_pi_mom_rec_sts_rich_trd);
    fh_pi_mom_rec_sts_rich_trd_tof = new TH1D("fh_pi_mom_rec_sts_rich_trd_tof", "fh_pi_mom_rec_sts_rich_trd_tof;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
    fHistoList.push_back(fh_pi_mom_rec_sts_rich_trd_tof);
+   fh_pi_rapidity_mc = new TH1D("fh_pi_rapidity_mc", "fh_pi_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
+   fHistoList.push_back(fh_pi_rapidity_mc);
+
+
+   //pions vs momentum for primary pions
+   fh_piprim_mom_mc = new TH1D("fh_piprim_mom_mc", "fh_piprim_mom_mc;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
+   fHistoList.push_back(fh_piprim_mom_mc);
+   fh_piprim_mom_acc = new TH1D("fh_piprim_mom_acc", "fh_piprim_mom_acc;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
+   fHistoList.push_back(fh_piprim_mom_acc);
+   fh_piprim_mom_rec = new TH1D("fh_piprim_mom_rec", "fh_piprim_mom_rec;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
+   fHistoList.push_back(fh_piprim_mom_rec);
+   fh_piprim_mom_rec_only_sts = new TH1D("fh_piprim_mom_rec_only_sts", "fh_piprim_mom_rec_only_sts;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
+   fHistoList.push_back(fh_piprim_mom_rec_only_sts);
+   fh_piprim_mom_rec_sts_rich_trd = new TH1D("fh_piprim_mom_rec_sts_rich_trd", "fh_piprim_mom_rec_sts_rich_trd;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
+   fHistoList.push_back(fh_piprim_mom_rec_sts_rich_trd);
+   fh_piprim_mom_rec_sts_rich_trd_tof = new TH1D("fh_piprim_mom_rec_sts_rich_trd_tof", "fh_piprim_mom_rec_sts_rich_trd_tof;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
+   fHistoList.push_back(fh_piprim_mom_rec_sts_rich_trd_tof);
+   fh_piprim_rapidity_mc = new TH1D("fh_piprim_rapidity_mc", "fh_piprim_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
+   fHistoList.push_back(fh_piprim_rapidity_mc);
+
+
 
    fh_nof_rec_pairs_gamma = new TH1D("fh_nof_rec_pairs_gamma", "fh_nof_rec_pairs_gamma;Pair category; Number per event", 3, -0.5, 2.5);
    fHistoList.push_back(fh_nof_rec_pairs_gamma);
@@ -663,13 +684,23 @@ void CbmAnaDielectronTask::FillElPiMomHist()
        Int_t motherId = mctrack->GetMotherId();
        Int_t pdg = TMath::Abs(mctrack->GetPdgCode());
        double momentum = mctrack->GetP();
+       double rapidity = mctrack->GetRapidity();
        Int_t nMvdPoints = mctrack->GetNPoints(kMVD);
        Int_t nStsPoints = mctrack->GetNPoints(kSTS);
        Bool_t isAcc = ( nMvdPoints+nStsPoints >= 4);
+       TVector3 vertex;
+       mctrack->GetStartVertex(vertex);
 
        if (pdg == 211){
           fh_pi_mom_mc->Fill(momentum);
+          fh_pi_rapidity_mc->Fill(rapidity);
           if (isAcc) fh_pi_mom_acc->Fill(momentum);
+
+          if (vertex.Mag() < 0.1) {
+             fh_piprim_mom_mc->Fill(momentum);
+             fh_piprim_rapidity_mc->Fill(rapidity);
+             if (isAcc) fh_piprim_mom_acc->Fill(momentum);
+          }
        }
    }
 
@@ -695,6 +726,9 @@ void CbmAnaDielectronTask::FillElPiMomHist()
        int motherId = mcTrack1->GetMotherId();
        double momentum = mcTrack1->GetP();
 
+       TVector3 vertex;
+       mcTrack1->GetStartVertex(vertex);
+
        if (pdg == 211) {
           fh_pi_mom_rec->Fill(momentum);
           if (richInd < 0 && trdInd < 0 && tofInd < 0) {
@@ -706,12 +740,26 @@ void CbmAnaDielectronTask::FillElPiMomHist()
           if (richInd >= 0 && trdInd >= 0 && tofInd >= 0) {
              fh_pi_mom_rec_sts_rich_trd_tof->Fill(momentum);
           }
+
+          if (vertex.Mag() < 0.1) {
+             fh_piprim_mom_rec->Fill(momentum);
+             if (richInd < 0 && trdInd < 0 && tofInd < 0) {
+                fh_piprim_mom_rec_only_sts->Fill(momentum);
+             }
+             if (richInd >= 0 && trdInd >= 0) {
+                  fh_piprim_mom_rec_sts_rich_trd->Fill(momentum);
+              }
+             if (richInd >= 0 && trdInd >= 0 && tofInd >= 0) {
+                fh_piprim_mom_rec_sts_rich_trd_tof->Fill(momentum);
+             }
+          }
        }
    }//gTracks
 }
 
 void CbmAnaDielectronTask::NofGammaAndPi0Pairs()
 {
+   return;
    Int_t ngTracks = fGlobalTracks->GetEntriesFast();
 
    // first index : [0] - G, [1] - S, [2] - P

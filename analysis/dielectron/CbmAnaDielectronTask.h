@@ -527,6 +527,16 @@ private:
    TH1D* fh_pi_mom_rec_only_sts;
    TH1D* fh_pi_mom_rec_sts_rich_trd;
    TH1D* fh_pi_mom_rec_sts_rich_trd_tof;
+   TH1D* fh_pi_rapidity_mc;
+
+   //Pions vs momentum for primary pions v < 0.1 cm
+   TH1D* fh_piprim_mom_mc;
+   TH1D* fh_piprim_mom_acc;
+   TH1D* fh_piprim_mom_rec;
+   TH1D* fh_piprim_mom_rec_only_sts;
+   TH1D* fh_piprim_mom_rec_sts_rich_trd;
+   TH1D* fh_piprim_mom_rec_sts_rich_trd_tof;
+   TH1D* fh_piprim_rapidity_mc;
 
 public:
    void SetUseMvd(Bool_t use){fUseMvd = use;};

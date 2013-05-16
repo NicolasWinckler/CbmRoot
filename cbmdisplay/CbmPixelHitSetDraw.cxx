@@ -7,9 +7,15 @@
 
 #include "CbmPixelHitSetDraw.h"
 
-#include "CbmPixelHit.h"
+#include "CbmPixelHit.h"                // for CbmPixelHit
 
-#include <iostream>
+#include "Riosfwd.h"                    // for ostream
+#include "TVector3.h"                   // for TVector3
+
+#include <iosfwd>                       // for ostream
+#include <iostream>                     // for cout
+#include <ostream>                      // for operator<<, basic_ostream, etc
+
 using std::cout;
 using std::endl;
 

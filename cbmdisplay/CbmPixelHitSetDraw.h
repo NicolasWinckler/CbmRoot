@@ -8,7 +8,8 @@
 #ifndef CBMPIXELHITSETDRAW_H_
 #define CBMPIXELHITSETDRAW_H_
 
-#include "FairPointSetDraw.h"
+#include "FairPointSetDraw.h"           // for FairPointSetDraw
+#include "Rtypes.h"                     // for CbmPixelHitSetDraw::Class, etc
 
 class TVector3;
 class TObject;

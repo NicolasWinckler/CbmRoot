@@ -5,25 +5,29 @@
 
 #include "CbmTrdDigiDraw.h"
 
-#include "FairRootManager.h"
-#include "FairRuntimeDb.h"
-#include "FairEventManager.h"
+#include "CbmTrdDetectorId.h"           // for CbmTrdDetectorId
+#include "CbmTrdDigi.h"                 // for CbmTrdDigi
+#include "CbmTrdDigiPar.h"              // for CbmTrdDigiPar
+#include "CbmTrdModule.h"               // for CbmTrdModule
 
-#include "CbmTrdDigi.h"
-#include "CbmTrdModule.h"
-#include "CbmTrdDigiPar.h"
+#include "FairEventManager.h"           // for FairEventManager
+#include "FairRootManager.h"            // for FairRootManager
+#include "FairRunAna.h"                 // for FairRunAna
+#include "FairRuntimeDb.h"              // for FairRuntimeDb
 
-//#include "TEveQuadSet.h"
-#include "TEveManager.h"
-#include "TEveBoxSet.h"
-//#include "TEveTreeTools.h"
+#include "Riosfwd.h"                    // for ostream
+#include "TClonesArray.h"               // for TClonesArray
+#include "TEveBoxSet.h"                 // for TEveBoxSet, etc
+#include "TEveManager.h"                // for TEveManager, gEve
+#include "TVector3.h"                   // for TVector3
 
-#include "TClonesArray.h"
-//#include "TObjArray.h"
-#include "TVector3.h"
+#include <stddef.h>                     // for NULL
+#include <iomanip>                      // for setprecision, operator<<
+#include <iosfwd>                       // for ostream
+#include <iostream>                     // for cout
+#include <ostream>                      // for basic_ostream, operator<<, etc
+#include <string>                       // for char_traits
 
-#include <iostream>
-#include <iomanip>
 using std::cout;
 using std::endl;
 using std::setprecision;

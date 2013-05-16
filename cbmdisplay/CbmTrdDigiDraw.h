@@ -14,12 +14,8 @@
 #ifndef CBMTRDDIGIDRAW_H
 #define CBMTRDDIGIDRAW_H
 
-
-#include "FairTask.h"
-
-//#include "CbmTrdDigiPar.h"
-//#include "CbmTrdModule.h"
-#include "CbmTrdDetectorId.h"
+#include "FairTask.h"                   // for FairTask, InitStatus
+#include "Rtypes.h"                     // for Bool_t, Int_t, etc
 
 class CbmTrdDigiPar;
 class CbmTrdModule;

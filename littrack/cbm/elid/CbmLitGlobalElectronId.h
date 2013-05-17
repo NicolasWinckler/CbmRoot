@@ -99,6 +99,9 @@ private:
     TClonesArray* fTrdTracks;
     TClonesArray* fTofHits;
 
+    CbmLitGlobalElectronId(const CbmLitGlobalElectronId&);
+    CbmLitGlobalElectronId& operator=(const CbmLitGlobalElectronId&);
+    
     ClassDef(CbmLitGlobalElectronId, 1);
 };
 

@@ -352,6 +352,9 @@ private:
    Double_t fTrdAnnCut;
    Double_t fRichAnnCut;
 
+   CbmLitTrackingQa(const CbmLitTrackingQa&);
+   CbmLitTrackingQa& operator=(const CbmLitTrackingQa&);
+   
    ClassDef(CbmLitTrackingQa, 1);
 };
 

@@ -113,6 +113,9 @@ private:
    };
    PadInformation* fPadList;
 
+   CbmClusteringGeometry(const CbmClusteringGeometry&);
+   CbmClusteringGeometry& operator=(const CbmClusteringGeometry&);
+   
    //ClassDef(CbmClusteringGeometry, 1);
 };
 

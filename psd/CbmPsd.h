@@ -148,7 +148,9 @@ protected:
    **/
   void ResetParameters();
 
-
+  CbmPsd(const CbmPsd&);
+  CbmPsd& operator=(const CbmPsd&);
+  
   ClassDef(CbmPsd,1)
 
 };

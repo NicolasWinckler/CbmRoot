@@ -52,62 +52,43 @@ using boost::assign::list_of;
 
 CbmRichPrototypeQa::CbmRichPrototypeQa():
    FairTask("RichGeoTestQa"),
-
    fOutputDir(""),
-
    fRichHits(NULL),
    fRichRings(NULL),
    fRichPoints(NULL),
    fMCTracks(NULL),
    fRichRingMatches(NULL),
-
    fCopFit(NULL),
    fTauFit(NULL),
    fCanvas(),
    fEventNum(0),
-   fMinNofHits(0),
-
+   fMinNofHits(7),
    fhHitsXY(NULL),
    fhPointsXY(NULL),
-
+   fhNofPhotonsPerHit(),
+   fhNofPointsEv(),
+   fhNofHitsEv(),   
    fhNofHitsRing(),
-   fhNofHitsEv(),
    fhAaxis(),
    fhBaxis(),
    fhBoverA(),
    fhXcYcCircle(),
    fhRadius(),
    fhDR(),
-
-   fMinAaxis(0.),
-   fMaxAaxis(0.),
-   fMinBaxis(0.),
-   fMaxBaxis(0.),
-   fMinRadius(0.),
-   fMaxRadius(0.),
-
+   fMinAaxis(1.5),
+   fMaxAaxis(7.),
+   fMinBaxis(1.5),
+   fMaxBaxis(7.),
+   fMinRadius(1.5),
+   fMaxRadius(7.),
    fhNofHitsAll(NULL),
    fhNofHitsCircleFit(NULL),
    fhNofHitsEllipseFit(NULL),
    fhNofHitsCircleFitEff(NULL),
    fhNofHitsEllipseFitEff(NULL),
-
    fHists(),
-
    fNofDrawnRings(0)
-
 {
-	fEventNum = 0;
-	fNofDrawnRings = 0;
-	fMinNofHits = 7;
-
-   fMinAaxis = 1.5;
-   fMaxAaxis = 7.;
-   fMinBaxis = 1.5;
-   fMaxBaxis = 7.;
-   fMinRadius = 1.5;
-   fMaxRadius = 7.;
-
 }
 
 CbmRichPrototypeQa::~CbmRichPrototypeQa()

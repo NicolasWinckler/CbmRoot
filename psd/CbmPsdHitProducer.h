@@ -54,14 +54,14 @@ class CbmPsdHitProducer : public FairTask
   /** Output array of CbmPsdDigits **/
   TClonesArray* fDigiArray; 
 
-  CbmPsdHitProducer(const CbmPsdHitProducer&);
-  CbmPsdHitProducer operator=(const CbmPsdHitProducer&);
-
-  void Reset();
   Float_t       fXi[44];  //X coordinate of center of module
   Float_t       fYi[44];  //X coordinate of center of module
   TH1F *fhModXNewEn; //edep in each module for Marina
  
+  void Reset();
+
+  CbmPsdHitProducer(const CbmPsdHitProducer&);
+  CbmPsdHitProducer operator=(const CbmPsdHitProducer&);
 
   ClassDef(CbmPsdHitProducer,2);
 

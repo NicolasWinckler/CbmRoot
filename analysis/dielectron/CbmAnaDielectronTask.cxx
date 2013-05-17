@@ -70,6 +70,44 @@ using namespace std;
 
 ClassImp(CbmAnaDielectronTask);
 
+DielectronCandidate::DielectronCandidate()
+  : position(), 
+    momentum(),
+    mass(0.), 
+    energy(0.), 
+    rapidity(0.),
+    charge(0),
+    chi2Prim(0.),
+    chi2sts(0.),
+    McMotherId(0),
+    stsMcTrackId(0),
+    richMcTrackId(0),
+    trdMcTrackId(0),
+    tofMcTrackId(0),
+    stsInd(0),
+    richInd(0),
+    trdInd(0),
+    tofInd(0),
+    isElectron(kFALSE),
+    isMcSignalElectron(kFALSE),
+    isMcPi0Electron(kFALSE),
+    isMcGammaElectron(kFALSE),
+    isMcEtaElectron(kFALSE),
+    mcPdg(0),
+    isGamma(kFALSE),
+    dSts(0.),
+    isTtCutElectron(kFALSE),
+    isStCutElectron(kFALSE),
+    isApmCutElectron(kFALSE),
+    isMvd1CutElectron(kFALSE),
+    isMvd2CutElectron(kFALSE),
+    richAnn(0.),
+    trdAnn(0.),
+    mass2(0.)
+{
+}
+
+
 void CbmAnaDielectronTask::CreateAnalysisStepsH1(
       vector<TH1D*>& hist,
       const string& name,
@@ -161,41 +199,143 @@ void CbmAnaDielectronTask::CreateSourceTypesH2(
 }
 
 CbmAnaDielectronTask::CbmAnaDielectronTask()
-: FairTask("CbmAnaDielectronTask")
+  : FairTask("CbmAnaDielectronTask"),
+    fMCTracks(NULL),
+    fRichRings(NULL),
+    fRichProj(NULL),
+    fRichPoints(NULL),
+    fRichRingMatches(NULL),
+    fRichHits(NULL),
+    fGlobalTracks(NULL),
+    fStsTracks(NULL),
+    fStsTrackMatches(NULL),
+    fStsHits(NULL),
+    fMvdHits(NULL),
+    fMvdPoints(NULL),
+    fMvdHitMatches(NULL),
+    fTrdTracks(NULL),
+    fTrdHits(NULL),
+    fTrdTrackMatches(NULL),
+    fTofHits(NULL),
+    fTofPoints(NULL),
+    fPrimVertex(NULL),
+    fKFFitter(),
+    fUseMvd(kFALSE),
+    fUseRich(kTRUE),
+    fUseTrd(kTRUE),
+    fUseTof(kTRUE),
+    fCandidates(),
+    fSegmentCandidates(),
+    fWeight(0.),
+    fPionMisidLevel(-1.),
+    fRandom3(new TRandom3(0)),
+    fTrdAnnCut(0.85),
+    fRichAnnCut(0.),
+    fMeanA(-1.),
+    fMeanB(-1.),
+    fRmsA(-1.),
+    fRmsB(-1.),
+    fRmsCoeff(-1.),
+    fDistCut(-1.),
+    fElIdAnn(NULL),
+    fUseRichAnn(kTRUE),
+    fMomentumCut(-1.),
+    fChiPrimCut(0.),
+    fPtCut(.2),
+    fAngleCut(1.),
+    fGammaCut(0.025),
+    fStCutAngle(1.5),
+    fStCutPP(1.5),
+    fTtCutAngle(0.75),
+    fTtCutPP(4.),
+    fMvd1CutP(1.2),
+    fMvd1CutD(0.4),
+    fMvd2CutP(1.5),
+    fMvd2CutD(0.5),
+    fHistoList(),
+    fNofHitsInRingMap(),
+    fh_mc_mother_pdg(NULL),
+    fh_acc_mother_pdg(NULL),
+    fh_vertex_el_gamma_xz(),
+    fh_vertex_el_gamma_yz(),
+    fh_vertex_el_gamma_xy(),
+    fh_vertex_el_gamma_rz(),
+    fh_signal_minv(),
+    fh_bg_minv(),
+    fh_pi0_minv(),
+    fh_eta_minv(),
+    fh_gamma_minv(),
+    fh_signal_mom(),
+    fh_signal_pty(),
+    fh_signal_minv_pt(),
+    fh_bg_truematch_minv(),
+    fh_bg_truematch_el_minv(),
+    fh_bg_truematch_notel_minv(),
+    fh_bg_mismatch_minv(),
+    fh_source_bg_minv(),
+    fh_pt(),
+    fh_mom(),
+    fh_chi2sts(),
+    fh_chi2prim(),
+    fh_ttcut(),
+    fh_stcut(),
+    fh_apcut(),
+    fh_apmcut(),
+    fh_mvd1cut(),
+    fh_mvd2cut(),
+    fh_richann(),
+    fh_trdann(),
+    fh_tofm2(),
+    fh_ttcut_pion(),
+    fh_ttcut_truepair(),
+    fh_stcut_pion(),
+    fh_stcut_truepair(),
+    fh_nofMvdHits(),
+    fh_nofStsHits(),
+    fh_mvd1xy(),
+    fh_mvd1r(),
+    fh_mvd2xy(),
+    fh_mvd2r(),   
+    fh_mvd1cut_mc_dist_gamma(NULL),
+    fh_mvd1cut_mc_dist_pi0(NULL),
+    fh_mvd2cut_mc_dist_gamma(NULL),
+    fh_mvd2cut_mc_dist_pi0(NULL),
+    fh_mvd1cut_qa(),
+    fh_mvd2cut_qa(),
+    fh_source_pairs_epem(),
+    fh_source_pairs(NULL),
+    fh_event_number(NULL),
+    fh_nof_bg_tracks(NULL),
+    fh_nof_el_tracks(NULL),
+    fh_source_tracks(NULL),
+    fh_nof_rec_pairs_gamma(NULL),
+    fh_nof_rec_pairs_pi0(NULL),
+    fh_nof_rec_gamma(NULL),
+    fh_nof_rec_pi0(NULL),
+    fh_nof_mismatches(NULL),
+    fh_nof_mismatches_rich(NULL),
+    fh_nof_mismatches_trd(NULL),
+    fh_nof_mismatches_tof(NULL),
+    fh_nof_ghosts(NULL),
+    fh_source_mom(),
+    fh_source_pt(),
+    fh_opening_angle(),
+    fh_pi_mom_mc(NULL),
+    fh_pi_mom_acc(NULL),
+    fh_pi_mom_rec(NULL),
+    fh_pi_mom_rec_only_sts(NULL),
+    fh_pi_mom_rec_sts_rich_trd(NULL),
+    fh_pi_mom_rec_sts_rich_trd_tof(NULL),
+    fh_pi_rapidity_mc(NULL),
+    fh_piprim_mom_mc(NULL),
+    fh_piprim_mom_acc(NULL),
+    fh_piprim_mom_rec(NULL),
+    fh_piprim_mom_rec_only_sts(NULL),
+    fh_piprim_mom_rec_sts_rich_trd(NULL),
+    fh_piprim_mom_rec_sts_rich_trd_tof(NULL),
+    fh_piprim_rapidity_mc(NULL)
 {
    // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
-   fWeight = 0.0;
-   fUseRich = true;
-   fUseTrd = true;
-   fUseTof = true;
-
-   fPionMisidLevel = -1.;
-   fRandom3 = new TRandom3(0);
-
-   //identification cuts
-   fTrdAnnCut = 0.85;
-   fRichAnnCut = 0.0;
-   fUseRichAnn = true;
-   fMeanA = -1.;
-   fMeanB = -1.;
-   fRmsA = -1.;
-   fRmsB = -1.;
-   fRmsCoeff = -1.;
-   fDistCut = -1.;
-   fMomentumCut = -1.; // if cut < 0 them it is not used
-   // analysis cuts
-   fPtCut = 0.2;
-   fAngleCut = 1.;
-   fChiPrimCut = 3.;
-   fGammaCut = 0.025;
-   fStCutAngle = 1.5;
-   fStCutPP = 1.5;
-   fTtCutAngle = 0.75;
-   fTtCutPP = 4.0;
-   fMvd1CutP = 1.2;
-   fMvd1CutD = 0.4;
-   fMvd2CutP = 1.5;
-   fMvd2CutD = 0.5;
 }
 
 CbmAnaDielectronTask::~CbmAnaDielectronTask()

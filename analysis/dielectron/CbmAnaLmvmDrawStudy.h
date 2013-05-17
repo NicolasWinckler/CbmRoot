@@ -32,7 +32,9 @@ public:
    /**
    * \brief Default constructor.
    */
-   CbmAnaLmvmDrawStudy(){;}
+   CbmAnaLmvmDrawStudy() : TObject(), fCanvas(), fNofStudies(0), fStudyNames(),
+                           fHM(), fMeanFiles(), fOutputDir("")
+   {;}
 
    /**
     * \brief Destructor.

@@ -80,6 +80,9 @@ class CbmStsModule : public TNamed
     map<Int_t, pair<Double_t, Double_t> > fBuffer;
 
 
+    CbmStsModule(const CbmStsModule&);
+    CbmStsModule& operator=(const CbmStsModule&);
+    
     ClassDef(CbmStsModule,1);
 
 };

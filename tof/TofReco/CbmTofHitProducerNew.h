@@ -108,6 +108,9 @@ private:
 
   Bool_t fParInitFromAscii;
 
+  CbmTofHitProducerNew(const CbmTofHitProducerNew&);
+  CbmTofHitProducerNew& operator=(const CbmTofHitProducerNew&);
+  
   ClassDef(CbmTofHitProducerNew,1) //CbmTofHitProducer
 
 };

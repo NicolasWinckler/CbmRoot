@@ -99,6 +99,9 @@ private:
 
    Int_t fEventNo; // event counter
 
+   CbmLitFindMvdTracks(const CbmLitFindMvdTracks&);
+   CbmLitFindMvdTracks& operator=(const CbmLitFindMvdTracks&);
+   
    ClassDef(CbmLitFindMvdTracks, 1);
 };
 

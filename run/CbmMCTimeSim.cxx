@@ -15,12 +15,21 @@
 #include "CbmMCTimeSim.h"
 
 
-
 using namespace std;
 
 
 // -----   Default constructor   ---------------------------------------------
-CbmMCTimeSim::CbmMCTimeSim() { 
+CbmMCTimeSim::CbmMCTimeSim() 
+ : FairTask(),
+   fEventRate(0.),
+   fBeamProfile(0),
+   fMaxBufferSize(0.),
+   fEventId(0),
+   fEventTime(0.),
+   fNofEvents(0),
+   fEvent(NULL),
+   fPointArrays()
+{ 
   gLogger->Fatal(MESSAGE_ORIGIN, 
 		 "Default constructor should not be used; specify interaction rate!");
 }
@@ -37,7 +46,8 @@ CbmMCTimeSim::CbmMCTimeSim(Double_t rate, Int_t profile, const char* name)
     fEventId(-1),
     fEventTime(0.),
     fNofEvents(0),
-    fEvent(NULL)
+    fEvent(NULL),
+    fPointArrays()
 {
   for (Int_t iDet = 0; iDet < kNOFDETS; iDet++) fPointArrays.push_back(NULL);
 }

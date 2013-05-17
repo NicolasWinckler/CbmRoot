@@ -115,6 +115,9 @@ private:
   TF1*     fPol;          //! Polarization function
   Bool_t   fBox;          // fBox = 1 Box generator, fBox = 0 - termal pt and gaussian y 
 
+  CbmLitPolarizedGenerator(const CbmLitPolarizedGenerator&);
+  CbmLitPolarizedGenerator& operator=(const CbmLitPolarizedGenerator&);
+  
   ClassDef(CbmLitPolarizedGenerator,1);
 };
 

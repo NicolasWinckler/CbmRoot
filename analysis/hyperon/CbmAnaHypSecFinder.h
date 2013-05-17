@@ -86,8 +86,8 @@ class CbmAnaHypSecFinder : public FairTask
 
  private:
   CbmAnaHypSecFinder(const CbmAnaHypSecFinder&);
-  CbmAnaHypSecFinder operator=(const CbmAnaHypSecFinder&);
-
+  CbmAnaHypSecFinder& operator=(const CbmAnaHypSecFinder&);
+  
   ClassDef(CbmAnaHypSecFinder,1);
 };
 
@@ -168,8 +168,8 @@ class Hit{
 
  private:
  
-  //  Hit(const Hit&);
-  //  Hit operator=(const Hit&);
+  //Hit(const Hit&);
+  //Hit operator=(const Hit&);
 
 };
 

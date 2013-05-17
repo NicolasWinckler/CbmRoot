@@ -21,7 +21,8 @@ CbmReport::CbmReport():
    fOutputDir("./"),
    fR(NULL),
    fOut(NULL),
-   fReportType(kCoutReport)
+   fReportType(kCoutReport),
+   fCanvases()
 {
 }
 

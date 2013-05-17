@@ -84,6 +84,9 @@ private:
 	Int_t fAddress; ///< Unique detector ID
 	FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
 
+        CbmCluster(const CbmCluster&);
+        CbmCluster& operator=(const CbmCluster&);
+        
 	ClassDef(CbmCluster, 1);
 };
 

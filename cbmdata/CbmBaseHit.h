@@ -79,6 +79,9 @@ protected:
      **/
 	void SetType(HitType type) { fType = type; }
 
+        CbmBaseHit(const CbmBaseHit&);
+        CbmBaseHit& operator=(const CbmBaseHit&);   
+
 private:
 	HitType fType; ///< hit type
 	Double_t fZ; ///< Z position of hit [cm]
@@ -87,6 +90,7 @@ private:
 	Int_t fAddress; ///< detector unique identifier
 	FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
 
+  
 	ClassDef(CbmBaseHit, 1);
 };
 

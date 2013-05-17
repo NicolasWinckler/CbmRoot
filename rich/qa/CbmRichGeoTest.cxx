@@ -84,6 +84,7 @@ CbmRichGeoTest::CbmRichGeoTest():
 
    fhHitsXY(NULL),
    fhPointsXY(NULL),
+   fhNofPhotonsPerHit(NULL),
 
    fhNofHits(),
    fhAaxisVsMom(),
@@ -139,6 +140,7 @@ CbmRichGeoTest::CbmRichGeoTest():
    fhBaxisXYZ(NULL),
    fhAaxisXYZ(NULL),
    fhRadiusXYZ(NULL),
+   fhdRXYZ(NULL),
 
    fHists(),
 

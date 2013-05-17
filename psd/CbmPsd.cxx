@@ -28,10 +28,23 @@
 using std::cout;
 using std::endl;
 
+
 // -----   Default constructor   -------------------------------------------
-CbmPsd::CbmPsd() : FairDetector("PSD", kTRUE, kPSD) {
-  fPsdCollection = new TClonesArray("CbmPsdPoint");
-  fPosIndex = 0;
+CbmPsd::CbmPsd() 
+ : FairDetector("PSD", kTRUE, kPSD),
+   fDebug(""),
+   fTrackID(0),
+   fVolumeID(0),
+   fPos(),
+   fMom(),
+   fTime(0.),
+   fLength(0.),
+   fELoss(0.),
+   fPosIndex(0),
+   fPsdCollection(new TClonesArray("CbmPsdPoint")),
+   fXshift(0.),
+   fZposition(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -39,10 +52,20 @@ CbmPsd::CbmPsd() : FairDetector("PSD", kTRUE, kPSD) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmPsd::CbmPsd(const char* name, Bool_t active)
-  : FairDetector(name, active, kPSD) {
-  fPsdCollection = new TClonesArray("CbmPsdPoint");
-  fPosIndex = 0;
-  fDebug    = "";
+  : FairDetector(name, active, kPSD),
+    fDebug(""),
+    fTrackID(0),
+    fVolumeID(0),
+    fPos(),
+    fMom(),
+    fTime(0.),
+    fLength(0.),
+    fELoss(0.),
+    fPosIndex(0),
+    fPsdCollection(new TClonesArray("CbmPsdPoint")),
+    fXshift(0.),
+    fZposition(0.)
+{
 }
 
 // -------------------------------------------------------------------------

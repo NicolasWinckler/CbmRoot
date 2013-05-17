@@ -14,6 +14,7 @@
 using std::vector;
 // -----   Default constructor   -------------------------------------------
 CbmAnaMuchBgd::CbmAnaMuchBgd() : FairTask("AnaDimuonAnalysis"),
+  fEvent(0),
   fMCTracks(0x0),
   fStsTracks(0x0),
   fMuchTracks(0x0),

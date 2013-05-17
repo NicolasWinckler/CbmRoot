@@ -69,6 +69,9 @@ public:
 private:
    CbmHistManager* fHM; // Histogram manager
 
+   CbmSimulationReport(const CbmSimulationReport&);
+   CbmSimulationReport& operator=(const CbmSimulationReport&);
+   
    ClassDef(CbmSimulationReport, 1)
 };
 

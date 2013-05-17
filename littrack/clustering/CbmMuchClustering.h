@@ -101,6 +101,9 @@ private:
 
    void SubclusteringA1(Int_t iCl, CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, CbmClusteringA1* clA1, Int_t it1);
 
+   CbmMuchClustering(const CbmMuchClustering&);
+   CbmMuchClustering& operator=(const CbmMuchClustering&);
+
    ClassDef(CbmMuchClustering, 1);
 };
 

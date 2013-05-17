@@ -77,7 +77,9 @@ class CbmDaq : public FairTask
     /** At end of run: Process the remaining data in the CbmDaqBuffer  **/
     virtual void Finish();
 
-
+    CbmDaq(const CbmDaq&);
+    CbmDaq& operator=(const CbmDaq&);
+    
     ClassDef (CbmDaq,1);
 
 };

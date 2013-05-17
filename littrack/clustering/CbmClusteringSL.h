@@ -59,6 +59,10 @@ private:
 	   vector<Int_t> fPadsInCluster;
    };
    Cluster* fClusters;
+
+   CbmClusteringSL(const CbmClusteringSL&);
+   CbmClusteringSL& operator=(const CbmClusteringSL&);
+   
 };
 
 #endif /* CBMCLUSTERINGSL_H_ */

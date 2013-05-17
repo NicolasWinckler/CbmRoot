@@ -19,12 +19,13 @@ using namespace std;
 // --- Energy for creation of an electron-hole pair in silicon [GeV]  ------
 const double kPairEnergy = 3.6e-9;
 
-
-
 // -----   Constructor   ---------------------------------------------------
 CbmStsSensorTypeDssd::CbmStsSensorTypeDssd()
-    : CbmStsSensorType(), fDx(-1.), fDy(-1.), fDz(-1.),
-      fPitch(), fStereo(), fIsSet(kFALSE) {
+    : CbmStsSensorType(), 
+      fDx(-1.), fDy(-1.), fDz(-1.),
+      fPitch(), fStereo(), fIsSet(kFALSE),
+      fNofStrips(), fCosStereo(), fSinStereo(), fStripShift()
+{
 }
 // -------------------------------------------------------------------------
 

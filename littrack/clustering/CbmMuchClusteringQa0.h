@@ -131,6 +131,9 @@ private:
 
 	static const Int_t nRadiusSteps = 50;
 
+  CbmMuchClusteringQa0(const CbmMuchClusteringQa0&);
+  CbmMuchClusteringQa0& operator=(const CbmMuchClusteringQa0&);
+  
   ClassDef(CbmMuchClusteringQa0,1)
 };
 

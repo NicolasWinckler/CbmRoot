@@ -155,6 +155,9 @@ private:
 
    Bool_t fFixedBounds; // Fixed bounds for error histograms
 
+   CbmLitFieldApproximationQa(const CbmLitFieldApproximationQa&);
+   CbmLitFieldApproximationQa& operator=(const CbmLitFieldApproximationQa&);
+   
    ClassDef(CbmLitFieldApproximationQa, 1);
 };
 

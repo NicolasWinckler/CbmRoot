@@ -17,7 +17,12 @@
 
 
 // -----   Default constructor   ---------------------------------------------
-CbmTimeSlice::CbmTimeSlice() : fStartTime(0.), fDuration(0.) {
+CbmTimeSlice::CbmTimeSlice() 
+ : TNamed(),
+   fStartTime(0.), 
+   fDuration(0.),
+   fStsData()
+{
   LOG(FATAL) << "Default constructor of CbmTimeSlice must not be used!";
 }
 // ---------------------------------------------------------------------------
@@ -26,7 +31,11 @@ CbmTimeSlice::CbmTimeSlice() : fStartTime(0.), fDuration(0.) {
 
 // -----   Standard constructor   --------------------------------------------
 CbmTimeSlice::CbmTimeSlice(Double_t start, Double_t duration)
-: fStartTime(start), fDuration(duration) {
+ : TNamed(),
+   fStartTime(start), 
+   fDuration(duration),
+   fStsData()
+{
 }
 // ---------------------------------------------------------------------------
 

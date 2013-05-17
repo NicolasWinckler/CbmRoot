@@ -106,6 +106,9 @@ private:
 
    Float_t fEfficiency;
    Float_t fEfficiencyForSubCenters;
+
+   CbmMuchTest(const CbmMuchTest&);
+   CbmMuchTest& operator=(const CbmMuchTest&);
 };
 
 #endif /* CBMMUCHTEST_H_ */

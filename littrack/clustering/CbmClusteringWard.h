@@ -121,6 +121,10 @@ private:
 	   Int_t padsInCluster[30];
    };
    Cluster* fClusters;
+
+   CbmClusteringWard(const CbmClusteringWard&);
+   CbmClusteringWard& operator=(const CbmClusteringWard&);
+   
 };
 
 #endif /* CBMCLUSTERINGWARD_H_ */

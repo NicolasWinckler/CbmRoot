@@ -37,6 +37,8 @@ class FairRootManager;
 
 class DielectronCandidate{
 public:
+
+  DielectronCandidate();
    TVector3 position, momentum;
    Double_t mass, energy, rapidity;
    Int_t charge;
@@ -309,6 +311,10 @@ public:
     ClassDef(CbmAnaDielectronTask,1);
 
 private:
+
+    CbmAnaDielectronTask(const CbmAnaDielectronTask&);
+    CbmAnaDielectronTask& operator=(const CbmAnaDielectronTask&);
+    
     Bool_t IsMismatch(
           DielectronCandidate* cand);
 

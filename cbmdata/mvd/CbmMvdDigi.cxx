@@ -18,6 +18,8 @@ using std::endl;
 CbmMvdDigi::CbmMvdDigi()
   : CbmDigi(),
     CbmMvdDetectorId(),
+    fDetectorId(0),
+    fChannelNr(0),
     fCharge(0.),
     fChannelNrX(0),
     fChannelNrY(0),
@@ -31,8 +33,6 @@ CbmMvdDigi::CbmMvdDigi()
     fDominatingPointY(0.),
     fContributors(0)
 {
-  //    fDetectorId   =  0;
-  //    fChannelNr    =  0;
 }
 // -------------------------------------------------------------------------
 
@@ -43,6 +43,8 @@ CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Flo
                        Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Float_t maxChargeContribution, Int_t pointID, Int_t trackID)
   : CbmDigi(),
     CbmMvdDetectorId(),
+    fDetectorId(0),
+    fChannelNr(0),
     fCharge(charge),
     fChannelNrX(iChannelNrX),
     fChannelNrY(iChannelNrY),

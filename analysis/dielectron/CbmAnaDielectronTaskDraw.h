@@ -327,6 +327,9 @@ private:
 
     void DrawMvdAndStsHist();
 
+   CbmAnaDielectronTaskDraw(const CbmAnaDielectronTaskDraw&);
+   CbmAnaDielectronTaskDraw& operator=(const CbmAnaDielectronTaskDraw&);
+   
    ClassDef(CbmAnaDielectronTaskDraw, 1);
 };
 

@@ -101,6 +101,9 @@ private:
    TStopwatch fTrackingWatch; // stopwatch for tracking without IO
    TStopwatch fTrackingWithIOWatch; // stopwatch for tracking including IO
 
+   CbmLitFindGlobalTracksParallel(const CbmLitFindGlobalTracksParallel&);
+   CbmLitFindGlobalTracksParallel& operator=(const CbmLitFindGlobalTracksParallel&);
+   
    ClassDef(CbmLitFindGlobalTracksParallel, 1);
 };
 

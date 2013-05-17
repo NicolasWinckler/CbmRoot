@@ -41,6 +41,7 @@ CbmSts::CbmSts()
   : FairDetector("STS", kTRUE, kSTS),
   fTrackID(0),   
   fVolumeID(0), 
+  fDetectorId(0),
   fPosIn(0.,0.,0.,0.), 
   fPosOut(0.,0.,0.,0.), 
   fMomIn(0.,0.,0.,0.),
@@ -51,7 +52,9 @@ CbmSts::CbmSts()
   fPosIndex(0),
   fStsCollection(NULL),
   kGeoSaved(kFALSE),
-  flGeoPar(new TList)
+  flGeoPar(new TList),
+  fVolumeMap(),
+  fVolumeMapIter()
 {
   ResetParameters();
   fStsCollection = new TClonesArray("CbmStsPoint");
@@ -70,6 +73,7 @@ CbmSts::CbmSts(const char* name, Bool_t active)
   : FairDetector(name, active, kSTS),
   fTrackID(0),   
   fVolumeID(0), 
+  fDetectorId(0),
   fPosIn(0.,0.,0.,0.), 
   fPosOut(0.,0.,0.,0.), 
   fMomIn(0.,0.,0.,0.),
@@ -80,7 +84,9 @@ CbmSts::CbmSts(const char* name, Bool_t active)
   fPosIndex(0),
   fStsCollection(NULL),
   kGeoSaved(kFALSE),
-  flGeoPar(new TList)
+  flGeoPar(new TList),
+  fVolumeMap(),
+  fVolumeMapIter()
 {
   ResetParameters();
   fStsCollection = new TClonesArray("CbmStsPoint");

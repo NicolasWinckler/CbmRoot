@@ -170,6 +170,9 @@ private:
 
    void ChangeClusters(pair<Int_t, Int_t> h, Int_t nCl0, Int_t nCl1);
 
+   CbmMvdClustering(const CbmMvdClustering&);
+   CbmMvdClustering& operator=(const CbmMvdClustering&);
+
    ClassDef(CbmMvdClustering, 1);
 };
 

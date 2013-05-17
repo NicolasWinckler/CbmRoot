@@ -16,7 +16,21 @@
 
 
 // =====   Constructor   ==================================================
-CbmStsRadTool::CbmStsRadTool() {
+CbmStsRadTool::CbmStsRadTool() 
+ : TObject(),
+  niel_neutron(),
+  niel_proton(),
+  niel_pion(),
+  niel_electron(),
+  fIAlpha(0.),
+  fEGap0(0.),
+  fEGapAlpha(0.),
+  fEGapBeta(0.),
+  fNeff0(0.),
+  fNeffC(0.),
+  fNeffGc(0.),
+  fEpsilon(0.)
+{
   Init();
 }
 // ========================================================================

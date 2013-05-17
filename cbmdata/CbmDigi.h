@@ -82,7 +82,8 @@ class CbmDigi : public TObject
 
   FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
 
-
+  CbmDigi(const CbmDigi&);
+  CbmDigi& operator=(const CbmDigi&);
 
   ClassDef(CbmDigi,2);
 

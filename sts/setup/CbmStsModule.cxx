@@ -10,7 +10,13 @@
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsModule::CbmStsModule() : fAddress(0), fNode(NULL) {
+CbmStsModule::CbmStsModule() 
+ : TNamed(),
+   fAddress(0), 
+   fSensors(),
+   fNode(NULL),
+   fBuffer()
+{
 }
 // -------------------------------------------------------------------------
 

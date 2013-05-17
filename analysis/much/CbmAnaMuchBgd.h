@@ -19,6 +19,8 @@ struct CbmMuon{
   Char_t  fMuchHits;
   Char_t  fStsHits;
   Float_t fChi;
+CbmMuon() : fChunk(0), fEvent(0), fMuons(0), fSign(0), fP(),
+    fMuchHits(0), fStsHits(0), fChi(0.) {;}
 };
 
 class CbmAnaMuchBgd : public FairTask{

@@ -68,6 +68,9 @@ private:
     TStopwatch fFitWatch; // stopwatch for track fit without IO
     TStopwatch fFitWithIOWatch; // stopwatch for track fit including IO
 
+    CbmLitFitTracksParallel(const CbmLitFitTracksParallel&);
+    CbmLitFitTracksParallel& operator=(const CbmLitFitTracksParallel&);
+    
     ClassDef(CbmLitFitTracksParallel, 1);
 };
 

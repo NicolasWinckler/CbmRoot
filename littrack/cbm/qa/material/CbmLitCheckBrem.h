@@ -9,6 +9,7 @@ class TGraph;
 class CbmLitSimpleMaterial
 {
 public:
+   CbmLitSimpleMaterial() : fZ(0.), fA(0.), fRho(0.), fX0(0.), fPHIRAD() {;}
    Double_t fZ;
    Double_t fA;
    Double_t fRho;

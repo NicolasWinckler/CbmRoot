@@ -47,7 +47,7 @@ class CbmTofDetectorId
   
   
   /** Destructor **/
-  ~CbmTofDetectorId()  {;}
+  virtual ~CbmTofDetectorId()  {;}
   
   /** Get System identifier from detector ID **/
   //  Int_t GetSystemId(const Int_t detectorId);

@@ -26,6 +26,9 @@ private:
 
    Int_t fEventNo;
 
+   CbmLitCreateStandaloneData(const CbmLitCreateStandaloneData&);
+   CbmLitCreateStandaloneData& operator=(const CbmLitCreateStandaloneData&);
+   
    ClassDef(CbmLitCreateStandaloneData, 1);
 };
 

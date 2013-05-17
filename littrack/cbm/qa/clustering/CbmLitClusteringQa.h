@@ -169,6 +169,9 @@ private:
     std::map<Int_t, Int_t> fBestPoints;
     std::map<Int_t, Int_t> fBestPointsForHits;
 
+    CbmLitClusteringQa(const CbmLitClusteringQa&);
+    CbmLitClusteringQa& operator=(const CbmLitClusteringQa&);
+    
     ClassDef(CbmLitClusteringQa, 1);
 };
 

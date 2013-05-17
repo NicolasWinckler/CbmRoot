@@ -54,16 +54,16 @@ using std::map;
 using std::ios_base;
 using std::vector;
 
+ 
 // -----   Default constructor   ------------------------------------------
 CbmStsDigitizeTb::CbmStsDigitizeTb()
   : FairTask("StsDigitize", 1),
   fGeoPar(NULL),
   fDigiPar(NULL),
+  fDigiScheme(NULL),
   fPoints(NULL),
   fDigis(NULL),
   fDigiMatches(NULL),
-  fRealistic(kFALSE),
-  fDigiScheme(NULL),
   fNDigis(0),
   fNMulti(0),
   fNEvents(0),
@@ -71,11 +71,18 @@ CbmStsDigitizeTb::CbmStsDigitizeTb()
   fNOutside(0),
   fNDigisFront(0),
   fNDigisBack(0),
+  fTime(0.),
+  fStepSize(0.),
+  fTimer(),
+  fRealistic(kFALSE),
+  fPairCreationEnergy(0.),
   fFNoiseWidth(0.1),
   fBNoiseWidth(0.1),
   fStripDeadTime(10),
-  fTime(0.),
-  fTimer(),
+  fQMax(0.),
+  fThreshold(0.),
+  fNAdcBits(0),
+  fNAdcChannels(0.),
   fFChannelPointsMap(),
   fBChannelPointsMap()
 {

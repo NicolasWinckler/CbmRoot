@@ -131,6 +131,9 @@ private:
    	   vector<Int_t> digisInCluster;
    	   Int_t nDigiMax;
    	   Int_t nMCPoint;
+   Cluster() : nofCluster(0), xc(0.), yc(0.), sumClCharge(0.),
+	     nofDidis(0), digisInCluster(), nDigiMax(0),
+	     nMCPoint(0) {;}
    };
    Cluster* fClusters;
    vector<Cluster> fFinalClusters;
@@ -184,6 +187,9 @@ private:
 
    void ChangeClusters(pair<Int_t, Int_t> h, Int_t nCl0, Int_t nCl1);
 
+   CbmMvdClusteringNoCharges(const CbmMvdClusteringNoCharges&);
+   CbmMvdClusteringNoCharges& operator=(const CbmMvdClusteringNoCharges&);
+   
    ClassDef(CbmMvdClusteringNoCharges, 1);
 };
 

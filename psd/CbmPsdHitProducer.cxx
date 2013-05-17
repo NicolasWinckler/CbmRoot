@@ -21,9 +21,12 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmPsdHitProducer::CbmPsdHitProducer() :
   FairTask("Ideal Psd Hit Producer",1),
+  fNHits(0),
   fHitArray(NULL),
   fDigiArray(NULL),
-  fNHits(0)
+  fXi(),
+  fYi(),
+  fhModXNewEn(NULL)  
 { 
   //  Reset();
 }

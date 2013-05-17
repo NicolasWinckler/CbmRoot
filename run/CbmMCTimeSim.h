@@ -157,7 +157,8 @@ class CbmMCTimeSim : public FairTask
   virtual InitStatus Init();
 
 
-
+  CbmMCTimeSim(const CbmMCTimeSim&);
+  CbmMCTimeSim& operator=(const CbmMCTimeSim&);
 
   ClassDef(CbmMCTimeSim,1);
 

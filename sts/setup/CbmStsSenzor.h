@@ -69,7 +69,8 @@ class CbmStsSenzor : public TNamed
     CbmStsModule* fModule;      ///< Pointer to mother module
 
 
-
+  CbmStsSenzor(const CbmStsSenzor&);
+  CbmStsSenzor& operator=(const CbmStsSenzor&);
 
   ClassDef(CbmStsSenzor,1);
 

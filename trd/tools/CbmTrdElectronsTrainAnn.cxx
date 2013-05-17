@@ -43,6 +43,7 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn(
     fTrdHits(NULL),
     fEloss(),
     fHists(),
+    fhResults(),
     fhMeanEloss(),
     fhEloss(),
     fhdEdX(),

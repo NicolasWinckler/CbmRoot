@@ -100,6 +100,9 @@ private:
 
    Int_t fEventNo; //event counter
 
+   CbmLitFindGlobalTracksIdeal(const CbmLitFindGlobalTracksIdeal&);
+   CbmLitFindGlobalTracksIdeal& operator=(const CbmLitFindGlobalTracksIdeal&);
+   
    ClassDef(CbmLitFindGlobalTracksIdeal, 1);
 };
 

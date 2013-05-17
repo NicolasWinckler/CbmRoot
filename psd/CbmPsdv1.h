@@ -90,7 +90,9 @@ class CbmPsdv1 : public CbmPsd
    **/
   void ResetParameters();
 
-
+  CbmPsdv1(const CbmPsdv1&);
+  CbmPsdv1& operator=(const CbmPsdv1&);
+  
   ClassDef(CbmPsdv1,3)
 
 };

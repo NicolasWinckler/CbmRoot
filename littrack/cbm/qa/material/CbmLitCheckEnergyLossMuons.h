@@ -35,6 +35,9 @@ private:
 
    string fOutputDir;
 
+   CbmLitCheckEnergyLossMuons(const CbmLitCheckEnergyLossMuons&);
+   CbmLitCheckEnergyLossMuons& operator=(const CbmLitCheckEnergyLossMuons&);
+   
    ClassDef(CbmLitCheckEnergyLossMuons, 1);
 };
 

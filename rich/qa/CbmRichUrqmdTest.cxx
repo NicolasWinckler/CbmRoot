@@ -30,26 +30,42 @@
 using namespace std;
 using boost::assign::list_of;
 
-
-CbmRichUrqmdTest::CbmRichUrqmdTest():
-   FairTask("CbmRichUrqmdTest"),
-   fOutputDir(""),
-
-   fRichHits(NULL),
-   fRichRings(NULL),
-   fRichPoints(NULL),
-   fMcTracks(NULL),
-   fRichRingMatches(NULL),
-
-   fCanvas(),
-   fEventNum(0),
-   fMinNofHits(7),
-
-   fHists()
-
+CbmRichUrqmdTest::CbmRichUrqmdTest()
+  : FairTask("CbmRichUrqmdTest"),
+    fOutputDir(""),
+    fRichHits(NULL),
+    fRichRings(NULL),
+    fRichPoints(NULL),
+    fMcTracks(NULL),
+    fRichRingMatches(NULL),
+    fRichProjections(NULL),
+    fCanvas(),
+    fEventNum(0),
+    fMinNofHits(7),
+    fNofHitsInRingMap(),
+    fh_vertex_z(NULL),
+    fh_nof_rings_1hit(NULL),		      
+    fh_nof_rings_7hits(NULL),		    
+    fh_nof_rings_prim_1hit(NULL),		    
+    fh_nof_rings_prim_7hits(NULL),	    
+    fh_nof_rings_target_1hit(NULL), 	    
+    fh_nof_rings_target_7hits(NULL),	    
+    fh_secel_mom(NULL),			    
+    fh_gamma_target_mom(NULL),
+    fh_gamma_nontarget_mom(NULL),
+    fh_pi_mom(NULL),			    
+    fh_kaon_mom(NULL),              	    
+    fh_mu_mom(NULL),			    
+    fh_nof_hits_per_event(NULL),              
+    fh_hits_xy_u(NULL),		
+    fh_hits_xy_d(NULL),		
+    fh_hitrate_xy_u(NULL),	
+    fh_hitrate_xy_d(NULL),	
+    fh_nof_proj_per_event(NULL),	
+    fh_proj_xy_u(NULL),		
+    fh_proj_xy_d(NULL),          
+    fHists()
 {
-
-
 }
 
 CbmRichUrqmdTest::~CbmRichUrqmdTest()

@@ -63,9 +63,11 @@ template <class T> class CbmMCPointBuffer
  public:
 
   /**   Default constructor  **/
-  CbmMCPointBuffer(const char* name = "") {
-    fName = name;
-    fBufferIt = fBuffer.begin();
+  CbmMCPointBuffer(const char* name = "") 
+   : fName(name),
+     fBuffer(),
+     fBufferIt(fBuffer.begin())
+  {
   };
 
 
@@ -195,7 +197,8 @@ template <class T> class CbmMCPointBuffer
   typename multiset<T, IsBefore<T> >::iterator fBufferIt;
 
 
-
+  CbmMCPointBuffer<T>(const CbmMCPointBuffer<T>&);  
+  CbmMCPointBuffer<T>& operator=(const CbmMCPointBuffer<T>&);  
 
 };
 

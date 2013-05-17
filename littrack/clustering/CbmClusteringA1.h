@@ -78,6 +78,10 @@ private:
    };
    Cluster* fClusters;
    //TClonesArray* fClFull;
+
+   CbmClusteringA1(const CbmClusteringA1&);
+   CbmClusteringA1& operator=(const CbmClusteringA1&);
+  
 };
 
 #endif /* CBMCLUSTERINGA1_H_ */

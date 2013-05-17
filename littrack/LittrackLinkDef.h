@@ -20,6 +20,7 @@
 #pragma link C++ class CbmLitFieldApproximationQa+;
 #pragma link C++ class CbmLitFitQa+;
 #pragma link C++ class CbmLitRadLengthQa+;
+#pragma link C++ class CbmLitTofQa+;
 
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckBrem+;
@@ -36,5 +37,6 @@
 #pragma link C++ class CbmLitFitQaStudyReport+;
 #pragma link C++ class CbmLitFieldApproximationQaReport+;
 #pragma link C++ class CbmLitRadLengthQaReport+;
+#pragma link C++ class CbmLitTofQaReport+;
 
 #endif

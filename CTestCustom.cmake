@@ -130,6 +130,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "FairDbValidityRec.h"
         "Fair"
         "base/source"
+        "std::binary_function"
   )
 
 # -----------------------------------------------------------

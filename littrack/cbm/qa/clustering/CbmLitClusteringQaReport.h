@@ -49,14 +49,9 @@ private:
 
    string PrintMuchAcuracy() const;
 
-   void DrawHistogramsByPattern(
-         const string& histNamePattern);
-
    void DrawLogYHistogramsByPattern(
             const string& histNamePattern);
 
-   void DrawH2HistogramsByPattern(
-         const string& histNamePattern);
    void DrawHistogramsByLayer(const string& histNamePattern, const string& histName);
 
    void DrawNofObjectsHistigrams(

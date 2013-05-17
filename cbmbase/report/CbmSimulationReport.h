@@ -64,7 +64,21 @@ public:
    /**
     * \brief Return pointer to Histogram manager.
     */
-   CbmHistManager* HM() const { return fHM; };
+   CbmHistManager* HM() const { return fHM; }
+
+   /**
+    * \brief Select by pattern TH1 histograms and draw each histogram on separate canvas.
+    * \param[in] histNamePattern Name pattern for histogram.
+    */
+   void DrawH1ByPattern(
+         const string& histNamePattern);
+
+   /**
+    * \brief Select by pattern TH2 histograms and draw each histogram on separate canvas.
+    * \param[in] histNamePattern Name pattern for histogram.
+    */
+   void DrawH2ByPattern(
+         const string& histNamePattern);
 
 private:
    CbmHistManager* fHM; // Histogram manager

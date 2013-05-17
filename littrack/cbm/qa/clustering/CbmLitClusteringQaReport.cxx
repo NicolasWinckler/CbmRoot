@@ -131,10 +131,10 @@ void CbmLitClusteringQaReport::Draw()
    ScaleHistogramsByNofEvents();
 
    if(HM()->Exists("hno_NofObjects_MuchHits_Station")){
-      DrawHistogramsByPattern("hss_Much_ClusterToPointRatio");
-      DrawHistogramsByPattern("hss_Much_ClusterQuality");
-      DrawHistogramsByPattern("hss_Much_NofPointsInCluster");
-      DrawHistogramsByPattern("hss_Much_NofPointsInDigi");
+      DrawH1ByPattern("hss_Much_ClusterToPointRatio");
+      DrawH1ByPattern("hss_Much_ClusterQuality");
+      DrawH1ByPattern("hss_Much_NofPointsInCluster");
+      DrawH1ByPattern("hss_Much_NofPointsInDigi");
 
       DrawNofObjectsHistigrams("hsh_Much_PixelHits", "hsh_Much_Points", "hsh_Much_Clusters", "hsh_Much_Digis", "nofObjects_Histograms");
 
@@ -143,34 +143,20 @@ void CbmLitClusteringQaReport::Draw()
       DrawNofObjectsHistigrams("hsh_Much_Muon_PixelHits", "hsh_Much_Muon_Points",
             "hsh_Much_Muon_Clusters", "hsh_Much_Muon_Digis", "nofObjects_Muon_Histograms");
 
-      DrawHistogramsByPattern("hss_Much_NofDigisByPoint");
+      DrawH1ByPattern("hss_Much_NofDigisByPoint");
 
-      DrawH2HistogramsByPattern("hsc_Much_.*_2D");
+      DrawH2ByPattern("hsc_Much_.*_2D");
 
       DrawLogYHistogramsByPattern("hss_Much_.*_Total");
 
-      DrawH2HistogramsByPattern("hr_Much_.*_2D");
+      DrawH2ByPattern("hr_Much_.*_2D");
 
       DrawResidualHistogrms();
 
-      DrawHistogramsByPattern("h_Much_.*RMS.*");
-      DrawHistogramsByPattern("h_Much_.*Mean.*");
-      DrawHistogramsByPattern("h_Much_.*Sigma.*");
+      DrawH1ByPattern("h_Much_.*RMS.*");
+      DrawH1ByPattern("h_Much_.*Mean.*");
+      DrawH1ByPattern("h_Much_.*Sigma.*");
    }
-}
-
-void CbmLitClusteringQaReport::DrawHistogramsByPattern(
-      const string& histNamePattern)
-{
-	vector<TH1*> histos = HM()->H1Vector(histNamePattern);
-	if (histos.size() == 0) return;
-	Int_t nofHistos = histos.size();
-	for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
-		TH1* hist = histos[iHist];
-		string canvasName = GetReportName() + hist->GetName();
-		TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
-		DrawH1(hist, kLinear, kLinear);
-	}
 }
 
 void CbmLitClusteringQaReport::DrawLogYHistogramsByPattern(
@@ -184,20 +170,6 @@ void CbmLitClusteringQaReport::DrawLogYHistogramsByPattern(
         string canvasName = GetReportName() + hist->GetName();
         TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
         DrawH1(hist, kLinear, kLog);
-    }
-}
-
-void CbmLitClusteringQaReport::DrawH2HistogramsByPattern(
-      const string& histNamePattern)
-{
-    vector<TH2*> histos = HM()->H2Vector(histNamePattern);
-    if (histos.size() == 0) return;
-    Int_t nofHistos = histos.size();
-    for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
-        TH2* hist = histos[iHist];
-        string canvasName = GetReportName() + hist->GetName();
-        TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
-        DrawH2(hist, kLinear, kLinear, kLinear);
     }
 }
 

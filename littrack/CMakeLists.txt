@@ -90,7 +90,7 @@ set(SRCS
    cbm/qa/radlength/CbmLitRadLengthQa.cxx
    cbm/qa/radlength/CbmLitRadLengthQaReport.cxx
    cbm/qa/tof/CbmLitTofQa.cxx
-   cbm/qa/tof/CbmLittofQaReport.cxx
+   cbm/qa/tof/CbmLitTofQaReport.cxx
 )
 
 set(HEADERS
@@ -122,7 +122,7 @@ set(HEADERS
    cbm/qa/radlength/CbmLitRadLengthQa.h
    cbm/qa/radlength/CbmLitRadLengthQaReport.h
    cbm/qa/tof/CbmLitTofQa.h
-   cbm/qa/tof/CbmLittofQaReport.h
+   cbm/qa/tof/CbmLitTofQaReport.h
 )
 
 

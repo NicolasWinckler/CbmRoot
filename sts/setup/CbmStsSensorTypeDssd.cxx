@@ -24,8 +24,7 @@ const double kPairEnergy = 3.6e-9;
 // -----   Constructor   ---------------------------------------------------
 CbmStsSensorTypeDssd::CbmStsSensorTypeDssd()
     : CbmStsSensorType(), fDx(-1.), fDy(-1.), fDz(-1.),
-      fPitchF(-1.), fPitchB(-1.), fStereoF(0.), fStereoB(0.),
-      fIsSet(kFALSE) {
+      fPitch(), fStereo(), fIsSet(kFALSE) {
 }
 // -------------------------------------------------------------------------
 
@@ -40,12 +39,12 @@ void CbmStsSensorTypeDssd::Print(Option_t* opt) const {
             << fDx << ", " << fDy << ", " << fDz
             << ") cm" << FairLogger::endl
             << setprecision(0)
-            << "\t  Front side: pitch = " << fPitchF*1.e4 << " mum, "
-            << fNofStripsF << " strips, stereo angle "
-            << fStereoF << " degrees" << FairLogger::endl
-            << "\t  Back side:  pitch = " << fPitchB*1.e4 << " mum, "
-            << fNofStripsB << " strips, stereo angle "
-            << fStereoB << " degrees" << FairLogger::endl;
+            << "\t  Front side: pitch = " << fPitch[0]*1.e4 << " mum, "
+            << fNofStrips[0] << " strips, stereo angle "
+            << fStereo[0] << " degrees" << FairLogger::endl
+            << "\t  Back side:  pitch = " << fPitch[1]*1.e4 << " mum, "
+            << fNofStrips[1] << " strips, stereo angle "
+            << fStereo[1] << " degrees" << FairLogger::endl;
 
 }
 // -------------------------------------------------------------------------
@@ -53,10 +52,11 @@ void CbmStsSensorTypeDssd::Print(Option_t* opt) const {
 
 
 // -----   Process an MC Point  --------------------------------------------
-void CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point) {
+void CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point,
+                                        const CbmStsSenzor* sensor) const {
 
-  ProduceCharge(point, 0);
-  ProduceCharge(point, 1);
+  ProduceCharge(point, 0, sensor);
+  ProduceCharge(point, 1, sensor);
 
 }
 // -------------------------------------------------------------------------
@@ -65,7 +65,8 @@ void CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point) {
 
 // -----   Produce charge on the strips   ----------------------------------
 void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
-                                         Int_t side) const {
+                                         Int_t side,
+                                         const CbmStsSenzor* sensor) const {
 
   // --- Protect against being called without parameters being set
   if ( ! fIsSet ) LOG(FATAL) << "Parameters of sensor " << fName
@@ -74,27 +75,19 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
   // This implementation assumes a straight trajectory in the sensor
   // and a constant charge distribution along it.
 
+  // Check for side qualifier
+  if ( side < 0 || side > 1 )  {
+    LOG(ERROR) << "Illegal side qualifier!" << FairLogger::endl;
+    return;
+  }
+
   // Total produced charge
   Double_t qtot = point->GetELoss() / kPairEnergy;
 
   // Stereo angle and strip pitch
-  Double_t tanphi = 0.;     // tangent of stereo angle
-  Double_t pitch  = 0.;     // strip pitch
-  Int_t nStrips;            // number of strips
-  if ( side == 0 ) {        // front side
-    tanphi  = fSinStereoF / fCosStereoF;
-    pitch   = fPitchF;
-    nStrips = fNofStripsF;
-  }
-  else if ( side == 1 ) {   // back side
-    tanphi  = fSinStereoB / fCosStereoB;
-    pitch   = fPitchB;
-    nStrips = fNofStripsB;
-  }
-  else {
-    LOG(ERROR) << "Illegal side qualifier!" << FairLogger::endl;
-    return;
-  }
+  Double_t tanphi = fSinStereo[side] / fCosStereo[side];
+  Double_t pitch  = fPitch[side];
+  Int_t nStrips   = fNofStrips[side];
 
 
   // Project point coordinates (in / out) to readout (top) edge
@@ -111,7 +104,7 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
 
   // --- If everything is in but one strip: register entire charge
   if ( i1 == i2 ) {
-    RegisterCharge(side, i1, qtot, point->GetTime());
+    RegisterCharge(sensor, side, i1, qtot, point->GetTime());
     return;
   }
 
@@ -142,7 +135,7 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
     else if ( jStrip >= nStrips ) jStrip -= nStrips;
 
     // --- Register charge to module
-    RegisterCharge(side, jStrip, charge, point->GetTime());
+    RegisterCharge(sensor, side, jStrip, charge, point->GetTime());
 
   } // Loop over fired strips
 
@@ -152,7 +145,8 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
 
 
 // -----   Register charge   -----------------------------------------------
-void CbmStsSensorTypeDssd::RegisterCharge(Int_t side, Int_t strip,
+void CbmStsSensorTypeDssd::RegisterCharge(const CbmStsSenzor* sensor,
+                                          Int_t side, Int_t strip,
                                           Double_t charge,
                                           Double_t time) const {
 
@@ -188,24 +182,24 @@ void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
                << FairLogger::endl;
 
   // --- Set members
-  fDx      = dx;
-  fDy      = dy;
-  fDz      = dz;
-  fPitchF  = pitchF;
-  fPitchB  = pitchB;
-  fStereoF = stereoF;
-  fStereoB = stereoB;
+  fDx        = dx;
+  fDy        = dy;
+  fDz        = dz;
+  fPitch[0]  = pitchF;
+  fPitch[1]  = pitchB;
+  fStereo[0] = stereoF;
+  fStereo[1] = stereoB;
 
-  // --- Calculate number of strips
-  fNofStripsF = TMath::CeilNint(fDx / fPitchF);
-  fNofStripsB = TMath::CeilNint(fDx / fPitchB);
+  // --- Calculate parameters for front and back
+  for (Int_t side = 0; side < 2; side++) {
+    fNofStrips[side] = TMath::CeilNint(fDx / fPitch[side]);
+    fCosStereo[side] = TMath::Cos( fStereo[side] * TMath::DegToRad() );
+    fSinStereo[side] = TMath::Sin( fStereo[side] * TMath::DegToRad() );
+    Double_t tanPhi = fSinStereo[side] / fCosStereo[side];
+    fStripShift[side] = TMath::Nint(fDy * tanPhi / fPitch[side]);
+  }
 
-  // --- Calculate cos and sin of stereo angles
-  fCosStereoF = TMath::Cos( fStereoF * TMath::DegToRad() );
-  fSinStereoF = TMath::Sin( fStereoF * TMath::DegToRad() );
-  fCosStereoB = TMath::Cos( fStereoB * TMath::DegToRad() );
-  fSinStereoB = TMath::Sin( fStereoB * TMath::DegToRad() );
-
+  // --- Flag parameters to be set
   fIsSet = kTRUE;
 
 }

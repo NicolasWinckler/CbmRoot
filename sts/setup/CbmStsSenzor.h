@@ -14,6 +14,7 @@
 #include "TNamed.h"
 
 
+class CbmStsModule;
 class CbmStsPoint;
 class CbmStsSensorType;
 
@@ -40,6 +41,18 @@ class CbmStsSenzor : public TNamed
     virtual ~CbmStsSenzor() { };
 
 
+    /** Get mother module **/
+    CbmStsModule* GetModule() const { return fModule; }
+
+
+    /** Sensor number within module (from top to bottom) **/
+    Int_t GetSensorNumber() const;
+
+
+    /** Pointer to sensor type **/
+    CbmStsSensorType* GetType() const { return fType; }
+
+
     /** Produce charge in the sensor and send it to the module.
      **
      ** Perform the appropriate action for a particle trajectory in the
@@ -53,6 +66,7 @@ class CbmStsSenzor : public TNamed
     Int_t fAddress;             ///< Unique identifier
     TGeoPhysicalNode*  fNode;   ///< Pointer to node in the geometry
     CbmStsSensorType* fType;    ///< Pointer to sensor type
+    CbmStsModule* fModule;      ///< Pointer to mother module
 
 
 

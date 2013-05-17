@@ -9,6 +9,7 @@
 
 #include "TNamed.h"
 
+class CbmStsSenzor;
 class CbmStsSensorPoint;
 
 
@@ -39,6 +40,10 @@ class CbmStsSensorType : public TNamed
     virtual ~CbmStsSensorType() { };
 
 
+    /** Type identifier **/
+    Int_t GetTypeId() const { return fTypeId; }
+
+
     /** Produce charge in the sensor
      **
      ** @param point   Pointer to CbmStsSensorPoint with relevant parameters
@@ -46,7 +51,8 @@ class CbmStsSensorType : public TNamed
      ** Perform the appropriate action for a particle trajectory in the
      ** sensor characterised by the CbmStsSensorPoint object.
      **/
-    virtual void ProcessPoint(CbmStsSensorPoint* point) = 0;
+    virtual void ProcessPoint(CbmStsSensorPoint* point,
+                              const CbmStsSenzor* sensor) const = 0;
 
 
   private:

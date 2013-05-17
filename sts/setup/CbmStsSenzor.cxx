@@ -21,6 +21,15 @@ CbmStsSenzor::CbmStsSenzor() : fAddress(0),
 
 
 
+// -----   Sensor number within module   -----------------------------------
+Int_t CbmStsSenzor::GetSensorNumber() const {
+  //TODO: Implementation
+  return 0;
+}
+// -------------------------------------------------------------------------
+
+
+
 // -----   Process a CbmStsPoint  ------------------------------------------
 void CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
 
@@ -49,7 +58,7 @@ void CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
                                                     point->GetTime());
 
   // --- Call ProcessPoint method from sensor type
-  fType->ProcessPoint(sPoint);
+  fType->ProcessPoint(sPoint, this);
 
 }
 // -------------------------------------------------------------------------

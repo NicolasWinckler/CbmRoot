@@ -43,12 +43,20 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     virtual ~CbmStsSensorTypeDssd() { };
 
 
+    /** Shift of strip number from bottom to top
+     ** @param side   0 = front, 1 = back
+     ** @value horizontal displacement of strip in units of pitch;
+     **/
+    Int_t GetStripShift(Int_t side) const { return fStripShift[side]; }
+
+
     /** Print parameters **/
     virtual void Print(Option_t* opt = "") const;
 
 
     /** Process a point **/
-    virtual void ProcessPoint(CbmStsSensorPoint*);
+    virtual void ProcessPoint(CbmStsSensorPoint* point,
+                              const CbmStsSenzor* sensor) const;
 
 
     /** Set the parameters
@@ -63,29 +71,26 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
 
   private:
 
-    Double_t fDx;       ///< Dimension in x [cm]
-    Double_t fDy;       ///< Dimension in y [cm]
-    Double_t fDz;       ///< Thickness in z [cm]
-    Double_t fPitchF;   ///< Strip pitch front side [cm]
-    Double_t fPitchB;   ///< Strip pitch back side [cm]
-    Double_t fStereoF;  ///< Stereo angle front side [degrees]
-    Double_t fStereoB;  ///< Stereo angle back side [degrees]
-    Bool_t   fIsSet;    ///< Flag whether parameters are set
+    Double_t fDx;        ///< Dimension in x [cm]
+    Double_t fDy;        ///< Dimension in y [cm]
+    Double_t fDz;        ///< Thickness in z [cm]
+    Double_t fPitch[2];  ///< Strip pitch front/back side [cm]
+    Double_t fStereo[2]; ///< Stereo angle front/back side [degrees]
+    Bool_t   fIsSet;     ///< Flag whether parameters are set
 
 
     /** Temporary variables to avoid frequent calculations **/
-    Double_t fNofStripsF;   //! Number of strips on front side
-    Double_t fNofStripsB;   //! Number of strips on back side
-    Double_t fCosStereoF;   //! cos of stereo angle front side
-    Double_t fSinStereoF;   //! sin if stereo angle front side
-    Double_t fCosStereoB;   //! cos of stereo angle back side
-    Double_t fSinStereoB;   //! sin of stereo angle back side
+    Double_t fNofStrips[2]; //! Number of strips on front/back side
+    Double_t fCosStereo[2]; //! cos of stereo angle front/back side
+    Double_t fSinStereo[2]; //! sin if stereo angle front/back side
+    Int_t   fStripShift[2]; //! Shift in number of strips from bottom to top
 
 
     /** Produce charge on front or back side from a CbmStsPoint
      ** @param side   0 = front, 1 = back side
      **/
-    void ProduceCharge(CbmStsSensorPoint* point, Int_t side) const;
+    void ProduceCharge(CbmStsSensorPoint* point, Int_t side,
+                       const CbmStsSenzor* sensor) const;
 
 
     /** Register produced charge in one strip
@@ -94,7 +99,7 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
      ** @param charge  charge in strip [e]
      ** @param time    time of registration [ns]
      **/
-    void RegisterCharge(Int_t side, Int_t strip,
+    void RegisterCharge(const CbmStsSenzor* sensor, Int_t side, Int_t strip,
                         Double_t charge, Double_t time) const;
 
 

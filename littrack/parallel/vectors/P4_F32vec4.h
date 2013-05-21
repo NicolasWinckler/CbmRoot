@@ -49,7 +49,7 @@ public:
    float& operator[]( int i ) { return ((float*)&v)[i]; }
    float   operator[]( int i ) const { return ((float*)&v)[i]; }
 
-   F32vec4( ) {}
+   F32vec4() : v(_mm_setzero_ps()) {}
    F32vec4( const __m128& a ) { v = a; }
    F32vec4( const float& a )  { v = _mm_set_ps1(a); }
 

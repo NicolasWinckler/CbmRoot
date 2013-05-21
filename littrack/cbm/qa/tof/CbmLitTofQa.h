@@ -78,6 +78,9 @@ private:
 
    void ProcessGlobalTracks();
 
+   CbmLitTofQa(const CbmLitTofQa&);
+   CbmLitTofQa& operator=(const CbmLitTofQa&);
+
    Bool_t fIsFixedBounds; // if true than fixed bounds are used for histograms
 
    string fOutputDir; // Output directory for images

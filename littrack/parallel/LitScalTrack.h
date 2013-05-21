@@ -37,6 +37,7 @@ public:
     * \brief Constructor.
     */
    LitScalTrack():
+      fHits(),
       fParamFirst(),
       fParamLast(),
       fChiSq(0.),

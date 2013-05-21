@@ -13,9 +13,13 @@
 
 
 // -----   Constructor   ---------------------------------------------------
-CbmStsSenzor::CbmStsSenzor() : fAddress(0),
-                               fNode(NULL),
-                               fType(NULL) {
+CbmStsSenzor::CbmStsSenzor() 
+ : TNamed(),
+   fAddress(0),
+   fNode(NULL),
+   fType(NULL),
+   fModule(NULL)
+{
 }
 // -------------------------------------------------------------------------
 

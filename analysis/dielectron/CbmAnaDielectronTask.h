@@ -542,7 +542,11 @@ private:
    TH1D* fh_piprim_mom_rec_only_sts;
    TH1D* fh_piprim_mom_rec_sts_rich_trd;
    TH1D* fh_piprim_mom_rec_sts_rich_trd_tof;
-   TH1D* fh_piprim_rapidity_mc;
+
+   TH1D* fh_piprim_plus_rapidity_mc;
+   TH1D* fh_piprim_minus_rapidity_mc;
+   TH1D* fh_pi0prim_rapidity_mc;
+   TH1D* fh_etaprim_rapidity_mc;
 
 public:
    void SetUseMvd(Bool_t use){fUseMvd = use;};

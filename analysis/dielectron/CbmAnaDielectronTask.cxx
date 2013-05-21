@@ -333,9 +333,42 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
     fh_piprim_mom_rec_only_sts(NULL),
     fh_piprim_mom_rec_sts_rich_trd(NULL),
     fh_piprim_mom_rec_sts_rich_trd_tof(NULL),
-    fh_piprim_rapidity_mc(NULL)
+    fh_piprim_minus_rapidity_mc(NULL),
+    fh_piprim_plus_rapidity_mc(NULL),
+    fh_pi0prim_rapidity_mc(NULL),
+    fh_etaprim_rapidity_mc(NULL)
 {
    // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
+   fWeight = 0.0;
+   fUseRich = true;
+   fUseTrd = true;
+   fUseTof = true;
+   fPionMisidLevel = -1.;
+   fRandom3 = new TRandom3(0);
+    //identification cuts
+   fTrdAnnCut = 0.85;
+   fRichAnnCut = 0.0;
+   fUseRichAnn = true;
+   fMeanA = -1.;
+   fMeanB = -1.;
+   fRmsA = -1.;
+   fRmsB = -1.;
+   fRmsCoeff = -1.;
+   fDistCut = -1.;
+   fMomentumCut = -1.; // if cut < 0 them it is not used
+   // analysis cuts
+   fPtCut = 0.2;
+   fAngleCut = 1.;
+   fChiPrimCut = 3.;
+   fGammaCut = 0.025;
+   fStCutAngle = 1.5;
+   fStCutPP = 1.5;
+   fTtCutAngle = 0.75;
+   fTtCutPP = 4.0;
+   fMvd1CutP = 1.2;
+   fMvd1CutD = 0.4;
+   fMvd2CutP = 1.5;
+   fMvd2CutD = 0.5;
 }
 
 CbmAnaDielectronTask::~CbmAnaDielectronTask()
@@ -517,9 +550,15 @@ void CbmAnaDielectronTask::InitHists()
    fHistoList.push_back(fh_piprim_mom_rec_sts_rich_trd);
    fh_piprim_mom_rec_sts_rich_trd_tof = new TH1D("fh_piprim_mom_rec_sts_rich_trd_tof", "fh_piprim_mom_rec_sts_rich_trd_tof;p [GeV/c];dN/dP [1/GeV/c]", 30, 0., 3.);
    fHistoList.push_back(fh_piprim_mom_rec_sts_rich_trd_tof);
-   fh_piprim_rapidity_mc = new TH1D("fh_piprim_rapidity_mc", "fh_piprim_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
-   fHistoList.push_back(fh_piprim_rapidity_mc);
 
+   fh_piprim_plus_rapidity_mc = new TH1D("fh_piprim_plus_rapidity_mc", "fh_piprim_plus_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
+   fHistoList.push_back(fh_piprim_plus_rapidity_mc);
+   fh_piprim_minus_rapidity_mc = new TH1D("fh_piprim_minus_rapidity_mc", "fh_piprim_minus_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
+   fHistoList.push_back(fh_piprim_minus_rapidity_mc);
+   fh_pi0prim_rapidity_mc = new TH1D("fh_pi0prim_rapidity_mc", "fh_pi0prim_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
+   fHistoList.push_back(fh_pi0prim_rapidity_mc);
+   fh_etaprim_rapidity_mc = new TH1D("fh_etaprim_rapidity_mc", "fh_etaprim_rapidity_mc;Rapidity;dN/dY", 400, 0., 4.);
+   fHistoList.push_back(fh_etaprim_rapidity_mc);
 
 
    fh_nof_rec_pairs_gamma = new TH1D("fh_nof_rec_pairs_gamma", "fh_nof_rec_pairs_gamma;Pair category; Number per event", 3, -0.5, 2.5);
@@ -838,9 +877,18 @@ void CbmAnaDielectronTask::FillElPiMomHist()
 
           if (vertex.Mag() < 0.1) {
              fh_piprim_mom_mc->Fill(momentum);
-             fh_piprim_rapidity_mc->Fill(rapidity);
+             if (mctrack->GetPdgCode() == 211) fh_piprim_plus_rapidity_mc->Fill(rapidity);
+             if (mctrack->GetPdgCode() == -211) fh_piprim_minus_rapidity_mc->Fill(rapidity);
              if (isAcc) fh_piprim_mom_acc->Fill(momentum);
           }
+       }
+
+       if (pdg == 111 && vertex.Mag() < 0.1) {
+          fh_pi0prim_rapidity_mc->Fill(rapidity);
+       }
+
+       if (pdg == 221 && vertex.Mag() < 0.1) {
+          fh_etaprim_rapidity_mc->Fill(rapidity);
        }
    }
 

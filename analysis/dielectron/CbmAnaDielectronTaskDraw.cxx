@@ -960,14 +960,40 @@ void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
          ("Rec STS-RICH-TRD-TOF (" + lit::NumberToString(H1("fh_piprim_mom_rec_sts_rich_trd_tof")->GetEntries()/fNofEvents, 2) +" per event)"),
          kLinear, kLog, 0.1, 0.3, 0.99, 0.99);
 
+   TCanvas *cPiNotAcc = CreateCanvas("lmvm_pi_mom_notacc", "lmvm_pi_mom_notacc", 800, 800);
+   TH1D* h1 = ((TH1D*)H1("fh_pi_mom_mc")->Clone());
+   h1->Add(H1("fh_pi_mom_acc"), -1.);
+   DrawH1( h1 );
+   TCanvas *cPiPrimNotAcc = CreateCanvas("lmvm_piprim_mom_notacc", "lmvm_piprim_mom_notacc", 800, 800);
+   TH1D* h2 = ((TH1D*)H1("fh_piprim_mom_mc")->Clone());
+   h2->Add(H1("fh_piprim_mom_acc"), -1.);
+   DrawH1( h2 );
+   DrawH1(h2);
+
+   cout << "Number of primary pions minus at rapidity 2 = " <<   H1("fh_piprim_minus_rapidity_mc")->GetBinContent(H1("fh_piprim_minus_rapidity_mc")->FindFixBin(2)) << endl;
+   cout << "Number of primary pions minus at rapidity (1, 3) = " <<
+         H1("fh_piprim_minus_rapidity_mc")->Integral(H1("fh_piprim_minus_rapidity_mc")->FindFixBin(1), H1("fh_piprim_minus_rapidity_mc")->FindFixBin(3)) << endl;
+
+   cout << "Number of primary pions plus at rapidity 2 = " <<   H1("fh_piprim_plus_rapidity_mc")->GetBinContent(H1("fh_piprim_plus_rapidity_mc")->FindFixBin(2)) << endl;
+   cout << "Number of primary pions plus at rapidity (1, 3) = " <<
+         H1("fh_piprim_plus_rapidity_mc")->Integral(H1("fh_piprim_plus_rapidity_mc")->FindFixBin(1), H1("fh_piprim_plus_rapidity_mc")->FindFixBin(3)) << endl;
+
 
    double binWRapidity = H1("fh_piprim_rapidity_mc")->GetBinWidth(1);
    H1("fh_pi_rapidity_mc")->Scale(1/binWRapidity);
    H1("fh_piprim_rapidity_mc")->Scale(1/binWRapidity);
    TCanvas *cPiY = CreateCanvas("lmvm_pi_rapidity", "lmvm_pi_rapidity", 800, 800);
    DrawH1(H1("fh_pi_rapidity_mc"));
-   TCanvas *cPiPrimY = CreateCanvas("lmvm_piprim_rapidity", "lmvm_piprim_rapidity", 800, 800);
-   DrawH1(H1("fh_piprim_rapidity_mc"));
+   TCanvas *cPiPrimPlusY = CreateCanvas("lmvm_piprim_plus_rapidity", "lmvm_piprim_plus_rapidity", 800, 800);
+   DrawH1(H1("fh_piprim_plus_rapidity_mc"));
+   TCanvas *cPiPrimMinusY = CreateCanvas("lmvm_piprim_minus_rapidity", "lmvm_piprim_minus_rapidity", 800, 800);
+   DrawH1(H1("fh_piprim_minus_rapidity_mc"));
+
+   TCanvas *cPi0PrimY = CreateCanvas("lmvm_pi0prim_rapidity", "lmvm_pi0prim_rapidity", 800, 800);
+   DrawH1(H1("fh_pi0prim_rapidity_mc"));
+   TCanvas *cEtaPrimY = CreateCanvas("lmvm_etaprim_rapidity", "lmvm_etaprim_rapidity", 800, 800);
+   DrawH1(H1("fh_etaprim_rapidity_mc"));
+
 }
 
 void CbmAnaDielectronTaskDraw::RemoveMvdCutBins()

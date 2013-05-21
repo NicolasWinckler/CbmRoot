@@ -142,14 +142,14 @@ inline Int_t CbmEcalStructure::GetNum(Int_t x, Int_t y) const
 inline Float_t CbmEcalStructure::GetX2() const
 {
   /** get ECAL right edge coordinate in cm **/
-  return fEcalInf->GetXPos() +
+  return fEcalInf->GetXPos()+
          fEcalInf->GetModuleSize()*fEcalInf->GetXSize()/2.0;
 }
 
 inline Float_t CbmEcalStructure::GetY2() const
 {
   /** get ECAL upper edge coordinate in cm **/
-  return fEcalInf->GetYPos() +
+  return fEcalInf->GetYPos()+
          fEcalInf->GetModuleSize()*fEcalInf->GetYSize()/2.0;
 }
 
@@ -158,8 +158,11 @@ inline Bool_t CbmEcalStructure::AddEnergy(Float_t x, Float_t y, Float_t energy, 
   /** Add preshower or calorimeter energy to a cell with coordinate (x,y) **/
   CbmEcalCell* cell=GetCell(x,y);
   if (cell)
+  {
     if (isPS) ; // cell->AddPSEnergy(energy); Preshower removed
-    else      cell->AddEnergy(energy);
+    else
+      cell->AddEnergy(energy);
+  }
   else
     return kFALSE;
   return kTRUE;
@@ -169,17 +172,23 @@ inline Float_t CbmEcalStructure::GetEnergy(Float_t x, Float_t y, Bool_t isPS) co
 {
   CbmEcalCell* cell=GetCell(x,y);
   if (cell)
-    if (isPS)  return 0; //  return cell->GetPSEnergy(); Preshower removed
-    else return cell->GetEnergy();
-  return -1;
+  {
+    if (isPS)
+      return 0; //  return cell->GetPSEnergy(); Preshower removed
+    else
+      return cell->GetEnergy();
+  }
+  return -1111;
 }
 
 //Converts (x,y) to hit Id
 inline Int_t CbmEcalStructure::GetHitId(Float_t x, Float_t y) const
 {
   CbmEcalCell* cell=GetCell(x,y);
-  if (cell) return cell->GetCellNumber();
-  else return -1;
+  if (cell)
+    return cell->GetCellNumber();
+  else
+    return -1111;
 }
 
 #endif

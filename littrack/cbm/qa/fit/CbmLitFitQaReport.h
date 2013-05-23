@@ -48,6 +48,9 @@ protected:
 	void DrawResidualAndPullHistograms(
 	      const string& detName);
 
+	void DrawTrackParams(
+	      const string& detName);
+
 	/**
 	 * \fn DrawHistSigmaRMS
 	 * \brief Draw sigma and RMS on histogram.

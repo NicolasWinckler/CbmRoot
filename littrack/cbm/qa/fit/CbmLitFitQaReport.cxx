@@ -108,6 +108,10 @@ void CbmLitFitQaReport::Draw()
 	DrawResidualAndPullHistograms("Trd");
 	DrawResidualAndPullHistograms("Much");
 
+	DrawTrackParams("Sts");
+	DrawTrackParams("Trd");
+	DrawTrackParams("Much");
+
 	DrawTrackParamsAtVertex();
 }
 
@@ -156,6 +160,26 @@ void CbmLitFitQaReport::DrawResidualAndPullHistograms(
 			   }
 		   }
 	   }
+   }
+}
+
+void CbmLitFitQaReport::DrawTrackParams(
+      const string& detName)
+{
+   for (Int_t i = 0; i < 2; i++) {
+      string trackParamName = (i == 0) ? "FirstParam" : "LastParam";
+      string canvasName = string("fit_qa_track_params_" + detName + trackParamName);
+      TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 2000, 1000);
+      canvas->Divide(4, 2);
+      string pattern = string("htp_") + detName + "_" + trackParamName + "_.+";
+      vector<TH1*> histos = HM()->H1Vector(pattern);
+      Int_t nofHistos = histos.size();
+      for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
+         canvas->cd(iHist + 1);
+         DrawH1(histos[iHist]);
+         gPad->SetGridx(true);
+         gPad->SetGridy(true);
+      }
    }
 }
 

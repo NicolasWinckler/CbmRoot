@@ -78,7 +78,7 @@ void CbmLitFitQa::Exec(
    Option_t* opt)
 {
    static Int_t nofEvents = 0;
-   std::cout << "CbmLitFitQaCalculator::Exec: event=" << nofEvents++ << std::endl;
+   std::cout << "CbmLitFitQa::Exec: event=" << nofEvents++ << std::endl;
    fMCTrackCreator->Create();
    ProcessGlobalTracks();
    ProcessTrackParamsAtVertex();
@@ -149,6 +149,9 @@ void CbmLitFitQa::ProcessStsTrack(
    FairTrackParam* firstParam = track->GetParamFirst();
    FairTrackParam* lastParam = track->GetParamLast();
 
+   FillTrackParamHistogramm("htp_Sts_FirstParam", firstParam);
+   FillTrackParamHistogramm("htp_Sts_LastParam", lastParam);
+
    // Fill histograms for first track parameters
    if (nofMvdHits > 0) { // first track parameters in MVD
       const CbmMvdHit* firstHit = static_cast<const CbmMvdHit*>(fMvdHits->At(track->GetMvdHitIndex(0)));
@@ -198,6 +201,9 @@ void CbmLitFitQa::ProcessTrdTrack(
    const FairTrackParam* firstParam = track->GetParamFirst();
    const FairTrackParam* lastParam = track->GetParamLast();
 
+   FillTrackParamHistogramm("htp_Trd_FirstParam", firstParam);
+   FillTrackParamHistogramm("htp_Trd_LastParam", lastParam);
+
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(0)));
    Int_t firstStation = 10 * CbmTrdDetectorId::GetStationNr(firstHit->GetAddress()) + CbmTrdDetectorId::GetLayerNr(firstHit->GetAddress());
@@ -237,6 +243,9 @@ void CbmLitFitQa::ProcessMuchTrack(
 
    const FairTrackParam* firstParam = track->GetParamFirst();
    const FairTrackParam* lastParam = track->GetParamLast();
+
+   FillTrackParamHistogramm("htp_Much_FirstParam", firstParam);
+   FillTrackParamHistogramm("htp_Much_LastParam", lastParam);
 
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fMuchPixelHits->At(track->GetHitIndex(0)));
@@ -317,6 +326,24 @@ void CbmLitFitQa::FillResidualsAndPulls(
    if (sigmaQp < 0) fHM->H1(histName + "WrongCov_Qp")->Fill(wrongPar); else fHM->H1(histName + "Pull_Qp")->Fill(resQp / sigmaQp);
 }
 
+void CbmLitFitQa::FillTrackParamHistogramm(
+      const string& histName,
+      const FairTrackParam* par)
+{
+   fHM->H1(histName + "_X")->Fill(par->GetX());
+   fHM->H1(histName + "_Y")->Fill(par->GetY());
+   fHM->H1(histName + "_Z")->Fill(par->GetY());
+   fHM->H1(histName + "_Tx")->Fill(par->GetTx());
+   fHM->H1(histName + "_Ty")->Fill(par->GetTy());
+   fHM->H1(histName + "_Qp")->Fill(par->GetQp());
+   Double_t p = (par->GetQp() != 0) ? std::fabs(1. / par->GetQp()) : 0.;
+   fHM->H1(histName + "_p")->Fill(p);
+   TVector3 mom;
+   par->Momentum(mom);
+   Double_t pt = std::sqrt(mom.X() * mom.X() + mom.Y() * mom.Y());
+   fHM->H1(histName + "_pt")->Fill(pt);
+}
+
 void CbmLitFitQa::ProcessTrackParamsAtVertex()
 {
    Int_t nofTracks = fStsTracks->GetEntriesFast();
@@ -355,6 +382,10 @@ void CbmLitFitQa::CreateHistograms()
    CreateResidualAndPullHistograms(kSTS, "Sts");
    CreateResidualAndPullHistograms(kTRD, "Trd");
    CreateResidualAndPullHistograms(kMUCH, "Much");
+
+   CreateTrackParamHistograms(kSTS, "Sts");
+   CreateTrackParamHistograms(kTRD, "Trd");
+   CreateTrackParamHistograms(kMUCH, "Much");
 
    // Momentum resolution vs momwntum
    fHM->Add("htf_MomRes_Mom", new TH2F("htf_MomRes_Mom", "htf_MomRes_Mom;P [GeV/c];dP/P [%]", fPRangeBins, fPRangeMin, fPRangeMax, 100, -3., 3.));
@@ -418,4 +449,44 @@ void CbmLitFitQa::CreateResidualAndPullHistograms(
    }
 }
 
+void CbmLitFitQa::CreateTrackParamHistograms(
+      DetectorId detId,
+      const string& detName)
+{
+   if (!fDet.GetDet(detId)) return;
+
+   // Parameter names of the state vector (x, y, tx, ty, q/p)
+   string parameterNames[] = { "X", "Y", "Z", "Tx", "Ty", "Qp", "p", "pt" };
+
+   // Axis titles for state vector Components
+   string xTitles[] = {
+       "X [cm]", "Y [cm]", "Z [cm]", "Tx", "Ty", "q/p [(GeV/c)^{-1}]", "Momentum [GeV/c]", "P_{t} [GeV/c]"
+   };
+
+   vector<Int_t> bins(8, 200);
+   vector<pair<Float_t, Float_t> > bounds;
+   if (fIsFixedBounds) {
+      bounds = boost::assign::list_of
+            (make_pair(-500., 500.)) // X
+            (make_pair(-500., 500.)) // Y
+            (make_pair(-500., 500.)) // Z
+            (make_pair(-1., 1.)) // Tx
+            (make_pair(-1., 1.)) // Ty
+            (make_pair(-2., 2.)) // Qp
+            (make_pair(0., 25.)) // Momentum
+            (make_pair(0., 5.)); // Pt
+   } else {
+      bounds.assign(8, make_pair(0.,0.));
+   }
+
+   // [0] - for the first track parameter, [1] - for the last track parameter
+   for (Int_t i = 0; i < 2; i++) {
+     string trackParamName = (i == 0) ? "FirstParam" : "LastParam";
+     for (Int_t iPar = 0; iPar < 8; iPar++) {
+       string histName = "htp_" + detName + "_" + trackParamName + "_" + parameterNames[iPar];
+       fHM->Add(histName, new TH1F(histName.c_str(), string(histName + ";" + xTitles[iPar] + ";Counter").c_str(),
+            bins[iPar], bounds[iPar].first, bounds[iPar].second));
+     }
+   }
+}
 ClassImp(CbmLitFitQa)

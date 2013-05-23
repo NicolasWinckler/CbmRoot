@@ -68,6 +68,7 @@ public:
    void SetTrdMinNofHits(Int_t minNofHits) { fTrdMinNofHits = minNofHits; }
    void SetMuchMinNofHits(Int_t minNofHits) { fMuchMinNofHits = minNofHits; }
    void SetOutputDir(const string& dir) { fOutputDir = dir; }
+   void SetFixedBounds(Bool_t isFixedBounds) { fIsFixedBounds = isFixedBounds; }
 
    void SetPRange(Int_t bins, Int_t min, Int_t max) {
       fPRangeBins = bins;
@@ -99,11 +100,19 @@ private:
       Float_t wrongPar,
       DetectorId detId);
 
+   void FillTrackParamHistogramm(
+         const string& histName,
+         const FairTrackParam* par);
+
    void ProcessTrackParamsAtVertex();
 
    void CreateHistograms();
 
    void CreateResidualAndPullHistograms(
+         DetectorId detId,
+         const string& detName);
+
+   void CreateTrackParamHistograms(
          DetectorId detId,
          const string& detName);
 

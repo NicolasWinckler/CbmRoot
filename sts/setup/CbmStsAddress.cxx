@@ -49,47 +49,54 @@ const Int_t CbmStsAddress::fgkMask[] = { ( 1 << fgkBits[0] ) -1,
 
 
 // -----  Unique element address   -----------------------------------------
-Int_t CbmStsAddress::GetAddress(Int_t station,
-                                Int_t ladder,
-                                Int_t halfladder,
-                                Int_t module,
-                                Int_t sensor,
-                                Int_t side,
-                                Int_t channel) {
+UInt_t CbmStsAddress::GetAddress(Int_t station,
+                                 Int_t ladder,
+                                 Int_t halfladder,
+                                 Int_t module,
+                                 Int_t sensor,
+                                 Int_t side,
+                                 Int_t channel) {
 
   // Catch overrunning of allowed ranges
-  if ( station > ( 1 << fgkBits[kStsStation]) ) {
-    LOG(FATAL) << "Station Id "  << station << " exceeds maximum"
+  if ( station >= ( 1 << fgkBits[kStsStation] ) ) {
+    LOG(ERROR) << "Station Id "  << station << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsStation] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
-  if ( ladder > ( 1 << fgkBits[kStsLadder]) ) {
-    LOG(FATAL) << "Ladder Id "  << ladder << " exceeds maximum"
+  if ( ladder >= ( 1 << fgkBits[kStsLadder]) ) {
+    LOG(ERROR) << "Ladder Id "  << ladder << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsLadder] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
-  if ( halfladder > ( 1 << fgkBits[kStsHalfLadder]) ) {
-    LOG(FATAL) << "HalfLadder Id "  << halfladder << " exceeds maximum"
+  if ( halfladder >= ( 1 << fgkBits[kStsHalfLadder]) ) {
+    LOG(ERROR) << "HalfLadder Id "  << halfladder << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsHalfLadder] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
-  if ( module > ( 1 << fgkBits[kStsModule]) ) {
-    LOG(FATAL) << "Module Id "  << module << " exceeds maximum"
+  if ( module >= ( 1 << fgkBits[kStsModule]) ) {
+    LOG(ERROR) << "Module Id "  << module << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsModule] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
-  if ( sensor > ( 1 << fgkBits[kStsSensor]) ) {
-    LOG(FATAL) << "Sensor Id "  << sensor << " exceeds maximum"
+  if ( sensor >= ( 1 << fgkBits[kStsSensor]) ) {
+    LOG(ERROR) << "Sensor Id "  << sensor << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsSensor] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
-  if ( side > ( 1 << fgkBits[kStsSide]) ) {
-    LOG(FATAL) << "Side Id "  << side << " exceeds maximum"
+  if ( side >= ( 1 << fgkBits[kStsSide]) ) {
+    LOG(ERROR) << "Side Id "  << side << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsSide] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
-  if ( channel > ( 1 << fgkBits[kStsChannel]) ) {
-    LOG(FATAL) << "Channel Id "  << channel << " exceeds maximum"
+  if ( channel >= ( 1 << fgkBits[kStsChannel]) ) {
+    LOG(ERROR) << "Channel Id "  << channel << " exceeds maximum ("
+               << ( 1 << fgkBits[kStsChannel] ) - 1 << ")"
                << FairLogger::endl;
     return 0;
   }
@@ -106,5 +113,24 @@ Int_t CbmStsAddress::GetAddress(Int_t station,
 }
 // -------------------------------------------------------------------------
 
+
+
+// -----  Unique element address   -----------------------------------------
+UInt_t CbmStsAddress::GetAddress(Int_t* elementId) {
+
+  UInt_t address = kSTS << fgkShift[kStsSystem];
+  for (Int_t level = 1; level < kStsNofLevels; level++) {
+    if ( elementId[level] >= ( 1 << fgkBits[level] ) ) {
+      LOG(ERROR) << "Id " << elementId[level] << " for STS level " << level
+                 << " exceeds maximum (" << (1 << fgkBits[level]) - 1
+                 << ")" << FairLogger::endl;
+      return 0;
+    }
+    address = address | ( elementId[level] << fgkShift[level] );
+  }
+
+  return address;
+}
+// -------------------------------------------------------------------------
 
 

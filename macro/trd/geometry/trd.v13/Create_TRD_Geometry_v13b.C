@@ -44,7 +44,7 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13n";
+const TString geoVersion = "trd_v13o";
 const TString FileNameSim = geoVersion + ".root";
 //const TString FileNameSim = geoVersion + ".geo.root";
 const TString FileNameGeo = geoVersion + "_geo.root";
@@ -453,7 +453,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
      // Radiator
      //   TGeoBBox* trd_radiator = new TGeoBBox("", activeAreaX /2., activeAreaY /2., radiator_thickness /2.);
      TGeoBBox* trd_radiator = new TGeoBBox("", sizeX /2., sizeY /2., radiator_thickness /2.);
-     TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("module%d_radiator", moduleType), trd_radiator, radVolMed);
+     TGeoVolume* trdmod1_radvol = new TGeoVolume("radiator", trd_radiator, radVolMed);
+     //     TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("module%d_radiator", moduleType), trd_radiator, radVolMed);
      //     TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd1mod%dradiator", moduleType), trd_radiator, radVolMed);
      trdmod1_radvol->SetLineColor(kBlue);
      trdmod1_radvol->SetTransparency(70);  // (60);  // (70);  // set transparency for the TRD
@@ -571,7 +572,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
        TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid", 
        "(S0ho:t010 + S0hi:t011 + S0hi:t012 + S0hi:t013 + S0hi:t014 + S0ho:t015 + \
          S0vo:t020 + S0vi:t021 + S0vi:t022 + S0vi:t023 + S0vi:t024 + S0vo:t025)");
-       TGeoVolume *trdmod0_lattice = new TGeoVolume(Form("module%d_latticegrid", moduleType), lattice_grid, latticeVolMed);
+       TGeoVolume *trdmod0_lattice = new TGeoVolume("latticegrid", lattice_grid, latticeVolMed);
+       //       TGeoVolume *trdmod0_lattice = new TGeoVolume(Form("module%d_latticegrid", moduleType), lattice_grid, latticeVolMed);
        //       TGeoVolume *trdmod0_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
        trdmod0_lattice->SetLineColor(kYellow);
        TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
@@ -696,7 +698,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
          TGeoCompositeShape *lattice_grid = new TGeoCompositeShape("lattice_grid",
          "(S1ho:t110 + S1hi:t111 + S1hi:t112 + S1hi:t113 + S1hi:t114 + S1hi:t115 + S1hi:t116 + S1hi:t117 + S1ho:t118 + \
            S1vo:t120 + S1vi:t121 + S1vi:t122 + S1vi:t123 + S1vi:t124 + S1vi:t125 + S1vi:t126 + S1vi:t127 + S1vo:t128)");
-       TGeoVolume *trdmod1_lattice = new TGeoVolume(Form("module%d_latticegrid", moduleType), lattice_grid, latticeVolMed);
+       TGeoVolume *trdmod1_lattice = new TGeoVolume("latticegrid", lattice_grid, latticeVolMed);
+       //       TGeoVolume *trdmod1_lattice = new TGeoVolume(Form("module%d_latticegrid", moduleType), lattice_grid, latticeVolMed);
        //       TGeoVolume *trdmod1_lattice = new TGeoVolume(Form("trd1mod%dlatticegrid", moduleType), lattice_grid, latticeVolMed);
        trdmod1_lattice->SetLineColor(kYellow);
        TGeoTranslation *trd_lattice_trans = new TGeoTranslation("", 0., 0., lattice_position);
@@ -707,7 +710,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // Kapton Foil
    TGeoBBox* trd_kapton = new TGeoBBox("", sizeX /2., sizeY /2., kapton_thickness /2.);
-   TGeoVolume* trdmod1_kaptonvol = new TGeoVolume(Form("module%d_kaptonfoil", moduleType), trd_kapton, kaptonVolMed);
+   TGeoVolume* trdmod1_kaptonvol = new TGeoVolume("kaptonfoil", trd_kapton, kaptonVolMed);
+   //   TGeoVolume* trdmod1_kaptonvol = new TGeoVolume(Form("module%d_kaptonfoil", moduleType), trd_kapton, kaptonVolMed);
    //   TGeoVolume* trdmod1_kaptonvol = new TGeoVolume(Form("trd1mod%dkapton", moduleType), trd_kapton, kaptonVolMed);
    trdmod1_kaptonvol->SetLineColor(kGreen);
    TGeoTranslation* trd_kapton_trans = new TGeoTranslation("", 0., 0., kapton_position);
@@ -716,7 +720,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    // start of Frame in z
    // Gas
    TGeoBBox* trd_gas = new TGeoBBox("", activeAreaX /2., activeAreaY /2., gas_thickness /2.);
-   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("module%d_gas", moduleType), trd_gas, gasVolMed);
+   TGeoVolume* trdmod1_gasvol = new TGeoVolume("gas", trd_gas, gasVolMed);
+   //   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("module%d_gas", moduleType), trd_gas, gasVolMed);
    //   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd1mod%dgas", moduleType), trd_gas, gasVolMed);
    //   trdmod1_gasvol->SetLineColor(kBlue);
    trdmod1_gasvol->SetLineColor(kGreen); // to avoid blue overlaps in the screenshots
@@ -727,7 +732,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // frame1
    TGeoBBox* trd_frame1 = new TGeoBBox("", sizeX /2., frameWidth /2., frame_thickness/2.);
-   TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("module%d_frame1", moduleType), trd_frame1, frameVolMed);
+   TGeoVolume* trdmod1_frame1vol = new TGeoVolume("frame1", trd_frame1, frameVolMed);
+   //   TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("module%d_frame1", moduleType), trd_frame1, frameVolMed);
    //   TGeoVolume* trdmod1_frame1vol = new TGeoVolume(Form("trd1mod%dframe1", moduleType), trd_frame1, frameVolMed);
    trdmod1_frame1vol->SetLineColor(kRed);
 
@@ -740,7 +746,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // frame2
    TGeoBBox* trd_frame2 = new TGeoBBox("", frameWidth /2., activeAreaY /2., frame_thickness /2.);
-   TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("module%d_frame2", moduleType), trd_frame2, frameVolMed);
+   TGeoVolume* trdmod1_frame2vol = new TGeoVolume("frame2", trd_frame2, frameVolMed);
+   //   TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("module%d_frame2", moduleType), trd_frame2, frameVolMed);
    //   TGeoVolume* trdmod1_frame2vol = new TGeoVolume(Form("trd1mod%dframe2", moduleType), trd_frame2, frameVolMed);
    trdmod1_frame2vol->SetLineColor(kRed);
 
@@ -753,7 +760,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // Pad Copper
    TGeoBBox *trd_padcopper = new TGeoBBox("", sizeX /2., sizeY /2., padcopper_thickness /2.);
-   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume(Form("module%d_padcopper", moduleType), trd_padcopper, padcopperVolMed);
+   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume("padcopper", trd_padcopper, padcopperVolMed);
+   //   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume(Form("module%d_padcopper", moduleType), trd_padcopper, padcopperVolMed);
    //   TGeoVolume* trdmod1_padcoppervol = new TGeoVolume(Form("trd1mod%dpadcopper", moduleType), trd_padcopper, padcopperVolMed);
    trdmod1_padcoppervol->SetLineColor(kOrange);
    TGeoTranslation *trd_padcopper_trans = new TGeoTranslation("", 0., 0., padcopper_position);
@@ -761,7 +769,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // Pad Plane
    TGeoBBox* trd_padpcb = new TGeoBBox("", sizeX /2., sizeY /2., padplane_thickness /2.);
-   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume(Form("module%d_padplane", moduleType), trd_padpcb, padpcbVolMed);
+   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume("padplane", trd_padpcb, padpcbVolMed);
+   //   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume(Form("module%d_padplane", moduleType), trd_padpcb, padpcbVolMed);
    //   TGeoVolume* trdmod1_padpcbvol = new TGeoVolume(Form("trd1mod%dpadplane", moduleType), trd_padpcb, padpcbVolMed);
    trdmod1_padpcbvol->SetLineColor(kBlue);
    TGeoTranslation *trd_padpcb_trans = new TGeoTranslation("", 0., 0., padplane_position);
@@ -769,7 +778,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // Honeycomb
    TGeoBBox* trd_honeycomb = new TGeoBBox("", sizeX /2., sizeY /2., honeycomb_thickness /2.);
-   TGeoVolume* trdmod1_honeycombvol = new TGeoVolume(Form("module%d_honeycomb", moduleType), trd_honeycomb, honeycombVolMed);
+   TGeoVolume* trdmod1_honeycombvol = new TGeoVolume("honeycomb", trd_honeycomb, honeycombVolMed);
+   //   TGeoVolume* trdmod1_honeycombvol = new TGeoVolume(Form("module%d_honeycomb", moduleType), trd_honeycomb, honeycombVolMed);
    //   TGeoVolume* trdmod1_honeycombvol = new TGeoVolume(Form("trd1mod%dhoneycomb", moduleType), trd_honeycomb, honeycombVolMed);
    trdmod1_honeycombvol->SetLineColor(kOrange);
    TGeoTranslation* trd_honeycomb_trans = new TGeoTranslation("", 0., 0., honeycomb_position);
@@ -777,7 +787,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
    // Carbon fiber layers
    TGeoBBox* trd_carbon = new TGeoBBox("", sizeX /2., sizeY /2., carbon_thickness /2.);
-   TGeoVolume* trdmod1_carbonvol = new TGeoVolume(Form("module%d_carbonsheet", moduleType), trd_carbon, carbonVolMed);
+   TGeoVolume* trdmod1_carbonvol = new TGeoVolume("carbonsheet", trd_carbon, carbonVolMed);
+   //   TGeoVolume* trdmod1_carbonvol = new TGeoVolume(Form("module%d_carbonsheet", moduleType), trd_carbon, carbonVolMed);
    //   TGeoVolume* trdmod1_carbonvol = new TGeoVolume(Form("trd1mod%dcarbon", moduleType), trd_carbon, carbonVolMed);
    trdmod1_carbonvol->SetLineColor(kGreen);
    TGeoTranslation* trd_carbon_trans = new TGeoTranslation("", 0., 0., carbon_position);
@@ -788,8 +799,10 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    if (IncludeFebs) {
 
       // assemblies
-      TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly(Form("module%d_febvol", moduleType));  // the mother volume of all FEBs
-      TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("module%d_febbox", moduleType)); // volume for inclined FEBs, then shifted along y
+      TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly("febvol");  // the mother volume of all FEBs
+      TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly("febbox"); // volume for inclined FEBs, then shifted along y
+      //TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly(Form("module%d_febvol", moduleType));  // the mother volume of all FEBs
+      //TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("module%d_febbox", moduleType)); // volume for inclined FEBs, then shifted along y
       //TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly(Form("trd1mod%dfebvol", moduleType));  // the mother volume of all FEBs
       //TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType)); // volume for inclined FEBs, then shifted along y
 
@@ -833,7 +846,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
 
       // Create all FEBs and place them in an assembly which will be added to the TRD module
       TGeoBBox* trd_feb = new TGeoBBox("", activeAreaX/2., feb_thickness/2., febvol_thickness/2.);   // the FEB itself - as a cuboid
-      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("module%d_feb", moduleType), trd_feb, febVolMed);  // the FEB made of a certain medium
+      TGeoVolume* trdmod1_feb = new TGeoVolume("feb", trd_feb, febVolMed);  // the FEB made of a certain medium
+      //      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("module%d_feb", moduleType), trd_feb, febVolMed);  // the FEB made of a certain medium
       //      TGeoVolume* trdmod1_feb = new TGeoVolume(Form("trd1mod%dfeb", moduleType), trd_feb, febVolMed);  // the FEB made of a certain medium
       trdmod1_feb->SetLineColor(kYellow);    // set yellow color
       trd_feb_box->AddNode(trdmod1_feb, 1, incline_feb);  
@@ -848,7 +862,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
         // put many ASICs on each inclined FEB
         TGeoBBox* trd_asic = new TGeoBBox("", asic_width/2., asic_thickness/2., asic_width/2.);              // ASIC dimensions
         // TODO: use Silicon as ASICs material
-        TGeoVolume* trdmod1_asic = new TGeoVolume(Form("module%d_asic", moduleType), trd_asic, asicVolMed);   // the ASIC made of a certain medium
+        TGeoVolume* trdmod1_asic = new TGeoVolume("asic", trd_asic, asicVolMed);   // the ASIC made of a certain medium
+	//        TGeoVolume* trdmod1_asic = new TGeoVolume(Form("module%d_asic", moduleType), trd_asic, asicVolMed);   // the ASIC made of a certain medium
 	//        TGeoVolume* trdmod1_asic = new TGeoVolume(Form("trd1mod%dasic", moduleType), trd_asic, asicVolMed);   // the ASIC made of a certain medium
         trdmod1_asic->SetLineColor(kBlue);                                                                   // set blue color for ASICs
   

@@ -20,7 +20,7 @@ ${CMAKE_SOURCE_DIR}/base
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-#CbmDetectorList.cxx
+CbmAddress.cxx
 
 #CbmDigiManager.cxx
 CbmPropagator.cxx

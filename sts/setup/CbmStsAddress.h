@@ -6,24 +6,27 @@
 #ifndef CBMSTSADDRESS_H
 #define CBMSTSADDRESS_H 1
 
-
+#include <iomanip>
 #include "Rtypes.h"
 #include "FairLogger.h"
+#include "CbmAddress.h"
 
 
 /** Enumerator for STS element levels
- ** If this is changed, the initialisation of the static members must be
- ** changed accordingly!
+ ** If this is changed, the initialisation of the static members
+ ** of CbmStsAddress must be changed accordingly!
  **/
-enum StsElementLevel { kStsSystem,     //!< kStsSystem
-                       kStsStation,    //!< kStsStation
-                       kStsLadder,     //!< kStsLadder
-                       kStsHalfLadder, //!< kStsHalfLadder
-                       kStsModule,     //!< kStsModule
-                       kStsSensor,     //!< kStsSensor
-                       kStsSide,       //!< kStsSide
-                       kStsChannel,    //!< kStsChannel
-                       kStsNofLevels };//!< kStsNofLevels
+enum StsElementLevel {
+  kStsSystem,     //!< System = STS
+  kStsStation,    //!< Station
+  kStsLadder,     //!< Ladder
+  kStsHalfLadder, //!< Halfladder
+  kStsModule,     //!< Module
+  kStsSensor,     //!< Sensor
+  kStsSide,       //!< Side
+  kStsChannel,    //!< Channel
+  kStsNofLevels   //!< Number of STS levels
+};
 
 
 
@@ -48,7 +51,7 @@ enum StsElementLevel { kStsSystem,     //!< kStsSystem
  ** Side              1          2         18    0000000000000x000000000000000000 \n
  ** Channel          13       8192         19    xxxxxxxxxxxxx0000000000000000000 \n
  **/
-class CbmStsAddress
+class CbmStsAddress : public CbmAddress
 {
 
   public:
@@ -102,6 +105,10 @@ class CbmStsAddress
       return ( address & ( fgkMask[level] << fgkShift[level] ) )
                >> fgkShift[level];
     }
+
+
+    /** Print information on the bit field **/
+    static void Print();
 
 
     /** Set the index of an element

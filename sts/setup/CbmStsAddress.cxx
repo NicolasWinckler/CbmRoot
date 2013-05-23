@@ -9,7 +9,7 @@
 
 
 //-----    Definition of the address field   -------------------------------
-const Int_t CbmStsAddress::fgkBits[] = { 4,   // system = kSTS
+const Int_t CbmStsAddress::fgkBits[] = { fgkSystemBits,   // system = kSTS
                                          4,   // station
                                          4,   // ladder
                                          1,   // halfladder
@@ -101,7 +101,7 @@ UInt_t CbmStsAddress::GetAddress(Int_t station,
     return 0;
   }
 
-  return kSTS       << fgkShift[kStsSystem]     |
+  return kSts       << fgkShift[kStsSystem]     |
          station    << fgkShift[kStsStation]    |
          ladder     << fgkShift[kStsLadder]     |
          halfladder << fgkShift[kStsHalfLadder] |
@@ -118,7 +118,7 @@ UInt_t CbmStsAddress::GetAddress(Int_t station,
 // -----  Unique element address   -----------------------------------------
 UInt_t CbmStsAddress::GetAddress(Int_t* elementId) {
 
-  UInt_t address = kSTS << fgkShift[kStsSystem];
+  UInt_t address = kSts << fgkShift[kStsSystem];
   for (Int_t level = 1; level < kStsNofLevels; level++) {
     if ( elementId[level] >= ( 1 << fgkBits[level] ) ) {
       LOG(ERROR) << "Id " << elementId[level] << " for STS level " << level
@@ -133,4 +133,17 @@ UInt_t CbmStsAddress::GetAddress(Int_t* elementId) {
 }
 // -------------------------------------------------------------------------
 
+
+
+// -----   Print info   ----------------------------------------------------
+void CbmStsAddress::Print() {
+  LOG(INFO) << "Number of STS levels is " << kStsNofLevels
+      << FairLogger::endl;
+  for (Int_t level = 0; level < kStsNofLevels; level++)
+    LOG(INFO) << "Level " << std::setw(2) << std::right << level
+              << ": bits " << std::setw(2) << fgkBits[level]
+              << ", max. range " << std::setw(6) << fgkMask[level]
+              << FairLogger::endl;
+}
+// -------------------------------------------------------------------------
 

@@ -30,9 +30,8 @@ Int_t CbmStsAddress_test(Int_t nTests = 10000) {
      cout << "Number of STS levels ( " << nLevels
           << " ) is larger than 10." << endl;
      cout << "Please adjust size of static arrays in this macro." << endl;
-     return;
+     return 1;
    }
-   cout << endl << "Number of STS levels is " << nLevels << endl;
 
    // -----  Some variables
    Bool_t testStatus = kTRUE;
@@ -44,15 +43,12 @@ Int_t CbmStsAddress_test(Int_t nTests = 10000) {
    Int_t elementId[10], newElementId[10];
    UInt_t address, newAddress;
 
-   // -----   Get and print address bit field
-   cout << endl;
-   for (Int_t level = 0; level < nLevels; level++) {
+
+   // -----   Get address bit field
+   for (Int_t level = 0; level < nLevels; level++)
      bitField[level] = CbmStsAddress::GetNofBits(level);
-     std::cout << "Level " << setw(2) << level
-               << ": Bits " << setw(2) << bitField[level]
-               << ", max. range " << setw(6) << ( 1 << bitField[level] ) -1
-               << std::endl;
-   }
+   cout << endl;
+   CbmStsAddress::Print();
    // =======================================================================
 
 

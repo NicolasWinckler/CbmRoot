@@ -3,6 +3,9 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// 2013-05-22 - DE - radiators G30 (z=240 mm) 
+// 2013-05-22 - DE - radiators H (z=275 mm - 125 * 2.2mm), (H++ z=335 mm)
+// 2013-05-22 - DE - radiators B++ (z=254 mm - 350 * 0.724 mm), K++ (z=254 mm - 350 * 0.724 mm)
 // 2013-04-17 - DE - introduce volume assembly for layers, e.g. trd_layer03
 // 2013-03-26 - DE - use Air as ASIC material
 // 2013-03-26 - DE - put support structure into its own assembly
@@ -40,8 +43,8 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13g";
-const TString FileNameSim = geoVersion + ".root";
+const TString geoVersion = "trd_v13m";
+const TString FileNameSim = geoVersion + ".geo.root";
 const TString FileNameGeo = geoVersion + "_geo.root";
 
 // display switches
@@ -99,6 +102,7 @@ const Int_t   MaxLayers = 10;   // max layers
 const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
 Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
+Int_t    ModId = 0;
 
 const Int_t    LayerType[MaxLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
 const Double_t LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
@@ -300,7 +304,7 @@ void create_detector_layers(Int_t layer);
 void create_supports();
 
 
-void Create_TRD_Geometry_v13b() {
+void Create_TRD_Geometry_v13l() {
   // Load the necessary FairRoot libraries 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -438,7 +442,8 @@ TGeoVolume* create_trd_module(Int_t moduleType)
   TGeoMedium* asicVolMed        = gGeoMan->GetMedium(AsicVolumeMedium);
 //  TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);
 
-  TString name = Form("trd1mod%d", moduleType);
+//  TString name = Form("trd1mod%d", moduleType);
+  TString name = Form("trd_module%d", moduleType);
   TGeoVolume* module = new TGeoVolumeAssembly(name);
 
 
@@ -897,6 +902,11 @@ Int_t copy_nr(Int_t stationNr, Int_t layerNr, Int_t copyNr)
    return stationNr * 10000 + layerNr * 1000 + copyNr;
 }
 
+Int_t copy_nr_modid(Int_t stationNr, Int_t layerNr, Int_t copyNr, Int_t planeNr, Int_t modinplaneNr)
+{
+  return (stationNr * 1000 + layerNr * 100 + copyNr) * 10000 + planeNr * 100 + modinplaneNr;
+}
+
 void create_detector_layers(Int_t layerId)
 {
   Int_t module_id = 0;
@@ -939,13 +949,18 @@ void create_detector_layers(Int_t layerId)
 
 // add layer keeping volume
   TString layername = Form("trd_layer%02d", PlaneId[layerId]);
+  //  TString layername = Form("layer%02d", PlaneId[layerId]);
   TGeoVolume* layer = new TGeoVolumeAssembly(layername);
-  gGeoMan->GetVolume(geoVersion)->AddNode(layer, 1);
+//  gGeoMan->GetVolume(geoVersion)->AddNode(layer, 1);
+  Int_t i = 100 + PlaneId[layerId];
+  gGeoMan->GetVolume(geoVersion)->AddNode(layer, i);
 //  cout << layername << endl;
 
   Double_t ExplodeScale = 1.00;
   if(DoExplode)  // if explosion, set scale
     ExplodeScale = ExplodeFactor;
+
+  Int_t modId = 0;  // module id, only within this layer
   
   Int_t copyNrIn[4] = { 0, 0, 0, 0 }; // copy number for each module type
   for ( Int_t type = 1; type <= 4; type++) {
@@ -971,7 +986,9 @@ void create_detector_layers(Int_t layerId)
           Double_t xPos = DetectorSizeX[0] * x * ExplodeScale + dx;
           Double_t yPos = DetectorSizeY[0] * y * ExplodeScale + dy;
           copyNrIn[type - 1]++;
-          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);
+          modId++;
+//          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);  // orig
+          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrIn[type - 1], PlaneId[layerId], modId);  // with modID
 
           // take care of FEB orientation away from beam
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
@@ -1032,7 +1049,9 @@ void create_detector_layers(Int_t layerId)
           Double_t xPos = DetectorSizeX[1] * x * ExplodeScale + dx;
           Double_t yPos = DetectorSizeY[1] * y * ExplodeScale + dy;
           copyNrOut[type - 5]++;
-          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);
+          modId++;
+//          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);  // orig
+          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrOut[type - 5],  PlaneId[layerId], modId);  // with modID
 
           // take care of FEB orientation - away from beam
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle

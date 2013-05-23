@@ -24,7 +24,7 @@ static const fvec Zero = 0;
 static const fvec One = 1;
 static const fvec small = 1.e-20;
 
-KFParticleBaseSIMD::KFParticleBaseSIMD() :fQ(0), fNDF(-3), fChi2(0), fSFromDecay(0), fAtProductionVertex(0), fIsLinearized(0), fConstructMethod(2), SumDaughterMass(0), fMassHypo(-1), fId(-1), fDaughterIds(), fPDG(0)
+KFParticleBaseSIMD::KFParticleBaseSIMD() :fQ(0), fNDF(-3), fChi2(0), fSFromDecay(0), fAtProductionVertex(0), fIsVtxGuess(0), fIsVtxErrGuess(0), fIsLinearized(0), fConstructMethod(2), SumDaughterMass(0), fMassHypo(-1), fId(-1), fDaughterIds(), fPDG(0)
 { 
   //* Constructor 
 

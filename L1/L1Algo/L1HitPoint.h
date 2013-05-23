@@ -4,7 +4,7 @@
 		/// contain strips positions and coordinates of hit
 #if 1
 struct L1HitPoint{
-  L1HitPoint(){};
+L1HitPoint() :     x(0.), y(0.), z(0.), u(0.), v(0.), n(0){};
   L1HitPoint(fscal x_, fscal y_, fscal z_, fscal v_, fscal u_, unsigned short int n_ = 0):
     x(x_), y(y_), z(z_), u(u_), v(v_), n(n_){};
 

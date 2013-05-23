@@ -46,7 +46,8 @@ void memset( T *dest, T i, size_t num ) {
 class L1Grid {
  public:
   L1Grid():
-  fN(0), fNy(0), fNz(0), fFirstHitInBin(0){}
+    fN(0), fNy(0), fNz(0), fYMinOverStep(0.), fZMinOverStep(0.),
+    fStepYInv(0.), fStepZInv(0.), fFirstHitInBin(NULL){}
 
   ~L1Grid(){ if ( fFirstHitInBin ) delete[] fFirstHitInBin; }
    
@@ -76,6 +77,9 @@ class L1Grid {
   float fStepZInv; //* inverse bin size in Z
 
   THitI* fFirstHitInBin;
+
+  L1Grid(const L1Grid&);
+  L1Grid& operator=(const L1Grid&);
 };
 
 inline unsigned int L1Grid::GetBinBounded( const float &Y, const float &Z ) const

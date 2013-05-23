@@ -67,6 +67,10 @@ class CbmKFParticlesFinder: public FairTask
   TClonesArray* flistTrdTracks;
 
   //CbmRichElectronIdAnn *fElIdAnn;
+
+  CbmKFParticlesFinder(const CbmKFParticlesFinder&);
+  CbmKFParticlesFinder& operator=(const CbmKFParticlesFinder&);
+
 };
 
 #endif

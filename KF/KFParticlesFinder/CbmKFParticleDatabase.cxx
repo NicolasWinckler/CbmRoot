@@ -3,6 +3,7 @@
 CbmKFParticleDatabase* CbmKFParticleDatabase::fDatabase = 0;
 
 CbmKFParticleDatabase::CbmKFParticleDatabase()
+  : fMass()
 {
   fMass[11]    = 0.000510999;
   fMass[-11]   = 0.000510999;

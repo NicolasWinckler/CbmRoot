@@ -9,8 +9,10 @@ class CbmKFPartEfficiencies: public TNamed
  public:
 
   CbmKFPartEfficiencies():
+  partDaughterPdg(),
     names(),
     indices(),
+    fPdgToIndex(),
     ratio_reco(),
     mc(),
     reco(),

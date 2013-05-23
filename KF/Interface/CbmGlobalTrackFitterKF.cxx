@@ -37,12 +37,13 @@ using std::vector;
 
 // ------------------------------------------------------------------
 CbmGlobalTrackFitterKF::CbmGlobalTrackFitterKF():
-  fArrayStsHit(0),
-  fArrayTrdHit(0),
-  fArrayTofHit(0),
-  fArrayStsTrack(0),
-  fArrayTrdTrack(0),
-  fPrimVertex(0)
+  fArrayStsHit(NULL),
+  fArrayTrdHit(NULL),
+  fArrayTofHit(NULL),
+  fArrayStsTrack(NULL),
+  fArrayTrdTrack(NULL),
+  fPrimVertex(NULL),
+  fKfTrack(NULL)
 {
   // Default constructor
 

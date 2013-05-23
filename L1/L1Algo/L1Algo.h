@@ -60,8 +60,9 @@ template<int NHits> class L1AlgoEfficiencyPerformance;
 class L1Algo{
  public:
   L1Algo():
-    NStations(0),    // number of all detector stations
+  NStations(0),    // number of all detector stations
     NMvdStations(0), // number of mvd stations
+    fRadThick(),
     vStsStrips(),  // strips positions created from hits. Front strips
     vStsStripsB(), // back strips
     vStsZPos(),    // all possible z-positions of hits
@@ -75,14 +76,17 @@ class L1Algo{
     vTracks(), // reconstructed tracks
     vRecoHits(), // packed hits of reconstructed tracks
     CATime(0), // time of trackfinding
+    FIRSTCASTATION(0),
 
     TRACK_CHI2_CUT(10.),
     TRIPLET_CHI2_CUT(5.),
     DOUBLET_CHI2_CUT(5.),
     
+    MaxDZ(0),
     Pick_gather(0),
     PickNeighbour(0), // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
     MaxInvMom(0),     // max considered q/p for tracks
+    MaxSlope(0),
     targX(0), targY(0), targZ(0),                        // target coor
     targB(),               // field in the target point
     TargetXYInfo(), // target constraint  [cm]

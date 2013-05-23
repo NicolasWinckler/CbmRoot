@@ -37,11 +37,12 @@ class CbmL1MCTrack
 
   CbmL1MCTrack()
     :mass(0),q(0),p(0),x(0),y(0),z(0),px(0),py(0),pz(0),ID(-1),mother_ID(-1),pdg(-1),Points(),StsHits(),
-     nMCContStations(0),nHitContStations(0),maxNStaMC(0),maxNSensorMC(0),maxNStaHits(0),nStations(0),isReconstructable(0),isAdditional(0),
+    nMCContStations(0),nHitContStations(0),maxNStaMC(0),maxNSensorMC(0),maxNStaHits(0),nStations(0),nMCStations(0),isReconstructable(0),isAdditional(0),
      rTracks(),tTracks(){};
+
   CbmL1MCTrack(int _ID)
     :mass(0),q(0),p(0),x(0),y(0),z(0),px(0),py(0),pz(0),ID(_ID),mother_ID(-1),pdg(-1),Points(),StsHits(),
-     nMCContStations(0),nHitContStations(0),maxNStaMC(0),maxNSensorMC(0),maxNStaHits(0),nStations(0),isReconstructable(0),isAdditional(0),
+    nMCContStations(0),nHitContStations(0),maxNStaMC(0),maxNSensorMC(0),maxNStaHits(0),nStations(0),nMCStations(),isReconstructable(0),isAdditional(0),
      rTracks(),tTracks(){};
   CbmL1MCTrack(double mass, double q, TVector3 vr, TLorentzVector vp, int ID, int mother_ID, int pdg);
 //   CbmL1MCTrack(TmpMCPoints &mcPoint, TVector3 vr, TLorentzVector vp, int ID, int mother_ID);

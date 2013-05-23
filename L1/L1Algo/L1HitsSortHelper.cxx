@@ -9,7 +9,7 @@
 
 using std::vector;
 
-L1HitsSortHelper::L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &points, vector<THitI> &indices, const L1Grid* grid, THitI* iStart, THitI* iStop, int nStations ): fHits(hits), fPoints(points), fIndices(indices), fGrid(grid), fStsHitsUnusedStartIndex( iStart ), fStsHitsUnusedStopIndex( iStop ), fNStations(nStations) {
+L1HitsSortHelper::L1HitsSortHelper( vector<L1StsHit> &hits, vector<L1HitPoint> &points, vector<THitI> &indices, const L1Grid* grid, THitI* iStart, THitI* iStop, int nStations ): fD(), fHits(hits), fPoints(points), fIndices(indices), fGrid(grid), fStsHitsUnusedStartIndex( iStart ), fStsHitsUnusedStopIndex( iStop ), fNStations(nStations) {
   L1_ASSERT( hits.size() ==  points.size(), hits.size() << " " << points.size() );
   const int NHits = hits.size();
   fD.resize( NHits );

@@ -7,7 +7,7 @@ using std::vector;
 
 class L1MaterialInfo{
  public:
-   L1MaterialInfo(): thick(0), RL(0),  RadThick(0), logRadThick(0){};
+ L1MaterialInfo(): thick(0), RL(0),  RadThick(0), logRadThick(0) {};
    
   fvec thick, RL,  RadThick, logRadThick;
 } _fvecalignment;
@@ -15,6 +15,9 @@ class L1MaterialInfo{
 
 class L1Material{
  public:
+
+ L1Material() : table(), NBins(0), RMax(0.), iD(0.) {}
+
   vector<vector<float> > table;
   
   // static const int NBins = 100; // TODO file?

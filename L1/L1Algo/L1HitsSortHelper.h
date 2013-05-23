@@ -34,6 +34,9 @@ class L1HitsSortHelper{
   const L1Grid* fGrid;
   THitI *fStsHitsUnusedStartIndex, *fStsHitsUnusedStopIndex;
   int fNStations;
+
+  L1HitsSortHelper(const L1HitsSortHelper&);
+  L1HitsSortHelper& operator=(const L1HitsSortHelper&);
 };
     
 #endif

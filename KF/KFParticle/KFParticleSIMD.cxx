@@ -41,6 +41,9 @@ static const fvec Zero = 0;
 static const fvec One = 1;
 
 KFParticleSIMD::KFParticleSIMD( const KFParticleSIMD &d1, const KFParticleSIMD &d2, Bool_t gamma )
+#ifdef NonhomogeneousField
+  : fField()
+#endif
 {
   if (!gamma) {
     KFParticleSIMD mother;
@@ -75,6 +78,7 @@ void KFParticleSIMD::Create( const fvec Param[], const fvec Cov[], Int_t Charge,
 
 #ifdef NonhomogeneousField
 KFParticleSIMD::KFParticleSIMD( CbmKFTrackInterface* Track[], int NTracks, Int_t *qHypo, const Int_t *pdg)
+    : fField()
 {
   Create(Track, NTracks, qHypo, pdg);
 }
@@ -175,6 +179,7 @@ void KFParticleSIMD::Create(CbmKFTrackInterface* Track[], int NTracks, Int_t *qH
 }
 
 KFParticleSIMD::KFParticleSIMD(CbmKFTrackInterface &Track, Int_t *qHypo, const Int_t *pdg)
+    : fField()
 {
   fDaughterIds.push_back( Track.Id() );
   
@@ -267,6 +272,7 @@ KFParticleSIMD::KFParticleSIMD(CbmKFTrackInterface &Track, Int_t *qHypo, const I
 }
 
 KFParticleSIMD::KFParticleSIMD( CbmKFVertexInterface &vertex )
+    : fField()
 {
   // Constructor from CBM KF vertex
   fP[0] = vertex.GetRefX();
@@ -365,6 +371,9 @@ void KFParticleSIMD::GetExternalTrackParam( const KFParticleBaseSIMD &p, Double_
 #endif
 
 KFParticleSIMD::KFParticleSIMD(KFParticle* parts[], const int nPart)
+#ifdef NonhomogeneousField
+  : fField()
+#endif
 {
   { // check
     bool ok = 1;
@@ -409,6 +418,9 @@ KFParticleSIMD::KFParticleSIMD(KFParticle* parts[], const int nPart)
 }
 
 KFParticleSIMD::KFParticleSIMD( KFParticle &part)
+#ifdef NonhomogeneousField
+  : fField()
+#endif
 {
 
  fId = part.Id();

@@ -98,8 +98,8 @@ function set_default_electron_geometry() {
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=rich/rich_v08a.geo
-    export LIT_TRD_GEOM=trd/trd_v13c.root
-    export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13c.digi.par
+    export LIT_TRD_GEOM=trd/trd_v13o.root
+    export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13o.digi.par
     export LIT_TOF_GEOM=tof/tof_v13b.root
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=

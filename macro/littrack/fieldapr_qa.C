@@ -44,6 +44,7 @@ void fieldapr_qa(Int_t nEvents = 1)
 	std::vector<Double_t> zPos;
    zPos.push_back(50.);
    zPos.push_back(100.);
+   zPos.push_back(150.);
    zPos.push_back(200.);
    fieldQa->SetSliceZPosition(zPos);
 

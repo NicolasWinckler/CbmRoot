@@ -37,6 +37,7 @@ function run_reco() {
    export LIT_GLOBAL_RECO_FILE=${LIT_DIR}/global.reco.${LIT_MUCH_HITPRODUCER_TYPE}.${LIT_GLOBAL_TRACKING_TYPE}.0000.root
    create_result_dir ${test_name}_${LIT_MUCH_HITPRODUCER_TYPE}_${LIT_GLOBAL_TRACKING_TYPE}/
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"all\")"
+   ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"reco\")"
 }
 
 #run_reco simple nn

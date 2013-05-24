@@ -1,9 +1,9 @@
 #!/bin/sh
 
 xterm -hold -e ". ./trd_qa.sh trd_v13c trd/trd_v13c.root $VMCWORKDIR/parameters/trd/trd_v13c.digi.par 6 25gev"&
-#xterm -hold -e ". ./trd_qa.sh trd_v13i trd/trd_v13i.root $VMCWORKDIR/parameters/trd/trd_v13i.digi.par 6 25gev"&
-#xterm -hold -e ". ./trd_qa.sh trd_v13j trd/trd_v13j.root $VMCWORKDIR/parameters/trd/trd_v13j.digi.par 6 25gev"&
-#xterm -hold -e ". ./trd_qa.sh trd_v13k trd/trd_v13k.root $VMCWORKDIR/parameters/trd/trd_v13k.digi.par 6 25gev"&
+#xterm -hold -e ". ./trd_qa.sh trd_v13d trd/trd_v13d.root $VMCWORKDIR/parameters/trd/trd_v13d.digi.par 1 8gev"&
+#xterm -hold -e ". ./trd_qa.sh trd_v13e trd/trd_v13e.root $VMCWORKDIR/parameters/trd/trd_v13e.digi.par 1 8gev"&
+#xterm -hold -e ". ./trd_qa.sh trd_v13f trd/trd_v13f.root $VMCWORKDIR/parameters/trd/trd_v13f.digi.par 1 8gev"&
 
 #xterm -hold -e ". ./trd_qa.sh trd_v13s trd/trd_v13s.root $VMCWORKDIR/parameters/trd/trd_v13s.digi.par 1 8gev"&
 #xterm -hold -e ". ./trd_qa.sh trd_v13t trd/trd_v13t.root $VMCWORKDIR/parameters/trd/trd_v13t.digi.par 1 8gev"&

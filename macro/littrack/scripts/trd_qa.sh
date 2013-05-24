@@ -12,7 +12,7 @@ collision_energy=$5
 
 create_output_dir events_${test_name}/
 
-nevents=5
+nevents=500
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       10     0  yes   no)

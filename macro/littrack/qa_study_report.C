@@ -25,15 +25,29 @@ void qa_study_report()
       }
       outputDir = std::string(gSystem->Getenv("LIT_STUDY_OUTPUT_DIR"));
    } else {
-      fileNames.push_back("scripts/events_trd_v13s/global.reco.smearing.branch.0000.root");
-      fileNames.push_back("scripts/events_trd_v13t/global.reco.smearing.branch.0000.root");
-      fileNames.push_back("scripts/events_trd_v13u/global.reco.smearing.branch.0000.root");
-      fileNames.push_back("scripts/events_trd_v13v/global.reco.smearing.branch.0000.root");
+      fileNames.push_back("scripts/events_trd_v13c/qa.smearing.nn.0000.root");
+      fileNames.push_back("scripts/events_trd_v13c/qa.smearing.nn_parallel.0000.root");
 
-      studyNames.push_back("v13s");
-      studyNames.push_back("v13t");
-      studyNames.push_back("v13u");
-      studyNames.push_back("v13v");
+      studyNames.push_back("nn");
+      studyNames.push_back("fast nn");
+
+   //   fileNames.push_back("scripts/events_trd_v13d/qa.smearing.branch.0000.root");
+    //  fileNames.push_back("scripts/events_trd_v13e/qa.smearing.branch.0000.root");
+    //  fileNames.push_back("scripts/events_trd_v13f/qa.smearing.branch.0000.root");
+
+   //   studyNames.push_back("v13d");
+   //   studyNames.push_back("v13e");
+   //   studyNames.push_back("v13f");
+
+ //      fileNames.push_back("scripts/events_much_v11a/qa.0000.root");
+ //      fileNames.push_back("scripts/events_much_v12a/qa.0000.root");
+  //     fileNames.push_back("scripts/events_much_v12b/qa.0000.root");
+ //      fileNames.push_back("scripts/events_much_v12c/qa.0000.root");
+
+  //     studyNames.push_back("v11a");
+  //     studyNames.push_back("v12a");
+  //     studyNames.push_back("v12b");
+  //     studyNames.push_back("v12c");
 
       outputDir = "./test/";
    }

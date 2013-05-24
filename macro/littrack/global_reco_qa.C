@@ -6,10 +6,13 @@
  **/
 
 #include <iostream>
+#include <vector>
 using std::cout;
 using std::endl;
+using std::vector;
+using std::string;
 
-void global_reco_qa(Int_t nEvents = 5,
+void global_reco_qa(Int_t nEvents = 100,
       TString opt = "reco")
 // opt == "reco" in case of one input file with all reconstructed data
 // opt == "ht" (hitas and tracks) in case of two input files with reconstructed hits and tracks
@@ -18,18 +21,18 @@ void global_reco_qa(Int_t nEvents = 5,
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "commit_tests/events_muon/"; // Output directory
+	TString dir = "events/trd_v13o/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
    TString globalRecoFile = dir + "global.reco.0000.root"; // File with global tracks
    TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
    TString globalTracksFile = dir + "global.tracks.0000.root";// Output file with global tracks
-	TString qaFile = dir + "qa.0000.root"; // Output file with histograms
+	TString qaFile = dir + "qa.nn_parallel.0000.root"; // Output file with histograms
 
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13o.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
@@ -103,6 +106,13 @@ void global_reco_qa(Int_t nEvents = 5,
 	run->AddTask(l1);
 
    // ----- Reconstruction QA tasks -----------------------------------------
+	vector<string> trackCategories;
+	trackCategories.push_back("All");
+	trackCategories.push_back("Electron");
+	trackCategories.push_back("Muon");
+	vector<string> ringCategories;
+	ringCategories.push_back("Electron");
+	ringCategories.push_back("ElectronReference");
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
    trackingQa->SetMinNofPointsSts(normStsPoints);
    trackingQa->SetMinNofPointsTrd(normTrdPoints);
@@ -114,6 +124,8 @@ void global_reco_qa(Int_t nEvents = 5,
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetVerbose(normTofHits);
+   trackingQa->SetTrackCategories(trackCategories);
+   trackingQa->SetRingCategories(ringCategories);
    trackingQa->SetOutputDir(std::string(resultDir));
    run->AddTask(trackingQa);
 

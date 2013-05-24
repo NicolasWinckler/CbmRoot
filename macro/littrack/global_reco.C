@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 5, // number of events
+void global_reco(Int_t nEvents = 10, // number of events
 		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/test_muon/"; // Output directory
+	TString dir = "events/trd_v13o/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -33,7 +33,7 @@ void global_reco(Int_t nEvents = 5, // number of events
    // Digi files
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v13b.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13o.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
@@ -173,6 +173,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 		FairTask* kalman = new CbmKF();
 		run->AddTask(kalman);
 		CbmL1* l1 = new CbmL1();
+		l1->SetExtrapolateToTheEndOfSTS(true);
 		l1->SetMaterialBudgetFileName(stsMatBudgetFile);
 		run->AddTask(l1);
 		CbmStsTrackFinder* trackFinder = new CbmL1StsTrackFinder();
@@ -216,19 +217,15 @@ void global_reco(Int_t nEvents = 5, // number of events
 			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
 			if (trdHitProducerType == "smearing") {
-   			// ----- TRD hit smearing -----
 				CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
 				trdHitProd->SetUseDigiPar(false);
 				run->AddTask(trdHitProd);
-				// ----- End TRD hit smearing -----
 			} else if (trdHitProducerType == "digi") {
-				// ----- TRD Digitizer -----
-				CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer", "TRD task", radiator);
+				CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(radiator);
 				run->AddTask(trdDigitizer);
 
-				CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi("TRD Hit Producer", "TRD task");
+				CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi();
 				run->AddTask(trdHitProd);
-				// ----- End TRD Digitizer -----
 			} else if (trdHitProducerType == "clustering") {
 				// ----- TRD clustering -----
 				CbmTrdDigitizerPRF* trdClustering = new CbmTrdDigitizerPRF("TRD Clusterizer", "TRD task", radiator, false, true);
@@ -256,6 +253,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 	if (opt == "all" || opt == "tracking") {
 		// ------ Global track reconstruction -------------------------------------
 		CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+		//CbmLitFindGlobalTracksParallel* finder = new CbmLitFindGlobalTracksParallel();
 		// Tracking method to be used
 		// "branch" - branching tracking
 		// "nn" - nearest neighbor tracking
@@ -269,7 +267,7 @@ void global_reco(Int_t nEvents = 5, // number of events
 		run->AddTask(finder);
 
 		if (IsTrd(parFile)) {
-			CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+			CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
 			run->AddTask(trdMatchTracks);
 		}
 

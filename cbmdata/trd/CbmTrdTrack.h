@@ -45,18 +45,6 @@ public:
     void SetPidLikePR(Double_t value) { fPidLikePR = value; }
     void SetPidLikeMU(Double_t value) { fPidLikeMU = value; }
 
-    /** Function for sorting **/
-//    static Bool_t CompareChi2(const CbmTrdTrack* a, const CbmTrdTrack* b)
-//    {
-//        return ( a->GetChi2()/(Double_t)a->GetNDF() < b->GetChi2()/(Double_t)b->GetNDF() );
-//    };
-//
-//    static Bool_t CompareMomentum(CbmTrdTrack* a, CbmTrdTrack* b)
-//    {
-//	Double_t mom_a = 1./TMath::Abs(a->GetParamLast()->GetQp());
-//        Double_t mom_b = 1./TMath::Abs(b->GetParamLast()->GetQp());
-//        return ( mom_a > mom_b );
-//    };
 private:
     /** PID value based on Wkn method **/
     Double_t fPidWkn;

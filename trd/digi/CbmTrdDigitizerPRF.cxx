@@ -595,15 +595,15 @@ void CbmTrdDigitizerPRF::GetModuleInformationFromDigiPar(Int_t VolumeID)
 	mCluster -> ModulePositionX = (Int_t)(10 * fModuleInfo->GetX());
 	mCluster -> ModulePositionY = (Int_t)(10 * fModuleInfo->GetY());
 	mCluster -> ModulePositionZ = (Int_t)(10 * fModuleInfo->GetZ());
-	mCluster -> ModuleSizeX = (fModuleInfo->GetSizex()) * 10. * 2;
-	mCluster -> ModuleSizeY = (fModuleInfo->GetSizey()) * 10. * 2;
-	mCluster -> nxPad = fModuleInfo->GetnCol();
-	mCluster -> nyPad = fModuleInfo->GetnRow();
-	mCluster -> NoSectors = fModuleInfo->GetNoSectors();
+	mCluster -> ModuleSizeX = (fModuleInfo->GetSizeX()) * 10. * 2;
+	mCluster -> ModuleSizeY = (fModuleInfo->GetSizeY()) * 10. * 2;
+	mCluster -> nxPad = fModuleInfo->GetNofColumns();
+	mCluster -> nyPad = fModuleInfo->GetNofRows();
+	mCluster -> NoSectors = fModuleInfo->GetNofSectors();
 	if(fDebug)
 	  printf("S%i L%i M%i Msx%.2f Msy%.2f\n",mCluster -> Station,mCluster -> Layer,mCluster -> moduleId,mCluster -> ModuleSizeX,mCluster -> ModuleSizeY);
 
-	const Int_t NoSectors = fModuleInfo->GetNoSectors();
+	const Int_t NoSectors = fModuleInfo->GetNofSectors();
 	mCluster -> SectorSizeX.resize(NoSectors);
 	mCluster -> SectorSizeY.resize(NoSectors);
 	mCluster -> PadSizeX.resize(NoSectors);
@@ -612,10 +612,10 @@ void CbmTrdDigitizerPRF::GetModuleInformationFromDigiPar(Int_t VolumeID)
 	mCluster -> SecxPad.resize(NoSectors);      
 
 	for (Int_t i = 0; i < NoSectors; i++) {
-	  mCluster -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
-	  mCluster -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);	
-	  mCluster -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
-	  mCluster -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
+	  mCluster -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizeX(i);
+	  mCluster -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizeY(i);	
+	  mCluster -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizeX(i);
+	  mCluster -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizeY(i);
 	  //}
 
 	  //for (Int_t i = 0; i < NoSectors; i++) {

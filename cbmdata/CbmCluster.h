@@ -17,7 +17,8 @@ class FairMultiLinkedData;
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2012
  */
-class CbmCluster : public TObject {
+class CbmCluster : public TObject
+{
 public:
 	/**
 	 * \brief Constructor.
@@ -80,12 +81,12 @@ public:
    void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
 
 private:
+   CbmCluster(const CbmCluster&);
+   CbmCluster& operator=(const CbmCluster&);
+
 	std::vector<Int_t> fDigis; ///< Array of digi indices
 	Int_t fAddress; ///< Unique detector ID
 	FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
-
-        CbmCluster(const CbmCluster&);
-        CbmCluster& operator=(const CbmCluster&);
         
 	ClassDef(CbmCluster, 1);
 };

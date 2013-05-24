@@ -751,13 +751,13 @@ void CbmTrdRadiator::ProcessTR(){
     Float_t energiefirst = fELoss;
     Float_t fTRAbsfirst = fnTRab;
 
-    // compute the TR spectra in the mylar foil between the two gas layers  
+    // compute the TR spectra in the mylar foil between the two gas layers
     WinTRspectrum();
-    // compute the TR spectra in the second halve of the detector  
+    // compute the TR spectra in the second halve of the detector
     DetTRspectrum();
     // Loop over photons and compute the E losses
     ELoss(-1);
-    fELoss += energiefirst; 
+    fELoss += energiefirst;
     fnTRab += fTRAbsfirst;
   }
 }

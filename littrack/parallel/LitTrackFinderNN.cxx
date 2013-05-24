@@ -92,7 +92,7 @@ void lit::parallel::LitTrackFinderNN::InitTrackSeeds(
    for (unsigned int iTrack = 0; iTrack < nofSeeds; iTrack++) {
       LitScalTrack* seed = trackSeeds[iTrack];
       // Apply cuts here
-      if (seed->GetParamFirst().Qp > 10) continue; // momentum cut 0.1 GeV
+      if (std::fabs(seed->GetParamFirst().Qp) > 10) continue; // momentum cut 0.1 GeV
 
       //if (fUsedSeedsSet.find(seed->GetPreviousTrackId()) != fUsedSeedsSet.end()) { continue; }
       LitScalTrack* track = new LitScalTrack();

@@ -100,8 +100,8 @@ public:
          return 0.;
       }
       // Calculate bin indices for X and Y
-      unsigned short ix = short((x - fXMin) / fBinSizeX);
-      unsigned short iy = short((y - fYMin) / fBinSizeY);
+      short ix = short((x - fXMin) / fBinSizeX);
+      short iy = short((y - fYMin) / fBinSizeY);
 
       // Check bound conditions and if out of bounds return zero.
       // Can be removed considering performance!
@@ -110,6 +110,7 @@ public:
       }
 
       return fMaterial[ix][iy];
+
 
       // Implementation based on the weighted mean of material thicknesses.
 

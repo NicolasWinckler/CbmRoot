@@ -10,7 +10,7 @@
 #include "FairRootManager.h"
 #include "FairRadLenPoint.h"
 #include "CbmDrawHist.h"
-#include "CbmTrdDetectorId.h"
+#include "CbmTrdAddress.h"
 #include "std/utils/CbmLitUtils.h"
 #include "cbm/base/CbmLitTrackingGeometryConstructor.h"
 
@@ -29,6 +29,7 @@
 #include <map>
 #include <cstdlib>
 
+using std::pair;
 using std::map;
 using std::atoi;
 using std::string;
@@ -222,9 +223,11 @@ void CbmLitRadLengthQa::ExecDetector(
    map<Int_t, map<Int_t, Double_t> > radThicknessOnTrack; // track ID -> sum of radiation thickness on track
    map<Int_t, map<Int_t, Double_t> > thicknessOnTrack; // track ID -> sum of thickness on track
    map<Int_t, map<Int_t, Double_t> > thicknessSiliconOnTrack; // track ID -> sum of thickness on track
+   map<Int_t, map<Int_t, pair<Double_t, Double_t> > > xyOnTrack; // track ID -> Station ID -> (X,Y) coordinate of exit point
+//   map<Int_t, map<Int_t, Double_t> > r2maxOnTrack; // track ID -> Station ID -> maximum radius
 
-   Double_t x, y;
-   Double_t r2max = std::numeric_limits<Double_t>::min();
+//   Double_t x, y;
+//   Double_t r2max = std::numeric_limits<Double_t>::min();
    for (Int_t iRL = 0; iRL < fRadLen->GetEntriesFast(); iRL++) {
       FairRadLenPoint* point = (FairRadLenPoint*) fRadLen->At(iRL);
       Int_t trackId = point->GetTrackID();
@@ -243,12 +246,14 @@ void CbmLitRadLengthQa::ExecDetector(
 
       // Check if node exists in one of the geometry versions
       if (stationId >= 0) {
-         Double_t r2 = posOut.X() * posOut.X() + posOut.Y() * posOut.Y();
-         if (r2 > r2max) {
-            x = posOut.X();
-            y = posOut.Y();
-            r2max = r2;
-         }
+//         Double_t r2 = posOut.X() * posOut.X() + posOut.Y() * posOut.Y();
+//         Double_t& r2max = r2maxOnTrack[trackId][stationId];
+//         if (r2 > r2max) {
+            pair<Double_t, Double_t>& xy = xyOnTrack[trackId][stationId];
+            xy.first = posOut.X();
+            xy.second = posOut.Y();
+ //           r2max = r2;
+//         }
          const Double_t thickness = res.Mag();
          const Double_t radThickness = 100 * thickness / point->GetRadLength();
          const Double_t thicknessSilicon = (SILICON_RAD_LENGTH / point->GetRadLength()) * thickness;
@@ -258,16 +263,15 @@ void CbmLitRadLengthQa::ExecDetector(
       }
    }
 
-   FillHistosDetector(radThicknessOnTrack, "hrl_RadThickness_" + detName + "_", x, y);
-   FillHistosDetector(thicknessOnTrack, "hrl_Thickness_" + detName + "_", x, y);
-   FillHistosDetector(thicknessSiliconOnTrack, "hrl_ThicknessSilicon_" + detName + "_", x, y);
+   FillHistosDetector(radThicknessOnTrack, "hrl_RadThickness_" + detName + "_", xyOnTrack);
+   FillHistosDetector(thicknessOnTrack, "hrl_Thickness_" + detName + "_", xyOnTrack);
+   FillHistosDetector(thicknessSiliconOnTrack, "hrl_ThicknessSilicon_" + detName + "_", xyOnTrack);
 }
 
 void CbmLitRadLengthQa::FillHistosDetector(
       const map<Int_t, map<Int_t, Double_t> >& parMap,
       const string& histName,
-      Double_t x,
-      Double_t y)
+      map<Int_t, map<Int_t, pair<Double_t, Double_t> > >& xyOnTrack)
 {
    map<Int_t, map<Int_t, Double_t> >::const_iterator it1;
    for (it1 = parMap.begin(); it1 != parMap.end(); it1++) {
@@ -279,7 +283,8 @@ void CbmLitRadLengthQa::FillHistosDetector(
          string name = histName + ToString<Int_t>(station) + "_H1";
          fHM->H1(name)->Fill(param);
          name = histName + ToString<Int_t>(station) + "_P2";
-         fHM->P2(name)->Fill(x, y, param);
+         const pair<Double_t, Double_t>& xy = xyOnTrack[trackId][station];
+         fHM->P2(name)->Fill(xy.first, xy.second, param);
       }
    }
 }
@@ -306,23 +311,28 @@ Int_t CbmLitRadLengthQa::GetStsStationId(
 Int_t CbmLitRadLengthQa::GetTrdStationId(
       const TString& nodePath)
 {
-   Int_t station = 0;
-   Int_t layer = 0;
-   Bool_t nodeExists = false;
-   if (nodePath.Contains(TRegexp("/cave_1/trd[1-3]_0/trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]/trd[1-3]mod.+"))) { // trd_v10b and trd_v11c
-      station = std::atoi(string(1, *(gGeoManager->GetPath() + 18)).c_str()); // 18th element is station number
-      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is layer number
-      nodeExists = true;
-   } else if (nodePath.Contains(TRegexp("/cave_1/trd1_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v12x
-      station = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is station number
-      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 25)).c_str()); // 25th element is layer number
-      nodeExists = true;
-   } else if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v13x
-      station = std::atoi(string(1, *(gGeoManager->GetPath() + 28)).c_str()); // 28th element is station number
-      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 29)).c_str()); // 29th element is layer number
-      nodeExists = true;
+//   Int_t station = 0;
+//   Int_t layer = 0;
+//   Bool_t nodeExists = false;
+//   if (nodePath.Contains(TRegexp("/cave_1/trd[1-3]_0/trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]/trd[1-3]mod.+"))) { // trd_v10b and trd_v11c
+//      station = std::atoi(string(1, *(gGeoManager->GetPath() + 18)).c_str()); // 18th element is station number
+//      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is layer number
+//      nodeExists = true;
+//   } else if (nodePath.Contains(TRegexp("/cave_1/trd1_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v12x
+//      station = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is station number
+//      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 25)).c_str()); // 25th element is layer number
+//      nodeExists = true;
+//   } else if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v13x
+//      station = std::atoi(string(1, *(gGeoManager->GetPath() + 28)).c_str()); // 28th element is station number
+//      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 29)).c_str()); // 29th element is layer number
+//      nodeExists = true;
+//   }
+   Int_t layerId = -1;
+   if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/layer[0-9][0-9]_[0-9][0-9][0-9]/module[0-9]_.+"))) { // trd_v13x NEW
+      layerId = std::atoi(string(nodePath.Data() + 24, 2).c_str()) - 1;
    }
-   return (nodeExists) ? CbmLitTrackingGeometryConstructor::Instance()->ConvertTrdToAbsoluteStationNr(station - 1, layer - 1) : -1;
+   return layerId;
+   //return (nodeExists) ? CbmLitTrackingGeometryConstructor::Instance()->ConvertTrdToAbsoluteStationNr(station - 1, layer - 1) : -1;
 }
 
 Int_t CbmLitRadLengthQa::GetMuchStationId(

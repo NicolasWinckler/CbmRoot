@@ -6,9 +6,7 @@
 #include "CbmTrdCluster.h"
 
 CbmTrdCluster::CbmTrdCluster()
-  :CbmCluster(),
-   fCharge(0.),
-   fMaxCharge(0.)
+  : CbmCluster()
 {
 }
 

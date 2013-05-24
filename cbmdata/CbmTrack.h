@@ -19,11 +19,13 @@
 #include "FairTrackParam.h"
 #include "CbmBaseHit.h"
 
-#include "FairMultiLinkedData.h"
+#include "TObject.h"
 
 #include <vector>
 
-class CbmTrack : public FairMultiLinkedData
+class FairMultiLinkedData;
+
+class CbmTrack : public TObject
 {
 public:
 	/** Default constructor **/
@@ -51,6 +53,7 @@ public:
 	Int_t GetPreviousTrackId() const { return fPreviousTrackId; }
 	const FairTrackParam* GetParamFirst() const { return &fParamFirst; }
 	const FairTrackParam* GetParamLast() const { return &fParamLast; }
+   FairMultiLinkedData* GetLinks() const { return fLinks; }
 
 	/** Modifiers  **/
 	void SetPidHypo(Int_t pid){ fPidHypo = pid; }
@@ -60,6 +63,7 @@ public:
 	void SetPreviousTrackId(Int_t previousTrackId) { fPreviousTrackId = previousTrackId; }
 	void SetParamFirst(const FairTrackParam* par) { fParamFirst = *par; }
 	void SetParamLast(const FairTrackParam* par){ fParamLast  = *par; }
+   void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
 
 	virtual void Print() const;
 
@@ -86,6 +90,9 @@ private:
 
 	/** Index of previous track segment **/
 	Int_t fPreviousTrackId;
+
+	/** Monte-Carlo link collection **/
+   FairMultiLinkedData* fLinks;
 
 	ClassDef(CbmTrack, 2);
 };

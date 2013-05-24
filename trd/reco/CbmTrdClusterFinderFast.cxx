@@ -271,12 +271,12 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	if (Layer%2 == 0) {
 	  d->colId = digi->GetRow();
 	  d->rowId = digi->GetCol();
-	  d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
+	  d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
 	}
 	else {
 	  d->rowId = digi->GetRow();
 	  d->colId = digi->GetCol();
-	  d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
+	  d->combiId = d->rowId * (fModuleInfo->GetNofColumns() + 1) + d->colId;
 	}
 	d->charge = digi->GetCharge();
 
@@ -313,8 +313,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	if (dynamic) {
 	  fModuleInfo = fDigiPar->GetModule(it->first);
 	  
-	  Float_t mSizeX   = (fModuleInfo->GetSizex()) * 2 * 10;
-	  Float_t mSizeY   = (fModuleInfo->GetSizey()) * 2 * 10;
+	  Float_t mSizeX   = (fModuleInfo->GetSizeX()) * 2 * 10;
+	  Float_t mSizeY   = (fModuleInfo->GetSizeY()) * 2 * 10;
 	  Float_t mPosXC   = fModuleInfo->GetX() * 10;
 	  Float_t mPosYC   = fModuleInfo->GetY() * 10;
 	  Float_t mR = sqrt(pow(mPosXC,2) + pow(mPosYC,2));

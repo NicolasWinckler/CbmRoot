@@ -11,8 +11,6 @@ using std::endl;
 
 CbmTrdHit::CbmTrdHit()
   : CbmPixelHit(),
-//    fDetId(-1),
-    fPlaneId(-1),
     fELossTR(-1.),
     fELossdEdx(-1.),
     fELoss(-1.)
@@ -26,12 +24,10 @@ CbmTrdHit::CbmTrdHit(
 		const TVector3& dpos,
 		Double_t dxy,
 		Int_t refId,
-		Int_t planeId,
 		Double_t eLossTR,
 		Double_t eLossdEdx,
 		Double_t eLoss)
   : CbmPixelHit(address, pos, dpos, dxy, refId),
-    fPlaneId(planeId),
     fELossTR(eLossTR),
     fELossdEdx(eLossdEdx),
     fELoss(eLoss)

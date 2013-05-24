@@ -1,8 +1,8 @@
-// -------------------------------------------------------------------------
-// -----                  CbmTrdMatchTracks source file                -----
-// -----                  Created 01/12/05  by V. Friese               -----
-// -------------------------------------------------------------------------
-
+/**
+ * \file CbmTrdMatchTracks.cxx
+ * \author V.Friese <v.friese@gsi.de>
+ * \date 01/12/05
+ **/
 #include "CbmTrdMatchTracks.h"
 
 #include "CbmTrackMatch.h"
@@ -14,328 +14,124 @@
 
 #include "FairMCPoint.h"
 #include "FairRootManager.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 
-#include <iostream>
 #include <map>
 
-// -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks() 
-  : FairTask("TRD track match", 1),
+  : FairTask("CbmTrdMatchTracks", 1),
     fTracks(NULL),
     fPoints(NULL),
     fHits(NULL),
     fClusters(NULL),
     fDigiMatches(NULL),
-    //	fDigis(NULL),
-    fMatches(NULL),
+    fTrackMatches(NULL),
     fNofHits(0),
     fNofTrueHits(0),
     fNofWrongHits(0),
-    fNofFakeHits(0),
-    fNEvents(0),
-    fUseDigis(kTRUE),
-    fUseClusters(kTRUE)
+    fPercentageTrueHits(0.),
+    fPercentageWrongHits(0.),
+    fNofMCTracksPerRecoTrack(0),
+    fNofTracks(0)
 {
 }
-// -------------------------------------------------------------------------
 
-// -----   Constructor with verbosity level   ------------------------------
-CbmTrdMatchTracks::CbmTrdMatchTracks(
-		Int_t verbose) 
-  : FairTask("TRD track match", verbose),
-    fTracks(NULL),
-    fPoints(NULL),
-    fHits(NULL),
-    fClusters(NULL),
-    fDigiMatches(NULL),
-    //	fDigis(NULL),
-    fMatches(NULL),
-    fNofHits(0),
-    fNofTrueHits(0),
-    fNofWrongHits(0),
-    fNofFakeHits(0),
-    fNEvents(0),
-    fUseDigis(kTRUE),
-    fUseClusters(kTRUE)
+CbmTrdMatchTracks::~CbmTrdMatchTracks()
 {
 }
-// -------------------------------------------------------------------------
 
-// -----   Constructor with name, title and verbosity  ---------------------
-CbmTrdMatchTracks::CbmTrdMatchTracks(
-		const char* name,
-		const char* title,
-		Int_t verbose) 
-  : FairTask(name, verbose),
-    fTracks(NULL),
-    fPoints(NULL),
-    fHits(NULL),
-    fClusters(NULL),
-    fDigiMatches(NULL),
-    //	fDigis(NULL),
-    fMatches(NULL),
-    fNofHits(0),
-    fNofTrueHits(0),
-    fNofWrongHits(0),
-    fNofFakeHits(0),
-    fNEvents(0),
-    fUseDigis(kTRUE),
-    fUseClusters(kTRUE)
+InitStatus CbmTrdMatchTracks::Init()
 {
-}
-// -------------------------------------------------------------------------
-
-// -----   Destructor   ----------------------------------------------------
-CbmTrdMatchTracks::~CbmTrdMatchTracks() {
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method Init   --------------------------------------------
-InitStatus CbmTrdMatchTracks::Init() {
-	// Get FairRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (ioman == NULL) Fatal("CbmTrdMatchTracks::Init", "RootManager not instantised!");
 
-	// Get TrdHit array
 	fHits = (TClonesArray*) ioman->GetObject("TrdHit");
-	if (fHits == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdHit array!");
+	if (fHits == NULL) LOG(FATAL) << "CbmTrdMatchTracks::Init: No TrdHit array!" << FairLogger::endl;
 
-	// Get TrdCluster array
-	fClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
-	fUseClusters = (fClusters == NULL) ? kFALSE : kTRUE;
-
-	// Get TrdTrack array
 	fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
-	if (fTracks == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdTrack array!");
+	if (fTracks == NULL) LOG(FATAL) << "CbmTrdMatchTracks::Init: No TrdTrack array!" << FairLogger::endl;
 
-	// Get TrdPoint array
 	fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
-	if (fPoints == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdPoint array!");
+	if (fPoints == NULL) LOG(FATAL) << "CbmTrdMatchTracks::Init: No TrdPoint array!" << FairLogger::endl;
 
-	// Get TrdDigiMatch array
+	// This two branches exist only if digitization and clustering is used
+	fClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
 	fDigiMatches = (TClonesArray*) ioman->GetObject("TrdDigiMatch");
-	fUseDigis = (fDigiMatches == NULL) ? kFALSE : kTRUE;
 
-	// Get TrdDigi array
-//	fDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
-	//if (fDigis == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdDigi array!");
-
-	// Create and register TrdTrackMatch array
-	fMatches = new TClonesArray("CbmTrackMatch", 100);
-	ioman->Register("TrdTrackMatch", "TRD", fMatches, kTRUE);
+	// Create and register CbmTrackMatch array
+	fTrackMatches = new TClonesArray("CbmTrackMatch", 100);
+	ioman->Register("TrdTrackMatch", "TRD", fTrackMatches, kTRUE);
 
 	return kSUCCESS;
 }
-// -------------------------------------------------------------------------
 
-// -----   Public method Exec   --------------------------------------------
 void CbmTrdMatchTracks::Exec(
-		Option_t* opt) {
-	if (!fUseDigis)
+		Option_t* opt)
+{
+   // If there are no clusters and digis than smearing hit producer was used.
+	if (NULL == fClusters || NULL == fDigiMatches) {
 		ExecSmearing(opt);
-	else {
-	    if (!fUseClusters) ExecDigi(opt);
-	    else ExecCluster(opt);
+	} else {
+	   ExecCluster(opt);
 	}
-	std::cout << "CbmTrdMatchTracks::Exec: event=" << fNEvents++ << std::endl;
+	static Int_t eventNo = 0;
+	LOG(INFO) << "CbmTrdMatchTracks::Exec: event=" << eventNo++ << FairLogger::endl;
 }
 
-// -----   Private method ExecSmearing   --------------------------------------------
 void CbmTrdMatchTracks::ExecSmearing(
-		Option_t* opt) {
-	// Clear output array
-	fMatches->Clear();
-
-	// Create some pointers and variables
-	CbmTrdTrack* track = NULL;
-	CbmTrdHit* hit = NULL;
-	FairMCPoint* point = NULL;
-	Int_t nHits = 0;
-	Int_t nMCTracks = 0;
-	Int_t iPoint = 0;
-	Int_t iMCTrack = 0;
-	Int_t nAll = 0;
-	Int_t nTrue = 0;
-	Int_t nWrong = 0;
-	Int_t nFake = 0;
-	Int_t nHitSum = 0;
-	Int_t nTrueSum = 0;
-	Int_t nWrongSum = 0;
-	Int_t nFakeSum = 0;
-	Int_t nMCTrackSum = 0;
-
-	/** Map from MCTrackID to number of common hits **/
-	std::map<Int_t, Int_t> matchMap;
-	std::map<Int_t, Int_t>::iterator it;
+		Option_t* opt)
+{
+	fTrackMatches->Clear();
 
 	// Loop over TrdTracks
-	Int_t nTracks = fTracks->GetEntriesFast();
-	for (Int_t iTrack = 0; iTrack < nTracks; iTrack++) {
-		track = (CbmTrdTrack*) fTracks->At(iTrack);
-		if (!track) {
-			std::cout << "-W- CbmTrdMatchTracks::Exec: Empty TrdTrack at "
-					<< iTrack << std::endl;
-			continue;
-		}
-		nHits = track->GetNofHits();
-		nAll = nTrue = nWrong = nFake = nMCTracks = 0;
-		matchMap.clear();
-		if (fVerbose > 2)
-			std::cout << std::endl << "Track " << iTrack << ", TrdHits "
-					<< nHits << std::endl;
-
-		// Loop over TRD hits of track
-		for (Int_t iHit = 0; iHit < nHits; iHit++) {
-			hit = (CbmTrdHit*) fHits->At(track->GetHitIndex(iHit));
-			if (!hit) {
-				std::cout << "-E- CbmTrdMatchTracks::Exec: " << "No TrdHit "
-						<< iHit << " for track " << iTrack << std::endl;
-				continue;
-			}
-			iPoint = hit->GetRefId();
-			if (iPoint < 0) { // Fake or background hit
-				nFake++;
-				continue;
-			}
-			point = (FairMCPoint*) fPoints->At(iPoint);
-			if (!point) {
-				std::cout << "-E- CbmTrdMatchTracks::Exec: "
-						<< "Empty MCPoint " << iPoint << " from TrdHit "
-						<< iHit << " (track " << iTrack << ")" << std::endl;
-				continue;
-			}
-			iMCTrack = point->GetTrackID();
-			if (fVerbose > 2)
-				std::cout << "Track " << iTrack << ", TRD hit "
-						<< track->GetHitIndex(iHit) << ", TRDPoint " << iPoint
-						<< ", MCTrack " << iMCTrack << std::endl;
-			matchMap[iMCTrack]++;
+	Int_t nofTracks = fTracks->GetEntriesFast();
+	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+		const CbmTrdTrack* track = static_cast<const CbmTrdTrack*>(fTracks->At(iTrack));
+		if (NULL == track) continue;
+		std::map<Int_t, Int_t> matchMap;
+		Int_t nofHits = track->GetNofHits();
+		for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+			const CbmTrdHit* hit = static_cast<const CbmTrdHit*>(fHits->At(track->GetHitIndex(iHit)));
+			if (NULL == hit) continue;
+			const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(hit->GetRefId()));
+			if (NULL == point) continue;
+			matchMap[point->GetTrackID()]++;
 		}
 
-		// Search for best matching MCTrack
-		iMCTrack = -1;
+		// Search for best matching MC track
+		Int_t bestMCTrackId = -1;
+		Int_t nofMCTracks = 0;
+		Int_t nofAllHits = 0;
+		Int_t nofTrueHits = 0;
+		std::map<Int_t, Int_t>::const_iterator it;
 		for (it = matchMap.begin(); it != matchMap.end(); it++) {
-			if (fVerbose > 2)
-				std::cout << it->second << " common points wth MCtrack "
-						<< it->first << std::endl;
-			nMCTracks++;
-			nAll += it->second;
-			if (it->second > nTrue) {
-				iMCTrack = it->first;
-				nTrue = it->second;
+			nofMCTracks++;
+			nofAllHits += it->second;
+			if (it->second > nofTrueHits) {
+				bestMCTrackId = it->first;
+				nofTrueHits = it->second;
 			}
 		}
-		nWrong = nAll - nTrue;
-		if (fVerbose > 1)
-			std::cout << "-I- CbmTrdMatchTracks: TrdTrack " << iTrack
-					<< ", MCTrack " << iMCTrack << ", true " << nTrue
-					<< ", wrong " << nWrong << ", fake " << nFake
-					<< ", #MCTracks " << nMCTracks << std::endl;
+		Int_t nofWrongHits = nofAllHits - nofTrueHits;
 
 		// Create TrdTrackMatch
-		new ((*fMatches)[iTrack]) CbmTrackMatch(iMCTrack, nTrue, nWrong, nFake,	nMCTracks);
+		new ((*fTrackMatches)[iTrack]) CbmTrackMatch(bestMCTrackId, nofTrueHits, nofWrongHits, 0, nofMCTracks);
 
 		// Some statistics
-		nHitSum += nHits;
-		nTrueSum += nTrue;
-		nWrongSum += nWrong;
-		nFakeSum += nFake;
-		nMCTrackSum += nMCTracks;
-
+		fNofHits += nofHits;
+		fNofTrueHits += nofTrueHits;
+		fNofWrongHits += nofWrongHits;
+		fPercentageTrueHits += 100. * (Double_t)nofTrueHits / (Double_t)nofHits;
+		fPercentageWrongHits += 100. * (Double_t)nofWrongHits / (Double_t)nofHits;
+		fNofMCTracksPerRecoTrack += nofMCTracks;
+		fNofTracks++;
 	} // Track loop
-
-	// Event statistics
-	Double_t qTrue = 0.;
-	if (nHitSum)
-		qTrue = Double_t(nTrueSum) / Double_t(nHitSum) * 100.;
-	if (fVerbose) {
-		Double_t qWrong = Double_t(nWrongSum) / Double_t(nHitSum) * 100.;
-		Double_t qFake = Double_t(nFakeSum) / Double_t(nHitSum) * 100.;
-		Double_t qMC = Double_t(nMCTrackSum) / Double_t(nTracks);
-		std::cout << std::endl;
-		std::cout << "-------------------------------------------------------" << std::endl;
-		std::cout << "-I-              TRD Track Matching                 -I-" << std::endl;
-		std::cout << "Reconstructed TrdTracks : " << nTracks << std::endl;
-		std::cout << "True  hit assignments   : " << qTrue << " %" << std::endl;
-		std::cout << "Wrong hit assignments   : " << qWrong << " %" << std::endl;
-		std::cout << "Fake  hit assignments   : " << qFake << " %" << std::endl;
-		std::cout << "MCTracks per TrdTrack   : " << qMC << std::endl;
-		std::cout << "--------------------------------------------------------" << std::endl;
-	} else
-		std::cout << "-I- CbmTrdMatchTracks: rec. " << nTracks << ", quota "
-				<< qTrue << " % " << std::endl;
 }
-// -------------------------------------------------------------------------
 
-// -----   Private method ExecDigi   --------------------------------------------
-void CbmTrdMatchTracks::ExecDigi(
-		Option_t* opt) {
-	fMatches->Clear();
-
-    Int_t nofTracks = fTracks->GetEntriesFast();
-	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) { // Loop over tracks
-		std::map<Int_t, Int_t> matchMap;
-
-		CbmTrdTrack* pTrack = (CbmTrdTrack*) fTracks->At(iTrack);
-		if (pTrack == NULL)	continue;
-		Int_t nofHits = pTrack->GetNofHits();
-		for (Int_t iHit = 0; iHit < nofHits; iHit++) { // Loop over hits
-			Int_t index = pTrack->GetHitIndex(iHit);
-			CbmTrdHit* hit = (CbmTrdHit*) fHits->At(index);
-			if (hit == NULL) continue;
-			Int_t digiId = hit->GetRefId();
-			CbmTrdDigiMatch* digiMatch = (CbmTrdDigiMatch*) fDigiMatches->At(digiId);
-			if (digiMatch == NULL) continue;
-			for (Int_t iPoint = 0; iPoint < digiMatch->GetNofRefs(); iPoint++) {
-				Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
-				if (pointIndex < 0) { // Fake or background hit
-					matchMap[-1]++;
-					continue;
-				}
-				FairMCPoint* point = (FairMCPoint*) fPoints->At(pointIndex);
-				if (point == NULL) continue;
-				matchMap[point->GetTrackID()]++;
-			}
-		} // Loop over hits
-
-		Int_t nofTrue = 0;
-		Int_t bestMcTrackId = -1;
-		Int_t nPoints = 0;
-		for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it != matchMap.end(); it++) {
-			if (it->first != -1 && it->second > nofTrue) {
-				bestMcTrackId = it->first;
-				nofTrue = it->second;
-			}
-			nPoints += it->second;
-		}
-
-		Int_t nofFake = 0;
-		Int_t nofWrong = nPoints - nofTrue - nofFake;
-		Int_t nofMcTracks = matchMap.size() - 1;
-
-		new ((*fMatches)[iTrack]) CbmTrackMatch(bestMcTrackId, nofTrue,
-				nofWrong, nofFake, nofMcTracks);
-
-		fNofHits += nPoints;
-		fNofTrueHits += nofTrue;
-		fNofWrongHits += nofWrong;
-		fNofFakeHits += nofFake;
-
-		if (fVerbose > 1)
-			std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
-					<< " nPoints=" << nPoints << " nofTrue=" << nofTrue
-					<< " nofWrong=" << nofWrong << " nofFake=" << nofFake
-					<< " nofMcTracks=" << nofMcTracks << std::endl;
-	} // Loop over tracks
-}
-// -------------------------------------------------------------------------
-
-// -----   Private method ExecCluster   --------------------------------------------
 void CbmTrdMatchTracks::ExecCluster(
 		Option_t* opt) {
-	fMatches->Clear();
+	fTrackMatches->Clear();
 
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) { // Loop over tracks
@@ -378,51 +174,50 @@ void CbmTrdMatchTracks::ExecCluster(
 
 		} // Loop over hits
 
-		Int_t nofTrue = 0;
+		Int_t nofTrueHits = 0;
 		Int_t bestMcTrackId = -1;
 		Int_t nPoints = 0;
 		for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it != matchMap.end(); it++) {
-			if (it->first != -1 && it->second >= nofTrue) {
+			if (it->first != -1 && it->second >= nofTrueHits) {
 				bestMcTrackId = it->first;
-				nofTrue = it->second;
+				nofTrueHits = it->second;
 			}
 			nPoints += it->second;
 		}
 
-		Int_t nofFake = 0;
-		Int_t nofWrong = nofHits - nofTrue - nofFake;
-		Int_t nofMcTracks = matchMap.size() - 1;
+		Int_t nofWrongHits = nofHits - nofTrueHits;
+		Int_t nofMCTracks = matchMap.size() - 1;
 
-		new ((*fMatches)[iTrack]) CbmTrackMatch(bestMcTrackId, nofTrue,
-				nofWrong, nofFake, nofMcTracks);
+		new ((*fTrackMatches)[iTrack]) CbmTrackMatch(bestMcTrackId, nofTrueHits, nofWrongHits, 0, nofMCTracks);
 
 		fNofHits += nofHits;
-		fNofTrueHits += nofTrue;
-		fNofWrongHits += nofWrong;
-		fNofFakeHits += nofFake;
-
-		if (fVerbose > 1)
-			std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
-					<< " nofHits=" << nofHits << " nPoints=" << nPoints << " nofTrue=" << nofTrue
-					<< " nofWrong=" << nofWrong << " nofFake=" << nofFake
-					<< " nofMcTracks=" << nofMcTracks << std::endl;
+		fNofTrueHits += nofTrueHits;
+		fNofWrongHits += nofWrongHits;
+      fPercentageTrueHits += 100. * (Double_t)nofTrueHits / (Double_t)nofHits;
+      fPercentageWrongHits += 100. * (Double_t)nofWrongHits / (Double_t)nofHits;
+      fNofMCTracksPerRecoTrack += nofMCTracks;
+      fNofTracks++;
 	} // Loop over tracks
 }
-// -------------------------------------------------------------------------
 
-
-// -----   Public method Finish   ------------------------------------------
-void CbmTrdMatchTracks::Finish() {
-	Double_t trueHits = 100. * Double_t(fNofTrueHits) / Double_t(fNofHits);
-	Double_t wrongHits = 100. * Double_t(fNofWrongHits) / Double_t(fNofHits);
-	Double_t fakeHits = 100. * Double_t(fNofFakeHits) / Double_t(fNofHits);
-	std::cout << "=================================================" << std::endl;
-	std::cout << "=====   " << GetName() << ": Run summary " << std::endl;
-	std::cout << "True hits: " << trueHits << "%" << std::endl;
-	std::cout << "Wrong hits: " << wrongHits << "%" << std::endl;
-	std::cout << "Fake hits: " << fakeHits << "%" << std::endl;
-	std::cout << "=================================================" << std::endl;
+void CbmTrdMatchTracks::Finish()
+{
+   PrintStatistics();
 }
-// -------------------------------------------------------------------------
+
+void CbmTrdMatchTracks::PrintStatistics()
+{
+   Double_t nofHits = (fNofTracks != 0) ? (Double_t)fNofHits / (Double_t)fNofTracks : 0;
+   Double_t nofTrueHits = (fNofTracks != 0) ? (Double_t)fNofTrueHits / (Double_t)fNofTracks : 0;
+   Double_t nofWrongHits = (fNofTracks != 0) ? (Double_t)fNofWrongHits / (Double_t)fNofTracks : 0;
+   Double_t percentageTrueHits = (fNofTracks != 0) ? (Double_t)fPercentageTrueHits / (Double_t)fNofTracks : 0;
+   Double_t percentageWrongHits = (fNofTracks != 0) ? (Double_t)fPercentageWrongHits / (Double_t)fNofTracks : 0;
+   Double_t nofMCTracksPerRecoTrack = (fNofTracks != 0) ? (Double_t)fNofMCTracksPerRecoTrack / (Double_t)fNofTracks : 0;
+   LOG(INFO) << "CbmTrdMatchTracks::PrintStatistics: nofHits=" << nofHits
+         << " nofTrueHits=" << nofTrueHits << " nofWrongHits=" << nofWrongHits
+         << " percentageTrueHits=" << percentageTrueHits
+         << " percentageWrongHits=" << percentageWrongHits
+         << " nofMCTracksPerRecoTrack=" << nofMCTracksPerRecoTrack << FairLogger::endl;
+}
 
 ClassImp( CbmTrdMatchTracks)

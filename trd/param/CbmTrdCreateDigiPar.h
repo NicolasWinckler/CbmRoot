@@ -1,16 +1,15 @@
-// --------------------------------------------------------------------------
-// -----          Header for the CbmTrdCreateDigiPar                   ------
-// -----              Created 06.06.08 by F.Uhlig                      ------
-// --------------------------------------------------------------------------
-
-///                                             
-/// \file CbmTrdCreateDigiPar.h
-/// \brief Assign pad layout to TRD Modules.    
-///                                             
-/// Crate digitisation parameter map.           
-/// Read pad geometry from CbmTrdPads.h,        
-/// assign pad layout to sectors in TRD modules.
-///                                             
+/**
+ * \file CbmTrdCreateDigiPar.h
+ * \brief Assign pad layout to TRD Modules.
+ * \author Florian Uhlig <f.uhlig@gsi.de>
+ * \date 06/06/2008
+ *
+ * Updated 20/05/2013 by Andrey Lebedev <andrey.lebedev@gsi.de>
+ *
+ * Create digitisation parameter map.
+ * Read pad geometry from CbmTrdPads.h,
+ * assign pad layout to sectors in TRD modules.
+ */
 
 #ifndef CBMTRDCREATEDIGIPAR_H
 #define CBMTRDCREATEDIGIPAR_H
@@ -25,99 +24,65 @@ class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdGeoHandler;
 
-///
-/// \brief Assign pad layout to TRD Modules.    
-///                                             
-class CbmTrdCreateDigiPar : public FairTask {
+/**
+ * \class CbmTrdCreateDigiPar
+ * \brief Assign pad layout to TRD Modules.
+ */
+class CbmTrdCreateDigiPar : public FairTask
+{
+public:
 
-  public:
+   /**
+    * \brief Default constructor.
+    **/
+   CbmTrdCreateDigiPar();
 
-    /** Default constructor **/
-    CbmTrdCreateDigiPar();
+   /**
+    * \brief Destructor.
+    **/
+   virtual ~CbmTrdCreateDigiPar();
 
-    /** Standard constructor **/
-    CbmTrdCreateDigiPar(const char *name, const char *title="CBM Task");
+   /**
+    * \breif Inherited from FairTask.
+    **/
+   virtual InitStatus Init();
 
-    /** Destructor **/
-    virtual ~CbmTrdCreateDigiPar();
+   /**
+    * \brief Inherited from FairTask.
+    **/
+   virtual void SetParContainers();
 
-    /** Initialisation **/
-    virtual InitStatus ReInit();
-    virtual InitStatus Init();
-    virtual void SetParContainers();
+   /**
+    * \brief Inherited from FairTask.
+    **/
+   virtual void Exec(Option_t* option);
 
-    /** Executed task **/
-    virtual void Exec(Option_t * option);
-
-    /** Finish (called after each event) **/
-    virtual void FinishEvent(){;}
- 
-   /** Finish task (called after all event) **/
-    virtual void FinishTask();
-
+   /**
+    * \breif Inherited from FairTask.
+    **/
+   virtual void Finish();
 
 private:
 
-    void FillModuleInfoFromGeoHandler(TString FullPath);
-    void CorrectOrientationOfPadPlane();
-    void FillDigiPar();
+   void CreateModule(
+         const TString& path);
 
-    void FillModuleMapRootGeometryWithLayers();
-    void FillModuleMapRootGeometry();
-    void FillModuleMapSegmentedSquaredOneKeepingVolume();
-    void FillPadInfoSegmentedSquaredOneKeepingVolume();
+   void FillModuleMap();
 
-//    void FillModuleMapSegmentedSquared();
-//    void FillPadInfoSegmentedSquared();
-//
-//    void FillModuleMapSegmentedRectangular();
-//    void FillPadInfoSegmentedRectangular();
+   void FillDigiPar();
 
-    Int_t fStation;    //station number
-    Int_t fLayer;      //layer number
-    Int_t fModuleType; //module type [1-8]
-    Int_t fModuleCopy; //module copy number
-    Int_t fSector;     //sector number
+   Int_t fMaxSectors; // Maximum number of sectors for all modules
 
-    Double_t fSizex;
-    Double_t fSizey;
-    Double_t fSizez;
-    Double_t fX;
-    Double_t fY;
-    Double_t fZ;
+   // Map of Unique TRD Module Id to corresponding CbmTrdModule
+   std::map<Int_t, CbmTrdModule*> fModuleMap;
 
-    TArrayD fpadsizex;      //pixel  width in x;
-    TArrayD fpadsizey;      //pixel  width in y;
-    Float_t fsizex;         //module width in x;
-    Float_t fsizey;         //module width in y;
-    TArrayD fSectorSizex;   //sector width in x;
-    TArrayD fSectorSizey;   //sector width in y;
-    Int_t   fCol;           //Calculated pixel column were the hit is in
-    Int_t   fRow;           //Calculated pixel row were the hit is in
+   CbmTrdDigiPar* fDigiPar; // pointer to digi parameters
 
-    Int_t   fModuleID;      //Unique number for detector module
+   CbmTrdGeoHandler* fGeoHandler;
 
-    Int_t   fMaxSectors;    //Max. number of sectors for all modules 
+   CbmTrdCreateDigiPar(const CbmTrdCreateDigiPar&);
+   CbmTrdCreateDigiPar& operator=(const CbmTrdCreateDigiPar&);
 
-    Float_t fPosX;          //Hit position in chamber coordinates
-    Float_t fPosY;          //Hit position in chamber coordinates
-
-    /** Map of Unique Trd Module Id to corresponding TrdModule **/
-    std::map<Int_t, CbmTrdModule*> fModuleMap;                  //!   
-    std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;      //!   
-
-    CbmTrdDigiPar *fDigiPar;    //! pointer to digi parameters
-
-    CbmTrdGeoHandler* fGeoHandler;
-  
-    std::map<Int_t, std::map<Int_t, std::vector<Int_t> > > fModInfoMap;
-    std::map<Int_t, std::vector<Int_t> >  fModTypeMap;
-    std::vector<Int_t> fModuleTypeVector;
-
-    CbmTrdCreateDigiPar(const CbmTrdCreateDigiPar&);
-    CbmTrdCreateDigiPar& operator=(const CbmTrdCreateDigiPar&);
-
-    ClassDef(CbmTrdCreateDigiPar,4)
-
-    };
+   ClassDef(CbmTrdCreateDigiPar, 4)
+};
 #endif //CBMTRDCREATEDIGIPAR_H

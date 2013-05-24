@@ -20,7 +20,7 @@
 #include "CbmMuchGeoScheme.h"
 
 #include "CbmGlobalTrack.h"
-#include "CbmTrdDetectorId.h"
+#include "CbmTrdAddress.h"
 
 #include "TClonesArray.h"
 
@@ -89,7 +89,7 @@ void CbmLitConverter::CbmPixelHitToCbmLitPixelHit(
    litHit->SetRefId(index);
 
    if (hit->GetType() == kTRDHIT) {
-	   litHit->SetDetectorId(kLITTRD, hit->GetPlaneId() - 1);
+	   litHit->SetDetectorId(kLITTRD, hit->GetPlaneId());
    } else if (hit->GetType() == kMUCHPIXELHIT) {
 	   litHit->SetDetectorId(kLITMUCH, (hit->GetPlaneId() - 1) / 2);
    } else if (hit->GetType() == kTOFHIT) {

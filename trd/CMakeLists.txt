@@ -39,17 +39,17 @@ param/CbmTrdContFact.cxx
 param/CbmTrdDigiPar.cxx
 param/CbmTrdCreateDigiPar.cxx
 
-digi/CbmTrdDigitizerMathieson.cxx 
-digi/CbmTrdDigitizerPRF.cxx
+#digi/CbmTrdDigitizerMathieson.cxx 
+#digi/CbmTrdDigitizerPRF.cxx
 digi/CbmTrdDigitizer.cxx
 #digi/CbmTrdDigiWriteoutBuffer.cxx
 
 qa/CbmTrdHitProducerQa.cxx  
 qa/CbmTrdTracksPidQa.cxx
-qa/CbmTrdQa.cxx
-qa/CbmTrdHitDensityQa.cxx
-qa/CbmTrdHitRateQa.cxx
-qa/CbmTrdOccupancyQa.cxx
+#qa/CbmTrdQa.cxx
+#qa/CbmTrdHitDensityQa.cxx
+#qa/CbmTrdHitRateQa.cxx
+#qa/CbmTrdOccupancyQa.cxx
 qa/CbmTrdDigitizerPRFQa.cxx
 qa/CbmTrdClusterizerFastQa.cxx
 qa/CbmTrdHitProducerClusterQa.cxx
@@ -57,10 +57,10 @@ qa/CbmTrdHitProducerClusterQa.cxx
 reco/CbmTrdHitProducerIdeal.cxx    
 reco/CbmTrdHitProducerSmearing.cxx
 reco/CbmTrdHitProducerDigi.cxx
-reco/CbmTrdClusterFinder.cxx
-reco/CbmTrdClusterFinderFast.cxx
-reco/CbmTrdHitProducerCluster.cxx
-reco/CbmTrdSimpleHitProducerCluster.cxx
+#reco/CbmTrdClusterFinder.cxx
+#reco/CbmTrdClusterFinderFast.cxx
+#reco/CbmTrdHitProducerCluster.cxx
+#reco/CbmTrdSimpleHitProducerCluster.cxx
 
 tools/CbmTrdElectronsTrainAnn.cxx
 tools/CbmTrdGeoHandler.cxx

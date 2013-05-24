@@ -14,7 +14,7 @@
 #include "CbmMvdHit.h"
 #include "CbmStsHit.h"
 #include "CbmMCTrack.h"
-#include "CbmTrdDetectorId.h"
+#include "CbmTrdAddress.h"
 #include "CbmMuchGeoScheme.h"
 #include "TClonesArray.h"
 #include "TH1.h"
@@ -206,7 +206,8 @@ void CbmLitFitQa::ProcessTrdTrack(
 
    // Fill histograms for first track parameters
    const CbmBaseHit* firstHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(0)));
-   Int_t firstStation = 10 * CbmTrdDetectorId::GetStationNr(firstHit->GetAddress()) + CbmTrdDetectorId::GetLayerNr(firstHit->GetAddress());
+   //Int_t firstStation = 10 * CbmTrdAddress::GetStationNr(firstHit->GetAddress()) + CbmTrdAddress::GetLayerNr(firstHit->GetAddress());
+   Int_t firstStation = CbmTrdAddress::GetLayerId(firstHit->GetAddress());
    if (mcTrack.GetNofPointsAtStation(kTRD, firstStation) > 0) {
       const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kTRD, firstStation, 0);
       FillResidualsAndPulls(firstParam, &firstPoint, "htf_Trd_FirstParam_", nofHits, kTRD);
@@ -214,7 +215,8 @@ void CbmLitFitQa::ProcessTrdTrack(
 
    // Fill histograms for last track parameters
    const CbmBaseHit* lastHit = static_cast<const CbmBaseHit*>(fTrdHits->At(track->GetHitIndex(nofHits - 1)));
-   Int_t lastStation = 10 * CbmTrdDetectorId::GetStationNr(lastHit->GetAddress()) + CbmTrdDetectorId::GetLayerNr(lastHit->GetAddress());
+   //Int_t lastStation = 10 * CbmTrdAddress::GetStationNr(lastHit->GetAddress()) + CbmTrdAddress::GetLayerNr(lastHit->GetAddress());
+   Int_t lastStation = CbmTrdAddress::GetLayerId(lastHit->GetAddress());
    if (mcTrack.GetNofPointsAtStation(kTRD, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kTRD, lastStation, 0);
       FillResidualsAndPulls(lastParam, &lastPoint, "htf_Trd_LastParam_", nofHits, kTRD);

@@ -11,8 +11,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTrack::CbmTrack()
-  : FairMultiLinkedData(),
+CbmTrack::CbmTrack() :
     fHitIndex(),
     fHitType(),
     fPidHypo(0),
@@ -21,7 +20,8 @@ CbmTrack::CbmTrack()
     fFlag(0),
     fChiSq(0.),
     fNDF(0),
-    fPreviousTrackId(-1)
+    fPreviousTrackId(-1),
+    fLinks(NULL)
 {
 }
 // -------------------------------------------------------------------------

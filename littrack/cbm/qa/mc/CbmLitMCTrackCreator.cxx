@@ -17,7 +17,7 @@
 #include "CbmGeoStsPar.h"
 #include "CbmStsDigiPar.h"
 #include "CbmMuchGeoScheme.h"
-#include "CbmTrdDetectorId.h"
+#include "CbmTrdAddress.h"
 #include "CbmMCTrack.h"
 #include "CbmStsPoint.h"
 #include "CbmRichPoint.h"
@@ -394,7 +394,8 @@ void CbmLitMCTrackCreator::FillStationMaps()
       Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
       for (Int_t iPoint = 0; iPoint < nofTrdPoints; iPoint++) {
          const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(iPoint));
-         Int_t stationId = 10 * CbmTrdDetectorId::GetStationNr(point->GetDetectorID()) + CbmTrdDetectorId::GetLayerNr(point->GetDetectorID());
+         //Int_t stationId = 10 * CbmTrdAddress::GetStationNr(point->GetDetectorID()) + CbmTrdAddress::GetLayerNr(point->GetDetectorID());
+         Int_t stationId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
          fTrdStationsMap[iPoint] = stationId;
       }
    }

@@ -31,15 +31,15 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
    fModuleType(-1),
    fModuleCopy(-1),
    fSector(-1),
-   fpadsizex(0), 
-   fpadsizey(0), 
+   fPadSizeX(0), 
+   fPadSizeY(0), 
    fsizex(-1.),    
    fsizey(-1.),    
-   fSectorSizex(0),
-   fSectorSizey(0),
-   fCol(-1),     
+   fSectorSizeX(0),
+   fSectorSizeY(0),
+   fColumn(-1),     
    fRow(-1),     
-   fModuleID(-1),
+   fModuleAddress(-1),
    fMaxSectors(0),
    fPosX(-1.),    
    fPosY(-1.),    
@@ -53,10 +53,10 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
   fMaxSectors=TMath::Max(fst1_sect_count,fst2_sect_count); 
   fMaxSectors=TMath::Max(fMaxSectors,fst3_sect_count); 
 
-  fSectorSizex.Set(fMaxSectors);
-  fSectorSizey.Set(fMaxSectors);
-  fpadsizex.Set(fMaxSectors);
-  fpadsizey.Set(fMaxSectors);
+  fSectorSizeX.Set(fMaxSectors);
+  fSectorSizeY.Set(fMaxSectors);
+  fPadSizeX.Set(fMaxSectors);
+  fPadSizeY.Set(fMaxSectors);
 }
 // --------------------------------------------------------------------
 
@@ -68,15 +68,15 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
    fModuleType(-1),
    fModuleCopy(-1),
    fSector(-1),
-   fpadsizex(0), 
-   fpadsizey(0), 
+   fPadSizeX(0), 
+   fPadSizeY(0), 
    fsizex(-1.),    
    fsizey(-1.),    
-   fSectorSizex(0),
-   fSectorSizey(0),
-   fCol(-1),     
+   fSectorSizeX(0),
+   fSectorSizeY(0),
+   fColumn(-1),     
    fRow(-1),     
-   fModuleID(-1),
+   fModuleAddress(-1),
    fMaxSectors(0),
    fPosX(-1.),    
    fPosY(-1.),    
@@ -90,10 +90,10 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
   fMaxSectors=TMath::Max(fst1_sect_count,fst2_sect_count); 
   fMaxSectors=TMath::Max(fMaxSectors,fst3_sect_count); 
 
-  fSectorSizex.Set(fMaxSectors);
-  fSectorSizey.Set(fMaxSectors);
-  fpadsizex.Set(fMaxSectors);
-  fpadsizey.Set(fMaxSectors);
+  fSectorSizeX.Set(fMaxSectors);
+  fSectorSizeY.Set(fMaxSectors);
+  fPadSizeX.Set(fMaxSectors);
+  fPadSizeY.Set(fMaxSectors);
 }
 // --------------------------------------------------------------------
 
@@ -209,7 +209,7 @@ void CbmTrdCreateDigiPar::CalculateModuleId(){
 
   Int_t detInfo_array[6]={kTRD, fStation, fLayer, fModuleType, 
                           fModuleCopy, 0};      
-  fModuleID = fTrdDetId.SetDetectorInfo(detInfo_array);
+  fModuleAddress = fTrdDetId.SetDetectorInfo(detInfo_array);
 
 }
 
@@ -305,21 +305,21 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
               if( 0 == Orientation) {  // flip pads for even layers
 		Double_t copybuf;
                 for ( Int_t i=0; i<fMaxSectors; i++) {
-		  copybuf = fpadsizex.At(i);
-		  fpadsizex.AddAt(fpadsizey.At(i),i);
-		  fpadsizey.AddAt(copybuf,i);
-		  copybuf = fSectorSizex.At(i);
-		  fSectorSizex.AddAt(fSectorSizey.At(i),i);
-		  fSectorSizey.AddAt(copybuf,i);
+		  copybuf = fPadSizeX.At(i);
+		  fPadSizeX.AddAt(fPadSizeY.At(i),i);
+		  fPadSizeY.AddAt(copybuf,i);
+		  copybuf = fSectorSizeX.At(i);
+		  fSectorSizeX.AddAt(fSectorSizeY.At(i),i);
+		  fSectorSizeY.AddAt(copybuf,i);
                 }
               }
               nmodules++;
 
               // Create new CbmTrdModule and add it to the map
-	      fModuleMap[fModuleID] = 
-                new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, sizez,
-				 fMaxSectors, fSectorSizex, fSectorSizey, 
-				 fpadsizex, fpadsizey);
+	      fModuleMap[fModuleAddress] = 
+                new CbmTrdModule(fModuleAddress, x, y, z, sizex, sizey, sizez,
+				 fMaxSectors, fSectorSizeX, fSectorSizeY, 
+				 fPadSizeX, fPadSizeY);
 	    }
 	  }
 
@@ -369,10 +369,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
   // different detector modules
 
   for (Int_t i=0; i < fMaxSectors; i++ ) {
-    fSectorSizex.AddAt(0.,i);
-    fSectorSizey.AddAt(0.,i);
-    fpadsizex.AddAt(   0.,i);
-    fpadsizey.AddAt(   0.,i);
+    fSectorSizeX.AddAt(0.,i);
+    fSectorSizeY.AddAt(0.,i);
+    fPadSizeX.AddAt(   0.,i);
+    fPadSizeY.AddAt(   0.,i);
   }
 
   Int_t moduleType;
@@ -413,10 +413,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
 
     for (Int_t i=0; i < fst1_sect_count; i++ ) {
-      fSectorSizex.AddAt(fst1_pad_type[moduleType][i][0],i);
-      fSectorSizey.AddAt(fst1_pad_type[moduleType][i][1],i);
-      fpadsizex.AddAt(   fst1_pad_type[moduleType][i][2],i);
-      fpadsizey.AddAt(   fst1_pad_type[moduleType][i][3],i);
+      fSectorSizeX.AddAt(fst1_pad_type[moduleType][i][0],i);
+      fSectorSizeY.AddAt(fst1_pad_type[moduleType][i][1],i);
+      fPadSizeX.AddAt(   fst1_pad_type[moduleType][i][2],i);
+      fPadSizeY.AddAt(   fst1_pad_type[moduleType][i][3],i);
     }
   }
 
@@ -456,10 +456,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
 
     for (Int_t i=0; i < fst2_sect_count; i++ ) {
-      fSectorSizex.AddAt(fst2_pad_type[moduleType][i][0],i);
-      fSectorSizey.AddAt(fst2_pad_type[moduleType][i][1],i);
-      fpadsizex.AddAt(   fst2_pad_type[moduleType][i][2],i);
-      fpadsizey.AddAt(   fst2_pad_type[moduleType][i][3],i);
+      fSectorSizeX.AddAt(fst2_pad_type[moduleType][i][0],i);
+      fSectorSizeY.AddAt(fst2_pad_type[moduleType][i][1],i);
+      fPadSizeX.AddAt(   fst2_pad_type[moduleType][i][2],i);
+      fPadSizeY.AddAt(   fst2_pad_type[moduleType][i][3],i);
     }
   }
   //------------------------------------------------------------------------
@@ -481,10 +481,10 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
     }
 
     for (Int_t i=0; i < fst3_sect_count; i++ ) {
-      fSectorSizex.AddAt(fst3_pad_type[moduleType][i][0],i);
-      fSectorSizey.AddAt(fst3_pad_type[moduleType][i][1],i);
-      fpadsizex.AddAt(   fst3_pad_type[moduleType][i][2],i);
-      fpadsizey.AddAt(   fst3_pad_type[moduleType][i][3],i);
+      fSectorSizeX.AddAt(fst3_pad_type[moduleType][i][0],i);
+      fSectorSizeY.AddAt(fst3_pad_type[moduleType][i][1],i);
+      fPadSizeX.AddAt(   fst3_pad_type[moduleType][i][2],i);
+      fPadSizeY.AddAt(   fst3_pad_type[moduleType][i][3],i);
     }
   }
   //-------------------------------------------------------------------------

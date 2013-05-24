@@ -58,12 +58,12 @@ inline void LitAddMaterial(
    T gamma = E / mass;
    T gammaSq = gamma * gamma;
 
-   //scale material thickness
+   // Scale material thickness
    T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
-   T thickness = norm * siliconThickness;
+   T thickness = 0.7 * norm * siliconThickness;
    T radThick = thickness / SILICON_RAD_LENGTH;
-   T sqrtRadThick = sqrt(radThick);//mat.SqrtRadThick;
-   T logRadThick = log(radThick);//mat.LogRadThick;
+   T sqrtRadThick = sqrt(radThick);
+   T logRadThick = log(radThick);
 
    /*
     * Energy loss corrections
@@ -75,15 +75,18 @@ inline void LitAddMaterial(
 
    // density correction
    T dc = ZERO;
-// if (p > 0.5) { // for particles above 1 Gev
-   static const T c7 = 28.816;
-   static const T c8 = 1e-9;
-   T hwp = c7 * sqrt(SILICON_DENSITY * SILICON_Z_OVER_A) * c8; // GeV
-   dc = log(hwp/SILICON_I) + log(beta*gamma) - C1_2;
-// }
+   if (p > 0.5) { // for particles above 1 Gev
+      static const T c7 = 28.816;
+      static const T c8 = 1e-9;
+      T hwp = c7 * sqrt(SILICON_DENSITY * SILICON_Z_OVER_A) * c8; // GeV
+      dc = log(hwp / SILICON_I) + log(beta * gamma) - C1_2;
+   }
 
    T bbLoss = K * SILICON_Z_OVER_A * rcp(betaSq) *
               (C1_2 * log(TWO * me * betaSq * gammaSq * Tmax / SILICON_I_SQ) - betaSq - dc);
+
+//   static const T bbc = 0.00354;
+//   T bbLoss = bbc * SILICON_Z_OVER_A;
 
    // Bethe-Heitler
 // T bhLoss = (E * ratio * ratio)/(mat.X0 * mat.Rho);
@@ -101,6 +104,7 @@ inline void LitAddMaterial(
    T Enew = E - energyLoss;
    T pnew = sqrt(Enew * Enew - massSq);
    par.Qp = sgn(par.Qp) * rcp(pnew);
+
 
    // Calculate Q/p correction in the covariance matrix
    T betanew = pnew / Enew;
@@ -136,9 +140,11 @@ inline void LitAddMaterial(
    /*
     * Multiple scattering corrections
     */
+
    T tx = par.Tx;
    T ty = par.Ty;
    T bcp = betanew * pnew;
+   //T bcp = beta * p;
    static const T c1 = 0.0136, c2 = 0.038;
    T theta = c1 * rcp(bcp) * sqrtRadThick * (ONE + c2 * logRadThick);
    T thetaSq = theta * theta;

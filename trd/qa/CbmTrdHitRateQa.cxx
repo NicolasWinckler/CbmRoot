@@ -610,23 +610,23 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       Mpos[2] = fModuleInfo->GetZ() * 10; // == z(station) ??
       
       Double_t Msize[3];
-      Msize[0] = fModuleInfo->GetSizex() * 10;
-      Msize[1] = fModuleInfo->GetSizey() * 10;
+      Msize[0] = fModuleInfo->GetSizeX() * 10;
+      Msize[1] = fModuleInfo->GetSizeY() * 10;
       Msize[2] = 0; 
 
-      const Int_t NoSectors = fModuleInfo->GetNoSectors();
+      const Int_t NoSectors = fModuleInfo->GetNofSectors();
       Int_t nSec = NoSectors;
       Double_t Ssize[3*NoSectors];
       Double_t Psize[3*NoSectors];
 
       for (Int_t i = 0; i < NoSectors; i++)// i = Sector
 	{
-	  Ssize[0+i*NoSectors] = fModuleInfo->GetSectorSizex(i) * 10;
-	  Ssize[1+i*NoSectors] = fModuleInfo->GetSectorSizey(i) * 10;
+	  Ssize[0+i*NoSectors] = fModuleInfo->GetSectorSizeX(i) * 10;
+	  Ssize[1+i*NoSectors] = fModuleInfo->GetSectorSizeY(i) * 10;
 	  Ssize[2+i*NoSectors] = 0;
 	  
-	  Psize[0+i*NoSectors] = fModuleInfo->GetPadSizex(i) * 10;
-	  Psize[1+i*NoSectors] = fModuleInfo->GetPadSizey(i) * 10;
+	  Psize[0+i*NoSectors] = fModuleInfo->GetPadSizeX(i) * 10;
+	  Psize[1+i*NoSectors] = fModuleInfo->GetPadSizeY(i) * 10;
 	  Psize[2+i*NoSectors] = 0;
 	}
 
@@ -675,7 +675,7 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 	  fModuleInfo->GetPosition(0, 0, VolumeID, s, padPos, padSize);
 	  GeoPara->pSize[s][i] = padSize[i] * 10;
 	  if (i == 0) {
-	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizex(s) * 10;
+	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizeX(s) * 10;
 	    if (GeoPara->sSize[s][i] < 2 * GeoPara->mSize[i]) {
 	      GeoPara->sCol[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
 	    }
@@ -686,7 +686,7 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 	    GeoPara->nCol += GeoPara->sCol[s];
 	  }
 	  if (i == 1) {
-	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizey(s) * 10;
+	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizeY(s) * 10;
 	    if (GeoPara->sSize[s][i] < 2 * GeoPara->mSize[i]) {
 	      GeoPara->sRow[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
 	    }

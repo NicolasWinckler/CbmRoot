@@ -14,6 +14,7 @@
 #include <map>
 using std::string;
 using std::map;
+using std::pair;
 class CbmHistManager;
 class TClonesArray;
 
@@ -79,10 +80,9 @@ private:
           Int_t (*getStationId)(const TString&));
 
     void FillHistosDetector(
-          const map<Int_t, map<Int_t, Double_t> >& map,
+          const map<Int_t, map<Int_t, Double_t> >& parMap,
           const string& histName,
-          Double_t x,
-          Double_t y);
+          map<Int_t, map<Int_t, pair<Double_t, Double_t> > >& xyOnTrack);
 
     /**
      * \brief Return MVD station ID by path to the node or -1 in case node does not exists.

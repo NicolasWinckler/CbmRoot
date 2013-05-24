@@ -74,8 +74,8 @@ public:
 
 protected:
 	/**
-     * Sets hit type.
-     * @param type hit type
+     * \brief Sets hit type.
+     * \param type hit type
      **/
 	void SetType(HitType type) { fType = type; }
 

@@ -2,12 +2,13 @@
  * \file CbmTrdHit.h
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
- * \brief Class for hits in TRD detector. Derives from CbmPixelHit.
+ * \brief Class for hits in TRD detector.
  **/
 
 #ifndef CBMTRDHIT_H_
 #define CBMTRDHIT_H_
 
+#include "CbmTrdAddress.h"
 #include "CbmPixelHit.h"
 
 class TVector3;
@@ -27,7 +28,6 @@ public:
      *\param dpos Errors of position in global c.s. [cm]
 	  *\param dxy XY correlation of the hit
 	  *\param refId Index of digi or cluster
-	  *\param planeId Detector plane identifier
 	  *\param eLossTR Energy losses of electron via TR
 	  *\param eLossdEdx Energy deposition in the detector without TR
 	  *\param eLoss TR + dEdx
@@ -38,7 +38,6 @@ public:
 			const TVector3& dpos,
 			Double_t dxy,
 			Int_t refId,
-			Int_t planeId,
 			Double_t eLossTR,
 			Double_t eLossdEdx,
 			Double_t eLoss);
@@ -50,9 +49,8 @@ public:
 
 	/**
 	 * \brief Inherited from CbmBaseHit.
-	 * TODO: Replace returning layer ID from address.
 	 */
-   Int_t GetPlaneId() const { return fPlaneId; }
+   Int_t GetPlaneId() const { return CbmTrdAddress::GetLayerId(GetAddress()); }
 
    /**
     * \brief Inherited from CbmBaseHit.
@@ -70,7 +68,6 @@ public:
 	void SetELossdEdx(Double_t loss) { fELossdEdx = loss; }
 
 private:
-	Int_t fPlaneId; // unique ID of TRD plane in the setup
    Double32_t fELossTR; // energy losses of electron via TR
    Double32_t fELossdEdx; // energy deposition in the detector without TR
    Double32_t fELoss; // TR + dEdx

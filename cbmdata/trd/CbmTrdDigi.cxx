@@ -1,43 +1,37 @@
 #include "CbmTrdDigi.h"
 
-#include <iostream>
-using std::cout;
+#include <sstream>
 using std::endl;
+using std::stringstream;
 
 CbmTrdDigi::CbmTrdDigi() 
-  : TObject(),
-    fDetId(-1),
-    fCol(-1),
-    fRow(-1),
-    fCharge(-1.0),
-    fTime(-1.0),
-    fMCIndex(0)
+  : CbmDigi(),
+    fAddress(-1),
+    fCharge(-1.),
+    fTime(-1.)
 {
 }
 
-CbmTrdDigi::CbmTrdDigi(Int_t detId, Int_t col, Int_t row, Double_t charge, 
-                       Double_t time, Int_t index)
-  : TObject(),
-    fDetId(detId),
-    fCol(col),
-    fRow(row),
+CbmTrdDigi::CbmTrdDigi(
+      Int_t address,
+      Double_t charge,
+      Double_t time)
+  : CbmDigi(),
+    fAddress(address),
     fCharge(charge),
-    fTime(time),
-    fMCIndex()
+    fTime(time)
 {
-  if (index >= 0)
-          fMCIndex.push_back(index);
-};
+}
+
 CbmTrdDigi::~CbmTrdDigi()
 {
-  fMCIndex.clear();
 }
-void CbmTrdDigi::Print() {
-  cout<<"fDetID : "<<fDetId <<endl;
-  cout<<"Col    : "<<fCol <<endl;
-  cout<<"Row    : "<<fRow <<endl;
-  cout<<"ELoss  : "<<fCharge <<endl;
-  cout<<"Time   : "<<fTime <<endl;
+
+string CbmTrdDigi::ToString() const {
+   stringstream ss;
+   ss << "CbmTrdDigi: address=" << fAddress << " charge=" << fCharge
+         << " time=" << fTime << endl;
+   return ss.str();
 }
 
 ClassImp(CbmTrdDigi)

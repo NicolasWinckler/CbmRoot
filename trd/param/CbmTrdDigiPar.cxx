@@ -84,15 +84,15 @@ void CbmTrdDigiPar::putParams(FairParamList* l)
      values.AddAt(fModuleMap[fModuleIdArray[i]]->GetX(),0);         
      values.AddAt(fModuleMap[fModuleIdArray[i]]->GetY(),1);          
      values.AddAt(fModuleMap[fModuleIdArray[i]]->GetZ(),2);          
-     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizex(),3);      
-     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizey(),4); 
-     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizez(),5); 
+     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizeX(),3);      
+     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizeY(),4); 
+     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizeZ(),5); 
      for (Int_t j=0; j < fMaxSectors; j++){       
        Int_t k=6+(j*4);
-       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSectorSizex(j),k);   
-       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSectorSizey(j),k+1);   
-       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetPadSizex(j),k+2);   
-       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetPadSizey(j),k+3);   
+       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSectorSizeX(j),k);   
+       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSectorSizeY(j),k+1);   
+       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetPadSizeX(j),k+2);   
+       values.AddAt(fModuleMap[fModuleIdArray[i]]->GetPadSizeY(j),k+3);   
      }
      TString text;
      text += fModuleIdArray[i];

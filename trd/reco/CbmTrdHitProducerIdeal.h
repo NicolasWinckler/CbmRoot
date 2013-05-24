@@ -1,42 +1,54 @@
-//-------------------------------------------------------------------
-//-----                  CbmTrdHitProducerIdeal                 -----
-//-----               Created 20/06/06 by D.Kresan              -----
-//-------------------------------------------------------------------
+/**
+ * \file CbmTrdHitProducerIdeal.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 06.05.2013
+ * \brief Ideal hit producer for TRD.
+ */
 
-#ifndef _CBM_TRD_HIT_PRODUCER_IDEAL_
-#define _CBM_TRD_HIT_PRODUCER_IDEAL_
+#ifndef CBMTRDHITPRODUCERIDEAL_H
+#define CBMTRDHITPRODUCERIDEAL_H
 
 #include "FairTask.h"
 
-#include <vector>
-
 class TClonesArray;
 
+class CbmTrdHitProducerIdeal : public FairTask
+{
+public:
+   /**
+    * \brief Constructor.
+    */
+    CbmTrdHitProducerIdeal();
 
-class CbmTrdHitProducerIdeal : public FairTask {
+    /**
+     * \brief Destructor.
+     */
+    virtual ~CbmTrdHitProducerIdeal();
+
+    /**
+     * \brief Inherited form FairTask.
+     */
+    virtual InitStatus Init();
+
+    /**
+     * \brief Inherited from FairTask.
+     */
+    virtual void Exec(Option_t* option = "");
+
+    /**
+     * \brief Inherited from FairTask.
+     */
+    virtual void Finish();
 
 private:
-    TClonesArray *fArrayTrdPoint;  // Array of TRD points
-    TClonesArray *fArrayTrdHit;    // Array of TRD hits
-    Int_t fEvents;                 // Number of events processed
-
-    std::vector<Int_t> fLayersBeforeStation; //! 
+    TClonesArray* fTrdPoints; // Array of TRD points
+    TClonesArray* fTrdHits; // Array of TRD hits
 
     CbmTrdHitProducerIdeal(const CbmTrdHitProducerIdeal&);
     CbmTrdHitProducerIdeal& operator=(const CbmTrdHitProducerIdeal&);
 
-public:
-    CbmTrdHitProducerIdeal();
-    CbmTrdHitProducerIdeal(const char *name,
-			   Int_t verbose = 1);
-    virtual ~CbmTrdHitProducerIdeal();
-    virtual InitStatus Init();
-    virtual void Exec(Option_t *option = "");
-    virtual void Finish() {}
-
-    ClassDef(CbmTrdHitProducerIdeal, 1);
+    ClassDef(CbmTrdHitProducerIdeal, 2);
 };
-
 
 #endif
 

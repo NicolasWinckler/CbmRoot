@@ -231,8 +231,8 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
     Int_t Layer    = fGeoHandler->GetLayer(moduleId);
     Int_t combiId = 10 * Station + Layer;
     fModuleInfo = fDigiPar->GetModule(moduleId);
-    Int_t nRows = fModuleInfo->GetnRow();
-    Int_t nCols = fModuleInfo->GetnCol();
+    Int_t nRows = fModuleInfo->GetNofRows();
+    Int_t nCols = fModuleInfo->GetNofColumns();
     fDigiChargeSpectrum->Fill(digi->GetCharge());
     if (digi->GetCharge() > fTriggerThreshold) {
       digiTriggerCounter++;
@@ -248,8 +248,8 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
 	fModuleMap[moduleId] = new OccupancyModule();
 	fModuleMap[moduleId]->Station = Station;
 	fModuleMap[moduleId]->Layer = Layer;
-	fModuleMap[moduleId]->ModuleSizeX = fModuleInfo->GetSizex();
-	fModuleMap[moduleId]->ModuleSizeY = fModuleInfo->GetSizey();
+	fModuleMap[moduleId]->ModuleSizeX = fModuleInfo->GetSizeX();
+	fModuleMap[moduleId]->ModuleSizeY = fModuleInfo->GetSizeY();
 	fModuleMap[moduleId]->ModulePositionX = fModuleInfo->GetX();
 	fModuleMap[moduleId]->ModulePositionY = fModuleInfo->GetY();
 	fModuleMap[moduleId]->moduleId = moduleId;

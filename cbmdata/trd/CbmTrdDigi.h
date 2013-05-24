@@ -1,49 +1,75 @@
-#ifndef CbmTrdDigi_HH
-#define CbmTrdDigi_HH
+/**
+ * \file CbmTrdDigi.h
+ * \author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * \date 03.05.2013
+ **/
 
-#include "TObject.h"
+#ifndef CBMTRDDIGI_H
+#define CBMTRDDIGI_H 1
 
-#include <vector>
+#include "CbmDigi.h"
+#include "CbmTrdAddress.h"
 
-class CbmTrdDigi : public TObject
+#include <string>
+using std::string;
+
+class CbmTrdDigi : public CbmDigi
 {
-  public:  
-    CbmTrdDigi();
-    CbmTrdDigi(Int_t detId, Int_t col, Int_t row, Double_t charge, 
-               Double_t time, Int_t index=-1);
-    ~CbmTrdDigi();
-   
-    void SetDetId(Int_t detId) {fDetId = detId;};
-    void SetCol(Int_t col) {fCol = col;};
-    void SetRow(Int_t row) {fRow = row;};
-    void SetCharge(Double_t charge) {fCharge = charge;};
-    void SetTime(Double_t time) {fTime = time;};
-		  
-    Int_t GetDetId() const {return fDetId;};
-    Int_t GetCol() const {return fCol;};
-    Int_t GetRow() const {return fRow;};
-    Double_t GetCharge() const {return fCharge;};
-    Double_t GetTime() const {return fTime;};
+public:
+   /**
+    * \brief Default constructor.
+    */
+   CbmTrdDigi();
 
-    std::vector<int> GetMCIndex(){return fMCIndex;};
-    int GetFirstMCIndex(){return fMCIndex[0];};
-		  
-    void AddCharge(Double_t charge){fCharge+= charge;};
-    void AddMCIndex(int i){fMCIndex.push_back(i);};
-		
-    void Print();
+   /**
+    * \brief Constructor with assignment.
+    * \param[in] address Unique channel address.
+    * \param[in] charge Charge.
+    * \param[in] time Absolute time [ns].
+    */
+   CbmTrdDigi(Int_t address, Double_t charge, Double_t time);
+
+   /**
+    * \brief Destructor.
+    */
+   ~CbmTrdDigi();
+
+   /**
+    * \brief Inherited from CbmDigi.
+    */
+   Int_t GetAddress() const { return fAddress; };
+
+   /**
+    * \brief Inherited from CbmDigi.
+    */
+   Double_t GetCharge() const { return fCharge; }
+
+   /**
+    * \brief Inherited from CbmDigi.
+    */
+   Int_t GetSystemId() const { return CbmTrdAddress::GetSystemId(fAddress); }
+
+   /**
+    * \brief Inherited from CbmDigi.
+    */
+   Double_t GetTime() const { return fTime; }
+
+   /** Accessors **/
+   void SetAddress(Int_t address) { fAddress = address; }
+   void SetCharge(Double_t charge) { fCharge = charge; }
+   void SetTime(Double_t time) { fTime = time; }
+
+   /** Modifiers **/
+   void AddCharge(Double_t charge) { fCharge += charge; }
+
+   string ToString() const;
   
-  private: 
-    Int_t fDetId;
-    Int_t fCol;
-    Int_t fRow;
-    Double_t fCharge;
-    Double_t fTime;
+private:
+   Int_t fAddress; ///< Unique channel address
+   Double_t fCharge; ///< Charge
+   Double_t fTime; ///< Absolute time [ns]
 
-    std::vector<int> fMCIndex;//! List of indices of the corresponding MC hits
-
-  ClassDef(CbmTrdDigi,2);
+   ClassDef(CbmTrdDigi, 3);
 };
-
 
 #endif

@@ -105,9 +105,9 @@ public:
    /**
     *
     */
-   Int_t ConvertTrdToAbsoluteStationNr(
-         Int_t station,
-         Int_t layer);
+//   Int_t ConvertTrdToAbsoluteStationNr(
+//         Int_t station,
+//         Int_t layer);
 
    /**
     *

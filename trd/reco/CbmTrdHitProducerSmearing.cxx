@@ -9,7 +9,7 @@
 #include "CbmTrdRadiator.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
-#include "CbmTrdGeoHandler.h"
+#include "CbmTrdAddress.h"
 
 #include "CbmMCTrack.h"
 
@@ -41,7 +41,6 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(
       fMCTracks(NULL),
       fDigiPar(NULL),
       fModuleInfo(NULL),
-      fGeoHandler(new CbmTrdGeoHandler()),
       fRadiator(radiator),
       fSigmaX(),
       fSigmaY(),
@@ -51,12 +50,21 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(
       fHitMergingDistance(0.),
       fUseDigiPar(true)
 {
-   // Default resolution
-   fSigmaX = list_of(0.03)(0.04)(0.05); // Resolution in x [cm]
-   // Resolutions in y - station and angle dependent [cm]
-   fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3));
-   fSigmaY.push_back(list_of(0.63)(0.83)(3.3)(3.3)(3.3)(3.3)(3.3));
-   fSigmaY.push_back(list_of(1.03)(1.5)(3.3)(3.3)(3.3)(3.3)(3.3));
+   // Default resolution for each TRD layer
+   fSigmaX = list_of(0.03)(0.03)(0.03)(0.03)(0.04)(0.04)(0.04)(0.04)(0.05)(0.05)(0.05)(0.05); // Resolution in x [cm]
+   // Hit resolution in y - layer and angle dependent [cm]
+   fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3)); // 1
+   fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3)); // 2
+   fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3)); // 3
+   fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3)); // 4
+   fSigmaY.push_back(list_of(0.63)(0.83)(3.3)(3.3)(3.3)(3.3)(3.3)); // 5
+   fSigmaY.push_back(list_of(0.63)(0.83)(3.3)(3.3)(3.3)(3.3)(3.3)); // 6
+   fSigmaY.push_back(list_of(0.63)(0.83)(3.3)(3.3)(3.3)(3.3)(3.3)); // 7
+   fSigmaY.push_back(list_of(0.63)(0.83)(3.3)(3.3)(3.3)(3.3)(3.3)); // 8
+   fSigmaY.push_back(list_of(1.03)(1.5)(3.3)(3.3)(3.3)(3.3)(3.3)); // 9
+   fSigmaY.push_back(list_of(1.03)(1.5)(3.3)(3.3)(3.3)(3.3)(3.3)); // 10
+   fSigmaY.push_back(list_of(1.03)(1.5)(3.3)(3.3)(3.3)(3.3)(3.3)); // 11
+   fSigmaY.push_back(list_of(1.03)(1.5)(3.3)(3.3)(3.3)(3.3)(3.3)); // 12
 }
 
 CbmTrdHitProducerSmearing::~CbmTrdHitProducerSmearing()
@@ -84,17 +92,6 @@ InitStatus CbmTrdHitProducerSmearing::Init()
 
    fTrdHits = new TClonesArray("CbmTrdHit", 100);
    ioman->Register("TrdHit", "TRD", fTrdHits, kTRUE);
-
-   // Extract information about the number of TRD stations and
-   // the number of layers per TRD station from the geomanager.
-   // Store the information about the number of layers at the entrance
-   // of subsequent stations in a vector.
-   // This allows to calculate the layer number starting with 1 for the
-   // first layer of the first station at a later stage by only adding
-   // the layer number in the station to the number of layers in
-   // previous stations
-
-   fGeoHandler->Init();
 
    fRadiator->Init();
 
@@ -128,6 +125,10 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
       delete hits[iHit];
    }
    hits.clear();
+
+   static Int_t eventNo = 0;
+   LOG(INFO) << "CbmTrdHitProducerSmearing::Exec: eventNo=" << eventNo++ << ",  points=" << fTrdPoints->GetEntriesFast()
+         << ", hits=" << fTrdHits->GetEntriesFast() << FairLogger::endl;
 }
 
 void CbmTrdHitProducerSmearing::Finish()
@@ -140,10 +141,8 @@ CbmTrdHit* CbmTrdHitProducerSmearing::CreateHit(Int_t pointId)
    CbmTrdPoint* trdPoint = static_cast<CbmTrdPoint*>(fTrdPoints->At(pointId));
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(trdPoint->GetTrackID()));
 
-   Int_t detectorId = trdPoint->GetDetectorID();
-   Int_t station = fGeoHandler->GetStation(detectorId);
-   Int_t layer = fGeoHandler->GetLayer(detectorId);
-   Int_t plane = fGeoHandler->GetPlane(detectorId);
+   Int_t address = trdPoint->GetDetectorID();
+   Int_t layerId = CbmTrdAddress::GetLayerId(address);
 
    Double_t ELossTR = 0.0; // TR energy loss for e- and e+
    Double_t ELossdEdX = trdPoint->GetEnergyLoss(); // Ionization energy loss
@@ -159,18 +158,18 @@ CbmTrdHit* CbmTrdHitProducerSmearing::CreateHit(Int_t pointId)
       ELoss += ELossTR;
    }
 
-   Int_t rotation = layer % 2; // Rotation of the TRD planes. Even layers are rotated.
+   Int_t rotation = layerId % 2; // Rotation of the TRD planes. Even layers are rotated.
 
    Double_t sigmaX = 0.;
    Double_t sigmaY = 0.;
    if (rotation == 1) { // rotated x->Y  y->X
       Double_t teta = TMath::ATan(TMath::Abs(mcPos.X() / mcPos.Z())) * 1000; // mrad
-      sigmaY = GetSigmaX(station);
-      sigmaX = GetSigmaY(teta, station);
+      sigmaY = GetSigmaX(layerId);
+      sigmaX = GetSigmaY(teta, layerId);
    } else if (rotation == 0) { // not rotated x->X  y->Y
       Double_t phi = TMath::ATan(TMath::Abs(mcPos.Y() / mcPos.Z())) * 1000; // mrad
-      sigmaX = GetSigmaX(station);
-      sigmaY = GetSigmaY(phi, station);
+      sigmaX = GetSigmaX(layerId);
+      sigmaY = GetSigmaY(phi, layerId);
    }
 
    TVector3 hitPos;
@@ -193,11 +192,11 @@ CbmTrdHit* CbmTrdHitProducerSmearing::CreateHit(Int_t pointId)
 
          // If digitization scheme is provided than check if hit position is inside the detector
          assert(fDigiPar != NULL);
-         fModuleInfo = fDigiPar->GetModule(detectorId);
-         Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizex();
-         Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizex();
-         Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizey();
-         Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizey();
+         fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(address));
+         Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizeX();
+         Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizeX();
+         Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizeY();
+         Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizeY();
          isOutside = (hitPosX > moduleXmax || hitPosX < moduleXmin)
                             || (hitPosX > moduleXmax || hitPosX < moduleXmin);
          counter++;
@@ -218,7 +217,7 @@ CbmTrdHit* CbmTrdHitProducerSmearing::CreateHit(Int_t pointId)
 
    TVector3 hitErr(sigmaX, sigmaY, 0.);
 
-   return new CbmTrdHit(detectorId, hitPos, hitErr, 0., pointId, plane, ELossTR, ELossdEdX, ELoss);
+   return new CbmTrdHit(address, hitPos, hitErr, 0., pointId, ELossTR, ELossdEdX, ELoss);
 }
 
 
@@ -267,38 +266,23 @@ Double_t CbmTrdHitProducerSmearing::GetHitErr(
    return (TMath::Abs(err) < 3 * sigma) ? err : (err > 0) ? 3 * sigma : -3 * sigma;
 }
 
-void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])
+Double_t CbmTrdHitProducerSmearing::GetSigmaX(
+      Int_t layerId) const
 {
-   for (Int_t i = 0; i < 3; i++) fSigmaX[i] = sigma[i];
+   return fSigmaX[layerId];
 }
 
-void CbmTrdHitProducerSmearing::SetSigmaY(
-      Double_t s1[],
-      Double_t s2[],
-      Double_t s3[])
+Double_t CbmTrdHitProducerSmearing::GetSigmaY(
+      Double_t teta,
+      Int_t layerId) const
 {
-   for (Int_t i = 0; i < 7; i++) {
-      fSigmaY[0][i] = s1[i];
-      fSigmaY[1][i] = s2[i];
-      fSigmaY[2][i] = s3[i];
-   }
-}
-
-Double_t CbmTrdHitProducerSmearing::GetSigmaX(Int_t stack) const
-{
-   return fSigmaX[stack - 1];
-}
-
-Double_t CbmTrdHitProducerSmearing::GetSigmaY(Double_t teta,
-      Int_t stack) const
-{
-   if (teta <= 50) return fSigmaY[stack - 1][0];
-   else if (teta > 50 && teta <= 100) return fSigmaY[stack - 1][1];
-   else if (teta > 100 && teta <= 200) return fSigmaY[stack - 1][2];
-   else if (teta > 200 && teta <= 300) return fSigmaY[stack - 1][3];
-   else if (teta > 300 && teta <= 400) return fSigmaY[stack - 1][4];
-   else if (teta > 400 && teta <= 500) return fSigmaY[stack - 1][5];
-   else if (teta > 500) return fSigmaY[stack - 1][6];
+   if (teta <= 50) return fSigmaY[layerId][0];
+   else if (teta > 50 && teta <= 100) return fSigmaY[layerId][1];
+   else if (teta > 100 && teta <= 200) return fSigmaY[layerId][2];
+   else if (teta > 200 && teta <= 300) return fSigmaY[layerId][3];
+   else if (teta > 300 && teta <= 400) return fSigmaY[layerId][4];
+   else if (teta > 400 && teta <= 500) return fSigmaY[layerId][5];
+   else if (teta > 500) return fSigmaY[layerId][6];
    else return 0;
 }
 

@@ -866,26 +866,26 @@ void CbmTrdQa::FinishEvent()
 }
 void CbmTrdQa::GetPadInfos(Int_t moduleId, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY)
 {
-  x += fModuleInfo->GetSizex(); // move origin from module center to lower right corner
-  y += fModuleInfo->GetSizey(); // move origin from module center to lower right corner
+  x += fModuleInfo->GetSizeX(); // move origin from module center to lower right corner
+  y += fModuleInfo->GetSizeY(); // move origin from module center to lower right corner
   fModuleInfo = fDigiPar->GetModule(moduleId);
-  Int_t nSector = fModuleInfo->GetNoSectors();
+  Int_t nSector = fModuleInfo->GetNofSectors();
   Int_t iSectorX(0), iSectorY(0);
-  Double_t iSectorSizeX = fModuleInfo->GetSectorSizex(iSectorX);
-  Double_t iSectorSizeY = fModuleInfo->GetSectorSizey(iSectorY);
-  Double_t iPadSizeX = fModuleInfo->GetPadSizex(iSectorX);
-  Double_t iPadSizeY = fModuleInfo->GetPadSizey(iSectorY);
+  Double_t iSectorSizeX = fModuleInfo->GetSectorSizeX(iSectorX);
+  Double_t iSectorSizeY = fModuleInfo->GetSectorSizeY(iSectorY);
+  Double_t iPadSizeX = fModuleInfo->GetPadSizeX(iSectorX);
+  Double_t iPadSizeY = fModuleInfo->GetPadSizeY(iSectorY);
   Int_t iPadX = 0;
   Int_t iPadY = 0;
-  if (x > 2 * fModuleInfo->GetSizex() || y > 2 * fModuleInfo->GetSizey() || x < 0 || y < 0) {
-    printf("point out of module::\n   module %i (%.2f, %.2f) (%.2f, %.2f)\n",moduleId,x,y,2 * fModuleInfo->GetSizex(),2 * fModuleInfo->GetSizey());
+  if (x > 2 * fModuleInfo->GetSizeX() || y > 2 * fModuleInfo->GetSizeY() || x < 0 || y < 0) {
+    printf("point out of module::\n   module %i (%.2f, %.2f) (%.2f, %.2f)\n",moduleId,x,y,2 * fModuleInfo->GetSizeX(),2 * fModuleInfo->GetSizeY());
   } else {   
     while (x > iSectorSizeX && iSectorX < nSector) {    
       x -= iSectorSizeX;
       iPadX += iSectorSizeX / iPadSizeX;
       iSectorX++;
-      iSectorSizeX = fModuleInfo->GetSectorSizex(iSectorX);
-      iPadSizeX = fModuleInfo->GetPadSizex(iSectorX);          
+      iSectorSizeX = fModuleInfo->GetSectorSizeX(iSectorX);
+      iPadSizeX = fModuleInfo->GetPadSizeX(iSectorX);          
     }   
     padSizeX = iPadSizeX;
     iPadX += Int_t((x / padSizeX) + 0.5);
@@ -894,8 +894,8 @@ void CbmTrdQa::GetPadInfos(Int_t moduleId, Double_t x, Double_t y, Int_t &iCol, 
       y -= iSectorSizeY;
       iPadY += iSectorSizeY / iPadSizeY;
       iSectorY++;
-      iSectorSizeY = fModuleInfo->GetSectorSizey(iSectorY);
-      iPadSizeY = fModuleInfo->GetPadSizey(iSectorY);      
+      iSectorSizeY = fModuleInfo->GetSectorSizeY(iSectorY);
+      iPadSizeY = fModuleInfo->GetPadSizeY(iSectorY);      
     }
     padSizeY = iPadSizeY;
     iPadY += Int_t((x / padSizeX) + 0.5);
@@ -934,10 +934,10 @@ void CbmTrdQa::CreateLayerView()
       fLayerDummy->SetZTitle("left over hits / all points [%]");
       fLayerDummy->DrawCopy();
     }
-    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizex(),
-				    fModuleInfo->GetY()-fModuleInfo->GetSizey(),
-				    fModuleInfo->GetX()+fModuleInfo->GetSizex(),
-				    fModuleInfo->GetY()+fModuleInfo->GetSizey());
+    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
     text->SetFillStyle(1001);
     text->SetLineColor(1);
     if (value >= 0 && value <= 5)
@@ -989,10 +989,10 @@ void CbmTrdQa::CreateLayerView()
       fLayerDummy->SetZTitle("left over points / all points [%]");
       fLayerDummy->DrawCopy();
     }
-    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizex(),
-				    fModuleInfo->GetY()-fModuleInfo->GetSizey(),
-				    fModuleInfo->GetX()+fModuleInfo->GetSizex(),
-				    fModuleInfo->GetY()+fModuleInfo->GetSizey());
+    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
     text->SetFillStyle(1001);
     text->SetLineColor(1);
     if (value >= 0 && value <= 5)
@@ -1046,10 +1046,10 @@ void CbmTrdQa::CreateLayerView()
       fLayerDummy->SetZTitle("found point hit pairs / all points [%]");
       fLayerDummy->DrawCopy();
     }
-    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizex(),
-				    fModuleInfo->GetY()-fModuleInfo->GetSizey(),
-				    fModuleInfo->GetX()+fModuleInfo->GetSizex(),
-				    fModuleInfo->GetY()+fModuleInfo->GetSizey());
+    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
     text->SetFillStyle(1001);
     text->SetLineColor(1);
     if (value >= 0 && value <= 12.5)

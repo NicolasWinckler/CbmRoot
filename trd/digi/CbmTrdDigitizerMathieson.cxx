@@ -657,13 +657,13 @@ void CbmTrdDigitizerMathieson::GetModuleInformationFromDigiPar( Int_t VolumeID)
 	mPara -> xPos = (Int_t)(10 * fModuleInfo->GetX());
 	mPara -> yPos = (Int_t)(10 * fModuleInfo->GetY());
 	mPara -> zPos = (Int_t)(10 * fModuleInfo->GetZ());
-	mPara -> ModuleSizeX = (fModuleInfo->GetSizex()) * 10. * 2;
-	mPara -> ModuleSizeY = (fModuleInfo->GetSizey()) * 10. * 2;
-	mPara -> nCol = fModuleInfo->GetnCol();
-	mPara -> nRow = fModuleInfo->GetnRow();
-	mPara -> NoSectors = fModuleInfo->GetNoSectors();
+	mPara -> ModuleSizeX = (fModuleInfo->GetSizeX()) * 10. * 2;
+	mPara -> ModuleSizeY = (fModuleInfo->GetSizeY()) * 10. * 2;
+	mPara -> nCol = fModuleInfo->GetNofColumns();
+	mPara -> nRow = fModuleInfo->GetNofRows();
+	mPara -> NoSectors = fModuleInfo->GetNofSectors();
 
-	const Int_t NoSectors = fModuleInfo->GetNoSectors();
+	const Int_t NoSectors = fModuleInfo->GetNofSectors();
 	mPara -> SectorSizeX.resize(NoSectors);
 	mPara -> SectorSizeY.resize(NoSectors);
 	mPara -> PadSizeX.resize(NoSectors);
@@ -672,23 +672,23 @@ void CbmTrdDigitizerMathieson::GetModuleInformationFromDigiPar( Int_t VolumeID)
 	mPara -> SecCol.resize(NoSectors);      
 
 	for (Int_t i = 0; i < NoSectors; i++) {
-	  mPara -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
-	  mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);
-	  mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
-	  mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
+	  mPara -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizeX(i);
+	  mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizeY(i);
+	  mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizeX(i);
+	  mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizeY(i);
 	}
 	if (mPara -> Layer%2 == 0) //un-rotate
 	  {
-	    mPara -> ModuleSizeX = (fModuleInfo->GetSizey()) * 10. * 2;
-	    mPara -> ModuleSizeY = (fModuleInfo->GetSizex()) * 10. * 2;
-	    mPara -> nCol = fModuleInfo->GetnRow();
-	    mPara -> nRow = fModuleInfo->GetnCol();
+	    mPara -> ModuleSizeX = (fModuleInfo->GetSizeY()) * 10. * 2;
+	    mPara -> ModuleSizeY = (fModuleInfo->GetSizeX()) * 10. * 2;
+	    mPara -> nCol = fModuleInfo->GetNofRows();
+	    mPara -> nRow = fModuleInfo->GetNofColumns();
 
 	    for (Int_t i = 0; i < NoSectors; i++) {
-	      mPara -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizey(i);
-	      mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizex(i);
-	      mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizey(i);
-	      mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizex(i);
+	      mPara -> SectorSizeX[i] = 10 * fModuleInfo->GetSectorSizeY(i);
+	      mPara -> SectorSizeY[i] = 10 * fModuleInfo->GetSectorSizeX(i);
+	      mPara -> PadSizeX[i]    = 10 * fModuleInfo->GetPadSizeY(i);
+	      mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizeX(i);
 	      averagePadSizeX += mPara -> PadSizeX[i];
 	      averagePadSizeY += mPara -> PadSizeY[i];
 	    }

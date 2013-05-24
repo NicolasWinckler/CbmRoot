@@ -6,7 +6,7 @@
 #include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
-#include "CbmTrdGeoHandler.h"
+#include "CbmTrdAddress.h"
 
 #include "CbmMCTrack.h"
 
@@ -21,12 +21,14 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 using std::cout;
 using std::endl;
 using std::pair;
 using std::make_pair;
 using std::map;
 using std::vector;
+using std::max;
 
 CbmTrdDigitizer::CbmTrdDigitizer(
       CbmTrdRadiator* radiator):
@@ -39,7 +41,6 @@ CbmTrdDigitizer::CbmTrdDigitizer(
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fRadiator(radiator),
-    fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap()
 {
 }
@@ -62,18 +63,16 @@ InitStatus CbmTrdDigitizer::Init()
    FairRootManager* ioman = FairRootManager::Instance();
 
    fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
-   Fatal("CbmTrdDigitizer::Init()", "No TrdPoint array!");
+   if (NULL == fTrdPoints) LOG(FATAL) << "CbmTrdDigitizer::Init(): No TrdPoint array!" << FairLogger::endl;
 
    fMCTracks = (TClonesArray*)ioman->GetObject("MCTrack");
-   Fatal("CbmTrdDigitizer::Init()", "No MCTrack array!");
+   if (NULL == fMCTracks) LOG(FATAL) << "CbmTrdDigitizer::Init(): No MCTrack array!" << FairLogger::endl;
 
    fTrdDigis = new TClonesArray("CbmTrdDigi", 100);
    ioman->Register("TrdDigi", "TRD Digis", fTrdDigis, kTRUE);
 
    fTrdDigiMatches = new TClonesArray("CbmTrdDigiMatch", 100);
    ioman->Register("TrdDigiMatch", "TRD Digis", fTrdDigiMatches, kTRUE);
-
-   fGeoHandler->Init();
 
    fRadiator->Init();
 
@@ -82,39 +81,36 @@ InitStatus CbmTrdDigitizer::Init()
 
 void CbmTrdDigitizer::Exec(Option_t * option)
 {
-   fDigiMap.clear();
    fTrdDigis->Clear();
    fTrdDigiMatches->Clear();
 
    Int_t nofTrdPoints = fTrdPoints->GetEntriesFast();
    for (Int_t iPoint = 0; iPoint < nofTrdPoints ; iPoint++ ) {
-      // If random value above fEfficency reject point
-      if (gRandom->Rndm() > fEfficiency ) continue;
-
+      if (gRandom->Rndm() > fEfficiency ) continue; // If random value above fEfficency reject point
       AddDigi(iPoint);
    }
 
    // Fill data from internally used stl map into output TClonesArray
-   Int_t iDigi=0;
-   map<pair< Int_t, pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator it;
+   Int_t iDigi = 0;
+   map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it;
    for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
-      CbmTrdDigi* digi = it->second;
-      new ((*fTrdDigis)[iDigi]) CbmTrdDigi(digi->GetDetId(), digi->GetCol(), digi->GetRow(), digi->GetCharge(), digi->GetTime());
-
-      CbmTrdDigiMatch* digiMatch = new ((*fTrdDigiMatches)[iDigi]) CbmTrdDigiMatch();
-
-      vector<Int_t> arr = digi->GetMCIndex();
-      vector<Int_t>::iterator itvec;
-      for (itvec = arr.begin() ; itvec <arr.end(); itvec++  ) {
-         Int_t bla = digiMatch->AddPoint((Int_t)*itvec);
-      }
+      CbmTrdDigi* digi = it->second.first;
+      new ((*fTrdDigis)[iDigi]) CbmTrdDigi(*digi);
+      CbmTrdDigiMatch* digiMatch = it->second.second;
+      new ((*fTrdDigiMatches)[iDigi]) CbmTrdDigiMatch(*digiMatch);
+      delete digi;
+      delete digiMatch;
       iDigi++;
    }
+   fDigiMap.clear();
+
+   static Int_t eventNo = 0;
+   LOG(INFO) << "CbmTrdDigitizer::Exec: eventNo=" << eventNo++ << ",  points="
+         << fTrdPoints->GetEntriesFast() << ", digis=" << fTrdDigis->GetEntriesFast() << FairLogger::endl;
 }
 
 void CbmTrdDigitizer::Finish()
 {
-
 
 }
 
@@ -132,30 +128,37 @@ void CbmTrdDigitizer::AddDigi(
 
    Bool_t isElectron = abs(mcTrack->GetPdgCode()) == 11;
    Double_t energyLoss = (isElectron) ? mcPoint->GetEnergyLoss() + fRadiator->GetTR(mom) :  mcPoint->GetEnergyLoss();
-   Int_t time = mcPoint->GetTime();
+   Double_t time = mcPoint->GetTime();
 
-   Int_t col, row, sector;
+   Int_t sectorId = 0, columnId = 0, rowId = 0;
    fModuleInfo = fDigiPar->GetModule(mcPoint->GetDetectorID());
-   fModuleInfo->GetPadInfo(mcPoint, col, row, sector);
-   Int_t detectorId = fGeoHandler->SetSector(mcPoint->GetDetectorID(), sector);
+   fModuleInfo->GetPadInfo(mcPoint, sectorId, columnId, rowId);
 
-  // Add digi for pixel(x,y) in module to map for intermediate storage.
-  // In case the pixel for this pixel/module combination does not exists it is added to the map.
-  // In case it exists already the information about another hit in this
-  // pixel is added. Also the additional energy loss is added to the pixel.
+   if (sectorId < 0 || columnId < 0 || rowId < 0) {
+      LOG(ERROR) << "CbmTrdDigitizer::AddDigi: Could not find local point in any of the sectors\n";
+      return;
+   }
 
-   // Look for pixel in charge map
-   pair<Int_t, pair<Int_t,Int_t> > b(detectorId, make_pair(col, row));
-   map<pair< Int_t, pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator it = fDigiMap.find(b);
+   // Form address which contains layerId, moduleId, sectorId, columnId and rowId.
+   // Address in the MC point contains only information about layerId and moduleId.
+   Int_t layerId = CbmTrdAddress::GetLayerId(mcPoint->GetDetectorID());
+   Int_t moduleId = CbmTrdAddress::GetModuleId(mcPoint->GetDetectorID());
+   Int_t address = CbmTrdAddress::GetAddress(layerId, moduleId, sectorId, rowId, columnId);
 
+   // Add digi with address "address" for intermediate storage.
+   // In case the digi for this address does not exists it is added to the map.
+   // In case it exists already the information about another MC point in this
+   // digi is added. Also the additional energy loss is added to the digi.
+
+   map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it = fDigiMap.find(address);
    if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-      fDigiMap[b] = new CbmTrdDigi(detectorId, col, row, energyLoss, time, pointId);
+      fDigiMap[address] = make_pair(new CbmTrdDigi(address, energyLoss, time), new CbmTrdDigiMatch(pointId));
    } else { // Pixel already in map -> Add charge
-      CbmTrdDigi* digi = (CbmTrdDigi*) it->second;
-      if (NULL == digi) Fatal("CbmTrdDigitizer::AddDigi", "Zero pointer in digi map!");
+      CbmTrdDigi* digi = it->second.first;
       digi->AddCharge(energyLoss);
-      digi->AddMCIndex(pointId);
-      if (time > (digi->GetTime())) digi->SetTime(time);
+      digi->SetTime(max(time, digi->GetTime()));
+      CbmTrdDigiMatch* digiMatch = it->second.second;
+      digiMatch->AddPoint(pointId);
    }
 }
 

@@ -26,8 +26,8 @@ CbmTrdPoint::CbmTrdPoint()
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmTrdPoint::CbmTrdPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
-			 TVector3 momIn, TVector3 posOut,  TVector3 momOut,
+CbmTrdPoint::CbmTrdPoint(Int_t trackID, Int_t detID, const TVector3& posIn,
+			 const TVector3& momIn, const TVector3& posOut,  const TVector3& momOut,
                          Double_t tof, Double_t length, Double_t eLoss)
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss),
   fX_out(posOut.X()),

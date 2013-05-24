@@ -285,7 +285,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     */
     d->rowId = digi->GetRow();
     d->colId = digi->GetCol();
-    d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
+    d->combiId = d->rowId * (fModuleInfo->GetNofColumns() + 1) + d->colId;
     /*
       }
     */
@@ -602,11 +602,11 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, Double_t qMax, MyH
   fModulePosition[0]/*xPos*/ = (Int_t)(10 * fModuleInfo->GetX());
   fModulePosition[1]/*yPos*/ = (Int_t)(10 * fModuleInfo->GetY());
   fModulePosition[3]/*zPos*/ = (Int_t)(10 * fModuleInfo->GetZ());
-  fnCol = fModuleInfo->GetnCol();
-  fnRow = fModuleInfo->GetnRow();
-  fNoSectors = fModuleInfo->GetNoSectors();
+  fnCol = fModuleInfo->GetNofColumns();
+  fnRow = fModuleInfo->GetNofRows();
+  fNoSectors = fModuleInfo->GetNofSectors();
   
-  const Int_t NoSectors = fModuleInfo->GetNoSectors();
+  const Int_t NoSectors = fModuleInfo->GetNofSectors();
   
   fSectorSizeX.resize(NoSectors);
   fSectorSizeY.resize(NoSectors);
@@ -625,10 +625,10 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, Double_t qMax, MyH
 	mPara -> SecRow[i]      = Int_t(mPara->SectorSizeY[i] / mPara->PadSizeY[i]);
 	mPara -> SecCol[i]      = Int_t(mPara->SectorSizeX[i] / mPara->PadSizeX[i]);
       */
-      fSectorSizeX[i] = 10 * fModuleInfo->GetSectorSizex(i);
-      fSectorSizeY[i] = 10 * fModuleInfo->GetSectorSizey(i);
-      fPadSizeX[i]    = 10 * fModuleInfo->GetPadSizex(i);
-      fPadSizeY[i]    = 10 * fModuleInfo->GetPadSizey(i);
+      fSectorSizeX[i] = 10 * fModuleInfo->GetSectorSizeX(i);
+      fSectorSizeY[i] = 10 * fModuleInfo->GetSectorSizeY(i);
+      fPadSizeX[i]    = 10 * fModuleInfo->GetPadSizeX(i);
+      fPadSizeY[i]    = 10 * fModuleInfo->GetPadSizeY(i);
       fSecRow[i]      = Int_t(fSectorSizeY[i] / fPadSizeY[i]);
       fSecCol[i]      = Int_t(fSectorSizeX[i] / fPadSizeX[i]);
       //printf("M(%.1f,%.1f) SS(%.1f,%.1f) N(%d,%d) S(%d,%d) PS(%.1f,%.1f)\n",ModuleSizeX,ModuleSizeY,SectorSizeX[i],SectorSizeY[i],nCol,nRow,SecCol[i],SecRow[i],PadSizeX[i],PadSizeY[i]);
@@ -1017,9 +1017,9 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax/*, Modul
   planeId=fGeoHandler->GetPlane(hit->moduleId);
   // if (hit within module) else printf()
  
-  if (hit->xPos/10. <= fModuleInfo->GetX()+fModuleInfo->GetSizex() && hit->xPos/10. >= fModuleInfo->GetX()-fModuleInfo->GetSizex()
+  if (hit->xPos/10. <= fModuleInfo->GetX()+fModuleInfo->GetSizeX() && hit->xPos/10. >= fModuleInfo->GetX()-fModuleInfo->GetSizeX()
       && 
-      hit->yPos/10. <= fModuleInfo->GetY()+fModuleInfo->GetSizey() && hit->yPos/10. >= fModuleInfo->GetY()-fModuleInfo->GetSizey())
+      hit->yPos/10. <= fModuleInfo->GetY()+fModuleInfo->GetSizeY() && hit->yPos/10. >= fModuleInfo->GetY()-fModuleInfo->GetSizeY())
        AddHit( qMaxIndex, hit->moduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
   else {
     fHitOutOfModuleCounter++;
@@ -1160,8 +1160,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  {
 	    MyHit* hit = new MyHit;
 	    fModuleInfo         = fDigiPar->GetModule(moduleId);
-	    hit -> nCol     = fModuleInfo->GetnCol();
-	    hit -> nRow     = fModuleInfo->GetnRow();
+	    hit -> nCol     = fModuleInfo->GetNofColumns();
+	    hit -> nRow     = fModuleInfo->GetNofRows();
 	    hit -> charge   = 0;//digi->GetCharge();
 	    hit -> digiId   = iPoint;
 	    hit -> moduleId = moduleId;
@@ -1178,8 +1178,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  {
 	    MyHit* hit = new MyHit;
 	    fModuleInfo     = fDigiPar->GetModule(moduleId);
-	    hit -> nCol     = fModuleInfo->GetnCol();
-	    hit -> nRow     = fModuleInfo->GetnRow();
+	    hit -> nCol     = fModuleInfo->GetNofColumns();
+	    hit -> nRow     = fModuleInfo->GetNofRows();
 	    hit -> xPos     = global_inC[0];//local_inC[0];
 	    hit -> yPos     = global_inC[1];//local_inC[1];
 	    hit -> charge   = 0;//digi->GetCharge();
@@ -1210,8 +1210,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 
 	MyHit* hit = new MyHit;
 	fModuleInfo     = fDigiPar->GetModule(moduleId);
-	hit -> nCol     = fModuleInfo->GetnCol();
-	hit -> nRow     = fModuleInfo->GetnRow();
+	hit -> nCol     = fModuleInfo->GetNofColumns();
+	hit -> nRow     = fModuleInfo->GetNofRows();
 	hit -> rowId    = digi->GetRow();
 	hit -> colId    = digi->GetCol();
 	hit -> charge   = digi->GetCharge();
@@ -1254,8 +1254,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 
 	    MyHit* hit = new MyHit;
 	    fModuleInfo     = fDigiPar->GetModule(moduleId);
-	    hit -> nCol     = fModuleInfo->GetnCol();
-	    hit -> nRow     = fModuleInfo->GetnRow();
+	    hit -> nCol     = fModuleInfo->GetNofColumns();
+	    hit -> nRow     = fModuleInfo->GetNofRows();
 	    hit -> rowId    = digi->GetRow();
 	    hit -> colId    = digi->GetCol();
 	    hit -> charge   = clusterId[moduleId];//digi->GetCharge();
@@ -1312,8 +1312,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  c->Divide(1,1);
 	  c->cd(1);
 	  fModuleInfo     = fDigiPar->GetModule((*it).first);
-	  Int_t mSizeX = fModuleInfo->GetnCol();
-	  Int_t mSizeY = fModuleInfo->GetnRow();
+	  Int_t mSizeX = fModuleInfo->GetNofColumns();
+	  Int_t mSizeY = fModuleInfo->GetNofRows();
 	  TH2F* Digi = new TH2F (title,name,mSizeX,0,mSizeX,mSizeY,0,mSizeY);
 	  Digi->SetXTitle("Pad column");
 	  Digi->SetYTitle("Pad row");
@@ -1383,8 +1383,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  c->Divide(1,1);
 	  c->cd(1);
 	  fModuleInfo     = fDigiPar->GetModule((*it).first);
-	  Int_t mSizeX = fModuleInfo->GetnCol();
-	  Int_t mSizeY = fModuleInfo->GetnRow();
+	  Int_t mSizeX = fModuleInfo->GetNofColumns();
+	  Int_t mSizeY = fModuleInfo->GetNofRows();
 	  TH2F* Cluster = new TH2F (title,name,mSizeX,0,mSizeX,mSizeY,0,mSizeY);
 	  Cluster->SetXTitle("Pad column");
 	  Cluster->SetYTitle("Pad row");
@@ -1453,8 +1453,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  c->cd(1);
       
 	  fModuleInfo     = fDigiPar->GetModule((*it).first);
-	  Float_t mSizeX  = (fModuleInfo->GetSizex()) * 2;
-	  Float_t mSizeY  = (fModuleInfo->GetSizey()) * 2;
+	  Float_t mSizeX  = (fModuleInfo->GetSizeX()) * 2;
+	  Float_t mSizeY  = (fModuleInfo->GetSizeY()) * 2;
 	  Float_t mPosX   = fModuleInfo->GetX();
 	  Float_t mPosY   = fModuleInfo->GetY();
       
@@ -1565,8 +1565,8 @@ void CbmTrdHitProducerCluster::DrawHits(Bool_t mean, Bool_t drawMCPoints, Bool_t
 	  c->cd(1);
       
 	  fModuleInfo     = fDigiPar->GetModule((*it).first);
-	  Float_t mSizeX  = (fModuleInfo->GetSizex()) * 2;
-	  Float_t mSizeY  = (fModuleInfo->GetSizey()) * 2;
+	  Float_t mSizeX  = (fModuleInfo->GetSizeX()) * 2;
+	  Float_t mSizeY  = (fModuleInfo->GetSizeY()) * 2;
 	  Float_t mPosX   = fModuleInfo->GetX();
 	  Float_t mPosY   = fModuleInfo->GetY();
 	  TProfile* Avatar = new TProfile (title,name,Int_t(mSizeX*10),0,Int_t(mSizeX),0,Int_t(mSizeY));
@@ -1672,14 +1672,14 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   Int_t Station = fGeoHandler->GetStation(moduleId);
   Int_t Layer   = fGeoHandler->GetLayer(moduleId);
   fModuleInfo = fDigiPar->GetModule(moduleId);
-  Int_t NoSectors = fModuleInfo->GetNoSectors();
+  Int_t NoSectors = fModuleInfo->GetNofSectors();
   Float_t pSizeLong = 0;
   for (Int_t iSec = 0; iSec < NoSectors; iSec++) {
     if (Layer%2 == 0) {
-      pSizeLong += (fModuleInfo->GetPadSizex(iSec)) * 10;
+      pSizeLong += (fModuleInfo->GetPadSizeX(iSec)) * 10;
     }
     else {
-      pSizeLong += (fModuleInfo->GetPadSizey(iSec)) * 10;
+      pSizeLong += (fModuleInfo->GetPadSizeY(iSec)) * 10;
     }
   }
   pSizeLong /= NoSectors;

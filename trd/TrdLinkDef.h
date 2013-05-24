@@ -18,11 +18,11 @@
 #pragma link C++ class  CbmTrdTrackFitterIdeal+;
 #pragma link C++ class  CbmGeoTrd+;
 #pragma link C++ class  CbmGeoTrdPar;
-#pragma link C++ class  CbmTrdDigitizerMathieson;
-#pragma link C++ class  CbmTrdDigitizerPRF;
-#pragma link C++ class  CbmTrdHitRateQa;
-#pragma link C++ class  CbmTrdHitDensityQa;
-#pragma link C++ class  CbmTrdOccupancyQa;
+//#pragma link C++ class  CbmTrdDigitizerMathieson;
+//#pragma link C++ class  CbmTrdDigitizerPRF;
+//#pragma link C++ class  CbmTrdHitRateQa;
+//#pragma link C++ class  CbmTrdHitDensityQa;
+//#pragma link C++ class  CbmTrdOccupancyQa;
 #pragma link C++ class  CbmTrdDigitizerPRFQa;
 #pragma link C++ class  CbmTrdClusterizerFastQa;
 #pragma link C++ class  CbmTrdHitProducerClusterQa;
@@ -43,13 +43,13 @@
 #pragma link C++ class  CbmTrdHitProducerDigi+;
 //#pragma link C++ class  CbmTrdDetectorId+;
 #pragma link C++ class CbmTrdElectronsTrainAnn+;
-#pragma link C++ class CbmTrdClusterFinder+;
-#pragma link C++ class CbmTrdClusterFinderFast+;
-#pragma link C++ class CbmTrdSimpleHitProducerCluster+;
-#pragma link C++ class CbmTrdHitProducerCluster+;
+//#pragma link C++ class CbmTrdClusterFinder+;
+//#pragma link C++ class CbmTrdClusterFinderFast+;
+//#pragma link C++ class CbmTrdSimpleHitProducerCluster+;
+//#pragma link C++ class CbmTrdHitProducerCluster+;
 #pragma link C++ class CbmTrdGeoHandler+;
 //#pragma link C++ class CbmTrdDigiWriteoutBuffer+;
 //#pragma link C++ class CbmTrdDigiRingSorter+;
 //#pragma link C++ class CbmTrdDigiSorterTask+;
-#pragma link C++ class CbmTrdQa+;
+//#pragma link C++ class CbmTrdQa+;
 #endif

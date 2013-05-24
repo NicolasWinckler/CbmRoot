@@ -132,7 +132,7 @@ class CbmTrdRadiator
 
   /* Input parameters to be set */
   TString   fRadType;
-  Int_t     fDetType;     // 0: GSI  1: Muenster-Bucarest 
+  Int_t     fDetType;     // 0: GSI  1: Muenster-Bucarest
   Bool_t    fFirstPass;   // used for MB-Chamber with two gas gaps
   Bool_t    fSimpleTR;    // mode of the TR production
   Int_t     fNFoils;      // Number of foils in the radiator stack

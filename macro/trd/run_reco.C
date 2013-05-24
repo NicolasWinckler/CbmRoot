@@ -1,22 +1,32 @@
 // --------------------------------------------------------------------------
 //
-// Macro for testing the trd digitizer and hit producer
+// Macro for reconstruction of simulated events with standard settings
 //
-// F. Uhlig    02/06/2010
-// Version     02/06/2010 (F. Uhlig)
+// HitProducers in MVD, RICH, TRD, TOF, ECAL
+// Digitizer and HitFinder in STS
+// FAST MC for ECAL
+// STS track finding and fitting (L1 / KF)
+// TRD track finding and fitting (L1 / KF)
+// RICH ring finding (ideal) and fitting
+// Global track finding (ideal), rich assignment
+// Primary vertex finding (ideal)
+// Matching of reconstructed and MC tracks in STS, RICH and TRD
+//
+// V. Friese   24/02/2006
+// Version     24/04/2007 (V. Friese)
 //
 // --------------------------------------------------------------------------
 
-/// extra Doxygen comment 10/11/2011 by DE
 
-void run_reco(Int_t nEvents = 1)
+void run_reco(Int_t nEvents = 1) 
 {
+
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");
-  gStyle->SetPadTickX(1);                        
-  gStyle->SetPadTickY(1);  
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
   // ========================================================================
-  // geometry selection for sim + reco  by Cyrano
+  // geometry selection for sim + reco  by Cyrano                            
   // ========================================================================
   ifstream whichTrdGeo;
   whichTrdGeo.open("whichTrdGeo",ios::in);
@@ -41,34 +51,36 @@ void run_reco(Int_t nEvents = 1)
   TString parFile = "data/params.root";
 
   // Output file
-  TString outFile = "data/test.esd.root";
+  TString outFile = "data/test.eds.root";
 
   //  Digitisation files.
-  // The sts digi file is not needed. The code is only here to
-  // show how one can load more than one digi file.
+  // Add TObjectString containing the different file names to
+  // a TList which is passed as input to the FairParAsciiFileIo.
+  // The FairParAsciiFileIo will take care to create on the fly 
+  // a concatenated input parameter file which is then used during
+  // the reconstruction.
   TList *parFileList = new TList();
 
-  TString paramDir = gSystem->Getenv("VMCWORKDIR");
-  paramDir += "/parameters";
+  TString workDir = gSystem->Getenv("VMCWORKDIR");
+  TString paramDir = workDir + "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v09a.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  //  TObjString trdDigiFile =  paramDir + "/trd/trd_v10b.digi.par";
+  //  TObjString trdDigiFile =  paramDir + "/trd/trd_v13o.digi.par";
   //  parFileList->Add(&trdDigiFile);
 
   TObjString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
   parFileList->Add(&trdDigiFile);
 
+
   // In general, the following parts need not be touched
   // ========================================================================
 
 
- 
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
-
 
 
   // -----   Timer   --------------------------------------------------------
@@ -76,35 +88,8 @@ void run_reco(Int_t nEvents = 1)
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-
-  // ----  Load libraries   -------------------------------------------------
- gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrackparallel");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libL1");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
-  // ------------------------------------------------------------------------
-
   // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *run= new FairRunAna();
+  FairRunAna *run = new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
@@ -114,44 +99,36 @@ void run_reco(Int_t nEvents = 1)
   // =========================================================================
 
   // Update of the values for the radiator F.U. 17.08.07
-  Int_t   trdNFoils = 130;       // number of polyetylene foils
-  Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-  Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-  Bool_t  simpleTR  = kTRUE;     // use fast and simple version for TR
-                                 // production
+  Int_t   trdNFoils = 130;    // number of polyethylene foils
+  Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
+  Float_t trdDGap   = 0.02;   // thickness of gap between foils [cm]
+  Bool_t  simpleTR  = kTRUE;  // use fast and simple version for TR production
 
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
-  // -----   TRD hit producer   ----------------------------------------------
-  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-  // Resolutions in y - station and angle dependent [mum]
-  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
-
-// from marco/run to keep reco alive - 20130514
   CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
   run->AddTask(trdHitProd);
 
-//// fails in Rev 19311 - 20130514
-//  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",
-//                                                  "TRD task", radiator);
-//  run->AddTask(trdDigitizer);
-//
-//
-//  CbmTrdHitProducerDigi* trdHitProd =
-//                   new CbmTrdHitProducerDigi("TRD Hit Producer","TRD task");
-//
-//  run->AddTask(trdHitProd);
+  //  // -----   TRD hit producer   ----------------------------------------------
+  //  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+  //  // Resolutions in y - station and angle dependent [mum]                     
+  //  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+  //  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+  //  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+  //// fails in Rev 19311 - 20130514                                             
+  //  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",       
+  //                                                  "TRD task", radiator);     
+  //  run->AddTask(trdDigitizer);                                                
+  //                                                                             
+  //                                                                             
+  //  CbmTrdHitProducerDigi* trdHitProd =                                        
+  //                   new CbmTrdHitProducerDigi("TRD Hit Producer","TRD task"); 
+  //                                                                             
+  //  run->AddTask(trdHitProd);                                                  
 
-/*
-  CbmTrdHitProducerQa* trdHitProdQa =
-                   new CbmTrdHitProducerQa("TRD Hit Producer Qa","TRD task");
-
-  run->AddTask(trdHitProdQa);
-*/  
   // -------------------------------------------------------------------------
-
+  // ===                 End of TRD local reconstruction                   ===
+  // =========================================================================
 
 
   // -----  Parameter database   --------------------------------------------
@@ -159,22 +136,19 @@ void run_reco(Int_t nEvents = 1)
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
-  parIo2->open(parFileList,"in");
+  parIo2->open(parFileList, "in");
   rtdb->setFirstInput(parIo1);
   rtdb->setSecondInput(parIo2);
-  //  rtdb->setOutput(parIo1);
-  //  rtdb->saveOutput();
+  rtdb->setOutput(parIo1);
+  rtdb->saveOutput();
   // ------------------------------------------------------------------------
 
 
-     
   // -----   Intialise and run   --------------------------------------------
   run->Init();
   cout << "Starting run" << endl;
-  run->Run(0,nEvents);
+  run->Run(0, nEvents);
   // ------------------------------------------------------------------------
-
-
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
@@ -182,11 +156,13 @@ void run_reco(Int_t nEvents = 1)
   Double_t ctime = timer.CpuTime();
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
-  cout << "Output file is "    << outFile << endl;
+  cout << "Output file is " << outFile << endl;
   cout << "Parameter file is " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------
+
+//  delete run;
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;

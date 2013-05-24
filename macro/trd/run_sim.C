@@ -11,7 +11,7 @@ void run_sim(Int_t nEvents = 1)
 {
 
   // ========================================================================
-  // geometry selection for sim + reco  by Cyrano
+  // geometry selection for sim + reco  by Cyrano                            
   // ========================================================================
   ifstream whichTrdGeo;
   whichTrdGeo.open("whichTrdGeo",ios::in);
@@ -38,24 +38,18 @@ void run_sim(Int_t nEvents = 1)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "passive/magnet_v09e.geo";
+  TString magnetGeom = "passive/magnet_v12a.geo";
   TString mvdGeom    = "mvd/mvd_v07a.geo";
-  TString stsGeom    = "sts/sts_v11a.geo";
+  TString stsGeom    = "sts/sts_v12b.geo.root";
   TString richGeom   = "rich/rich_v08a.geo";
-  //  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
-  //  TString trdGeom    = "trd/trd_v10b.geo";
-  //  TString trdGeom    = "trd/trd_v10b.geo";
-  //  TString trdGeom    = "trd/TRD_geom_v12b.root";
-  //  TString trdGeom    = "trd/trd_v13a.root";
-  //  TString trdGeom    = "trd/" + digipar + ".geo";
-  //  TString trdGeom    = "trd/" + digipar + ".root";
+  //  TString trdGeom    = "trd/trd_v13o.root";
   TString trdGeom    = "trd/" + selectGeo;
-
-  TString tofGeom = "";
-  //  TString ecalGeom   = "ecal/ecal_v08a.geo";
- 
+  TString tofGeom    = "tof/tof_v13b.root";
+  TString ecalGeom   = "";
+//  TString ecalGeom   = "ecal/ecal_v08a.geo";
+  
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_v10e";    // name of field map
+  TString fieldMap    = "field_v12a";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   
@@ -76,31 +70,6 @@ void run_sim(Int_t nEvents = 1)
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libEcal");
-  gSystem->Load("libKF");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libLittrackparallel");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  // -----------------------------------------------------------------------
-
- 
- 
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -169,13 +138,15 @@ void run_sim(Int_t nEvents = 1)
     tof->SetGeometryFileName(tofGeom);
     fRun->AddModule(tof);
   }
-  /*
-    if ( ecalGeom != "" ) {
+  
+  if ( ecalGeom != "" ) {
     FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
-    }
-  */
+  }
+  
   // ------------------------------------------------------------------------
+
+
 
   // -----   Create magnetic field   ----------------------------------------
   CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
@@ -184,33 +155,46 @@ void run_sim(Int_t nEvents = 1)
   fRun->SetField(magField);
   // ------------------------------------------------------------------------
 
+  // Use theexperiment specific MC Event header instead of the default one
+  // This one stores additional information about the reaction plane
+  CbmMCEventHeader* mcHeader = new CbmMCEventHeader();
+  fRun->SetMCEventHeader(mcHeader);
 
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+  // Use the CbmUrqmdGenrator which calculates a reaction plane and
+  // rotate all particles accordingly
+  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  urqmdGen->SetEventPlane(0. , 360.);
   primGen->AddGenerator(urqmdGen);
   fRun->SetGenerator(primGen);       
   // ------------------------------------------------------------------------
 
+ 
   // -Trajectories Visualization (TGeoManager Only )
+  // Switch this on if you want to visualize tracks in the
+  // eventdisplay.
+  // This is normally switch off, because of the huge files created
+  // when it is switched on. 
   fRun->SetStoreTraj(kTRUE);
 
- 
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
   // ------------------------------------------------------------------------
+  
+  // Set cuts for storing the trajectories.
+  // Switch this on only if trajectories are stored.
+  // Choose this cuts according to your needs, but be aware
+  // that the file size of the output file depends on these cuts
 
-  // Set cuts for storing the trajectpries
-  FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-  trajFilter->SetStepSizeCut(0.01); // 1 cm
-  trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
-  trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
-  trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
-  trajFilter->SetStorePrimaries(kTRUE);
-  trajFilter->SetStoreSecondaries(kTRUE);
-   
-  
-  
+   FairTrajFilter* trajFilter = FairTrajFilter::Instance();
+   trajFilter->SetStepSizeCut(0.01); // 1 cm
+   trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
+   trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
+   trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
+   trajFilter->SetStorePrimaries(kTRUE);
+   trajFilter->SetStoreSecondaries(kTRUE);
+
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
   fieldPar->SetParameters(magField);
@@ -228,6 +212,7 @@ void run_sim(Int_t nEvents = 1)
   // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
+  fRun->CreateGeometryFile("data/geofile_full.root");
 
 
   // -----   Finish   -------------------------------------------------------

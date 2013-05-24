@@ -15,7 +15,9 @@
 #include "TGeoMatrix.h"
 
 #include <string>
+#include <cstdlib>
 using std::string;
+using std::atoi;
 
 CbmTrdGeoHandler::CbmTrdGeoHandler() 
   : TObject(),

@@ -44,7 +44,8 @@ void run_sim(Int_t nEvents = 1)
   TString richGeom   = "rich/rich_v08a.geo";
   //  TString trdGeom    = "trd/trd_v13o.root";
   TString trdGeom    = "trd/" + selectGeo;
-  TString tofGeom    = "tof/tof_v13b.root";
+  //  TString tofGeom    = "tof/tof_v13b.root";
+  TString tofGeom    = "";
   TString ecalGeom   = "";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   

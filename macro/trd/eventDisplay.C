@@ -1,115 +1,57 @@
-eventDisplay(TString inputFriend = "data/test.esd.root")
+eventDisplay()
 {
 
   // ========================================================================
-  // geometry selection for sim + reco  by Cyrano
+  // geometry selection for sim + reco  by Cyrano                            
   // ========================================================================
   ifstream whichTrdGeo;
   whichTrdGeo.open("whichTrdGeo",ios::in);
   TString selectGeo;
   if (whichTrdGeo) whichTrdGeo >> selectGeo;
   TString digipar = selectGeo(0,8);
-  cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/which\
-TrdGeo file)" << endl;
+  cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_standard";
 
-   // Load basic libraries
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  //  gSystem->Load("libSts");
-  //gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libEve");
-  /*
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libEve");
-  */
-  gSystem->Load("libEventDisplay");
-  gSystem->Load("libCbmDisplay");
+  TString  InputFile     ="data/test.mc.root";
+  TString  ParFile       ="data/params.root";
 
-                                     
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile("data/test.mc.root");
-  fRun->AddFriend(inputFriend);
-  
+
+  fRun->SetInputFile(InputFile.Data());
   fRun->SetOutputFile("data/test.root");
 
-  // -----  Parameter database   --------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-
-  FairParRootFileIo* parIo1 = new FairParRootFileIo();
-  parIo1->open("data/params.root");
-  rtdb->setFirstInput(parIo1);
+  FairParRootFileIo* parInput1 = new FairParRootFileIo();
+  parInput1->open(ParFile.Data());
+  rtdb->setFirstInput(parInput1);
 
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters";
   TString trdDigiFile = paramDir + "/trd/" + digipar + ".digi.par";
 
-  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+  FairParAsciiFileIo* parInput2 = new FairParAsciiFileIo();
   cout << "-I- CbmTrdDigiPar: Using file " << trdDigiFile << endl;
-  parIo2->open(trdDigiFile, "in");
-  rtdb->setSecondInput(parIo2);
+  parInput2->open(trdDigiFile, "in");
+  rtdb->setSecondInput(parInput2);
   // ------------------------------------------------------------------------
 
-  FairEventManager   *fMan      = new FairEventManager   ();
+  FairEventManager *fMan= new FairEventManager();
   FairMCTracks       *Track     = new FairMCTracks       ("Monte-Carlo Tracks");
   FairMCPointDraw    *TrdPoints = new FairMCPointDraw    ("TrdPoint",kBlue , kFullSquare);
   CbmPixelHitSetDraw *TrdHits   = new CbmPixelHitSetDraw ("TrdHit"  ,kRed  , kFullSquare);
-  CbmTrdDigiDraw     *TrdDigis  = new CbmTrdDigiDraw     ("TrdDigi" ,kGreen, kFullSquare);
+  //  CbmTrdDigiDraw     *TrdDigis  = new CbmTrdDigiDraw     ("TrdDigi" ,kGreen, kFullSquare);
 
-  // ugly version to switch of the drawing of digis in layers which are not visible
-  // in the eventdisplay.
-  // This works only for the digis. For the points a class from FairRoot is used which
-  // is generic and does not know about the specific detector.
-  // TODO: check for each digi if the volume it is inside is visible or not. If not
-  // don't add the digi to the list of digis to be drawn. Check if it is possible to
-  // get the required information from the gGeomanager and the eventdisplay. With the
-  // geomanager it is possible to get the volume the digi/hit/point is in. From the
-  // eventdisplay one can get hopefully the information if a volume is visible.
-  /*
-  TrdDigis->SetLayerStation1(kTRUE,kFALSE,kFALSE,kFALSE);
-  TrdDigis->SetLayerStation2(kTRUE,kFALSE,kFALSE,kFALSE);
-  TrdDigis->SetLayerStation3(kTRUE,kFALSE,kFALSE,kFALSE);
-  */    
-    
-  TrdDigis->SetLayerStation1(kTRUE,kTRUE,kTRUE,kTRUE);
-  TrdDigis->SetLayerStation2(kTRUE,kTRUE,kTRUE,kTRUE);
-  TrdDigis->SetLayerStation3(kTRUE,kTRUE,kTRUE,kTRUE);
-                                                     
+  //  TrdDigis->SetLayerStation1(kTRUE,kTRUE,kTRUE,kTRUE);
+  //  TrdDigis->SetLayerStation2(kTRUE,kTRUE,kTRUE,kTRUE);
+  //  TrdDigis->SetLayerStation3(kTRUE,kTRUE,kTRUE,kTRUE);
+
   fMan->AddTask(Track);
   fMan->AddTask(TrdPoints);
   fMan->AddTask(TrdHits);
-  fMan->AddTask(TrdDigis);
-    
-  fMan->Init();                    
+  //  fMan->AddTask(TrdDigis);
 
-  // Automatic visible depth is disabled
-  //  gGeoManager->SetVisLevel(3);
+  fMan->Init(1,4,10000);  
 }

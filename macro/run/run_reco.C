@@ -49,7 +49,7 @@ void run_reco(Int_t nEvents = 2) {
   TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  TObjString trdDigiFile =  paramDir + "/trd/trd_v13c.digi.par";
+  TObjString trdDigiFile =  paramDir + "/trd/trd_v13o.digi.par";
   parFileList->Add(&trdDigiFile);
 
   TObjString tofDigiFile =  paramDir + "/tof/tof_v13b.digi.par";
@@ -250,7 +250,7 @@ void run_reco(Int_t nEvents = 2) {
 
 
   // -----   TRD track matching   --------------------------------------------
-  CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
+  CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
   run->AddTask(trdMatchTracks);
   // ----------------------------------------------------
 

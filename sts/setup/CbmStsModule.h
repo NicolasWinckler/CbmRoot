@@ -56,7 +56,7 @@ class CbmStsModule : public TNamed
 
     /** Add an analogue signal to the buffer
      *
-     * @param sensorChannel  channel number within sensor
+     * @param channel        channel number
      * @param time           time of signal [ns]
      * @param charge         analogue charge [e]
      *
@@ -64,8 +64,7 @@ class CbmStsModule : public TNamed
      * previous signals within the same channels is checked and the
      * proper action is executed.
      */
-    void AddSignal(CbmStsSenzor* sensor, Int_t side, Int_t strip,
-                   Double_t time, Double_t charge);
+    void AddSignal(Int_t channel, Double_t time, Double_t charge);
 
 
   private:

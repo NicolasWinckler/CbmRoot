@@ -8,8 +8,9 @@
 #include "TGeoPhysicalNode.h"
 #include "CbmStsPoint.h"
 #include "CbmStsSenzor.h"
-#include "CbmStsSensorPoint.h"
-#include "CbmStsSensorType.h"
+#include "setup/CbmStsAddress.h"
+#include "setup/CbmStsSensorPoint.h"
+#include "setup/CbmStsSensorType.h"
 
 
 // -----   Constructor   ---------------------------------------------------
@@ -23,14 +24,6 @@ CbmStsSenzor::CbmStsSenzor()
 }
 // -------------------------------------------------------------------------
 
-
-
-// -----   Sensor number within module   -----------------------------------
-Int_t CbmStsSenzor::GetSensorNumber() const {
-  //TODO: Implementation
-  return 0;
-}
-// -------------------------------------------------------------------------
 
 
 
@@ -66,6 +59,13 @@ void CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
 
 }
 // -------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 
 

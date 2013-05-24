@@ -13,6 +13,8 @@
 #include "TGeoPhysicalNode.h"
 #include "TNamed.h"
 
+#include "CbmStsAddress.h"
+
 
 class CbmStsModule;
 class CbmStsPoint;
@@ -41,12 +43,18 @@ class CbmStsSenzor : public TNamed
     virtual ~CbmStsSenzor() { };
 
 
+    /** Get sensor address  **/
+    UInt_t GetAddress() const { return fAddress; }
+
+
     /** Get mother module **/
     CbmStsModule* GetModule() const { return fModule; }
 
 
-    /** Sensor number within module (from top to bottom) **/
-    Int_t GetSensorNumber() const;
+    /** Get the sensor Id within the module  **/
+    Int_t GetSensorId() const {
+      return CbmStsAddress::GetElementId(fAddress, kStsSensor);
+    }
 
 
     /** Pointer to sensor type **/
@@ -61,18 +69,30 @@ class CbmStsSenzor : public TNamed
     void ProcessPoint(CbmStsPoint* point) const;
 
 
+    /** Set the sensor address
+     ** @param address  Sensor address
+     **/
+    void SetAddress(UInt_t address) { fAddress = address; }
+
+
+    /** Set a pointer to the mother module
+     ** @param  module   Pointer to mother module
+     **/
+    void SetModule(CbmStsModule* module) { fModule = module; }
+
+
   private:
 
-    Int_t fAddress;             ///< Unique identifier
+    UInt_t fAddress;            ///< Unique identifier
     TGeoPhysicalNode*  fNode;   ///< Pointer to node in the geometry
     CbmStsSensorType* fType;    ///< Pointer to sensor type
     CbmStsModule* fModule;      ///< Pointer to mother module
 
 
-  CbmStsSenzor(const CbmStsSenzor&);
-  CbmStsSenzor& operator=(const CbmStsSenzor&);
+    CbmStsSenzor(const CbmStsSenzor&);
+    CbmStsSenzor& operator=(const CbmStsSenzor&);
 
-  ClassDef(CbmStsSenzor,1);
+    ClassDef(CbmStsSenzor,1);
 
 };
 

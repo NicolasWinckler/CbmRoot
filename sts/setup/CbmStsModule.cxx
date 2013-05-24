@@ -5,6 +5,7 @@
 
 
 #include "FairLogger.h"
+#include "setup/CbmStsAddress.h"
 #include "setup/CbmStsModule.h"
 #include "setup/CbmStsSensorType.h"
 
@@ -42,14 +43,24 @@ void CbmStsModule::AddSensor(CbmStsSenzor* sensor) {
     }
   }
 
+  // Add sensor to the array
+  fSensors.push_back(sensor);
 
+  // Set sensor address and pointer to module
+  Int_t sensorId = fSensors.size() - 1;
+  UInt_t address = CbmStsAddress::SetElementId(fAddress, kStsSensor,
+                                               sensorId);
+  sensor->SetAddress(address);
+  sensor->SetModule(this);
 
+  return;
 }
+// -------------------------------------------------------------------------
 
 
 // -----   Add a signal to the buffer   ------------------------------------
-void CbmStsModule::AddSignal(CbmStsSenzor* sensor, Int_t side, Int_t strip,
-                             Double_t time, Double_t charge) {
+void CbmStsModule::AddSignal(Int_t channel, Double_t time,
+                             Double_t charge) {
 
 
 

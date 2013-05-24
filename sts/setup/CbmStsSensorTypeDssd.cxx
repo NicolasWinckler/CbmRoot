@@ -3,21 +3,26 @@
  ** @date 02.05.2013
  **/
 
+#include <iomanip>
 
 #include "TMath.h"
 
 #include "FairLogger.h"
 
-#include "CbmStsSensorPoint.h"
-#include "CbmStsSensorTypeDssd.h"
+#include "setup/CbmStsAddress.h"
+#include "setup/CbmStsModule.h"
+#include "setup/CbmStsSenzor.h"
+#include "setup/CbmStsSensorPoint.h"
+#include "setup/CbmStsSensorTypeDssd.h"
 
-#include <iomanip>
 
 using namespace std;
 
 
 // --- Energy for creation of an electron-hole pair in silicon [GeV]  ------
 const double kPairEnergy = 3.6e-9;
+
+
 
 // -----   Constructor   ---------------------------------------------------
 CbmStsSensorTypeDssd::CbmStsSensorTypeDssd()
@@ -31,21 +36,84 @@ CbmStsSensorTypeDssd::CbmStsSensorTypeDssd()
 
 
 
+// -----   Get channel number in module   ----------------------------------
+Int_t CbmStsSensorTypeDssd::GetModuleChannel(Int_t strip, Int_t side,
+                                             Int_t sensorId) const {
+
+  // --- Check side
+  if ( side < 0 || side > 1 ) {
+    LOG(ERROR) << "Illegal side qualifier " << side << FairLogger::endl;
+    return -1;
+  }
+
+  // --- Account for offset due to stereo angle
+  Int_t channel = strip - sensorId * fStripShift[side];
+
+  // --- Account for horizontal cross-connection of strips
+  while ( channel < 0 ) channel += fNofStrips[side];
+  while ( channel >= fNofStrips[side] ) channel -= fNofStrips[side];
+
+  // --- Account for front or back side
+  if ( side ) channel += fNofStrips[0];
+
+  return channel;
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Get strip and side from channel number   ------------------------
+void CbmStsSensorTypeDssd::GetStrip(Int_t channel, Int_t sensorId,
+                                    Int_t& strip, Int_t& side) {
+
+  Int_t stripNr = -1;
+  Int_t sideNr  = -1;
+
+
+  // --- Determine front or back side
+  if ( channel < fNofStrips[0] ) {          // front side
+    sideNr = 0;
+    stripNr = channel;
+  }
+  else {
+    sideNr = 1;
+    stripNr = channel - fNofStrips[0];      // back side
+  }
+  side = sideNr;
+
+  // --- Offset due to stereo angle
+  stripNr += sensorId * fStripShift[side];
+
+  // --- Horizontal cross-connection
+  while ( stripNr < 0 ) stripNr += fNofStrips[side];
+  while ( stripNr >= fNofStrips[side] ) stripNr -= fNofStrips[side];
+
+  strip = stripNr;
+  return;
+}
+// -------------------------------------------------------------------------
+
+
+
+
 // -----   Print parameters   ----------------------------------------------
 void CbmStsSensorTypeDssd::Print(Option_t* opt) const {
 
   LOG(INFO) << "Properties of sensor type " << GetName() << ": "
             << FairLogger::endl
             << "\t  Dimensions: (" << fixed << setprecision(4)
-            << fDx << ", " << fDy << ", " << fDz
-            << ") cm" << FairLogger::endl
-            << setprecision(0)
-            << "\t  Front side: pitch = " << fPitch[0]*1.e4 << " mum, "
+            << fDx << ", " << fDy << ", " << fDz << ") cm"
+            << FairLogger::endl
+            << "\t  Front side: pitch = "
+            << setprecision(0) << fPitch[0]*1.e4 << " mum, "
             << fNofStrips[0] << " strips, stereo angle "
-            << fStereo[0] << " degrees" << FairLogger::endl
-            << "\t  Back side:  pitch = " << fPitch[1]*1.e4 << " mum, "
+            << setprecision(1) << fStereo[0] << " degrees"
+            << FairLogger::endl
+            << "\t  Back side:  pitch = "
+            << setprecision(0) << fPitch[1]*1.e4 << " mum, "
             << fNofStrips[1] << " strips, stereo angle "
-            << fStereo[1] << " degrees" << FairLogger::endl;
+            << setprecision(1) << fStereo[1] << " degrees"
+            << FairLogger::endl;
 
 }
 // -------------------------------------------------------------------------
@@ -55,6 +123,13 @@ void CbmStsSensorTypeDssd::Print(Option_t* opt) const {
 // -----   Process an MC Point  --------------------------------------------
 void CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point,
                                         const CbmStsSenzor* sensor) const {
+
+  // --- Catch if parameters are not set
+  if ( ! fIsSet ) {
+    LOG(FATAL) << fName << ": parameters are not set!"
+               << FairLogger::endl;
+    return;
+  }
 
   ProduceCharge(point, 0, sensor);
   ProduceCharge(point, 1, sensor);
@@ -103,13 +178,6 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
   Int_t i2 = TMath::FloorNint( x2 / pitch );
 
 
-  // --- If everything is in but one strip: register entire charge
-  if ( i1 == i2 ) {
-    RegisterCharge(sensor, side, i1, qtot, point->GetTime());
-    return;
-  }
-
-
   // --- More than one strip: sort strips
   if ( i1 > i2 ) {
     Int_t tempI = i1;
@@ -125,18 +193,12 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
   for (Int_t iStrip = i1; iStrip <= i2; iStrip++) {
 
     // --- Calculate charge in strip
-    Double_t d = pitch;    // Width of strip covered by trajectory
-    if ( iStrip == i1 ) d = Double_t(i1+1) * pitch - x1;
-    else if ( iStrip == i2 ) d = x2 - Double_t(i2) * pitch;
-    Double_t charge = d * qtot / ( x2 - x1 );
-
-    // --- Account for cross-connection (double metal)
-    Int_t jStrip = iStrip;
-    if      ( jStrip < 0 ) jStrip += nStrips;
-    else if ( jStrip >= nStrips ) jStrip -= nStrips;
+    Double_t y1 = TMath::Max(x1, Double_t(iStrip) * pitch);  // start in strip
+    Double_t y2 = TMath::Min(x2, Double_t(iStrip+1) * pitch); // stop in strip
+    Double_t charge = (y2 - y1) * qtot / ( x2 - x1 );
 
     // --- Register charge to module
-    RegisterCharge(sensor, side, jStrip, charge, point->GetTime());
+    RegisterCharge(sensor, side, iStrip, charge, point->GetTime());
 
   } // Loop over fired strips
 
@@ -151,14 +213,45 @@ void CbmStsSensorTypeDssd::RegisterCharge(const CbmStsSenzor* sensor,
                                           Double_t charge,
                                           Double_t time) const {
 
-  // Dummy implementation for the time being
-  // TODO: Deliver charge to corresponding module.
+  // --- Determine module channel for given sensor strip
+  Int_t channel = GetModuleChannel(strip, side, sensor->GetSensorId() );
+
+  // --- Send signal to module
+  sensor->GetModule()->AddSignal(channel, time, charge);
+
+  // --- Debug output
+  LOG(DEBUG3) << fName << ": Registering charge: side " << side
+              << ", strip " << strip << ", time " << time
+              << ", charge " << charge << FairLogger::endl;
+
+}
+// -------------------------------------------------------------------------
 
 
-  LOG(INFO) << "Registering charge: side " << side << ", strip " << strip
-            << ", charge " << charge << ", time " << time
-            << FairLogger::endl;
 
+// -----   Self test   -----------------------------------------------------
+Bool_t CbmStsSensorTypeDssd::SelfTest() {
+
+  for (Int_t sensorId = 0; sensorId < 3; sensorId++ ) {
+    for (Int_t side = 0; side < 2; side ++ ) {
+      for (Int_t strip = 0; strip < fNofStrips[side]; strip++ ) {
+        Int_t channel = GetModuleChannel(strip, side, sensorId);
+        Int_t testStrip, testSide;
+        GetStrip(channel, sensorId, testStrip, testSide);
+        if ( testStrip != strip || testSide != side ) {
+          LOG(ERROR) << fName << "Self test failed! Sensor " << sensorId
+                     << " side " << side << " strip " << strip
+                     << " gives channel " << channel << " gives strip "
+                     << testStrip << " side " << testSide
+                     << FairLogger::endl;
+          return kFALSE;
+        }
+      } // strip loop
+    } // side loop
+  } // sensor loop
+
+  LOG(INFO) << fName << ": self test passed" << FairLogger::endl;
+  return kTRUE;
 }
 // -------------------------------------------------------------------------
 
@@ -200,8 +293,8 @@ void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
     fStripShift[side] = TMath::Nint(fDy * tanPhi / fPitch[side]);
   }
 
-  // --- Flag parameters to be set
-  fIsSet = kTRUE;
+  // --- Flag parameters to be set if test is ok
+  fIsSet = SelfTest();
 
 }
 // -------------------------------------------------------------------------

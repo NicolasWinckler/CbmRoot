@@ -43,20 +43,14 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     virtual ~CbmStsSensorTypeDssd() { };
 
 
-    /** Shift of strip number from bottom to top
-     ** @param side   0 = front, 1 = back
-     ** @value horizontal displacement of strip in units of pitch;
-     **/
-    Int_t GetStripShift(Int_t side) const { return fStripShift[side]; }
-
-
-    /** Print parameters **/
+   /** Print parameters **/
     virtual void Print(Option_t* opt = "") const;
 
 
     /** Process a point **/
     virtual void ProcessPoint(CbmStsSensorPoint* point,
                               const CbmStsSenzor* sensor) const;
+
 
 
     /** Set the parameters
@@ -86,6 +80,24 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     Int_t   fStripShift[2]; //! Shift in number of strips from bottom to top
 
 
+    /** Get the readout channel in the module for a given strip and side
+     ** @param strip     Strip number
+     ** @param side      Side (0 = front, 1 = back)
+     ** @param sensorId  Index of sensor within module
+     ** @return  Channel number in module
+     **/
+    Int_t GetModuleChannel(Int_t strip, Int_t side, Int_t sensorId) const;
+
+
+    /** Get strip and side from module channel.
+     ** @param[in] channel   Channel number in module
+     ** @param[in] sensorId  Sensor index in module
+     ** @param[out]  strip   Strip number in sensor
+     ** @param[out]  side    Sensor side [0 = front, 1 = back]
+     **/
+    void GetStrip(Int_t channel, Int_t sensorId, Int_t& strip, Int_t& side);
+
+
     /** Produce charge on front or back side from a CbmStsPoint
      ** @param side   0 = front, 1 = back side
      **/
@@ -103,15 +115,17 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
                         Double_t charge, Double_t time) const;
 
 
+    /** Test the consistent implementation of GetModuleChannel and
+     ** GetStrip. The latter should be the reverse of the former.
+     ** @return kTRUE if successful
+     **/
+    Bool_t SelfTest();
 
 
 
-
-  ClassDef(CbmStsSensorTypeDssd,1);
+    ClassDef(CbmStsSensorTypeDssd,1);
 
 };
-
-
 
 
 #endif

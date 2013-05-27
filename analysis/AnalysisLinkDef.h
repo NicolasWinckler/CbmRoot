@@ -9,8 +9,8 @@
 //#pragma link C++ class  CbmV0Analysis+;
 //#pragma link C++ class  CbmV0TrackInfo+;
 #pragma link C++ class CbmAnaHypYPtGenerator+;
-#pragma link C++ class CbmAnaHypSecFinder+;
-#pragma link C++ class CbmAnaHypSecFinderQa+;
+//#pragma link C++ class CbmAnaHypSecFinder+;
+//#pragma link C++ class CbmAnaHypSecFinderQa+;
 #pragma link C++ class CbmAnaHypSelectLambda+;
 #pragma link C++ class CbmAnaHypRecLambda+;
 #pragma link C++ class CbmAnaHypRecEff+;

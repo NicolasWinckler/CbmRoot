@@ -42,8 +42,8 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 hyperon/CbmAnaHypYPtGenerator.cxx
 hyperon/CbmAnaHypTools.cxx
-hyperon/CbmAnaHypSecFinder.cxx
-hyperon/CbmAnaHypSecFinderQa.cxx
+#hyperon/CbmAnaHypSecFinder.cxx
+#hyperon/CbmAnaHypSecFinderQa.cxx
 hyperon/CbmAnaHypPair.cxx
 hyperon/CbmAnaHypLambdaCandidate.cxx
 hyperon/CbmAnaHypTrack.cxx

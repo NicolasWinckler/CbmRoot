@@ -35,7 +35,7 @@ eventDisplay()
  
     
   fMan->Init();                     
-  
+  fMan->Init(1,4,10000);
 
 
 }

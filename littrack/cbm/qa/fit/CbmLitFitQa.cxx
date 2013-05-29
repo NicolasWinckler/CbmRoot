@@ -334,7 +334,7 @@ void CbmLitFitQa::FillTrackParamHistogramm(
 {
    fHM->H1(histName + "_X")->Fill(par->GetX());
    fHM->H1(histName + "_Y")->Fill(par->GetY());
-   fHM->H1(histName + "_Z")->Fill(par->GetY());
+   fHM->H1(histName + "_Z")->Fill(par->GetZ());
    fHM->H1(histName + "_Tx")->Fill(par->GetTx());
    fHM->H1(histName + "_Ty")->Fill(par->GetTy());
    fHM->H1(histName + "_Qp")->Fill(par->GetQp());

@@ -61,7 +61,7 @@ const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is inc
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
-const Bool_t IncludeSupports = false;  //true;  // false;  // true, if support structure is included in geometry
+const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -114,15 +114,15 @@ Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
 const Int_t    LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
 const Double_t LayerNrInStation[MaxLayers] = {  1,  2,  3,  4,  1,  2,  3,  4,  1,  2 };
 
-Double_t LayerPosition[MaxLayers] = { 120. }; // start position - 2013-05-29 - trd100_sts              (    4 layers, z = 1200 )
+//Double_t LayerPosition[MaxLayers] = { 120. }; // start position - 2013-05-29 - trd100_sts              (    4 layers, z = 1200 )
 //Double_t LayerPosition[MaxLayers] = { 380. }; // start position - 2013-05-29 - trd100_rich             (2,3,4 layers, z = 3800 )
 //Double_t LayerPosition[MaxLayers] = { 450. }; // start position - 2013-05-29 - trd100_much_3_absorbers (    4 layers, z = 4500 )
-//Double_t LayerPosition[MaxLayers] = { 540. }; // start position - 2013-05-29 - trd300_much_6_absorbers (   10 layers, z = 5400 )
+Double_t LayerPosition[MaxLayers] = { 540. }; // start position - 2013-05-29 - trd300_much_6_absorbers (   10 layers, z = 5400 )
 
 const Double_t LayerThickness = 45.0; // Thickness of one TRD layer in cm
+
 //const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
- 
-//// just behind RICH v13a at z=400
+ //// just behind RICH v13a at z=400
 //const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };  // z position in cm of Layer front
 // 3 stations, no gap between TRD stations
 //const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // v13c // z position in cm of Layer front
@@ -319,6 +319,7 @@ void create_materials_from_media_file();
 void create_trd_module(Int_t moduleType);
 void create_detector_layers(Int_t layer);
 void create_supports();
+void dump_info_file();
 
 
 void Create_TRD_Geometry_v13b() {
@@ -332,13 +333,9 @@ void Create_TRD_Geometry_v13b() {
   // Load needed material definition from media.geo file
   create_materials_from_media_file();
 
-  // Position the layers
+  // Position the layers in z
   for (Int_t iLayer = 1; iLayer < MaxLayers; iLayer++)
     LayerPosition[iLayer] = LayerPosition[iLayer-1] + LayerThickness;
-
-  // Show layer positions
-  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
-    printf("Layer Position %2d: %2d\n", iLayer, LayerPosition[iLayer]);
 
   // Get the GeoManager for later usage
   gGeoMan = (TGeoManager*) gROOT->FindObject("FAIRGeom");
@@ -391,13 +388,61 @@ void Create_TRD_Geometry_v13b() {
   TFile* outfile = new TFile(FileNameGeo,"RECREATE");
   gGeoMan->Write();  // use this is you want GeoManager format in the output
   outfile->Close();
+
+  dump_info_file();
+
   top->Draw("ogl");
+
   //top->Raytrace();
 
 //  cout << "Press Return to exit" << endl;
 //  cin.get();
 //  exit();
 }
+
+void dump_info_file()
+{
+  Double_t z_last_layer = 0;
+
+  printf("writing info file: %s\n", FileNameInfo.Data());
+
+  FILE *ifile;
+  ifile = fopen(FileNameInfo.Data(),"w");
+
+  if (ifile == NULL)
+    {
+      printf("error opening %s\n", FileNameInfo.Data());
+      exit(1);
+    }
+
+  fprintf(ifile,"#\n##   %s information file\n#\n\n", geoVersion.Data());
+
+  // Show layers flags
+  fprintf(ifile,"generated TRD layers:\n ");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+      fprintf(ifile,"%2d ",PlaneId[iLayer]);
+  fprintf(ifile,"\n");
+
+  // Layer thickness
+  fprintf(ifile,"Layer thickness: %2d cm\n", LayerThickness);
+
+  // Show layer positions
+  fprintf(ifile,"z-positions of layers (cm):\n");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+  {
+    fprintf(ifile,"layer %2d: position  %2d cm\n", iLayer, LayerPosition[iLayer]);
+    if (ShowLayer[iLayer])
+      if (z_last_layer < LayerPosition[iLayer])
+        z_last_layer = LayerPosition[iLayer];
+  }
+
+  // Show extension of TRD
+  fprintf(ifile,"end of TRD (z): %2d cm\n", z_last_layer + LayerThickness);
+
+  fclose(ifile);
+}
+
 
 void create_materials_from_media_file()
 {

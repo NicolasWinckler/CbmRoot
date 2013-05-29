@@ -17,15 +17,33 @@
  **
  ** This class describes the response of double-sided silicon
  ** strip sensors in the STS. Its free parameters are the dimensions
- ** of the sensor, the strip pitches and stereo angles on front
- ** and back side, and the width of the inactive area at the
- ** sensor borders.
+ ** of the active area, the number of strips at the
+ ** top (readout) edge and the stereo angles on front and back side.
  **
- ** Charge is created uniformly along the particle trajectory
- ** in the sensor and is projected to the read-out edge (top edge).
- ** Strips not reaching the top edge are cross-connected
- ** horizontally (double metal layer or cable) to a
- ** corresponding strip.
+ ** The active area does not necessarily coincide with the geometric
+ ** dimensions of the sensor. It is, however, centred in the latter,
+ ** meaning that the width of inactive regions (guard ring) are
+ ** the same on the left and on the right side and also the same at
+ ** the top and and the bottom.
+ **
+ ** The stereo angle is defined with respect to the y (vertical) axis.
+ ** Readout is performed at the top edge of the sensor. In case of
+ ** finite stereo angle, the corner strips not reaching the top edge are
+ ** connected horizontally to the corresponding strip in the other corner.
+ **
+ ** The response to charged particles is modelled by a uniform charge
+ ** distribution along the particle trajectory in the active volume,
+ ** which is projected to the readout edge, where it is discretised
+ ** on the active strips. The charge is then delivered to the corresponding
+ ** channel of the readout module (CbmStsModule).
+ **
+ ** The mapping of strip number and module channel is trivial in the case
+ ** of just one sensor per module. In case of several daisy-chained sensors,
+ ** the top-edge strip is vertically connected vertically to the corresponding
+ ** strip on the bottom edge of the sensor above. This results in an offset
+ ** of strip number to channel number which depends on the position of the'
+ ** sensor in the daisy chain. The behaviour is implemented in the methods
+ ** GetStrip and GetModuleChannel.
  **/
 
 
@@ -56,25 +74,25 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     /** Set the parameters
      ** @param dx,dy,dz          Size in x,y,z [cm]
      ** @param pitchF,pitchB     Strip pitch foint and back side [cm]
-     ** @param stereoF,stereoB   Strip stereo angle fron and back side [degrees]
+     ** @param stereoF,stereoB   Strip stereo angle front and back side [degrees]
      **/
     void SetParameters(Double_t dx, Double_t dy, Double_t dz,
-                       Double_t pitchF, Double_t pitchB,
+                       Int_t nStripsF, Int_t nStripsB,
                        Double_t stereoF, Double_t stereoB);
 
 
   private:
 
-    Double_t fDx;        ///< Dimension in x [cm]
-    Double_t fDy;        ///< Dimension in y [cm]
-    Double_t fDz;        ///< Thickness in z [cm]
-    Double_t fPitch[2];  ///< Strip pitch front/back side [cm]
-    Double_t fStereo[2]; ///< Stereo angle front/back side [degrees]
-    Bool_t   fIsSet;     ///< Flag whether parameters are set
+    Double_t fDx;             ///< Dimension of active area in x [cm]
+    Double_t fDy;             ///< Dimension of active area in y [cm]
+    Double_t fDz;             ///< Thickness in z [cm]
+    Int_t    fNofStrips[2];   ///< Number of strips on front/back side
+    Double_t fStereo[2];      ///< Stereo angle front/back side [degrees]
+    Bool_t   fIsSet;          ///< Flag whether parameters are set
 
 
     /** Temporary variables to avoid frequent calculations **/
-    Double_t fNofStrips[2]; //! Number of strips on front/back side
+    Double_t fPitch[2];     //! Strip pitch front/back side [cm]
     Double_t fCosStereo[2]; //! cos of stereo angle front/back side
     Double_t fSinStereo[2]; //! sin if stereo angle front/back side
     Int_t   fStripShift[2]; //! Shift in number of strips from bottom to top

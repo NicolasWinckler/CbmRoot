@@ -142,6 +142,8 @@ class CbmStsAddress : public CbmAddress
     /** Bit masks for the different levels **/
     static const Int_t fgkMask[kStsNofLevels];
 
+
+    ClassDef(CbmStsAddress,1);
 };
 
 

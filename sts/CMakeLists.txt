@@ -36,11 +36,13 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS_SETUP
 setup/CbmStsAddress.cxx
+setup/CbmStsElement.cxx
 setup/CbmStsModule.cxx
 setup/CbmStsSenzor.cxx
 setup/CbmStsSensorPoint.cxx
 setup/CbmStsSensorType.cxx
 setup/CbmStsSensorTypeDssd.cxx
+setup/CbmStsSetup.cxx
 )
 
 

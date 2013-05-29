@@ -167,8 +167,12 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
 
 
   // Project point coordinates (in / out) to readout (top) edge
-  Double_t x1 = point->GetX1() - ( fDy - point->GetY1() ) * tanphi;
-  Double_t x2 = point->GetX2() - ( fDy - point->GetY2() ) * tanphi;
+  // Keep in mind that the SensorPoint gives coordinates with
+  // respect to the centre of the active area/
+  Double_t x1 = point->GetX1() - 0.5 * fDx
+                - ( 0.5 * fDy - point->GetY1() ) * tanphi;
+  Double_t x2 = point->GetX2() - 0.5 * fDx
+                - ( 0.5 * fDy - point->GetY2() ) * tanphi;
 
 
   // Calculate corresponding strip numbers
@@ -259,8 +263,8 @@ Bool_t CbmStsSensorTypeDssd::SelfTest() {
 
 // -----   Set the parameters   --------------------------------------------
 void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
-                                         Double_t dz, Double_t pitchF,
-                                         Double_t pitchB, Double_t stereoF,
+                                         Double_t dz, Int_t nStripsF,
+                                         Int_t nStripsB, Double_t stereoF,
                                          Double_t stereoB) {
 
   // --- Check stereo angles
@@ -276,17 +280,17 @@ void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
                << FairLogger::endl;
 
   // --- Set members
-  fDx        = dx;
-  fDy        = dy;
-  fDz        = dz;
-  fPitch[0]  = pitchF;
-  fPitch[1]  = pitchB;
-  fStereo[0] = stereoF;
-  fStereo[1] = stereoB;
+  fDx           = dx;
+  fDy           = dy;
+  fDz           = dz;
+  fNofStrips[0] = nStripsF;
+  fNofStrips[1] = nStripsB;
+  fStereo[0]    = stereoF;
+  fStereo[1]    = stereoB;
 
   // --- Calculate parameters for front and back
   for (Int_t side = 0; side < 2; side++) {
-    fNofStrips[side] = TMath::CeilNint(fDx / fPitch[side]);
+    fPitch[side] = fDx / Double_t(fNofStrips[side]);
     fCosStereo[side] = TMath::Cos( fStereo[side] * TMath::DegToRad() );
     fSinStereo[side] = TMath::Sin( fStereo[side] * TMath::DegToRad() );
     Double_t tanPhi = fSinStereo[side] / fCosStereo[side];

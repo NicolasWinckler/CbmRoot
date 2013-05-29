@@ -40,11 +40,13 @@
 
 // Setup
 #pragma link C++ class CbmStsAddress;
+#pragma link C++ class CbmStsElement;
 #pragma link C++ class CbmStsModule;
 #pragma link C++ class CbmStsSenzor;
 #pragma link C++ class CbmStsSensorPoint;
 #pragma link C++ class CbmStsSensorType;
 #pragma link C++ class CbmStsSensorTypeDssd;
+#pragma link C++ class CbmStsSetup;
 
 
 

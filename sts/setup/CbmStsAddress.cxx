@@ -8,7 +8,7 @@
 #include "setup/CbmStsAddress.h"
 
 
-//-----    Definition of the address field   -------------------------------
+// -----    Definition of the address field   -------------------------------
 const Int_t CbmStsAddress::fgkBits[] = { fgkSystemBits,   // system = kSTS
                                          4,   // station
                                          4,   // ladder
@@ -21,7 +21,7 @@ const Int_t CbmStsAddress::fgkBits[] = { fgkSystemBits,   // system = kSTS
 
 
 
-//-----    Initialisation of bit shifts ------------------------------------
+// -----    Initialisation of bit shifts -----------------------------------
 const Int_t CbmStsAddress::fgkShift[] =
    { 0,
      CbmStsAddress::fgkShift[0] + CbmStsAddress::fgkBits[0],
@@ -35,7 +35,7 @@ const Int_t CbmStsAddress::fgkShift[] =
 
 
 
-//-----    Initialisation of bit masks  ------------------------------------
+// -----    Initialisation of bit masks  -----------------------------------
 const Int_t CbmStsAddress::fgkMask[] = { ( 1 << fgkBits[0] ) -1,
                                          ( 1 << fgkBits[1] ) -1,
                                          ( 1 << fgkBits[2] ) -1,
@@ -146,4 +146,7 @@ void CbmStsAddress::Print() {
               << FairLogger::endl;
 }
 // -------------------------------------------------------------------------
+
+
+ClassImp(CbmStsAddress)
 

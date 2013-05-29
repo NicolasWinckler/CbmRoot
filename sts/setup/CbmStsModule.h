@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include "TNamed.h"
+#include "CbmStsElement.h"
 #include "CbmStsSenzor.h"
 
 
@@ -36,7 +37,7 @@ using namespace std;
  **/
 
 
-class CbmStsModule : public TNamed
+class CbmStsModule : public CbmStsElement
 {
   public:
 
@@ -44,8 +45,23 @@ class CbmStsModule : public TNamed
     CbmStsModule();
 
 
+    /** Standard constructor
+     ** @param name   Name
+     ** @param title  Title
+     ** @param node   Pointer to relevant TGeoPhysicalNode
+     */
+    CbmStsModule(const char* name, const char* title,
+                 TGeoPhysicalNode* node = NULL);
+
+
     /** Destructor **/
     virtual ~CbmStsModule();
+
+
+    /** Add daughter element (from base class)
+     ** @param element  Pointer to element to be added as daughter.
+     **/
+    //virtual void AddDaughter(CbmStsElement* element);
 
 
     /** Add a sensor to the module
@@ -69,11 +85,9 @@ class CbmStsModule : public TNamed
 
   private:
 
-    Int_t fAddress;                       ///< Unique element identifier
-
     vector<CbmStsSenzor*> fSensors;       ///< Array of sensors
+    // TODO: Unify inherited array and private array
 
-    TGeoPhysicalNode* fNode;               ///< Pointer to geometry
 
     /** Buffer for the analogue signals **/
     map<Int_t, pair<Double_t, Double_t> > fBuffer;

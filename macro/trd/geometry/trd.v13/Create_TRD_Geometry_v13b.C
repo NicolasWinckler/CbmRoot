@@ -3,6 +3,12 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// 2013-05-29 - DE - allow for flexible TRD z-positions defined by position of layer01
+// 2013-05-29 - DE - trd100_sts              (    4 layers, z = 1200 ) - TRD right behind STS to allow TOF to move upstream
+// 2013-05-29 - DE - trd100_rich             (2,3,4 layers, z = 3800 ) - TRD right behind RICH			      
+// 2013-05-29 - DE - trd100_much_2_absorbers (    4 layers, z = 4200 ) - same as version at z = 4500			      
+// 2013-05-29 - DE - trd100_much_3_absorbers (    4 layers, z = 4500 ) - TRD right behind SIS100 MUCH		      
+// 2013-05-29 - DE - trd300_much_6_absorbers (   10 layers, z = 5400 ) - TRD right behind SIS300 MUCH                      
 // 2013-05-23 - DE - remove "trd_" prefix from node names (except top node)
 // 2013-05-22 - DE - radiators G30 (z=240 mm) 
 // 2013-05-22 - DE - radiators H (z=275 mm - 125 * 2.2mm), (H++ z=335 mm)
@@ -44,10 +50,10 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion = "trd_v13o";
-const TString FileNameSim = geoVersion + ".root";
-//const TString FileNameSim = geoVersion + ".geo.root";
-const TString FileNameGeo = geoVersion + "_geo.root";
+const TString geoVersion   = "trd_v13p";
+const TString FileNameSim  = geoVersion + ".root";
+const TString FileNameGeo  = geoVersion + "_geo.root";
+const TString FileNameInfo = geoVersion + ".geo.info";
 
 // display switches
 const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is included in geometry
@@ -55,7 +61,7 @@ const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is inc
 const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
-const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
+const Bool_t IncludeSupports = false;  //true;  // false;  // true, if support structure is included in geometry
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -104,14 +110,20 @@ const Int_t   MaxLayers = 10;   // max layers
 const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
 Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
-Int_t    ModId = 0;
 
-const Int_t    LayerType[MaxLayers] = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
-const Double_t LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
-const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
+const Int_t    LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
+const Double_t LayerNrInStation[MaxLayers] = {  1,  2,  3,  4,  1,  2,  3,  4,  1,  2 };
+
+Double_t LayerPosition[MaxLayers] = { 120. }; // start position - 2013-05-29 - trd100_sts              (    4 layers, z = 1200 )
+//Double_t LayerPosition[MaxLayers] = { 380. }; // start position - 2013-05-29 - trd100_rich             (2,3,4 layers, z = 3800 )
+//Double_t LayerPosition[MaxLayers] = { 450. }; // start position - 2013-05-29 - trd100_much_3_absorbers (    4 layers, z = 4500 )
+//Double_t LayerPosition[MaxLayers] = { 540. }; // start position - 2013-05-29 - trd300_much_6_absorbers (   10 layers, z = 5400 )
+
+const Double_t LayerThickness = 45.0; // Thickness of one TRD layer in cm
+//const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
  
-// just behind RICH v13a at z=400
-const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };   // z position in cm of Layer front
+//// just behind RICH v13a at z=400
+//const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };  // z position in cm of Layer front
 // 3 stations, no gap between TRD stations
 //const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // v13c // z position in cm of Layer front
 // 3 stations, 25 cm gap
@@ -241,7 +253,8 @@ const Double_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice fr
 // Thickness (in z) of lattice frames in cm - see below
 
 // z - geometry of TRD modules
-const Double_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
+//const Double_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
+const Double_t radiator_thickness     =  30.0;    // 30 cm thickness of radiator
 const Double_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
 const Double_t lattice_thickness      =   1.0;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
@@ -253,6 +266,11 @@ const Double_t kapton_position        =  lattice_position + lattice_thickness/2.
 const Double_t gas_thickness          =   1.2;    //  12 mm thickness of gas
 const Double_t gas_position           =  kapton_position + kapton_thickness/2. + gas_thickness/2.;
 
+// frame thickness
+const Double_t frame_thickness        =  gas_thickness;   // frame covers gas volume: from kapton foil to pad plane
+const Double_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;
+
+// pad plane
 const Double_t padcopper_thickness    =   0.0025; //  25 micron thickness of copper pads
 const Double_t padcopper_position     =  gas_position + gas_thickness/2. + padcopper_thickness/2.;
 
@@ -268,11 +286,8 @@ const Double_t carbon_position        =  honeycomb_position + honeycomb_thicknes
 // readout boards
 const  Double_t febvol_thickness      =  10.0;    // 10 cm length of FEBs
 const  Double_t febvol_position       =  carbon_position + carbon_thickness/2. + febvol_thickness/2.;
-//const  Double_t feb_thickness         =   0.50;  //  5.0 mm thickness of FEBs
 const  Double_t feb_thickness         =   0.25;  // light //  2.5 mm thickness of FEBs
 
-const Double_t frame_thickness        =  gas_thickness;   // frame covers gas volume: from kapton foil to pad plane
-const Double_t frame_position         =  - LayerThickness /2. + radiator_thickness + lattice_thickness + kapton_thickness + frame_thickness/2.;
 
 
 // Names of the different used materials which are used to build the modules
@@ -316,6 +331,14 @@ void Create_TRD_Geometry_v13b() {
 
   // Load needed material definition from media.geo file
   create_materials_from_media_file();
+
+  // Position the layers
+  for (Int_t iLayer = 1; iLayer < MaxLayers; iLayer++)
+    LayerPosition[iLayer] = LayerPosition[iLayer-1] + LayerThickness;
+
+  // Show layer positions
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    printf("Layer Position %2d: %2d\n", iLayer, LayerPosition[iLayer]);
 
   // Get the GeoManager for later usage
   gGeoMan = (TGeoManager*) gROOT->FindObject("FAIRGeom");
@@ -470,13 +493,12 @@ TGeoVolume* create_trd_module(Int_t moduleType)
      {
        //     printf("lattice type %d\n", type);
        // drift window - lattice grid - sprossenfenster
+       // avoid open ends in -x direction
        TGeoBBox *trd_lattice_mod0_ho = new TGeoBBox("S0ho", sizeX/2.,                       lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
        TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
-       //       TGeoBBox *trd_lattice_mod0_hi = new TGeoBBox("S0hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
-    
-       TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2.,                       lattice_thickness/2.);  // vertical
+
+       TGeoBBox *trd_lattice_mod0_vo = new TGeoBBox("S0vo", lattice_o_width[type]/2., sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
        TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
-       //       TGeoBBox *trd_lattice_mod0_vi = new TGeoBBox("S0vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
     
        TGeoTranslation *t010 = new TGeoTranslation("t010", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
        t010->RegisterYourself();
@@ -585,13 +607,12 @@ TGeoVolume* create_trd_module(Int_t moduleType)
      {
        //     printf("lattice type %d\n", type);
        // drift window - lattice grid - sprossenfenster
+       // avoid open ends in -x direction
        TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("S1ho", sizeX/2.,                       lattice_o_width[type]/2., lattice_thickness/2.);  // horizontal
        TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
-       //       TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("S1hi", sizeX/2., lattice_i_width[type]/2., lattice_thickness/2.);  // horizontal
-    
-       TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("S1vo", lattice_o_width[type]/2., sizeX/2.,                       lattice_thickness/2.);  // vertical
+
+       TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("S1vo", lattice_o_width[type]/2., sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
        TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("S1vi", lattice_i_width[type]/2., sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
-       //       TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("S1vi", lattice_i_width[type]/2., sizeX/2., lattice_thickness/2.);  // vertical
     
        TGeoTranslation *t110 = new TGeoTranslation("t110", 0.,  (1.00*activeAreaY/2.+lattice_o_width[type]/2.), 0);
        t110->RegisterYourself();

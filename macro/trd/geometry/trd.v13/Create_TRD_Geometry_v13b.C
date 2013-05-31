@@ -30,6 +30,10 @@
 
 // TODO: 
 // - use Silicon as ASIC material
+// - dump angles
+// - dump sub totals for small / large modules  
+// - move padplane to full integer multiple of 1 mm
+
 
 // in root all sizes are diven in cm
 
@@ -257,10 +261,11 @@ Int_t ModuleStats[MaxLayers][NofModuleTypes] = { 0 };
 
 // z - geometry of TRD modules
 //const Double_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
-const Double_t radiator_thickness     =  30.0;    // 30 cm thickness of radiator
+//const Double_t radiator_thickness     =  30.0 + 0.0770;    // 30 cm thickness of radiator + shift pad plane to integer multiple of 1 mm
+const Double_t radiator_thickness     =  30.0;    // 30 cm thickness of radiator + shift pad plane to integer multiple of 1 mm
 const Double_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
-const Double_t lattice_thickness      =   1.0;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
+const Double_t lattice_thickness      =   1.0 - 0.0230;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
 const Double_t lattice_position       =  radiator_position + radiator_thickness/2. + lattice_thickness/2.;
 
 const Double_t kapton_thickness       =   0.0025; //  25 micron thickness of kapton
@@ -405,18 +410,24 @@ void Create_TRD_Geometry_v13b() {
 
 void dump_info_file()
 {
-  Double_t z_first_layer = 0;   // z position of first layer (front)
-  Double_t z_last_layer  = 0;   // z position of last  layer (front)
+  Double_t z_first_layer = 2000;   // z position of first layer (front)
+  Double_t z_last_layer  = 0;      // z position of last  layer (front)
+
+  Double_t xangle;   // horizontal angle
+  Double_t yangle;   // vertical   angle
 
   Double_t total_surface = 0;   // total surface
   Double_t total_actarea = 0;   // total active area
 
-  Int_t    channels_per_module[NofModuleTypes+1] = { 0 };   // channels per module
+  Int_t    channels_per_module[NofModuleTypes+1] = { 0 };   // number of channels per module
+  Int_t    channels_per_feb[NofModuleTypes+1]    = { 0 };   // number of channels per feb
+  Int_t    asics_per_module[NofModuleTypes+1]    = { 0 };   // number of asics per module
 
-  Int_t    total_modules[NofModuleTypes+1]  = { 0 };   // total number of modules
-  Int_t    total_febs[NofModuleTypes+1]     = { 0 };   // total number of febs
-  Int_t    total_asics[NofModuleTypes+1]    = { 0 };   // total number of asics
-  Int_t    total_channels[NofModuleTypes+1] = { 0 };   // total number of channels
+  Int_t    total_modules[NofModuleTypes+1]       = { 0 };   // total number of modules
+  Int_t    total_febs[NofModuleTypes+1]          = { 0 };   // total number of febs
+  Int_t    total_asics[NofModuleTypes+1]         = { 0 };   // total number of asics
+  Int_t    total_channels[NofModuleTypes+1]      = { 0 };   // total number of channels
+
 
   printf("writing info file: %s\n", FileNameInfo.Data());
 
@@ -443,41 +454,74 @@ void dump_info_file()
     }
   }
 
+  fprintf(ifile,"# envelope\n");
   // Show extension of TRD
-  fprintf(ifile,"start of TRD (z): %4d cm\n", z_first_layer);
-  fprintf(ifile,"end   of TRD (z): %4d cm\n", z_last_layer + LayerThickness);
+  fprintf(ifile,"%4d cm   start of TRD (z)\n", z_first_layer);
+  fprintf(ifile,"%4d cm   end   of TRD (z)\n", z_last_layer + LayerThickness);
+  fprintf(ifile,"\n");
 
   // Layer thickness
-  fprintf(ifile,"thickness of single layer (z): %3d cm\n", LayerThickness);
+  fprintf(ifile,"# thickness\n");
+  fprintf(ifile,"%4d cm   per single layer (z)\n", LayerThickness);
+  fprintf(ifile,"\n");
 
   // Show layer flags
-  fprintf(ifile,"generated TRD layers:\n ");
+  fprintf(ifile,"# generated TRD layers\n ");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
       fprintf(ifile,"%2d ", PlaneId[iLayer]);
+  fprintf(ifile,"   planeID\n");
   fprintf(ifile,"\n");
 
-
   // Show layer positions
-  fprintf(ifile,"z-positions of layers (cm):\n");
+  fprintf(ifile,"# z-positions of layers front\n");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
   {
     if (ShowLayer[iLayer])
-      fprintf(ifile,"layer %2d: position  %2d cm\n", PlaneId[iLayer], LayerPosition[iLayer]);
+      fprintf(ifile,"%5d cm   z-position of layer %2d\n", LayerPosition[iLayer], PlaneId[iLayer]);
   }
+  fprintf(ifile,"\n");
 
-  // Show if supports are included
-  if (IncludeSupports)
-    fprintf(ifile,"support structure included\n");
-  else
-    fprintf(ifile,"support structure not included\n");
+  // flags
+  fprintf(ifile,"# flags\n");
+
+  fprintf(ifile,"radiator is ");
+  if (!IncludeRadiator) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"lattice grid is ");
+  if (!IncludeLattice ) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"gas holes in lattice are ");
+  if (!IncludeGasHoles) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"front-end boards are ");
+  if (!IncludeFebs    ) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"asics are ");
+  if (!IncludeAsics   ) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"support structure is ");
+  if (!IncludeSupports) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
   fprintf(ifile,"\n");
 
 
-  fprintf(ifile,"#\n##   modules\n#\n\n");
-
   // module statistics
-  fprintf(ifile,"number of modules per type and layer:\n");
+//  fprintf(ifile,"#\n##   modules\n#\n\n");
+//  fprintf(ifile,"number of modules per type and layer:\n");
+  fprintf(ifile,"# modules\n");
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+    fprintf(ifile,"   mod%1d", iModule);
+  fprintf(ifile,"  total");
+
+  fprintf(ifile,"\n---------------------------------------------------------------\n");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
     {
@@ -486,7 +530,7 @@ void dump_info_file()
         fprintf(ifile," %6d", ModuleStats[iLayer][iModule]);
         total_modules[iModule] += ModuleStats[iLayer][iModule];  // sum up modules across layers
       }
-      fprintf(ifile,"         layer %2d\n", PlaneId[iLayer]);
+      fprintf(ifile,"          layer %2d\n", PlaneId[iLayer]);
     }
   fprintf(ifile,"---------------------------------------------------------------\n");
 
@@ -529,6 +573,15 @@ void dump_info_file()
   }
   fprintf(ifile,"          ASICs per FEB\n");
 
+  // ASICs per module
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    asics_per_module[iModule] = FebsPerModule[iModule] * (AsicsPerFeb[iModule] %100);
+    fprintf(ifile," %6d", asics_per_module[iModule]);
+  }
+  fprintf(ifile,"          ASICs per module\n");
+
+  // ASICs per module type
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_asics[iModule] = total_febs[iModule] * (AsicsPerFeb[iModule] %100);
@@ -545,17 +598,35 @@ void dump_info_file()
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     if ((AsicsPerFeb[iModule] %100) == 16)
-      channels_per_module[iModule] = FebsPerModule[iModule] *  80 * 6;   // rows
+    {
+      channels_per_feb[iModule] =  80 * 6;   // rows  // 84, if 63 of 64 ch used
+      channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
+    }
     if ((AsicsPerFeb[iModule] %100) == 10)
-      channels_per_module[iModule] = FebsPerModule[iModule] *  80 * 4;   // rows
+    {
+      channels_per_feb[iModule] =  80 * 4;   // rows
+      channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
+    }
     if ((AsicsPerFeb[iModule] %100) ==  5)
-      channels_per_module[iModule] = FebsPerModule[iModule] *  80 * 2;   // rows
+    {
+      channels_per_feb[iModule] =  80 * 2;   // rows
+      channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
+    }
 
     if ((AsicsPerFeb[iModule] %100) ==  8)
-      channels_per_module[iModule] = FebsPerModule[iModule] * 128 * 2;   // rows
-    fprintf(ifile," %6d", channels_per_module[iModule]);
+    {
+      channels_per_feb[iModule] = 128 * 2;   // rows
+      channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
+    }
   }
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+    fprintf(ifile," %6d", channels_per_module[iModule]);
   fprintf(ifile,"          channels per module\n");
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+    fprintf(ifile," %6d", channels_per_feb[iModule]);
+  fprintf(ifile,"          channels per feb\n");
 
   // channels used
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
@@ -574,35 +645,66 @@ void dump_info_file()
   }
   fprintf(ifile," %6d", total_asics[NofModuleTypes] * 32);
   fprintf(ifile,"   channels available\n");
+  fprintf(ifile,"\n");
 
-  // channels efficiency
+  // channel efficiency
   fprintf(ifile,"%6.1f%%   channel efficiency\n", 1. * total_channels[NofModuleTypes] / (total_asics[NofModuleTypes] * 32) * 100);
-
-  // surface
-  Double_t total_60 = 0;
 
   // total surface of TRD
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
     if (iModule <= 3)     
     {
-      total_60      += total_modules[iModule] * 0.6 * 0.6;
       total_surface += total_modules[iModule] * DetectorSizeX[0] / 100 * DetectorSizeY[0] / 100;
       total_actarea += total_modules[iModule] * (DetectorSizeX[0]-FrameWidth[0]) / 100 * (DetectorSizeY[0]-FrameWidth[0]) / 100;
     }
     else
     {
-      total_60      += total_modules[iModule] * 1.0 * 1.0;
       total_surface += total_modules[iModule] * DetectorSizeX[1] / 100 * DetectorSizeY[1] / 100;
       total_actarea += total_modules[iModule] * (DetectorSizeX[1]-FrameWidth[1]) / 100 * (DetectorSizeY[1]-FrameWidth[1]) / 100;
     }
-
   fprintf(ifile,"\n");
-  //  fprintf(ifile,"%7.2f m2   total 60 cm      \n", total_60);
-  fprintf(ifile,"%7.2f m2   total surface    \n", total_surface);
-  fprintf(ifile,"%7.2f m2   total active area\n", total_actarea);
 
-  fprintf(ifile,"%7.2f cm2  average channel size\n", 100. * 100 * total_actarea / total_channels[NofModuleTypes]);
-  fprintf(ifile,"%7.2f      channels per m2 active area\n", 1. * total_channels[NofModuleTypes] / total_actarea);
+  // summary
+  fprintf(ifile,"%7.2f m2      total surface    \n", total_surface);
+  fprintf(ifile,"%7.2f m2      total active area\n", total_actarea);
+
+  fprintf(ifile,"%7.2f cm2/ch  average channel size\n", 100. * 100 * total_actarea / total_channels[NofModuleTypes]);
+  fprintf(ifile,"%7.2f ch/m2   channels per m2 active area\n", 1. * total_channels[NofModuleTypes] / total_actarea);
+  fprintf(ifile,"\n");
+
+  // pad plane position
+  fprintf(ifile,"# pad plane\n");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+      fprintf(ifile,"%10.4f cm   position of pad plane - layer %2d\n", LayerPosition[iLayer] + LayerThickness/2. + padplane_position,  PlaneId[iLayer]);
+  fprintf(ifile,"\n");
+   
+  // angles
+  fprintf(ifile,"# angles of acceptance\n");
+
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+    {
+      if (iLayer < 4)
+      {	
+	//        fprintf(ifile,"y %10.4f cm   x %10.4f cm\n", 2.5 * DetectorSizeY[1], 3.5 * DetectorSizeX[1]);
+        yangle = atan(2.5 * DetectorSizeY[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+        xangle = atan(3.5 * DetectorSizeX[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+      }
+      if ((iLayer >= 4) && (iLayer < 8))
+      {	
+	//        fprintf(ifile,"y %10.4f cm   x %10.4f cm\n", 3.5 * DetectorSizeY[1], 4.5 * DetectorSizeX[1]);
+        yangle = atan(3.5 * DetectorSizeY[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+        xangle = atan(4.5 * DetectorSizeX[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+      }
+      if ((iLayer >= 8) && (iLayer <10))
+      {	
+	//        fprintf(ifile,"y %10.4f cm   x %10.4f cm\n", 4.5 * DetectorSizeY[1], 5.5 * DetectorSizeX[1]);
+        yangle = atan(4.5 * DetectorSizeY[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+        xangle = atan(5.5 * DetectorSizeX[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+      }
+      fprintf(ifile,"v: %5.2f deg, h: %5.2f deg - vertical/horizontal - layer %2d\n", yangle, xangle, PlaneId[iLayer]);
+    }  
 
   fclose(ifile);
 }

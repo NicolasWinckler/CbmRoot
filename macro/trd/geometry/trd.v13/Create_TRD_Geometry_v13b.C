@@ -50,6 +50,7 @@
 #include "TString.h"
 #include "TList.h"
 #include "TRandom3.h"
+#include "TDatime.h"
 
 #include <iostream>
 
@@ -410,6 +411,8 @@ void Create_TRD_Geometry_v13b() {
 
 void dump_info_file()
 {
+  TDatime  datetime;   // used to get timestamp
+
   Double_t z_first_layer = 2000;   // z position of first layer (front)
   Double_t z_last_layer  = 0;      // z position of last  layer (front)
 
@@ -428,7 +431,6 @@ void dump_info_file()
   Int_t    total_asics[NofModuleTypes+1]         = { 0 };   // total number of asics
   Int_t    total_channels[NofModuleTypes+1]      = { 0 };   // total number of channels
 
-
   printf("writing info file: %s\n", FileNameInfo.Data());
 
   FILE *ifile;
@@ -441,6 +443,8 @@ void dump_info_file()
     }
 
   fprintf(ifile,"#\n##   %s information file\n#\n\n", geoVersion.Data());
+
+  fprintf(ifile,"# created %d\n\n", datetime.GetDate());
 
   // determine first and last TRD layer
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)

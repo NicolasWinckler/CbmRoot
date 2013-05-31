@@ -103,7 +103,7 @@ const Int_t   MaxLayers = 10;   // max layers
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 1, 1, 1, 0, 1, 1 };  // Station 1, 2 and 3
 //
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
-//const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
+//const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-3l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 };  // SIS300-mu  // 1: plot, 0: hide
 //
@@ -252,6 +252,9 @@ const Double_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice fr
 const Double_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice frame in cm
 // Thickness (in z) of lattice frames in cm - see below
 
+// statistics
+Int_t ModuleStats[MaxLayers][NofModuleTypes] = { 0 };
+
 // z - geometry of TRD modules
 //const Double_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
 const Double_t radiator_thickness     =  30.0;    // 30 cm thickness of radiator
@@ -316,7 +319,7 @@ TGeoVolume*  gModules[NofModuleTypes]; // Global storage for module types
 
 // Forward declarations
 void create_materials_from_media_file();
-void create_trd_module(Int_t moduleType);
+void create_trd_module_type(Int_t moduleType);
 void create_detector_layers(Int_t layer);
 void create_supports();
 void dump_info_file();
@@ -351,7 +354,7 @@ void Create_TRD_Geometry_v13b() {
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++) {
      Int_t moduleType = iModule + 1;
-     gModules[iModule] = create_trd_module(moduleType);
+     gModules[iModule] = create_trd_module_type(moduleType);
   }
 
   Int_t nLayer = 0;  // active layer counter
@@ -402,7 +405,18 @@ void Create_TRD_Geometry_v13b() {
 
 void dump_info_file()
 {
-  Double_t z_last_layer = 0;
+  Double_t z_first_layer = 0;   // z position of first layer (front)
+  Double_t z_last_layer  = 0;   // z position of last  layer (front)
+
+  Double_t total_surface = 0;   // total surface
+  Double_t total_actarea = 0;   // total active area
+
+  Int_t    channels_per_module[NofModuleTypes+1] = { 0 };   // channels per module
+
+  Int_t    total_modules[NofModuleTypes+1]  = { 0 };   // total number of modules
+  Int_t    total_febs[NofModuleTypes+1]     = { 0 };   // total number of febs
+  Int_t    total_asics[NofModuleTypes+1]    = { 0 };   // total number of asics
+  Int_t    total_channels[NofModuleTypes+1] = { 0 };   // total number of channels
 
   printf("writing info file: %s\n", FileNameInfo.Data());
 
@@ -417,28 +431,178 @@ void dump_info_file()
 
   fprintf(ifile,"#\n##   %s information file\n#\n\n", geoVersion.Data());
 
-  // Show layers flags
+  // determine first and last TRD layer
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+  {
+    if (ShowLayer[iLayer])
+    {
+      if (z_first_layer > LayerPosition[iLayer])
+        z_first_layer = LayerPosition[iLayer];
+      if (z_last_layer < LayerPosition[iLayer])
+        z_last_layer  = LayerPosition[iLayer];
+    }
+  }
+
+  // Show extension of TRD
+  fprintf(ifile,"start of TRD (z): %4d cm\n", z_first_layer);
+  fprintf(ifile,"end   of TRD (z): %4d cm\n", z_last_layer + LayerThickness);
+
+  // Layer thickness
+  fprintf(ifile,"thickness of single layer (z): %3d cm\n", LayerThickness);
+
+  // Show layer flags
   fprintf(ifile,"generated TRD layers:\n ");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
-      fprintf(ifile,"%2d ",PlaneId[iLayer]);
+      fprintf(ifile,"%2d ", PlaneId[iLayer]);
   fprintf(ifile,"\n");
 
-  // Layer thickness
-  fprintf(ifile,"Layer thickness: %2d cm\n", LayerThickness);
 
   // Show layer positions
   fprintf(ifile,"z-positions of layers (cm):\n");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
   {
-    fprintf(ifile,"layer %2d: position  %2d cm\n", iLayer, LayerPosition[iLayer]);
     if (ShowLayer[iLayer])
-      if (z_last_layer < LayerPosition[iLayer])
-        z_last_layer = LayerPosition[iLayer];
+      fprintf(ifile,"layer %2d: position  %2d cm\n", PlaneId[iLayer], LayerPosition[iLayer]);
   }
 
-  // Show extension of TRD
-  fprintf(ifile,"end of TRD (z): %2d cm\n", z_last_layer + LayerThickness);
+  // Show if supports are included
+  if (IncludeSupports)
+    fprintf(ifile,"support structure included\n");
+  else
+    fprintf(ifile,"support structure not included\n");
+  fprintf(ifile,"\n");
+
+
+  fprintf(ifile,"#\n##   modules\n#\n\n");
+
+  // module statistics
+  fprintf(ifile,"number of modules per type and layer:\n");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+    {
+      for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+      {
+        fprintf(ifile," %6d", ModuleStats[iLayer][iModule]);
+        total_modules[iModule] += ModuleStats[iLayer][iModule];  // sum up modules across layers
+      }
+      fprintf(ifile,"         layer %2d\n", PlaneId[iLayer]);
+    }
+  fprintf(ifile,"---------------------------------------------------------------\n");
+
+  // total statistics
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    fprintf(ifile," %6d", total_modules[iModule]);
+    total_modules[NofModuleTypes] += total_modules[iModule];
+  }
+  fprintf(ifile," %6d", total_modules[NofModuleTypes]);
+  fprintf(ifile,"   number of modules\n");
+
+  // number of FEBs
+  //  fprintf(ifile,"\n#\n##   febs\n#\n\n");
+  fprintf(ifile,"# febs\n");
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    fprintf(ifile," %6d", FebsPerModule[iModule]);
+  }
+  fprintf(ifile,"          FEBs per module\n");
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+    fprintf(ifile," %6d", total_febs[iModule]);
+    total_febs[NofModuleTypes] += total_febs[iModule];
+  }
+  fprintf(ifile," %6d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   number of FEBs\n");
+
+
+  // number of ASICs
+  //  fprintf(ifile,"\n#\n##   asics\n#\n\n");
+  fprintf(ifile,"# asics\n");
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    fprintf(ifile," %6d", AsicsPerFeb[iModule] %100);
+  }
+  fprintf(ifile,"          ASICs per FEB\n");
+
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    total_asics[iModule] = total_febs[iModule] * (AsicsPerFeb[iModule] %100);
+    fprintf(ifile," %6d", total_asics[iModule]);
+    total_asics[NofModuleTypes] += total_asics[iModule];
+  }
+  fprintf(ifile," %6d", total_asics[NofModuleTypes]);
+  fprintf(ifile,"   number of ASICs\n");
+
+  // number of channels
+  fprintf(ifile,"# channels\n");
+
+  // channels per module
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] %100) == 16)
+      channels_per_module[iModule] = FebsPerModule[iModule] *  80 * 6;   // rows
+    if ((AsicsPerFeb[iModule] %100) == 10)
+      channels_per_module[iModule] = FebsPerModule[iModule] *  80 * 4;   // rows
+    if ((AsicsPerFeb[iModule] %100) ==  5)
+      channels_per_module[iModule] = FebsPerModule[iModule] *  80 * 2;   // rows
+
+    if ((AsicsPerFeb[iModule] %100) ==  8)
+      channels_per_module[iModule] = FebsPerModule[iModule] * 128 * 2;   // rows
+    fprintf(ifile," %6d", channels_per_module[iModule]);
+  }
+  fprintf(ifile,"          channels per module\n");
+
+  // channels used
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    total_channels[iModule] = channels_per_module[iModule] * total_modules[iModule]; 
+    fprintf(ifile," %6d", total_channels[iModule]);
+    total_channels[NofModuleTypes] += total_channels[iModule];
+  }
+  fprintf(ifile," %6d", total_channels[NofModuleTypes]);
+  fprintf(ifile,"   channels used\n");
+
+  // channels available
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    fprintf(ifile," %6d", total_asics[iModule] * 32);
+  }
+  fprintf(ifile," %6d", total_asics[NofModuleTypes] * 32);
+  fprintf(ifile,"   channels available\n");
+
+  // channels efficiency
+  fprintf(ifile,"%6.1f%%   channel efficiency\n", 1. * total_channels[NofModuleTypes] / (total_asics[NofModuleTypes] * 32) * 100);
+
+  // surface
+  Double_t total_60 = 0;
+
+  // total surface of TRD
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+    if (iModule <= 3)     
+    {
+      total_60      += total_modules[iModule] * 0.6 * 0.6;
+      total_surface += total_modules[iModule] * DetectorSizeX[0] / 100 * DetectorSizeY[0] / 100;
+      total_actarea += total_modules[iModule] * (DetectorSizeX[0]-FrameWidth[0]) / 100 * (DetectorSizeY[0]-FrameWidth[0]) / 100;
+    }
+    else
+    {
+      total_60      += total_modules[iModule] * 1.0 * 1.0;
+      total_surface += total_modules[iModule] * DetectorSizeX[1] / 100 * DetectorSizeY[1] / 100;
+      total_actarea += total_modules[iModule] * (DetectorSizeX[1]-FrameWidth[1]) / 100 * (DetectorSizeY[1]-FrameWidth[1]) / 100;
+    }
+
+  fprintf(ifile,"\n");
+  //  fprintf(ifile,"%7.2f m2   total 60 cm      \n", total_60);
+  fprintf(ifile,"%7.2f m2   total surface    \n", total_surface);
+  fprintf(ifile,"%7.2f m2   total active area\n", total_actarea);
+
+  fprintf(ifile,"%7.2f cm2  average channel size\n", 100. * 100 * total_actarea / total_channels[NofModuleTypes]);
+  fprintf(ifile,"%7.2f      channels per m2 active area\n", 1. * total_channels[NofModuleTypes] / total_actarea);
 
   fclose(ifile);
 }
@@ -487,7 +651,7 @@ void create_materials_from_media_file()
 //  geoBuild->createMedium(mylar);
 }
 
-TGeoVolume* create_trd_module(Int_t moduleType)
+TGeoVolume* create_trd_module_type(Int_t moduleType)
 {
   Int_t type = ModuleType[moduleType - 1];
   Double_t sizeX = DetectorSizeX[type];
@@ -994,11 +1158,6 @@ TGeoVolume* create_trd_module(Int_t moduleType)
    return module;
 }
 
-Int_t copy_nr(Int_t stationNr, Int_t layerNr, Int_t copyNr)
-{
-   return stationNr * 10000 + layerNr * 1000 + copyNr;
-}
-
 Int_t copy_nr_modid(Int_t stationNr, Int_t layerNr, Int_t copyNr, Int_t planeNr, Int_t modinplaneNr)
 {
   return (stationNr * 1000 + layerNr * 100 + copyNr) * 10000 + planeNr * 100 + modinplaneNr;
@@ -1083,6 +1242,10 @@ void create_detector_layers(Int_t layerId)
           Double_t yPos = DetectorSizeY[0] * y * ExplodeScale + dy;
           copyNrIn[type - 1]++;
           modId++;
+
+          // statistics per layer and module type
+          ModuleStats[layerId][type - 1]++;
+
 //          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);  // orig
           Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrIn[type - 1], PlaneId[layerId], modId);  // with modID
 
@@ -1146,6 +1309,10 @@ void create_detector_layers(Int_t layerId)
           Double_t yPos = DetectorSizeY[1] * y * ExplodeScale + dy;
           copyNrOut[type - 5]++;
           modId++;
+
+          // statistics per layer and module type
+          ModuleStats[layerId][type - 1]++;
+
 //          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);  // orig
           Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrOut[type - 5],  PlaneId[layerId], modId);  // with modID
 

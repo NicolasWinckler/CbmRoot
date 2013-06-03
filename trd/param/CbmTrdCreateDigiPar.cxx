@@ -137,11 +137,12 @@ void CbmTrdCreateDigiPar::CreateModule(
    }
 
    // Orientation of the detector layers
-   // Odd layers have resolution in x-direction (orientation == 1)
-   // Even layers have resolution in y-direction (orientation == 0)
+   // Odd  layers (1,3,5..) have resolution in x-direction (isRotated == 0) - vertical pads
+   // Even layers (2,4,6..) have resolution in y-direction (isRotated == 1) - horizontal pads
    Int_t layerNr = CbmTrdAddress::GetLayerId(moduleAddress) + 1;
-   Int_t orientation = layerNr % 2;
-   if( 0 == orientation) {  // flip pads for even layers
+   Int_t isRotated = fGeoHandler->GetPadOrientation(path);
+   //   printf("layer %02d %d isRotated\n", layerNr, isRotated);   // check, if even layers are isRotated == 1
+   if( isRotated == 1 ) {  // flip pads for even layers
       Double_t copybuf;
       for (Int_t i = 0; i < fMaxSectors; i++) {
          copybuf = padSizeX.At(i);

@@ -34,6 +34,8 @@ public:
    **/
    ~CbmTrdGeoHandler();
 
+   void Init(Bool_t isSimulation = kFALSE);
+
    /**
    * \brief Return module address calculated based on the current node in the TGeoManager.
    */
@@ -42,14 +44,23 @@ public:
    /**
    * \brief Navigate to node and return module address.
    */
-   Int_t GetModuleAddress(
-         const TString& path);
+   Int_t GetModuleAddress(const TString& path);
           
-   void Init(Bool_t isSimulation = kFALSE);
+   /**
+   * \brief Return pad orientation of the current node in the TGeoManager.
+   */
+   Int_t GetPadOrientation();
 
-   // Path has to contain information down to module part, otherwise retrieved
-   // information can be wrong. Path example:
-   // /cave_1/trd_v13m_0/trd_layer01_101/trd_module1_11010101/trd1mod1gas_0
+   /**
+   * \brief Navigate to node and return pad orientation.
+   */
+   Int_t GetPadOrientation(const TString& path);
+
+   // Path has to contain information down to module part, 
+   // otherwise retrieved information can be wrong.
+   // Path example:
+   // /cave_1/trd_v13x_1/layer01_101/module1_10100101/gas_1
+
    Double_t GetSizeX(const TString& path);
    Double_t GetSizeY(const TString& path);
    Double_t GetSizeZ(const TString& path);

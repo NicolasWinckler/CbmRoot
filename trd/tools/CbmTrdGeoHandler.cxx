@@ -43,9 +43,9 @@ void CbmTrdGeoHandler::Init(Bool_t isSimulation)
 
 Int_t CbmTrdGeoHandler::GetModuleAddress()
 {
-   // We take the mother node of the current node we are in.
+   // We take the mother node (module) of the current node we are in (gas).
    TGeoNode* node = gGeoManager->GetMother();
-   // Get the copy number to get the information about layerId and moduleId.
+   // Get the module copy number to get the information about layerId and moduleId.
    Int_t copyNr = node->GetNumber();
    // In TGeoManager numbering starts with 1, so we have to subtract 1.
    Int_t layerId = ((copyNr / 100) % 100) - 1;
@@ -61,6 +61,27 @@ Int_t CbmTrdGeoHandler::GetModuleAddress(
     NavigateTo(path);
   }
   return GetModuleAddress();
+}
+
+Int_t CbmTrdGeoHandler::GetPadOrientation()
+{
+   // We take the mother node (module) of the current node we are in (gas).
+   TGeoNode* node = gGeoManager->GetMother();
+   // Get the module copy number to get the information about layerId and moduleId.
+   Int_t copyNr = node->GetNumber();
+   // isRotated is the 5th digit from the back
+   Int_t isRotated = ((copyNr / 10000) % 10);
+   // return isRotated
+   return isRotated;
+}
+
+Int_t CbmTrdGeoHandler::GetPadOrientation(
+      const TString& path)
+{
+  if (fGeoPathHash != path.Hash()) {
+    NavigateTo(path);
+  }
+  return GetPadOrientation();
 }
 
 Double_t CbmTrdGeoHandler::GetSizeX(

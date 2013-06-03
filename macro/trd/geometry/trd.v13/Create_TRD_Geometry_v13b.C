@@ -55,7 +55,7 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion   = "trd_v13p";
+const TString geoVersion   = "trd_v13q";
 const TString FileNameSim  = geoVersion + ".root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
@@ -116,8 +116,8 @@ const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS3
 
 Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
 
-const Int_t    LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/hoziontal pads
-const Double_t LayerNrInStation[MaxLayers] = {  1,  2,  3,  4,  1,  2,  3,  4,  1,  2 };
+const Int_t    LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/horizontal pads
+//const Double_t LayerNrInStation[MaxLayers] = {  1,  2,  3,  4,  1,  2,  3,  4,  1,  2 };
 
 //Double_t LayerPosition[MaxLayers] = { 120. }; // start position - 2013-05-29 - trd100_sts              (    4 layers, z = 1200 )
 //Double_t LayerPosition[MaxLayers] = { 380. }; // start position - 2013-05-29 - trd100_rich             (2,3,4 layers, z = 3800 )
@@ -262,11 +262,11 @@ Int_t ModuleStats[MaxLayers][NofModuleTypes] = { 0 };
 
 // z - geometry of TRD modules
 //const Double_t radiator_thickness     =  35.0;    // 35 cm thickness of radiator
-//const Double_t radiator_thickness     =  30.0 + 0.0770;    // 30 cm thickness of radiator + shift pad plane to integer multiple of 1 mm
 const Double_t radiator_thickness     =  30.0;    // 30 cm thickness of radiator + shift pad plane to integer multiple of 1 mm
 const Double_t radiator_position      =  - LayerThickness/2. + radiator_thickness/2.;
 
-const Double_t lattice_thickness      =   1.0 - 0.0230;    // 0.9975;  // 1.0;  // 10 mm thick lattice frames
+//const Double_t lattice_thickness      =   1.0;  // 1.0;  // 10 mm thick lattice frames
+const Double_t lattice_thickness      =   1.0 - 0.0025; // 0.9975;  // 1.0;  // 10 mm thick lattice frames
 const Double_t lattice_position       =  radiator_position + radiator_thickness/2. + lattice_thickness/2.;
 
 const Double_t kapton_thickness       =   0.0025; //  25 micron thickness of kapton
@@ -676,11 +676,11 @@ void dump_info_file()
   fprintf(ifile,"%7.2f ch/m2   channels per m2 active area\n", 1. * total_channels[NofModuleTypes] / total_actarea);
   fprintf(ifile,"\n");
 
-  // pad plane position
-  fprintf(ifile,"# pad plane\n");
+  // gas volume position
+  fprintf(ifile,"# gas volume\n");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
-      fprintf(ifile,"%10.4f cm   position of pad plane - layer %2d\n", LayerPosition[iLayer] + LayerThickness/2. + padplane_position,  PlaneId[iLayer]);
+      fprintf(ifile,"%10.4f cm   position of gas volume - layer %2d\n", LayerPosition[iLayer] + LayerThickness/2. + gas_position,  PlaneId[iLayer]);
   fprintf(ifile,"\n");
    
   // angles
@@ -1264,15 +1264,28 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
    return module;
 }
 
-Int_t copy_nr_modid(Int_t stationNr, Int_t layerNr, Int_t copyNr, Int_t planeNr, Int_t modinplaneNr)
+Int_t copy_nr(Int_t stationNr, Int_t copyNr, Int_t isRotated, Int_t planeNr, Int_t modinplaneNr)
 {
-  return (stationNr * 1000 + layerNr * 100 + copyNr) * 10000 + planeNr * 100 + modinplaneNr;
+  return (stationNr      * 10000000    // 1 digit
+        + copyNr         *   100000    // 2 digit
+        + isRotated      *    10000    // 1 digit
+        + planeNr        *      100    // 2 digit
+        + modinplaneNr   *        1 ); // 2 digit
 }
+
+//Int_t copy_nr_modid(Int_t stationNr, Int_t layerNr, Int_t copyNr, Int_t planeNr, Int_t modinplaneNr)
+//{
+//  return (stationNr      * 10000000    // 1 digit
+//        + layerNr        *  1000000    // 1 digit
+//        + copyNr         *    10000    // 2 digit
+//        + planeNr        *      100    // 2 digit
+//        + modinplaneNr   *        1 ); // 2 digit
+//}
 
 void create_detector_layers(Int_t layerId)
 {
   Int_t module_id = 0;
-  Int_t layerNrInStation = LayerNrInStation[layerId];
+  //  Int_t layerNrInStation = LayerNrInStation[layerId];
   Int_t layerType = LayerType[layerId] / 10;  // this is also a station number
   Int_t isRotated = LayerType[layerId] % 10;  // is 1 for layers 2,4, ...
   TGeoRotation* module_rotation = new TGeoRotation();
@@ -1353,16 +1366,15 @@ void create_detector_layers(Int_t layerId)
           ModuleStats[layerId][type - 1]++;
 
 //          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrIn[type - 1]);  // orig
-          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrIn[type - 1], PlaneId[layerId], modId);  // with modID
+//          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrIn[type - 1], PlaneId[layerId], modId);  // with modID
+          Int_t copy = copy_nr(stationNr, copyNrIn[type - 1], isRotated, PlaneId[layerId], modId);
 
           // take care of FEB orientation away from beam
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
-	    //   	     module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
-   	     module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
+   	     module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate module by   0 or 180 degrees, see layer[1-3][i,o] - vertical pads
           else  // layer 2,4 ...
-	    //   	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
-   	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
+   	     module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
 
           // rotation
           Double_t drotx = 0;
@@ -1420,16 +1432,15 @@ void create_detector_layers(Int_t layerId)
           ModuleStats[layerId][type - 1]++;
 
 //          Int_t copy = copy_nr(stationNr, layerNrInStation, copyNrOut[type - 5]);  // orig
-          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrOut[type - 5],  PlaneId[layerId], modId);  // with modID
+//          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrOut[type - 5],  PlaneId[layerId], modId);  // with modID
+          Int_t copy = copy_nr(stationNr, copyNrOut[type - 5], isRotated, PlaneId[layerId], modId);
 
           // take care of FEB orientation - away from beam
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
-	    //          module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
-            module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate   0 or 180 degrees, see layer[1-3][i,o]
+            module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate module by   0 or 180 degrees, see layer[1-3][i,o] - vertical pads
           else  // layer 2,4 ...
-	    //          module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
-            module_rotation->RotateZ( (module_id %10) * 90. );      // rotate  90 or 270 degrees, see layer[1-3][i,o]
+            module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
     
           // rotation
           Double_t drotx = 0;

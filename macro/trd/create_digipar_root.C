@@ -10,12 +10,11 @@
 //
 // --------------------------------------------------------------------------
 
-void create_digipar_root(
-      TString geoName = "trd_v13o")
+void create_digipar_root(TString geoName = "trd_v13q")
 {
-   TString inFile = "data/test.mc." + geoName + ".root";
-   TString geoFile = "geofile_" + geoName + ".root";
-   TString outFile = "data/test.esd." + geoName + ".root";
+   TString inFile   = "data/test.mc." + geoName + ".root";
+   TString geoFile  = "geofile_" + geoName + ".root";
+   TString outFile  = "data/test.esd." + geoName + ".root";
    TString digiFile = geoName + ".digi.par.long";  // Digi Parameter Output File
 
    FairRunAna* run = new FairRunAna();
@@ -41,3 +40,4 @@ void create_digipar_root(
    rtdb->print();
    rtdb->saveOutput();
 }
+

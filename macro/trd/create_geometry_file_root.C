@@ -7,16 +7,21 @@
 // F. Uhlig 07.05.2010
 //
 // D. Emschermann - 26.05.2010 - fix TRD geo input file
+//
+// expecting the trd_v13q.root file in directory "geometry"
+//
 // --------------------------------------------------------------------------
 
-void create_geometry_file_root(TString geoName = "trd_v13o")
+void create_geometry_file_root(TString geoName = "trd_v13q")
 {
-   TString outDir = "data";
+   TString outDir  = "data";
    TString outFile = outDir + "/test.mc."+ geoName + ".root";
    TString parFile = outDir + "/params.root";
 
    TString caveGeom   = "cave.geo";
-   TString trdGeom = "trd/" + geoName + ".root";
+//   TString trdGeom    = "trd/" + geoName + ".root";
+//   TString trdGeom    = "../macro/trd/geometry/trd.v13/" + geoName + ".root";
+   TString trdGeom    = "../macro/trd/geometry/" + geoName + ".root";
    TString trdGeomOut = "geofile_" + geoName + ".root";
 
    FairRunSim* run = new FairRunSim();

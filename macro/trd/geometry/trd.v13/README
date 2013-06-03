@@ -1,8 +1,18 @@
 #
-##   Howto generate a digipar file form a .root geometry
+##   Information about trd.v13 geometries
 #
 
-# created new official ROOT TRD geomtries (21.03.2013)
+# introduced new geometry naming scheme in May/June 2013, new geos:
+
+- v13g - SIS 300, 10 layers, behind RICH (z = 3800 mm), compact layers (dz = 450 mm)
+- v13h - SIS 300, 10 layers, behind MUCH (z = 5400 mm), compact layers (dz = 450 mm)
+- v13i - SIS 100,  2 layers, behind RICH (z = 3800 mm), compact layers (dz = 450 mm)
+- v13j - SIS 100,  3 layers, behind RICH (z = 3800 mm), compact layers (dz = 450 mm)
+- v13k - SIS 100,  4 layers, behind RICH (z = 3800 mm), compact layers (dz = 450 mm)
+- v13l - SIS 100,  4 layers, behind MUCH (z = 4500 mm), compact layers (dz = 450 mm)
+- v13m - SIS 100,  4 layers, behind STS  (z = 2700 mm), parking for TOF
+
+# created new official ROOT TRD geometries (21.03.2013)
 
 - v13c - as v13i, compressed, without 25 cm gaps between stations, z = 4.5m to 9.5m
 - v13d - as v13s - 2 layers, SIS100
@@ -11,27 +21,12 @@
 
 # develloper's versions
 
-v13c - like v13b, but reduced FEBs: 10 FEBs for 1 cm2 and 5 FEBs for 2 cm2 pad size
-v13d - like v13b, but FEB  0 degree inclination
-v13e - like v13b, but FEB 30 degree inclination
-v13f - like v13b, but FEB 60 degree inclination
-v13g - like v13b, but FEB 80 degree inclination
-v13h - like v13b, but no radiator material
-v13i - like v13c, but FEB thickness reduced from 5.0 to 2.5 mm
-v13j - like v13b, but no FEBs at all
-v13k - like v13b, but no FEBs at all and no lattice grid
-v13l - like v13b, full FEBs, reduced FEB thickness (2.5mm)
 
-v13r - like v13a, SIS100 TRD, 3 layers (x,y,x), reduced number of FEBs, reduced FEB thickness
-v13s - like v13a, SIS100 TRD, 2 layers, reduced number of FEBs, reduced FEB thickness
-v13t - like v13s, SIS100 TRD, 4 layers, reduced number of FEBs, reduced FEB thickness
-v13u - like v13s, SIS100 TRD, 2 layers, with 6 mm gas gap
-v13v - like v13t, SIS100 TRD, 4 layers, with 6 mm gas gap
+#
+## Howto generate a digipar file form a .root geometry
+#
 
-# DE, January 2013
+# DE, June 2013
 
-# take the short geometry file (not containing the master volume)
-root -l -b -q create_geometry_file_root.C\(\"geometry/trd_v13d.root\"\)
-root -l -b -q create_digipar_root.C\(\"geometry/trd_v13d.root\"\)
-gcc -o cut_digipar_lf cut_digipar_lf.c 
-./cut_digipar_lf trd_v13d.digi.par.long trd_v13d.digi.par
+# in macro/run
+./create_digipar_root.sh

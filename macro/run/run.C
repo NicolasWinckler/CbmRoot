@@ -16,7 +16,7 @@ void run()
   TString magnetGeom = "passive/magnet_v09e.geo";
   TString stsGeom    = "sts/sts_v11a.geo";
   TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v13o.root";
+  TString trdGeom    = "trd/trd_v13g.root";
   TString tofGeom    = "tof/tof_v07a.geo";
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
 

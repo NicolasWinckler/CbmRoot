@@ -2,11 +2,11 @@
 ##   trd_v13m information file
 #
 
-# created 20130603
+# created 20130604
 
 # envelope
- 270 cm   start of TRD (z)
- 450 cm   end   of TRD (z)
+ 300 cm   start of TRD (z)
+ 480 cm   end   of TRD (z)
 
 # thickness
   45 cm   per single layer (z)
@@ -15,10 +15,10 @@
   1  2  3  4    planeID
 
 # z-positions of layer front
-  270 cm   z-position of layer  1
-  315 cm   z-position of layer  2
-  360 cm   z-position of layer  3
-  405 cm   z-position of layer  4
+  300 cm   z-position of layer  1
+  345 cm   z-position of layer  2
+  390 cm   z-position of layer  3
+  435 cm   z-position of layer  4
 
 # flags
 radiator is             : included
@@ -58,13 +58,13 @@ support structure is    : included
 2163.32 ch/m2   channels per m2 active area
 
 # gas volume position
-  301.6000 cm   position of gas volume - layer  1
-  346.6000 cm   position of gas volume - layer  2
-  391.6000 cm   position of gas volume - layer  3
-  436.6000 cm   position of gas volume - layer  4
+  331.6000 cm   position of gas volume - layer  1
+  376.6000 cm   position of gas volume - layer  2
+  421.6000 cm   position of gas volume - layer  3
+  466.6000 cm   position of gas volume - layer  4
 
 # angles of acceptance
-v: 38.16 deg, h: 47.73 deg - vertical/horizontal - layer  1
-v: 34.37 deg, h: 43.76 deg - vertical/horizontal - layer  2
-v: 31.20 deg, h: 40.29 deg - vertical/horizontal - layer  3
-v: 28.51 deg, h: 37.25 deg - vertical/horizontal - layer  4
+v: 35.56 deg, h: 45.02 deg - vertical/horizontal - layer  1
+v: 32.19 deg, h: 41.39 deg - vertical/horizontal - layer  2
+v: 29.36 deg, h: 38.22 deg - vertical/horizontal - layer  3
+v: 26.95 deg, h: 35.44 deg - vertical/horizontal - layer  4

@@ -33,7 +33,7 @@ void global_sim(Int_t nEvents = 10)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "events/trd_v13o/"; // Directory for output simulation files
+	TString dir = "events/trd_v13g/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -60,7 +60,7 @@ void global_sim(Int_t nEvents = 10)
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
 		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v13o.root";
+		trdGeom    = "trd/trd_v13g.root";
 		tofGeom    = "tof/tof_v13b.root";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";

@@ -1,35 +1,12 @@
 trd_v13g.root
-trd_v13c.root
-trd_v13b.root
-trd_v11c.geo
-trd_v12b.geo
-trd_v12a.geo
 
+trd_v13m.root
 trd_v13l.root
 trd_v13k.root
+trd_v13j.root
 trd_v13i.root
-
 trd_v13h.root
 trd_v13g.root
-trd_v13f.root
-trd_v13e.root
-trd_v13d.root
-trd_v13c.root
-
-trd_v12b.geo
-trd_v12a.geo
-trd_v10a.geo
-trd_v12b.geo
-trd_v12a.geo
-trd_v11c.geo
-trd_v11d.geo
-
-trd_v10a.geo
-trd_v10b.geo
-trd_v10c.geo
-trd_v10d.geo
-trd_v10e.geo
-trd_v10f.geo
 
 #
 # First line defines the geometry for:

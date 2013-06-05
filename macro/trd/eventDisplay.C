@@ -1,3 +1,5 @@
+// 20130605 - checked by DE
+
 eventDisplay()
 {
 

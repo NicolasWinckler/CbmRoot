@@ -5,6 +5,7 @@
 //
 // V. Friese   22/02/2007
 //
+// 20130605 - checked by DE
 // --------------------------------------------------------------------------
 
 void run_sim(Int_t nEvents = 1)
@@ -38,7 +39,7 @@ void run_sim(Int_t nEvents = 1)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "passive/magnet_v12a.geo";
+  TString magnetGeom = "passive/magnet_v12b.root";
   TString mvdGeom    = "mvd/mvd_v07a.geo";
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString richGeom   = "rich/rich_v08a.geo";
@@ -50,7 +51,7 @@ void run_sim(Int_t nEvents = 1)
 //  TString ecalGeom   = "ecal/ecal_v08a.geo";
   
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_v12a";   // name of field map
+  TString fieldMap    = "field_v12b";    // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   

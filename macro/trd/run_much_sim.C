@@ -1,3 +1,4 @@
+// 20130605 - checked by DE
 /**
  * DE 2013/01 - added TRD for a combined MUCH+TRD setup display
  *
@@ -10,10 +11,11 @@
  * @param outFile        Output file for transport data
  * @param nEvents        Number of events to process
  */
+
 void run_much_sim(TString inputSignal = "",
-              TString inputBgr = "",
-              TString outFile = "",
-              Int_t nEvents = 1)
+                  TString inputBgr = "",
+                  TString outFile = "",
+                  Int_t nEvents = 1)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -53,15 +55,15 @@ void run_much_sim(TString inputSignal = "",
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "passive/magnet_v09m.geo";
-  TString stsGeom    = "sts/sts_v11a.geo";
+  TString magnetGeom = "passive/magnet_v12b.root";
+  TString stsGeom    = "sts/sts_v12b.geo.root";
   TString trdGeom    = "trd/trd_v13h.root";
   TString tofGeom    = "";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap   = "field_v10e";   // name of field map
-  Double_t fieldZ     = 50.;                 // field center z position
-  Double_t fieldScale =  1.;                 // field scaling factor
+  TString  fieldMap   = "field_v10e";    // name of field map
+  Double_t fieldZ     = 50.;             // field center z position
+  Double_t fieldScale =  1.;             // field scaling factor
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -78,23 +80,6 @@ void run_much_sim(TString inputSignal = "",
   // ------------------------------------------------------------------------
 
 
-  // ----  Load libraries   -------------------------------------------------
-  cout << endl << "=== much_sim.C : Loading libraries ..." << endl;
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libSts");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libMuch");
-  // -----------------------------------------------------------------------
 
   // -----   Create simulation run   ----------------------------------------
   cout << endl << "=== much_sim.C : Creating run and database ..." << endl;

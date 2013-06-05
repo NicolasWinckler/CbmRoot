@@ -151,7 +151,7 @@ void run_sim(Int_t nEvents = 1)
 
 
   // -----   Create magnetic field   ----------------------------------------
-  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

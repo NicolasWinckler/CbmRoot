@@ -34,7 +34,6 @@ eventDisplay()
   fMan->AddTask(StsPoint);
  
     
-  fMan->Init();                     
   fMan->Init(1,4,10000);
 
 

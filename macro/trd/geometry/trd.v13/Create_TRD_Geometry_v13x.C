@@ -1491,12 +1491,19 @@ void create_supports()
   const Double_t BeamHeight = 570;  // beamline is at 5.7m above floor
 
   Double_t PilPosZ[6];  // PilPosZ
-  PilPosZ[0] = LayerPosition[0] + LayerThickness/2.;
-  PilPosZ[1] = LayerPosition[3] + LayerThickness/2.;
-  PilPosZ[2] = LayerPosition[4] + LayerThickness/2.;
-  PilPosZ[3] = LayerPosition[7] + LayerThickness/2.;
-  PilPosZ[4] = LayerPosition[8] + LayerThickness/2.;
-  PilPosZ[5] = LayerPosition[9] + LayerThickness/2.;
+//  PilPosZ[0] = LayerPosition[0] + LayerThickness/2.;
+//  PilPosZ[1] = LayerPosition[3] + LayerThickness/2.;
+//  PilPosZ[2] = LayerPosition[4] + LayerThickness/2.;
+//  PilPosZ[3] = LayerPosition[7] + LayerThickness/2.;
+//  PilPosZ[4] = LayerPosition[8] + LayerThickness/2.;
+//  PilPosZ[5] = LayerPosition[9] + LayerThickness/2.;
+
+  PilPosZ[0] = LayerPosition[0] + 15;
+  PilPosZ[1] = LayerPosition[3] - 15 + LayerThickness;
+  PilPosZ[2] = LayerPosition[4] + 15;		      
+  PilPosZ[3] = LayerPosition[7] - 15 + LayerThickness;
+  PilPosZ[4] = LayerPosition[8] + 15;		      
+  PilPosZ[5] = LayerPosition[9] - 15 + LayerThickness;
 
 //  cout << "PilPosZ[0]: " << PilPosZ[0] << endl;
 //  cout << "PilPosZ[1]: " << PilPosZ[1] << endl;

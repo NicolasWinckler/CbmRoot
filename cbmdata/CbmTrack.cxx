@@ -6,12 +6,15 @@
 
 #include "CbmTrack.h"
 
+#include "FairMultiLinkedData.h"
+
 #include <iostream>
 using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrack::CbmTrack() :
+    TObject(),
     fHitIndex(),
     fHitType(),
     fPidHypo(0),
@@ -25,6 +28,53 @@ CbmTrack::CbmTrack() :
 {
 }
 // -------------------------------------------------------------------------
+
+CbmTrack::CbmTrack(const CbmTrack& rhs)
+ : TObject(rhs),
+    fHitIndex(rhs.fHitIndex),
+    fHitType(rhs.fHitType),
+    fPidHypo(rhs.fPidHypo),
+    fParamFirst(rhs.fParamFirst),
+    fParamLast(rhs.fParamLast),
+    fFlag(rhs.fFlag),
+    fChiSq(rhs.fChiSq),
+    fNDF(rhs.fNDF),
+   fPreviousTrackId(rhs.fPreviousTrackId),
+   fLinks(NULL)
+{
+   if (NULL != rhs.fLinks) {
+     fLinks = new FairMultiLinkedData(*(rhs.fLinks));
+   }
+}
+
+CbmTrack& CbmTrack::operator=(const CbmTrack& rhs)
+{
+
+  if (this != &rhs) {
+
+    TObject::operator=(rhs);
+    fHitIndex = rhs.fHitIndex;
+    fHitType = rhs.fHitType;
+    fPidHypo = rhs.fPidHypo;
+    fParamFirst = rhs.fParamFirst;
+    fParamLast = rhs.fParamLast;
+    fFlag = rhs.fFlag;
+    fChiSq = rhs.fChiSq;
+    fNDF = rhs.fNDF;
+    fPreviousTrackId = rhs.fPreviousTrackId;
+
+    if (NULL != rhs.fLinks) {
+      std::auto_ptr<FairMultiLinkedData> tmp(new FairMultiLinkedData(*rhs.fLinks));
+      delete fLinks;
+      fLinks = tmp.release();
+    } else {
+      fLinks = NULL;
+    }
+  }
+  return *this;
+}
+
+
 
 // -----   Destructor   ----------------------------------------------------
 CbmTrack::~CbmTrack()

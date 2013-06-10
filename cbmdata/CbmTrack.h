@@ -34,6 +34,13 @@ public:
 	/** Destructor **/
 	virtual ~CbmTrack();
 
+        /** Copy Constructor **/
+        CbmTrack(const CbmTrack&);
+
+        /** Assignment Operator **/
+        CbmTrack& operator=(const CbmTrack&);
+
+
 	/** Add a hit to the list, using index and HitType
 	 * @param index Index of the hit in the array
 	 * @param type Type of the hit to be added
@@ -92,7 +99,7 @@ private:
 	Int_t fPreviousTrackId;
 
 	/** Monte-Carlo link collection **/
-   FairMultiLinkedData* fLinks;
+        FairMultiLinkedData* fLinks;
 
 	ClassDef(CbmTrack, 2);
 };

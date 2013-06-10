@@ -20,23 +20,10 @@ void run_sim(Int_t nEvents = 2)
   TString outFile = outDir + "/test.mc.root";
   TString parFile = outDir + "/params.root";
   
-  // -----  Geometries  -----------------------------------------------------
-  TString caveGeom   = "cave.geo";
-  TString targetGeom = "target_au_250mu.geo";
-  TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "passive/magnet_v12a.geo";
-  TString mvdGeom    = "mvd/mvd_v07a.geo";
-  TString stsGeom    = "sts/sts_v12b.geo.root";
-  TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v13g.root";
-  TString tofGeom    = "tof/tof_v13b.root";
-  TString ecalGeom   = "";
-//  TString ecalGeom   = "ecal/ecal_v08a.geo";
-  
-  // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_v12a";   // name of field map
-  Double_t fieldZ     = 50.;             // field centre z position
-  Double_t fieldScale =  1.;             // field scaling factor
+  TString macro = inDir + "/geometry/standard_electron_setup.C";
+  gROOT->LoadMacro(macro);
+  gInterpreter->ProcessLine("standard_electron_setup()");
+
   
   // In general, the following parts need not be touched
   // ========================================================================
@@ -131,10 +118,12 @@ void run_sim(Int_t nEvents = 2)
   
   // ------------------------------------------------------------------------
 
-
-
   // -----   Create magnetic field   ----------------------------------------
-  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  if ( 2 == fieldSymType ) {
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  }  else if ( 3 == fieldSymType ) {
+    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
+  } 
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

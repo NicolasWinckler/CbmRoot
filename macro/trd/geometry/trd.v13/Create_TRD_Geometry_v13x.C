@@ -116,7 +116,8 @@ const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS3
 
 Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
 
-const Int_t    LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/horizontal pads
+const Int_t   LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/horizontal pads
+const Int_t   LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 
 //Double_t LayerPosition[MaxLayers] = { 120. }; // start position - 2013-05-29 - trd100_sts              (    4 layers, z = 1200 )
 //Double_t LayerPosition[MaxLayers] = { 380. }; // start position - 2013-05-29 - trd100_rich             (2,3,4 layers, z = 3800 )
@@ -1314,10 +1315,16 @@ void create_detector_layers(Int_t layerId)
 // add layer keeping volume
   TString layername = Form("layer%02d", PlaneId[layerId]);
   TGeoVolume* layer = new TGeoVolumeAssembly(layername);
-//  gGeoMan->GetVolume(geoVersion)->AddNode(layer, 1);
-  Int_t i = LayerType[layerId] / 10 * 100 + PlaneId[layerId];  // layer type as leading digit in copy number of layer
-  //  Int_t i = 100 + PlaneId[layerId];
+
+  // compute layer copy number
+  Int_t i = LayerType[layerId] / 10   * 10000   // 1 digit 
+          + LayerType[layerId] % 10   *  1000   // 1 digit  // isRotated
+          + LayerNrInStation[layerId] *   100   // 1 digit
+          + PlaneId[layerId];                   // 2 digits // layer type as leading digit in copy number of layer
   gGeoMan->GetVolume(geoVersion)->AddNode(layer, i);
+
+//  Int_t i = 100 + PlaneId[layerId];
+//  gGeoMan->GetVolume(geoVersion)->AddNode(layer, 1);
 //  cout << layername << endl;
 
   Double_t ExplodeScale = 1.00;
@@ -1460,21 +1467,21 @@ void create_detector_layers(Int_t layerId)
 
 void create_supports()
 {
-  const TString trdSupport = "supportframe";
-  TGeoVolume* trdsupport = new TGeoVolumeAssembly(trdSupport);
-
-  const TString trd_01 = "trd1";
+  const TString trd_01 = "support_trd1";
   TGeoVolume* trd_1 = new TGeoVolumeAssembly(trd_01);
 
-  const TString trd_02 = "trd2";
+  const TString trd_02 = "support_trd2";
   TGeoVolume* trd_2 = new TGeoVolumeAssembly(trd_02);
 
-  const TString trd_03 = "trd3";
+  const TString trd_03 = "support_trd3";
   TGeoVolume* trd_3 = new TGeoVolumeAssembly(trd_03);
 
-  trdsupport->AddNode(trd_1, 1);
-  trdsupport->AddNode(trd_2, 2);
-  trdsupport->AddNode(trd_3, 3);
+//  const TString trdSupport = "supportframe";
+//  TGeoVolume* trdsupport = new TGeoVolumeAssembly(trdSupport);
+//
+//  trdsupport->AddNode(trd_1, 1);
+//  trdsupport->AddNode(trd_2, 2);
+//  trdsupport->AddNode(trd_3, 3);
 
   TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
 
@@ -1742,6 +1749,10 @@ void create_supports()
       trd_3->AddNode(trd_H_slope_vol1, 34, trd_H_slope_combi04);
     }
 
-  gGeoMan->GetVolume(geoVersion)->AddNode(trdsupport,1);
+  //  gGeoMan->GetVolume(geoVersion)->AddNode(trdsupport,1);
+
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd_1, 1);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd_2, 2);
+  gGeoMan->GetVolume(geoVersion)->AddNode(trd_3, 3);
 
 }

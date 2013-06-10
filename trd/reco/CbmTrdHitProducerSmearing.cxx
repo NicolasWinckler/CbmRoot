@@ -15,6 +15,7 @@
 
 #include "FairRootManager.h"
 #include "FairTask.h"
+#include "FairLogger.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 

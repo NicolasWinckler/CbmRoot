@@ -6,10 +6,12 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairRootManager.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 
 #include <fstream>
+#include <iostream>
 
 CbmLitCreateStandaloneData::CbmLitCreateStandaloneData():
    fEventNo(0)

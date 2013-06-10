@@ -18,6 +18,7 @@
 #include "TRandom.h"
 #include "TVector3.h"
 #include "TClonesArray.h"
+#include "FairLogger.h"
 
 #include <iostream>
 #include <iomanip>

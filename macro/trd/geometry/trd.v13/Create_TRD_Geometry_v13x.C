@@ -126,6 +126,10 @@ Double_t LayerPosition[MaxLayers] = { 540. }; // start position - 2013-05-29 - t
 
 const Double_t LayerThickness = 45.0; // Thickness of one TRD layer in cm
 
+const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0. };  // z offest in addition to LayerThickness 
+//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,  10.,   0.,   0.,   0.,  10.,   0. };  // z offest in addition to LayerThickness 
+//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0., 165.,   0.,   0.,   0., 165.,   0. };  // z offest in addition to LayerThickness 
+
 //const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
  //// just behind RICH v13a at z=400
 //const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };  // z position in cm of Layer front
@@ -344,7 +348,7 @@ void Create_TRD_Geometry_v13x() {
 
   // Position the layers in z
   for (Int_t iLayer = 1; iLayer < MaxLayers; iLayer++)
-    LayerPosition[iLayer] = LayerPosition[iLayer-1] + LayerThickness;
+    LayerPosition[iLayer] = LayerPosition[iLayer-1] + LayerThickness + LayerOffset[iLayer];  // add offset for extra gaps
 
   // Get the GeoManager for later usage
   gGeoMan = (TGeoManager*) gROOT->FindObject("FAIRGeom");
@@ -467,6 +471,14 @@ void dump_info_file()
   // Layer thickness
   fprintf(ifile,"# thickness\n");
   fprintf(ifile,"%4d cm   per single layer (z)\n", LayerThickness);
+  fprintf(ifile,"\n");
+
+  // Show extra gaps
+  fprintf(ifile,"# extra gaps\n ");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+      fprintf(ifile,"%3d ", LayerOffset[iLayer]);
+  fprintf(ifile,"   extra gaps in z (cm)\n");
   fprintf(ifile,"\n");
 
   // Show layer flags

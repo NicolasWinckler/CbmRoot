@@ -34,6 +34,7 @@
 #include "FairHit.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
+#include "FairLogger.h"
 #include "CbmRichConverter.h"
 #include "TClonesArray.h"
 
@@ -87,7 +88,8 @@ void CbmRichReconstruction::SetParContainers()
    if (fProjectionName == "standard") fProjectionProducer = new CbmRichProjectionProducer(1);
    else if (fProjectionName == "prototype") fProjectionProducer = new CbmRichProtProjectionProducer(1);
    else {
-      Fatal("CbmRichReconstruction::",(fProjectionName + string(" is not correct name for projection algorithm.")).c_str());
+      LOG(FATAL) << fProjectionName << " is not correct name for projection algorithm." << FairLogger::endl;
+//      Fatal("CbmRichReconstruction::",(fProjectionName + string(" is not correct name for projection algorithm.")).c_str());
    }
    fProjectionProducer->SetParContainers();
 }
@@ -143,8 +145,9 @@ void CbmRichReconstruction::InitExtrapolation()
    } else if (fExtrapolationName == "kf" || fExtrapolationName == "KF"){
       fTrackExtrapolation = new CbmRichTrackExtrapolationKF();
    } else {
-      Fatal("CbmRichReconstruction::InitExtrapolation",
-           (fExtrapolationName + string(" is not correct name for extrapolation algorithm.")).c_str());
+      LOG(FATAL) << fExtrapolationName << " is not correct name for extrapolation algorithm." << FairLogger::endl;
+//      Fatal("CbmRichReconstruction::InitExtrapolation",
+//           (fExtrapolationName + string(" is not correct name for extrapolation algorithm.")).c_str());
    }
    fTrackExtrapolation->Init();
 }
@@ -167,8 +170,9 @@ void CbmRichReconstruction::InitFinder()
    } else if (fFinderName == "hough_prototype") {
       fRingFinder = new CbmRichProtRingFinderHough();
    } else {
-      Fatal("CbmRichReconstruction::InitFinder",
-            (fFinderName + string(" is not correct name for ring finder algorithm.")).c_str());
+      LOG(FATAL) << fFinderName << " is not correct name for ring finder algorithm." << FairLogger::endl;
+//      Fatal("CbmRichReconstruction::InitFinder",
+//            (fFinderName + string(" is not correct name for ring finder algorithm.")).c_str());
    }
 
    fRingFinder->Init();
@@ -189,8 +193,9 @@ void CbmRichReconstruction::InitFitter()
    } else if (fFitterName == "ellipse_minuit") {
       fRingFitter = new CbmRichRingFitterEllipseMinuit();
    } else {
-      Fatal("CbmRichReconstruction::InitFitter",
-            (fFitterName + string(" is not correct name for ring fitter algorithm.")).c_str());
+      LOG(FATAL) << fFitterName << " is not correct name for ring fitter algorithm." << FairLogger::endl;
+//      Fatal("CbmRichReconstruction::InitFitter",
+//            (fFitterName + string(" is not correct name for ring fitter algorithm.")).c_str());
    }
    CbmRichConverter::Init();
 }
@@ -200,8 +205,9 @@ void CbmRichReconstruction::InitTrackAssign()
    if (fTrackAssignName == "closest_distance"){
       fRingTrackAssign = new CbmRichRingTrackAssignClosestD();
    } else {
-      Fatal("CbmRichReconstruction::InitTrackAssign",
-            (fTrackAssignName + string(" is not correct name for ring-track assignment algorithm.")).c_str());
+      LOG(FATAL) << fTrackAssignName << " is not correct name for ring-track assignment algorithm." << FairLogger::endl;
+//      Fatal("CbmRichReconstruction::InitTrackAssign",
+//            (fTrackAssignName + string(" is not correct name for ring-track assignment algorithm.")).c_str());
    }
    fRingTrackAssign->Init();
 }

@@ -11,7 +11,7 @@
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsModule::CbmStsModule() : CbmStsElement(), fBuffer()
+CbmStsModule::CbmStsModule() : CbmStsElement(), fSensors(), fBuffer()
 {
 }
 // -------------------------------------------------------------------------
@@ -21,7 +21,8 @@ CbmStsModule::CbmStsModule() : CbmStsElement(), fBuffer()
 // -----   Standard constructor   ------------------------------------------
 CbmStsModule::CbmStsModule(const char* name, const char* title,
                            TGeoPhysicalNode* node) :
-                           CbmStsElement(name, title, kStsModule, node)
+                           CbmStsElement(name, title, kStsModule, node),
+                           fSensors(), fBuffer()
 {
 }
 // -------------------------------------------------------------------------

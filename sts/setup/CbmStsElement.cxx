@@ -15,7 +15,8 @@
 CbmStsElement::CbmStsElement() : TNamed(),
                                  fAddress(0),
                                  fLevel(kStsNofLevels),
-                                 fNode(NULL)
+                                 fNode(NULL),
+                                 fDaughters()
 {
 }
 // -------------------------------------------------------------------------
@@ -29,7 +30,8 @@ CbmStsElement::CbmStsElement(const char* name, const char* title,
                              TNamed(name, title),
                              fAddress(0),
                              fLevel(kStsSystem),
-                             fNode(node)
+                             fNode(node),
+                             fDaughters()
 {
   SetLevel(level);
 }

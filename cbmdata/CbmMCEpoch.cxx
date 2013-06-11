@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#include "FairLogger.h"
+
 #include "TClonesArray.h"
 
 using namespace std;
@@ -72,6 +74,9 @@ void CbmMCEpoch::AddPoint(DetectorId det, FairMCPoint* point,
 							    fStartTime);
   }
     break;
+
+  default: 
+    LOG(FATAL) << "The functionality is not yet implemented for the detector with id " << det << FairLogger::endl;
 
   }
 

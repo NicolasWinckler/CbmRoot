@@ -20,7 +20,7 @@
 #pragma link C++ class  CbmGeoTrdPar;
 //#pragma link C++ class  CbmTrdDigitizerMathieson;
 //#pragma link C++ class  CbmTrdDigitizerPRF;
-//#pragma link C++ class  CbmTrdHitRateQa;
+#pragma link C++ class  CbmTrdHitRateQa;
 //#pragma link C++ class  CbmTrdHitDensityQa;
 //#pragma link C++ class  CbmTrdOccupancyQa;
 #pragma link C++ class  CbmTrdDigitizerPRFQa;

@@ -572,7 +572,7 @@ void CbmTrdHitRateQa::FinishEvent()
 	substringLength=pos-7;
 	TString bla1 = bla3(7,substringLength);     
 	fModuleType = bla1.Atoi();
-	fModuleCopy = bla2.Atoi();
+	//	fModuleCopy = bla2.Atoi();
 	break;
       } 
     }
@@ -583,7 +583,7 @@ void CbmTrdHitRateQa::GetModuleInformationSL(Int_t VolumeID)
       fStation    = fGeoHandler->GetStation(VolumeID);
       fLayer      = fGeoHandler->GetLayer(VolumeID);     
       fModuleType = fGeoHandler->GetModuleType(VolumeID);
-      fModuleCopy = fGeoHandler->GetModuleCopyNr(VolumeID);
+      //      fModuleCopy = fGeoHandler->GetModuleCopyNr(VolumeID);
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
@@ -597,11 +597,11 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
   fModuleInfo = fDigiPar->GetModule(VolumeID);
   if (fModuleInfo != NULL)
     {
-      Int_t detID = fModuleInfo->GetDetectorId();
-
-      if (detID != VolumeID ){
-	cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
-      }
+//      Int_t detID = fModuleInfo->GetDetectorId();
+//
+//      if (detID != VolumeID ){
+//	cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
+//      }
       Int_t nRow = 0;
       Int_t nCol = 0;
       Double_t Mpos[3];
@@ -633,7 +633,7 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       fStation    = fGeoHandler->GetStation(VolumeID);
       fLayer      = fGeoHandler->GetLayer(VolumeID);     
       fModuleType = fGeoHandler->GetModuleType(VolumeID);
-      fModuleCopy = fGeoHandler->GetModuleCopyNr(VolumeID);
+      //      fModuleCopy = fGeoHandler->GetModuleCopyNr(VolumeID);
       GeoPara->moduleId  = VolumeID;
       GeoPara->layerId   = fLayer;
       GeoPara->stationId = fStation;

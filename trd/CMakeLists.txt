@@ -48,7 +48,7 @@ qa/CbmTrdHitProducerQa.cxx
 qa/CbmTrdTracksPidQa.cxx
 #qa/CbmTrdQa.cxx
 #qa/CbmTrdHitDensityQa.cxx
-#qa/CbmTrdHitRateQa.cxx
+qa/CbmTrdHitRateQa.cxx
 #qa/CbmTrdOccupancyQa.cxx
 qa/CbmTrdDigitizerPRFQa.cxx
 qa/CbmTrdClusterizerFastQa.cxx

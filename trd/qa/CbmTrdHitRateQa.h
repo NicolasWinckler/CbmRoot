@@ -2,13 +2,13 @@
 #define CBMTRDHITRATEQA_H_
 
 #include "FairTask.h"
+#include "CbmTrdDigi.h"
 
 #include <map>
 #include <list>
 #include <vector>
 
 class CbmTrdDigiPar;
-class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
 class CbmTrdGeoHandler;

@@ -46,10 +46,10 @@ public:
    */
    Int_t GetModuleAddress(const TString& path);
           
-   /**
-   * \brief Return pad orientation of the current node in the TGeoManager.
-   */
-   Int_t GetPadOrientation();
+//   /**
+//   * \brief Return pad orientation of the current node in the TGeoManager.
+//   */
+//   Int_t GetPadOrientation();
 
    /**
    * \brief Navigate to node and return pad orientation.
@@ -69,18 +69,31 @@ public:
    Double_t GetZ(const TString& path);
    Int_t GetModuleType(const TString& path);
 
+   // for backward compatibility
+   Int_t GetStation(const TString& path);
+   Int_t GetLayer(const TString& path);
+   Int_t GetModuleCopyNr(const TString& path);
+
 private:
 
    void NavigateTo(const TString& path);
 
    Bool_t fIsSimulation; //!
 
-   UInt_t fGeoPathHash;        //!
-   TGeoVolume* fCurrentVolume; //!
-   TGeoBBox* fVolumeShape;     //!
-   Double_t fGlobal[3];        //! Global center of volume
-   TGeoHMatrix* fGlobalMatrix; //!
-   Int_t fModuleType; //!
+   UInt_t       fGeoPathHash;   //!
+   TGeoVolume*  fCurrentVolume; //!
+   TGeoBBox*    fVolumeShape;   //!
+   Double_t     fGlobal[3];     //! Global center of volume
+   TGeoHMatrix* fGlobalMatrix;  //!
+   Int_t        fLayerId;       //!
+   Int_t        fModuleId;      //!
+   Int_t        fModuleType;    //!
+   Int_t        fIsRotated;     //! IsRotated Module
+
+   // for backward compatibility
+   Int_t        fStation;       //! StationTypeID, 1..3
+   Int_t        fLayer;         //! LayerID within station, 1..4
+   Int_t        fModuleCopy;    //! ModuleCopyID with module type
 
    CbmTrdGeoHandler(const CbmTrdGeoHandler&);
    CbmTrdGeoHandler operator=(const CbmTrdGeoHandler&);

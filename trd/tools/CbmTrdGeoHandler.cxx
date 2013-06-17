@@ -16,6 +16,9 @@
 
 #include <string>
 #include <cstdlib>
+#include <iostream>
+using std::cout;
+using std::endl;
 using std::string;
 using std::atoi;
 
@@ -63,17 +66,20 @@ Int_t CbmTrdGeoHandler::GetModuleAddress(
   return GetModuleAddress();
 }
 
-Int_t CbmTrdGeoHandler::GetPadOrientation()
-{
-   // We take the mother node (module) of the current node we are in (gas).
-   TGeoNode* node = gGeoManager->GetMother();
-   // Get the module copy number to get the information about layerId and moduleId.
-   Int_t copyNr = node->GetNumber();
-   // isRotated is the 5th digit from the back
-   Int_t isRotated = ((copyNr / 10000) % 10);
-   // return isRotated
-   return isRotated;
-}
+//Int_t CbmTrdGeoHandler::GetPadOrientation()
+//{
+//   // We take the mother node (module) of the current node we are in (gas).
+//   TGeoNode* node = gGeoManager->GetMother(2);   // get layer
+//   //   TGeoNode* node = gGeoManager->GetMother();   // get module
+//   // Get the module copy number to get the information about layerId and moduleId.
+//   Int_t copyNr = node->GetNumber();
+//   //   std::cout << copyNr << std::endl;
+//   // isRotated is the 4th digit from the back
+//   Int_t isRotated = ((copyNr / 1000) % 10);  // from layer copy number
+//   // isRotated is the 5th digit from the back
+//   //   Int_t isRotated = ((copyNr / 10000) % 10);   // from module copy number
+//   return isRotated;
+//}
 
 Int_t CbmTrdGeoHandler::GetPadOrientation(
       const TString& path)
@@ -81,7 +87,7 @@ Int_t CbmTrdGeoHandler::GetPadOrientation(
   if (fGeoPathHash != path.Hash()) {
     NavigateTo(path);
   }
-  return GetPadOrientation();
+  return fIsRotated;
 }
 
 Double_t CbmTrdGeoHandler::GetSizeX(
@@ -147,6 +153,33 @@ Int_t CbmTrdGeoHandler::GetModuleType(
    return fModuleType;
 }
 
+Int_t CbmTrdGeoHandler::GetStation(
+      const TString& path)
+{
+   if (fGeoPathHash != path.Hash()) {
+      NavigateTo(path);
+   }
+   return fStation;
+}
+
+Int_t CbmTrdGeoHandler::GetLayer(
+      const TString& path)
+{
+   if (fGeoPathHash != path.Hash()) {
+      NavigateTo(path);
+   }
+   return fLayer;
+}
+
+Int_t CbmTrdGeoHandler::GetModuleCopyNr(
+      const TString& path)
+{
+   if (fGeoPathHash != path.Hash()) {
+      NavigateTo(path);
+   }
+   return fModuleCopy;
+}
+
 void CbmTrdGeoHandler::NavigateTo(
       const TString& path)
 {
@@ -163,6 +196,23 @@ void CbmTrdGeoHandler::NavigateTo(
       // Get module type information which is decoded in copy number.
       const char* moduleName = gGeoManager->GetMother()->GetName();
       fModuleType = std::atoi(string(1, *(moduleName + 6)).c_str()); // 6th element module type
+
+      // We take the mother of the mother node (layer) of the current node we are in (gas).
+      TGeoNode* layernode = gGeoManager->GetMother(2);   // get layer
+      Int_t layercopyNr = layernode->GetNumber();
+      // fIsRotated is the 4th digit from the back
+      fStation   = ((layercopyNr / 10000) % 10);  // from layer copy number
+      fIsRotated = ((layercopyNr /  1000) % 10);  // from layer copy number
+      fLayer     = ((layercopyNr /   100) % 10);  // from layer copy number
+
+      // We take the mother node (module) of the current node we are in (gas).
+      TGeoNode* modulenode = gGeoManager->GetMother();
+      // Get the module copy number to get the information about layerId and moduleId.
+      Int_t modulecopyNr = modulenode->GetNumber();
+      // In TGeoManager numbering starts with 1, so we have to subtract 1.
+      fModuleCopy= ((modulecopyNr / 100000) % 100);
+      //      fLayerId   = ((modulecopyNr /    100) % 100) - 1;
+      //      fModuleId  = ((modulecopyNr /      1) % 100) - 1;
    }
 }
  

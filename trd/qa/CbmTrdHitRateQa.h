@@ -83,13 +83,6 @@ class CbmTrdHitRateQa : public FairTask {
 
   void GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
 
-  void GetModuleInformationSL( Int_t VolumeID);
-
-  void FillVector(Bool_t firstLayer, Int_t VolumeID,
-		   std::vector<int>& L1S1, std::vector<int>& L2S1, std::vector<int>& L3S1, std::vector<int>& L4S1, 
-		   std::vector<int>& L1S2, std::vector<int>& L2S2, std::vector<int>& L3S2, std::vector<int>& L4S2, 
-		   std::vector<int>& L1S3, std::vector<int>& L2S3, std::vector<int>& L3S3, std::vector<int>& L4S3);
-
   void GetModuleInformation();
 
   void Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2,  TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
@@ -107,10 +100,10 @@ class CbmTrdHitRateQa : public FairTask {
 
   Bool_t fDraw;
 
+  Int_t   fPlane;  // DE
   Int_t   fStation;
   Int_t   fLayer;
-  Int_t   fModuleType;
-  Int_t   fModuleCopy;
+
   Int_t   fCol_mean,fCol_in,fCol_out; //Calculated pixel column were the hit is in
   Int_t   fRow_mean,fRow_in,fRow_out; //Calculated pixel row were the hit is in
   Int_t   fModuleID;//Unique number for detector module

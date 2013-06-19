@@ -4,6 +4,7 @@
 ///                                             
 
 
+// 2013-06-19 - DE - add TRD (I, II, III) labels on support structure
 // 2013-05-29 - DE - v13g trd300_rich             (10 layers, z = 3800 ) - TRD right behind SIS300 RICH
 // 2013-05-29 - DE - v13h trd300_much_6_absorbers (10 layers, z = 5400 ) - TRD right behind SIS300 MUCH
 // 2013-05-29 - DE - v13i trd100_rich             ( 2 layers, z = 3800 ) - TRD right behind RICH			      
@@ -67,6 +68,7 @@ const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pll
 const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
 const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
 const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
+const Bool_t IncludeLabels   = true;  // false;  // true, if TRD (I, II, III) labels are plottoed in (VisLevel 5)
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -316,6 +318,7 @@ const TString HoneycombVolumeMedium   = "TRDaramide";
 const TString CarbonVolumeMedium      = "TRDcarbon";
 const TString FebVolumeMedium         = "TRDG10";    // todo - put correct FEB material here
 const TString AsicVolumeMedium        = "air";       // todo - put correct ASIC material here
+const TString TextVolumeMedium        = "air";       // leave as air
 const TString FrameVolumeMedium       = "TRDG10";
 const TString AluminiumVolumeMedium   = "aluminium";
 //const TString MylarVolumeMedium       = "mylar";
@@ -332,6 +335,7 @@ void create_materials_from_media_file();
 void create_trd_module_type(Int_t moduleType);
 void create_detector_layers(Int_t layer);
 void create_supports();
+void add_trd_labels();
 void dump_info_file();
 
 
@@ -1530,6 +1534,7 @@ void create_supports()
   TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX( 90.); // rotate  90 deg around x-axis                     
   TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY( 90.); // rotate  90 deg around y-axis                     
   TGeoRotation  *rotz090 = new TGeoRotation("rotz090"); rotz090->RotateZ( 90.); // rotate  90 deg around y-axis                     
+  TGeoRotation  *roty270 = new TGeoRotation("roty270"); roty270->RotateY(270.); // rotate 270 deg around y-axis                     
 
   TGeoRotation  *rotzx01 = new TGeoRotation("rotzx01"); 
   rotzx01->RotateZ(  90.); // rotate  90 deg around z-axis
@@ -1761,6 +1766,50 @@ void create_supports()
       trd_3->AddNode(trd_H_slope_vol1, 34, trd_H_slope_combi04);
     }
 
+  if (IncludeLabels)
+  {
+
+    Int_t text_height    = 40;
+    Int_t text_thickness =  8;
+  
+    TGeoTranslation *tr200 = new TGeoTranslation(0., (AperY[0]+Hhei+ text_height/2.), PilPosZ[0]-15+ text_thickness/2.);
+    TGeoTranslation *tr201 = new TGeoTranslation(0., (AperY[1]+Hhei+ text_height/2.), PilPosZ[2]-15+ text_thickness/2.);
+    TGeoTranslation *tr202 = new TGeoTranslation(0., (AperY[2]+Hhei+ text_height/2.), PilPosZ[4]-15+ text_thickness/2.);
+  
+    TGeoCombiTrans  *tr203 = new TGeoCombiTrans(-(AperX[0]+Hhei+ text_thickness/2.), (AperY[0]+Hhei-Hwid-text_height/2.), (PilPosZ[0]+PilPosZ[1])/2., roty090);
+    TGeoCombiTrans  *tr204 = new TGeoCombiTrans(-(AperX[1]+Hhei+ text_thickness/2.), (AperY[1]+Hhei-Hwid-text_height/2.), (PilPosZ[2]+PilPosZ[3])/2., roty090);
+    TGeoCombiTrans  *tr205 = new TGeoCombiTrans(-(AperX[2]+Hhei+ text_thickness/2.), (AperY[2]+Hhei-Hwid-text_height/2.), (PilPosZ[4]+PilPosZ[5])/2., roty090);
+  
+    TGeoCombiTrans  *tr206 = new TGeoCombiTrans( (AperX[0]+Hhei+ text_thickness/2.), (AperY[0]+Hhei-Hwid-text_height/2.), (PilPosZ[0]+PilPosZ[1])/2., roty270);
+    TGeoCombiTrans  *tr207 = new TGeoCombiTrans( (AperX[1]+Hhei+ text_thickness/2.), (AperY[1]+Hhei-Hwid-text_height/2.), (PilPosZ[2]+PilPosZ[3])/2., roty270);
+    TGeoCombiTrans  *tr208 = new TGeoCombiTrans( (AperX[2]+Hhei+ text_thickness/2.), (AperY[2]+Hhei-Hwid-text_height/2.), (PilPosZ[4]+PilPosZ[5])/2., roty270);
+  
+    TGeoVolume* trdbox1 = new TGeoVolumeAssembly("trdbox1"); // volume for TRD text (108, 40, 8)
+    TGeoVolume* trdbox2 = new TGeoVolumeAssembly("trdbox2"); // volume for TRD text (108, 40, 8)
+    TGeoVolume* trdbox3 = new TGeoVolumeAssembly("trdbox3"); // volume for TRD text (108, 40, 8)
+    add_trd_labels(trdbox1, trdbox2, trdbox3);
+  
+    // final placement
+    if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      //    trd_1->AddNode(trdbox1, 1, tr200);
+      trd_1->AddNode(trdbox1, 4, tr203);
+      trd_1->AddNode(trdbox1, 7, tr206);
+    }
+    if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      //    trd_2->AddNode(trdbox2, 2, tr201);
+      trd_2->AddNode(trdbox2, 5, tr204);
+      trd_2->AddNode(trdbox2, 8, tr207);
+    }
+    if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      //    trd_3->AddNode(trdbox3, 3, tr202);
+      trd_3->AddNode(trdbox3, 6, tr205);
+      trd_3->AddNode(trdbox3, 9, tr208);
+    }
+  }
+
   //  gGeoMan->GetVolume(geoVersion)->AddNode(trdsupport,1);
 
   gGeoMan->GetVolume(geoVersion)->AddNode(trd_1, 1);
@@ -1768,3 +1817,189 @@ void create_supports()
   gGeoMan->GetVolume(geoVersion)->AddNode(trd_3, 3);
 
 }
+
+
+add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
+{
+// write TRD (the 3 characters) in a simple geometry
+  TGeoMedium* textVolMed        = gGeoMan->GetMedium(TextVolumeMedium);
+
+  Int_t Tcolor = kBlue;  // kRed;
+  Int_t Rcolor = kBlue;  // kRed;  // kRed;
+  Int_t Dcolor = kBlue;  // kRed;  // kYellow;
+  Int_t Icolor = kBlue;  // kRed;  
+
+// define transformations for letter pieces
+// T
+  TGeoTranslation *tr01 = new TGeoTranslation(  0. , -4., 0.);
+  TGeoTranslation *tr02 = new TGeoTranslation(  0. , 16., 0.);
+
+// R
+  TGeoTranslation *tr11 = new TGeoTranslation( 10,  0., 0.);
+  TGeoTranslation *tr12 = new TGeoTranslation(  2,  0., 0.);
+  TGeoTranslation *tr13 = new TGeoTranslation(  2, 16., 0.);
+  TGeoTranslation *tr14 = new TGeoTranslation( -2,  8., 0.);
+  TGeoTranslation *tr15 = new TGeoTranslation( -6,  0., 0.);
+
+// D
+  TGeoTranslation *tr21 = new TGeoTranslation( 12.,  0., 0.);
+  TGeoTranslation *tr22 = new TGeoTranslation(  6., 16., 0.);
+  TGeoTranslation *tr23 = new TGeoTranslation(  6.,-16., 0.);
+  TGeoTranslation *tr24 = new TGeoTranslation(  4.,  0., 0.);
+
+// I
+  TGeoTranslation *tr31 = new TGeoTranslation(  0. ,  0., 0.);
+  TGeoTranslation *tr32 = new TGeoTranslation(  0. , 16., 0.);
+  TGeoTranslation *tr33 = new TGeoTranslation(  0. ,-16., 0.);
+
+// make letter T
+//   TGeoVolume *T = geom->MakeBox("T", Vacuum, 25., 25., 5.);
+//   T->SetVisibility(kFALSE);
+  TGeoVolume* T = new TGeoVolumeAssembly("Tbox"); // volume for T
+
+  TGeoBBox *Tbar1b = new TGeoBBox("", 4., 16., 4.);  // | vertical
+  TGeoVolume *Tbar1 = new TGeoVolume("Tbar1", Tbar1b, textVolMed);
+  Tbar1->SetLineColor(Tcolor);
+  T->AddNode(Tbar1, 1, tr01);
+  TGeoBBox *Tbar2b = new TGeoBBox("", 16, 4., 4.);  // - top
+  TGeoVolume *Tbar2 = new TGeoVolume("Tbar2", Tbar2b, textVolMed);
+  Tbar2->SetLineColor(Tcolor);
+  T->AddNode(Tbar2, 1, tr02);
+
+// make letter R
+//   TGeoVolume *R = geom->MakeBox("R", Vacuum, 25., 25., 5.);
+//   R->SetVisibility(kFALSE);
+  TGeoVolume* R = new TGeoVolumeAssembly("Rbox"); // volume for R
+
+  TGeoBBox *Rbar1b = new TGeoBBox("", 4., 20, 4.);
+  TGeoVolume *Rbar1 = new TGeoVolume("Rbar1", Rbar1b, textVolMed);
+  Rbar1->SetLineColor(Rcolor);
+  R->AddNode(Rbar1, 1, tr11);
+  TGeoBBox *Rbar2b = new TGeoBBox("", 4., 4., 4.);
+  TGeoVolume *Rbar2 = new TGeoVolume("Rbar2", Rbar2b, textVolMed);
+  Rbar2->SetLineColor(Rcolor);
+  R->AddNode(Rbar2, 1, tr12);
+  R->AddNode(Rbar2, 2, tr13);
+  TGeoTubeSeg *Rtub1b = new TGeoTubeSeg("", 4., 12, 4., 90., 270.);
+  TGeoVolume *Rtub1 = new TGeoVolume("Rtub1", Rtub1b, textVolMed);
+  Rtub1->SetLineColor(Rcolor);
+  R->AddNode(Rtub1, 1, tr14);
+  TGeoArb8 *Rbar3b = new TGeoArb8("", 4.);
+  TGeoVolume *Rbar3 = new TGeoVolume("Rbar3", Rbar3b, textVolMed);
+  Rbar3->SetLineColor(Rcolor);
+  TGeoArb8 *arb = (TGeoArb8*)Rbar3->GetShape();
+  arb->SetVertex(0, 12.,  -4.);
+  arb->SetVertex(1,  0., -20.);
+  arb->SetVertex(2, -8., -20.);
+  arb->SetVertex(3,  4.,  -4.);
+  arb->SetVertex(4, 12.,  -4.);
+  arb->SetVertex(5,  0., -20.);
+  arb->SetVertex(6, -8., -20.);
+  arb->SetVertex(7,  4.,  -4.);
+  R->AddNode(Rbar3, 1, tr15);
+
+// make letter D
+//   TGeoVolume *D = geom->MakeBox("D", Vacuum, 25., 25., 5.);
+//   D->SetVisibility(kFALSE);
+  TGeoVolume* D = new TGeoVolumeAssembly("Dbox"); // volume for D
+
+  TGeoBBox *Dbar1b = new TGeoBBox("", 4., 20, 4.);
+  TGeoVolume *Dbar1 = new TGeoVolume("Dbar1", Dbar1b, textVolMed);
+  Dbar1->SetLineColor(Dcolor);
+  D->AddNode(Dbar1, 1, tr21);
+  TGeoBBox *Dbar2b = new TGeoBBox("", 2., 4., 4.);
+  TGeoVolume *Dbar2 = new TGeoVolume("Dbar2", Dbar2b, textVolMed);
+  Dbar2->SetLineColor(Dcolor);
+  D->AddNode(Dbar2, 1, tr22);
+  D->AddNode(Dbar2, 2, tr23);
+  TGeoTubeSeg *Dtub1b = new TGeoTubeSeg("", 12, 20, 4., 90., 270.);
+  TGeoVolume *Dtub1 = new TGeoVolume("Dtub1", Dtub1b, textVolMed);
+  Dtub1->SetLineColor(Dcolor);
+  D->AddNode(Dtub1, 1, tr24);
+
+// make letter I
+  TGeoVolume* I = new TGeoVolumeAssembly("Ibox"); // volume for I
+
+  TGeoBBox *Ibar1b = new TGeoBBox("", 4., 12., 4.);  // | vertical
+  TGeoVolume *Ibar1 = new TGeoVolume("Ibar1", Ibar1b, textVolMed);
+  Ibar1->SetLineColor(Icolor);
+  I->AddNode(Ibar1, 1, tr31);
+  TGeoBBox *Ibar2b = new TGeoBBox("", 10., 4., 4.);  // - top
+  TGeoVolume *Ibar2 = new TGeoVolume("Ibar2", Ibar2b, textVolMed);
+  Ibar2->SetLineColor(Icolor);
+  I->AddNode(Ibar2, 1, tr32);
+  I->AddNode(Ibar2, 2, tr33);
+
+
+// build text block "TRD"  <32> + 8 + <28> + 8 + <32> = 108
+
+//  TGeoBBox *trdboxb = new TGeoBBox("", 108./2, 40./2, 8./2);
+//  TGeoVolume *trdbox = new TGeoVolume("trdboxb", trdboxb, textVolMed);
+//  trdbox->SetVisibility(kFALSE);
+
+//  TGeoVolume* trdbox[0] = new TGeoVolumeAssembly("trdbox1"); // volume for TRD text (108, 40, 8)
+//  TGeoVolume* trdbox[1] = new TGeoVolumeAssembly("trdbox2"); // volume for TRD text (108, 40, 8)
+//  TGeoVolume* trdbox[2] = new TGeoVolumeAssembly("trdbox3"); // volume for TRD text (108, 40, 8)
+
+  TGeoTranslation *tr100 = new TGeoTranslation( 38., 0., 0.);
+  TGeoTranslation *tr101 = new TGeoTranslation(  0., 0., 0.);
+  TGeoTranslation *tr102 = new TGeoTranslation(-38., 0., 0.);
+
+//  TGeoTranslation *tr103 = new TGeoTranslation( -70., 0., 0.);  // on the same line
+//  TGeoTranslation *tr104 = new TGeoTranslation( -86., 0., 0.);  // on the same line
+//  TGeoTranslation *tr105 = new TGeoTranslation(-102., 0., 0.);  // on the same line
+
+  TGeoTranslation *tr110 = new TGeoTranslation(   0., -50., 0.);
+  TGeoTranslation *tr111 = new TGeoTranslation(   8., -50., 0.);
+  TGeoTranslation *tr112 = new TGeoTranslation(  -8., -50., 0.);
+  TGeoTranslation *tr113 = new TGeoTranslation(  16., -50., 0.);
+  TGeoTranslation *tr114 = new TGeoTranslation( -16., -50., 0.);
+
+// station 1
+  trdbox1->AddNode(T, 1, tr100);
+  trdbox1->AddNode(R, 1, tr101);
+  trdbox1->AddNode(D, 1, tr102);
+
+  trdbox1->AddNode(I, 1, tr110);
+
+// station 2
+  trdbox2->AddNode(T, 1, tr100);
+  trdbox2->AddNode(R, 1, tr101);
+  trdbox2->AddNode(D, 1, tr102);
+
+  trdbox2->AddNode(I, 1, tr111);
+  trdbox2->AddNode(I, 2, tr112);
+
+// station 3
+  trdbox3->AddNode(T, 1, tr100);
+  trdbox3->AddNode(R, 1, tr101);
+  trdbox3->AddNode(D, 1, tr102);
+
+  trdbox3->AddNode(I, 1, tr110);
+  trdbox3->AddNode(I, 2, tr113);
+  trdbox3->AddNode(I, 3, tr114);
+
+//  TGeoScale *sc100 = new TGeoScale( 36./50., 36./50., 1.);  // text is vertical 50 cm, H-bar opening is 36 cm
+//
+//  // scale text
+//  TGeoHMatrix *mat100 = new TGeoHMatrix("");
+//  TGeoHMatrix *mat101 = new TGeoHMatrix("");
+//  TGeoHMatrix *mat102 = new TGeoHMatrix("");
+//  (*mat100) = (*tr100) * (*sc100);
+//  (*mat101) = (*tr101) * (*sc100);
+//  (*mat102) = (*tr102) * (*sc100);
+//
+//  trdbox->AddNode(T, 1, mat100);
+//  trdbox->AddNode(R, 1, mat101);
+//  trdbox->AddNode(D, 1, mat102);
+
+//   // final placement
+//   //   TGeoTranslation *tr103 = new TGeoTranslation(0., 400., 500.);
+//   gGeoMan->GetVolume(geoVersion)->AddNode(trdbox, 1, new TGeoTranslation(0., 400., 500.));
+//   gGeoMan->GetVolume(geoVersion)->AddNode(trdbox, 2, new TGeoTranslation(0., 500., 600.));
+//   gGeoMan->GetVolume(geoVersion)->AddNode(trdbox, 3, new TGeoTranslation(0., 600., 700.));
+
+//  return trdbox;
+
+}   
+   

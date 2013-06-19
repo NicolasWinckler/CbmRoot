@@ -14,5 +14,7 @@
 #pragma link C++ class CbmRunAna+;
 #pragma link C++ class CbmMCStreamerQa+;
 
+#pragma link C++ class CbmSetup;
+
 #endif
 

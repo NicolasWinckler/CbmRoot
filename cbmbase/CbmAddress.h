@@ -7,22 +7,14 @@
 #define CBMADDRESS_H 1
 
 #include "Rtypes.h"
+#include "CbmModuleList.h"
 
 
 
 
-/**  System Id enumerator  **/
-enum SystemId {kRef,         // Reference plane
-               kMvd,         // Micro-Vertex Detector
-               kSts,         // Silicon Tracking System
-               kRich,        // Ring-Imaging Cherenkov Detector
-               kMuch,        // Muon detection system
-               kTrd,         // Transition Radiation Detector
-               kTof,         // Time-of-flight Detector
-               kEcal,        // EM-Calorimeter
-               kPsd,         // Projectile spectator detector
-               kDummy,       // Dummy for tutorials or tests
-               kNofSystems}; // Number of system (e.g. for loops)
+
+
+
 
 
 

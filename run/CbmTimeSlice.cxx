@@ -90,8 +90,8 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
     case kSTS: {
       CbmStsDigiLight* digi = static_cast<CbmStsDigiLight*>(data);
       fStsData.push_back(*digi);
+      break;
     }
-    break;
 
     default:
       TString sysName;

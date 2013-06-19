@@ -10,6 +10,7 @@
 
 #include "TNamed.h"
 #include "CbmStsDigiLight.h"
+#include "CbmMuchDigi.h"
 #include "CbmDigi.h"
 
 using namespace std;
@@ -94,6 +95,7 @@ class CbmTimeSlice : public TNamed
     Double_t fStartTime;    /** start time [ns] **/
     Double_t fDuration;     /** duration [ns] **/
     vector<CbmStsDigiLight> fStsData;  /** raw data container for STS **/
+    vector<CbmMuchDigi>     fMuchData;  /** raw data container for MUCH **/
 
 
     ClassDef(CbmTimeSlice,1)

@@ -5,6 +5,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class CbmAddress;
+#pragma link C++ class CbmModuleList;
 
 //#pragma link C++ class CbmDigiManager+;
 #pragma link C++ class CbmPropagator+;
@@ -58,6 +59,9 @@
 #pragma link C++ class CbmTextReportElement+;
 #pragma link C++ class CbmLatexReportElement+;
 #pragma link C++ class CbmHtmlReportElement+;
+
+#pragma link C++ enum ESystemId;
+#pragma link C++ enum EPassiveId;
 
 #endif
 

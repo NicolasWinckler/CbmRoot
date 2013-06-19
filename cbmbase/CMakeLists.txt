@@ -21,6 +21,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 CbmAddress.cxx
+CbmModuleList.cxx
 
 #CbmDigiManager.cxx
 CbmPropagator.cxx

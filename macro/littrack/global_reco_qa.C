@@ -12,7 +12,7 @@ using std::endl;
 using std::vector;
 using std::string;
 
-void global_reco_qa(Int_t nEvents = 100,
+void global_reco_qa(Int_t nEvents = 100000,
       TString opt = "reco")
 // opt == "reco" in case of one input file with all reconstructed data
 // opt == "ht" (hitas and tracks) in case of two input files with reconstructed hits and tracks
@@ -21,29 +21,29 @@ void global_reco_qa(Int_t nEvents = 100,
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "events/trd_v13g/"; // Output directory
+	TString dir = "events/much_v12c_omega_10k/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
    TString globalRecoFile = dir + "global.reco.0000.root"; // File with global tracks
    TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
    TString globalTracksFile = dir + "global.tracks.0000.root";// Output file with global tracks
-	TString qaFile = dir + "qa.nn_parallel.0000.root"; // Output file with histograms
+	TString qaFile = dir + "qa.nn.0000.root"; // Output file with histograms
 
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
+   TString muchDigiFile = parDir + "/much/much_v12c.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
    // Normalization for efficiency
    Int_t normStsPoints = 4;
    Int_t normTrdPoints = 6;
-   Int_t normMuchPoints = 16;
+   Int_t normMuchPoints = 6;
    Int_t normTofPoints = 1;
    Int_t normTrdHits = 6;
-   Int_t normMuchHits = 16;
+   Int_t normMuchHits = 6;
    Int_t normTofHits = 1;
 
    if (script == "yes") {
@@ -108,7 +108,7 @@ void global_reco_qa(Int_t nEvents = 100,
    // ----- Reconstruction QA tasks -----------------------------------------
 	vector<string> trackCategories;
 	trackCategories.push_back("All");
-	trackCategories.push_back("Electron");
+	//trackCategories.push_back("Electron");
 	trackCategories.push_back("Muon");
 	vector<string> ringCategories;
 	ringCategories.push_back("Electron");
@@ -140,7 +140,7 @@ void global_reco_qa(Int_t nEvents = 100,
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);
+  // run->AddTask(clusteringQa);
    // -----------------------------------------------------------------------
 
    // -----  Parameter database   --------------------------------------------

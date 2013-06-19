@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 10, // number of events
+void global_reco(Int_t nEvents = 10000, // number of events
 		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/trd_v13g/"; // Output directory
+	TString dir = "events/much_v12c_omega_10k/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -34,7 +34,7 @@ void global_reco(Int_t nEvents = 10, // number of events
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
+   TString muchDigiFile = parDir + "/much/much_v12c.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
@@ -42,7 +42,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 //   TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "branch"; // Global tracking type
+   TString globalTrackingType = "nn"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
@@ -196,13 +196,13 @@ void global_reco(Int_t nEvents = 10, // number of events
 			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
 			run->AddTask(findHits);
 
-			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
-			      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
-			run->AddTask(strawDigitize);
-			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
-					"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
-			strawFindHits->SetMerge(1);
-			run->AddTask(strawFindHits);
+		//	CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
+		//	      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
+		//	run->AddTask(strawDigitize);
+		//	CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
+		//			"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
+		//	strawFindHits->SetMerge(1);
+		//	run->AddTask(strawFindHits);
 			// -----------------------------------------------------------------
 		}
 

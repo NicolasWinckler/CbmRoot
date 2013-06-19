@@ -9,14 +9,14 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 10)
+void global_sim(Int_t nEvents = 10000)
 {
    TTree::SetMaxTreeSize(90000000000);
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
 	// Specify "electron" or "muon" setup of CBM
-//	TString setup = "muon";
-	TString setup = "electron";
+	TString setup = "muon";
+//	TString setup = "electron";
 
 	// Event parameters
 	Int_t nofMuonsPlus = 0; // number of embedded muons from FairBoxGenerator
@@ -26,16 +26,18 @@ void global_sim(Int_t nEvents = 10)
 	Int_t nofPionsPlus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofPionsMinus = 0; // number of embedded pions from FairBoxGenerator
 	Int_t nofJPsiToMuons = 0; // number of embedded J/Psi particles decaying to mu+ and mu-
-	Int_t nofJPsiToElectrons = 10; // number of embedded J/Psi particles decaying to e+ and e-
+	Int_t nofJPsiToElectrons = 0; // number of embedded J/Psi particles decaying to e+ and e-
 	Int_t nofAuIons = 0; // number of generated Au ions
-	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
-   TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
+	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
+    TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
+    TString pluto = "yes";
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "events/trd_v13g/"; // Directory for output simulation files
+	TString dir = "events/much_v12c_omega_10k/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
+	TString plutoFile = "/Users/andrey/Development/cbm/d/pluto/omega.25gev.1M.root";
 
 	// Geometries
 	TString caveGeom = "", targetGeom = "", pipeGeom = "", shieldGeom = "",
@@ -48,9 +50,9 @@ void global_sim(Int_t nEvents = 10)
 		shieldGeom = "shield_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
-		muchGeom   = "much/much_v12b.geo";
+		muchGeom   = "much/much_v12c.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
-		tofGeom    = "tof/tof_v13b.root";
+		tofGeom    = "";//"tof/tof_v13b.root";
 		fieldMap   = "field_v12a";
 		magnetGeom = "passive/magnet_v12a.geo";
 	} else if (setup == "electron") {
@@ -121,35 +123,30 @@ void global_sim(Int_t nEvents = 10)
 		FairModule* cave = new CbmCave("CAVE");
 		cave->SetGeometryFileName(caveGeom);
 		run->AddModule(cave);
-		cout << "    --- " << caveGeom << endl;
 	}
 
 	if ( pipeGeom != "" ) {
 		FairModule* pipe = new CbmPipe("PIPE");
 		pipe->SetGeometryFileName(pipeGeom);
 		run->AddModule(pipe);
-		cout << "    --- " << pipeGeom << endl;
 	}
 
 	if ( shieldGeom != "" ) {
 		FairModule* shield = new CbmShield("SHIELD");
 		shield->SetGeometryFileName(shieldGeom);
 		run->AddModule(shield);
-		cout << "    --- " << shieldGeom << endl;
 	}
 
 	if ( targetGeom != "" ) {
 		FairModule* target = new CbmTarget("Target");
 		target->SetGeometryFileName(targetGeom);
 		run->AddModule(target);
-		cout << "    --- " << targetGeom << endl;
 	}
 
 	if ( magnetGeom != "" ) {
 		FairModule* magnet = new CbmMagnet("MAGNET");
 		magnet->SetGeometryFileName(magnetGeom);
 		run->AddModule(magnet);
-		cout << "    --- " << magnetGeom << endl;
 	}
 
 	if ( mvdGeom != "" ) {
@@ -162,7 +159,6 @@ void global_sim(Int_t nEvents = 10)
 		FairDetector* sts = new CbmSts("STS", kTRUE);
 		sts->SetGeometryFileName(stsGeom);
 		run->AddModule(sts);
-		cout << "    --- " << stsGeom << endl;
 	}
 
 	if ( richGeom != "" ) {
@@ -175,21 +171,18 @@ void global_sim(Int_t nEvents = 10)
 		FairDetector* much = new CbmMuch("MUCH", kTRUE);
 		much->SetGeometryFileName(muchGeom);
 		run->AddModule(much);
-		cout << "    --- " << muchGeom << endl;
 	}
 
 	if ( trdGeom != "" ) {
 		FairDetector* trd = new CbmTrd("TRD",kTRUE );
 		trd->SetGeometryFileName(trdGeom);
 		run->AddModule(trd);
-		cout << "    --- " << trdGeom << endl;
 	}
 
 	if ( tofGeom != "" ) {
 		FairDetector* tof = new CbmTof("TOF", kTRUE);
 		tof->SetGeometryFileName(tofGeom);
 		run->AddModule(tof);
-		cout << "    --- " << tofGeom << endl;
 	}
 
 	if ( ecalGeom != "" ) {
@@ -214,8 +207,13 @@ void global_sim(Int_t nEvents = 10)
 	}
 
 	if (urqmd == "yes" && unigen != "yes") {
-	    FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(urqmdFile);
+	   FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(urqmdFile);
        primGen->AddGenerator(urqmdGen);
+	}
+
+	if (pluto == "yes") {
+	   FairPlutoGenerator* plutoGen = new FairPlutoGenerator(plutoFile);
+       primGen->AddGenerator(plutoGen);
 	}
 
 	if (nofJPsiToMuons > 0) {

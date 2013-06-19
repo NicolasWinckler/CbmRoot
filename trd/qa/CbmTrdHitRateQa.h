@@ -23,22 +23,28 @@ typedef struct HitRateGeoPara
   Int_t moduleId;
   Int_t layerId;
   Int_t stationId;
-  Double_t mPos[3];
-  Double_t mSize[3];// [dimensions]
-  Double_t sSize[3][3];
-  Double_t pSize[3][3]; // [sectors][dimensions]
+
+  Double_t mPos[3];     // center of module (x,y,z)
+  Double_t mSize[3];    // half size of pad plane in (x,y,z) from digi.par
+
+  Double_t sSize[3][3]; // sector size
+  Double_t pSize[3][3]; // pad size     // [sectors][dimensions]
+
   Int_t nCol;
   Int_t nRow;
-  Int_t sCol[3];
-  Int_t sRow[3];
-  Double_t vOrigin[3];
-  Double_t vX[3];
-  Double_t vY[3];
-  Double_t vN[3];
+  Int_t sCol[3];  // number of cols in sector
+  Int_t sRow[3];  // number of rows in sector
+
+  Double_t vOrigin[3]; // vector of pad 0,0
+  Double_t vX[3];      // differential vector of pad 1,0 to pad 0,0
+  Double_t vY[3];      // differential vector of pad 0,1 to pad 0,0
+  Double_t vN[3];      // normal vector
+
   Double_t lambda;
   Double_t cosX;
   Double_t cosY;
   Int_t stepDirection[3];
+
 } HitRateGeoPara;
 
 class CbmTrdHitRateQa : public FairTask {

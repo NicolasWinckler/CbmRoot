@@ -284,15 +284,15 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   fDraw = true; // false;
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
-  Double_t mm2bin = 10.0; // 5.0; // 2.5;
+  Double_t mm2bin = 20.0; // 10.0; // 5.0; // 2.5;
  
   fStation = 0;
   fLayer = 0;
   tFile = new TFile("CbmTrdHitRateQa.root","RECREATE"," ROOT file with histograms");
 
-  TH1F* HitPad = NULL;
-  TH2F* Layer = NULL;
-  TH2F* Topview[3] = {NULL,NULL,NULL};
+  TH1F* h1HitPad = NULL;
+  TH2F* h2Layer  = NULL;
+  TH2F* h2Topview[3] = {NULL,NULL,NULL};
   TCanvas* c1 = NULL;
   TCanvas* c2 = NULL;
   TCanvas* c0 = NULL;
@@ -301,36 +301,36 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
     c0->Divide(3,1);
   }
   const Int_t z_cave = 12000;
-  Topview[0] = new TH2F("TopView","TopView",    int(2* winsize /mm2bin), -winsize, winsize, int(z_cave /mm2bin),    0, z_cave);
-  Topview[0]->SetXTitle("x-Coordinate [mm]");
-  Topview[0]->SetYTitle("z-Coordinate [mm]");
-  Topview[0]->SetZTitle("#");
-  Topview[1] = new TH2F("FrontView","FrontView",int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
-  Topview[1]->SetXTitle("x-Coordinate [mm]");
-  Topview[1]->SetYTitle("y-Coordinate [mm]");
-  Topview[1]->SetZTitle("#");
-  Topview[2] = new TH2F("SideView","SideView",  int(z_cave /mm2bin),    0, z_cave, int(2* winsize /mm2bin), -winsize, winsize);
-  Topview[2]->SetXTitle("z-Coordinate [mm]");
-  Topview[2]->SetYTitle("y-Coordinate [mm]");
-  Topview[2]->SetZTitle("#");
+  h2Topview[0] = new TH2F("TopView","TopView",    int(2* winsize /mm2bin), -winsize, winsize, int(z_cave /mm2bin),    0, z_cave);
+  h2Topview[0]->SetXTitle("x-Coordinate [mm]");
+  h2Topview[0]->SetYTitle("z-Coordinate [mm]");
+  h2Topview[0]->SetZTitle("#");
+  h2Topview[1] = new TH2F("FrontView","FrontView",int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
+  h2Topview[1]->SetXTitle("x-Coordinate [mm]");
+  h2Topview[1]->SetYTitle("y-Coordinate [mm]");
+  h2Topview[1]->SetZTitle("#");
+  h2Topview[2] = new TH2F("SideView","SideView",  int(z_cave /mm2bin),    0, z_cave, int(2* winsize /mm2bin), -winsize, winsize);
+  h2Topview[2]->SetXTitle("z-Coordinate [mm]");
+  h2Topview[2]->SetYTitle("y-Coordinate [mm]");
+  h2Topview[2]->SetZTitle("#");
   for (Int_t i = 0; i < 3; i++) {
-    Topview[i]->SetContour(99);
-    Topview[i]->SetStats(kFALSE);
-    Topview[i]->GetXaxis()->SetLabelSize(0.02);
-    Topview[i]->GetYaxis()->SetLabelSize(0.02);
-    Topview[i]->GetZaxis()->SetLabelSize(0.02);
-    Topview[i]->GetXaxis()->SetTitleSize(0.02);
-    Topview[i]->GetXaxis()->SetTitleOffset(1.5);
-    Topview[i]->GetYaxis()->SetTitleSize(0.02);
-    Topview[i]->GetYaxis()->SetTitleOffset(2);
-    Topview[i]->GetZaxis()->SetTitleSize(0.02);
-    Topview[i]->GetZaxis()->SetTitleOffset(-2);
+    h2Topview[i]->SetContour(99);
+    h2Topview[i]->SetStats(kFALSE);
+    h2Topview[i]->GetXaxis()->SetLabelSize(0.02);
+    h2Topview[i]->GetYaxis()->SetLabelSize(0.02);
+    h2Topview[i]->GetZaxis()->SetLabelSize(0.02);
+    h2Topview[i]->GetXaxis()->SetTitleSize(0.02);
+    h2Topview[i]->GetXaxis()->SetTitleOffset(1.5);
+    h2Topview[i]->GetYaxis()->SetTitleSize(0.02);
+    h2Topview[i]->GetYaxis()->SetTitleOffset(2);
+    h2Topview[i]->GetZaxis()->SetTitleSize(0.02);
+    h2Topview[i]->GetZaxis()->SetTitleOffset(-2);
     if(fDraw) {
       c0->cd(i+1);
-      Topview[i]->Draw("colz");
+      h2Topview[i]->Draw("colz");
     }
   }
-  //Topview->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
+  //h2Topview->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
 
 
   vector<int> Plane01;
@@ -346,7 +346,9 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
 
   Int_t ModuleID;
   Int_t Sector = 0;
-  const Int_t NofModules = fDigiPar->GetNrOfModules();
+  //  const Int_t NofModules = fDigiPar->GetNrOfModules();
+
+  const Int_t NofModules = 80; // DE
   //TH2F *Module[NofModules];
 
   for (Int_t i = 0; i < NofModules; i++) {  
@@ -387,8 +389,10 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   vector< vector<int> > LiSi;
   LiSi.push_back(Plane01);
   LiSi.push_back(Plane02);
-//  LiSi.push_back(Plane05);
-//  LiSi.push_back(Plane09);
+  LiSi.push_back(Plane05);
+  LiSi.push_back(Plane06);
+  LiSi.push_back(Plane09);
+  LiSi.push_back(Plane10);
 //  LiSi.push_back(Plane01);
 //  LiSi.push_back(Plane02);
 //  LiSi.push_back(Plane03);
@@ -400,96 +404,99 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
 //  LiSi.push_back(Plane09);
 //  LiSi.push_back(Plane10);
 
-  Char_t Canfile1[200];
-  Char_t Canfile2[200];
+  Char_t OutFile1[200];
+  Char_t OutFile2[200];
 
   TImage *Outimage1;
   TImage *Outimage2;
-  TLine* border = new TLine(1e05,0,1e05,1e04);
-  border->SetLineColor(2);
+
+  TLine* MaxHitRatePerPad = new TLine(1e05,0,1e05,1e04);  // 100.000 hits per pad
+  MaxHitRatePerPad->SetLineColor(2);  // make it red
+  MaxHitRatePerPad->SetLineWidth(8);  // make it thick
+
   /*
-    Layer  = new TH2F("dummy1","dummy1",1,-0.5,0.5,1,-0.5,0.5);
-    HitPad = new TH1F("dummy2","dummy2",1,-0.5,0.5);
+    h2Layer  = new TH2F("dummy1","dummy1",1,-0.5,0.5,1,-0.5,0.5);
+    h1HitPad = new TH1F("dummy2","dummy2",1,-0.5,0.5);
     c1 = new TCanvas("dummy3","dummy3",10,10);
     c2 = new TCanvas("dummy4","dummy4",10,10);
   */
   //**************************************************************************************
-  fStation = 1;
-  fLayer = 1;
+
   for (vector< vector<int> >::size_type j = 0; j < LiSi.size(); j++)
     {
-      Int_t NumberOfLayerPerStation = LiSi[j].size();
+      // fix layer number
+      fPlane   = CbmTrdAddress::GetLayerId(LiSi[j][0]);
+      fStation = fPlane / 4 + 1;  // OK for SIS100 and SIS300
+      fLayer   = fPlane % 4 + 1;  // OK for SIS100 and SIS300
+      //      cout << fStation << ", " << fLayer << endl;
+
+      Int_t nModulesInThisLayer = LiSi[j].size();
+      //      cout << nModulesInThisLayer << " modules in this layer" << endl;
  
-      Topview[0]->Reset();
-      Topview[1]->Reset();
-      Topview[2]->Reset();
+      h2Topview[0]->Reset();
+      h2Topview[1]->Reset();
+      h2Topview[2]->Reset();
 
-      sprintf(Canfile1,"pics/HitPerPadFrontView_S%d_L%d.png",fStation,fLayer);
-      sprintf(Canfile2,"pics/HitPerPadSpectra_S%d_L%d.png",fStation,fLayer);
+      sprintf(OutFile1,"pics/HitRateLayerPadView_S%d_L%d.png", fStation,fLayer);
+      sprintf(OutFile2,"pics/HitRateLayerSpectrum_S%d_L%d.png",fStation,fLayer);
 
-      HistoInit(c1, c2,  Layer, HitPad, Canfile1, Canfile2, ZRangeL, ZRangeU, mm2bin);
+      HistoInit(c1, c2, h2Layer, h1HitPad, ZRangeL, ZRangeU, mm2bin);
 
       if(fDraw)
-	border->Draw("same");
+	MaxHitRatePerPad->Draw("same");  // draw red line
 
+      // generate HitPerPadSpectra
+      // generate png files
       Lines = false;
-      for (vector<int>::size_type i = 0; i < NumberOfLayerPerStation; i++)
+      for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
 	{	 
-	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
+	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
 	}
 
       if(fDraw)
       {
 	c1->cd(1)->SetLogz(1);
-	Layer->Draw("colz");
+	h2Layer->Draw("colz");  // draw layer view
       }
 
       Lines = true;
-      for (vector<int>::size_type i = 0; i < NumberOfLayerPerStation; i++)
+      for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
 	{
-	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
+	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
 	}
 
-      if(fDraw){
+      if(fDraw)  // dump png file for this layer
+      {
 	Outimage1 = TImage::Create();
 	Outimage1->FromPad(c1);
-	Outimage1->WriteImage(Canfile1);
+	Outimage1->WriteImage(OutFile1);
       }
-
-      /*
-	sprintf(Canfile1,"pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
-	c1->cd(1)->Print(Canfile1);
-      */
-      delete Layer;
 
       if(fDraw){
 	delete c1;
 	delete Outimage1;   
-	HitPad->Draw("same");      
+	h1HitPad->Draw("same");      
 	Outimage2 = TImage::Create();
 	Outimage2->FromPad(c2);
-	Outimage2->WriteImage(Canfile2);
+	Outimage2->WriteImage(OutFile2);
       }
+
       /*
-	sprintf(Canfile2,"pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
-	c2->cd(1)->Print(Canfile2);
+	sprintf(OutFile1,"pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+	c1->cd(1)->Print(OutFile1);
       */
-      delete HitPad;
+      delete h2Layer;
+
+      /*
+	sprintf(OutFile2,"pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+	c2->cd(1)->Print(OutFile2);
+      */
+      delete h1HitPad;
 
       if(fDraw){
 	delete c2;  
 	delete Outimage2;
       }
-
-      if (fLayer == 4)
-	{
-	  fStation++;
-	  fLayer = 1;
-	}
-      else
-	{
-	  fLayer++;
-	}  
 
       if(fDraw)
 	c0->Update();
@@ -505,16 +512,16 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   //  tFile->Close();  // this causes a segfalut
 }
 
-void CbmTrdHitRateQa::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
+
+void CbmTrdHitRateQa::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
 {
   Char_t name[50];
   Char_t title[50];
 
   sprintf(name,"S%d_L%d",fStation,fLayer);
   sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  printf("%s                        \n",title);
-  //sprintf(Canfile1,"pics/Station%dLayer%d.png",fStation,fLayer);
-  //sprintf(Canfile2,"pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
+  printf("%s\n",title);
+
   Layer = new TH2F(name,title,int(2* winsize /mm2bin), -winsize, winsize, int(2* winsize /mm2bin), -winsize, winsize);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
@@ -614,7 +621,7 @@ void CbmTrdHitRateQa::GetModuleInformation()
 
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
+void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
   // fPos is >0 for x and y and not rotated
   // origin of the local coordinate system in 
@@ -639,10 +646,17 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       Msize[1] = fModuleInfo->GetSizeY() * 10;
       Msize[2] = 0; 
 
+      if (Lines)
+        cout << "pos " << Mpos[0] << " " << Mpos[1] << " " << Mpos[2] << " size " << Msize[0] << " " << Msize[1] << " " << Msize[2] << endl;
+      else
+        cout << "--- " << Mpos[0] << " " << Mpos[1] << " " << Mpos[2] << " size " << Msize[0] << " " << Msize[1] << " " << Msize[2] << endl;
+
       const Int_t NoSectors = fModuleInfo->GetNofSectors();
       Int_t nSec = NoSectors;
       Double_t Ssize[3*NoSectors];
       Double_t Psize[3*NoSectors];
+
+      cout << NoSectors << " NoSectors" << endl;
 
       for (Int_t i = 0; i < NoSectors; i++)// i = Sector
 	{
@@ -654,10 +668,6 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 	  Psize[1+i*NoSectors] = fModuleInfo->GetPadSizeY(i) * 10;
 	  Psize[2+i*NoSectors] = 0;
 	}
-
-      fPlane   = CbmTrdAddress::GetLayerId(VolumeID);
-      fStation = fPlane / 4 + 1;  // OK for SIS100 and SIS300
-      fLayer   = fPlane % 4 + 1;  // OK for SIS100 and SIS300
 
       GeoPara->moduleId  = VolumeID;
       GeoPara->layerId   = fLayer;
@@ -788,7 +798,7 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       if (Lines)
         DrawLines(VolumeID, Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1, Topview, c0);
       else
-        Histo(GeoPara, Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2, Topview, c0, mm2bin);
+        Histo(GeoPara, Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, HitPad, c2, Topview, c0, mm2bin);
 
     }
   else
@@ -843,7 +853,7 @@ float CbmTrdHitRateQa::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Floa
   return (HitRate/*/(counter/100.)*/);/*Convertes Hits/Pad -> Hits/cm² on each Pad*/
 }
 
-void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
+void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
@@ -859,7 +869,7 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos
   //  TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
 
   // show only current module name
-  name.Form("Module %5d",GeoPara->moduleId);
+  name.Form("ModuleID %5d",GeoPara->moduleId);
   cout << "      " << name << "\r" << flush;
 
   /*
@@ -1090,7 +1100,7 @@ void CbmTrdHitRateQa::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Doubl
   Float_t SecXStart = 0.0;
   Float_t SecYStop  = 0.0;
   Float_t SecXStop  = 0.0;
-  for (Int_t iSec = 0; iSec < nSec-1; iSec++)//would be enought to iterate up to nSec-1
+  for (Int_t iSec = 0; iSec < nSec-1; iSec++)  //would be enough to iterate up to nSec-1
     {
       if (Ssize[0+iSec*nSec] < 2 * Msize[0] && Ssize[0+iSec*nSec] > 0)
 	{
@@ -1141,15 +1151,15 @@ void CbmTrdHitRateQa::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Doubl
     c1->Write("", TObject::kOverwrite);
   }
 }
+// --------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-// ------AddDigi--------------------------------------------------------------
 
-//void CbmTrdHitRateQa::AddDigi()
+// ------DrawDigi------------------------------------------------------
 void CbmTrdHitRateQa::DrawDigi()
 {
-
 }
+// --------------------------------------------------------------------
+
 
 // ---- Register ------------------------------------------------------
 void CbmTrdHitRateQa::Register()

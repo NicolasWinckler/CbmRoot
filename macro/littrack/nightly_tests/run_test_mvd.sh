@@ -31,8 +31,8 @@ export LIT_URQMD_FILE=/data.local1/andrey/tests/urqmd/${system}/${energy}/${coll
 
 # Generate file for delta electrons
 if [ "${mvd_delta}" = "delta" ] ; then
-    #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
-    pars=(0    0    0   0   0    0    0       0      1  no    no)
+    #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN PLUTO
+    pars=(0    0    0   0   0    0    0       0      1  no    no     no)
     set_simulation_parameters ${pars}
     export LIT_MC_FILE=${dir}/mc.delta.0000.root
     export LIT_PAR_FILE=${dir}/param.delta.0000.root
@@ -42,8 +42,8 @@ if [ "${mvd_delta}" = "delta" ] ; then
     export LIT_PAR_FILE=${dir}/param.0000.root
 fi
 
-#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
-pars=(0    0    0   0   0    0    0       10     0  yes   no)
+#     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN PLUTO
+pars=(0    0    0   0   0    0    0       10     0  yes   no     no)
 set_simulation_parameters ${pars} 
 
 ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"

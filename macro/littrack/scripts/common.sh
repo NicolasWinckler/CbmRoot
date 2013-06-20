@@ -25,6 +25,8 @@ function set_simulation_parameters() {
     export LIT_URQMD=${pars[9]}
     # If "yes" than CbmUnigenGenerator will be useed instead of FairUrqmdGenerator
     export LIT_UNIGEN=${pars[10]}
+    # If "yes" than PLUTO will be used
+    export LIT_PLUTO=${pars[11]}
 }
 
 

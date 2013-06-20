@@ -52,7 +52,7 @@ EndForEach(__setup_mvd IN LISTS setup_mvd)
 If(BUILD_LITTRACK_EXPERIMENTAL)
   GENERATE_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/littrack/nightly_tests/run_test_reco.sh)
   
-  List(APPEND electron_geo v13o)
+  List(APPEND electron_geo v13g)
   List(APPEND electron_collision auau_25gev_centr auau_25gev_mbias) 
   ForEach(geo IN  LISTS  electron_geo)
     ForEach(collision IN  LISTS  electron_collision)
@@ -64,7 +64,7 @@ If(BUILD_LITTRACK_EXPERIMENTAL)
   EndForEach(geo IN  LISTS  electron_geo)
   
   
-  List(APPEND muon_geo  v11a v12b)
+  List(APPEND muon_geo  v11a v12c)
   List(APPEND muon_collision auau_25gev_centr auau_25gev_mbias) 
   ForEach(geo IN  LISTS  muon_geo)
     ForEach(collision IN  LISTS  muon_collision)

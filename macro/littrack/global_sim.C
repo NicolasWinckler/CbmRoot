@@ -74,6 +74,7 @@ void global_sim(Int_t nEvents = 10000)
 		urqmdFile  = TString(gSystem->Getenv("LIT_URQMD_FILE"));
 		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
 		parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
+		plutoFile = TString(gSystem->Getenv("LIT_PLUTO_FILE"));
 
 		nofMuonsPlus = TString(gSystem->Getenv("LIT_NOF_MUONS_PLUS")).Atoi();
 		nofMuonsMinus = TString(gSystem->Getenv("LIT_NOF_MUONS_MINUS")).Atoi();
@@ -85,7 +86,8 @@ void global_sim(Int_t nEvents = 10000)
 		nofJPsiToElectrons = TString(gSystem->Getenv("LIT_NOF_JPSI_TO_ELECTRONS")).Atoi();
 		nofAuIons = TString(gSystem->Getenv("LIT_NOF_AU_IONS")).Atoi();
 		urqmd = TString(gSystem->Getenv("LIT_URQMD"));
-      unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
+        unigen = TString(gSystem->Getenv("LIT_UNIGEN"));
+        pluto = TString(gSystem->Getenv("LIT_PLUTO"));
 
 		caveGeom = TString(gSystem->Getenv("LIT_CAVE_GEOM"));
 		targetGeom = TString(gSystem->Getenv("LIT_TARGET_GEOM"));

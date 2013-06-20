@@ -42,7 +42,7 @@ void global_reco(Int_t nEvents = 10000, // number of events
 //   TString resultDir = "./test/";
 
    // Reconstruction parameters
-   TString globalTrackingType = "nn"; // Global tracking type
+   TString globalTrackingType = "branch"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
    TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
@@ -173,7 +173,7 @@ void global_reco(Int_t nEvents = 10000, // number of events
 		FairTask* kalman = new CbmKF();
 		run->AddTask(kalman);
 		CbmL1* l1 = new CbmL1();
-		l1->SetExtrapolateToTheEndOfSTS(true);
+		//l1->SetExtrapolateToTheEndOfSTS(true);
 		l1->SetMaterialBudgetFileName(stsMatBudgetFile);
 		run->AddTask(l1);
 		CbmStsTrackFinder* trackFinder = new CbmL1StsTrackFinder();

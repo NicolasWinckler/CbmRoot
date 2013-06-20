@@ -128,10 +128,11 @@ void CbmLitTrackFinderBranch::FollowTracks(
       for (Int_t iStation = 0; iStation < fNofStations; iStation++) {
          litfloat zMin = fHitData.GetMinZPos(iStation);
          const vector<Int_t>& bins = fHitData.GetZPosBins(iStation);
-         map<Int_t, CbmLitTrackParam> binParamMap;
+         // map<bin index, pair<track parameter for the bin, true if track was propagated correctly >>
+         map<Int_t, pair<CbmLitTrackParam, Bool_t> > binParamMap;
          vector<Int_t>::const_iterator itBins;
          for (itBins = bins.begin(); itBins != bins.end(); itBins++) {
-            binParamMap[*itBins] = CbmLitTrackParam();
+            binParamMap[*itBins] = make_pair<CbmLitTrackParam, Bool_t>(CbmLitTrackParam(), true);
          }
          // Number of branches can change in the next loop turn
          // since branches array is filled with additional track branches
@@ -143,17 +144,21 @@ void CbmLitTrackFinderBranch::FollowTracks(
             if (branch->GetNofMissingHits() > fMaxNofMissingHits[fIteration]) { continue; }
 
             CbmLitTrackParam par(*branch->GetParamLast());
-            fPropagator->Propagate(&par, zMin, fPDG[fIteration]);
+            if (fPropagator->Propagate(&par, zMin, fPDG[fIteration]) == kLITERROR) {
+            	break;
+            }
 
             // Extrapolate track parameters to each Z position in the map.
             // This is done to improve calculation speed.
             // In case of planar station only 1 track extrapolation is required,
             // since all hits located at the same Z.
-            map<Int_t, CbmLitTrackParam>::iterator itMap;
+            map<Int_t, pair<CbmLitTrackParam, Bool_t> >::iterator itMap;
             for (itMap = binParamMap.begin(); itMap != binParamMap.end(); itMap++) {
-               (*itMap).second = par;
+               (*itMap).second.first = par;
                litfloat z = fHitData.GetZPosByBin(iStation, (*itMap).first);
-               fPropagator->Propagate(&(*itMap).second, z, fPDG[fIteration]);
+               if (fPropagator->Propagate(&(*itMap).second.first, z, fPDG[fIteration]) == kLITERROR) {
+                  (*itMap).second.second = false;
+               }
             }
 
             // Loop over hits
@@ -162,10 +167,9 @@ void CbmLitTrackFinderBranch::FollowTracks(
             for (HitPtrConstIterator itHit = hits.begin(); itHit != hits.end(); itHit++) {
                const CbmLitHit* hit = *itHit;
                Int_t bin = fHitData.GetBinByZPos(iStation, hit->GetZ());
-               if (binParamMap.find(bin) == binParamMap.end()) { // This should never happen
-                  std::cout << "-E- CbmLitTrackFinderNNNew::FollowTracks: Z position " << hit->GetZ() << " not found in map. Something is wrong.\n";
-               }
-               CbmLitTrackParam tpar(binParamMap[bin]);
+               assert(binParamMap.find(bin) != binParamMap.end());
+               if (!binParamMap[bin].second) continue; // Track parameters are wrong for this propagation
+               CbmLitTrackParam tpar(binParamMap[bin].first);
 
                // Check preliminary if hit is in the validation gate.
                // This is done in order to speed up the algorithm.

@@ -258,8 +258,12 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
 	vector<string> accRecTracks = list_of("Sts")("Trd")("Much")("Tof");
 	for (UInt_t i = 0; i < accRecTracks.size(); i++) {
 		string variant = accRecTracks[i];
+
 		string re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_(Acc|Rec)_Np" : "hte_" + variant + "_.*_(All|Muon|Electron)_(Acc|Rec)_Np";
 		DrawAccAndRec("tracking_qa_local_acc_and_rec_" + variant + "_Np", re);
+
+		re = (variant == "Sts") ? "hte_Sts_Sts_(All|Muon|Electron)_(Acc|Rec)_p" : "hte_" + variant + "_.*_(All|Muon|Electron)_(Acc|Rec)_p";
+		DrawAccAndRec("tracking_qa_local_acc_and_rec_" + variant + "_p", re);
 	}
 
 	//
@@ -366,7 +370,7 @@ void CbmLitTrackingQaReport::DrawAccAndRec(
 		labels[iHist] = split[4] + ":" + split[3] + "(" + NumberToString<Double_t>(hist->GetEntries() / nofEvents, 1) + ")";
 	}
 
-	DrawH1(histos, labels, kLinear, kLog, true, 0.2, 0.75, 0.5, 0.99);
+	DrawH1(histos, labels, kLinear, kLinear, true, 0.2, 0.75, 0.5, 0.99);
 }
 
 void CbmLitTrackingQaReport::DrawYPtHistos()
@@ -415,8 +419,6 @@ void CbmLitTrackingQaReport::DrawYPt(
       canvas->cd(3);
       DrawH2(effHist);
    }
-
-
 }
 
 void CbmLitTrackingQaReport::DrawHitsHistos()

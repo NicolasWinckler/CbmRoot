@@ -55,6 +55,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
       litfloat length = 0;
       if (fPropagator->Propagate(&par, Ze, track->GetPDG(), &F, &length) == kLITERROR) {
          track->SetQuality(kLITBAD);
+         //std::cout << "PROP ERROR: Ze=" << Ze << " length=" << length << " par=" << par.ToString();
          return kLITERROR;
       }
       totalLength += length;
@@ -63,6 +64,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
       litfloat chi2Hit = 0.;
       if (fUpdate->Update(&par, hit, chi2Hit) == kLITERROR) {
          track->SetQuality(kLITBAD);
+         //std::cout << "UPD ERROR: Ze=" << Ze << " length=" << length << " par=" << par.ToString();
          return kLITERROR;
       }
       nodes[iHit].SetUpdatedParam(&par);

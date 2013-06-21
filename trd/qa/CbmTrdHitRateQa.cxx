@@ -276,7 +276,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   printf("Introduction:\n");
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
-  Bool_t Fast = true; // false;  // will not fill the root file (in Histo)!!
+  Bool_t Fast = false; // true; // false;  // will not fill the root file (in Histo)!!
   Bool_t firstLayer = false;
   fDraw = true; // false;
   Double_t ZRangeL = 1e00;//1e05;
@@ -389,7 +389,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   LiSi.push_back(Plane05);
   LiSi.push_back(Plane06);
   LiSi.push_back(Plane09);
-  //  LiSi.push_back(Plane10);
+  LiSi.push_back(Plane10);
 //  LiSi.push_back(Plane01);
 //  LiSi.push_back(Plane02);
 //  LiSi.push_back(Plane03);
@@ -626,13 +626,11 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
   if (fModuleInfo != NULL)
   {
 
-    const Int_t nSec = fModuleInfo->GetNofSectors();  // is always 3
-    //      cout << nSec << " nSec" << endl;
-
 // fill GeoPara
     TVector3 padPos;
     TVector3 padSize;
      
+    GeoPara->nSec      = fModuleInfo->GetNofSectors();  // is always 3
     GeoPara->moduleId  = VolumeID;
     GeoPara->layerId   = fLayer;
     GeoPara->stationId = fStation;
@@ -648,7 +646,7 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     GeoPara->nCol = 0;  // reset total number of columns
     GeoPara->nRow = 0;  // reset total number of rows   
 
-    for (Int_t s = 0; s < nSec; s++)  // for all (3) sectors
+    for (Int_t s = 0; s < GeoPara->nSec; s++)  // for all (3) sectors
     {
       GeoPara->sCol[s] = 0;  // reset number of columns in sector
       GeoPara->sRow[s] = 0;  // reset number of rows    in sector
@@ -697,6 +695,33 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       }
     }
 
+    // swap, if required
+    if (GeoPara->nRow > GeoPara->nCol)  // if mofre rows than columns
+    {
+      Int_t    itemp;
+      Double_t dtemp;
+
+      itemp = GeoPara->nRow;
+      GeoPara->nRow = GeoPara->nCol;
+      GeoPara->nCol = itemp;
+
+      for (Int_t s = 0; s < GeoPara->nSec; s++)  // for all (3) sectors
+      {
+        dtemp = GeoPara->sRow[s];  
+        GeoPara->sRow[s] = GeoPara->sCol[s];
+        GeoPara->sCol[s] = dtemp;
+
+        dtemp = GeoPara->sSize[s][0];  
+        GeoPara->sSize[s][0] = GeoPara->sSize[s][1];
+        GeoPara->sSize[s][1] = dtemp;
+
+        dtemp = GeoPara->pSize[s][0];  
+        GeoPara->pSize[s][0] = GeoPara->pSize[s][1];
+        GeoPara->pSize[s][1] = dtemp;
+      }
+      cout << "swapped x and y" << endl;
+    }
+
     // get origin
     fModuleInfo->GetPosition(VolumeID, 0, 0, 0, padPos, padSize);
     GeoPara->vOrigin[0] = padPos[0] * 10;
@@ -722,8 +747,8 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 
     // inclination angle
     GeoPara->lambda = (GeoPara->vOrigin[0] * GeoPara->vN[0] +
-			 GeoPara->vOrigin[1] * GeoPara->vN[1] +
-			 GeoPara->vOrigin[2] * GeoPara->vN[2]);
+		       GeoPara->vOrigin[1] * GeoPara->vN[1] +
+		       GeoPara->vOrigin[2] * GeoPara->vN[2]);
 
     /*x-direction*/
     GeoPara->cosX = (GeoPara->vX[0] * 1 + GeoPara->vX[1] * 0 + GeoPara->vX[2] * 0) / sqrt(pow(GeoPara->vX[0],2) + pow(GeoPara->vX[1],2) + pow(GeoPara->vX[2],2));
@@ -765,6 +790,9 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       cout << "pos "   << setw(6) << Mpos[0]  << setw(6) << Mpos[1]  << setw(6) << Mpos[2] 
            << " size " << setw(6) << Msize[0] << setw(6) << Msize[1] << setw(6) << Msize[2] << endl;
 
+
+    const Int_t nSec = fModuleInfo->GetNofSectors();  // is always 3
+    //      cout << nSec << " nSec" << endl;
     Double_t Ssize[3*nSec];  // sector size
     Double_t Psize[3*nSec];  // pad size
     for (Int_t iSec = 0; iSec < nSec; iSec++)// iSec = Sector
@@ -793,12 +821,16 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     Int_t nCol = GeoPara->nCol;  // columns per module - or - pads per row
     Int_t nRow = GeoPara->nRow;  // rows    per module
 
+    const Int_t mCol = fModuleInfo->GetNofColumns(); 
+    const Int_t mRow = fModuleInfo->GetNofRows();
+
     if (Lines)
     {
       cout << "col0  " << setw(10) << GeoPara->sCol[0] << "  row0  "<< setw(10) << GeoPara->sRow[0] << endl;
       cout << "col1  " << setw(10) << GeoPara->sCol[1] << "  row1  "<< setw(10) << GeoPara->sRow[1] << endl;
       cout << "col2  " << setw(10) << GeoPara->sCol[2] << "  row2  "<< setw(10) << GeoPara->sRow[2] << endl;
       cout << "col   " << setw(10) << nCol             << "  row   "<< setw(10) << nRow << endl;
+      cout << "mcol  " << setw(10) << mCol             << "  mrow  "<< setw(10) << mRow << endl;
     }
 
        
@@ -837,8 +869,21 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       cout << "vY0   " << setw(10) << GeoPara->vY[0] << endl;
       cout << "vY1   " << setw(10) << GeoPara->vY[1] << endl;
       cout << "step  " << setw(10) << GeoPara->stepDirection[0] << setw(10) << GeoPara->stepDirection[1] << endl;
-	//        cout << "step10" << setw(10) << GeoPara->stepDirection[0] << setw(10) << GeoPara->stepDirection[1] << endl;
+
+      cout << "v00xy " << setw(10) << GeoPara->mPos[0]-GeoPara->vOrigin[0] 
+                       << setw(10) << GeoPara->mPos[1]-GeoPara->vOrigin[1] << endl;
+
+      cout << "------------------------------------------------------" << endl;
     }
+
+    if ((GeoPara->stepDirection[0] ==  1) && (GeoPara->stepDirection[1] == -1)) // OK - hori right
+      GeoPara->rot_angle = 0;
+    if ((GeoPara->stepDirection[0] ==  1) && (GeoPara->stepDirection[1] ==  1)) // OK - vert up
+      GeoPara->rot_angle = 1;
+    if ((GeoPara->stepDirection[0] == -1) && (GeoPara->stepDirection[1] ==  1)) // OK - hori left
+      GeoPara->rot_angle = 2;
+    if ((GeoPara->stepDirection[0] == -1) && (GeoPara->stepDirection[1] == -1)) // OK - vert down
+      GeoPara->rot_angle = 3;
 
     Topview[0]->Fill(GeoPara->mPos[0],GeoPara->mPos[2]);
     Topview[1]->Fill(GeoPara->mPos[0],GeoPara->mPos[1]);
@@ -846,11 +891,11 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     
     if (Lines)
     {
-      DrawBorders(GeoPara, nSec, Layer, c1);
+      DrawBorders(GeoPara, Layer, c1);
     }
     else
     {
-      Histo(GeoPara, Fast, nSec, Layer, c1, HitPad, c2, Topview, c0, mm2bin);
+      Histo(GeoPara, Fast, Layer, c1, HitPad, c2, Topview, c0, mm2bin);
     }
   }
 
@@ -905,7 +950,7 @@ Double_t CbmTrdHitRateQa::CalcHitRate(HitRateGeoPara *GeoPara, Double_t StartX, 
 }
 
 
-void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH2F* h2Layer, TCanvas* c1, TH1F* h1HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
+void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* h2Layer, TCanvas* c1, TH1F* h1HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
@@ -913,7 +958,8 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH
 
   // show only current module name
   name.Form("ModuleID %5d",GeoPara->moduleId);
-  cout << "      " << name << "\r" << flush;
+  //  cout << "      " << name << "\r" << flush;
+  cout << "      " << name << "\n" << flush;
 
   name.Form("Module%05d",GeoPara->moduleId);  
   TH2F* h2Module = new TH2F(name,name,1000/mm2bin+1,-500.5,500.5, 1000/mm2bin+1,-500.5,500.5);  // 1001 x 1001 bins
@@ -956,6 +1002,10 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH
   //Int_t xStepDirection = GeoPara->vX[0] / fabs(GeoPara->vX[0]); // is the next pad (1,0,0) on the left or right side?
   //Int_t yStepDirection = GeoPara->vY[1] / fabs(GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
 
+//----------------------------------------------------------------------------------------
+
+//if (GeoPara->rot_angle == 1)
+//if (GeoPara->rot_angle != 3)
   for (Int_t iR = 0; iR < GeoPara->nRow; iR++)  // rows
     {
       StartX = GeoPara->vOrigin[0] + 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX; // why to the left?
@@ -1061,19 +1111,7 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH
       planeStopY  += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1];
     }
 
-//  if(fDraw)
-//  {
-//    c1->cd(1);
-//    //    c1->cd(1)->SetLogz(1);
-//    h2Layer->Draw("colz");
-//    //    h2Layer->Draw("colz,same");
-//
-//    for (Int_t i = 0; i < 3; i++) 
-//    {
-//      c0->cd(i+1);
-//      Topview[i]->Draw("colz");
-//    }
-//  }
+//----------------------------------------------------------------------------------------
 
   for (Int_t i = 0; i < 3; i++)
     Topview[i]->Write("", TObject::kOverwrite);
@@ -1086,15 +1124,10 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH
   delete h2Module;
   delete h1HitPadModule;
 
-  //c0->Update();
-  /*
-    c2->cd(1);
-    h1HitPad->Draw();
-  */
 }
 
 
-void CbmTrdHitRateQa::DrawBorders(HitRateGeoPara *GeoPara, Int_t nSec, TH2F* Layer, TCanvas* c1)
+void CbmTrdHitRateQa::DrawBorders(HitRateGeoPara *GeoPara, TH2F* Layer, TCanvas* c1)
 {
   /*
   //----------------------Pad--------------------------------------
@@ -1166,7 +1199,7 @@ void CbmTrdHitRateQa::DrawBorders(HitRateGeoPara *GeoPara, Int_t nSec, TH2F* Lay
   Float_t SecXStop  = 0.0;
   Float_t SecYStop  = 0.0;
 
-  for (Int_t iSec = 0; iSec < nSec-1; iSec++)  // would be enough to iterate up to nSec-1
+  for (Int_t iSec = 0; iSec < GeoPara->nSec-1; iSec++)  // would be enough to iterate up to nSec-1
     {
 
       if (GeoPara->sSize[iSec][0] < 2 * GeoPara->mSize[0] && GeoPara->sSize[iSec][0] > 0)  // in x direction

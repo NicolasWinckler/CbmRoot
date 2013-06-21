@@ -30,6 +30,9 @@ typedef struct HitRateGeoPara
   Double_t sSize[3][3]; // sector size
   Double_t pSize[3][3]; // pad size     // [sectors][dimensions]
 
+  Int_t nSec;      // 3 - number of sectors in module
+  Int_t rot_angle; // 0,1,2,3 - angle between long pad axis and x axis
+
   Int_t nCol;
   Int_t nRow;
   Int_t sCol[3];  // number of cols in sector
@@ -91,11 +94,11 @@ class CbmTrdHitRateQa : public FairTask {
 
   void GetModuleInformation();
 
-  void Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2,  TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
+  void Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2,  TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
  
   Double_t CalcHitRate(HitRateGeoPara *GeoPara, Double_t StartX, Double_t StopX, Int_t xSteps, Double_t StartY, Double_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0);
 
-  void DrawBorders(HitRateGeoPara *GeoPara, Int_t nSec, TH2F* Layer, TCanvas* c1);
+  void DrawBorders(HitRateGeoPara *GeoPara, TH2F* Layer, TCanvas* c1);
 
   void DrawDigi();
 

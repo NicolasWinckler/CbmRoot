@@ -91,11 +91,11 @@ class CbmTrdHitRateQa : public FairTask {
 
   void GetModuleInformation();
 
-  void Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2,  TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
+  void Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2,  TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
  
-  float CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Int_t xSteps, Float_t StartY, Float_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0);
+  Double_t CalcHitRate(HitRateGeoPara *GeoPara, Double_t StartX, Double_t StopX, Int_t xSteps, Double_t StartY, Double_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0);
 
-  void DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0);
+  void DrawBorders(HitRateGeoPara *GeoPara, Int_t nSec, TH2F* Layer, TCanvas* c1);
 
   void DrawDigi();
 
@@ -136,8 +136,7 @@ class CbmTrdHitRateQa : public FairTask {
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
   static const Int_t fPadNrX = 7;//7; // has to be odd
   static const Int_t fPadNrY = 5;//5; // has to be odd
-  static const Int_t fNoSectors = 3;
-  //Int_t fNoSectors;
+
   /*
     static const Bool_t Histo = true;
     //static const Bool_t Histo = false;
@@ -149,8 +148,6 @@ class CbmTrdHitRateQa : public FairTask {
   
   Double_t padsize[3];
   Double_t modulesize[3];
-  Double_t sectorsize[fNoSectors]; // 3 sectors per module
-  Int_t sectorrows[fNoSectors];
 
   Float_t fELoss;//energy loss from MCPoint 
   Float_t fELossdEdX;

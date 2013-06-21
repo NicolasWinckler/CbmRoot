@@ -19,6 +19,7 @@
 #include "TClonesArray.h"
 #include "TGeoManager.h"
 #include "TPRegexp.h"
+#include "TPolyMarker.h"
 
 #include <vector>
 #include <iostream>
@@ -76,8 +77,6 @@ CbmTrdHitRateQa::CbmTrdHitRateQa()
     fSector(-1),
     padsize(),
     modulesize(),
-    sectorsize(),
-    sectorrows(),
     fELoss(-1.),
     fELossdEdX(-1.),
     fELossTR(-1.),
@@ -149,8 +148,6 @@ CbmTrdHitRateQa::CbmTrdHitRateQa(const char *name, const char *title,
     fSector(-1),
     padsize(),
     modulesize(),
-    sectorsize(),
-    sectorrows(),
     fELoss(-1.),
     fELossdEdX(-1.),
     fELossTR(-1.),
@@ -279,7 +276,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   printf("Introduction:\n");
   HitRateGeoPara *GeoPara = new HitRateGeoPara;
   Bool_t Lines;
-  Bool_t Fast = true; // false;
+  Bool_t Fast = true; // false;  // will not fill the root file (in Histo)!!
   Bool_t firstLayer = false;
   fDraw = true; // false;
   Double_t ZRangeL = 1e00;//1e05;
@@ -392,7 +389,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   LiSi.push_back(Plane05);
   LiSi.push_back(Plane06);
   LiSi.push_back(Plane09);
-  LiSi.push_back(Plane10);
+  //  LiSi.push_back(Plane10);
 //  LiSi.push_back(Plane01);
 //  LiSi.push_back(Plane02);
 //  LiSi.push_back(Plane03);
@@ -449,9 +446,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
       // generate png files
       Lines = false;
       for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
-	{	 
-	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
-	}
+        GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
 
       if(fDraw)
       {
@@ -461,9 +456,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
 
       Lines = true;
       for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
-	{
-	  GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
-	}
+        GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
 
       if(fDraw)  // dump png file for this layer
       {
@@ -631,109 +624,40 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 
   fModuleInfo = fDigiPar->GetModule(VolumeID);
   if (fModuleInfo != NULL)
+  {
+
+    const Int_t nSec = fModuleInfo->GetNofSectors();  // is always 3
+    //      cout << nSec << " nSec" << endl;
+
+// fill GeoPara
+    TVector3 padPos;
+    TVector3 padSize;
+     
+    GeoPara->moduleId  = VolumeID;
+    GeoPara->layerId   = fLayer;
+    GeoPara->stationId = fStation;
+
+    GeoPara->mPos[0] = fModuleInfo->GetX() * 10;
+    GeoPara->mPos[1] = fModuleInfo->GetY() * 10;
+    GeoPara->mPos[2] = fModuleInfo->GetZ() * 10; // == z(station) ??
+    
+    GeoPara->mSize[0] = fModuleInfo->GetSizeX() * 10;
+    GeoPara->mSize[1] = fModuleInfo->GetSizeY() * 10;
+    GeoPara->mSize[2] = 0; 
+
+    GeoPara->nCol = 0;  // reset total number of columns
+    GeoPara->nRow = 0;  // reset total number of rows   
+
+    for (Int_t s = 0; s < nSec; s++)  // for all (3) sectors
     {
+      GeoPara->sCol[s] = 0;  // reset number of columns in sector
+      GeoPara->sRow[s] = 0;  // reset number of rows    in sector
 
-      Int_t nRow = 0;
-      Int_t nCol = 0;
+      fModuleInfo->GetPosition(VolumeID, s, 0, 0, padPos, padSize);
+      GeoPara->pSize[s][2] = 0;
 
-      Double_t Mpos[3];
-      Mpos[0] = fModuleInfo->GetX() * 10;
-      Mpos[1] = fModuleInfo->GetY() * 10;
-      Mpos[2] = fModuleInfo->GetZ() * 10; // == z(station) ??
-      
-      Double_t Msize[3];  // half module size
-      Msize[0] = fModuleInfo->GetSizeX() * 10;
-      Msize[1] = fModuleInfo->GetSizeY() * 10;
-      Msize[2] = 0; 
-
-      cout.setf(ios::fixed);
-      cout.precision(0);
-      if (Lines)
-        cout << "pos "   << setw(6) << Mpos[0]  << setw(6) << Mpos[1]  << setw(6) << Mpos[2] 
-             << " size " << setw(6) << Msize[0] << setw(6) << Msize[1] << setw(6) << Msize[2] << endl;
-
-      const Int_t NoSectors = fModuleInfo->GetNofSectors();  // is always 3
-      Int_t nSec = NoSectors;
-      Double_t Ssize[3*NoSectors];  // sector size
-      Double_t Psize[3*NoSectors];  // pad size
-
-      //      cout << NoSectors << " NoSectors" << endl;
-
-      for (Int_t i = 0; i < NoSectors; i++)// i = Sector
-	{
-	  Ssize[0+i*NoSectors] = fModuleInfo->GetSectorSizeX(i) * 10;
-	  Ssize[1+i*NoSectors] = fModuleInfo->GetSectorSizeY(i) * 10;
-	  Ssize[2+i*NoSectors] = 0;
-	  
-	  Psize[0+i*NoSectors] = fModuleInfo->GetPadSizeX(i) * 10;
-	  Psize[1+i*NoSectors] = fModuleInfo->GetPadSizeY(i) * 10;
-	  Psize[2+i*NoSectors] = 0;
-	}
-
-      if (Lines)
-        cout << "sec   " << setw(10) << Ssize[0]  << setw(10) << Ssize[1]  
-                         << setw(10) << Ssize[3]  << setw(10) << Ssize[4]  
-                         << setw(10) << Ssize[6]  << setw(10) << Ssize[7] << endl; 
-
-      cout.precision(2);
-      if (Lines)
-        cout << "pad   " << setw(10) << Psize[0]  << setw(10) << Psize[1] 
-                         << setw(10) << Psize[3]  << setw(10) << Psize[4] 
-                         << setw(10) << Psize[6]  << setw(10) << Psize[7] << endl;
-
-      GeoPara->moduleId  = VolumeID;
-      GeoPara->layerId   = fLayer;
-      GeoPara->stationId = fStation;
-      
-      //nCol = (Int_t)(2*Msize[0] / (int(Psize[0] * 100) / 100.0));   
-      Int_t tempX = 0;  // columns per module - or - pads per row
-      Int_t tempY = 0;  // rows    per module
-
-      for (Int_t i = 0; i < fNoSectors; i++)
-	{
-	  if (Ssize[0+i*NoSectors] < 2 * Msize[0] && Ssize[0+i*NoSectors] > 0)  // sector size within module size
-	    {
-	      tempX += int(Ssize[0+i*NoSectors]/Psize[0+i*NoSectors]); 
-	    }
-	  else
-	    {
-	      tempX  = int(Ssize[0+i*NoSectors]/Psize[0+i*NoSectors]); 
-	    }
-
-	  if (Ssize[1+i*NoSectors] < 2 * Msize[1] && Ssize[1+i*NoSectors] > 0)  // sector size within module size
-	    {
-	      tempY += int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); 
-	    }
-	  else
-	    {
-	      tempY  = int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); 
-	    }
-	}
-
-      if (Lines)
-        cout << "temp  " << setw(10) << tempX  << setw(10) << tempY << endl;
-
-
-      TVector3 padPos;
-      TVector3 padSize;
-      
-      for (Int_t s = 0; s < fNoSectors; s++) 
+      for (Int_t i = 0; i < 2; i++)  // for x and y
       {
-	GeoPara->sCol[s] = 0;  // reset number of columns in sector
-	GeoPara->sRow[s] = 0;  // reset number of rows    in sector
-      }
-
-     GeoPara->nCol = 0;  // reset total number of columns
-     GeoPara->nRow = 0;  // reset total number of rows   
-
-      for (Int_t i = 0; i < 3; i++)  // for x and y
-      {
-	GeoPara->mPos[i]  = Mpos[i];  // get module position
-	GeoPara->mSize[i] = Msize[i]; // get module size
-
-	for (Int_t s = 0; s < fNoSectors; s++)  // for all (3) sectors
-        {
-	  fModuleInfo->GetPosition(VolumeID, s, 0, 0, padPos, padSize);
 	  GeoPara->pSize[s][i] = padSize[i] * 10;  // convert to mm
 
 	  if (i == 0) // x direction
@@ -741,12 +665,12 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizeX(s) * 10;
 	    if (GeoPara->sSize[s][i] < 2 * GeoPara->mSize[i]) // if sector smaller than module
             {
-	      GeoPara->sCol[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i]; // calculate number of pads
+	      GeoPara->sCol[s] = round(GeoPara->sSize[s][i] / GeoPara->pSize[s][i]); // calculate number of pads
 	    }
 	    else // only one sector
             {
 	      if (s == 0) 
-                GeoPara->sCol[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i]; // calculate number of pads
+                GeoPara->sCol[s] = round(GeoPara->sSize[s][i] / GeoPara->pSize[s][i]); // calculate number of pads
 	      else        
                 GeoPara->sCol[s] = 0; // set other sectors 0
 	    }
@@ -758,105 +682,192 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
 	    GeoPara->sSize[s][i] = fModuleInfo->GetSectorSizeY(s) * 10;
 	    if (GeoPara->sSize[s][i] < 2 * GeoPara->mSize[i]) // if sector smaller than module
             {
-	      GeoPara->sRow[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i];
+	      GeoPara->sRow[s] = round(GeoPara->sSize[s][i] / GeoPara->pSize[s][i]);
 	    }
 	    else // only one sector
             {
 	      if (s == 0) 
-                GeoPara->sRow[s] = GeoPara->sSize[s][i] / GeoPara->pSize[s][i]; // calculate number of pads
+		GeoPara->sRow[s] = round(GeoPara->sSize[s][i] / GeoPara->pSize[s][i]); // calculate number of pads
 	      else        
                 GeoPara->sRow[s] = 0; // set other sectors 0
 	    }
 	    GeoPara->nRow += GeoPara->sRow[s];  // sum up columns
 	  }
 
-	}
       }
+    }
 
-      if (Lines)
-        cout << "col   " << setw(10) << GeoPara->nCol << " row   " << setw(10) << GeoPara->nRow << endl;
+    // get origin
+    fModuleInfo->GetPosition(VolumeID, 0, 0, 0, padPos, padSize);
+    GeoPara->vOrigin[0] = padPos[0] * 10;
+    GeoPara->vOrigin[1] = padPos[1] * 10; 
+    GeoPara->vOrigin[2] = padPos[2] * 10;
+    
+    // get col offset
+    fModuleInfo->GetPosition(VolumeID, 0, 1, 0, padPos, padSize);
+    GeoPara->vX[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]; 
+    GeoPara->vX[1]      = padPos[1] * 10 - GeoPara->vOrigin[1];			   
+    GeoPara->vX[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
 
-      // get origin
-      fModuleInfo->GetPosition(VolumeID, 0, 0, 0, padPos, padSize);
-      GeoPara->vOrigin[0] = padPos[0] * 10;
-      GeoPara->vOrigin[1] = padPos[1] * 10; 
-      GeoPara->vOrigin[2] = padPos[2] * 10;
-      
-      // get col offset
-      fModuleInfo->GetPosition(VolumeID, 0, 1, 0, padPos, padSize);
-      GeoPara->vX[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]; 
-      GeoPara->vX[1]      = padPos[1] * 10 - GeoPara->vOrigin[1];			   
-      GeoPara->vX[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
+    // get row offset
+    fModuleInfo->GetPosition(VolumeID, 0, 0, 1, padPos, padSize);
+    GeoPara->vY[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]; 
+    GeoPara->vY[1]      = padPos[1] * 10 - GeoPara->vOrigin[1]; 
+    GeoPara->vY[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
 
-      // get row offset
-      fModuleInfo->GetPosition(VolumeID, 0, 0, 1, padPos, padSize);
-      GeoPara->vY[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]; 
-      GeoPara->vY[1]      = padPos[1] * 10 - GeoPara->vOrigin[1]; 
-      GeoPara->vY[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
+    // normal vector
+    GeoPara->vN[0]      = GeoPara->vX[1]*GeoPara->vY[2] - GeoPara->vX[2]*GeoPara->vY[1];
+    GeoPara->vN[1]      = GeoPara->vX[2]*GeoPara->vY[0] - GeoPara->vX[0]*GeoPara->vY[2];
+    GeoPara->vN[2]      = GeoPara->vX[0]*GeoPara->vY[1] - GeoPara->vX[1]*GeoPara->vY[0];
 
-      // normal vector
-      GeoPara->vN[0]      = GeoPara->vX[1]*GeoPara->vY[2] - GeoPara->vX[2]*GeoPara->vY[1];
-      GeoPara->vN[1]      = GeoPara->vX[2]*GeoPara->vY[0] - GeoPara->vX[0]*GeoPara->vY[2];
-      GeoPara->vN[2]      = GeoPara->vX[0]*GeoPara->vY[1] - GeoPara->vX[1]*GeoPara->vY[0];
-
-      // inclination angle
-      GeoPara->lambda = (GeoPara->vOrigin[0] * GeoPara->vN[0] +
+    // inclination angle
+    GeoPara->lambda = (GeoPara->vOrigin[0] * GeoPara->vN[0] +
 			 GeoPara->vOrigin[1] * GeoPara->vN[1] +
 			 GeoPara->vOrigin[2] * GeoPara->vN[2]);
 
-      /*x-direction*/
-      GeoPara->cosX = (GeoPara->vX[0] * 1 + GeoPara->vX[1] * 0 + GeoPara->vX[2] * 0) / sqrt(pow(GeoPara->vX[0],2) + pow(GeoPara->vX[1],2) + pow(GeoPara->vX[2],2));
-      /*y-direction*/
-      GeoPara->cosY = (GeoPara->vY[0] * 0 + GeoPara->vY[1] * 1 + GeoPara->vY[2] * 0) / sqrt(pow(GeoPara->vY[0],2) + pow(GeoPara->vY[1],2) + pow(GeoPara->vY[2],2));
+    /*x-direction*/
+    GeoPara->cosX = (GeoPara->vX[0] * 1 + GeoPara->vX[1] * 0 + GeoPara->vX[2] * 0) / sqrt(pow(GeoPara->vX[0],2) + pow(GeoPara->vX[1],2) + pow(GeoPara->vX[2],2));
+    /*y-direction*/
+    GeoPara->cosY = (GeoPara->vY[0] * 0 + GeoPara->vY[1] * 1 + GeoPara->vY[2] * 0) / sqrt(pow(GeoPara->vY[0],2) + pow(GeoPara->vY[1],2) + pow(GeoPara->vY[2],2));
 
-      if (GeoPara->vX[0] != 0)
-        GeoPara->stepDirection[0] = fabs(GeoPara->vX[0]) / (GeoPara->vX[0]); // is the next pad (1,0,0) on the left  or right side?
-      else
-        GeoPara->stepDirection[0] = fabs(GeoPara->vX[1]) / (GeoPara->vX[1]); // is the next pad (1,0,0) on the left  or right side?
+    // check and fix cos values (were larger than 1)
+    //    cout << "a cosX " << GeoPara->cosX << " cosY " << GeoPara->cosY << endl;
 
-      if (GeoPara->vY[1] != 0)
-        GeoPara->stepDirection[1] = fabs(GeoPara->vY[1]) / (GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
-      else
-        GeoPara->stepDirection[1] = fabs(GeoPara->vY[0]) / (GeoPara->vY[0]); // is the next pad (0,1,0) on the upper or lower side?
+    if (GeoPara->cosX >  1) GeoPara->cosX =  1;
+    if (GeoPara->cosX < -1) GeoPara->cosX = -1;
+    if (GeoPara->cosY >  1) GeoPara->cosY =  1;
+    if (GeoPara->cosY < -1) GeoPara->cosY = -1;
 
-      if (Lines)
-      {
-        cout << "vX0   " << setw(10) << GeoPara->vX[0]            << setw(10) << fabs(GeoPara->vX[0]) << endl;
-        cout << "vX1   " << setw(10) << GeoPara->vX[1]            << setw(10) << fabs(GeoPara->vX[1]) << endl;
-        cout << "vY0   " << setw(10) << GeoPara->vY[0]            << setw(10) << fabs(GeoPara->vY[0]) << endl;
-        cout << "vY1   " << setw(10) << GeoPara->vY[1]            << setw(10) << fabs(GeoPara->vY[1]) << endl;
-        cout << "step  " << setw(10) << GeoPara->stepDirection[0] << setw(10) << GeoPara->stepDirection[1] << endl;
-	//        cout << "step10" << setw(10) << GeoPara->stepDirection[0] << setw(10) << GeoPara->stepDirection[1] << endl;
-      }
+    //    cout << "b cosX " << GeoPara->cosX << " cosY " << GeoPara->cosY << endl;
 
-      Topview[0]->Fill(GeoPara->mPos[0],GeoPara->mPos[2]);
-      Topview[1]->Fill(GeoPara->mPos[0],GeoPara->mPos[1]);
-      Topview[2]->Fill(GeoPara->mPos[2],GeoPara->mPos[1]);
-      
-      nCol = tempX;
-      nRow = tempY;
+    if (GeoPara->vX[0] != 0)
+      GeoPara->stepDirection[0] = fabs(GeoPara->vX[0]) / (GeoPara->vX[0]); // is the next pad (1,0,0) on the left  or right side?
+    else
+      GeoPara->stepDirection[0] =-fabs(GeoPara->vX[1]) / (GeoPara->vX[1]); // is the next pad (1,0,0) on the left  or right side?
 
-      if (Lines)
-        DrawLines( VolumeID, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Topview, c0);
-      else
-        Histo(GeoPara, Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, HitPad, c2, Topview, c0, mm2bin);
-    }
-  else
+    if (GeoPara->vY[1] != 0)
+      GeoPara->stepDirection[1] = fabs(GeoPara->vY[1]) / (GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
+    else
+      GeoPara->stepDirection[1] =-fabs(GeoPara->vY[0]) / (GeoPara->vY[0]); // is the next pad (0,1,0) on the upper or lower side?
+
+    // transfer values to old variables
+    Double_t Mpos[3];
+    Double_t Msize[3];
+    for (Int_t i = 0; i < 3; i++)  // for x, y and z
     {
-      printf("fModuleInfo == NULL\n");
+      Mpos[i]  = GeoPara->mPos[i];   // set module position
+      Msize[i] = GeoPara->mSize[i];  // set module size
     }
+
+    cout.setf(ios::fixed);
+    cout.precision(0);
+    if (Lines)
+      cout << "pos "   << setw(6) << Mpos[0]  << setw(6) << Mpos[1]  << setw(6) << Mpos[2] 
+           << " size " << setw(6) << Msize[0] << setw(6) << Msize[1] << setw(6) << Msize[2] << endl;
+
+    Double_t Ssize[3*nSec];  // sector size
+    Double_t Psize[3*nSec];  // pad size
+    for (Int_t iSec = 0; iSec < nSec; iSec++)// iSec = Sector
+    {
+      Ssize[0+iSec*nSec] = GeoPara->sSize[iSec][0];
+      Ssize[1+iSec*nSec] = GeoPara->sSize[iSec][1];
+      Ssize[2+iSec*nSec] = 0;
+      
+      Psize[0+iSec*nSec] = GeoPara->pSize[iSec][0];
+      Psize[1+iSec*nSec] = GeoPara->pSize[iSec][1];
+      Psize[2+iSec*nSec] = 0;
+    }
+
+    if (Lines)
+      cout << "sec   " << setw(10) << Ssize[0]  << setw(10) << Ssize[1]  
+                       << setw(10) << Ssize[3]  << setw(10) << Ssize[4]  
+                       << setw(10) << Ssize[6]  << setw(10) << Ssize[7] << endl; 
+
+    cout.precision(2);
+    if (Lines)
+      cout << "pad   " << setw(10) << Psize[0]  << setw(10) << Psize[1] 
+                       << setw(10) << Psize[3]  << setw(10) << Psize[4] 
+                       << setw(10) << Psize[6]  << setw(10) << Psize[7] << endl;
+
+// nCol and nRow
+    Int_t nCol = GeoPara->nCol;  // columns per module - or - pads per row
+    Int_t nRow = GeoPara->nRow;  // rows    per module
+
+    if (Lines)
+    {
+      cout << "col0  " << setw(10) << GeoPara->sCol[0] << "  row0  "<< setw(10) << GeoPara->sRow[0] << endl;
+      cout << "col1  " << setw(10) << GeoPara->sCol[1] << "  row1  "<< setw(10) << GeoPara->sRow[1] << endl;
+      cout << "col2  " << setw(10) << GeoPara->sCol[2] << "  row2  "<< setw(10) << GeoPara->sRow[2] << endl;
+      cout << "col   " << setw(10) << nCol             << "  row   "<< setw(10) << nRow << endl;
+    }
+
+       
+//// nCol and nRow
+//      Int_t nCol = 0;  // columns per module - or - pads per row
+//      Int_t nRow = 0;  // rows    per module
+//
+//      for (Int_t i = 0; i < fnSec; i++)
+//	{
+//	  if (Ssize[0+i*nSec] < 2 * Msize[0] && Ssize[0+i*nSec] > 0)  // sector size within module size
+//	    {
+//	      nCol += int(Ssize[0+i*nSec]/Psize[0+i*nSec]); 
+//	    }
+//	  else
+//	    {
+//	      nCol  = int(Ssize[0+i*nSec]/Psize[0+i*nSec]); 
+//	    }
+//
+//	  if (Ssize[1+i*nSec] < 2 * Msize[1] && Ssize[1+i*nSec] > 0)  // sector size within module size
+//	    {
+//	      nRow += int(Ssize[1+i*nSec]/Psize[1+i*nSec]); 
+//	    }
+//	  else
+//	    {
+//	      nRow  = int(Ssize[1+i*nSec]/Psize[1+i*nSec]); 
+//	    }
+//	}
+//
+//      if (Lines)
+//        cout << "nCol  " << setw(10) << nCol  << "  nRow  "<< setw(10) << nRow << endl;
+
+    if (Lines)
+    {
+      cout << "vX0   " << setw(10) << GeoPara->vX[0] << endl;
+      cout << "vX1   " << setw(10) << GeoPara->vX[1] << endl;
+      cout << "vY0   " << setw(10) << GeoPara->vY[0] << endl;
+      cout << "vY1   " << setw(10) << GeoPara->vY[1] << endl;
+      cout << "step  " << setw(10) << GeoPara->stepDirection[0] << setw(10) << GeoPara->stepDirection[1] << endl;
+	//        cout << "step10" << setw(10) << GeoPara->stepDirection[0] << setw(10) << GeoPara->stepDirection[1] << endl;
+    }
+
+    Topview[0]->Fill(GeoPara->mPos[0],GeoPara->mPos[2]);
+    Topview[1]->Fill(GeoPara->mPos[0],GeoPara->mPos[1]);
+    Topview[2]->Fill(GeoPara->mPos[2],GeoPara->mPos[1]);
+    
+    if (Lines)
+    {
+      DrawBorders(GeoPara, nSec, Layer, c1);
+    }
+    else
+    {
+      Histo(GeoPara, Fast, nSec, Layer, c1, HitPad, c2, Topview, c0, mm2bin);
+    }
+  }
+
+  else
+    printf("fModuleInfo == NULL\n");
 }
 
 
-float CbmTrdHitRateQa::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Float_t StopX, Int_t xSteps, Float_t StartY, Float_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0)
+Double_t CbmTrdHitRateQa::CalcHitRate(HitRateGeoPara *GeoPara, Double_t StartX, Double_t StopX, Int_t xSteps, Double_t StartY, Double_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0)
 {
   //cout << "CalcHitRate" << endl;
-  Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
-  Float_t r = 0;
-  Float_t alpha = 0;
+  Double_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
+  Double_t r = 0;
+  Double_t alpha = 0;
   Int_t counter = 0;
-  Float_t a[3] = { 7.66582e+00,  6.97712e+00,  6.53780e+00};
-  Float_t b[3] = {-2.72375e-03, -1.85168e-03, -1.42673e-03};
+  Double_t a[3] = { 7.66582e+00,  6.97712e+00,  6.53780e+00};
+  Double_t b[3] = {-2.72375e-03, -1.85168e-03, -1.42673e-03};
 
   Double_t xStepWidth = GeoPara->cosX;
   Double_t yStepWidth = GeoPara->cosY;
@@ -893,64 +904,66 @@ float CbmTrdHitRateQa::CalcHitRate(HitRateGeoPara *GeoPara, Float_t StartX, Floa
   return (HitRate/*/(counter/100.)*/);/*Convertes Hits/Pad -> Hits/cm² on each Pad*/
 }
 
-void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
+
+void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Int_t nSec, TH2F* h2Layer, TCanvas* c1, TH1F* h1HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin)
 {
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
   TString name;
 
-  name.Form("Module%05d",GeoPara->moduleId);  
-  //  TH2F *Module = new TH2F(name,name,1500/mm2bin+1,-750.5,750.5,1500/mm2bin+1,-750.5,750.5);
-  TH2F *Module = new TH2F(name,name,1000/mm2bin+1,-500.5,500.5, 1000/mm2bin+1,-500.5,500.5);  // 1001 x 1001 bins
-  Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
-
-  name.Form("Module%05dHitPad",GeoPara->moduleId);
-  TH1F* HitPadModule = new TH1F(name,name,1200,0,120000);
-  //  TH1F* HitPadModule = new TH1F(name,name,10000,1e00,1e06);
-
   // show only current module name
   name.Form("ModuleID %5d",GeoPara->moduleId);
   cout << "      " << name << "\r" << flush;
 
-  /*
-  // show all module names
-  //  cout << "Modules" << endl;
-  name.Form("%10d",GeoPara->moduleId);
-  cout << name << flush;
-  */
+  name.Form("Module%05d",GeoPara->moduleId);  
+  TH2F* h2Module = new TH2F(name,name,1000/mm2bin+1,-500.5,500.5, 1000/mm2bin+1,-500.5,500.5);  // 1001 x 1001 bins
+  //  TH2F *h2Module = new TH2F(name,name,1500/mm2bin+1,-750.5,750.5,1500/mm2bin+1,-750.5,750.5);
+  h2Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
+
+  name.Form("Module%05dHitPad",GeoPara->moduleId);
+  TH1F* h1HitPadModule = new TH1F(name,name,1200,0,120000);
+  //  TH1F* h1HitPadModule = new TH1F(name,name,10000,1e00,1e06);
+
   //cout << "Histo" << endl;
 
-  //  printf(" Xp %6d Xs %6d Yp %6d Ys %6d\n", (Int_t)Mpos[0], (Int_t)Msize[0], (Int_t)Mpos[1], (Int_t)Msize[1]);
-  //  cout << endl << "Xp " << Mpos[0] << " Xs " << Msize[0] << " Yp " << Mpos[1] << " Ys " << Msize[1] << endl;
+  //  printf(" Xp %6d Xs %6d Yp %6d Ys %6d\n", (Int_t)GeoPara->mPos[0], (Int_t)GeoPara->mSize[0], (Int_t)GeoPara->mPos[1], (Int_t)GeoPara->mSize[1]);
+  //  cout << endl << "Xp " << GeoPara->mPos[0] << " Xs " << GeoPara->mSize[0] << " Yp " << GeoPara->mPos[1] << " Ys " << GeoPara->mSize[1] << endl;
 
-  const Int_t nR = nRow;
-  const Int_t nC = nCol;
-  Float_t HiteRate = 0;
+  Double_t HiteRate = 0;
+
   Int_t iSecX = 0;
   Int_t iSecY = 0;
-  Double_t planeStartX = Mpos[0]-Msize[0];
-  Double_t planeStartY = Mpos[1]-Msize[1];
-  Double_t planeStopX = planeStartX + GeoPara->pSize[iSecX][0];
-  Double_t planeStopY = planeStartY + GeoPara->pSize[iSecX][1];
-  Float_t StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX;// vOrigin points to the center of pad (0,0,0)
-  Float_t StartY = GeoPara->vOrigin[1] - 0.5 * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
-  Float_t StopX = StartX + GeoPara->pSize[iSecX][0] * GeoPara->cosX;
-  Float_t StopY = StartY + GeoPara->pSize[iSecY][1] * GeoPara->cosY;
+
+  Double_t planeStartX = GeoPara->mPos[0]-GeoPara->mSize[0];
+  Double_t planeStopX  = planeStartX + GeoPara->pSize[iSecX][0];
+
+  Double_t planeStartY = GeoPara->mPos[1]-GeoPara->mSize[1];
+  Double_t planeStopY  = planeStartY + GeoPara->pSize[iSecY][1];
+
+  Double_t StartX = GeoPara->vOrigin[0] + 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX;  // vOrigin points to the center of pad (0,0,0)
+  Double_t StopX  = StartX + GeoPara->pSize[iSecX][0] * GeoPara->cosX;
+
+  Double_t StartY = GeoPara->vOrigin[1] + 0.5 * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
+  Double_t StopY  = StartY + GeoPara->pSize[iSecY][1] * GeoPara->cosY;
+
   Int_t xSteps = 0;
   Int_t ySteps = 0;
+
+  //  cout << "x " << GeoPara->pSize[iSecX][0] << " y " <<  GeoPara->pSize[iSecX][1] << endl;
 
   //  printf("stX %6d spX %6d stY %6d spY %6d\n", (Int_t)StartX, (Int_t)StopX, (Int_t)StartY, (Int_t)StopY);
 
   //Int_t xStepDirection = GeoPara->vX[0] / fabs(GeoPara->vX[0]); // is the next pad (1,0,0) on the left or right side?
   //Int_t yStepDirection = GeoPara->vY[1] / fabs(GeoPara->vY[1]); // is the next pad (0,1,0) on the upper or lower side?
 
-  for (Int_t iR = 0; iR < nR; iR++)
+  for (Int_t iR = 0; iR < GeoPara->nRow; iR++)  // rows
     {
-      StartX = GeoPara->vOrigin[0] - 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX; 
+      StartX = GeoPara->vOrigin[0] + 0.5 * GeoPara->pSize[iSecX][0] * GeoPara->cosX; // why to the left?
       StopX  = StartX + GeoPara->pSize[iSecX][0] * GeoPara->cosX;
       planeStartX = GeoPara->mPos[0] - GeoPara->mSize[0];
       planeStopX  = planeStartX + GeoPara->pSize[iSecX][0];
-      for (Int_t iC = 0; iC < nC; iC++)
+
+      for (Int_t iC = 0; iC < GeoPara->nCol; iC++)  // for all columns
 	{
 	  xSteps = GeoPara->pSize[iSecX][0] - 1; // 1 Step / mm
 	  ySteps = GeoPara->pSize[iSecY][1] - 1;
@@ -958,79 +971,89 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos
 	  if (Fast)
 	    {
 	      //DE
-	      //	      if (Mpos[0] > -1 && Mpos[1] > -1)
-	      if (Mpos[0] < 1 && Mpos[1] < 1)  // copy the bottom left quadrant
+	      //	      if (GeoPara->mPos[0] > -1 && GeoPara->mPos[1] > -1)
+	      if (GeoPara->mPos[0] < 1 && GeoPara->mPos[1] < 1)  // copy the bottom left quadrant
 		{
-		  HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
-		  HitPad->Fill(HiteRate);
-		  HitPad->Fill(HiteRate);
-		  HitPad->Fill(HiteRate);
-		  HitPad->Fill(HiteRate);
+		  HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, GeoPara->mPos, Topview, c0);
+      		  h1HitPad->Fill(HiteRate,4);  // weight 4 for each quadrant
 		}
 	    }
 
-	  else
+	  else  // slow, for each module
 	    {
-	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, Mpos, Topview, c0);
-	      HitPad->Fill(HiteRate);
-	      HitPadModule->Fill(HiteRate);
+	      HiteRate = CalcHitRate(GeoPara, StartX, StopX, xSteps, StartY, StopY, ySteps, GeoPara->mPos, Topview, c0);
+	      h1HitPad->Fill(HiteRate);
+	      h1HitPadModule->Fill(HiteRate);  // single module, goes into root file
 	    }
 
-	  Int_t mStepY = Int_t((planeStartY-Mpos[1]));
-	  Int_t mStepX = Int_t((planeStartX-Mpos[0]));
+//   fill HitRate into h2Layer histo
+
+//	  Int_t mStepX = Int_t((planeStartX-GeoPara->mPos[0]));
+//	  Int_t mStepY = Int_t((planeStartY-GeoPara->mPos[1]));
+
 	  for (Int_t stepY = int(planeStartY/mm2bin); stepY < int(planeStopY/mm2bin); stepY++)
 	    {
-	      mStepX = Int_t((planeStartX-Mpos[0]));
+	      //	      mStepX = Int_t((planeStartX-GeoPara->mPos[0]));
+
 	      for (Int_t stepX = int(planeStartX/mm2bin); stepX < int(planeStopX/mm2bin); stepX++)
 		{
 
 		  if (Fast)
 		    {
 		      //DE
-		      //		      if (GeoPara->mPos[0]/*Mpos[0]*/ > -1 && GeoPara->mPos[1]/*Mpos[1]*/ > -1)
-		      if (GeoPara->mPos[0]/*Mpos[0]*/ < 1 && GeoPara->mPos[1]/*Mpos[1]*/ < 1)
+		      //		      if (GeoPara->mPos[0]/*GeoPara->mPos[0]*/ > -1 && GeoPara->mPos[1]/*GeoPara->mPos[1]*/ > -1)
+		      if (GeoPara->mPos[0]/*GeoPara->mPos[0]*/ < 1 && GeoPara->mPos[1]/*GeoPara->mPos[1]*/ < 1)
 			{
-			  /*
-			    Layer->Fill(     stepX*mm2bin,     stepY*mm2bin,HiteRate);
-			    Layer->Fill(-1 * stepX*mm2bin,     stepY*mm2bin,HiteRate);
-			    Layer->Fill(     stepX*mm2bin,-1 * stepY*mm2bin,HiteRate);
-			    Layer->Fill(-1 * stepX*mm2bin,-1 * stepY*mm2bin,HiteRate);
-			  */
 			  
-			  Layer->SetBinContent(     stepX+int( winsize /mm2bin),      stepY+int( winsize /mm2bin), HiteRate);
-			  Layer->SetBinContent(-1 * stepX+int( winsize /mm2bin),      stepY+int( winsize /mm2bin), HiteRate);
-			  Layer->SetBinContent(     stepX+int( winsize /mm2bin), -1 * stepY+int( winsize /mm2bin), HiteRate);
-			  Layer->SetBinContent(-1 * stepX+int( winsize /mm2bin), -1 * stepY+int( winsize /mm2bin), HiteRate);
-			  
-			}
+			  h2Layer->SetBinContent(     stepX + int( winsize / mm2bin ),      stepY + int( winsize / mm2bin ), HiteRate); // bin coordiantes
+			  h2Layer->SetBinContent(-1 * stepX + int( winsize / mm2bin ),      stepY + int( winsize / mm2bin ), HiteRate); // bin coordiantes
+			  h2Layer->SetBinContent(     stepX + int( winsize / mm2bin ), -1 * stepY + int( winsize / mm2bin ), HiteRate); // bin coordiantes
+			  h2Layer->SetBinContent(-1 * stepX + int( winsize / mm2bin ), -1 * stepY + int( winsize / mm2bin ), HiteRate); // bin coordiantes
+			  											      
+			}											      
+		    }												      
+														      
+		  else  // slow											      
+		    {												      
+														      
+		      h2Layer ->SetBinContent(stepX + int( winsize / mm2bin ), 
+                                              stepY + int( winsize / mm2bin ), HiteRate); // bin coordinates
+
+		      //                      cout << "StepX " << stepX << " StepY " << stepY << endl;
+
+		      //		      h2Module->Fill(mStepX,mStepY,HiteRate);  // single module, goes into root file
+		      //                      cout << "mStepX " << mStepX << " mStepY " << mStepY << endl;
+
 		    }
 
-		  else
-		    {
-		      //Layer->Fill(     stepX*mm2bin,     stepY*mm2bin,HiteRate);
-		      Module->Fill(mStepX,mStepY,HiteRate);
-		      Layer ->SetBinContent(stepX+int( winsize /mm2bin), stepY+int( winsize /mm2bin), HiteRate);
-		    }
-
-		  mStepX += mm2bin;
+		  //		  mStepX += mm2bin;
 		}
-	      mStepY += mm2bin;
+
+	      //	      mStepY += mm2bin;
 	    }
 
 	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)             Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
 
-	  if (iC == GeoPara->sCol[iSecX]-1)	   
+	  //	  if (iC == GeoPara->sCol[iSecX]-1)  // why -1 ??
+          if (iC == GeoPara->sCol[iSecX])
+	  { 
+	    //	    cout << "iC " << iC << " " << GeoPara->nCol << " " << iSecX << endl;
 	    iSecX++;
-	    
+	  }  
 	  StartX += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0] * GeoPara->cosX;
 	  StopX  += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0] * GeoPara->cosX;
 	  planeStartX += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0];
 	  planeStopX  += GeoPara->stepDirection[0] * GeoPara->pSize[iSecX][0];
 	}
+
       iSecX = 0;
    
-      if (iR == GeoPara->sRow[iSecY]-1)       
+      //      if (iR == GeoPara->sRow[iSecY]-1)  // why -1 ??
+      if (iR == GeoPara->sRow[iSecY])
+      {
+	//        cout << "iR " << iR << " " << GeoPara->nRow << " " << iSecY << endl;
 	iSecY++;
+      }
 
       StartY += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
       StopY  += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1] * GeoPara->cosY;
@@ -1038,39 +1061,40 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, Double_t* Mpos
       planeStopY  += GeoPara->stepDirection[1] * GeoPara->pSize[iSecY][1];
     }
 
-  if(fDraw)
-  {
-    c1->cd(1);
-    Layer->Draw("colz");
-    for (Int_t i = 0; i < 3; i++) 
-    {
-      c0->cd(i+1);
-      Topview[i]->Draw("colz");
-    }
-  }
-
-  Layer->Write("", TObject::kOverwrite);
-  HitPad->Write("", TObject::kOverwrite);
-  Module->Write("", TObject::kOverwrite);
-  HitPadModule->Write("", TObject::kOverwrite);
-
-  delete Module;
-  delete HitPadModule;
+//  if(fDraw)
+//  {
+//    c1->cd(1);
+//    //    c1->cd(1)->SetLogz(1);
+//    h2Layer->Draw("colz");
+//    //    h2Layer->Draw("colz,same");
+//
+//    for (Int_t i = 0; i < 3; i++) 
+//    {
+//      c0->cd(i+1);
+//      Topview[i]->Draw("colz");
+//    }
+//  }
 
   for (Int_t i = 0; i < 3; i++)
     Topview[i]->Write("", TObject::kOverwrite);
 
+  h2Layer->Write("", TObject::kOverwrite);
+  h1HitPad->Write("", TObject::kOverwrite);
+  h2Module->Write("", TObject::kOverwrite);
+  h1HitPadModule->Write("", TObject::kOverwrite);
+
+  delete h2Module;
+  delete h1HitPadModule;
+
   //c0->Update();
   /*
     c2->cd(1);
-    HitPad->Draw();
+    h1HitPad->Draw();
   */
-  //DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1);
-
 }
 
 
-void CbmTrdHitRateQa::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TH2F* Topview[3], TCanvas* c0/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
+void CbmTrdHitRateQa::DrawBorders(HitRateGeoPara *GeoPara, Int_t nSec, TH2F* Layer, TCanvas* c1)
 {
   /*
   //----------------------Pad--------------------------------------
@@ -1135,61 +1159,82 @@ void CbmTrdHitRateQa::DrawLines(Int_t Mid, Double_t* Mpos, Double_t* Msize,Doubl
   }
 
   */
+
   //----------------------Sector--------------------------------------
-  Float_t SecYStart = 0.0;
   Float_t SecXStart = 0.0;
-  Float_t SecYStop  = 0.0;
+  Float_t SecYStart = 0.0;
   Float_t SecXStop  = 0.0;
-  for (Int_t iSec = 0; iSec < nSec-1; iSec++)  //would be enough to iterate up to nSec-1
+  Float_t SecYStop  = 0.0;
+
+  for (Int_t iSec = 0; iSec < nSec-1; iSec++)  // would be enough to iterate up to nSec-1
     {
-      if (Ssize[0+iSec*nSec] < 2 * Msize[0] && Ssize[0+iSec*nSec] > 0)
+
+      if (GeoPara->sSize[iSec][0] < 2 * GeoPara->mSize[0] && GeoPara->sSize[iSec][0] > 0)  // in x direction
 	{
-	  SecXStart += Ssize[0+iSec*nSec];
+	  SecXStart += GeoPara->sSize[iSec][0];
 	  SecXStop   = SecXStart;
 	}
       else
 	{
 	  SecXStart = 0.0;
-	  SecXStop  = Ssize[0+iSec*nSec];
+	  SecXStop  = GeoPara->sSize[iSec][0];
 	}
-      if (Ssize[1+iSec*nSec] < 2 * Msize[1] && Ssize[1+iSec*nSec] > 0)
+
+      if (GeoPara->sSize[iSec][1] < 2 * GeoPara->mSize[1] && GeoPara->sSize[iSec][1] > 0)  // in x direction
 	{
-	  SecYStart += Ssize[1+iSec*nSec];
+	  SecYStart += GeoPara->sSize[iSec][1];
 	  SecYStop = SecYStart;
 	}
       else
 	{
 	  SecYStart = 0.0;
-	  SecYStop  = Ssize[1+iSec*nSec];
+	  SecYStop  = GeoPara->sSize[iSec][1];
 	}
 
 
-      TLine* S1 = new TLine(Mpos[0]-Msize[0]+SecXStart,
-			    Mpos[1]-Msize[1]+SecYStart,
-			    Mpos[0]-Msize[0]+SecXStop,
-			    Mpos[1]-Msize[1]+SecYStop);
-      S1->SetLineColor(15);
-      S1->SetLineStyle(2);
-      if(fDraw){
+      TLine* sector = new TLine(GeoPara->mPos[0]-GeoPara->mSize[0]+SecXStart,
+	    		        GeoPara->mPos[1]-GeoPara->mSize[1]+SecYStart,
+	    		        GeoPara->mPos[0]-GeoPara->mSize[0]+SecXStop,
+	    		        GeoPara->mPos[1]-GeoPara->mSize[1]+SecYStop);
+      sector->SetLineColor(15);
+      sector->SetLineStyle(2);
+
+      TPolyMarker* corner = new TPolyMarker(1);
+      corner->SetPoint(0, GeoPara->mPos[0] - GeoPara->stepDirection[0] * GeoPara->mSize[0],
+                          GeoPara->mPos[1] - GeoPara->stepDirection[1] * GeoPara->mSize[1]);
+      corner->SetMarkerStyle(21);
+      corner->SetMarkerSize(.8);
+
+      if(fDraw)
+      {
 	c1->cd(1);
-	S1->Draw("same");
+	sector->Draw("same");
+	corner->Draw("same");
       }
+
     }
   
   
   //----------------------Module--------------------------------------
-  TBox *M       = new TBox(Mpos[0]-Msize[0],Mpos[1]-Msize[1],Mpos[0]+Msize[0],Mpos[1]+Msize[1]);
-  TBox *M_inner = new TBox(Mpos[0]-100,     Mpos[1]-100,     Mpos[0]+100,     Mpos[1]+100);
-  M_inner->SetUniqueID(Mid);
+  TBox *module  = new TBox(GeoPara->mPos[0]-GeoPara->mSize[0],
+                           GeoPara->mPos[1]-GeoPara->mSize[1],
+                           GeoPara->mPos[0]+GeoPara->mSize[0],
+                           GeoPara->mPos[1]+GeoPara->mSize[1]);
+  module->SetFillStyle(0);
+  module->SetLineColor(1);
+
+  TBox *M_inner = new TBox(GeoPara->mPos[0]-100,     GeoPara->mPos[1]-100,     GeoPara->mPos[0]+100,     GeoPara->mPos[1]+100);
+  //  M_inner->SetUniqueID(ModuleId);
   M_inner->SetFillColor(kWhite);
-  M->SetFillStyle(0);
-  M->SetLineColor(1);
-  if(fDraw){
+
+  if(fDraw)
+  {
     c1->cd(1);
-    M->Draw("same");         // black module frame
+    module->Draw("same");         // black module frame
     //    M_inner->Draw("same");   // white box in module center // do not draw fot the time being
     c1->Write("", TObject::kOverwrite);
   }
+
 }
 // --------------------------------------------------------------------
 

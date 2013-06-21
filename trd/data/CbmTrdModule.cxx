@@ -172,10 +172,12 @@ Int_t CbmTrdModule::GetNofColumns() const
    Int_t nofColumns = 0;
    if (fSectorSizeX.At(0) < fSizeX) {
       for (Int_t i = 0; i < fNofSectors; i++) {
-         nofColumns += (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i));
+         nofColumns += (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5);
+	 //         std::cout << "a " << fSectorSizeX.At(i) / fPadSizeX.At(i) << " " << (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5) << std::endl;
       }
    } else {
-      nofColumns = (Int_t)(fSectorSizeX.At(0) / fPadSizeX.At(0));
+      nofColumns = (Int_t)(fSectorSizeX.At(0) / fPadSizeX.At(0) + 0.5);
+      //      std::cout << "b " << fSectorSizeX.At(0) / fPadSizeX.At(0) << " " << (Int_t)(fSectorSizeX.At(0) / fPadSizeX.At(0) + 0.5) << std::endl;
    }
    return nofColumns;
 }
@@ -185,10 +187,12 @@ Int_t CbmTrdModule::GetNofRows() const
    Int_t nofRows = 0;
    if (fSectorSizeY.At(0) < fSizeY) {
       for (Int_t i = 0; i < fNofSectors; i++) {
-         nofRows += (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i));
+         nofRows += (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);
+	 //         std::cout << "c " << fSectorSizeY.At(i) / fPadSizeY.At(i) << " " << (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5) << std::endl;
       }
    } else {
-      nofRows = (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0));
+      nofRows = (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0) + 0.5);
+      //      std::cout << "d " << fSectorSizeY.At(0) / fPadSizeY.At(0) << " " << (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0) + 0.5) << std::endl;
    }
    return nofRows;
 }
@@ -276,7 +280,7 @@ void CbmTrdModule::GetModuleInformation(
    TransformToLocalSector(local_point, sectorId, posX, posY);
 
    columnId = (Int_t)(posX / fPadSizeX.At(sectorId));
-   rowId = (Int_t)(posY / fPadSizeY.At(sectorId));
+   rowId    = (Int_t)(posY / fPadSizeY.At(sectorId));
 }
 
 void CbmTrdModule::GetPosition(
@@ -303,7 +307,7 @@ void CbmTrdModule::GetPosition(
    // calculate position in sector coordinate system with the
    // origin in the lower right corner
    local_point[0] = (((Float_t)columnId - 0.5) * padsizex);
-   local_point[1] = (((Float_t)rowId - 0.5) * padsizey);
+   local_point[1] = (((Float_t)rowId    - 0.5) * padsizey);
 
    // calculate position in module coordinate system
    // with origin in the lower right corner of the module
@@ -314,7 +318,7 @@ void CbmTrdModule::GetPosition(
    // with origin in the middle of the module
    local_point[0] -= fSizeX;
    local_point[1] -= fSizeY;
-   local_point[2] = fSizeZ;
+   local_point[2]  = fSizeZ;
 
    // Navigate to the correct module. (fX,fY,fZ)
    gGeoManager->FindNode(fX, fY, fZ);
@@ -326,7 +330,6 @@ void CbmTrdModule::GetPosition(
    // the same local coordinate system in all the chambers
    Double_t global_point[3];  // global_point[3];
    gGeoManager->LocalToMaster(local_point, global_point);
-
 
    // calculate the position in the global coordinate system
    // with the origin in target

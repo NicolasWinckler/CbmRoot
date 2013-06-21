@@ -93,19 +93,19 @@ private:
    void ProjectPositionToNextAnodeWire(
          Double_t* local_point) const;
 
-   Int_t fModuleAddress; // Unique detector ID
+   Int_t fModuleAddress; // unique detector ID
    Double_t fX; // center of module in global c.s. [cm]
    Double_t fY; // center of module in global c.s. [cm]
    Double_t fZ; // center of module in global c.s. [cm]
    Double_t fSizeX; // module half size in x [cm]
    Double_t fSizeY; // module half size in y [cm]
-   Double_t fSizeZ; // module half size in y [cm]
+   Double_t fSizeZ; // module half size in z [cm]
 
    Double_t fAnodeWireOffset; // [cm]
    Double_t fAnodeWireSpacing; // [cm]
    Double_t fAnodeWireToPadPlaneDistance; // [cm]
 
-   Int_t fNofSectors; // Number sectors for this Module
+   Int_t fNofSectors; // number sectors for this module
    TArrayD fSectorX; // center of sectors local c.s. [cm]
    TArrayD fSectorY; // center of sectors local c.s. [cm]
    TArrayD fSectorZ; // center of sectors local c.s. [cm]

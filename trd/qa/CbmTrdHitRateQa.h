@@ -100,6 +100,8 @@ class CbmTrdHitRateQa : public FairTask {
 
   void DrawBorders(HitRateGeoPara *GeoPara, TH2F* Layer, TCanvas* c1);
 
+  void DrawPads(HitRateGeoPara *GeoPara, TH2F* Layer, TCanvas* c1);
+
   void DrawDigi();
 
  

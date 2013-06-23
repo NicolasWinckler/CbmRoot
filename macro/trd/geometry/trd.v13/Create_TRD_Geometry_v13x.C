@@ -1379,14 +1379,21 @@ void create_detector_layers(Int_t layerId)
           ModuleStats[layerId][type - 1]++;
 
 //          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrIn[type - 1], PlaneId[layerId], modId);  // with modID
-          Int_t copy = copy_nr(stationNr, copyNrIn[type - 1], isRotated, PlaneId[layerId], modId);
+//          Int_t copy = copy_nr(stationNr, copyNrIn[type - 1], isRotated, PlaneId[layerId], modId);
 
           // take care of FEB orientation - away from beam
+          Int_t copy = 0;
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
+	  {
+            copy = copy_nr(stationNr, copyNrIn[type - 1], module_id /10 %10, PlaneId[layerId], modId);
    	    module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate module by   0 or 180 degrees, see layer[1-3][i,o] - vertical pads
+	  }
           else  // layer 2,4 ...
+	  {
    	    module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
+            copy = copy_nr(stationNr, copyNrIn[type - 1], module_id %10    , PlaneId[layerId], modId);
+	  }
 
           // rotation
           Double_t drotx = 0;
@@ -1444,14 +1451,21 @@ void create_detector_layers(Int_t layerId)
           ModuleStats[layerId][type - 1]++;
 
 //          Int_t copy = copy_nr_modid(stationNr, layerNrInStation, copyNrOut[type - 5],  PlaneId[layerId], modId);  // with modID
-          Int_t copy = copy_nr(stationNr, copyNrOut[type - 5], isRotated, PlaneId[layerId], modId);
+//          Int_t copy = copy_nr(stationNr, copyNrOut[type - 5], isRotated, PlaneId[layerId], modId);
 
           // take care of FEB orientation - away from beam
+          Int_t copy = 0;
           module_rotation = new TGeoRotation();   // need to renew rotation to start from 0 degree angle
           if ( isRotated == 0 )  // layer 1,3 ...
+	  {
+            copy = copy_nr(stationNr, copyNrOut[type - 5], module_id /10 %10, PlaneId[layerId], modId);
             module_rotation->RotateZ( (module_id /10 %10) * 90. );  // rotate module by   0 or 180 degrees, see layer[1-3][i,o] - vertical pads
+	  }
           else  // layer 2,4 ...
+	  {
+            copy = copy_nr(stationNr, copyNrOut[type - 5], module_id %10    , PlaneId[layerId], modId);
             module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
+	  }
     
           // rotation
           Double_t drotx = 0;

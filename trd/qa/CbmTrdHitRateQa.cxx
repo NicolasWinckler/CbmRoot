@@ -281,7 +281,7 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   fDraw = true; // false;
   Double_t ZRangeL = 1e00;//1e05;
   Double_t ZRangeU = 1e05;//1e06;
-  Double_t mm2bin = 20.0; // 10.0; // 5.0; // 2.5;
+  Double_t mm2bin = 2.5; // 20.0; // 10.0; // 5.0; // 2.5;
  
   fStation = 0;
   fLayer = 0;
@@ -1002,7 +1002,11 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* h2Layer,
   cout << "      " << name << "\n" << flush;
 
   name.Form("Module%05d",GeoPara->moduleId);  
-  TH2F* h2Module = new TH2F(name,name,1000/mm2bin+1,-500.5,500.5, 1000/mm2bin+1,-500.5,500.5);  // 1001 x 1001 bins
+  TH2F* h2Module; 
+  if (GeoPara->mSize[0] < 500)  // small module
+    h2Module = new TH2F(name,name, 600/mm2bin+1,-300.5,300.5, 600/mm2bin+1,-300.5,300.5);   //  501 x  501 bins
+  else  // large module
+    h2Module = new TH2F(name,name,1000/mm2bin+1,-500.5,500.5, 1000/mm2bin+1,-500.5,500.5);  // 1001 x 1001 bins
   //  TH2F *h2Module = new TH2F(name,name,1500/mm2bin+1,-750.5,750.5,1500/mm2bin+1,-750.5,750.5);
   h2Module->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
 
@@ -1078,8 +1082,8 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* h2Layer,
 
 //   fill HitRate into h2Layer histo
 
-//	  Int_t mStepX = Int_t((planeStartX-GeoPara->mPos[0]));
-//	  Int_t mStepY = Int_t((planeStartY-GeoPara->mPos[1]));
+	  Int_t mStepX = Int_t((planeStartX-GeoPara->mPos[0]));
+	  Int_t mStepY = Int_t((planeStartY-GeoPara->mPos[1]));
 
 	  for (Int_t stepY = int(planeStartY/mm2bin); stepY < int(planeStopY/mm2bin); stepY++)
 	    {
@@ -1100,6 +1104,12 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* h2Layer,
 			  h2Layer->SetBinContent(     stepX + int( winsize / mm2bin ), -1 * stepY + int( winsize / mm2bin ), HiteRate); // bin coordiantes
 			  h2Layer->SetBinContent(-1 * stepX + int( winsize / mm2bin ), -1 * stepY + int( winsize / mm2bin ), HiteRate); // bin coordiantes
 			  											      
+                          if (GeoPara->moduleId == 5)
+                          {
+                            cout << "filling 5 " << mStepX << " " << mStepY << " " << HiteRate << endl;
+                            h2Module->Fill(mStepX,mStepY,HiteRate);  // single module, goes into root file
+                          }
+
 			}											      
 		    }												      
 														      
@@ -1111,15 +1121,19 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* h2Layer,
 
 		      //                      cout << "StepX " << stepX << " StepY " << stepY << endl;
 
-		      //		      h2Module->Fill(mStepX,mStepY,HiteRate);  // single module, goes into root file
+                      if (GeoPara->moduleId == 5)
+		      {
+                        cout << "filling 5 " << mStepX << " " << mStepY << " " << HiteRate << endl;
+                        h2Module->Fill(mStepX,mStepY,HiteRate);  // single module, goes into root file
+                      }
 		      //                      cout << "mStepX " << mStepX << " mStepY " << mStepY << endl;
 
 		    }
 
-		  //		  mStepX += mm2bin;
+		  mStepX += mm2bin;
 		}
 
-	      //	      mStepY += mm2bin;
+	      mStepY += mm2bin;
 	    }
 
 	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)             Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);

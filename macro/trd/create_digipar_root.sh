@@ -9,13 +9,13 @@
 directory=geometry
 #directory=geometry/trd.v13
 
-for file in $directory/*.root; do
+for file in $directory/*.geo.root; do
 
  echo "Creating trd parameters for $file"
  fileName=$(basename $file)
-# echo $fileName
- fileNameNoExt=${fileName%.*}
-# echo $fileNameNoExt
+# echo "fileName : $fileName"
+ fileNameNoExt=${fileName%.*.*}
+# echo "fileNoExt: $fileNameNoExt"
 
 # prepare geometry file
  root -l -b -q create_geometry_file_root.C\(\"$fileNameNoExt\"\)

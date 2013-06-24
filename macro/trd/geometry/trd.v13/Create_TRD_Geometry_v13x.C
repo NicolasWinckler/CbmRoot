@@ -57,7 +57,7 @@
 
 // Name of output file with geometry
 const TString geoVersion   = "trd_v13x";
-const TString FileNameSim  = geoVersion + ".root";
+const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
 

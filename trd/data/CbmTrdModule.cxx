@@ -167,17 +167,16 @@ Int_t CbmTrdModule::GetSector(
    return -1; // This should be never reached
 }
 
+
 Int_t CbmTrdModule::GetNofColumns() const
 {
    Int_t nofColumns = 0;
    if (fSectorSizeX.At(0) < fSizeX) {
       for (Int_t i = 0; i < fNofSectors; i++) {
-         nofColumns += (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5);
-	 //         std::cout << "a " << fSectorSizeX.At(i) / fPadSizeX.At(i) << " " << (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5) << std::endl;
+         nofColumns += (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5);  // need to round for correct result
       }
    } else {
-      nofColumns = (Int_t)(fSectorSizeX.At(0) / fPadSizeX.At(0) + 0.5);
-      //      std::cout << "b " << fSectorSizeX.At(0) / fPadSizeX.At(0) << " " << (Int_t)(fSectorSizeX.At(0) / fPadSizeX.At(0) + 0.5) << std::endl;
+     nofColumns = (Int_t)(fSectorSizeX.At(0) / fPadSizeX.At(0) + 0.5);       // need to round for correct result
    }
    return nofColumns;
 }
@@ -187,14 +186,22 @@ Int_t CbmTrdModule::GetNofRows() const
    Int_t nofRows = 0;
    if (fSectorSizeY.At(0) < fSizeY) {
       for (Int_t i = 0; i < fNofSectors; i++) {
-         nofRows += (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);
-	 //         std::cout << "c " << fSectorSizeY.At(i) / fPadSizeY.At(i) << " " << (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5) << std::endl;
+         nofRows += (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);     // need to round for correct result
       }
    } else {
-      nofRows = (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0) + 0.5);
-      //      std::cout << "d " << fSectorSizeY.At(0) / fPadSizeY.At(0) << " " << (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0) + 0.5) << std::endl;
+      nofRows = (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0) + 0.5);         // need to round for correct result
    }
    return nofRows;
+}
+
+Int_t CbmTrdModule::GetNofColumnsInSector(Int_t i) const
+{
+   return (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5);  // need to round for correct result
+}
+
+Int_t CbmTrdModule::GetNofRowsInSector(Int_t i) const
+{
+   return (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);  // need to round for correct result
 }
 
 void CbmTrdModule::GetPadInfo(

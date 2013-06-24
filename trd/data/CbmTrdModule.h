@@ -41,6 +41,9 @@ public:
   
   Int_t GetNofColumns() const;
   Int_t GetNofRows() const;
+
+  Int_t GetNofColumnsInSector(Int_t i) const;
+  Int_t GetNofRowsInSector(Int_t i) const;
   
   Double_t GetPadSizeX(Int_t i) const { return fPadSizeX.At(i); }
   Double_t GetPadSizeY(Int_t i) const { return fPadSizeY.At(i); }

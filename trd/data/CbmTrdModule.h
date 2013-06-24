@@ -20,7 +20,8 @@ public:
    * \brief Constructor with parameters.
    */
   CbmTrdModule(
-        Int_t address, Double_t x, Double_t y, Double_t z,
+        Int_t address, Int_t orientation, 
+        Double_t x, Double_t y, Double_t z,
         Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
         const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
         const TArrayD& padSizeX, const TArrayD& padSizeY);
@@ -32,6 +33,7 @@ public:
 
   /** Accessors **/
   Int_t GetModuleAddress() const { return fModuleAddress; }
+  Int_t GetOrientation() const { return fOrientation; }
   Double_t GetX() const { return fX; }
   Double_t GetY() const { return fY; }
   Double_t GetZ() const { return fZ; }
@@ -97,6 +99,7 @@ private:
          Double_t* local_point) const;
 
    Int_t fModuleAddress; // unique detector ID
+   Int_t fOrientation; // angle between long pad axis and y-axis in steps of 90 deg [0..3]
    Double_t fX; // center of module in global c.s. [cm]
    Double_t fY; // center of module in global c.s. [cm]
    Double_t fZ; // center of module in global c.s. [cm]

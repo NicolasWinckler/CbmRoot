@@ -10,6 +10,7 @@
 CbmTrdModule::CbmTrdModule() 
   : TNamed(),
   fModuleAddress(0),
+  fOrientation(0),
   fX(0.),
   fY(0.),
   fZ(0.),
@@ -35,12 +36,13 @@ CbmTrdModule::CbmTrdModule()
 }
 
 CbmTrdModule::CbmTrdModule(
-      Int_t address, Double_t x, Double_t y, Double_t z,
+      Int_t address, Int_t orientation, Double_t x, Double_t y, Double_t z,
       Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
       const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
       const TArrayD& padSizeX, const TArrayD& padSizeY)
   : TNamed(),
   fModuleAddress(address),
+  fOrientation(orientation),
   fX(x),
   fY(y),
   fZ(z),

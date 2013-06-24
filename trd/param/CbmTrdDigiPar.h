@@ -44,13 +44,13 @@ class CbmTrdDigiPar : public FairParGenericSet
   void SetMaxSectors(Int_t i) { fMaxSectors = i; }
   void SetModuleIdArray(TArrayI array) { fModuleIdArray = array; }
   void SetModuleMap(std::map<Int_t, CbmTrdModule*> map) 
-                    { fModuleMap = map;}
+                    { fModuleMap = map; }
 
-  Int_t GetNrOfModules() { return fNrOfModules;}
-  Int_t GetMaxSectors() { return fMaxSectors;}
-  Int_t GetModuleId(Int_t i) {return fModuleIdArray[i];}
+  Int_t GetNrOfModules() { return fNrOfModules; }
+  Int_t GetMaxSectors() { return fMaxSectors; }
+  Int_t GetModuleId(Int_t i) { return fModuleIdArray[i]; }
 
-  CbmTrdModule* GetModule(Int_t i) {return fModuleMap[i];}
+  CbmTrdModule* GetModule(Int_t i) { return fModuleMap[i]; }
 
  private:
 
@@ -63,13 +63,5 @@ class CbmTrdDigiPar : public FairParGenericSet
   Int_t fMaxSectors; // Maximum number of sectors
 
   ClassDef(CbmTrdDigiPar,3);
-
 };
-
-
 #endif
-
-
-
-
-

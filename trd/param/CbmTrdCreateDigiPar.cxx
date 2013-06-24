@@ -32,7 +32,6 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
 
 CbmTrdCreateDigiPar::~CbmTrdCreateDigiPar()
 {
-
 }
 
 void CbmTrdCreateDigiPar::SetParContainers()
@@ -116,6 +115,7 @@ void CbmTrdCreateDigiPar::CreateModule(
       const TString& path)
 {
    Int_t moduleAddress = fGeoHandler->GetModuleAddress(path);
+   Int_t orientation   = fGeoHandler->GetModuleOrientation(path);
 
    Double_t sizeX = fGeoHandler->GetSizeX(path);
    Double_t sizeY = fGeoHandler->GetSizeY(path);
@@ -155,7 +155,7 @@ void CbmTrdCreateDigiPar::CreateModule(
 //   }
 
    // Create new CbmTrdModule and add it to the map
-   fModuleMap[moduleAddress] = new CbmTrdModule(moduleAddress, x, y, z,
+   fModuleMap[moduleAddress] = new CbmTrdModule(moduleAddress, orientation, x, y, z,
          sizeX, sizeY, sizeZ, fMaxSectors, sectorSizeX, sectorSizeY, padSizeX, padSizeY);
 }
 

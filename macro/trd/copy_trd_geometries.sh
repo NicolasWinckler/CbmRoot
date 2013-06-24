@@ -4,7 +4,7 @@
 
 echo \# copy geometries
 cp -v geometry/trd.v13/media.geo ../../geometry
-cp -v geometry/trd.v13/trd_v13?.root ../../geometry/trd
+cp -v geometry/trd.v13/trd_v13?.geo.root ../../geometry/trd
 cp -v geometry/trd.v13/trd_v13?.digi.par ../../parameters/trd
 echo
 #ln -s ../../parameters/trd/trd_v13b.digi.par ../../parameters/trd/trd_v13c.digi.par 

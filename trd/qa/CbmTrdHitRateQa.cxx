@@ -830,7 +830,14 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
       cout << "col1  " << setw(10) << GeoPara->sCol[1] << "  row1  "<< setw(10) << GeoPara->sRow[1] << endl;
       cout << "col2  " << setw(10) << GeoPara->sCol[2] << "  row2  "<< setw(10) << GeoPara->sRow[2] << endl;
       cout << "col   " << setw(10) << nCol             << "  row   "<< setw(10) << nRow << endl;
+
       cout << "mcol  " << setw(10) << mCol             << "  mrow  "<< setw(10) << mRow << endl;
+      cout << "0col  " << setw(10) << fModuleInfo->GetNofColumnsInSector(0) 
+	 << "  0row  " << setw(10) << fModuleInfo->GetNofRowsInSector(0) << endl;
+      cout << "1col  " << setw(10) << fModuleInfo->GetNofColumnsInSector(1) 
+	 << "  1row  " << setw(10) << fModuleInfo->GetNofRowsInSector(1) << endl;
+      cout << "2col  " << setw(10) << fModuleInfo->GetNofColumnsInSector(2) 
+	 << "  2row  " << setw(10) << fModuleInfo->GetNofRowsInSector(2) << endl;
     }
 
        
@@ -886,6 +893,9 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     if ((GeoPara->stepDirection[0] ==  1) && (GeoPara->stepDirection[1] == -1)) // OK - hori right
       GeoPara->rot_angle = 3;
 
+    //    GeoPara->ori       = fModuleInfo->GetOrientation();  // is 0,1,2,3
+    if (Lines)
+      cout << "ori   " << setw(10) << fModuleInfo->GetOrientation() << "  rot   " << setw(10) << GeoPara->rot_angle << endl;
 
     if (GeoPara->rot_angle == 3)
     {

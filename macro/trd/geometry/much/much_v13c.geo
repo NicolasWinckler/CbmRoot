@@ -53,7 +53,7 @@ Overlap along y axis [cm]   :       2
 Straw thickness [cm]        :     0.4
 
 # Sector-type GEM module specification (type 3)
-Number of sectors/layer     :      14      18      22      26      32      42
+Number of sectors/layer     :       6       6       6       6       6       6
 Active volume lz [cm]       :     0.3
 Spacer in r [cm]            :       2
 Spacer in phi [cm]          :       2

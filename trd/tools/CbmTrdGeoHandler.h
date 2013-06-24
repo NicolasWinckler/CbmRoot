@@ -49,17 +49,18 @@ public:
 //   /**
 //   * \brief Return pad orientation of the current node in the TGeoManager.
 //   */
-//   Int_t GetPadOrientation();
+//   Int_t GetModuleOrientation();
 
    /**
    * \brief Navigate to node and return pad orientation.
    */
-   Int_t GetPadOrientation(const TString& path);
+   Int_t GetModuleOrientation(const TString& path);
 
    // Path has to contain information down to module part, 
    // otherwise retrieved information can be wrong.
-   // Path example:
-   // /cave_1/trd_v13x_1/layer01_101/module1_10100101/gas_1
+   // Path examples:
+   // /cave_1/trd_v13x_0/layer01_1101/module1_10100101/gas_1
+   // /cave_1/trd_v13x_0/layer10_3210/module8_35411098/gas_1
 
    Double_t GetSizeX(const TString& path);
    Double_t GetSizeY(const TString& path);
@@ -88,7 +89,7 @@ private:
    Int_t        fLayerId;       //!
    Int_t        fModuleId;      //!
    Int_t        fModuleType;    //!
-   Int_t        fIsRotated;     //! IsRotated Module
+   Int_t        fRotation;      //! rotation angle 0,1,2,3
 
    // for backward compatibility
    Int_t        fStation;       //! StationTypeID, 1..3

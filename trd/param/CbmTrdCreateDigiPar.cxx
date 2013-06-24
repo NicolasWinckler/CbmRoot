@@ -136,23 +136,23 @@ void CbmTrdCreateDigiPar::CreateModule(
       padSizeY.AddAt(fst1_pad_type[moduleType - 1][i][3], i);
    }
 
-   // Orientation of the detector layers
-   // Odd  layers (1,3,5..) have resolution in x-direction (isRotated == 0) - vertical pads
-   // Even layers (2,4,6..) have resolution in y-direction (isRotated == 1) - horizontal pads
-   Int_t layerNr = CbmTrdAddress::GetLayerId(moduleAddress) + 1;
-   Int_t isRotated = fGeoHandler->GetPadOrientation(path);
-   //   printf("layer %02d %d isRotated\n", layerNr, isRotated);   // check, if even layers are isRotated == 1
-   if( isRotated == 1 ) {  // flip pads for even layers
-      Double_t copybuf;
-      for (Int_t i = 0; i < fMaxSectors; i++) {
-         copybuf = padSizeX.At(i);
-         padSizeX.AddAt(padSizeY.At(i), i);
-         padSizeY.AddAt(copybuf, i);
-         copybuf = sectorSizeX.At(i);
-         sectorSizeX.AddAt(sectorSizeY.At(i), i);
-         sectorSizeY.AddAt(copybuf, i);
-      }
-   }
+//   // Orientation of the detector layers
+//   // Odd  layers (1,3,5..) have resolution in x-direction (isRotated == 0) - vertical pads
+//   // Even layers (2,4,6..) have resolution in y-direction (isRotated == 1) - horizontal pads
+//   Int_t layerNr = CbmTrdAddress::GetLayerId(moduleAddress) + 1;
+//   Int_t isRotated = fGeoHandler->GetPadOrientation(path);
+//   //   printf("layer %02d %d isRotated\n", layerNr, isRotated);   // check, if even layers are isRotated == 1
+//   if( (isRotated%2) == 1 ) {  // flip pads for even layers
+//      Double_t copybuf;
+//      for (Int_t i = 0; i < fMaxSectors; i++) {
+//         copybuf = padSizeX.At(i);
+//         padSizeX.AddAt(padSizeY.At(i), i);
+//         padSizeY.AddAt(copybuf, i);
+//         copybuf = sectorSizeX.At(i);
+//         sectorSizeX.AddAt(sectorSizeY.At(i), i);
+//         sectorSizeY.AddAt(copybuf, i);
+//      }
+//   }
 
    // Create new CbmTrdModule and add it to the map
    fModuleMap[moduleAddress] = new CbmTrdModule(moduleAddress, x, y, z,

@@ -4,15 +4,17 @@
 ///                                             
 
 
+// 2013-06-25 - DE - v13g trd300_rich             (10 layers, z = 4100 ) - TRD right behind SIS300 RICH
+// 2013-06-25 - DE - v13h trd100_sts              ( 4 layers, z = 2600 ) - TRD completely on RICH/MUCH platform to allow TOF to move upstream
+// 2013-06-25 - DE - v13i trd100_rich             ( 2 layers, z = 4100 ) - TRD right behind RICH			      
+// 2013-06-25 - DE - v13j trd100_rich             ( 3 layers, z = 4100 ) - TRD right behind RICH			      
+// 2013-06-25 - DE - v13k trd100_rich             ( 4 layers, z = 4100 ) - TRD right behind RICH			      
+// 2013-06-25 - DE - ---  trd100_much_2_absorbers ( 4 layers, z = 4300 ) - same as version at z = 4600			      
+// 2013-06-25 - DE - v13l trd100_much_3_absorbers ( 4 layers, z = 4600 ) - TRD right behind SIS100 MUCH
+// 2013-06-25 - DE - v13m trd300_much_6_absorbers (10 layers, z = 5500 ) - TRD right behind SIS300 MUCH
+// 2013-06-25 - DE - v13n trd300_rich_streched    (10 layers, z = 4600 ) - TRD streched behind SIS300 RICH
+//
 // 2013-06-19 - DE - add TRD (I, II, III) labels on support structure
-// 2013-05-29 - DE - v13g trd300_rich             (10 layers, z = 3800 ) - TRD right behind SIS300 RICH
-// 2013-05-29 - DE - v13h trd300_much_6_absorbers (10 layers, z = 5400 ) - TRD right behind SIS300 MUCH
-// 2013-05-29 - DE - v13i trd100_rich             ( 2 layers, z = 3800 ) - TRD right behind RICH			      
-// 2013-05-29 - DE - v13j trd100_rich             ( 3 layers, z = 3800 ) - TRD right behind RICH			      
-// 2013-05-29 - DE - v13l trd100_rich             ( 4 layers, z = 3800 ) - TRD right behind RICH			      
-// 2013-05-29 - DE - v13k trd100_much_3_absorbers ( 4 layers, z = 4500 ) - TRD right behind SIS100 MUCH
-// 2013-05-29 - DE - ---  trd100_much_2_absorbers ( 4 layers, z = 4200 ) - same as version at z = 4500			      
-// 2013-05-29 - DE - v13m trd100_sts              ( 4 layers, z = 2700 ) - TRD completely on RICH/MUCH platform to allow TOF to move upstream
 // 2013-05-29 - DE - allow for flexible TRD z-positions defined by position of layer01
 // 2013-05-23 - DE - remove "trd_" prefix from node names (except top node)
 // 2013-05-22 - DE - radiators G30 (z=240 mm) 
@@ -121,16 +123,23 @@ Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
 const Int_t   LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/horizontal pads
 const Int_t   LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 
-//Double_t LayerPosition[MaxLayers] = { 120. }; // start position - 2013-05-29 - trd100_sts              (    4 layers, z = 1200 )
-//Double_t LayerPosition[MaxLayers] = { 380. }; // start position - 2013-05-29 - trd100_rich             (2,3,4 layers, z = 3800 )
-//Double_t LayerPosition[MaxLayers] = { 450. }; // start position - 2013-05-29 - trd100_much_3_absorbers (    4 layers, z = 4500 )
-Double_t LayerPosition[MaxLayers] = { 540. }; // start position - 2013-05-29 - trd300_much_6_absorbers (   10 layers, z = 5400 )
+// 5x z-positions from 260 till 550 cm
+Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13g trd300_rich             (10 layers, z = 4100 )
+//Double_t LayerPosition[MaxLayers] = { 260. }; // start position - 2013-06-25 - DE - v13h trd100_sts              ( 4 layers, z = 2600 )
+//Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13i trd100_rich             ( 2 layers, z = 4100 )
+//Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13j trd100_rich             ( 3 layers, z = 4100 )
+//Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13k trd100_rich             ( 4 layers, z = 4100 )
+//Double_t LayerPosition[MaxLayers] = { 430. }; // start position - 2013-06-25 - DE - ---  trd100_much_2_absorbers ( 4 layers, z = 4300 )
+//Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13l trd100_much_3_absorbers ( 4 layers, z = 4600 )
+//Double_t LayerPosition[MaxLayers] = { 550. }; // start position - 2013-06-25 - DE - v13m trd300_much_6_absorbers (10 layers, z = 5500 )
+//Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13n trd300_rich_streched    (10 layers, z = 4600 )
+
 
 const Double_t LayerThickness = 45.0; // Thickness of one TRD layer in cm
 
-const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0. };  // z offest in addition to LayerThickness 
-//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,  10.,   0.,   0.,   0.,  10.,   0. };  // z offest in addition to LayerThickness 
-//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0., 165.,   0.,   0.,   0., 165.,   0. };  // z offest in addition to LayerThickness 
+//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0. };  // SIS100 - z offest in addition to LayerThickness 
+const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   5.,   0.,   0.,   0.,   5.,   0. };  // v13g, v13m - z offest in addition to LayerThickness 
+//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,  95.,   0.,   0.,   0.,   5.,   0. };  // v13n       - z offest in addition to LayerThickness 
 
 //const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
  //// just behind RICH v13a at z=400

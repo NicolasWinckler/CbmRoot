@@ -2,23 +2,26 @@
 ##   trd_v13l information file
 #
 
-# created 20130603
+# created 20130625
 
 # envelope
- 450 cm   start of TRD (z)
- 630 cm   end   of TRD (z)
+ 460 cm   start of TRD (z)
+ 640 cm   end   of TRD (z)
 
 # thickness
   45 cm   per single layer (z)
+
+# extra gaps
+   0   0   0   0    extra gaps in z (cm)
 
 # generated TRD layers
   1  2  3  4    planeID
 
 # z-positions of layer front
-  450 cm   z-position of layer  1
-  495 cm   z-position of layer  2
-  540 cm   z-position of layer  3
-  585 cm   z-position of layer  4
+  460 cm   z-position of layer  1
+  505 cm   z-position of layer  2
+  550 cm   z-position of layer  3
+  595 cm   z-position of layer  4
 
 # flags
 radiator is             : included
@@ -29,7 +32,7 @@ asics are               : included
 support structure is    : included
 
 # modules
-   mod0   mod1   mod2   mod3   mod4   mod5   mod6   mod7  total
+   mod1   mod2   mod3   mod4   mod5   mod6   mod7   mod8  total
 ---------------------------------------------------------------
       8      4      8      4      0      0     12     14          layer  1
       8      4      8      4      0      0     12     14          layer  2
@@ -58,13 +61,13 @@ support structure is    : included
 2163.32 ch/m2   channels per m2 active area
 
 # gas volume position
-  481.6000 cm   position of gas volume - layer  1
-  526.6000 cm   position of gas volume - layer  2
-  571.6000 cm   position of gas volume - layer  3
-  616.6000 cm   position of gas volume - layer  4
+  491.6000 cm   position of gas volume - layer  1
+  536.6000 cm   position of gas volume - layer  2
+  581.6000 cm   position of gas volume - layer  3
+  626.6000 cm   position of gas volume - layer  4
 
 # angles of acceptance
-v: 26.22 deg, h: 34.59 deg - vertical/horizontal - layer  1
-v: 24.25 deg, h: 32.24 deg - vertical/horizontal - layer  2
-v: 22.54 deg, h: 30.16 deg - vertical/horizontal - layer  3
-v: 21.05 deg, h: 28.31 deg - vertical/horizontal - layer  4
+v: 25.76 deg, h: 34.04 deg - vertical/horizontal - layer  1
+v: 23.85 deg, h: 31.75 deg - vertical/horizontal - layer  2
+v: 22.19 deg, h: 29.73 deg - vertical/horizontal - layer  3
+v: 20.74 deg, h: 27.93 deg - vertical/horizontal - layer  4

@@ -150,10 +150,10 @@ void CbmTrdModule::ProjectPositionToNextAnodeWire(
 Int_t CbmTrdModule::GetSector(
       const Double_t* local_point) const
 {
-   // Calculate the position in the chamber with the origin of
-   // the local coordinate system in the lower left corner
-   // of the chamber. x goes to the left looking in beam direction
-   // y goes upward
+   // Calculate the position in the chamber 
+   // with the origin of the local coordinate system 
+   // in the lower left corner of the chamber (looking upstream)
+   // x goes to the left, looking in beam direction, y goes upward
 
    Double_t posx = local_point[0] + fSizeX;
    Double_t posy = local_point[1] + fSizeY;
@@ -242,11 +242,11 @@ void CbmTrdModule::TransformToLocalCorner(
       Double_t& posX,
 		Double_t& posY) const
 {
-   // Transformation from local coordinate system with origin in
-   // the middle of the module into a system with origin in the
-   // lower right corner of the module. Since for both coordinate
-   // systems the orientation is the same this is only a shift by
-   // the half size of the module in x- and y-direction
+   // Transformation from local coordinate system with origin
+   // in the middle of the module into a system
+   // with the origin in the lower left corner (looking upstream).
+   // Since for both coordinate systems the orientation is the same 
+   // this is only a shift by the half size of the module in x- and y-direction
    posX = local_point[0] + fSizeX;
    posY = local_point[1] + fSizeY;
 }
@@ -258,10 +258,10 @@ void CbmTrdModule::TransformToLocalSector(
 	   Double_t& posY) const
 {
    // Transformation of the module coordinate system with origin
-   // in the middle of the chamber into a system with
-   // the origin in the lower right corner of the sector the point
-   // is in. First transform in a system with origin in the lower
-   // right corner.
+   // in the middle of the chamber into a system
+   // with the origin in the lower left corner (looking upstream)
+   // of the sector the point is in. 
+   // First, transform in a system with origin in the lower left corner.
    TransformToLocalCorner(local_point, posX, posY);
    posX -= fSectorBeginX.GetAt(sector);
    posY -= fSectorBeginY.GetAt(sector);
@@ -300,28 +300,41 @@ void CbmTrdModule::GetPosition(
       TVector3& padPos,
       TVector3& padSize) const
 {
-   // calculate position in global coordinates from digi
-   // information(sectorId, columnId, rowId).
-   // Returns two TVector3. One with the position and one
-   // with the padsize of the fired pad
+   // calculate position in global coordinates 
+   // from digi information (sectorId, columnId, rowId).
+   // Returns two TVector3. One with the position
+   // and one with the padsize of the fired pad
 
    if (fModuleAddress != moduleAddress) {
       LOG(ERROR) << "CbmTrdModule::GetPosition This is wrong!" << FairLogger::endl;
    }
 
+   // check limits
+   if ( (sectorId < 0) || (sectorId > GetNofSectors()-1) )
+     LOG(FATAL) << "CbmTrdModule::sectorId " << sectorId << " is out of bounds!" << FairLogger::endl;
+
+   // check limits
+   if ( (columnId < 0) || (columnId > GetNofColumnsInSector(sectorId)-1) )
+     LOG(FATAL) << "CbmTrdModule::columnId " << columnId << " is out of bounds!" << FairLogger::endl;
+
+   // check limits
+   if ( (rowId < 0) || (rowId > GetNofRowsInSector(sectorId)-1) )
+     LOG(FATAL) << "CbmTrdModule::rowId "   << rowId     << " is out of bounds!" << FairLogger::endl;
+
    Double_t local_point[3];
    Double_t padsizex = fPadSizeX.At(sectorId);
    Double_t padsizey = fPadSizeY.At(sectorId);
 
-   // calculate position in sector coordinate system with the
-   // origin in the lower right corner
-   local_point[0] = (((Float_t)columnId - 0.5) * padsizex);
-   local_point[1] = (((Float_t)rowId    - 0.5) * padsizey);
+   // calculate position in sector coordinate system 
+   // with the origin in the lower left corner (looking upstream)
+   local_point[0] = (((Double_t)columnId + 0.5) * padsizex);
+   local_point[1] = (((Double_t)rowId    + 0.5) * padsizey);
 
    // calculate position in module coordinate system
-   // with origin in the lower right corner of the module
+   // with the origin in the lower left corner (looking upstream)
    local_point[0] += fSectorBeginX.GetAt(sectorId);
    local_point[1] += fSectorBeginY.GetAt(sectorId);
+   // local_point[i] must be >= 0 at this point 
 
    // calculte position in the module coordinate system
    // with origin in the middle of the module
@@ -329,22 +342,22 @@ void CbmTrdModule::GetPosition(
    local_point[1] -= fSizeY;
    local_point[2]  = fSizeZ;
 
-   // Navigate to the correct module. (fX,fY,fZ)
+   // navigate to the correct module. (fX,fY,fZ)
    gGeoManager->FindNode(fX, fY, fZ);
 
-   // Get the local point in local MC coordinates from
-   // the geomanager. This coordinate system is rotated
+   // get the local point in local MC coordinates from
+   // the geomanager. This coordinate system is rotated,
    // if the chamber is rotated. This is corrected in
-   // GetModuleInformation to have a
-   // the same local coordinate system in all the chambers
+   // GetModuleInformation to have the same 
+   // local coordinate system in all the chambers
    Double_t global_point[3];  // global_point[3];
    gGeoManager->LocalToMaster(local_point, global_point);
 
    // calculate the position in the global coordinate system
    // with the origin in target
-   Float_t posX = global_point[0];
-   Float_t posY = global_point[1];
-   Float_t posZ = global_point[2];
+   Double_t posX = global_point[0];
+   Double_t posY = global_point[1];
+   Double_t posZ = global_point[2];
 
    padPos.SetXYZ(posX, posY, posZ);
    padSize.SetXYZ(padsizex,padsizey, 0.);

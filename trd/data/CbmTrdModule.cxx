@@ -311,15 +311,15 @@ void CbmTrdModule::GetPosition(
 
    // check limits
    if ( (sectorId < 0) || (sectorId > GetNofSectors()-1) )
-     LOG(FATAL) << "CbmTrdModule::sectorId " << sectorId << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::sectorId " << sectorId << " of " << GetNofSectors()-1                 << " is out of bounds!" << FairLogger::endl;
 
    // check limits
    if ( (columnId < 0) || (columnId > GetNofColumnsInSector(sectorId)-1) )
-     LOG(FATAL) << "CbmTrdModule::columnId " << columnId << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::columnId " << columnId << " of " << GetNofColumnsInSector(sectorId)-1 << " is out of bounds!" << FairLogger::endl;
 
    // check limits
    if ( (rowId < 0) || (rowId > GetNofRowsInSector(sectorId)-1) )
-     LOG(FATAL) << "CbmTrdModule::rowId "   << rowId     << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::rowId "   << rowId     << " of " << GetNofRowsInSector(sectorId)-1    << " is out of bounds!" << FairLogger::endl;
 
    Double_t local_point[3];
    Double_t padsizex = fPadSizeX.At(sectorId);

@@ -1978,6 +1978,14 @@ add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
   TGeoTranslation *tr113 = new TGeoTranslation(  16., -50., 0.);
   TGeoTranslation *tr114 = new TGeoTranslation( -16., -50., 0.);
 
+  TGeoTranslation *tr200 = new TGeoTranslation(   0.,   0., 0.);
+  TGeoTranslation *tr201 = new TGeoTranslation(   0., -50., 0.);
+  TGeoTranslation *tr202 = new TGeoTranslation(   0.,-100., 0.);
+
+  TGeoTranslation *tr210 = new TGeoTranslation(   0.,-150., 0.);
+  TGeoTranslation *tr213 = new TGeoTranslation(  16.,-150., 0.);
+  TGeoTranslation *tr214 = new TGeoTranslation( -16.,-150., 0.);
+
 // station 1
   trdbox1->AddNode(T, 1, tr100);
   trdbox1->AddNode(R, 1, tr101);
@@ -1993,14 +2001,23 @@ add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
   trdbox2->AddNode(I, 1, tr111);
   trdbox2->AddNode(I, 2, tr112);
 
-// station 3
-  trdbox3->AddNode(T, 1, tr100);
-  trdbox3->AddNode(R, 1, tr101);
-  trdbox3->AddNode(D, 1, tr102);
+//// station 3
+//  trdbox3->AddNode(T, 1, tr100);
+//  trdbox3->AddNode(R, 1, tr101);
+//  trdbox3->AddNode(D, 1, tr102);
+//
+//  trdbox3->AddNode(I, 1, tr110);
+//  trdbox3->AddNode(I, 2, tr113);
+//  trdbox3->AddNode(I, 3, tr114);
 
-  trdbox3->AddNode(I, 1, tr110);
-  trdbox3->AddNode(I, 2, tr113);
-  trdbox3->AddNode(I, 3, tr114);
+// station 3
+  trdbox3->AddNode(T, 1, tr200);
+  trdbox3->AddNode(R, 1, tr201);
+  trdbox3->AddNode(D, 1, tr202);
+
+  trdbox3->AddNode(I, 1, tr210);
+  trdbox3->AddNode(I, 2, tr213);
+  trdbox3->AddNode(I, 3, tr214);
 
 //  TGeoScale *sc100 = new TGeoScale( 36./50., 36./50., 1.);  // text is vertical 50 cm, H-bar opening is 36 cm
 //

@@ -45,8 +45,8 @@ void CbmLitTofQaReport::Create()
 
 void CbmLitTofQaReport::Draw()
 {
-	DrawH2ByPattern("hmp_Tof_Reco_m2p");
-	DrawH2ByPattern("hmp_Tof_RecoMCID_m2p");
+	DrawH2ByPattern("hmp_Tof_Reco_.+_m2p", kLinear, kLinear, kLog, "colz");
+	DrawH2ByPattern("hmp_Tof_RecoMCID_.+_m2p", kLinear, kLinear, kLog, "colz");
 }
 
 ClassImp(CbmLitTofQaReport)

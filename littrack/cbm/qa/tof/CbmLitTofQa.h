@@ -11,12 +11,16 @@
 #include "FairTask.h"
 #include "CbmStsKFTrackFitter.h"
 #include <string>
+#include <map>
+#include <vector>
 
 class CbmHistManager;
 class CbmVertex;
 class FairTrackParam;
 
 using std::string;
+using std::map;
+using std::vector;
 
 /**
  * \class CbmLitTofQa
@@ -27,6 +31,7 @@ using std::string;
 class CbmLitTofQa : public FairTask
 {
 public:
+	typedef Bool_t (*LitTrackAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index);
    /**
     * \brief Constructor.
     */
@@ -72,6 +77,11 @@ private:
    void ReadDataBranches();
 
    /**
+    * \brief Assign default track categories and track acceptance functions.
+    */
+   void FillTrackCategoriesAndAcceptanceFunctions();
+
+   /**
     * \brief Creates histograms.
     */
    void CreateHistograms();
@@ -101,6 +111,9 @@ private:
 
    CbmVertex* fPrimVertex; // Pointer to the primary vertex
    CbmStsKFTrackFitter fKFFitter; // Pointer to the Kalman Filter Fitter algorithm
+
+   vector<string> fTrackCategories; // Vector of track category names
+   map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
 
    ClassDef(CbmLitTofQa, 1)
 };

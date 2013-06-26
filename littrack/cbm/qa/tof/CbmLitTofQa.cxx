@@ -18,6 +18,59 @@
 #include <vector>
 using std::vector;
 using std::pair;
+using boost::assign::list_of;
+
+Bool_t AllTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   return index > -1;
+}
+
+Bool_t ElectronTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 11;
+}
+
+Bool_t MuonTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 13;
+}
+
+Bool_t ProtonTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 2212;
+}
+
+Bool_t PionTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 211;
+}
+
+Bool_t KaonTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 321;
+}
 
 CbmLitTofQa::CbmLitTofQa():
    fIsFixedBounds(true),
@@ -33,9 +86,11 @@ CbmLitTofQa::CbmLitTofQa():
    fTofPoints(NULL),
    fMCTracks(NULL),
    fPrimVertex(NULL),
-   fKFFitter()
+   fKFFitter(),
+   fTrackCategories(),
+   fTrackAcceptanceFunctions()
 {
-
+   FillTrackCategoriesAndAcceptanceFunctions();
 }
 
 CbmLitTofQa::~CbmLitTofQa()
@@ -56,7 +111,7 @@ void CbmLitTofQa::Exec(
    Option_t* opt)
 {
    static Int_t nofEvents = 0;
-   std::cout << "CbmLitFitQaCalculator::Exec: event=" << nofEvents++ << std::endl;
+   std::cout << "CbmLitTofQa::Exec: event=" << nofEvents++ << std::endl;
    ProcessGlobalTracks();
 }
 
@@ -82,10 +137,27 @@ void CbmLitTofQa::ReadDataBranches()
    fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
 }
 
+void CbmLitTofQa::FillTrackCategoriesAndAcceptanceFunctions()
+{
+   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("Pion")("Kaon");
+   // List of all supported track categories
+   fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Electron"] = ElectronTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Muon"] = MuonTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunctionTof;
+}
+
 void CbmLitTofQa::CreateHistograms()
 {
-   fHM->Add("hmp_Tof_Reco_m2p", new TH2F("hmp_Tof_Reco_m2p", "hmp_Tof_Reco_m2p;P [GeV/c];M^{2} [(GeV/c)^{2}]", fPRangeBins, fPRangeMin, fPRangeMax, 100, 0, 1.));
-   fHM->Add("hmp_Tof_RecoMCID_m2p", new TH2F("hmp_Tof_RecoMCID_m2p", "hmp_Tof_RecoMCID_m2p;P [GeV/c];M^{2} [(GeV/c)^{2}]", fPRangeBins, fPRangeMin, fPRangeMax, 100, 0, 1.));
+   Int_t nofTrackCategories = fTrackCategories.size();
+   for (Int_t iCat = 0; iCat < nofTrackCategories; iCat++) {
+	  string name = "hmp_Tof_Reco_" + fTrackCategories[iCat] + "_m2p";
+      fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 100, -0.2, 1.8));
+      name = "hmp_Tof_RecoMCID_" + fTrackCategories[iCat] + "_m2p";
+      fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 100, -0.2, 1.8));
+   }
 }
 
 void CbmLitTofQa::ProcessGlobalTracks()
@@ -115,10 +187,19 @@ void CbmLitTofQa::ProcessGlobalTracks()
       Double_t t = (trackLength != 0) ? (ct / trackLength) : 0;
       Double_t m2reco = preco * preco * (t * t - 1);
 
-      fHM->H1("hmp_Tof_Reco_m2p")->Fill(preco, m2reco);
+      Int_t nofTrackCategories = fTrackCategories.size();
+      for (Int_t iCat = 0; iCat < nofTrackCategories; iCat++) {
+    	  string category = fTrackCategories[iCat];
+    	  LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(category)->second;
+    	  Bool_t accOk = function(fMCTracks, stsMCTrackId);
 
-      if (stsMCTrackId == tofMCTrackId) {
-         fHM->H1("hmp_Tof_RecoMCID_m2p")->Fill(preco, m2reco);
+    	  if (accOk) {
+    		  fHM->H1("hmp_Tof_Reco_" + category + "_m2p")->Fill(preco, m2reco);
+
+    		  if (stsMCTrackId == tofMCTrackId) {
+    		     fHM->H1("hmp_Tof_RecoMCID_" + category + "_m2p")->Fill(preco, m2reco);
+    		  }
+    	  }
       }
    }
 }

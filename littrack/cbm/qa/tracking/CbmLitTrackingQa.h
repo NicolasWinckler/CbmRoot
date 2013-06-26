@@ -21,9 +21,6 @@ using std::string;
 using std::vector;
 using std::multimap;
 
-typedef Bool_t (*LitTrackAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index);
-typedef Bool_t (*LitRingAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index, Int_t nofHitsInRing);
-typedef Bool_t (*LitPiSuppAcceptanceFunction)(const TClonesArray* globalTracks, const TClonesArray* stsMatches, const TClonesArray* richMatches, Int_t index);
 
 /**
  * \class CbmLitTrackingQa.h
@@ -34,6 +31,10 @@ typedef Bool_t (*LitPiSuppAcceptanceFunction)(const TClonesArray* globalTracks, 
 class CbmLitTrackingQa : public FairTask
 {
 public:
+	typedef Bool_t (*LitTrackAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index);
+	typedef Bool_t (*LitRingAcceptanceFunction)(const TClonesArray* mcTracks, Int_t index, Int_t nofHitsInRing);
+	typedef Bool_t (*LitPiSuppAcceptanceFunction)(const TClonesArray* globalTracks, const TClonesArray* stsMatches, const TClonesArray* richMatches, Int_t index);
+
    /**
     * \brief Constructor.
     */

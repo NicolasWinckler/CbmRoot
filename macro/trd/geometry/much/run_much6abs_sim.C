@@ -58,7 +58,7 @@ void run_much6abs_sim(TString inputSignal = "",
   TString magnetGeom = "passive/magnet_v12b.root";
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString muchGeom   = "../macro/trd/geometry/much/much_v13c.geo";
-  TString trdGeom    = "trd/trd_v13h.root";
+  TString trdGeom    = "trd/trd_v13m.geo.root";
 
   // -----   Magnetic field   -----------------------------------------------
   TString  fieldMap   = "field_v12b";   // name of field map

@@ -8,6 +8,7 @@
 #define CBMSIMULATIONREPORT_H_
 
 #include "CbmReport.h"
+#include "draw/CbmDrawHist.h"
 #include <string>
 
 using std::ostream;
@@ -76,9 +77,17 @@ public:
    /**
     * \brief Select by pattern TH2 histograms and draw each histogram on separate canvas.
     * \param[in] histNamePattern Name pattern for histogram.
+    * \param[in] logx Specify logarithmic or linear scale for X axis.
+    * \param[in] logy Specify logarithmic or linear scale for Y axis.
+    * \param[in] logz Specify logarithmic or linear scale for Z axis.
+    * \param[in] drawOpt Other drawing options (see ROOT documentation for details).
     */
    void DrawH2ByPattern(
-         const string& histNamePattern);
+         const string& histNamePattern,
+         HistScale logx = kLinear,
+         HistScale logy = kLinear,
+         HistScale logz = kLinear,
+         const string& drawOpt = "");
 
 private:
    CbmHistManager* fHM; // Histogram manager

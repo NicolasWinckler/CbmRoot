@@ -67,7 +67,11 @@ void CbmSimulationReport::DrawH1ByPattern(
 }
 
 void CbmSimulationReport::DrawH2ByPattern(
-      const string& histNamePattern)
+      const string& histNamePattern,
+      HistScale logx,
+      HistScale logy,
+      HistScale logz,
+      const string& drawOpt)
 {
     vector<TH2*> histos = HM()->H2Vector(histNamePattern);
     if (histos.size() == 0) return;
@@ -76,7 +80,7 @@ void CbmSimulationReport::DrawH2ByPattern(
         TH2* hist = histos[iHist];
         string canvasName = GetReportName() + hist->GetName();
         TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
-        DrawH2(hist, kLinear, kLinear, kLinear);
+        DrawH2(hist, logx, logy, logz, drawOpt);
     }
 }
 

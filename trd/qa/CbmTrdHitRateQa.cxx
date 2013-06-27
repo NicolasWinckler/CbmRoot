@@ -27,7 +27,7 @@
 #include <fstream>
 #include <cmath>
 
-#define winsize 1000 // 1500 // 5500 // 6000
+#define winsize 2000 // 1500 // 5500 // 6000
 
 using std::cout;
 using std::cin;
@@ -735,7 +735,8 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     GeoPara->vX[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
 
     // get row offset
-    fModuleInfo->GetPosition(VolumeID, 0, 0, 1, padPos, padSize);
+    //    fModuleInfo->GetPosition(VolumeID, 0, 0, 1, padPos, padSize); // rather take next of 3 sectors
+    fModuleInfo->GetPosition(VolumeID, 1, 0, 0, padPos, padSize);
     GeoPara->vY[0]      = padPos[0] * 10 - GeoPara->vOrigin[0]; 
     GeoPara->vY[1]      = padPos[1] * 10 - GeoPara->vOrigin[1]; 
     GeoPara->vY[2]      = padPos[2] * 10 - GeoPara->vOrigin[2];
@@ -897,23 +898,23 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     if (Lines)
       cout << "ori   " << setw(10) << fModuleInfo->GetOrientation() << "  rot   " << setw(10) << GeoPara->rot_angle << endl;
 
-    if (GeoPara->rot_angle == 3)
-    {
-      fModuleInfo->GetPosition(VolumeID, 2, GeoPara->sCol[0], GeoPara->sRow[2], padPos, padSize);
-      if (Lines)
-	{
-//      cout << "v--xy " << setw(10) << GeoPara->sCol[0] 
-//                       << setw(10) << GeoPara->sRow[0] << endl;
-//      cout << "v--xy " << setw(10) << GeoPara->sCol[1] 
-//                       << setw(10) << GeoPara->sRow[1] << endl;
-//      cout << "v--xy " << setw(10) << GeoPara->sCol[2] 
-//                       << setw(10) << GeoPara->sRow[2] << endl;
-      cout << "v11xy " << setw(10) << padPos[0] * 10 - GeoPara->vOrigin[0] 
-                       << setw(10) << padPos[1] * 10 - GeoPara->vOrigin[1] << endl;
-        }
-      GeoPara->vOrigin[0] = padPos[0] * 10;
-      GeoPara->vOrigin[1] = padPos[1] * 10; 
-    }
+//    if (GeoPara->rot_angle == 3)
+//    {
+//      fModuleInfo->GetPosition(VolumeID, 2, GeoPara->sCol[0], GeoPara->sRow[2], padPos, padSize);
+//      if (Lines)
+//	{
+////      cout << "v--xy " << setw(10) << GeoPara->sCol[0] 
+////                       << setw(10) << GeoPara->sRow[0] << endl;
+////      cout << "v--xy " << setw(10) << GeoPara->sCol[1] 
+////                       << setw(10) << GeoPara->sRow[1] << endl;
+////      cout << "v--xy " << setw(10) << GeoPara->sCol[2] 
+////                       << setw(10) << GeoPara->sRow[2] << endl;
+//      cout << "v11xy " << setw(10) << padPos[0] * 10 - GeoPara->vOrigin[0] 
+//                       << setw(10) << padPos[1] * 10 - GeoPara->vOrigin[1] << endl;
+//        }
+//      GeoPara->vOrigin[0] = padPos[0] * 10;
+//      GeoPara->vOrigin[1] = padPos[1] * 10; 
+//    }
 
     if (Lines)
       cout << "------------------------------------------------------" << endl;
@@ -931,6 +932,38 @@ void CbmTrdHitRateQa::GetModuleInformationFromDigiPar(HitRateGeoPara *GeoPara, B
     {
       Histo(GeoPara, Fast, Layer, c1, HitPad, c2, Topview, c0, mm2bin);
     }
+
+    if (Lines)
+      for (Int_t s = 0; s < GeoPara->nSec; s++)  // for all (3) sectors
+      {
+        fModuleInfo->GetPosition(VolumeID, s, 0, 0, padPos, padSize);
+  
+        TPolyMarker* start = new TPolyMarker(1);
+        start->SetPoint(0, padPos(0)*10, padPos(1)*10);
+        start->SetMarkerStyle(22);
+        start->SetMarkerSize(.8);
+    
+        if(fDraw)
+        {
+      	  c1->cd(1);
+      	  start->Draw("same");
+        }
+  
+        fModuleInfo->GetPosition(VolumeID, s, GeoPara->sCol[0]-1, GeoPara->sRow[s]-1, padPos, padSize);
+  
+        TPolyMarker* end = new TPolyMarker(1);
+        end->SetPoint(0, padPos(0)*10, padPos(1)*10);
+        end->SetMarkerStyle(20);
+        end->SetMarkerSize(.8);
+    
+        if(fDraw)
+        {
+      	  c1->cd(1);
+      	  end->Draw("same");
+        }
+  
+      }
+
   }
 
   else
@@ -1106,7 +1139,7 @@ void CbmTrdHitRateQa::Histo(HitRateGeoPara *GeoPara, Bool_t Fast, TH2F* h2Layer,
 			  											      
                           if (GeoPara->moduleId == 5)
                           {
-                            cout << "filling 5 " << mStepX << " " << mStepY << " " << HiteRate << endl;
+			    //                            cout << "filling 5 " << mStepX << " " << mStepY << " " << HiteRate << endl;
                             h2Module->Fill(mStepX,mStepY,HiteRate);  // single module, goes into root file
                           }
 

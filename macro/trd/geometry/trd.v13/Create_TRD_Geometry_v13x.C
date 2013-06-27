@@ -1835,9 +1835,12 @@ void create_supports()
 
   //  gGeoMan->GetVolume(geoVersion)->AddNode(trdsupport,1);
 
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd_1, 1);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd_2, 2);
-  gGeoMan->GetVolume(geoVersion)->AddNode(trd_3, 3);
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    gGeoMan->GetVolume(geoVersion)->AddNode(trd_1, 1);
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    gGeoMan->GetVolume(geoVersion)->AddNode(trd_2, 2);
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    gGeoMan->GetVolume(geoVersion)->AddNode(trd_3, 3);
 
 }
 

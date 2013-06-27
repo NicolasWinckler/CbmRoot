@@ -19,20 +19,20 @@ void standard_electron_setup()
   FairLogger* logger = FairLogger::GetLogger();
 
   // -----   Magnetic field   -----------------------------------------------
-  fieldMap    = "field_v12a";   // name of field map
+  fieldMap    = "field_v12b";   // name of field map
   fieldZ     = 50.;             // field centre z position
   fieldScale =  1.;             // field scaling factor
-  fieldSymType = 2;
+  fieldSymType = 3;
 
   // -----  Geometries  -----------------------------------------------------
   caveGeom   = "cave.geo";
   targetGeom = "target_au_250mu.geo";
   pipeGeom   = "pipe_standard.geo";
-  magnetGeom = "passive/magnet_v12a.geo";
+  magnetGeom = "passive/magnet_v12b.root";
   mvdGeom    = "mvd/mvd_v07a.geo";
   stsGeom    = "sts/sts_v12b.geo.root";
   richGeom   = "rich/rich_v08a.geo";
-  trdGeom    = "trd/trd_v13g.root";
+  trdGeom    = "trd/trd_v13g.geo.root";
   tofGeom    = "tof/tof_v13b.root";
   ecalGeom   = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;

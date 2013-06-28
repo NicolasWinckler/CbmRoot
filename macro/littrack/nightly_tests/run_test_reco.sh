@@ -23,7 +23,7 @@ if [ "${detector_setup}" = "electron" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN PLUTO
     pars=(0    0    0   0   0    0    0       10     0  yes   no     no)
     set_default_electron_geometry
-    export LIT_TRD_GEOM=trd/trd_${main_detector_geometry}.root
+    export LIT_TRD_GEOM=trd/trd_${main_detector_geometry}.geo.root
     export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_${main_detector_geometry}.digi.par
 elif [ "${detector_setup}" = "muon" ] ; then
     #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN PLUTO

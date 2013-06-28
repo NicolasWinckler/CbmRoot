@@ -44,7 +44,7 @@ eventDisplay()
   FairMCTracks       *Track     = new FairMCTracks       ("Monte-Carlo Tracks");
   FairMCPointDraw    *TrdPoints = new FairMCPointDraw    ("TrdPoint",kBlue , kFullSquare);
   CbmPixelHitSetDraw *TrdHits   = new CbmPixelHitSetDraw ("TrdHit"  ,kRed  , kFullSquare);
-  //  CbmTrdDigiDraw     *TrdDigis  = new CbmTrdDigiDraw     ("TrdDigi" ,kGreen, kFullSquare);
+  CbmTrdDigiDraw     *TrdDigis  = new CbmTrdDigiDraw     ("TrdDigi" ,kGreen, kFullSquare);
 
   //  TrdDigis->SetLayerStation1(kTRUE,kTRUE,kTRUE,kTRUE);
   //  TrdDigis->SetLayerStation2(kTRUE,kTRUE,kTRUE,kTRUE);

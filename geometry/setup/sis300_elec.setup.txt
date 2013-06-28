@@ -5,3 +5,4 @@ RICH  v08a
 TRD   v13g
 
 TOF   v13b
+Magnet  v12b

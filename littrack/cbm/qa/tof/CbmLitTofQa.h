@@ -88,6 +88,8 @@ private:
 
    void ProcessGlobalTracks();
 
+   void FitHistograms();
+
    CbmLitTofQa(const CbmLitTofQa&);
    CbmLitTofQa& operator=(const CbmLitTofQa&);
 

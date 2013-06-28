@@ -117,6 +117,7 @@ void CbmLitTofQa::Exec(
 
 void CbmLitTofQa::Finish()
 {
+   FitHistograms();
    fHM->WriteToFile();
    CbmSimulationReport* report = new CbmLitTofQaReport();
    report->Create(fHM, fOutputDir);
@@ -202,6 +203,21 @@ void CbmLitTofQa::ProcessGlobalTracks()
     	  }
       }
    }
+}
+
+void CbmLitTofQa::FitHistograms()
+{
+	//TCanvas* canvas3 = CreateCanvas("fit_qa_momentum_momres_mom_sigma", "fit_qa_momentum_momres_mom_sigma", 600, 600);
+	//canvas3->cd(1);
+	fHM->H2("hmp_Tof_RecoMCID_Pion_m2p")->FitSlicesY();
+	TH1* meanHist = (TH1*) gDirectory->Get("hmp_Tof_RecoMCID_Pion_m2p_1"); // mean
+	TH1* sigmaHist = (TH1*) gDirectory->Get("hmp_Tof_RecoMCID_Pion_m2p_2"); // sigma
+	Int_t nofBins = meanHist->GetNbinsX();
+	for (Int_t iBin = 0; iBin <= nofBins; iBin++) {
+		Double_t mean = meanHist->GetBinContent(iBin);
+		Double_t sigma = sigmaHist->GetBinContent(iBin);
+		std::cout << "mean=" << mean << " sigma=" << sigma << std::endl;
+	}
 }
 
 ClassImp(CbmLitTofQa)

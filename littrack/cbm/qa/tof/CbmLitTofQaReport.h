@@ -40,6 +40,11 @@ protected:
     */
    virtual void Draw();
 
+   void FitHistograms();
+
+   void FitFunction(
+   		TGraph* graph);
+
 	ClassDef(CbmLitTofQaReport, 1);
 };
 

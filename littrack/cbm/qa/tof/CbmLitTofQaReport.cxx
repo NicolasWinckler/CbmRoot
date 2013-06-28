@@ -84,7 +84,9 @@ void CbmLitTofQaReport::FitHistograms()
 			downGraph->SetPoint(iBin - 1, p, mean - sigma);
 			meanGraph->SetPoint(iBin - 1, p, mean);
 		}
+		std::cout << "Upper function for " << categories[iCat] << std::endl;
 		FitFunction(upGraph);
+		std::cout << "Lower function for " << categories[iCat] << std::endl;
 		FitFunction(downGraph);
 		DrawGraph(meanGraph, kLinear, kLinear, "PSAME");
 	}

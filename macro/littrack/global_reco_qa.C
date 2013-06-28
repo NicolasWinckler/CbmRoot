@@ -12,7 +12,7 @@ using std::endl;
 using std::vector;
 using std::string;
 
-void global_reco_qa(Int_t nEvents = 100000,
+void global_reco_qa(Int_t nEvents = 1000,
       TString opt = "reco")
 // opt == "reco" in case of one input file with all reconstructed data
 // opt == "ht" (hitas and tracks) in case of two input files with reconstructed hits and tracks
@@ -21,14 +21,14 @@ void global_reco_qa(Int_t nEvents = 100000,
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "events/much_v12c_omega_10k/"; // Output directory
+	TString dir = "events/sts_rich_tof/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
    TString globalRecoFile = dir + "global.reco.0000.root"; // File with global tracks
    TString globalHitsFile = dir + "global.hits.0000.root"; // File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
    TString globalTracksFile = dir + "global.tracks.0000.root";// Output file with global tracks
-	TString qaFile = dir + "qa.nn.0000.root"; // Output file with histograms
+	TString qaFile = dir + "qa.0000.root"; // Output file with histograms
 
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
@@ -124,8 +124,8 @@ void global_reco_qa(Int_t nEvents = 100000,
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetVerbose(normTofHits);
-   trackingQa->SetTrackCategories(trackCategories);
-   trackingQa->SetRingCategories(ringCategories);
+  // trackingQa->SetTrackCategories(trackCategories);
+  // trackingQa->SetRingCategories(ringCategories);
    trackingQa->SetOutputDir(std::string(resultDir));
    run->AddTask(trackingQa);
 
@@ -140,7 +140,11 @@ void global_reco_qa(Int_t nEvents = 100000,
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
-  // run->AddTask(clusteringQa);
+   run->AddTask(clusteringQa);
+
+   CbmLitTofQa* tofQa = new CbmLitTofQa();
+   tofQa->SetOutputDir(std::string(resultDir));
+   run->AddTask(tofQa);
    // -----------------------------------------------------------------------
 
    // -----  Parameter database   --------------------------------------------

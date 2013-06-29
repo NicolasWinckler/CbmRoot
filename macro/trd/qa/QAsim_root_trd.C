@@ -23,9 +23,9 @@ void QAsim_root_trd(Int_t nEvents = 1)
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target_au_250mu.geo";
-  TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "passive/magnet_v12b.root";
+  TString targetGeom = "target/target_au_250mu.geo";
+  TString pipeGeom   = "pipe/pipe_standard.geo";
+  TString magnetGeom = "magnet/magnet_v12b.geo.root";
   TString mvdGeom    = "mvd/mvd_v07a.geo";
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString richGeom   = "rich/rich_v08a.geo";

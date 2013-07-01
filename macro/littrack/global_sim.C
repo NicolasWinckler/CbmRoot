@@ -30,14 +30,14 @@ void global_sim(Int_t nEvents = 10000)
 	Int_t nofAuIons = 0; // number of generated Au ions
 	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
     TString unigen = "no"; // If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
-    TString pluto = "yes";
+    TString pluto = "yes"; // If "yes" PLUTO generator will be used
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "events/much_v12c_omega_10k/"; // Directory for output simulation files
+	TString dir = "events/much_anna_omega_8gev_10k/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
-	TString plutoFile = "/Users/andrey/Development/cbm/d/pluto/omega.25gev.1M.root";
+	TString plutoFile = "/Users/andrey/Development/cbm/d/pluto/omega.8gev.1M.root";
 
 	// Geometries
 	TString caveGeom = "", targetGeom = "", pipeGeom = "", shieldGeom = "",
@@ -45,28 +45,28 @@ void global_sim(Int_t nEvents = 10000)
 			tofGeom = "", ecalGeom = "", fieldMap = "", magnetGeom = "";
 	if (setup == "muon") {
 		caveGeom   = "cave.geo";
-		targetGeom = "target_au_250mu.geo";
-		pipeGeom   = "pipe_much.geo";
-		shieldGeom = "shield_standard.geo";
+		targetGeom = "target/target_au_250mu.geo";
+		pipeGeom   = "pipe/pipe_much.geo";
+		shieldGeom = "shield_segmented_CPbFe_wo2last.geo";//"shield_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
-		muchGeom   = "much/much_v12c.geo";
+		muchGeom   = "much/much/much_v12c.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
-		tofGeom    = "";//"tof/tof_v13b.root";
+		tofGeom    = "tof/tof_v13b.root";
 		fieldMap   = "field_v12a";
-		magnetGeom = "passive/magnet_v12a.geo";
+		magnetGeom = "magnet/magnet_v12a.geo";
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
-		targetGeom = "target_au_250mu.geo";
-		pipeGeom   = "pipe_standard.geo";
+		targetGeom = "target/target_au_250mu.geo";
+		pipeGeom   = "pipe/pipe_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
 		richGeom   = "rich/rich_v08a.geo";
-		trdGeom    = "trd/trd_v13g.root";
+		trdGeom    = "";//"trd/trd_v13g.root";
 		tofGeom    = "tof/tof_v13b.root";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";
-		magnetGeom = "passive/magnet_v12a.geo";
+		magnetGeom = "magnet/magnet_v12a.geo";
 	}
 
 	// If SCRIPT environment variable is set to "yes", i.e. macro is run via script

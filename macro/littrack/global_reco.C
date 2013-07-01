@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 10000, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/much_v12c_omega_10k/"; // Output directory
+	TString dir = "events/much_anna_omega_8gev_10k/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits

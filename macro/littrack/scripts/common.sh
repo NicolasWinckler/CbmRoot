@@ -57,8 +57,8 @@ function set_default_file_names() {
 # Function sets the default muon geometry
 function set_default_muon_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe_much.geo
+    export LIT_TARGET_GEOM=target/target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe/pipe_much.geo
     export LIT_SHIELD_GEOM=shield_standard.geo
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v12b.geo.root
@@ -73,7 +73,7 @@ function set_default_muon_geometry() {
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -90,8 +90,8 @@ function set_default_muon_geometry() {
 # Function sets the default electron geometry
 function set_default_electron_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe_standard.geo
+    export LIT_TARGET_GEOM=target/target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe/pipe_standard.geo
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v12b.geo.root
@@ -106,7 +106,7 @@ function set_default_electron_geometry() {
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -123,8 +123,8 @@ function set_default_electron_geometry() {
 # Function set default mvd geometry
 function set_default_mvd_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe_much.geo
+    export LIT_TARGET_GEOM=target/target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe/pipe_much.geo
     export LIT_SHIELD_GEOM=shield_standard.geo
     export LIT_MVD_GEOM=mvd/mvd_v07a.geo
     export LIT_STS_GEOM=sts/sts_v12b.geo.root
@@ -139,7 +139,7 @@ function set_default_mvd_geometry() {
     export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -154,8 +154,8 @@ function set_default_mvd_geometry() {
 # Function set default sts geometry
 function set_default_sts_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe_standard.geo
+    export LIT_TARGET_GEOM=target/target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe/pipe_standard.geo
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v12b.geo.root
@@ -170,7 +170,7 @@ function set_default_sts_geometry() {
     export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -187,8 +187,8 @@ function set_default_sts_geometry() {
 # Function set default sts geometry
 function set_default_sts_tof_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe_standard.geo
+    export LIT_TARGET_GEOM=target/target_au_250mu.geo
+    export LIT_PIPE_GEOM=pipe/pipe_standard.geo
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v12b.geo.root
@@ -203,7 +203,7 @@ function set_default_sts_tof_geometry() {
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=passive/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4

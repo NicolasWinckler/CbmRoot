@@ -28,7 +28,7 @@ void standard_electron_setup()
   caveGeom   = "cave.geo";
   targetGeom = "target/target_au_250mu.geo";
   pipeGeom   = "pipe/pipe_standard.geo";
-  magnetGeom = "magnet/magnet_v12b.root";
+  magnetGeom = "magnet/magnet_v12b.geo.root";
   mvdGeom    = "mvd/mvd_v07a.geo";
   stsGeom    = "sts/sts_v12b.geo.root";
   richGeom   = "rich/rich_v08a.geo";

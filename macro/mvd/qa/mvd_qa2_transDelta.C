@@ -41,13 +41,13 @@ Int_t mvd_qa2_transDelta()
   TString caveGeom = "cave.geo";
 
   // Target geometry
-  TString targetGeom = "target_au_250mu.geo";
+  TString targetGeom = "target/target_au_250mu.geo";
 
   // Beam pipe geometry
-  TString pipeGeom = "pipe_standard.geo";
+  TString pipeGeom = "pipe/pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  =  "passive/magnet_v09e.geo";
+  TString magnetGeom  =  "magnet/magnet_v09e.geo";
   TString fieldMap    = "field_v10e";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor

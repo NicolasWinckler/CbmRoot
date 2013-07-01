@@ -49,13 +49,13 @@ void much_sim(TString inputSignal = "",
   // MUCH geometry. Otherwise, define an empty string.
 //  TString muchGeom   = "much/much_v11a.geo"; // default rectangular geometry
   TString muchGeom   = "much/much_v12b.geo"; // default sector geometry
-  TString pipeGeom   = "pipe_much.geo";
+  TString pipeGeom   = "pipe/pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
 
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "passive/magnet_v12a.geo";
+  TString targetGeom = "target/target_au_250mu.geo";
+  TString magnetGeom = "magnet/magnet_v12a.geo";
   TString stsGeom    = "sts/sts_v12b.geo.root";
 
   // -----   Magnetic field   -----------------------------------------------

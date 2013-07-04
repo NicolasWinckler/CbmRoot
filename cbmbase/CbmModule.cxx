@@ -44,76 +44,61 @@ void CbmModule::ConstructGDMLGeometry(TGeoMatrix* posrot)
 
 void CbmModule::ExpandNodeForGDML(TGeoNode* curNode)
 {
-//	std::cout << "[ExpandNodeForGDML] Expanding node " << curNode->GetName() << std::endl;
 	TGeoVolume* curVol = curNode->GetVolume();
-	TString curMedName = curNode->GetMedium()->GetName();
-	TGeoMedium* curMedInGeoManager = gGeoManager->GetMedium(curMedName);
-	Int_t matIndToDel = gGeoManager->GetMaterialIndex(curMedName);
 
-	if (curMedName.BeginsWith("G4_"))
-	{
-//		std::cout << "[ExpandNodeForGDML] Material in GDML begins with G4_" << std::endl;
-		curMedName.Remove(0, 3);
-	}
-	else
-	{
-//		std::cout << "[ExpandNodeForGDML] Material in GDML does not start with G4_" << "\t\t" << curNode->GetName() << "\t\t" << curMedName << std::endl;
-//		return;
-	}
+	//! Assembly-volumes are skipped as they do not have any material
+	if (!curVol->IsAssembly()) {
+		TString curMedName = curNode->GetMedium()->GetName();
+		TGeoMedium* curMedInGeoManager = gGeoManager->GetMedium(curMedName);
+		Int_t matIndToDel = gGeoManager->GetMaterialIndex(curMedName);
 
-	Int_t nmed;
-
-	FairGeoLoader* geoLoad = FairGeoLoader::Instance();
-	FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-	FairGeoMedia* geoMediaBase =  geoFace->getMedia();
-	FairGeoBuilder* geobuild = geoLoad->getGeoBuilder();
-	FairGeoMedium* curMedInGeo;
-
-	if (curMedInGeoManager == 0)
-	{
-		std::cout << "[ExpandNodeForGDML] New medium found in gmdl - it is not in gGeoManager list." << std::endl;
-		//! New medium found in gmdl - it is not in gGeoManager list.
-		//! This should not happen as GDML parser adds medium into the list
-	}
-	else
-	{
-		//! Medium is in the list in gGeoManager.
-		//! Trying to replace it with the one from the Geo file.
-//		std::cout << "Medium is in the list in gGeoManager." << std::endl;
-
-		curMedInGeo = geoMediaBase->getMedium(curMedName);
-		if (curMedInGeo == 0)
-		{
-			std::cout << "[ExpandNodeForGDML] Media not found in Geo file." << std::endl;
+		if (curMedName.BeginsWith("G4_")) {
+			curMedName.Remove(0, 3);
 		}
-		else
-		{
-			if (fixedMats.find(curMedName) == fixedMats.end())
+
+		Int_t nmed;
+
+		FairGeoLoader* geoLoad = FairGeoLoader::Instance();
+		FairGeoInterface* geoFace = geoLoad->getGeoInterface();
+		FairGeoMedia* geoMediaBase =  geoFace->getMedia();
+		FairGeoBuilder* geobuild = geoLoad->getGeoBuilder();
+		FairGeoMedium* curMedInGeo;
+
+		if (curMedInGeoManager == 0) {
+			std::cout << "[ExpandNodeForGDML] New medium found in gmdl - it is not in gGeoManager list." << std::endl;
+			//! New medium found in gmdl - it is not in gGeoManager list.
+			//! This should never happen as GDML parser adds medium into the list.
+			//! If happens - something is extremely strange.
+		} else {
+			//! Medium is in the list in gGeoManager.
+			//! Trying to replace it with the one from the Geo file.
+
+			curMedInGeo = geoMediaBase->getMedium(curMedName);
+			if (curMedInGeo == 0)
 			{
-				nmed = geobuild->createMedium(curMedInGeo);
-				fixedMats[curMedName] = gGeoManager->GetListOfMedia()->GetEntries();
-//				std::cout << "[ExpandNodeForGDML] " << curMedName << " added to list\t" << fixedMats[curMedName] << "\t" << nmed << std::endl;
+				std::cout << "[ExpandNodeForGDML] Media not found in Geo file." << std::endl;
+				//! This should not happen.
+				//! This means that somebody uses material in GDML that is not in the media.geo file.
+				//! Most probably this is the sign to the user to check materials' names in the CATIA model.
 			}
 			else
 			{
-//				std::cout << "[ExpandNodeForGDML] " << curMedName << " is already in the list.\t\t" << fixedMats[curMedName] << std::endl;
+				if (fixedMats.find(curMedName) == fixedMats.end()) {
+					nmed = geobuild->createMedium(curMedInGeo);
+					fixedMats[curMedName] = gGeoManager->GetListOfMedia()->GetEntries();
+				}
+				curNode->GetVolume()->SetMedium(gGeoManager->GetMedium(curMedName));
+				gGeoManager->SetAllIndex();
 			}
-	
-			curNode->GetVolume()->SetMedium(gGeoManager->GetMedium(curMedName));
-			gGeoManager->SetAllIndex();
+		}
+
+		//! The volume is sensitive => add it to the list
+		if (curMedInGeo->getSensitivityFlag()) {
+			AddSensitiveVolume(curVol);
 		}
 	}
 
-//! Making volume sensitive according to the media 0-th flag
-	if ((Int_t)(curVol->GetMedium()->GetParam(0)) == 1)
-    {
-		//! The volume is sensitive => add it to the list
-//		std::cout << "\t\t\tAdding sensitive volume: " << curVol->GetName() << std::endl;
-		AddSensitiveVolume(curVol);
-	}
-//! endof Making volume sensitive according to the media 0-th flag
-
-//! Recursevly go down the tree of nodes
+	//! Recursevly go down the tree of nodes
 	if (curVol->GetNdaughters() != 0)
 	{
 		TObjArray* NodeChildList = curVol->GetNodes();

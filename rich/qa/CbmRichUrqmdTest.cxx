@@ -121,12 +121,12 @@ void CbmRichUrqmdTest::Exec(
 void CbmRichUrqmdTest::InitHistograms()
 {
    fh_vertex_z = new TH1D("fh_vertex_z", "fh_vertex_z;z [cm];Number of vertices per event", 200, -1., 200);
-   fh_nof_rings_1hit = new TH1D("fh_nof_rings_1hit", "fh_nof_rings_1hit;Number of rings per event;Yield", 100, -.5, 99.5);
-   fh_nof_rings_7hits = new TH1D("fh_nof_rings_7hits", "fh_nof_rings_7hits;Number of rings per event;Yield", 100, -.5, 99.5 );
-   fh_nof_rings_prim_1hit = new TH1D("fh_nof_rings_prim_1hit", "fh_nof_rings_prim_1hit;Number of rings per event;Yield", 50, -.5, 49.5);
-   fh_nof_rings_prim_7hits = new TH1D("fh_nof_rings_prim_7hits", "fh_nof_rings_prim_7hits;Number of rings per event;Yield", 50, -.5, 49.5 );
-   fh_nof_rings_target_1hit = new TH1D("fh_nof_rings_target_1hit", "fh_nof_rings_target_1hit;Number of rings per event;Yield", 60, -.5, 59.5);
-   fh_nof_rings_target_7hits = new TH1D("fh_nof_rings_target_7hits", "fh_nof_rings_target_7hits;Number of rings per event;Yield", 60, -.5, 59.5 );
+   fh_nof_rings_1hit = new TH1D("fh_nof_rings_1hit", "fh_nof_rings_1hit;Number of detected particles/event;Yield", 100, -.5, 99.5);
+   fh_nof_rings_7hits = new TH1D("fh_nof_rings_7hits", "fh_nof_rings_7hits;Number of detected particles/event;Yield", 100, -.5, 99.5 );
+   fh_nof_rings_prim_1hit = new TH1D("fh_nof_rings_prim_1hit", "fh_nof_rings_prim_1hit;Number of detected particles/event;Yield", 50, -.5, 49.5);
+   fh_nof_rings_prim_7hits = new TH1D("fh_nof_rings_prim_7hits", "fh_nof_rings_prim_7hits;Number of detected particles/event;Yield", 50, -.5, 49.5 );
+   fh_nof_rings_target_1hit = new TH1D("fh_nof_rings_target_1hit", "fh_nof_rings_target_1hit;Number of detected particles/event;Yield", 60, -.5, 59.5);
+   fh_nof_rings_target_7hits = new TH1D("fh_nof_rings_target_7hits", "fh_nof_rings_target_7hits;Number of detected particles/event;Yield", 60, -.5, 59.5 );
 
    fh_secel_mom = new TH1D("fh_secel_mom", "fh_secel_mom;p [GeV/c];Number per event", 100, 0., 20);
    fh_gamma_target_mom = new TH1D("fh_gamma_target_mom", "fh_gamma_target_mom;p [GeV/c];Number per event", 100, 0., 20);
@@ -136,11 +136,12 @@ void CbmRichUrqmdTest::InitHistograms()
    fh_mu_mom = new TH1D("fh_mu_mom", "fh_mu_mom;p [GeV/c];Number per event", 100, 0., 20);
 
    fh_nof_hits_per_event = new TH1D("fh_nof_hits_per_event", "fh_nof_hits_per_event;Number of hits per event;Yield", 50, 0, 1500);
-   fh_hits_xy_u = new TH2D("fh_hits_xy_u", "fh_hits_xy_u;x [cm];y [cm];Number of hits/cm^{2}/event", 220, -110, 110, 90, 90, 180);
-   fh_hits_xy_d = new TH2D("fh_hits_xy_d", "fh_hits_xy_d;x [cm];y [cm];Number of hits/cm^{2}/event", 220, -110, 110, 90, -180, -90);
+   fh_hits_xy_u = new TH2D("fh_hits_xy_u", "fh_hits_xy_u;x [cm];y [cm];Number of hits/cm^{2}/event", 110, -110, 110, 45, 90, 180);
+   fh_hits_xy_d = new TH2D("fh_hits_xy_d", "fh_hits_xy_d;x [cm];y [cm];Number of hits/cm^{2}/event", 110, -110, 110, 45, -180, -90);
 
-   fh_hitrate_xy_u = new TH2D("fh_hitrate_xy_u", "fh_hitrate_xy_u;x [cm];y [cm];Number of hits/pixel/s", 400, -110, 110, 165, 90, 180);
-   fh_hitrate_xy_d = new TH2D("fh_hitrate_xy_d", "fh_hitrate_xy_d;x [cm];y [cm];Number of hits/pixel/s", 400, -110, 110, 165, -180, -90);
+   // bin size is set to 1.2 cm in order to cover 4 pixels, before drawing must be normalized by 1/4
+   fh_hitrate_xy_u = new TH2D("fh_hitrate_xy_u", "fh_hitrate_xy_u;x [cm];y [cm];Number of hits/pixel/s", 184, -110, 110, 75, 90, 180);
+   fh_hitrate_xy_d = new TH2D("fh_hitrate_xy_d", "fh_hitrate_xy_d;x [cm];y [cm];Number of hits/pixel/s", 184, -110, 110, 75, -180, -90);
 
    fh_nof_proj_per_event = new TH1D("fh_nof_proj_per_event", "fh_nof_proj_per_event;Number of tracks per event;Yield", 50, 200, 600);
    fh_proj_xy_u = new TH2D("fh_proj_xy_u", "fh_proj_xy_u;x [cm];y [cm];Number of tracks/cm^{2}/event", 220, -110, 110, 90, 90, 180);
@@ -275,6 +276,7 @@ void CbmRichUrqmdTest::NofHits()
       double x = hit->GetX();
       double y = hit->GetY();
       if (y > 0) {
+        // cout << x << " " <<  y << endl;
          fh_hits_xy_u->Fill(x, y);
          fh_hitrate_xy_u->Fill(x, y);
       } else {
@@ -338,24 +340,24 @@ void CbmRichUrqmdTest::DrawHist()
    TCanvas* c2 = CreateCanvas("rich_urqmd_nof_rings", "rich_urqmd_nof_rings", 800, 800);
    fh_nof_rings_1hit->Scale(1./fh_nof_rings_1hit->Integral());
    fh_nof_rings_7hits->Scale(1./fh_nof_rings_7hits->Integral());
-   DrawH1(list_of(fh_nof_rings_1hit)(fh_nof_rings_7hits), list_of(string(">= 1 hit per ring"))(string(">= 7 hits per ring")),
-         kLinear, kLinear, true, 0.55, 0.85, 0.99, 0.99);
+   DrawH1(list_of(fh_nof_rings_1hit)(fh_nof_rings_7hits), list_of(string("At least 1 hit detected"))(string("At least 7 hits detected")),
+         kLinear, kLinear, true, 0.4, 0.78, 0.99, 0.99);
    cout << "Mean nof rings per event (1 hit) = " << fh_nof_rings_1hit->GetMean() << endl;
    cout << "Mean nof rings per event (7 hits) = " << fh_nof_rings_7hits->GetMean() << endl;
 
    TCanvas* c3 = CreateCanvas("rich_urqmd_nof_rings_prim", "rich_urqmd_nof_rings_prim", 800, 800);
    fh_nof_rings_prim_1hit->Scale(1./fh_nof_rings_prim_1hit->Integral());
    fh_nof_rings_prim_7hits->Scale(1./fh_nof_rings_prim_7hits->Integral());
-   DrawH1(list_of(fh_nof_rings_prim_1hit)(fh_nof_rings_prim_7hits), list_of(">= 1 hit per ring")(">= 7 hits per ring"),
-         kLinear, kLinear, true, 0.55, 0.85, 0.99, 0.99);
+   DrawH1(list_of(fh_nof_rings_prim_1hit)(fh_nof_rings_prim_7hits), list_of("At least 1 hit detected")("At least 7 hits detected"),
+         kLinear, kLinear, true, 0.4, 0.78, 0.99, 0.99);
    cout << "Mean nof primary rings per event (1 hit) = " << fh_nof_rings_prim_1hit->GetMean() << endl;
    cout << "Mean nof primary rings per event (7 hits) = " << fh_nof_rings_prim_7hits->GetMean() << endl;
 
    TCanvas* cTarget = CreateCanvas("rich_urqmd_nof_rings_target", "rich_urqmd_nof_rings_target", 800, 800);
    fh_nof_rings_target_1hit->Scale(1./fh_nof_rings_target_1hit->Integral());
    fh_nof_rings_target_7hits->Scale(1./fh_nof_rings_target_7hits->Integral());
-   DrawH1(list_of(fh_nof_rings_target_1hit)(fh_nof_rings_target_7hits), list_of(">= 1 hit per ring")(">= 7 hits per ring"),
-         kLinear, kLinear, true, 0.55, 0.85, 0.99, 0.99);
+   DrawH1(list_of(fh_nof_rings_target_1hit)(fh_nof_rings_target_7hits), list_of("At least 1 hit detected")("At least 7 hits detected"),
+         kLinear, kLinear, true, 0.4, 0.78, 0.99, 0.99);
    cout << "Mean nof target rings per event (1 hit) = " << fh_nof_rings_target_1hit->GetMean() << endl;
    cout << "Mean nof target rings per event (7 hits) = " << fh_nof_rings_target_7hits->GetMean() << endl;
 
@@ -380,8 +382,11 @@ void CbmRichUrqmdTest::DrawHist()
 
 
    TCanvas *c5 = CreateCanvas("rich_urqmd_hits_xy", "rich_urqmd_hits_xy", 800, 800);
-   fh_hits_xy_u->Scale(1./fEventNum);
-   fh_hits_xy_d->Scale(1./fEventNum);
+   double binArea = fh_hits_xy_u->GetXaxis()->GetBinWidth(1) * fh_hits_xy_u->GetYaxis()->GetBinWidth(1);
+   cout << "binArea = " << binArea << endl;
+   fh_hits_xy_u->Scale(1./(fEventNum * binArea));
+   fh_hits_xy_d->Scale(1./(fEventNum * binArea));
+
    c5->Divide(1, 2);
    c5->cd(1);
    DrawH2(fh_hits_xy_u);
@@ -402,8 +407,8 @@ void CbmRichUrqmdTest::DrawHist()
    cout << "Mean number of hits per event = " << fh_nof_hits_per_event->GetMean() << endl;
 
    TCanvas *cHitRate = CreateCanvas("rich_urqmd_hitrate_xy", "rich_urqmd_hitrate_xy", 800, 800);
-   fh_hitrate_xy_u->Scale(1e7/fEventNum);
-   fh_hitrate_xy_d->Scale(1e7/fEventNum);
+   fh_hitrate_xy_u->Scale(1e7/(fEventNum * 4.));
+   fh_hitrate_xy_d->Scale(1e7/(fEventNum * 4.));
    cHitRate->Divide(1, 2);
    cHitRate->cd(1);
    DrawH2(fh_hitrate_xy_u);

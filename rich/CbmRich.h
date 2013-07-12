@@ -20,7 +20,8 @@ class CbmRichRefPlanePoint;
 class CbmRichPoint;
 class CbmRichMirrorPoint;
 class FairVolume; 
-
+class TGeoMatrix;
+class TGeoNode;
 /**
 * \class CbmRich
 *
@@ -39,15 +40,26 @@ public:
    */
    CbmRich();
 
-
    /**
-    * \brief Standard constructor.
+    * \brief Constructor for the GDML geometry.
     * \param[in] name Detector name.
     * \param[in] active Sensitivity flag.
+    * \param[in] px Position X.
+    * \param[in] py Position Y.
+    * \param[in] pz Position Z from target to the center of the RICH detector.
+    * \param[in] rx Rotation around X.
+    * \param[in] ry Rotation around Y.
+    * \param[in] rz Rotation around Z.
     */
    CbmRich(
          const char* name,
-         Bool_t active);
+         Bool_t active,
+         Double_t px=0.,
+         Double_t py=0.,
+         Double_t pz=0.,
+         Double_t rx=0.,
+         Double_t ry=0.,
+         Double_t rz=0.);
 
 
    /**
@@ -117,27 +129,57 @@ public:
 
 
    /**
-    * \brief Construct geometry.
+    * \brief Construct geometry. Currently ROOT and ASCII formats are supported.
+    * The concrete method for geometry construction is called according to geometry file.
     */
    virtual void ConstructGeometry();
+
+   /**
+    * \brief Construct geometry from ASCII file. Supported structure for the mirrors are added on a fly.
+    */
+   void ConstructAsciiGeometry();
+
+
+   /**
+    * \brief Construct geometry from GDML file.
+    * \param[in] geoMatrix Position and rotation of the RICH detector.
+    */
+   void ConstructGdmlGeometry(TGeoMatrix* geoMatrix);
+
+   /**
+    * \brief Assign materials by taking description from medoa.geo and not from GDML for a certain node.
+    * \param[in] node GeoNode.
+    */
+   void ExpandNodeForGdml(TGeoNode* node);
+
 
    /**
     * \brief Put some optical properties.
     */
    void ConstructOpGeometry();
 
+
+   /** Check whether a volume is sensitive.
+    ** The decision is based on the volume name. Only used in case
+    ** of ROOT geometry.
+    ** @since 11.06.2012
+    ** @param(name)  Volume name
+    ** @value        kTRUE if volume is sensitive, else kFALSE
+    **/
+   virtual Bool_t CheckIfSensitive(std::string name);
+
 private:
 
    Int_t fPosIndex;
-   Int_t volDetector; // MC volume ID of RICH photodetector
-   Int_t volRefPlane; //  MC volume ID of RICH reference plane
-   Int_t volMir; // MC volume ID of RICH Mirror (3 parts)
-   Int_t volMir1; // MC volume ID of RICH Mirror
-   Int_t volMir2; // MC volume ID of RICH Mirror
 
    TClonesArray* fRichCollection; // Hit collection (photodetector)
    TClonesArray* fRichRefPlaneCollection; // Hit collection (reference plane)
-   TClonesArray* fRichMirrorCollection; // Hit collection (Mirror)
+
+   // GDML geometry
+   static std::map<TString, Int_t> fFixedMats; // materials for the GDML geometry
+   static Bool_t fIsFirstGDML;
+   TGeoRotation* fRotation; // Rotation matrix of the RICH detector
+   TGeoCombiTrans* fPositionRotation;  // Full combined matrix for position and rotation of the RICH detector
 
    /**
     * \brief Adds a RichPoint to the HitCollection.
@@ -155,18 +197,6 @@ private:
     * \brief Adds a RichRefPlanePoint to the HitCollection.
     */
    CbmRichPoint* AddRefPlaneHit(
-         Int_t trackID,
-         Int_t detID,
-         TVector3 pos,
-         TVector3 mom,
-         Double_t time,
-         Double_t length,
-         Double_t eLoss);
-
-   /**
-    * \brief Adds a RichMirrorPoint to the HitCollection.
-    */
-   CbmRichPoint* AddMirrorHit(
          Int_t trackID,
          Int_t detID,
          TVector3 pos,

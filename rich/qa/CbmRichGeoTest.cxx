@@ -358,11 +358,11 @@ void CbmRichGeoTest::InitHistograms()
    fHists.push_back(fhNofPointsXYZ);
    fhBoverAXYZ = new TH3D("fhBoverAXYZ", "fhBoverAXYZ;X [cm];Y [cm];B/A", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 50, 0., 1.);
    fHists.push_back(fhBoverAXYZ);
-   fhBaxisXYZ = new TH3D("fhBaxisXYZ", "fhBaxisXYZ;X [cm];Y [cm];B axis [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 40, 3., 7.);
+   fhBaxisXYZ = new TH3D("fhBaxisXYZ", "fhBaxisXYZ;X [cm];Y [cm];B axis [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 80, 3., 7.);
    fHists.push_back(fhBaxisXYZ);
-   fhAaxisXYZ = new TH3D("fhAaxisXYZ", "fhAaxisXYZ;X [cm];Y [cm];A axis [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 40, 3., 7.);
+   fhAaxisXYZ = new TH3D("fhAaxisXYZ", "fhAaxisXYZ;X [cm];Y [cm];A axis [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 80, 3., 7.);
    fHists.push_back(fhAaxisXYZ);
-   fhRadiusXYZ = new TH3D("fhRadiusXYZ", "fhRadiusXYZ;X [cm];Y [cm];Radius [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 40, 3., 7.);
+   fhRadiusXYZ = new TH3D("fhRadiusXYZ", "fhRadiusXYZ;X [cm];Y [cm];Radius [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 80, 3., 7.);
    fHists.push_back(fhRadiusXYZ);
    fhdRXYZ = new TH3D("fhdRXYZ", "fhdRXYZ;X [cm];Y [cm];dR [cm]", nBinsX, xMin, xMax, nBinsY, yMin, yMax, 100, -1., 1.);
    fHists.push_back(fhdRXYZ);
@@ -802,9 +802,11 @@ void CbmRichGeoTest::DrawH1andFit(
    hist->Scale(1./ hist->Integral());
    hist->GetXaxis()->SetRangeUser(2., 8.);
    hist->Fit("gaus", "Q");
-   hist->GetFunction("gaus")->SetLineColor(kBlack);
-   double m = hist->GetFunction("gaus")->GetParameter(1);
-   double s = hist->GetFunction("gaus")->GetParameter(2);
+   TF1* func = hist->GetFunction("gaus");
+   if (func == NULL) return;
+   func->SetLineColor(kBlack);
+   double m = func->GetParameter(1);
+   double s = func->GetParameter(2);
    string txt1 = lit::NumberToString<double>(m, 2) + " / " + lit::NumberToString<double>(s, 2);
    TLatex text;
    text.SetTextAlign(21);
@@ -1110,6 +1112,16 @@ void CbmRichGeoTest::DrawH3(
    TCanvas *rms = CreateCanvas(string(cName+"_rms").c_str(), string(cName+"_rms").c_str(), 800, 800);
    h2Rms->GetZaxis()->SetTitle(string("RMS."+zAxisTitle).c_str());
    DrawH2(h2Rms);
+
+
+   TCanvas* cHitsRAB = CreateCanvas(string(cName+"_local_xy").c_str(), string(cName+"_local_xy").c_str(), 800, 800);
+   int x = h->GetXaxis()->FindBin(20);
+   int y = h->GetYaxis()->FindBin(120);
+   cout << x << " " << y << endl;
+   TH1D* hz = h->ProjectionZ((string(h->GetName())+"_local_xy").c_str(), x, x, y, y);
+   //if (hz->GetEntries() > 2) {
+      DrawH1andFit(hz);
+   //}
 
    if (canvas != NULL) delete canvas;
 

@@ -231,7 +231,7 @@ EndIf(BUILD_ROCLIB)
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)
   MESSAGE(STATUS "*** Building the Doxygen documentaion ***")
-  ADD_SUBDIRECTORY(doc)
+  ADD_SUBDIRECTORY(doxygen)
 endif(BUILD_DOXYGEN)
 
 if(RULE_CHECKER_FOUND)

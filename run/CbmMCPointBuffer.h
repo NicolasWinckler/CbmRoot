@@ -97,6 +97,10 @@ template <class T> class CbmMCPointBuffer
       T* point = (T*) array->At(iPoint);
       point->SetEventID(eventId);
       point->SetTime(eventTime + point->GetTime());
+      // 2 lines added by EK to propagate point index in TClonesArray
+      // TODO add functionality in the buffer to return FairLink to the point
+      FairLink l = point->GetLink(0);
+      point->AddLink(FairLink(l.GetFile(),l.GetEntry(),-1,iPoint));
       fBuffer.insert(*point);
     }
     fBufferIt = fBuffer.begin();

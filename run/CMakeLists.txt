@@ -44,6 +44,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 
 CbmDaq.cxx
+CbmDaqQa.cxx
 CbmDaqBuffer.cxx
 CbmMCBuffer.cxx
 CbmMCTimeSim.cxx

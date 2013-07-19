@@ -14,7 +14,8 @@
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchPoint.h"
 #include "TClonesArray.h"
-
+#include "TMath.h"
+#include "TRandom.h"
 #include <iostream>
 #include <limits>
 #include <cassert>
@@ -32,51 +33,33 @@ CbmMuchDigiMatch::CbmMuchDigiMatch()
     fCharge(0),
     fRefIndexPerPrimaryElectron(0),
     fChargePerPrimaryElectron(0),
-    fDriftTimePerPrimaryElectron(0),
-    fSignalShape(0)
+    fTimePerPrimaryElectron(0),
+    fMCtimePerPrimaryElectron(0),
+    fSignalShape(0),
+    fT0(0)
 {
 };
 // -------------------------------------------------------------------------
-// -----   Standard constructor   ------------------------------------------
 
+
+// -----   Standard constructor   ------------------------------------------
 CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match)
   : TObject(*match),
     fRefIndex(match->fRefIndex),
     fCharge(match->fCharge),
     fRefIndexPerPrimaryElectron(match->fRefIndexPerPrimaryElectron),
     fChargePerPrimaryElectron(match->fChargePerPrimaryElectron),
-    fDriftTimePerPrimaryElectron(match->fDriftTimePerPrimaryElectron),
-    fSignalShape(match->fSignalShape)
-{
-  /*
-   if(!match){
-      cout << "-W- CbmMuchDigiMatch: NULL CbmMuchDigiMatch object " << endl;
-   }
-   else {
-      fRefIndex.Set(match->GetNPoints());
-      fCharge.Set(match->GetNPoints());
-      for(Int_t i=0; i<fRefIndex.GetSize();i++){
-         fRefIndex.AddAt(match->GetRefIndex(i), i);
-         fCharge.AddAt(match->GetCharge(i), i);
-      }
-      Int_t nEl = match->GetNoPrimaryElectrons(); 
-      fRefIndexPerPrimaryElectron.Set(nEl);
-      fChargePerPrimaryElectron.Set(nEl);
-      fDriftTimePerPrimaryElectron.Set(nEl); 
-      for(Int_t i=0; i<nEl;i++){
-        fRefIndexPerPrimaryElectron.AddAt(match->GetRefIndexPerPrimaryElectron(i),i);
-        fChargePerPrimaryElectron.AddAt(match->GetChargePerPrimaryElectron(i),i);
-        fDriftTimePerPrimaryElectron.AddAt(match->GetDriftTimePerPrimaryElectron(i),i);
-      }
-   }
-  */
+    fTimePerPrimaryElectron(match->fTimePerPrimaryElectron),
+    fMCtimePerPrimaryElectron(match->fMCtimePerPrimaryElectron),
+    fSignalShape(match->fSignalShape),
+    fT0(match->fT0){
 }
-
 // -------------------------------------------------------------------------
+
+
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigiMatch::~CbmMuchDigiMatch() { };
 // -------------------------------------------------------------------------
-
 
 
 // -----   Public method AddPoint   ----------------------------------------
@@ -92,6 +75,8 @@ Int_t CbmMuchDigiMatch::AddPoint(Int_t iPoint) {
   return n+1;
 }
 // -------------------------------------------------------------------------
+
+
 // -----   Public method GetRefIndex   -------------------------------------
 Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
   if ( i<0 || i>GetNPoints()-1 ) {
@@ -102,6 +87,7 @@ Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
   return fRefIndex.At(i);
 }
 // -------------------------------------------------------------------------
+
 
 // -----   Public method AddCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
@@ -132,7 +118,6 @@ UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t iCharge) {
 // -------------------------------------------------------------------------
 
 
-
 // -----   Public method GetCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
   if ( i<0 || i>GetNPoints()-1 ) {
@@ -143,6 +128,7 @@ UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
   return fCharge.At(i);
 }
 // -------------------------------------------------------------------------
+
 
 // -----   Public method GetTotalCharge  -----------------------------------
 UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
@@ -156,6 +142,8 @@ UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
 }
 // -------------------------------------------------------------------------
 
+
+// -------------------------------------------------------------------------
 void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
   map<Double_t,Int_t> time_vs_index;
   map<Double_t,Int_t> time_vs_charge;
@@ -176,37 +164,108 @@ void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
   time_vs_index.clear();
   time_vs_charge.clear();
 }
+// -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
-
 void CbmMuchDigiMatch::Reset() {
   fRefIndex.Reset();
   fCharge.Reset();
   fRefIndexPerPrimaryElectron.Reset(0);
   fChargePerPrimaryElectron.Reset(0);
-  fDriftTimePerPrimaryElectron.Reset(0);
+  fTimePerPrimaryElectron.Reset(0);
+  fMCtimePerPrimaryElectron.Reset(0);
   fSignalShape.Reset(0);
   fRefIndex.Set(0);
   fCharge.Set(0);
   fRefIndexPerPrimaryElectron.Set(0);
   fChargePerPrimaryElectron.Set(0);
-  fDriftTimePerPrimaryElectron.Set(0);
+  fTimePerPrimaryElectron.Set(0);
+  fMCtimePerPrimaryElectron.Set(0);
   fSignalShape.Set(0);
 }
+// -------------------------------------------------------------------------
 
 
-UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime) {
-  AddCharge(iPoint,iCharge);
-//  printf("Add...\n");
+// -------------------------------------------------------------------------
+UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t charge, Double_t t, TArrayD shape, Double_t mcTime) {
+  AddCharge(iPoint,charge);
   Int_t n = fRefIndexPerPrimaryElectron.GetSize();
   fRefIndexPerPrimaryElectron.Set(n+1);
   fChargePerPrimaryElectron.Set(n+1);
-  fDriftTimePerPrimaryElectron.Set(n+1);
+  fTimePerPrimaryElectron.Set(n+1);
+  fMCtimePerPrimaryElectron.Set(n+1);
   fRefIndexPerPrimaryElectron.AddAt(iPoint, n);
-  fChargePerPrimaryElectron.AddAt(iCharge, n);
-  fDriftTimePerPrimaryElectron.AddAt(driftTime, n);
+  fChargePerPrimaryElectron.AddAt(charge, n);
+  fTimePerPrimaryElectron.AddAt(t, n);
+  fMCtimePerPrimaryElectron.AddAt(mcTime,n);
+  // initial time is set 100 ns before arrival of the first point 
+  // since later points may contribute before if drift time is different for them
+  // TODO  take from digitizer
+  if (n==0) fT0 = t-50;
+  Int_t bin0 = Int_t((t-fT0)/gkResponseBin);
+  if (t<fT0) {
+    printf("=====\n");
+    printf("Warning t=%f < fT0=%f\n",t,fT0);
+    printf("=====\n");
+  }
+  Int_t nbins = bin0+shape.GetSize();
+  if (fSignalShape.GetSize()<nbins) fSignalShape.Set(nbins);
+  for (Int_t j=0;j<shape.GetSize();j++)  fSignalShape[bin0 + j]+=charge*shape[j];
 }
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+void CbmMuchDigiMatch::AddNoise(Double_t meanNoise){
+  for (Int_t i=0;i<fSignalShape.GetSize();i++){
+    fSignalShape[i]+=TMath::Abs(meanNoise*gRandom->Gaus());
+  }
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchDigiMatch::GetMaxCharge(){
+  Double_t max_charge = -1;
+  for (Int_t i=0;i<fSignalShape.GetSize();i++){
+    Double_t charge = fSignalShape[i];
+    if (charge>max_charge) max_charge = charge;
+  }
+  return max_charge;
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchDigiMatch::GetTimeStamp(Double_t threshold){
+  Int_t bin1 = -1;
+  for (Int_t i=0;i<fSignalShape.GetSize();i++){
+    if (bin1<0 && fSignalShape[i]>threshold) {
+      bin1 = i;
+      return fT0+bin1*gkResponseBin;
+    }
+  }
+  return -1;
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchDigiMatch::GetTimeOverThreshold(Double_t threshold){
+  Int_t bin1 = -1;
+  Int_t bin2 = -1;
+  for (Int_t i=0;i<fSignalShape.GetSize();i++){
+    if (bin1<0 && fSignalShape[i]>threshold) bin1 = i;
+    if (bin1>0 && fSignalShape[i]<threshold) {
+      bin2 = i;
+      return (bin2-bin1)*gkResponseBin;
+    }
+  }
+  if (bin1>0 && bin2<0) return (fSignalShape.GetSize()-bin1)*gkResponseBin;
+  return -1;
+}
+// -------------------------------------------------------------------------
 
 
 ClassImp(CbmMuchDigiMatch)

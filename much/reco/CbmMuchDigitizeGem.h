@@ -13,7 +13,7 @@
 
 #ifndef CBMMUCHDIGITIZEGEM_H
 #define CBMMUCHDIGITIZEGEM_H 1
-
+#define NTIMEBINS 200
 #include "FairTask.h"
 
 #include "TStopwatch.h"
@@ -21,6 +21,7 @@
 #include "TMath.h"
 #include "TClonesArray.h"
 #include "TString.h"
+#include "TArrayD.h"
 
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
@@ -49,6 +50,8 @@ static double min_logT_mu = -0.916291;
 static double min_logT_p  =  1.0986; 
 static double l_e         = 0.47;
 static double l_not_e     = 0.36;
+
+static const Double_t gkResponsePeriod = 400.;
 
 class CbmMuchDigitizeGem : public FairTask{
   public:
@@ -83,7 +86,7 @@ class CbmMuchDigitizeGem : public FairTask{
      * Sets charge threshold [ADC channels] for pads.
      * @param qThreshold Charge threshold value [ADC channels] (3 by default).
      */
-    void SetQThreshold(UInt_t qThreshold) { fQThreshold = qThreshold*fQMax/fNADCChannels; }
+    void SetQThreshold(UInt_t qThreshold) { fQThreshold = qThreshold; }
 
     /**
      * Sets number of ADC channels.
@@ -123,7 +126,7 @@ class CbmMuchDigitizeGem : public FairTask{
      **/
     static Double_t MPV_n_e(Double_t Tkin, Double_t mass);
     
-    void SetEpoch(Bool_t epoch) {fEpoch=epoch;}
+    void SetDaq(Bool_t daq) {fDaq = daq;}
     void SetMcChain(TChain* mcChain) {fMcChain=mcChain;}
     void SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; } 
     void SetDriftVelocity(Double_t velocity) {fDriftVelocity = velocity; }
@@ -131,6 +134,9 @@ class CbmMuchDigitizeGem : public FairTask{
     void SetRemainderTime(Double_t remainderTime) {fRemainderTime = remainderTime; }
     void SetTimeBinWidth(Double_t timeBinWidth) {fTimeBinWidth = timeBinWidth; }
     void SetAlgorithm(Int_t algorithm) {fAlgorithm = algorithm; }
+    void SetTimeOverThreshold(Bool_t tot) {fTOT = tot; }
+    TArrayD fgDeltaResponse; // Signal shape on delta function response
+
   private:
     Int_t              fAlgorithm;     // Algorithm
     CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
@@ -139,7 +145,6 @@ class CbmMuchDigitizeGem : public FairTask{
     TClonesArray*      fMCTracks;      // Input array of MCTrack
     TClonesArray*      fDigis;         // Output array of CbmMuchDigi
     TClonesArray*      fDigiMatches;   // Output array of CbmMuchDigiMatches
-    CbmMCEpoch*        fMcEpoch;      // Output array of CbmMuchDigiMatches
     Int_t              fNFailed;       // Total number of points which digitization has failed
     Int_t              fNOutside;      // Total number of points which was found outside a detector
     Int_t              fNMulti;        // Total number of channels that was hitby several points
@@ -150,24 +155,25 @@ class CbmMuchDigitizeGem : public FairTask{
     Double_t           fSpotRadius;    // Spot radius from secondary electrons [cm]
     Double_t           fMeanGasGain;   // Mean gas gain value (1e4 by default)
     Double_t           fDTime;         // Time resolution [ns]
-    Int_t              fEvent;         // Event counter
     Double_t           fDeadPadsFrac;  // Probability to find a dead pad
     TStopwatch         fTimer;         // Timer
-    Bool_t             fEpoch;         // Epoch digitizer fEpoch=1. Default fEpoch=0 
+    Bool_t             fDaq;           // Daq digitizer fDaq=1. Default fDaq=0 - event-by-event
     TChain*            fMcChain;       // Chain of McFiles with McTrack info    
     Double_t           fDeadTime;      // Channel dead time [ns]
     Double_t           fDriftVelocity; // Drift Velocity [um/ns]
     Double_t           fPeakingTime;   // Peaking time [ns]
     Double_t           fRemainderTime; // Remainder time = t_r [ns]: remainder is simulated as exp(-t/t_r)
     Double_t           fTimeBinWidth;  // Width of the bin for signal shape simulation
-    Int_t              fChainEventId;  // Temporary solution for accessing MC chain in epoch approach
-    Double_t fTotalDriftTime;
+    Int_t              fNTimeBins;     // Number of bins for signal shape simulation
+    Int_t              fNdigis;        // Number of created digis
+    Bool_t             fTOT;           // Flag to switch between time over threshold/direct amplitude measurement
+    Double_t           fTotalDriftTime;// Total drift time (calculated from drift velocity and drift volume width)
 
     /** Initialization. **/
     virtual InitStatus Init();
 
     /** Advanced digis production using avalanches. **/
-    Bool_t ExecPoint(CbmMuchPoint* point, Int_t iPoint);
+    Bool_t ExecPoint(const CbmMuchPoint* point);
 
     /** Builds a TPolyLine from given rectangle parameters (no rotation angle).
      *@param x0     X of the center.
@@ -181,11 +187,10 @@ class CbmMuchDigitizeGem : public FairTask{
     CbmMuchDigitizeGem(const CbmMuchDigitizeGem&);
     CbmMuchDigitizeGem& operator=(const CbmMuchDigitizeGem&);
         
-    Double_t GetNPrimaryElectronsPerCm(CbmMuchPoint* point);
+    Double_t GetNPrimaryElectronsPerCm(const CbmMuchPoint* point);
     Bool_t AddCharge(CbmMuchSectorRadial* s,UInt_t ne, Int_t iPoint, Double_t time, Double_t driftTime, Double_t phi1, Double_t phi2);
     void AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint, Double_t time, Double_t driftTime);
 
-    
     ClassDef(CbmMuchDigitizeGem,1)
 };
 #endif

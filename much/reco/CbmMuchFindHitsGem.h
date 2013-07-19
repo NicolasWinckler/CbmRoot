@@ -24,6 +24,7 @@
 #include "TString.h"
 #include <map>
 #include <vector>
+#include "CbmMuchDigiLight.h"
 using std::map;
 using std::pair;
 using std::vector;
@@ -32,6 +33,7 @@ class CbmMuchPad;
 class CbmMuchCluster;
 class TClonesArray;
 class CbmMuchGeoScheme;
+class CbmTimeSlice;
 
 class CbmMuchFindHitsGem: public FairTask {
   public:
@@ -41,6 +43,8 @@ class CbmMuchFindHitsGem: public FairTask {
     void SetAlgorithm(Int_t iAlgorithm)             { fAlgorithm = iAlgorithm;}
     void SetThresholdRatio(Double_t thresholdRatio) {fThresholdRatio = thresholdRatio; }
     void SetClusterSeparationTime(Double_t time)    { fClusterSeparationTime = time; }
+    void SetDaq(Bool_t daq)                         { fDaq = daq; }
+
   private:
     virtual InitStatus Init();
     void FindClusters();
@@ -66,6 +70,9 @@ class CbmMuchFindHitsGem: public FairTask {
     vector<Int_t> fDigiIndices;             //!
     vector<CbmMuchPad*> fFiredPads;         //!
     
+    Bool_t fDaq;                            // To daq or not to daq // TODO
+    CbmTimeSlice* fTimeSlice;               // Time slice object in the DAQ approach
+    vector<CbmMuchDigiLight> fDigiData;     // Vector of digis
     CbmMuchFindHitsGem(const CbmMuchFindHitsGem&);
     CbmMuchFindHitsGem operator=(const CbmMuchFindHitsGem&);
 

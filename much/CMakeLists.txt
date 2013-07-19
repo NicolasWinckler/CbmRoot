@@ -7,12 +7,22 @@ set(INCLUDE_DIRECTORIES
 ${BASE_INCLUDE_DIRECTORIES} 
 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/run 
 ${CBMROOT_SOURCE_DIR}/cbmdata 
 ${CBMROOT_SOURCE_DIR}/cbmdata/much 
 ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/much/reco
 ${CBMROOT_SOURCE_DIR}/much/tracking
+
+# needed by run/FairMCBuffer.h
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
+${CBMROOT_SOURCE_DIR}/cbmdata/rich 
+${CBMROOT_SOURCE_DIR}/cbmdata/sts 
+${CBMROOT_SOURCE_DIR}/cbmdata/trd 
+${CBMROOT_SOURCE_DIR}/cbmdata/tof 
+${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
+${CBMROOT_SOURCE_DIR}/cbmdata/psd 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

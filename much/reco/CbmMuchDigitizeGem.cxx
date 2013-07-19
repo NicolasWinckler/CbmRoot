@@ -24,12 +24,15 @@
 #include "CbmMuchPadRectangular.h"
 #include "CbmMuchSectorRadial.h"
 #include "CbmMuchSectorRectangular.h"
+#include "CbmMuchDigiLight.h"
 
 // Includes from base
 #include "FairRootManager.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
 #include "CbmMCEpoch.h"
+#include "CbmMCBuffer.h"
+#include "CbmDaqBuffer.h"
 
 // Includes from ROOT
 #include "TObjArray.h"
@@ -51,32 +54,30 @@ CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* digiFileName)
     fMCTracks(NULL),
     fDigis(NULL),
     fDigiMatches(NULL),
-    fMcEpoch(NULL),
     fNFailed(0),
     fNOutside(0),
     fNMulti(0),
     fNADCChannels(256),
     fQMax(500000),
-    fQThreshold(3),
-    fMeanNoise(0),//(1500),
+    fQThreshold(10000),
+    fMeanNoise(1500),
     fSpotRadius(0.05),
     fMeanGasGain(1e4),
     fDTime(3),
-    fEvent(0),
     fDeadPadsFrac(0),
     fTimer(),
-    fEpoch(0),
+    fDaq(0),
     fMcChain(NULL),
     fDeadTime(400),
     fDriftVelocity(100),
     fPeakingTime(20),
     fRemainderTime(40),
     fTimeBinWidth(1),
-    fChainEventId(0),
-    fTotalDriftTime(0.)
+    fTotalDriftTime(0.4/fDriftVelocity*10000), // 40 ns
+    fNTimeBins(200),
+    fNdigis(0),
+    fTOT(0)
 {
-  Double_t driftVolumeWidth = 0.4; // cm // TODO
-  fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
 }
 // -------------------------------------------------------------------------
 
@@ -108,43 +109,47 @@ InitStatus CbmMuchDigitizeGem::Init() {
   gFile=oldfile;
   fGeoScheme->Init(stations);
 
-  // Get input array of MuchPoints
-  fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
-
-  // Get input array of MC tracks
-  fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-
-  if (fEpoch) {
-    fMcEpoch = (CbmMCEpoch*) ioman->GetObject("MCEpoch.");
-    if (!fMcEpoch) {
-      Fatal("Init","No MC epoch branch found in file");
-      return kFATAL;
-    }
-    // Check for the chain of MC files
-    if (!fMcChain) {
-      Fatal("Init","MC chain pointer is NULL"); 
-      return kFATAL;
-    }
-    
-    if (!fMcChain->GetEntries()) {
-      Fatal("Init","No entries in the MC chain");
-      return kFATAL;
-    }
-    
-    fMCTracks = new TClonesArray("CbmMCTrack");
-    fMcChain->SetBranchAddress("MCTrack",&fMCTracks);
-    fMcChain->GetEntry(fChainEventId);
+  // Determine drift volume width
+  Double_t driftVolumeWidth = 0.4; // cm - default
+  for (Int_t i=0;i<fGeoScheme->GetNStations();i++){
+    CbmMuchStation* station = fGeoScheme->GetStation(i);
+    if (station->GetNLayers()<=0) continue;
+    CbmMuchLayerSide* side = station->GetLayer(0)->GetSide(0);
+    if (side->GetNModules()<=0) continue;
+    CbmMuchModule* module = side->GetModule(0);
+    if (module->GetDetectorType()!=1 && module->GetDetectorType()!=3) continue;
+    driftVolumeWidth = module->GetSize().Z();
+    break;
   }
+  fTotalDriftTime = driftVolumeWidth/fDriftVelocity*10000; // [ns];
   
-  // Register output array MuchDigi
-  fDigis = new TClonesArray("CbmMuchDigi", 1000);
-  ioman->Register("MuchDigi", "Digital response in MUCH", fDigis, kTRUE);
+  if (!fDaq){
+    // Get input array of MuchPoints
+    fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+    // Get input array of MC tracks
+    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+    // Register output array MuchDigi
+    fDigis = new TClonesArray("CbmMuchDigi", 1000);
+    ioman->Register("MuchDigi", "Digital response in MUCH", fDigis, kTRUE);
+    // Register output array MuchDigiMatches
+    fDigiMatches = new TClonesArray("CbmMuchDigiMatch", 1000);
+    ioman->Register("MuchDigiMatch", "Digi Match in MUCH", fDigiMatches, kTRUE);
+  } else {
+    if ( ! ( CbmMCBuffer::Instance() && CbmDaqBuffer::Instance() ) ) {
+      fLogger->Fatal(MESSAGE_ORIGIN, "No MCBuffer or DaqBuffer present!");
+      return kFATAL;
+    } 
+    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+  }
 
-  // Register output array MuchDigiMatches
-  fDigiMatches = new TClonesArray("CbmMuchDigiMatch", 1000);
-  ioman->Register("MuchDigiMatch", "Digi Match in MUCH", fDigiMatches, kTRUE);
-
-  fEvent = 0;
+  // Set response on delta function
+  Int_t nShapeTimeBins=Int_t(gkResponsePeriod/gkResponseBin);
+  fgDeltaResponse.Set(nShapeTimeBins);
+  for (Int_t i=0;i<fgDeltaResponse.GetSize();i++){
+    Double_t time = i*gkResponseBin;
+    if (time<=fPeakingTime) fgDeltaResponse[i]=time/fPeakingTime;
+    else fgDeltaResponse[i] = exp(-(time-fPeakingTime)/fRemainderTime); 
+  }
 
   return kSUCCESS;
 }
@@ -153,19 +158,25 @@ InitStatus CbmMuchDigitizeGem::Init() {
 
 // -----   Public method Exec   --------------------------------------------
 void CbmMuchDigitizeGem::Exec(Option_t* opt) {
+  // get current event to revert back at the end of exec
+  Int_t currentEvent = FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetReadEntry();
   fTimer.Start();
-  fDigis->Clear();
-  fDigiMatches->Delete();
+  fNdigis = 0;
+  Int_t nPoints=0;
+  
+  if (!fDaq){
+    fDigis->Clear();
+    fDigiMatches->Delete();
+    CbmMCBuffer::Instance()->Clear();
+    CbmMCBuffer::Instance()->Fill(fPoints,kMUCH,0,0);
+    CbmMCBuffer::Instance()->SetEndOfRun();
+  }
 
-  if (fEpoch) fPoints = fMcEpoch->GetPoints(kMUCH);
-  Int_t nPoints = fPoints->GetEntriesFast();
-
-  for (Int_t iPoint = 0; iPoint < nPoints; iPoint++) {
-    CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
-    if (!point || !point->IsUsable())  continue;
-    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
-    if (!module) continue;
-    ExecPoint(point, iPoint);
+  const CbmMuchPoint* point = dynamic_cast<const CbmMuchPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kMUCH));
+  while (point) {
+    nPoints++;
+    ExecPoint(point);
+    point = dynamic_cast<const CbmMuchPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kMUCH));
   }
 
   // Add remaining digis
@@ -178,13 +189,18 @@ void CbmMuchDigitizeGem::Exec(Option_t* opt) {
   }
 
   fTimer.Stop();
-  printf("-I- MuchDigitizer: event=%3i, time=%5.2f s, points=%i, digis=%i\n",fEvent++,fTimer.RealTime(),nPoints,fDigis->GetEntriesFast());
+  gLogger->Info(MESSAGE_ORIGIN,"MuchDigitizeGem: %5.2f s, %i points, %i digis",fTimer.RealTime(),nPoints,fNdigis);
+
+  // revert branch to "current event"
+  FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetEntry(currentEvent);
 }
 // -------------------------------------------------------------------------
 
 
 // ------- Private method ExecAdvanced -------------------------------------
-Bool_t CbmMuchDigitizeGem::ExecPoint(CbmMuchPoint* point, Int_t iPoint) {
+Bool_t CbmMuchDigitizeGem::ExecPoint(const CbmMuchPoint* point) {
+  // TODO workaround to extract point index - to be reconsidered
+  Int_t iPoint = point->GetLink(1).GetIndex();
   TVector3 v1,v2,dv;
   point->PositionIn(v1);
   point->PositionOut(v2);
@@ -213,9 +229,7 @@ Bool_t CbmMuchDigitizeGem::ExecPoint(CbmMuchPoint* point, Int_t iPoint) {
   Int_t nElectrons = Int_t(GetNPrimaryElectronsPerCm(point)*dv.Mag());
   if (nElectrons<0) return kFALSE;
   
-  Double_t time = -1;
-  // TODO
-  while(time < 0) time = point->GetTime() + gRandom->Gaus(0, fDTime);
+  Double_t time = point->GetTime();
   
   if (module->GetDetectorType()==1) {
     CbmMuchModuleGemRectangular* module1 = (CbmMuchModuleGemRectangular*) module;
@@ -270,7 +284,8 @@ Bool_t CbmMuchDigitizeGem::ExecPoint(CbmMuchPoint* point, Int_t iPoint) {
 
     for (Int_t i=0;i<nElectrons;i++) {
       Double_t aL   = gRandom->Rndm();
-      Double_t driftTime = (1-aL)*fTotalDriftTime;
+      Double_t driftTime = -1;
+      while(driftTime < 0) driftTime = (1-aL)*fTotalDriftTime + gRandom->Gaus(0, fDTime);
       TVector3 ve   = v1 + dv*aL;
       UInt_t ne     = GasGain();
       Double_t r    = ve.Perp();
@@ -358,25 +373,17 @@ Double_t CbmMuchDigitizeGem::MPV_n_e(Double_t Tkin, Double_t mass) {
 
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchDigitizeGem::GetNPrimaryElectronsPerCm(CbmMuchPoint* point){
-  Int_t trackID = point->GetTrackID();
-  if (trackID < 0) return -1;
+Double_t CbmMuchDigitizeGem::GetNPrimaryElectronsPerCm(const CbmMuchPoint* point){
+  Int_t trackId = point->GetTrackID();
+  Int_t eventId = point->GetEventID();
+  if (trackId < 0) return -1;
 
-  CbmMCTrack* mcTrack;
-  if (!fEpoch) {
-    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
-  } else {
-    Int_t eventId = point->GetEventID();
-    if (eventId!=fChainEventId) {
-      fChainEventId=eventId;
-      fMcChain->GetEntry(eventId);
-    }
-    mcTrack = (CbmMCTrack*) fMCTracks->At(trackID);
-  }
-  if (!mcTrack) return -1;
+  if (eventId>=0 && eventId!=FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetReadEntry())
+      FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetEntry(eventId);
+  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(trackId);
   
+  if (!mcTrack) return -1;
   Int_t pdgCode = mcTrack->GetPdgCode();
-
 
   TParticlePDG *particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
   // Assign proton hypothesis for unknown particles
@@ -418,16 +425,19 @@ void CbmMuchDigitizeGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint,
   if (!pad) return;
   CbmMuchDigiMatch* match = pad->GetMatch();
   CbmMuchDigi* digi = pad->GetDigi();
+  
   if (match->GetNPoints()==0) {
-    digi->SetTime(time);
+    digi->SetTime(time+driftTime);
     digi->SetDeadTime(fDeadTime);
   }
   if (time>digi->GetTime()+digi->GetDeadTime()) {
+    // TODO rewrite "release" condition
     AddDigi(pad);
-    digi->SetTime(time);
+    //digi->SetTime(time+driftTime);
     digi->SetDeadTime(fDeadTime);
+//    printf("%f\n",time+driftTime);
   }
-  match->AddCharge(iPoint,charge,driftTime);
+  match->AddCharge(iPoint,charge,time+driftTime,fgDeltaResponse,time);
 }
 // -------------------------------------------------------------------------
 
@@ -437,27 +447,45 @@ void CbmMuchDigitizeGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint,
 Bool_t CbmMuchDigitizeGem::AddDigi(CbmMuchPad* pad) {
   CbmMuchDigiMatch* match = pad->GetMatch();
   CbmMuchDigi* digi = pad->GetDigi();
-  
-  // Add noise
-  if (fMeanNoise){
-    Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
-    UInt_t noiseCharge = (UInt_t) rndGaus;
-    match->AddCharge(-1,noiseCharge);
-  }
-  
+  match->AddNoise(fMeanNoise);
+  Double_t  max_charge = match->GetMaxCharge();
+  Double_t t1 = match->GetTimeStamp(fQThreshold);
+  Double_t  dt = match->GetTimeOverThreshold(fQThreshold);
+
   // Check for threshold 
-  if (match->GetTotalCharge() < fQThreshold) {
+  if (t1<0) {
     match->Reset();
     return kFALSE;
   }
   
-  Int_t adc = match->GetTotalCharge() * fNADCChannels/ fQMax;
-  digi->SetADCCharge(adc > fNADCChannels ? fNADCChannels-1 : adc);
-  new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
-  new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch(match);
+  
+  Int_t adc = 0;
+  Double_t nBinsInNs = 1;
+  if (fTOT) adc = Int_t(dt/nBinsInNs);        // if time over threshold
+  else      adc = max_charge*fNADCChannels/fQMax;  // if max amplitude
+  // if overflow
+  if (adc >= (1<<12)) adc = (1<<12) - 1;
+
+  digi->SetADCCharge(adc);
+  digi->SetTime(t1);
+  
+  if (fDaq){
+    CbmMuchDigiLight* digLight = new CbmMuchDigiLight(digi,new CbmMuchDigiMatch(match));
+    CbmDaqBuffer::Instance()->InsertData(digLight);
+  } else {
+    new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
+    new ((*fDigiMatches)[fDigiMatches->GetEntriesFast()]) CbmMuchDigiMatch(match);
+  }
   match->Reset();
+  fNdigis++;
   return kTRUE;
 }
 // -------------------------------------------------------------------------
 
 ClassImp(CbmMuchDigitizeGem)
+
+
+
+
+
+

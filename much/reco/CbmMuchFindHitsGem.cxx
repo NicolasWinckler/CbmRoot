@@ -14,13 +14,14 @@
 #include "TFile.h"
 #include "TStopwatch.h"
 #include "TClonesArray.h"
-
+#include "CbmTimeSlice.h"
+#include "CbmMuchDigiLight.h"
 #include <algorithm>
 
 // -------------------------------------------------------------------------
 CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* digiFileName) 
   : FairTask("MuchFindHitsGem", 1) ,
-    fDigiFile(""),
+    fDigiFile(digiFileName),
     fAlgorithm(3),
     fClusterSeparationTime(100.),
     fThresholdRatio(0.1),
@@ -34,14 +35,17 @@ CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* digiFileName)
     fHits(new TClonesArray("CbmMuchPixelHit", 1000)),
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiIndices(),
-    fFiredPads()
+    fFiredPads(),
+    fDaq()
 {
 }
 
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchFindHitsGem::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
-  fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
+  if (fDaq) fTimeSlice = (CbmTimeSlice*) ioman->GetObject("TimeSlice.");
+  else      fDigis     = (TClonesArray*) ioman->GetObject("MuchDigi");
+  
   ioman->Register("MuchCluster", "Cluster in MUCH", fClusters, kTRUE);
   ioman->Register("MuchPixelHit", "Hit in MUCH", fHits, kTRUE);
   
@@ -63,7 +67,17 @@ void CbmMuchFindHitsGem::Exec(Option_t* opt) {
   TStopwatch timer;
   timer.Start();
   fEvent++;
-
+  fDigiData.clear();
+  
+  if (fDaq) fDigiData = fTimeSlice->GetMuchData();
+  else {
+    for (Int_t iDigi = 0; iDigi < fDigis->GetEntriesFast(); iDigi++) {
+      CbmMuchDigiLight* digi = new CbmMuchDigiLight((CbmMuchDigi*) fDigis->At(iDigi),NULL);
+      fDigiData.push_back(*digi);
+    }
+  }
+  
+  
   // Clear output array
   if (fHits) fHits->Clear();
   if (fClusters) fClusters->Delete();//Clear(); // Delete because of memory escape
@@ -102,7 +116,7 @@ void CbmMuchFindHitsGem::Exec(Option_t* opt) {
 
   timer.Stop();
   printf("-I- %s:",fName.Data());
-  printf(" digis: %i",fDigis->GetEntriesFast());
+  printf(" digis: %lu",fDigiData.size());
   printf(" clusters: %i",fClusters->GetEntriesFast());
   printf(" hits: %i",fHits->GetEntriesFast());
   printf(" time: %f s\n",timer.RealTime());
@@ -115,7 +129,7 @@ void CbmMuchFindHitsGem::FindClusters() {
   Int_t nClusters = 0;
   
   if (fAlgorithm==0){
-    for (Int_t iDigi = 0; iDigi < fDigis->GetEntriesFast(); iDigi++) {
+    for (Int_t iDigi = 0; iDigi < fDigiData.size(); iDigi++) {
       fDigiIndices.clear();
       fDigiIndices.push_back(iDigi);
       new ((*fClusters)[nClusters++]) CbmMuchCluster(fDigiIndices);
@@ -129,8 +143,8 @@ void CbmMuchFindHitsGem::FindClusters() {
   for (UInt_t m=0;m<modules.size();m++) modules[m]->ClearDigis();
 
   // Fill array of digis in the modules. Digis are automatically sorted in time
-  for (Int_t iDigi = 0; iDigi < fDigis->GetEntriesFast(); iDigi++) {
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+  for (Int_t iDigi = 0; iDigi < fDigiData.size(); iDigi++) {
+    CbmMuchDigiLight* digi =&(fDigiData[iDigi]);
     Double_t time = digi->GetTime();
     Int_t detId = digi->GetDetectorId();
     fGeoScheme->GetModuleByDetId(detId)->AddDigi(time,iDigi);
@@ -156,7 +170,7 @@ void CbmMuchFindHitsGem::FindClusters() {
       fFiredPads.clear();
       for (it=slices[s-1];it!=slices[s];it++){
         Int_t iDigi = it->second;
-        CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+        CbmMuchDigiLight* digi = &(fDigiData[iDigi]);
         CbmMuchPad* pad = module->GetPad(digi->GetChannelId());
         pad->SetDigiIndex(iDigi);
         fFiredPads.push_back(pad);
@@ -189,7 +203,7 @@ void CbmMuchFindHitsGem::CreateCluster(CbmMuchPad* pad) {
 
 // -----   Private method ExecClusteringSimple  ----------------------------
 void CbmMuchFindHitsGem::ExecClusteringSimple(CbmMuchCluster* cluster,Int_t iCluster) {
-  CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(cluster->GetDigiIndex(0));
+  CbmMuchDigiLight* digi = &(fDigiData[cluster->GetDigiIndex(0)]);
   CbmMuchModule* m = fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
   CbmMuchModuleGem* module = (CbmMuchModuleGem*) m;
   Int_t iStation = fGeoScheme->GetStationIndex(digi->GetDetectorId());
@@ -197,7 +211,7 @@ void CbmMuchFindHitsGem::ExecClusteringSimple(CbmMuchCluster* cluster,Int_t iClu
   Int_t maxCharge = 0;
   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++) {
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-    digi = (CbmMuchDigi*) fDigis->At(digiIndex);
+    digi = &(fDigiData[digiIndex]);
     Int_t charge = digi->GetADCCharge();
     if (charge>maxCharge) maxCharge = charge;
   }
@@ -208,7 +222,7 @@ void CbmMuchFindHitsGem::ExecClusteringSimple(CbmMuchCluster* cluster,Int_t iClu
   fFiredPads.clear();
   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++) {
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);
-    digi = (CbmMuchDigi*) fDigis->At(digiIndex);
+    digi = &(fDigiData[digiIndex]);
     if (digi->GetADCCharge()<=threshold) continue;
     CbmMuchPad* pad = module->GetPad(digi->GetChannelId());
     pad->SetDigiIndex(digiIndex);
@@ -238,7 +252,7 @@ void CbmMuchFindHitsGem::ExecClusteringPeaks(CbmMuchCluster* cluster,Int_t iClus
   // Fill cluster map
   for (Int_t i=0;i<nDigis;i++){
     Int_t iDigi = cluster->GetDigiIndex(i);
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+    CbmMuchDigiLight* digi = &(fDigiData[iDigi]);
     Int_t detId = digi->GetDetectorId();
     Long64_t chanId = digi->GetChannelId();
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detId);
@@ -303,9 +317,10 @@ void CbmMuchFindHitsGem::CreateHits(CbmMuchCluster* cluster, Int_t iCluster) {
   Int_t planeId = 0;
   CbmMuchModuleGem* module = NULL;
   
+  Double_t tmin = -1;
   for (Int_t i=0;i<nDigis;i++) {
     Int_t iDigi = cluster->GetDigiIndex(i);
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+    CbmMuchDigiLight* digi = &(fDigiData[iDigi]);
     if (i==0) {
       detId   = digi->GetDetectorId();
       planeId = fGeoScheme->GetLayerSideNr(detId);
@@ -316,11 +331,13 @@ void CbmMuchFindHitsGem::CreateHits(CbmMuchCluster* cluster, Int_t iCluster) {
     x   = pad->GetX();
     y   = pad->GetY();
     t   = digi->GetTime();
+    if (tmin<0) tmin = t;
+    if (tmin<t) tmin = t;
     q   = digi->GetADCCharge();
     dx  = pad->GetDx();
     dy  = pad->GetDy();
     dxy = pad->GetDxy();
-    dt = digi->GetDTime();
+    dt  = 4.; // digi->GetDTime(); //TODO introduce time uncertainty determination
     sumq    += q;
     sumx    += q*x;
     sumy    += q*y;
@@ -333,7 +350,8 @@ void CbmMuchFindHitsGem::CreateHits(CbmMuchCluster* cluster, Int_t iCluster) {
   
   x   = sumx/sumq;
   y   = sumy/sumq;
-  t   = sumt/sumq;
+//  t   = sumt/sumq;
+  t   = tmin;
   dx  = sqrt(sumdx2/12)/sumq;
   dy  = sqrt(sumdy2/12)/sumq;
   dxy = sqrt(sumdxy2/12)/sumq;
@@ -344,3 +362,5 @@ void CbmMuchFindHitsGem::CreateHits(CbmMuchCluster* cluster, Int_t iCluster) {
 // -------------------------------------------------------------------------
 
 ClassImp(CbmMuchFindHitsGem)
+
+

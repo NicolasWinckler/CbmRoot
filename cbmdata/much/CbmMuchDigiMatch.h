@@ -20,6 +20,7 @@
 #include "TArrayD.h"
 class TClonesArray;
 
+static const Double_t gkResponseBin    = 1.;
 
 class CbmMuchDigiMatch : public TObject
 {
@@ -83,20 +84,30 @@ class CbmMuchDigiMatch : public TObject
    */
   UInt_t AddCharge(Int_t iPoint, UInt_t iCharge);
 
-  UInt_t AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime);
- 
-  Int_t GetNoPrimaryElectrons() { return fDriftTimePerPrimaryElectron.GetSize(); }
+  UInt_t AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime, TArrayD shape, Double_t mcTime);
+  
+  Int_t GetNoPrimaryElectrons() { return fTimePerPrimaryElectron.GetSize(); }
   Int_t    GetRefIndexPerPrimaryElectron(Int_t i)  { return fRefIndexPerPrimaryElectron[i]; }
   Int_t    GetChargePerPrimaryElectron(Int_t i)    { return fChargePerPrimaryElectron[i]; }
-  Double_t GetDriftTimePerPrimaryElectron(Int_t i) { return fDriftTimePerPrimaryElectron[i]; }
+  Double_t GetTimePerPrimaryElectron(Int_t i)      { return fTimePerPrimaryElectron[i]; }
+  Double_t GetMCtimePerPrimaryElectron(Int_t i)    { return fMCtimePerPrimaryElectron[i]; }
+  TArrayD GetSignalShape() {return fSignalShape; }
+  Double_t GetT0() {return fT0; }
+  void AddNoise(Double_t meanNoise);
+  Double_t GetMaxCharge();
+  Double_t GetTimeStamp(Double_t threshold);
+  Double_t GetTimeOverThreshold(Double_t threshold);
+  
  private:
 
   TArrayI fRefIndex;                    // Array of MC point indices
+  TArrayD fMCtimePerPrimaryElectron;    // Array of MC point times
   TArrayI fCharge;                      // Array of charges from each MC point
   TArrayI fRefIndexPerPrimaryElectron;  // Array of ref indices per primary electron 
   TArrayI fChargePerPrimaryElectron;    // Array of charges per primary electron
-  TArrayD fDriftTimePerPrimaryElectron; // Array of driftTimes per primary electron 
+  TArrayD fTimePerPrimaryElectron;      // Array of arrival times per primary electron 
   TArrayD fSignalShape;                 // Array of time bins
+  Double_t fT0;                         // Start time for the signal shape array
   ClassDef(CbmMuchDigiMatch,1);
 
 };

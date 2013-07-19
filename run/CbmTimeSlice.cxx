@@ -23,7 +23,7 @@ CbmTimeSlice::CbmTimeSlice()
    fDuration(0.),
    fStsData()
 {
-  LOG(FATAL) << "Default constructor of CbmTimeSlice must not be used!";
+//  LOG(FATAL) << "Default constructor of CbmTimeSlice must not be used!";
 }
 // ---------------------------------------------------------------------------
 
@@ -58,7 +58,9 @@ CbmDigi* CbmTimeSlice::GetData(DetectorId iDet, Int_t index) {
     case kSTS:
       if ( index < fStsData.size() ) digi = &(fStsData[index]);
       break;
-
+    case kMUCH:
+      if ( index < fMuchData.size() ) digi = &(fMuchData[index]);
+      break;
     default:
       break;
   }
@@ -67,6 +69,18 @@ CbmDigi* CbmTimeSlice::GetData(DetectorId iDet, Int_t index) {
 }
 // ---------------------------------------------------------------------------
 
+
+// -----   Get data array size   ----------------------------------------------
+Int_t CbmTimeSlice::GetDataSize(DetectorId iDet) const {
+  switch (iDet) {
+    case kSTS:  return fStsData.size();
+    case kMUCH: return fMuchData.size();
+    default:    return 0;
+  }
+
+  return 0;
+}
+// ---------------------------------------------------------------------------
 
 
 // -----   Copy data into the time slice   -----------------------------------
@@ -93,6 +107,12 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
       break;
     }
 
+    case kMUCH: {
+      CbmMuchDigiLight* digi = static_cast<CbmMuchDigiLight*>(data);
+      fMuchData.push_back(*digi);
+    }
+    break;
+
     default:
       TString sysName;
       CbmDetectorList::GetSystemName(iDet, sysName);
@@ -101,8 +121,6 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
       break;
 
   }  // detector switch
-
-
 }
 // ---------------------------------------------------------------------------
 
@@ -113,7 +131,8 @@ void CbmTimeSlice::Print(Option_t* opt) const {
   LOG(INFO) << "TimeSlice: Interval [" << fixed << setprecision(3)
             << fStartTime << ", " << GetEndTime() << "] ns"
             << FairLogger::endl;
-  LOG(INFO) << "\t     Data: STS " << fStsData.size() << FairLogger::endl;
+  LOG(INFO) << "\t     Data: STS  " << fStsData.size() << FairLogger::endl;
+  LOG(INFO) << "\t     Data: MUCH " << fMuchData.size() << FairLogger::endl;
 }
 // ---------------------------------------------------------------------------
 
@@ -123,6 +142,7 @@ void CbmTimeSlice::Print(Option_t* opt) const {
 void CbmTimeSlice::Reset(Double_t start, Double_t duration) {
 
   fStsData.clear();
+  fMuchData.clear();
   fStartTime = start;
   fDuration = duration;
 

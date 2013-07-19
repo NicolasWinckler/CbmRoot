@@ -10,7 +10,7 @@
 
 #include "TNamed.h"
 #include "CbmStsDigiLight.h"
-#include "CbmMuchDigi.h"
+#include "CbmMuchDigiLight.h"
 #include "CbmDigi.h"
 
 using namespace std;
@@ -89,13 +89,27 @@ class CbmTimeSlice : public TNamed
      */
     void Reset(Double_t start, Double_t duration);
 
-
+    /** 
+     **
+     ** Get size of raw data container 
+     **
+     ** @param iDet   detector type
+     ** @return size of raw data container (number of digis)
+     */
+    Int_t GetDataSize(DetectorId iDet) const;
+    
+    /** Get vector of much digis
+     **
+     ** @return MUCH raw data container (vector of digis) 
+     */
+    vector<CbmMuchDigiLight> GetMuchData() {return fMuchData; } 
+    
   private:
 
     Double_t fStartTime;    /** start time [ns] **/
     Double_t fDuration;     /** duration [ns] **/
     vector<CbmStsDigiLight> fStsData;  /** raw data container for STS **/
-    vector<CbmMuchDigi>     fMuchData;  /** raw data container for MUCH **/
+    vector<CbmMuchDigiLight> fMuchData;  /** raw data container for MUCH **/
 
 
     ClassDef(CbmTimeSlice,1)

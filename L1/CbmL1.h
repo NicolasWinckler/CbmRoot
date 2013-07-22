@@ -23,7 +23,8 @@
 #include "CbmKFParticle.h"
 
 #include "CbmL1MCTrack.h"
-#include "CbmL1PFMCParticle.h"
+#include "KFMCParticle.h"
+#include "KFParticleMatch.h"
 #include "CbmL1MCPoint.h"
 #include "CbmL1StsHit.h"
 
@@ -74,7 +75,6 @@ class CbmL1ParticlesFinder;
 class L1FieldSlice;
 class CbmL1Track;
 class CbmL1MCTrack;
-class CbmL1ParticlesFinder;
 
 class CbmL1HitStore{
  public:
@@ -201,16 +201,16 @@ class CbmL1 : public FairTask
    vector<int>          vHitMCRef; // indices of MCPoints in vMCPoints, indexed by index of hit in algo->vStsHits array. According to StsMatch. Used for IdealResponce
 
   vector<CbmKFParticle>  vRParticles;      // reco particles
-  vector<CbmL1PFMCParticle> vMCParticles;  // MC particles
-  vector<CbmL1TrackMatch> MCtoRParticleId; // array for match
-  vector<CbmL1TrackMatch> RtoMCParticleId; 
+  vector<KFMCParticle> vMCParticles;  // MC particles
+  vector<KFMatchParticles> MCtoRParticleId; // array for match
+  vector<KFMatchParticles> RtoMCParticleId; 
   
   TDirectory *histodir;
    
   static CbmL1 *fInstance;
 
  private:
-  void CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part); // recursive func, used in FindReconstructableMCParticles
+  void CheckMCParticleIsReconstructable(KFMCParticle &part); // recursive func, used in FindReconstructableMCParticles
 
   int fFindParticlesMode;
 

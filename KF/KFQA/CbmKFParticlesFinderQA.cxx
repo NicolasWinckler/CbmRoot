@@ -17,11 +17,13 @@
 #include "CbmKFParticlesFinder.h"
 
 #include "CbmKF.h"
-#include "CbmKFParticle.h"
+/*#include "CbmKFParticle.h"*/
 #include "CbmKFVertex.h"
 
 #include "KFParticle.h"
 #include "KFParticleSIMD.h"
+
+#include "KFParticleMatch.h"
 
 #include "CbmStsHit.h"
 #include "CbmStsTrack.h"
@@ -45,6 +47,8 @@
 #include "CbmL1PFFitter.h"
 #include "L1Field.h"
 
+#include "FairRunAna.h"
+
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -66,7 +70,6 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   vMCParticles(),
   MCtoRParticleId(),
   RtoMCParticleId(),
-  vIsBkgWithSamePDG(),
   flistStsPts(0),
   flistMvdPts(0),
   flistMCTracks(0),
@@ -78,6 +81,11 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   flistStsClusters(0),
   flistStsDigi(0),
   fPrimVtx(0),
+  fRecParticles(0),
+  fMCParticles(0),
+  fMatchParticles(0),
+  fSaveParticles(0),
+  fSaveMCParticles(0),
   outfileName("CbmParticlesFinderQA.root"),
   fEfffileName("Efficiency.txt"),
   histodir(0),
@@ -331,6 +339,13 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
 
 CbmKFParticlesFinderQA::~CbmKFParticlesFinderQA()
 {
+  if(fSaveParticles)
+    fRecParticles->Delete();
+  if(fSaveMCParticles)
+  {
+    fMCParticles->Delete();
+    fMatchParticles->Delete();
+  }
 }
 
 InitStatus CbmKFParticlesFinderQA::ReInit()
@@ -364,11 +379,37 @@ InitStatus CbmKFParticlesFinderQA::Init()
     flistMvdHitMatches = dynamic_cast<TClonesArray*>(  fManger->GetObject("MvdHitMatch") );
   }
 
+  if(fSaveParticles)
+  {
+    // create and register TClonesArray with output reco particles
+    fRecParticles = new TClonesArray("KFParticle",100);
+    fManger->Register("RecoParticles", "KFParticle", fRecParticles, kTRUE);
+  }
+
+  if(fSaveMCParticles)
+  {
+    // create and register TClonesArray with output MC particles
+    fMCParticles = new TClonesArray("KFMCParticle",100);
+    fManger->Register("KFMCParticles", "KFParticle", fMCParticles, kTRUE);
+
+    // create and register TClonesArray with matching between reco and MC particles
+    fMatchParticles = new TClonesArray("KFParticleMatch",100);
+    fManger->Register("KFParticleMatch", "KFParticle", fMatchParticles, kTRUE);
+  }
+
   return kSUCCESS;
 }
 
 void CbmKFParticlesFinderQA::Exec(Option_t * option)
 {
+  if(fSaveParticles)
+    fRecParticles->Delete();
+  if(fSaveMCParticles)
+  {
+    fMCParticles->Delete();
+    fMatchParticles->Delete();
+  }
+
   vStsHitMatch.clear();
   vStsPointMatch.clear();
   vMvdPointMatch.clear();
@@ -437,6 +478,50 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
   MatchParticles();
   PartEffPerformance();
   PartHistoPerformance();
+
+  // save particles to file
+  if(fSaveParticles)
+  {
+    for(unsigned int iP=0; iP < fPF->GetParticles().size(); iP++)
+    {
+      new((*fRecParticles)[iP]) KFParticle(fPF->GetParticles()[iP]);
+    }
+  }
+
+  if(fSaveMCParticles)
+  {
+    for(unsigned int iP=0; iP < fPF->GetParticles().size(); iP++)
+    {
+      new((*fMatchParticles)[iP]) KFParticleMatch();
+      KFParticleMatch *p = (KFParticleMatch*)( fMatchParticles->At(iP) );
+
+      Short_t matchType = 0;
+      int iMCPart = -1;
+      if(!RtoMCParticleId[iP].IsMatchedWithPdg()) //background
+      {
+        if(RtoMCParticleId[iP].IsMatched())
+        {
+          iMCPart = RtoMCParticleId[iP].GetBestMatchWithPdg();
+          matchType = 1;
+        }
+      }
+      else
+      {
+        iMCPart = RtoMCParticleId[iP].GetBestMatchWithPdg();
+        matchType = 2;
+      }
+
+      p->SetMatch(iMCPart);
+      p->SetMatchType(matchType);
+    }
+
+    for(unsigned int iP=0; iP < vMCParticles.size(); iP++)
+    {
+      new((*fMCParticles)[iP]) KFMCParticle(vMCParticles[iP]);
+//       KFMCParticle *p = (KFMCParticle*)( fMCParticles->At(iP) );
+//       *p = vMCParticles[iP];
+    }
+  }
 }
 
 void CbmKFParticlesFinderQA::Finish()
@@ -557,7 +642,7 @@ void CbmKFParticlesFinderQA::GetMCParticles()
   for(int i=0; i < flistMCTracks->GetEntriesFast(); i++)
   {
     CbmMCTrack &mtra = *(static_cast<CbmMCTrack*>(flistMCTracks->At(i)));
-    CbmL1PFMCParticle part;
+    KFMCParticle part;
     part.SetMCTrackID( i );
     part.SetMotherId ( mtra.GetMotherId() );
     part.SetPDG      ( mtra.GetPdgCode() );
@@ -566,9 +651,9 @@ void CbmKFParticlesFinderQA::GetMCParticles()
     // find relations
   const unsigned int nMCParticles = vMCParticles.size();
   for ( unsigned int iP = 0; iP < nMCParticles; iP++ ) {
-    CbmL1PFMCParticle &part = vMCParticles[iP];
+    KFMCParticle &part = vMCParticles[iP];
     for(unsigned int iP2 = 0; iP2 < nMCParticles; iP2++) {
-      CbmL1PFMCParticle &part2 = vMCParticles[iP2];
+      KFMCParticle &part2 = vMCParticles[iP2];
 
       if(part.GetMotherId() == part2.GetMCTrackID()) {
         part2.AddDaughter(iP);
@@ -582,12 +667,12 @@ void CbmKFParticlesFinderQA::FindReconstructableMCParticles()
   const unsigned int nMCParticles = vMCParticles.size();
 
   for ( unsigned int iP = 0; iP < nMCParticles; iP++ ) {
-    CbmL1PFMCParticle &part = vMCParticles[iP];
+    KFMCParticle &part = vMCParticles[iP];
     CheckMCParticleIsReconstructable(part);
   }
 }
 
-void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
+void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(KFMCParticle &part)
 {
   if ( part.IsReconstructable() ) return;
 
@@ -661,7 +746,7 @@ void CbmKFParticlesFinderQA::CheckMCParticleIsReconstructable(CbmL1PFMCParticle 
     const unsigned int nD = dIds.size();
     bool reco = 1;
     for ( unsigned int iD = 0; iD < nD && reco; iD++ ) {
-      CbmL1PFMCParticle &dp = vMCParticles[dIds[iD]];
+      KFMCParticle &dp = vMCParticles[dIds[iD]];
       CheckMCParticleIsReconstructable(dp);
       reco &= dp.IsReconstructable();
     }
@@ -693,7 +778,7 @@ void CbmKFParticlesFinderQA::MatchParticles()
     const int mcTrackId = StsTrackMatch->GetMCTrackId();
 
     for ( unsigned int iMP = 0; iMP < vMCParticles.size(); iMP++ ) {
-      CbmL1PFMCParticle &mPart = vMCParticles[iMP];
+      KFMCParticle &mPart = vMCParticles[iMP];
       if ( mPart.GetMCTrackID() == mcTrackId ) { // match is found
         if( mPart.GetPDG() == rPart.GetPDG() ) {
           MCtoRParticleId[iMP].ids.push_back(iRP);
@@ -730,7 +815,7 @@ void CbmKFParticlesFinderQA::MatchParticles()
       if( vMCParticles[mdId].GetMotherId() != mmId ) break;
     }
     if ( iD == NRDaughters && mmId != -1 ) { // match is found and it is not primary vertex
-      CbmL1PFMCParticle &mmPart = vMCParticles[mmId];
+      KFMCParticle &mmPart = vMCParticles[mmId];
       if( mmPart.GetPDG()     == rPart.GetPDG()     &&
           mmPart.NDaughters() == rPart.NDaughters() ) {
         MCtoRParticleId[mmId].ids.push_back(iRP);
@@ -766,7 +851,7 @@ void CbmKFParticlesFinderQA::PartEffPerformance()
     
   const int NMP = vMCParticles.size();
   for ( int iP = 0; iP < NMP; ++iP ) {
-    const CbmL1PFMCParticle &part = vMCParticles[iP];
+    const KFMCParticle &part = vMCParticles[iP];
     if ( !part.IsReconstructable() ) continue;
     const int pdg = part.GetPDG();
     const int mId = part.GetMotherId();
@@ -939,7 +1024,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     hPartParam2DSignal[iParticle][0]->Fill(Rapidity,Pt,1);
 
     int iMCPart = RtoMCParticleId[iP].GetBestMatchWithPdg();
-    CbmL1PFMCParticle &mcPart = vMCParticles[iMCPart];
+    KFMCParticle &mcPart = vMCParticles[iMCPart];
     // Fit quality of the mother particle
     {
       int iMCTrack = mcPart.GetMCTrackID();

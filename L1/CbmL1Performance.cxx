@@ -420,7 +420,7 @@ void CbmL1::GetMCParticles()
   for(int i=0; i < listMCTracks->GetEntriesFast(); i++)
   {
     CbmMCTrack &mtra = *(L1_DYNAMIC_CAST<CbmMCTrack*>(listMCTracks->At(i)));
-    CbmL1PFMCParticle part;
+    KFMCParticle part;
     part.SetMCTrackID( i );
     part.SetMotherId ( mtra.GetMotherId() );
     part.SetPDG      ( mtra.GetPdgCode() );
@@ -430,9 +430,9 @@ void CbmL1::GetMCParticles()
     // find relations
   const unsigned int nParticles = vMCParticles.size();
   for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
-    CbmL1PFMCParticle &part = vMCParticles[iP];
+    KFMCParticle &part = vMCParticles[iP];
     for(unsigned int iP2 = 0; iP2 < nParticles; iP2++) {
-      CbmL1PFMCParticle &part2 = vMCParticles[iP2];
+      KFMCParticle &part2 = vMCParticles[iP2];
       
       if(part.GetMotherId() == part2.GetMCTrackID()) {
         part2.AddDaughter(iP);
@@ -441,9 +441,9 @@ void CbmL1::GetMCParticles()
   }
   //   // correct idices according to the new array
   // for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
-  //   CbmL1PFMCParticle &part = vMCParticles[iP];
+  //   KFMCParticle &part = vMCParticles[iP];
   //   for(unsigned int iP2 = 0; iP2 < nParticles; iP2++) {
-  //     CbmL1PFMCParticle &part2 = vMCParticles[iP2];
+  //     KFMCParticle &part2 = vMCParticles[iP2];
       
   //     if(part.GetMotherId() == part2.GetMCTrackID()) {
   //       part.SetMotherId (iP2);
@@ -457,12 +457,12 @@ void CbmL1::FindReconstructableMCParticles()
   const unsigned int nParticles = vMCParticles.size();
 
   for ( unsigned int iP = 0; iP < nParticles; iP++ ) {
-    CbmL1PFMCParticle &part = vMCParticles[iP];
+    KFMCParticle &part = vMCParticles[iP];
     CheckMCParticleIsReconstructable(part);
   }
 }
 
-void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
+void CbmL1::CheckMCParticleIsReconstructable(KFMCParticle &part)
 {
 
   if ( part.IsReconstructable() ) return;
@@ -552,7 +552,7 @@ void CbmL1::CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part)
     const unsigned int nD = dIds.size();
     bool reco = 1;
     for ( unsigned int iD = 0; iD < nD && reco; iD++ ) {
-      CbmL1PFMCParticle &dp = vMCParticles[dIds[iD]];
+      KFMCParticle &dp = vMCParticles[dIds[iD]];
       CheckMCParticleIsReconstructable(dp);
       reco &= dp.IsReconstructable();
     }
@@ -584,7 +584,7 @@ void CbmL1::MatchParticles()
     const int mcTrackId = vRTracks[rTrackId].GetMCTrack()->ID;
 
     for ( unsigned int iMP = 0; iMP < vMCParticles.size(); iMP++ ) {
-      CbmL1PFMCParticle &mPart = vMCParticles[iMP];
+      KFMCParticle &mPart = vMCParticles[iMP];
       if ( mPart.GetMCTrackID() == mcTrackId ) { // match is found
         if( mPart.GetPDG() == rPart.GetPDG() ) {
           MCtoRParticleId[iMP].ids.push_back(iRP);
@@ -620,7 +620,7 @@ void CbmL1::MatchParticles()
       if( vMCParticles[mdId].GetMotherId() != mmId ) break;
     }
     if ( iD == NRDaughters && mmId != -1 ) { // match is found and it is not primary vertex
-      CbmL1PFMCParticle &mmPart = vMCParticles[mmId];
+      KFMCParticle &mmPart = vMCParticles[mmId];
       if( mmPart.GetPDG()     == rPart.GetPDG()     &&
           mmPart.NDaughters() == rPart.NDaughters() ) {
         MCtoRParticleId[mmId].ids.push_back(iRP);
@@ -659,7 +659,7 @@ void CbmL1::PartEffPerformance()
     
   const int NMP = vMCParticles.size();
   for ( int iP = 0; iP < NMP; ++iP ) {
-    const CbmL1PFMCParticle &part = vMCParticles[iP];
+    const KFMCParticle &part = vMCParticles[iP];
     if ( !part.IsReconstructable() ) continue;
     const int pdg = part.GetPDG();
     const int mId = part.GetMotherId();
@@ -908,7 +908,7 @@ void CbmL1::PartHistoPerformance()
     hPartParamSignal[iParticle][4]->Fill(prob);
 
     int iMCPart = RtoMCParticleId[iP].GetBestMatchWithPdg();
-    CbmL1PFMCParticle &mcPart = vMCParticles[iMCPart];
+    KFMCParticle &mcPart = vMCParticles[iMCPart];
     // Fit quality of the mother particle
     {
       int iMCTrack = mcPart.GetMCTrackID();

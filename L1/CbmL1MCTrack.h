@@ -17,7 +17,6 @@
 #ifndef CbmL1MCTrack_H
 #define CbmL1MCTrack_H
 
-#include "CbmL1.h"
 #include "TVector3.h"
 #include "TLorentzVector.h"
 #include "CbmL1MCPoint.h"

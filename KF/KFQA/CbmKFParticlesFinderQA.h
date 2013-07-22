@@ -17,7 +17,8 @@
 #ifndef _CbmKFParticlesFinderQA_h_
 #define _CbmKFParticlesFinderQA_h_
 
-#include "CbmL1PFMCParticle.h"
+#include "KFMCParticle.h"
+#include "KFParticleMatch.h"
 #include "CbmKFPartEfficiencies.h"
 #include "CbmKFTrErrMCPoints.h"
 #include "FairTask.h"
@@ -44,6 +45,9 @@ class CbmKFParticlesFinderQA :public FairTask
   void SetOutFile(TString outname) {outfileName = outname;}
   void SetEffFileName(TString effname) {fEfffileName = effname;}
 
+  void SaveParticles(Bool_t b) { fSaveParticles = 1; }
+  void SaveMCParticles(Bool_t b) { fSaveMCParticles = 1; }
+
   virtual InitStatus ReInit();
   virtual InitStatus Init();
   void Exec(Option_t * option);
@@ -56,7 +60,7 @@ class CbmKFParticlesFinderQA :public FairTask
   void WriteHistosCurFile( TObject *obj );
   void GetMCParticles();
   void FindReconstructableMCParticles();
-  void CheckMCParticleIsReconstructable(CbmL1PFMCParticle &part);
+  void CheckMCParticleIsReconstructable(KFMCParticle &part);
   void MatchParticles();
   void PartEffPerformance();
   void PartHistoPerformance();
@@ -70,9 +74,9 @@ class CbmKFParticlesFinderQA :public FairTask
   CbmKFParticlesFinder *fPF;
 
   vector<CbmKFTrErrMCPoints> fMCTrackPoints;
-  vector<CbmL1PFMCParticle> vMCParticles;  // MC particles
-  vector<CbmL1TrackMatch> MCtoRParticleId; // array for match
-  vector<CbmL1TrackMatch> RtoMCParticleId;
+  vector<KFMCParticle> vMCParticles;  // MC particles
+  vector<KFMatchParticles> MCtoRParticleId; // array for match
+  vector<KFMatchParticles> RtoMCParticleId;
   vector<bool> vIsBkgWithSamePDG;
 // Arrays of points, tracks, etc
 
@@ -87,6 +91,14 @@ class CbmKFParticlesFinderQA :public FairTask
   TClonesArray* flistStsClusters;
   TClonesArray* flistStsDigi;
   CbmVertex*    fPrimVtx;
+
+// output arrays of particles
+  TClonesArray* fRecParticles;    // output array of KF Particles
+  TClonesArray* fMCParticles;     // output array of MC Particles
+  TClonesArray* fMatchParticles;  // output array of match objects
+
+  Bool_t fSaveParticles;
+  Bool_t fSaveMCParticles;
 
 // Names of files
   TString outfileName;

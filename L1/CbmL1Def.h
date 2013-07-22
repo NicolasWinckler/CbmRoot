@@ -7,6 +7,8 @@
 
 #ifdef HAVE_SSE
   #include "vectors/P4_F32vec4.h"
+//  #include "vectors/P4_F64vec2.h"
+
 #else
   #include "vectors/PSEUDO_F32vec4.h"
   #error NoSseFound

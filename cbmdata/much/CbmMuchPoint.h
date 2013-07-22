@@ -71,9 +71,9 @@ class CbmMuchPoint : public FairMCPoint
   Double_t GetPxOut()       const { return fPx_out; }
   Double_t GetPyOut()       const { return fPy_out; }
   Double_t GetPzOut()       const { return fPz_out; }
-  void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
-  void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
-  void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
+  void PositionIn(TVector3& pos)  const { pos.SetXYZ(fX, fY, fZ); }
+  void PositionOut(TVector3& pos) const { pos.SetXYZ(fX_out,fY_out,fZ_out); }
+  void MomentumOut(TVector3& mom) const { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
 
   /** Point coordinates at given z from linear extrapolation **/
   Double_t GetX(Double_t z) const;

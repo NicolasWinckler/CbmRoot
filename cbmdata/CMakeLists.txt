@@ -59,6 +59,7 @@ much/CbmMuchDigi.cxx
 much/CbmMuchDigiMatch.cxx
 much/CbmMuchTrack.cxx 
 much/CbmMuchStrawHit.cxx
+much/CbmMuchDigiLight.cxx
 
 trd/CbmTrdHit.cxx		 
 trd/CbmTrdTrack.cxx		 

@@ -49,13 +49,13 @@ void run_much6abs_sim(TString inputSignal = "",
   // use shield_standard.geo or shield_compact.geo, respective to the
   // MUCH geometry. Otherwise, define an empty string.
 
-  TString pipeGeom   = "pipe_much.geo";
+  TString pipeGeom   = "pipe/pipe_much.geo";
   TString shieldGeom = "../macro/trd/geometry/much/shield_standard_trd_v13h.geo";
 
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "passive/magnet_v12b.root";
+  TString targetGeom = "target/target_au_250mu.geo";
+  TString magnetGeom = "magnet/magnet_v12b.geo.root";
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString muchGeom   = "../macro/trd/geometry/much/much_v13c.geo";
   TString trdGeom    = "trd/trd_v13m.geo.root";

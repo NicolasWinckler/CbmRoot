@@ -54,8 +54,8 @@ void run_much2abs_sim(TString inputSignal = "",
 
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "passive/magnet_v12b.root";
+  TString targetGeom = "target/target_au_250mu.geo";
+  TString magnetGeom = "magnet/magnet_v12b.geo.root";
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString muchGeom   = "../macro/trd/geometry/much/much_v13a.geo";
   TString trdGeom    = "trd/trd_v13l.geo.root";

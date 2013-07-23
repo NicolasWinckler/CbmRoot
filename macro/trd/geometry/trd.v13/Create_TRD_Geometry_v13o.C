@@ -131,8 +131,8 @@ const Int_t   LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 //Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13j trd100_rich             ( 3 layers, z = 4100 )
 //Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13k trd100_rich             ( 4 layers, z = 4100 )
 //Double_t LayerPosition[MaxLayers] = { 430. }; // start position - 2013-06-25 - DE - ---  trd100_much_2_absorbers ( 4 layers, z = 4300 )
-//Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13l trd100_much_3_absorbers ( 4 layers, z = 4600 )
-Double_t LayerPosition[MaxLayers] = { 550. }; // start position - 2013-06-25 - DE - v13m trd300_much_6_absorbers (10 layers, z = 5500 )
+Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13l trd100_much_3_absorbers ( 4 layers, z = 4600 )
+//Double_t LayerPosition[MaxLayers] = { 550. }; // start position - 2013-06-25 - DE - v13m trd300_much_6_absorbers (10 layers, z = 5500 )
 //Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13n trd300_rich_streched    (10 layers, z = 4600 )
 
 

@@ -108,7 +108,7 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
     }
 
     case kMUCH: {
-      CbmMuchDigiLight* digi = static_cast<CbmMuchDigiLight*>(data);
+      CbmMuchDigi* digi = static_cast<CbmMuchDigi*>(data);
       fMuchData.push_back(*digi);
     }
     break;

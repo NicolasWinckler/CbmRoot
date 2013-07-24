@@ -5,7 +5,7 @@
 
 #include "CbmDaqQa.h"
 #include "CbmTimeSlice.h"
-#include "CbmMuchDigiLight.h"
+#include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -54,11 +54,11 @@ void CbmDaqQa::Exec(Option_t* opt) {
   printf("   number of STS points = %i\n",fTimeSlice->GetDataSize(kSTS));
   printf("   number of MUCH points = %i\n",fTimeSlice->GetDataSize(kMUCH));
   for (Int_t iDigi=0;iDigi<fTimeSlice->GetDataSize(kSTS);iDigi++){
-    CbmMuchDigiLight* digi = (CbmMuchDigiLight*) fTimeSlice->GetData(kSTS,iDigi);
+    CbmMuchDigi* digi = (CbmMuchDigi*) fTimeSlice->GetData(kSTS,iDigi);
     fTimeSTS->Fill(digi->GetTime());
   }
   for (Int_t iDigi=0;iDigi<fTimeSlice->GetDataSize(kMUCH);iDigi++){
-    CbmMuchDigiLight* digi = (CbmMuchDigiLight*) fTimeSlice->GetData(kMUCH,iDigi);
+    CbmMuchDigi* digi = (CbmMuchDigi*) fTimeSlice->GetData(kMUCH,iDigi);
     fTimeMUCH->Fill(digi->GetTime());
     fTimeOverThreshold->Fill(digi->GetAdc());
     CbmMuchDigiMatch* match = digi->GetMatch();
@@ -92,7 +92,7 @@ void CbmDaqQa::Exec(Option_t* opt) {
     for (Int_t iDigi=0;iDigi<cluster->GetNDigis();iDigi++){
       Int_t iDigiIndex = cluster->GetDigiIndex(iDigi);
 //    for (Int_t iDigi=0;iDigi<fTimeSlice->GetDataSize(kMUCH);iDigi++){
-      CbmMuchDigiLight* digi = (CbmMuchDigiLight*) fTimeSlice->GetData(kMUCH,iDigiIndex);
+      CbmMuchDigi* digi = (CbmMuchDigi*) fTimeSlice->GetData(kMUCH,iDigiIndex);
       Double_t t = digi->GetTime();
       CbmMuchDigiMatch* match = digi->GetMatch();
       for (Int_t el=0;el<match->GetNoPrimaryElectrons();el++){

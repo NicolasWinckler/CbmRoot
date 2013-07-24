@@ -68,22 +68,22 @@ CbmMuchPadRadial* CbmMuchModuleGemRadial::GetPad(Double_t x, Double_t y){
 // -------------------------------------------------------------------------
 Bool_t CbmMuchModuleGemRadial::InitModule(){
   for (Int_t s=0;s<GetNSectors();s++){
-    CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) GetSector(s);
+    CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) GetSectorByIndex(s);
     if (!sector) continue;
     fSectorRadii.push_back(sector->GetR1());
     sector->AddPads();
   }
   vector<CbmMuchPad*> neighbours;
   for (Int_t s=0;s<GetNSectors();s++){
-    CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) GetSector(s);
+    CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) GetSectorByIndex(s);
     if (!sector) continue;
     for (Int_t p=0;p<sector->GetNChannels();p++){
       CbmMuchPadRadial* pad = (CbmMuchPadRadial*) sector->GetPadByChannelIndex(p);
       if (!pad) continue;
       if (p>0)                        neighbours.push_back(sector->GetPadByChannelIndex(p-1));
       if (p<sector->GetNChannels()-1) neighbours.push_back(sector->GetPadByChannelIndex(p+1));
-      CbmMuchSectorRadial* sec1 = s>0 ?               (CbmMuchSectorRadial*) GetSector(s-1) : 0;
-      CbmMuchSectorRadial* sec2 = s<GetNSectors()-1 ? (CbmMuchSectorRadial*) GetSector(s+1) : 0;
+      CbmMuchSectorRadial* sec1 = s>0 ?               (CbmMuchSectorRadial*) GetSectorByIndex(s-1) : 0;
+      CbmMuchSectorRadial* sec2 = s<GetNSectors()-1 ? (CbmMuchSectorRadial*) GetSectorByIndex(s+1) : 0;
       Double_t phi1 = pad->GetPhi1()-0.001;
       Double_t phi2 = pad->GetPhi2()+0.001;
       if (sec1) {
@@ -104,6 +104,7 @@ Bool_t CbmMuchModuleGemRadial::InitModule(){
       neighbours.clear();
     }
   }
+  gLogger->Debug(MESSAGE_ORIGIN,"Init module successful");
   return kTRUE;
 }
 // -------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 #include "CbmMuchPadRectangular.h"
 #include "CbmMuchSectorRadial.h"
 #include "CbmMuchSectorRectangular.h"
-#include "CbmMuchDigiLight.h"
+#include "CbmMuchDigi.h"
 
 // Includes from base
 #include "FairRootManager.h"
@@ -108,7 +108,6 @@ InitStatus CbmMuchDigitizeGem::Init() {
   file->Delete();
   gFile=oldfile;
   fGeoScheme->Init(stations);
-
   // Determine drift volume width
   Double_t driftVolumeWidth = 0.4; // cm - default
   for (Int_t i=0;i<fGeoScheme->GetNStations();i++){
@@ -193,6 +192,13 @@ void CbmMuchDigitizeGem::Exec(Option_t* opt) {
 
   // revert branch to "current event"
   FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetEntry(currentEvent);
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+void CbmMuchDigitizeGem::Finish(){
+  if (fDaq) Exec("");
 }
 // -------------------------------------------------------------------------
 
@@ -427,15 +433,13 @@ void CbmMuchDigitizeGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint,
   CbmMuchDigi* digi = pad->GetDigi();
   
   if (match->GetNPoints()==0) {
-    digi->SetTime(time+driftTime);
-    digi->SetDeadTime(fDeadTime);
+    digi->SetTime(time);
+    match->SetDeadTime(fDeadTime);
   }
-  if (time>digi->GetTime()+digi->GetDeadTime()) {
-    // TODO rewrite "release" condition
+  if (time>digi->GetTime()+match->GetDeadTime()) {
     AddDigi(pad);
-    //digi->SetTime(time+driftTime);
-    digi->SetDeadTime(fDeadTime);
-//    printf("%f\n",time+driftTime);
+    digi->SetTime(time);
+    match->SetDeadTime(fDeadTime);
   }
   match->AddCharge(iPoint,charge,time+driftTime,fgDeltaResponse,time);
 }
@@ -461,16 +465,18 @@ Bool_t CbmMuchDigitizeGem::AddDigi(CbmMuchPad* pad) {
   
   Int_t adc = 0;
   Double_t nBinsInNs = 1;
-  if (fTOT) adc = Int_t(dt/nBinsInNs);        // if time over threshold
+  if (fTOT) adc = Int_t(dt/nBinsInNs);             // if time over threshold
   else      adc = max_charge*fNADCChannels/fQMax;  // if max amplitude
   // if overflow
   if (adc >= (1<<12)) adc = (1<<12) - 1;
 
-  digi->SetADCCharge(adc);
+  digi->SetAdc(adc);
   digi->SetTime(t1);
+  gLogger->Debug1(MESSAGE_ORIGIN,"Pad: sector=%i channel=%i",pad->GetSectorIndex(),pad->GetChannelIndex());
+  gLogger->Debug1(MESSAGE_ORIGIN,"New digi: sector=%i channel=%i",CbmMuchAddress::GetSectorIndex(digi->GetAddress()),CbmMuchAddress::GetChannelIndex(digi->GetAddress()));
   
   if (fDaq){
-    CbmMuchDigiLight* digLight = new CbmMuchDigiLight(digi,new CbmMuchDigiMatch(match));
+    CbmMuchDigi* digLight = new CbmMuchDigi(digi,match);
     CbmDaqBuffer::Instance()->InsertData(digLight);
   } else {
     new ((*fDigis)[fDigis->GetEntriesFast()]) CbmMuchDigi(digi);
@@ -481,6 +487,7 @@ Bool_t CbmMuchDigitizeGem::AddDigi(CbmMuchPad* pad) {
   return kTRUE;
 }
 // -------------------------------------------------------------------------
+
 
 ClassImp(CbmMuchDigitizeGem)
 

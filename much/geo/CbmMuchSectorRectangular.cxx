@@ -20,9 +20,9 @@ CbmMuchSectorRectangular::CbmMuchSectorRectangular()
 
 
 // -----  Standard constructor  --------------------------------------------
-CbmMuchSectorRectangular::CbmMuchSectorRectangular(Int_t detId, Int_t secId, 
+CbmMuchSectorRectangular::CbmMuchSectorRectangular(UInt_t modAddress, UInt_t index, 
     TVector3 pos, TVector3 size, Int_t padNx, Int_t padNy)
-  : CbmMuchSector(detId,secId,padNx*padNy),
+  : CbmMuchSector(modAddress,index,padNx*padNy),
     TPave(pos[0]-size[0]/2,pos[1]-size[1]/2,pos[0]+size[0]/2,pos[1]+size[1]/2,1),
     fPosition(pos),
     fSize(size),
@@ -50,10 +50,10 @@ void CbmMuchSectorRectangular::AddPads(){
   for(Int_t ix = 0; ix < fPadNx; ix++){
     for(Int_t iy = 0; iy < fPadNy; iy++){
       Int_t channelIndex = fPadNy*ix+iy;
-      Long64_t channelId = CbmMuchModuleGem::GetChannelId(fSectorId,channelIndex);
+      UInt_t address = CbmMuchAddress::SetElementId(fAddress,kMuchChannel,channelIndex);
       Double_t x0 = GetXmin()+(ix+0.5)*fPadDx;
       Double_t y0 = GetYmin()+(iy+0.5)*fPadDy;
-      CbmMuchPadRectangular* pad = new CbmMuchPadRectangular(fDetectorId,channelId,x0,y0,fPadDx,fPadDy);
+      CbmMuchPadRectangular* pad = new CbmMuchPadRectangular(address,x0,y0,fPadDx,fPadDy);
       fPads.push_back(pad);
     }
   }

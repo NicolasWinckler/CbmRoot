@@ -13,7 +13,7 @@
 #define CBMMUCHPAD_H 1
 
 #include "TArrayL64.h"
-
+#include "CbmMuchAddress.h"
 class CbmMuchSector;
 class CbmMuchDigi;
 class CbmMuchDigiMatch;
@@ -25,27 +25,30 @@ class CbmMuchPad {
 
 public:
   CbmMuchPad();
-  CbmMuchPad(Int_t detId, Long64_t channelId, Double_t x, Double_t y, Double_t dx, Double_t dy);
+  CbmMuchPad(Int_t address, Double_t x, Double_t y, Double_t dx, Double_t dy);
   virtual ~CbmMuchPad(){};
-  Int_t    GetDetectorId()     const { return fDetectorId; }
-  Long64_t GetChannelId()      const { return fChannelId; }
-  Int_t    GetSectorIndex()    const { return CbmMuchModuleGem::GetSectorIndex(fChannelId); }
-  Int_t    GetChannelIndex()   const { return CbmMuchModuleGem::GetChannelIndex(fChannelId); }
+  Int_t    GetAddress()        const { return fAddress; }
   Double_t GetX()              const { return fX; }
   Double_t GetY()              const { return fY; }
   Double_t GetDx()             const { return fDx; }
   Double_t GetDy()             const { return fDy; }
   Double_t GetDxy()            const { return 0.; }
   Int_t GetDigiIndex()         const { return fDigiIndex; }
-  CbmMuchDigi* GetDigi()       const { return fDigi; }
+  CbmMuchDigi* GetDigi()  const { return fDigi; }
   CbmMuchDigiMatch* GetMatch() const { return fMatch; }
   vector<CbmMuchPad*> GetNeighbours() const { return fNeighbours; }
   void SetNeighbours(vector<CbmMuchPad*> neighbours) { fNeighbours = neighbours; }
   void SetDigiIndex(Int_t iDigi)             { fDigiIndex = iDigi; }
   virtual void SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels=256){}
+
+  Int_t GetSectorIndex()  { return CbmMuchAddress::GetElementId(fAddress,kMuchSector);  }
+  Int_t GetChannelIndex() { return CbmMuchAddress::GetElementId(fAddress,kMuchChannel); }
+  
+  // specially for littrack
+  // TODO remove after littrack fix
+  Int_t GetChannelId() {return CbmMuchAddress::GetElementAddress(fAddress,kMuchChannel); }
 protected:
-  Int_t               fDetectorId; // Detector ID (including module number)
-  Long64_t            fChannelId;  // Channel ID within the module
+  Int_t               fAddress;    // Detector ID (including module number)
   Double_t            fX;          // X-coordinate of the pad center
   Double_t            fY;          // Y-coordinate of the pad center
   Double_t            fDx;         // X-pad width
@@ -53,7 +56,7 @@ protected:
   Int_t               fDigiIndex;  // Index of the corresponding CbmMuchDigi (if any)
   CbmMuchDigi*        fDigi;       //! pointer to current digi
   CbmMuchDigiMatch*   fMatch;      //! pointer to current digi match
-  vector<CbmMuchPad*> fNeighbours; //! Array of channel IDs of neighbour pads
+  vector<CbmMuchPad*> fNeighbours; //! Array of neighbour pads
 
  private:
   CbmMuchPad(const CbmMuchPad&);

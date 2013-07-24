@@ -24,7 +24,7 @@
 #include "TString.h"
 #include <map>
 #include <vector>
-#include "CbmMuchDigiLight.h"
+#include "CbmMuchDigi.h"
 using std::map;
 using std::pair;
 using std::vector;
@@ -72,7 +72,7 @@ class CbmMuchFindHitsGem: public FairTask {
     
     Bool_t fDaq;                            // To daq or not to daq // TODO
     CbmTimeSlice* fTimeSlice;               // Time slice object in the DAQ approach
-    vector<CbmMuchDigiLight> fDigiData;     // Vector of digis
+    vector<CbmMuchDigi> fDigiData;          // Vector of digis
     CbmMuchFindHitsGem(const CbmMuchFindHitsGem&);
     CbmMuchFindHitsGem operator=(const CbmMuchFindHitsGem&);
 

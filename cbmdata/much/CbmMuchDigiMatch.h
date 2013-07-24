@@ -97,7 +97,8 @@ class CbmMuchDigiMatch : public TObject
   Double_t GetMaxCharge();
   Double_t GetTimeStamp(Double_t threshold);
   Double_t GetTimeOverThreshold(Double_t threshold);
-  
+  Double_t GetDeadTime() const {return fDeadTime; }
+  Double_t SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; }
  private:
 
   TArrayI fRefIndex;                    // Array of MC point indices
@@ -108,6 +109,7 @@ class CbmMuchDigiMatch : public TObject
   TArrayD fTimePerPrimaryElectron;      // Array of arrival times per primary electron 
   TArrayD fSignalShape;                 // Array of time bins
   Double_t fT0;                         // Start time for the signal shape array
+  Double_t fDeadTime;                   // Deadtime
   ClassDef(CbmMuchDigiMatch,1);
 
 };

@@ -142,7 +142,7 @@ void CbmMuchClusterAnalysis::Exec(Option_t * option){
     CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(iCluster);
     Int_t iDigi = cluster->GetDigiIndex(0);
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-    Int_t iStation = CbmMuchGeoScheme::GetStationIndex(digi->GetDetectorId());
+    Int_t iStation = CbmMuchAddress::GetStationIndex(digi->GetDetectorId());
 
     if(IsSingleMuCluster(cluster)) nSingleMuClusters.at(iStation)++;
 
@@ -237,7 +237,7 @@ vector<Int_t> CbmMuchClusterAnalysis::GetNSignalMuons(){
   vector<Int_t> signalMuons(nStations, 0);
   for(Int_t iPoint = 0; iPoint < fPoints->GetEntriesFast(); +iPoint){
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
-    Int_t iStation = fGeoScheme->GetStationIndex(point->GetDetectorId());
+    Int_t iStation = CbmMuchAddress::GetStationIndex(point->GetDetectorId());
     Int_t trackId = point->GetTrackID();
     CbmMCTrack* track = (CbmMCTrack*)fMCTracks->At(trackId);
     Int_t pdgCode = track->GetPdgCode();

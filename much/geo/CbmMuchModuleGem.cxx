@@ -40,7 +40,7 @@ CbmMuchModuleGem::CbmMuchModuleGem(Int_t iStation, Int_t iLayer, Bool_t iSide,
 vector<CbmMuchPad*> CbmMuchModuleGem::GetPads() {
   vector<CbmMuchPad*> pads;
   for(Int_t iSector = 0; iSector < GetNSectors(); ++iSector){
-    CbmMuchSector* sector = GetSector(iSector);
+    CbmMuchSector* sector = GetSectorByIndex(iSector);
     if(!sector) continue;
     for(Int_t iPad=0; iPad<sector->GetNChannels(); ++iPad){
       CbmMuchPad* pad = sector->GetPadByChannelIndex(iPad);
@@ -53,20 +53,11 @@ vector<CbmMuchPad*> CbmMuchModuleGem::GetPads() {
 // -------------------------------------------------------------------------
 
 
-// -----   Public method GetPad  -------------------------------------------
-CbmMuchPad* CbmMuchModuleGem::GetPad(Long64_t channelId) {
-  CbmMuchSector* sector = GetSector(channelId);
-  Int_t iChannel = GetChannelIndex(channelId);
-  return sector ? sector->GetPadByChannelIndex(iChannel) : NULL;
-}
-// -------------------------------------------------------------------------
-
-
 // -----   Public method GetNPads ------------------------------------------
 Int_t CbmMuchModuleGem::GetNPads() {
   Int_t nChannels = 0;
   for(Int_t iSector=0; iSector < GetNSectors(); ++iSector){
-    CbmMuchSector* sector = GetSector(iSector);
+    CbmMuchSector* sector = GetSectorByIndex(iSector);
     if(!sector) continue;
     nChannels += sector->GetNChannels();
   }
@@ -76,9 +67,18 @@ Int_t CbmMuchModuleGem::GetNPads() {
 
 
 // -----   Public method GetSector   ---------------------------------------
-CbmMuchSector* CbmMuchModuleGem::GetSector(Long64_t channelId) {
-  Int_t iSector = GetSectorIndex(channelId);
+CbmMuchSector* CbmMuchModuleGem::GetSector(Int_t address) {
+  Int_t iSector = CbmMuchAddress::GetSectorIndex(address);
   return (CbmMuchSector*)fSectors[iSector];
+}
+// -------------------------------------------------------------------------
+
+
+// -----   Public method GetPad  -------------------------------------------
+CbmMuchPad* CbmMuchModuleGem::GetPad(Int_t address) {
+  CbmMuchSector* sector = GetSector(address);
+  Int_t iChannel = CbmMuchAddress::GetChannelIndex(address);
+  return sector ? sector->GetPadByChannelIndex(iChannel) : NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -106,9 +106,8 @@ void CbmMuchModuleGem::DrawPads() {
 // -------------------------------------------------------------------------
 
 
-void CbmMuchModuleGem::SetPadFired(Long64_t channelId,Int_t digiIndex,Int_t adcCharge){
-  CbmMuchSector* sector = GetSector(channelId);
-  CbmMuchPad* pad = sector->GetPadByChannelIndex(CbmMuchModuleGem::GetChannelIndex(channelId));
-  pad->SetFired(digiIndex,adcCharge);
+void CbmMuchModuleGem::SetPadFired(Int_t address,Int_t digiIndex,Int_t adcCharge){
+  CbmMuchPad* pad = GetPad(address);
+  if (pad) pad->SetFired(digiIndex,adcCharge);
 }
 ClassImp(CbmMuchModuleGem)

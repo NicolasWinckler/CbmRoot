@@ -78,15 +78,16 @@ class CbmMuchSegmentSector : public FairTask {
     /**
      * Performs segmentation of the given layer side.
      * @param layerSide layer side to segment
+     * @return number of segmented sectors
      */
-    void SegmentLayerSide(CbmMuchLayerSide* layerSide);
+    Int_t SegmentLayerSide(CbmMuchLayerSide* layerSide);
 
     /**
      * Performs segmentation of the given module.
      * @param module          Module to segment
      * @param useModuleDesign Whether module design is used
      */
-    void SegmentModule(CbmMuchModuleGemRadial* module, Bool_t useModuleDesign);
+    Int_t SegmentModule(CbmMuchModuleGemRadial* module, Bool_t useModuleDesign);
 
     /**
      * Performs segmentation of the given sector in the module.

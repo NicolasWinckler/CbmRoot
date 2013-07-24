@@ -30,6 +30,7 @@
 #include "FairGeoMedium.h"
 #include "TGeoBoolNode.h"
 
+#include "CbmMuchAddress.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
@@ -136,14 +137,14 @@ Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
     Int_t fDetectorId = GetDetId(vol);
     if (fVerboseLevel>2){
       printf(" TrackId: %i",fTrackID);
-      printf(" System: %i" , CbmMuchGeoScheme::GetSystemIndex(fDetectorId));
-      printf(" Station: %i", CbmMuchGeoScheme::GetStationIndex(fDetectorId));
-      printf(" Layer: %i"  , CbmMuchGeoScheme::GetLayerIndex(fDetectorId));
-      printf(" Side: %i"   , CbmMuchGeoScheme::GetLayerSideIndex(fDetectorId));
-      printf(" Module: %i" , CbmMuchGeoScheme::GetModuleIndex(fDetectorId));
+      printf(" System: %i" , CbmMuchAddress::GetSystemIndex(fDetectorId));
+      printf(" Station: %i", CbmMuchAddress::GetStationIndex(fDetectorId));
+      printf(" Layer: %i"  , CbmMuchAddress::GetLayerIndex(fDetectorId));
+      printf(" Side: %i"   , CbmMuchAddress::GetLayerSideIndex(fDetectorId));
+      printf(" Module: %i" , CbmMuchAddress::GetModuleIndex(fDetectorId));
       printf(" Vol %i \n",fVolumeID);
     }
-    Int_t iStation = CbmMuchGeoScheme::GetStationIndex(fDetectorId);
+    Int_t iStation = CbmMuchAddress::GetStationIndex(fDetectorId);
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     assert(iStation >=0 && iStation < fPar->GetNStations());
@@ -549,11 +550,11 @@ Int_t CbmMuch::GetDetId(FairVolume* vol) {
   Char_t cModuleNr[4] = {name[26],name[27],name[28],' '};
   Int_t  iModule      = atoi(cModuleNr)-1;
   if(iSide!=1 && iSide !=0) printf("side = %i", iSide);
-  Int_t detectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule);
-  assert(CbmMuchGeoScheme::GetStationIndex(detectorId) == iStation);
-  assert(CbmMuchGeoScheme::GetLayerIndex(detectorId) == iLayer);
-  assert(CbmMuchGeoScheme::GetLayerSideIndex(detectorId) == iSide);
-  assert(CbmMuchGeoScheme::GetModuleIndex(detectorId) == iModule);
+  Int_t detectorId = CbmMuchAddress::GetAddress(iStation,iLayer,iSide,iModule);
+  assert(CbmMuchAddress::GetStationIndex(detectorId) == iStation);
+  assert(CbmMuchAddress::GetLayerIndex(detectorId) == iLayer);
+  assert(CbmMuchAddress::GetLayerSideIndex(detectorId) == iSide);
+  assert(CbmMuchAddress::GetModuleIndex(detectorId) == iModule);
   assert(detectorId > 0);
   return detectorId;
 

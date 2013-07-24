@@ -14,7 +14,7 @@
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGemRadial.h"
 #include "CbmMuchSectorRadial.h"
-
+#include "CbmMuchAddress.h"
 #include "FairRuntimeDb.h"
 
 #include "TFile.h"
@@ -122,8 +122,8 @@ void CbmMuchSegmentSector::SegmentMuch(){
       CbmMuchLayer* layer = station->GetLayer(iLayer);
       if(!layer) Fatal("SegmentMuch", "Incomplete layers array.");
       // Segment layer sides
-      SegmentLayerSide(layer->GetSideF());
-      SegmentLayerSide(layer->GetSideB());
+      printf("Sectors=%i\n",SegmentLayerSide(layer->GetSideF()));
+      printf("Sectors=%i\n",SegmentLayerSide(layer->GetSideB()));
     }
     printf("Station %i segmented\n",iStation+1);
   }
@@ -141,26 +141,28 @@ void CbmMuchSegmentSector::SegmentMuch(){
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentLayerSide  --------------------------------
-void CbmMuchSegmentSector::SegmentLayerSide(CbmMuchLayerSide* layerSide){
+Int_t CbmMuchSegmentSector::SegmentLayerSide(CbmMuchLayerSide* layerSide){
   if(!layerSide) Fatal("SegmentLayerSide", "Incomplete layer sides array.");
   Int_t nModules = layerSide->GetNModules();
+  Int_t nSectors = 0;
   for(Int_t iModule = 0; iModule < nModules; iModule++){
     CbmMuchModule* module = layerSide->GetModule(iModule);
     if(module->GetDetectorType()!=3) continue;
     CbmMuchModuleGemRadial* mod = (CbmMuchModuleGemRadial*)module;
-    if(nModules > 1) SegmentModule(mod, true); // Module design
-    else SegmentModule(mod, false);            // Monolithic design
+    if(nModules > 1) nSectors+=SegmentModule(mod, true); // Module design
+    else nSectors+=SegmentModule(mod, false);            // Monolithic design
   }
+  return nSectors;
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentSector  -----------------------------------
-void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleGemRadial* module, Bool_t useModuleDesign){
+Int_t CbmMuchSegmentSector::SegmentModule(CbmMuchModuleGemRadial* module, Bool_t useModuleDesign){
   Int_t detectorId = module->GetDetectorId();
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
-  Int_t iModule  = CbmMuchGeoScheme::GetModuleIndex(detectorId);
-  Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(detectorId);
-  Int_t iSide    = CbmMuchGeoScheme::GetLayerSideIndex(detectorId);
+  Int_t iStation = CbmMuchAddress::GetStationIndex(detectorId);
+  Int_t iModule  = CbmMuchAddress::GetModuleIndex(detectorId);
+  Int_t iLayer   = CbmMuchAddress::GetLayerIndex(detectorId);
+  Int_t iSide    = CbmMuchAddress::GetLayerSideIndex(detectorId);
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
   Double_t rMin = station->GetRmin();
   Double_t rMax = station->GetRmax();
@@ -180,7 +182,7 @@ void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleGemRadial* module, Bool_t 
  
   Double_t r1 = rMin;
   Double_t r2 = rMin;
-//  printf("Debug: %i %i %i %i\n",iStation,iLayer,iSide,iModule);
+  printf("Debug: %i %i %i %i\n",iStation,iLayer,iSide,iModule);
   Int_t iSector=0;
   for (Int_t i=0;i<fNRegions[iStation];i++){
     Double_t angle = fAngles[iStation][i]*TMath::DegToRad();
@@ -194,6 +196,8 @@ void CbmMuchSegmentSector::SegmentModule(CbmMuchModuleGemRadial* module, Bool_t 
       iSector++;
     }
   }
+  printf("  Sectors = %i\n",iSector);
+  return iSector;
 }
 // -------------------------------------------------------------------------
 
@@ -279,15 +283,15 @@ void CbmMuchSegmentSector::DrawSegmentation(){
                     kGreen+4, kMagenta+4, kCyan+4, kRed+4, kBlue+4, kYellow+4, kTeal+4,
                     kPink+4, kAzure+4, kOrange+4, kViolet+4, kSpring+4};
   for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
-//  for (Int_t iStation=0;iStation<6;++iStation){
     fprintf(outfile, "===========================================================================\n");
     fprintf(outfile, "Station %i\n", iStation+1);
     fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");
     fprintf(outfile, "----------------------------------------------------------------------------\n");
     TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),1000,1000);
     c1->SetFillColor(0);
-//    c1->Range(-200,-200,200,200);
+    c1->Range(-200,-200,200,200);
     c1->Range(-270,-270,270,270);
+    c1->Range(-50,-50,50,50);
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
     for (Int_t iSide=1;iSide>=0;iSide--){
@@ -299,7 +303,7 @@ void CbmMuchSegmentSector::DrawSegmentation(){
         if(mod->GetDetectorType() != 3) continue;
         CbmMuchModuleGemRadial* module = (CbmMuchModuleGemRadial*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
-          CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSector(iSector);
+          CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSectorByIndex(iSector);
           sector->AddPads();
           sector->DrawPads();
         } // sectors

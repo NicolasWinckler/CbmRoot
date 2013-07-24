@@ -9,8 +9,7 @@
 
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
-#include "CbmMuchGeoScheme.h"
-
+#include "CbmMuchAddress.h"
 #include "TObjArray.h"
 
 
@@ -33,7 +32,7 @@ CbmMuchStation::CbmMuchStation()
 // -----   Standard constructor   ------------------------------------------
 CbmMuchStation::CbmMuchStation(Int_t iStation, Double_t z)
   : TObject(),
-    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation)),
+    fDetectorId(CbmMuchAddress::GetAddress(iStation)),
     fZ(z),
     fLayers(),
     fRmin(0.),

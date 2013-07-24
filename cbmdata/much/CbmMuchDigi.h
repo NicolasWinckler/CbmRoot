@@ -14,65 +14,52 @@
 #ifndef CBMMUCHDIGI_H
 #define CBMMUCHDIGI_H 1
 
-#include "TObject.h"
+#include "CbmDigi.h"
+#include "CbmDetectorList.h"
+#include "CbmMuchDigiMatch.h"
+#include "CbmMuchAddress.h"
 
-class CbmMuchDigi : public TObject
-{
-
+class CbmMuchDigi : public CbmDigi{
  public:
-
-  /** Default constructor **/
   CbmMuchDigi();
-
-  /** Constructor from station number, sector number,
-   ** front/back side and channel number
-   **@param detectorId   Unique detector ID (including module number)
-   **@param channelId    Unique channel ID within the module
-   **@param time         time since event start [ns]
-   **@param dTime        time resolution [ns]
-   **/
-  CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime, Double_t deadTime=0);
-
-  /** Constructor from a given digi object.
-   *@param digi  Digi object
-   **/
+  CbmMuchDigi(Int_t address, Int_t charge=0, Int_t time=0);
   CbmMuchDigi(CbmMuchDigi* digi);
-
-  /** Destructor **/
-  virtual ~CbmMuchDigi();
-
-
-  /** Accessors **/
-  Int_t GetDetectorId()  const  { return fDetectorId; }
-  Long64_t GetChannelId()   const  { return fChannelId; }
-  /** Gets time since event start [ns] **/
-  Double_t  GetTime() const {return fTime;}
-  /** Gets time resolution [ns] */
-  Double_t  GetDTime() const { return fDTime; }
-  /** Gets channel dead time [ns] */
-  Double_t GetDeadTime() const {return fDeadTime; }
-  /** Gets charge in ADC channels collected by the channel. **/
-  UInt_t GetADCCharge() const  {return fADCCharge; }
-  /** Sets charge in ADC channels collected by the channel. **/
-  void SetADCCharge(UInt_t adcCharge) { fADCCharge = adcCharge; }
-  /** Set time **/
-  void SetTime(Double_t time) {fTime = time;}
-  /** Set time uncertainty**/
-  void SetDTime(Double_t dtime) {fDTime = dtime;}
-  /** Set channel dead time**/
-  void SetDeadTime(Double_t time) {fDeadTime = time;}
-
- private:
-
-  Int_t    fDetectorId;      // Detector Id (including module number)
-  Long64_t fChannelId;       // Channel Id within the module
-  UInt_t   fADCCharge;       // Charge for the digi in ADC channels
-  Double_t fTime;            // Time since event start [ns]
-  Double_t fDTime;           // Time resolution [ns]
-  Double_t fDeadTime;        // Channel dead time
+  CbmMuchDigi(CbmMuchDigi* digi,CbmMuchDigiMatch* match);
   
-  ClassDef(CbmMuchDigi,2);
-
+  virtual ~CbmMuchDigi(){}
+  Int_t GetSystemId() const { return kMUCH; }
+  Int_t GetAddress()  const { return (fData >> fgkAddrShift) & fgkAddrMask; }
+  Int_t GetAdc()      const { return (fData >> fgkCharShift) & fgkCharMask; }
+  Double_t GetTime()  const { return (fData >> fgkTimeShift) & fgkTimeMask; }
+  
+  void AddAdc(Int_t adc);
+  void SetAdc(Int_t adc);
+  void SetTime(Int_t time);
+  
+  void SetMatch(CbmMuchDigiMatch* match) { fMatch = match; }
+  CbmMuchDigiMatch* GetMatch() const { return fMatch; }
+ 
+  // Specially for littrack
+  // TODO remove after littrack fix
+  Int_t GetDetectorId() const { return CbmMuchAddress::GetElementAddress(GetAddress(),kMuchModule); }
+  Int_t GetChannelId()  const { return GetAddress(); }
+  Int_t GetADCCharge()  const { return GetAdc(); }
+  Int_t GetDTime() const { return 0; }
+ 
+ private:
+  Long64_t fData;
+  CbmMuchDigiMatch* fMatch;  ///< matches to MC points (to be replaced with Fair links)
+  
+  static const Int_t fgkAddrBits;
+  static const Int_t fgkCharBits;
+  static const Int_t fgkTimeBits;
+  static const Int_t fgkAddrShift;
+  static const Int_t fgkCharShift;
+  static const Int_t fgkTimeShift;
+  static const Long64_t fgkAddrMask;
+  static const Long64_t fgkCharMask;
+  static const Long64_t fgkTimeMask;
+  
+  ClassDef(CbmMuchDigi,1);
 };
-
 #endif

@@ -9,8 +9,8 @@
 
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
-#include "CbmMuchGeoScheme.h"
 #include "CbmMuchModule.h"
+#include "CbmMuchAddress.h"
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchLayer::CbmMuchLayer() 
@@ -39,8 +39,8 @@ CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel)
     fSupportDz(0.),
     fZtoStationCenter(zRel)
 {
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detId);
-  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(detId);
+  Int_t iStation = CbmMuchAddress::GetStationIndex(detId);
+  Int_t iLayer = CbmMuchAddress::GetLayerIndex(detId);
   fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
   fSideB=CbmMuchLayerSide(iStation,iLayer,1,z);
 }
@@ -49,7 +49,7 @@ CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel)
 // -----   Standard constructor   ------------------------------------------
 CbmMuchLayer::CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z, Double_t zRel)  
   : TObject(),
-    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation, iLayer)),
+    fDetectorId(CbmMuchAddress::GetAddress(iStation, iLayer)),
     fZ(z),
     fSideF(),
     fSideB(),

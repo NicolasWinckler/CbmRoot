@@ -22,7 +22,7 @@ class CbmMuchPadRectangular;
 class CbmMuchSectorRectangular : public CbmMuchSector, public TPave{
 public:
   CbmMuchSectorRectangular();
-  CbmMuchSectorRectangular(Int_t detId, Int_t secId, TVector3 pos, TVector3 size, Int_t padNx, Int_t padNy);
+  CbmMuchSectorRectangular(UInt_t modAddress, UInt_t index, TVector3 pos, TVector3 size, Int_t padNx, Int_t padNy);
   virtual ~CbmMuchSectorRectangular(){};
 //  virtual void GetPadVertices(Int_t iChannel, Double_t* xPad, Double_t* yPad);
   TVector3 GetPosition() const { return fPosition; }

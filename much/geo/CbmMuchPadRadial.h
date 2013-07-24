@@ -23,7 +23,7 @@ public:
    */
   CbmMuchPadRadial (CbmMuchSectorRadial* sector, Int_t iChannel);
   
-  CbmMuchPadRadial(Int_t detId, Long64_t chanId, Double_t r1, Double_t r2, Double_t phi1, Double_t phi2);
+  CbmMuchPadRadial(Int_t address, Double_t r1, Double_t r2, Double_t phi1, Double_t phi2);
   
   ~CbmMuchPadRadial() {}
   Double_t GetPhi1() const { return fPhi1; }

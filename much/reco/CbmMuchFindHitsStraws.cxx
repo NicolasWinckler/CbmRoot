@@ -2,8 +2,9 @@
  **/
 
 #include "CbmMuchFindHitsStraws.h"
-#include "CbmMuchDigi.h"
+#include "CbmMuchStrawDigi.h"
 #include "CbmMuchDigiMatch.h"
+#include "CbmMuchAddress.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModule.h"
 #include "CbmMuchStation.h"
@@ -164,19 +165,16 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
   TVector3 pos, dpos;
   Double_t xyz[3] = {0}, array[5] = {0};
   for (Int_t idig = 0; idig < nDigis; ++idig) {
-    CbmMuchDigi *digi = (CbmMuchDigi*) fDigis->UncheckedAt(idig);
-    xyz[0] = digi->GetTime();
-    xyz[1] = digi->GetDTime();
-    UInt_t iz = digi->GetADCCharge();
-    xyz[2] = *((Float_t*) &iz);
-    //cout << xyz[0] << " " << xyz[1] << " " << xyz[2] << endl;
-
-    Int_t detId =  digi->GetDetectorId();
-    Int_t station3 = fGeoScheme->GetStationIndex(detId);
-    Int_t layer = fGeoScheme->GetLayerIndex(detId);
-    Int_t side = fGeoScheme->GetLayerSideIndex(detId);
+    CbmMuchStrawDigi *digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(idig);
+    xyz[0] = digi->GetX();
+    xyz[1] = digi->GetY();
+    xyz[2] = digi->GetZ();
+    UInt_t address =  CbmMuchAddress::GetElementAddress(digi->GetAddress(),kMuchModule);
+    Int_t station3 = CbmMuchAddress::GetStationIndex(address);
+    Int_t layer = CbmMuchAddress::GetLayerIndex(address);
+    Int_t side = CbmMuchAddress::GetLayerSideIndex(address);
     Int_t rot = layer % 3;
-    Double_t plocX = xyz[0] * TMath::Cos(phi[rot]) + xyz[1] * TMath::Sin(phi[rot]);
+    Double_t plocX =  xyz[0] * TMath::Cos(phi[rot]) + xyz[1] * TMath::Sin(phi[rot]);
     Double_t plocY = -xyz[0] * TMath::Sin(phi[rot]) + xyz[1] * TMath::Cos(phi[rot]);
 //    std::cout << "phi=" << phi[rot] << " x=" << xyz[0] << " y=" << xyz[1] << " z=" << xyz[2] << " plocX=" << plocX << " plocY=" << plocY << std::endl;
     Double_t xloc = plocX;
@@ -207,9 +205,9 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 
     //CbmMuchStrawHit(detectorId,u,phi,z,du,dphi,dz,refId,planeId);
     //cout << " Local: " << ploc.getX()+errU << " " << ploc.getY() << " " << ploc.getZ() << endl;
-    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(detId,
+    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(address,
 			   plocX + errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0,
-                           idig, fGeoScheme->GetLayerSideNr(detId));
+                           idig, fGeoScheme->GetLayerSideNr(address));
     hit->SetX(pos[0]);
     hit->SetY(pos[1]);
     hit->SetTube(itube);

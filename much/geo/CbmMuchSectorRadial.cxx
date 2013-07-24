@@ -70,14 +70,15 @@ CbmMuchPadRadial* CbmMuchSectorRadial::GetPadByPhi(Double_t phi) {
 // -------------------------------------------------------------------------
 void CbmMuchSectorRadial::AddPads(){
   for(Int_t iChannel = 0; iChannel < fNChannels; iChannel++){
-     Long64_t channelId = CbmMuchModuleGem::GetChannelId(fSectorId,iChannel);
+     UInt_t address = CbmMuchAddress::SetElementId(fAddress,kMuchChannel,iChannel);
      Double_t r1,r2,phi1,phi2;
      r1 = fR1;
      r2 = fR2;
      phi1 = fPhi1+iChannel*fPadDphi;
      phi2 = phi1+fPadDphi;
-     CbmMuchPad* pad = new CbmMuchPadRadial(fDetectorId,channelId,r1,r2,phi1,phi2);
+     CbmMuchPad* pad = new CbmMuchPadRadial(address,r1,r2,phi1,phi2);
      fPads.push_back(pad);
+     gLogger->Debug(MESSAGE_ORIGIN,"iChannel=%i fPads.size()=%i fNChannels=%i",iChannel,fPads.size(),fNChannels);
   }
 }
 // -------------------------------------------------------------------------

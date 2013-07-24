@@ -9,58 +9,95 @@
  **
  **
  **/
-
 #include "CbmMuchDigi.h"
+#include "CbmMuchAddress.h"
+#include "CbmMuchDigiMatch.h"
 
-// -----   Default constructor   -------------------------------------------
+// -------------------------------------------------------------------------
+const Int_t CbmMuchDigi::fgkCharBits = 12;
+const Int_t CbmMuchDigi::fgkTimeBits = 14;
+const Int_t CbmMuchDigi::fgkAddrBits = 32;
+// -------------------------------------------------------------------------
+
+// -----   Bit shift for charge and time stamp   ---------------------------
+const Int_t CbmMuchDigi::fgkAddrShift = 0;
+const Int_t CbmMuchDigi::fgkCharShift = CbmMuchDigi::fgkAddrShift + CbmMuchDigi::fgkAddrBits;
+const Int_t CbmMuchDigi::fgkTimeShift = CbmMuchDigi::fgkCharShift + CbmMuchDigi::fgkCharBits;
+// -------------------------------------------------------------------------
+
+// -----   Bit masks for charge and time stamp   ---------------------------
+const Long64_t CbmMuchDigi::fgkAddrMask = (1LL << CbmMuchDigi::fgkAddrBits) - 1;
+const Long64_t CbmMuchDigi::fgkCharMask = (1LL << CbmMuchDigi::fgkCharBits) - 1;
+const Long64_t CbmMuchDigi::fgkTimeMask = (1LL << CbmMuchDigi::fgkTimeBits) - 1;
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
 CbmMuchDigi::CbmMuchDigi() 
-  : TObject(),
-    fDetectorId(0),
-    fChannelId(0),
-    fADCCharge(0),
-    fTime(-1.),
-    fDTime(8e-2),
-    fDeadTime(-1.)
-{
-  /*
-  fDetectorId   =  0;
-  fChannelId = 0;
-  fTime = -1;
-  fDTime = 8e-2;
-  */
-}
-// -------------------------------------------------------------------------
-
-// -----   Standard constructor   ------------------------------------------
-CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime, Double_t deadTime) 
-  : TObject(),
-    fDetectorId(detectorId),
-    fChannelId(channelId),
-    fADCCharge(0),
-    fTime(time),
-    fDTime(dTime),
-    fDeadTime(deadTime)
+  : CbmDigi(),
+    fData(0),
+    fMatch(0)
 {
 }
 // -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
+
+// -------------------------------------------------------------------------
+CbmMuchDigi::CbmMuchDigi(Int_t address, Int_t charge, Int_t time)
+  : CbmDigi(),
+    fData(0),
+    fMatch(0)
+{
+  fData |= (address & fgkAddrMask) << fgkAddrShift;
+  fData |= (charge  & fgkCharMask) << fgkCharShift;
+  fData |= (time    & fgkTimeMask) << fgkTimeShift;
+}
+// -------------------------------------------------------------------------
+
 CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi)
-  : TObject(),
-    fDetectorId(digi->GetDetectorId()),
-    fChannelId(digi->GetChannelId()),
-    fADCCharge(digi->GetADCCharge()),
-    fTime(digi->GetTime()),
-    fDTime(digi->GetDTime()),
-    fDeadTime(digi->GetDeadTime())
-{
+  : CbmDigi(*digi),
+    fData(digi->fData),
+    fMatch(0)
+{ 
+}
+
+CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi,CbmMuchDigiMatch* match)
+  : CbmDigi(*digi),
+    fData(digi->fData),
+    fMatch(new CbmMuchDigiMatch(match))
+{  
+}
+
+
+
+// -----   Add charge   ----------------------------------------------------
+void CbmMuchDigi::AddAdc(Int_t adc) {
+  Int_t newAdc = GetAdc() + adc;
+  if (newAdc > fgkCharMask) newAdc = fgkCharMask;
+  SetAdc(newAdc);
 }
 // -------------------------------------------------------------------------
 
 
-// -----   Destructor   ----------------------------------------------------
-CbmMuchDigi::~CbmMuchDigi() { }
+// -----   Set new charge   ------------------------------------------------
+void CbmMuchDigi::SetAdc(Int_t adc) {
+  // reset to 0
+  fData &= ~(fgkCharMask << fgkCharShift);
+  // set new value
+  fData |=  (adc & fgkCharMask) << fgkCharShift;
+}
 // -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+void CbmMuchDigi::SetTime(Int_t time) { 
+  // reset to 0
+  fData &= ~(fgkTimeMask << fgkTimeShift);
+  // set new value
+  fData |= (time    & fgkTimeMask) << fgkTimeShift; 
+}
+// -------------------------------------------------------------------------
+
 
 
 ClassImp(CbmMuchDigi)

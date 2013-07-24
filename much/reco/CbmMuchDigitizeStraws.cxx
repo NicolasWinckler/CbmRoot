@@ -7,7 +7,7 @@
 #include "CbmMuchPoint.h"
 #include "CbmMuchModuleStraws.h"
 #include "TRandom.h"
-
+#include "CbmMuchStrawDigi.h"
 // Includes from base
 #include "FairRootManager.h"
 
@@ -190,7 +190,7 @@ InitStatus CbmMuchDigitizeStraws::Init() {
   // Get Digi array from memory
   fDigis = (TClonesArray*) ioman->GetObject("MuchStrawDigi");
   if (! fDigis) {
-    fDigis = new TClonesArray("CbmMuchDigi", 1000);
+    fDigis = new TClonesArray("CbmMuchStrawDigi", 1000);
     ioman->Register("MuchStrawDigi", "Digi in MUCH", fDigis, kTRUE);
   }
 
@@ -237,12 +237,9 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   //cout << "Digitizer: " << coord[0] << " " << coord[1] << " " << coord[2] << endl;
   Int_t iDigi = fDigis->GetEntriesFast();
   //cout << iDigi << endl; //AZ
-  CbmMuchDigi *digi = new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, 0, coord[0], coord[1]);
+  CbmMuchStrawDigi* digi  = new ((*fDigis)[iDigi]) CbmMuchStrawDigi(detectorId,coord[0],coord[1],coord[2],point->GetTime());
   CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
   match->AddPoint(iPoint);
-
-  UInt_t iz = *((UInt_t*) &coord[2]); // pass float through int 
-  digi->SetADCCharge(iz);
   return kTRUE;
 }
 // -------------------------------------------------------------------------

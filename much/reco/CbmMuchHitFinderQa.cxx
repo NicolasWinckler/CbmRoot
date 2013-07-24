@@ -10,6 +10,7 @@
 #include "CbmMuchCluster.h"
 #include "CbmMuchPixelHit.h"
 
+#include "CbmMuchAddress.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
@@ -286,7 +287,7 @@ InitStatus CbmMuchHitFinderQa::Init()
       vector<CbmMuchPad*> pads = module->GetPads();
       for (Int_t ip=0; ip<pads.size(); ip++) {
         CbmMuchPad* pad = pads[ip];
-        Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
+        Int_t stationId = CbmMuchAddress::GetStationIndex(pad->GetAddress());
         Double_t x0 = pad->GetX();
         Double_t y0 = pad->GetY();
         Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
@@ -401,9 +402,9 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
   return;
   for (int i=0;i<fPoints->GetEntriesFast();i++){
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(i);
-    Int_t stId = fGeoScheme->GetStationIndex(point->GetDetectorID());
+    Int_t stId = CbmMuchAddress::GetStationIndex(point->GetDetectorID());
     if (stId!=0) continue;
-    Int_t layerId = fGeoScheme->GetLayerIndex(point->GetDetectorID());
+    Int_t layerId = CbmMuchAddress::GetLayerIndex(point->GetDetectorID());
     if (layerId!=0) continue;
     printf("point %4i xin=%6.2f yin=%6.2f xout=%6.2f yout=%6.2f zin=%6.2f\n",i,point->GetXIn(),point->GetYIn(),point->GetXOut(),point->GetYOut(),point->GetZIn());
     fprintf (pointsFile, "%7.3f %7.3f %7.3f %7.3f\n",point->GetXIn(),point->GetYIn(),point->GetXOut(),point->GetYOut());
@@ -411,18 +412,17 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
 
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    Int_t detectorId = digi->GetDetectorId();
-    Int_t stId = fGeoScheme->GetStationIndex(detectorId);
+    UInt_t address = digi->GetAddress();
+    Int_t stId = CbmMuchAddress::GetStationIndex(address);
     if (stId!=0) continue;
-    Int_t layerId = fGeoScheme->GetLayerIndex(detectorId);
+    Int_t layerId = CbmMuchAddress::GetLayerIndex(address);
     if (layerId!=0) continue;
-    Long64_t channelId  = digi->GetChannelId();
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(address);
     if(!module) continue;
-    CbmMuchPad* pad = module->GetPad(digi->GetChannelId());
+    CbmMuchPad* pad = module->GetPad(address);
     Double_t x0 = pad->GetX();
     Double_t y0 = pad->GetY();
-    UInt_t charge = digi->GetADCCharge();
+    UInt_t charge = digi->GetAdc();
     printf("digi %4i x0=%5.1f y0=%5.1f charge=%3i\n",i,x0,y0,charge);
     fprintf(padsFile,"%5.1f %5.1f %3i\n",x0,y0,charge);
   }
@@ -846,7 +846,7 @@ void CbmMuchHitFinderQa::DigitizerQa(){
 
   for (Int_t i=0;i<fPoints->GetEntriesFast();i++){
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(i);
-    Int_t stId = fGeoScheme->GetStationIndex(point->GetDetectorID());
+    Int_t stId = CbmMuchAddress::GetStationIndex(point->GetDetectorID());
 
     // Check if the point corresponds to a certain  MC Track
     Int_t trackId = point->GetTrackID();
@@ -873,7 +873,7 @@ void CbmMuchHitFinderQa::DigitizerQa(){
        continue;
     }
 
-    if (fGeoScheme->GetLayerIndex(point->GetDetectorID())==0){
+    if (CbmMuchAddress::GetLayerIndex(point->GetDetectorID())==0){
       fNall[stId]++;
 
       if      (pdgCode==2212)                 fNpr[stId]++;
@@ -907,12 +907,12 @@ void CbmMuchHitFinderQa::DigitizerQa(){
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
     // Get pad area
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(digi->GetAddress());
     if(!module) continue;
     Double_t area=0;
     if (module->GetDetectorType()!=1 && module->GetDetectorType()!=3) continue;
     CbmMuchModuleGem* module1 = (CbmMuchModuleGem*) module;
-    CbmMuchPad* pad = module1->GetPad(digi->GetChannelId());
+    CbmMuchPad* pad = module1->GetPad(digi->GetAddress());
     area = pad->GetDx()*pad->GetDy();
     for (Int_t pt=0;pt<match->GetNPoints();pt++){
       Int_t pointId = match->GetRefIndex(pt);
@@ -969,18 +969,17 @@ void CbmMuchHitFinderQa::OccupancyQa(){
   // Filling occupancy plots
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    Int_t detectorId = digi->GetDetectorId();
-    Long64_t channelId  = digi->GetChannelId();
-    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
+    UInt_t address = digi->GetAddress();
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(address);
     if(!module) continue;
     Double_t r0=0;
     if (module->GetDetectorType()!=1 && module->GetDetectorType()!=3)  continue;
     CbmMuchModuleGem* module1 = (CbmMuchModuleGem*)module;
-    CbmMuchPad* pad = module1->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);
+    CbmMuchPad* pad = module1->GetPad(address);//fGeoScheme->GetPadByDetId(detectorId, channelId);
     Double_t x0 = pad->GetX();
     Double_t y0 = pad->GetY();
     r0 = TMath::Sqrt(x0*x0+y0*y0);
-    fhPadsFiredR[fGeoScheme->GetStationIndex(detectorId)]->Fill(r0);
+    fhPadsFiredR[CbmMuchAddress::GetStationIndex(address)]->Fill(r0);
   }
 }
 // -------------------------------------------------------------------------
@@ -1043,8 +1042,8 @@ void CbmMuchHitFinderQa::PullsQa(){
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
     CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(i);
     // Select hits from the first station only
-    Int_t iStation = CbmMuchGeoScheme::GetStationIndex(hit->GetAddress());
-    Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(hit->GetAddress());
+    Int_t iStation = CbmMuchAddress::GetStationIndex(hit->GetAddress());
+    Int_t iLayer   = CbmMuchAddress::GetLayerIndex(hit->GetAddress());
     if(!(iStation == 0)) continue;
 //    if(!(iStation == 3 && iLayer == 0)) continue;
     if (verbose) printf("   Hit %i, station %i, layer %i ",i,iStation, iLayer);
@@ -1086,9 +1085,9 @@ void CbmMuchHitFinderQa::PullsQa(){
       if (match->GetNPoints()>1) { point_unique=0; break; }
       Int_t currentPointId = match->GetRefIndex(0);
       CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+      CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetAddress());
       if(!module) continue;
-      CbmMuchPad* pad = module->GetPad(digi->GetChannelId());//fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
+      CbmMuchPad* pad = module->GetPad(digi->GetAddress());//fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
       Double_t x = pad->GetX();
       Double_t y = pad->GetY();
       Double_t dx = pad->GetDx();

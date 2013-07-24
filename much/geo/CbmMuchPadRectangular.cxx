@@ -17,9 +17,9 @@ CbmMuchPadRectangular::CbmMuchPadRectangular()
 // -------------------------------------------------------------------------
 
 // -----  Standard constructor  --------------------------------------------
-CbmMuchPadRectangular::CbmMuchPadRectangular(Int_t detId, Long64_t channelId, 
+CbmMuchPadRectangular::CbmMuchPadRectangular(Int_t address, 
     Double_t x, Double_t y, Double_t lx, Double_t ly)
-  :CbmMuchPad(detId,channelId,x,y,lx,ly),
+  :CbmMuchPad(address,x,y,lx,ly),
    TPave(x-lx/2,y-ly/2,x+lx/2,y+ly/2,1)
 {
   SetFillColor(kYellow);

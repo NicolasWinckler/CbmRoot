@@ -14,6 +14,7 @@
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGemRectangular.h"
 #include "CbmMuchSectorRectangular.h"
+#include "CbmMuchAddress.h"
 
 #include "FairRuntimeDb.h"
 
@@ -260,7 +261,7 @@ void CbmMuchSegmentManual::SegmentLayerSide(CbmMuchLayerSide* layerSide){
 // -----   Private method SegmentSector  -----------------------------------
 void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGemRectangular* module, Bool_t useModuleDesign){
   Int_t detectorId = module->GetDetectorId();
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
+  Int_t iStation = CbmMuchAddress::GetStationIndex(detectorId);
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
   Int_t iRegion = -1;
   Double_t secMaxLx = GetSectorMaxSize(module, "Width", iRegion);
@@ -353,7 +354,7 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGemRectangular* module, Cb
   TVector3 secSize = sector->GetSize();
   TVector3 secPosition = sector->GetPosition();
   Int_t detectorId = module->GetDetectorId();
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
+  Int_t iStation = CbmMuchAddress::GetStationIndex(detectorId);
   Int_t iSector = module->GetNSectors();
   Double_t secLx = secSize.X();
   Double_t secLy = secSize.Y();
@@ -481,7 +482,7 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSectorRectangular* sector, con
   Double_t secL = direction == "X" ? secLx : secLy;
   Bool_t isIncomplete = IsIncompleteSector(sector);
 
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(sector->GetAddress());
 
   // Get region index for the sector
   iRegion = GetRegionIndex(sector);
@@ -503,7 +504,7 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSectorRectangular* sector, con
 
 // -----   Private method GetRegionIndex  ----------------------------------
 Int_t CbmMuchSegmentManual::GetRegionIndex(CbmMuchSectorRectangular* sector){
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(sector->GetAddress());
   Double_t secLx = sector->GetSize()[0];
   Double_t secLy = sector->GetSize()[1];
   Double_t secArea = secLx*secLy;
@@ -532,7 +533,7 @@ Int_t CbmMuchSegmentManual::GetRegionIndex(CbmMuchSectorRectangular* sector){
 // -----   Private method GetSectorMaxSize  --------------------------------
 Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModuleGemRectangular* module,
     const TString side, Int_t &iRegion){
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(module->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(module->GetDetectorId());
   Int_t nRegions = fNRegions[iStation];
   for(iRegion = 0; iRegion < nRegions; ++iRegion){
     Double_t rad = fRadii[iStation].at(iRegion);
@@ -546,7 +547,7 @@ Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModuleGemRectangular* mod
 
 // -----   Private method GetPadMaxSize  -----------------------------------
 Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModuleGemRectangular* module, const TString side){
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(module->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(module->GetDetectorId());
   Int_t iRegion = -1;
   Double_t sectorSize = GetSectorMaxSize(module, side, iRegion);
   return side == "Width" ? sectorSize/fNCols[iStation].at(iRegion)
@@ -557,7 +558,7 @@ Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModuleGemRectangular* module
 // -----   Private method IsIncompleteSector  ------------------------------
 Bool_t CbmMuchSegmentManual::IsIncompleteSector(CbmMuchSectorRectangular* sector){
   Bool_t result = false;
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(sector->GetAddress());
   Double_t secLx = sector->GetSize()[0];
   Double_t secLy = sector->GetSize()[1];
   Double_t minL = TMath::Min(secLx, secLy);

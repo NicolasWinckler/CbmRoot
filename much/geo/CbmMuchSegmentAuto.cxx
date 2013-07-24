@@ -18,6 +18,7 @@
 #include "CbmMuchSectorRectangular.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchGeoScheme.h"
+#include "CbmMuchAddress.h"
 
 #include "TMath.h"
 #include "TClonesArray.h"
@@ -156,11 +157,11 @@ void CbmMuchSegmentAuto::Exec(Option_t * option){
   for(Int_t iPoint = 0; iPoint < fPoints->GetEntriesFast(); iPoint++){
     CbmMuchPoint* point = (CbmMuchPoint*)fPoints->At(iPoint);
     if(!point) continue;
-    Int_t iStation = CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID());
+    Int_t iStation = CbmMuchAddress::GetStationIndex(point->GetDetectorID());
     //        CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     //        if (station->GetDetectorType()==2) continue;
 
-    Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID());
+    Int_t iLayer = CbmMuchAddress::GetLayerIndex(point->GetDetectorID());
     //    printf("iStation = %i\n", iStation);
     //    printf("detId = %qd\n", point->GetDetectorID());
     //    printf("iPoint = %i\n", iPoint);
@@ -266,16 +267,12 @@ void CbmMuchSegmentAuto::SegmentModule(CbmMuchModuleGem* module){
   Int_t iRatio = (result) ? (Int_t)((modLx+1e-3)/modLy)
       : (Int_t)((modLy+1e-3)/modLx);
   Int_t detectorId = module->GetDetectorId();
-  //  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(moduleId);
-  //  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(moduleId);
-  //  Int_t iSide = CbmMuchGeoScheme::GetLayerSideIndex(moduleId);
-  //  Int_t iModule = CbmMuchGeoScheme::GetModuleIndex(moduleId);
   Double_t secLx = (result) ? modLx/iRatio : modLx;
   Double_t secLy = (result) ? modLy : modLy/iRatio;
   for(Int_t i = 0; i< iRatio; i++){
     Double_t secX = (result) ? modX - modLx/2. + (i+0.5)*secLx : modX;
     Double_t secY = (result) ? modY : modY - modLy/2. + (i+0.5)*secLy;
-    Int_t iSector = module->GetNSectors();//CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule, module->GetNSectors());
+    Int_t iSector = module->GetNSectors();
 
     TVector3 sectorPosition(secX, secY, modZ);
     TVector3 sectorSize(secLx, secLy, modLz);
@@ -290,10 +287,10 @@ void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSectorRe
   TVector3 secSize = sector->GetSize();
   TVector3 secPosition = sector->GetPosition();
   Int_t detectorId = module->GetDetectorId();
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
-  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(detectorId);
-  Int_t iSide = CbmMuchGeoScheme::GetLayerSideIndex(detectorId);
-  Int_t iModule = CbmMuchGeoScheme::GetModuleIndex(detectorId);
+  Int_t iStation = CbmMuchAddress::GetStationIndex(detectorId);
+  Int_t iLayer = CbmMuchAddress::GetLayerIndex(detectorId);
+  Int_t iSide = CbmMuchAddress::GetLayerSideIndex(detectorId);
+  Int_t iModule = CbmMuchAddress::GetModuleIndex(detectorId);
   Double_t secLx = secSize.X();
   Double_t secLy = secSize.Y();
   Double_t secLz = secSize.Z();
@@ -301,10 +298,10 @@ void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSectorRe
   Double_t secY  = secPosition.Y();
   Double_t secZ  = secPosition.Z();
 
-  assert(CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId()) == iStation);
-  assert(CbmMuchGeoScheme::GetLayerIndex(sector->GetDetectorId()) == iLayer);
-  assert(CbmMuchGeoScheme::GetLayerSideIndex(sector->GetDetectorId()) == iSide);
-  assert(CbmMuchGeoScheme::GetModuleIndex(sector->GetDetectorId()) == iModule);
+  assert(CbmMuchAddress::GetStationIndex(sector->GetAddress()) == iStation);
+  assert(CbmMuchAddress::GetLayerIndex(sector->GetAddress()) == iLayer);
+  assert(CbmMuchAddress::GetLayerSideIndex(sector->GetAddress()) == iSide);
+  assert(CbmMuchAddress::GetModuleIndex(sector->GetAddress()) == iModule);
 
   Bool_t result1 = ShouldSegmentByX(sector);
   Bool_t result2 = ShouldSegmentByY(sector);
@@ -374,7 +371,7 @@ Bool_t CbmMuchSegmentAuto::ShouldSegmentByX(CbmMuchSectorRectangular* sector){
   Double_t bR = (blR < brR) ? blR : brR;
   Double_t R  = (uR < bR) ? uR : bR;
 
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(sector->GetAddress());
   //CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
   // Check minimum and maximum allowed resolution
   Double_t sigmaMax = fSigmaXmax.at(iStation);//station->GetSigmaXmax(); //[cm]
@@ -410,7 +407,7 @@ Bool_t CbmMuchSegmentAuto::ShouldSegmentByY(CbmMuchSectorRectangular* sector){
   Double_t bR = (blR < brR) ? blR : brR;
   Double_t R  = (uR < bR) ? uR : bR;
 
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
+  Int_t iStation = CbmMuchAddress::GetStationIndex(sector->GetAddress());
   //CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
   // Check minimum and maximum allowed resolution
   Double_t sigmaMax = fSigmaYmax.at(iStation);//station->GetSigmaYmax(); //[cm]

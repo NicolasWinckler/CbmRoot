@@ -4,13 +4,14 @@
 // -------------------------------------------------------------------------
 #include "CbmMuchStrawHitFinderQa.h"
 #include "CbmMuchPoint.h"
-#include "CbmMuchDigi.h"
+#include "CbmMuchStrawDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
 #include "CbmMuchStrawHit.h"
 
 //#include "CbmRunAna.h"
 //#include "CbmRuntimeDb.h"
+#include "CbmMuchAddress.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchSector.h"
@@ -137,7 +138,7 @@ InitStatus CbmMuchStrawHitFinderQa::Init()
     fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i",i+1),100,0,1.2*rMax);
     Int_t nSectors = station->GetNSectors();
     for (Int_t j=0;j<nSectors;j++){
-      CbmMuchSector* sector = station->GetSector(j);
+      CbmMuchSector* sector = station->GetSectorByIndex(j);
       for (Int_t iPad=0;iPad<sector->GetNChannels();iPad++){
         CbmMuchPad* pad = sector->GetPad(iPad);
         Double_t x0 = pad->GetX0();
@@ -189,10 +190,10 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
   // Filling occupancy plots
   Int_t nDigis = fDigis->GetEntriesFast();
   for (Int_t i = 0; i < nDigis; ++i){
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(i);
-    Int_t detId =  digi->GetDetectorId();
-    Int_t station3 = fGeoScheme->GetStationIndex(detId);
-    Double_t x = digi->GetTime();
+    CbmMuchStrawDigi* digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(i);
+    Int_t detId =  digi->GetAddress();
+    Int_t station3 = CbmMuchAddress::GetStationIndex(detId);
+    Double_t x = digi->GetX();
     Double_t tubeNo = x / diam[station3];
     if (TMath::Abs(x) > fRadIn[station3]) {
       fhOccup[station3]->Fill(x,1);
@@ -207,13 +208,13 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
   Double_t xz[2] = {0};
   for (Int_t i = 0; i < nHits; ++i){
     CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fHits->UncheckedAt(i);
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
-    Int_t detId =  digi->GetDetectorId();
-    Int_t station3 = fGeoScheme->GetStationIndex(detId);
+    CbmMuchStrawDigi* digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(hit->GetRefId());
+    Int_t detId =  digi->GetAddress();
+    Int_t station3 = CbmMuchAddress::GetStationIndex(detId);
     fhMult[station3]->Fill(hit->GetFlag()>>1); // overlap multiplicity
     Double_t x = hit->GetX();
-    Int_t rot = fGeoScheme->GetLayerIndex(detId); // view
-    Int_t layer = fGeoScheme->GetLayerSideIndex(detId); // layer of the doublet
+    Int_t rot = CbmMuchAddress::GetLayerIndex(detId); // view
+    Int_t layer = CbmMuchAddress::GetLayerSideIndex(detId); // layer of the doublet
     if (rot == 0 && layer == 0) fhDx[station3]->Fill(hit->GetU()-x); // hit residual
     if (rot != 0 || layer != 0) continue;
     CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
@@ -226,12 +227,12 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
     for (Int_t j = 0; j < nHits; ++j){
       if (j == i) continue;
       CbmMuchStrawHit* hit1 = (CbmMuchStrawHit*) fHits->UncheckedAt(j);
-      CbmMuchDigi* digi1 = (CbmMuchDigi*) fDigis->UncheckedAt(hit1->GetRefId());
-      Int_t detId1 =  digi1->GetDetectorId();
-      Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
+      CbmMuchStrawDigi* digi1 = (CbmMuchStrawDigi*) fDigis->UncheckedAt(hit1->GetRefId());
+      Int_t detId1 =  digi1->GetAddress();
+      Int_t stat3 = CbmMuchAddress::GetStationIndex(detId1);
       if (stat3 != station3) continue;
-      Int_t rot1 = fGeoScheme->GetLayerIndex(detId1); // view
-      Int_t lay = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
+      Int_t rot1 = CbmMuchAddress::GetLayerIndex(detId1); // view
+      Int_t lay = CbmMuchAddress::GetLayerSideIndex(detId1); // layer of the doublet
       if (rot1 != 0 || lay == 0) continue;
       digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetRefId());
       p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex());
@@ -326,11 +327,11 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
     //CbmMuchHit* hit = (CbmMuchHit*) fHits->UncheckedAt(i);
     CbmMuchStrawHit* hit = tmp[i];
     if (!hit) continue;
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
-    Int_t detId =  digi->GetDetectorId();
-    Int_t station3 = fGeoScheme->GetStationIndex(detId);
-    Int_t rot = fGeoScheme->GetLayerIndex(detId); // view
-    Int_t layer = fGeoScheme->GetLayerSideIndex(detId); // layer of the doublet
+    CbmMuchStrawDigi* digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(hit->GetRefId());
+    Int_t detId =  digi->GetAddress();
+    Int_t station3 = CbmMuchAddress::GetStationIndex(detId);
+    Int_t rot = CbmMuchAddress::GetLayerIndex(detId); // view
+    Int_t layer = CbmMuchAddress::GetLayerSideIndex(detId); // layer of the doublet
     //fhMult[station3]->Fill(hit->GetFlag()>>1); // overlap multiplicity
     if (rot != 0 || layer != 0) continue;
     Int_t n2 = 0;
@@ -347,11 +348,11 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       //hit = (CbmMuchHit*) fHits->UncheckedAt(i1);
       hit = tmp[i1];
       if (!hit) continue;
-      digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
-      Int_t detId1 =  digi->GetDetectorId();
-      Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
-      Int_t rot1 = fGeoScheme->GetLayerIndex(detId1); // view
-      Int_t layer1 = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
+      digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(hit->GetRefId());
+      Int_t detId1 =  digi->GetAddress();
+      Int_t stat3 = CbmMuchAddress::GetStationIndex(detId1);
+      Int_t rot1 = CbmMuchAddress::GetLayerIndex(detId1); // view
+      Int_t layer1 = CbmMuchAddress::GetLayerSideIndex(detId1); // layer of the doublet
       //cout << stat3 << " " << hit->GetCluster() << endl;
       if (stat3 != station3) continue;
       if (rot1 != 0 || layer1 != 0) continue;
@@ -381,12 +382,12 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       CbmMuchStrawHit* hit1 = tmp[i1];
       if (!hit1) continue;
       if (hit1 == hits[0] || hit1 == hits[1]) continue;
-      CbmMuchDigi* digi1 = (CbmMuchDigi*) fDigis->UncheckedAt(hit1->GetRefId());
-      Int_t detId1 =  digi1->GetDetectorId();
-      Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
+      CbmMuchStrawDigi* digi1 = (CbmMuchStrawDigi*) fDigis->UncheckedAt(hit1->GetRefId());
+      Int_t detId1 =  digi1->GetAddress();
+      Int_t stat3 = CbmMuchAddress::GetStationIndex(detId1);
       if (stat3 != station3) continue;
-      Int_t rot1 = fGeoScheme->GetLayerIndex(detId1); // view
-      Int_t layer1 = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
+      Int_t rot1 = CbmMuchAddress::GetLayerIndex(detId1); // view
+      Int_t layer1 = CbmMuchAddress::GetLayerSideIndex(detId1); // layer of the doublet
       if (rot1 != 0 || layer1 == 0) continue;
       if (hit1->GetSegment() != hits[0]->GetSegment()) continue; // different segments
       digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetRefId());

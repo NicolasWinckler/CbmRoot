@@ -28,7 +28,7 @@ using std::vector;
 class CbmMuchPadRectangular : public CbmMuchPad, public TPave {
 public:
   CbmMuchPadRectangular();
-  CbmMuchPadRectangular(Int_t detId, Long64_t channelId, Double_t x0, Double_t y0, Double_t lx, Double_t ly);
+  CbmMuchPadRectangular(Int_t address, Double_t x0, Double_t y0, Double_t lx, Double_t ly);
   virtual ~CbmMuchPadRectangular(){};
   void DrawPad();
   void SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels=256);

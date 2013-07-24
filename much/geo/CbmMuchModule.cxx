@@ -11,6 +11,7 @@
 #include "CbmMuchSector.h"
 #include "CbmMuchPad.h"
 #include "CbmMuchGeoScheme.h"
+#include "CbmMuchAddress.h"
 
 #include "TMath.h"
 #include "TPolyLine.h"
@@ -47,7 +48,7 @@ CbmMuchModule::CbmMuchModule(Int_t iStation, Int_t iLayer, Bool_t iSide,
         Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius)
   : TPave(position[0] - size[0] / 2, position[1] - size[1] / 2, position[0]
 	  + size[0] / 2, position[1] + size[1] / 2, 1),
-    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide,iModule)),
+    fDetectorId(CbmMuchAddress::GetAddress(iStation,iLayer, iSide,iModule)),
     fDetectorType(-1),
     fCutRadius(cutRadius),
     fSize(size),

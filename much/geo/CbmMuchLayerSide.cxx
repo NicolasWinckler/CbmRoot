@@ -11,6 +11,7 @@
 #include "CbmMuchLayer.h"
 #include "CbmMuchModule.h"
 #include "CbmMuchSector.h"
+#include "CbmMuchAddress.h"
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchLayerSide::CbmMuchLayerSide() 
@@ -35,7 +36,7 @@ CbmMuchLayerSide::CbmMuchLayerSide(Int_t detId, Double_t z)
 // -----   Standard constructor   ------------------------------------------
 CbmMuchLayerSide::CbmMuchLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide, Double_t z) 
   : TObject(),
-    fDetectorId(CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide)),
+    fDetectorId(CbmMuchAddress::GetAddress(iStation, iLayer, iSide)),
     fZ(z),
     fModules()
 {

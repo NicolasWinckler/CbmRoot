@@ -5,11 +5,6 @@
  *@since   11.02.08
  *
  * This class holds geometry parameters of much modules
- *
- * The channel ID consists of:
- *   sector number  (0-2047),       bits 0-10
- *   channel number (0-1024),       bits 11-20
- *
  */
 
 #ifndef CBMMUCHMODULEGEM_H
@@ -26,14 +21,6 @@
 using std::vector;
 using std::multimap;
 using std::pair;
-
-// Length of the index of the corresponding volume
-#define WL_SECTOR 2147483647LL //2047
-#define WL_CHANNEL 1023LL
-
-// Number of a start bit for each volume
-#define SB_SECTOR 0LL
-#define SB_CHANNEL 32LL //11
 
 class CbmMuchSector;
 class CbmMuchPad;
@@ -53,45 +40,16 @@ class CbmMuchModuleGem : public CbmMuchModule{
    **/
   CbmMuchModuleGem(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius);
 
-  /** Destructor **/
+  /** Destructor */
   virtual ~CbmMuchModuleGem(){}
 
-  /**
-   * Gets sector index for the given channel Id.
-   * @param channelId   Channel Id.
-   * @return            Sector index within the module.
-   */
-  static Int_t GetSectorIndex(Long64_t channelId) {
-    return (channelId & (WL_SECTOR << SB_SECTOR)) >> SB_SECTOR;
-  }
-  
-  /**
-   * Gets channel index for the given channel Id.
-   * @param channelId   Channel Id.
-   * @return            Channel index within the sector.
-   */
-  static Int_t GetChannelIndex(Long64_t channelId) {
-    return (channelId & (WL_CHANNEL << SB_CHANNEL)) >> SB_CHANNEL;
-  }
-  
-  /**
-   * Gets channel Id by sector index and channel index.
-   * @param iSector    Sector index within the module.
-   * @param iChannel   Channel index within the sector.
-   * @return           Detector Id.
-   */
-  static Long64_t GetChannelId(Int_t iSector, Int_t iChannel) {
-    return ((Long64_t)iSector << SB_SECTOR) | ((Long64_t)iChannel << SB_CHANNEL);
-  }
+  /** Gets sector by the given address */
+  CbmMuchSector* GetSector(Int_t address);
 
-  /** Gets sector by the given channel Id. **/
-  CbmMuchSector* GetSector(Long64_t channelId);
+  /** Gets pad by the given address */
+  CbmMuchPad* GetPad(Int_t address);
   
   CbmMuchSector* GetSectorByIndex(Int_t iSector) { return fSectors[iSector]; }
-  
-  
-  /** Gets pad by the given Id. */
-  CbmMuchPad* GetPad(Long64_t channelId);
   
   /** */
   Int_t GetNSectors() const { return fSectors.size(); }
@@ -113,7 +71,7 @@ class CbmMuchModuleGem : public CbmMuchModule{
   void DrawModule(Color_t color);
   
   void DrawPads();
-  void SetPadFired(Long64_t channelId,Int_t digiIndex,Int_t adcCharge);
+  void SetPadFired(Int_t address,Int_t digiIndex,Int_t adcCharge);
   
  protected:
   vector<CbmMuchSector*> fSectors; // Array of sectors within this module

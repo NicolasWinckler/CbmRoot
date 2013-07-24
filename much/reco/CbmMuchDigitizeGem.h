@@ -64,6 +64,8 @@ class CbmMuchDigitizeGem : public FairTask{
     /** Execution. */
     virtual void Exec(Option_t* opt);
 
+    /** Execution. */
+    virtual void Finish();
     /**
      * Sets radius of a spot from secondary electrons.
      * @param spotRadius Spot radius [cm] (0.03 cm by default).

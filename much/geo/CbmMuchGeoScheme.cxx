@@ -3,6 +3,7 @@
 // -----                  Created 18/02/08  by E. Kryshen              -----
 // -------------------------------------------------------------------------
 #include "CbmMuchGeoScheme.h"
+#include "CbmMuchAddress.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
@@ -85,7 +86,7 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
     fStations = stations;
     fInitialized = kTRUE;
   }
-
+  gLogger->Debug(MESSAGE_ORIGIN,"CbmMuchGeoScheme init successful");
   InitModules();
 }
 // -------------------------------------------------------------------------
@@ -115,24 +116,24 @@ void CbmMuchGeoScheme::InitModules() {
     for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
       CbmMuchStation* station = GetStation(iStation);
       if (!station)  continue;
-      assert(iStation == GetStationIndex(station->GetDetectorId()));
+      assert(iStation == CbmMuchAddress::GetStationIndex(station->GetDetectorId()));
       vector<CbmMuchLayerSide*> sides;
       vector<CbmMuchModule*> modules;
       for (Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++) {
         CbmMuchLayer* layer = station->GetLayer(iLayer);
         if (!layer)  continue;
-        assert(iLayer == GetLayerIndex(layer->GetDetectorId()));
+        assert(iLayer == CbmMuchAddress::GetLayerIndex(layer->GetDetectorId()));
         for (Int_t iSide = 0; iSide < 2; iSide++) {
           CbmMuchLayerSide* side = (CbmMuchLayerSide*) layer->GetSide(iSide);
           if (!side) continue;
-          assert(iSide == GetLayerSideIndex(side->GetDetectorId()));
+          assert(iSide == CbmMuchAddress::GetLayerSideIndex(side->GetDetectorId()));
           if(side->GetNModules()!=0) fMapSides[side->GetDetectorId()] = incSides++;
           sides.push_back(side);
           for (Int_t iModule = 0; iModule < side->GetNModules(); iModule++) {
             CbmMuchModule* mod = side->GetModule(iModule);
             if (!mod) continue;
-            assert(iModule == GetModuleIndex(mod->GetDetectorId()));
-            assert(iStation == GetStationIndex(mod->GetDetectorId()));
+            assert(iModule == CbmMuchAddress::GetModuleIndex(mod->GetDetectorId()));
+            assert(iStation == CbmMuchAddress::GetStationIndex(mod->GetDetectorId()));
             if(!mod->InitModule()) continue;
             modules.push_back(mod);
           } // Modules
@@ -181,7 +182,7 @@ CbmMuchModule* CbmMuchGeoScheme::GetModule(Int_t iStation, Int_t iLayer,
 
 // -------------------------------------------------------------------------
 CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
-  Int_t iStation = GetStationIndex(detId);
+  Int_t iStation = CbmMuchAddress::GetStationIndex(detId);
   assert(iStation < GetNStations());
   return GetStation(iStation);
 }
@@ -190,7 +191,7 @@ CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
   CbmMuchStation* station = GetStationByDetId(detId);
-  Int_t iLayer = GetLayerIndex(detId);
+  Int_t iLayer = CbmMuchAddress::GetLayerIndex(detId);
   assert(iLayer < station->GetNLayers());
   return station ? station->GetLayer(iLayer) : NULL;
 }
@@ -199,7 +200,7 @@ CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
   CbmMuchLayer* layer = GetLayerByDetId(detId);
-  Int_t iSide = GetLayerSideIndex(detId);
+  Int_t iSide = CbmMuchAddress::GetLayerSideIndex(detId);
   assert(iSide < 2);
   return layer ? layer->GetSide(iSide) : NULL;
 }
@@ -208,7 +209,7 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) {
   CbmMuchLayerSide* side = GetLayerSideByDetId(detId);
-  Int_t iModule = GetModuleIndex(detId);
+  Int_t iModule = CbmMuchAddress::GetModuleIndex(detId);
   assert(iModule < side->GetNModules());
   return side ? side->GetModule(iModule) : NULL;
 }
@@ -795,7 +796,7 @@ vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
     for(vector<CbmMuchModule*>::iterator it=stationModules.begin(); it!=stationModules.end(); it++){
       CbmMuchModule* module = (*it);
       modules.push_back(module);
-      assert(GetStationIndex(module->GetDetectorId()) == iStation);
+      assert(CbmMuchAddress::GetStationIndex(module->GetDetectorId()) == iStation);
     }
   }
   return modules;
@@ -812,7 +813,7 @@ vector<CbmMuchModuleGem*> CbmMuchGeoScheme::GetGemModules(){
       CbmMuchModule* module = (*it);
       if (module->GetDetectorType()!=1 && module->GetDetectorType()!=3) continue;
       modules.push_back((CbmMuchModuleGem*)module);
-      assert(GetStationIndex(module->GetDetectorId()) == iStation);
+      assert(CbmMuchAddress::GetStationIndex(module->GetDetectorId()) == iStation);
     }
   }
   return modules;

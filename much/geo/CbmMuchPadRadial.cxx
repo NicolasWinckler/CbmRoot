@@ -21,8 +21,8 @@ CbmMuchPadRadial::CbmMuchPadRadial()
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchPadRadial::CbmMuchPadRadial(Int_t detId, Long64_t chanId, Double_t r1, Double_t r2, Double_t phi1, Double_t phi2)
-  : CbmMuchPad(detId,chanId,(r1+r2)/2.*cos((phi1+phi2)/2.),(r1+r2)/2.*sin((phi1+phi2)/2.),r2-r1,r2-r1),
+CbmMuchPadRadial::CbmMuchPadRadial(Int_t address, Double_t r1, Double_t r2, Double_t phi1, Double_t phi2)
+  : CbmMuchPad(address,(r1+r2)/2.*cos((phi1+phi2)/2.),(r1+r2)/2.*sin((phi1+phi2)/2.),r2-r1,r2-r1),
     TCrown(0,0,r1,r2,phi1*TMath::RadToDeg(),phi2*TMath::RadToDeg()),
     fPhi1(phi1),
     fPhi2(phi2)

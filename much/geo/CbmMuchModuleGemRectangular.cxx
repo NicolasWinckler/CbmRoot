@@ -135,7 +135,7 @@ Bool_t CbmMuchModuleGemRectangular::InitGrid(Bool_t useModuleDesign) {
       for (int iSector = 0; iSector < nSectors; iSector++) {
         CbmMuchSectorRectangular* sec = (CbmMuchSectorRectangular*) fSectors[iSector];
         if(sec->Inside(x, y)) {
-          fGrid[ix][iy] = sec->GetSectorId();
+          fGrid[ix][iy] = sec->GetSectorIndex();
           break;
         }
       }

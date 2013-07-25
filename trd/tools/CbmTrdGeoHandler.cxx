@@ -31,7 +31,13 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
     fVolumeShape(NULL),    
     fGlobal(),    
     fGlobalMatrix(NULL),
-    fModuleType(0)
+    fLayerId(0),
+    fModuleId(0),
+    fModuleType(0),
+    fRotation(0),
+    fStation(0),
+    fLayer(0),
+    fModuleCopy(0)
 {
 }
 

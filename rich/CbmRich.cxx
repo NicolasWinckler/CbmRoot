@@ -47,7 +47,9 @@ CbmRich::CbmRich() :
    fPosIndex(0),
 
    fRichCollection(NULL),
-   fRichRefPlaneCollection(NULL)
+   fRichRefPlaneCollection(NULL),
+   fRotation(),
+   fPositionRotation()
 {
    fRichCollection = new TClonesArray("CbmRichPoint");
    fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");

@@ -16,11 +16,21 @@
 #include "CbmMuchCluster.h"
 #include "TClonesArray.h"
 
-CbmDaqQa::CbmDaqQa(TChain* mcChain) : FairTask("DaqQa"),
-fMCChain(mcChain),
-fTimeSlice(NULL),
-fTimeSTS(NULL),
-fTimeMUCH(NULL)
+CbmDaqQa::CbmDaqQa(TChain* mcChain) 
+ : FairTask("DaqQa"),
+   fMCChain(mcChain),
+   fTimeSlice(NULL),
+   fTimeSTS(NULL),
+   fTimeMUCH(NULL),
+   fSignalShape(NULL),         
+   fTimeMUCHhits(NULL),        
+   fTimeOverThreshold(NULL),   
+   fChargeVsTOT(NULL),         
+   fTotChargeVsTOT(NULL),      
+   fTotChargeVsAMP(NULL),      
+   fTimeMUCHmc(NULL),          
+   fTimeDiff(NULL), 
+   fTimeDiff2(NULL)
 {
 }
 

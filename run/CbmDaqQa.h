@@ -38,6 +38,10 @@ class CbmDaqQa : public FairTask{
   TH1D*  fTimeMUCHmc;          //!
   TH1D*  fTimeDiff; //!
   TH2D*  fTimeDiff2; //!
+
+  CbmDaqQa(const CbmDaqQa&);
+  CbmDaqQa operator=(const CbmDaqQa&);
+  
   ClassDef (CbmDaqQa,1);
 };
 

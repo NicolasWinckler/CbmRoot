@@ -69,6 +69,34 @@ CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi,CbmMuchDigiMatch* match)
 }
 
 
+CbmMuchDigi::CbmMuchDigi(const CbmMuchDigi& rhs)
+ : CbmDigi(rhs),
+   fData(rhs.fData),
+   fMatch(NULL)
+{
+  if (NULL != rhs.fMatch) {
+     fMatch = new CbmMuchDigiMatch(*(rhs.fMatch));
+   }
+}
+
+CbmMuchDigi& CbmMuchDigi::operator=(const CbmMuchDigi& rhs)
+{
+
+  if (this != &rhs) {
+    CbmDigi::operator=(rhs);
+    fData = rhs.fData;
+    if (NULL != rhs.fMatch) {
+      std::auto_ptr<CbmMuchDigiMatch> tmp(new CbmMuchDigiMatch(*rhs.fMatch));
+      delete fMatch;
+      fMatch = tmp.release();
+    } else {
+      fMatch = NULL;
+    }
+
+  }
+  return *this;
+}
+
 
 // -----   Add charge   ----------------------------------------------------
 void CbmMuchDigi::AddAdc(Int_t adc) {

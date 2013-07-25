@@ -21,7 +21,8 @@ CbmTimeSlice::CbmTimeSlice()
  : TNamed(),
    fStartTime(0.), 
    fDuration(0.),
-   fStsData()
+   fStsData(),
+   fMuchData()
 {
 //  LOG(FATAL) << "Default constructor of CbmTimeSlice must not be used!";
 }
@@ -34,7 +35,8 @@ CbmTimeSlice::CbmTimeSlice(Double_t start, Double_t duration)
  : TNamed(),
    fStartTime(start), 
    fDuration(duration),
-   fStsData()
+   fStsData(),
+   fMuchData()
 {
 }
 // ---------------------------------------------------------------------------

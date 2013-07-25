@@ -25,6 +25,9 @@ class CbmMuchDigi : public CbmDigi{
   CbmMuchDigi(Int_t address, Int_t charge=0, Int_t time=0);
   CbmMuchDigi(CbmMuchDigi* digi);
   CbmMuchDigi(CbmMuchDigi* digi,CbmMuchDigiMatch* match);
+  CbmMuchDigi(const CbmMuchDigi&);
+  CbmMuchDigi& operator=(const CbmMuchDigi&);
+
   
   virtual ~CbmMuchDigi(){}
   Int_t GetSystemId() const { return kMUCH; }
@@ -59,7 +62,7 @@ class CbmMuchDigi : public CbmDigi{
   static const Long64_t fgkAddrMask;
   static const Long64_t fgkCharMask;
   static const Long64_t fgkTimeMask;
-  
+
   ClassDef(CbmMuchDigi,1);
 };
 #endif

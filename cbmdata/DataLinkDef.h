@@ -45,9 +45,10 @@
 #pragma link C++ class CbmMuchPoint+;
 #pragma link C++ class CbmMuchDigi+;
 #pragma link C++ class CbmMuchDigiMatch+;
-#pragma link C++ class CbmMuchDigiLight+;
 #pragma link C++ class CbmMuchTrack+;
 #pragma link C++ class CbmMuchStrawHit+;
+#pragma link C++ class CbmMuchStrawDigi+;
+#pragma link C++ class CbmMuchAddress+;
 
 #pragma link C++ class CbmTrdHit+;
 #pragma link C++ class CbmTrdPoint+;

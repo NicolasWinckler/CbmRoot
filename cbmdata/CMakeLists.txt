@@ -4,6 +4,7 @@
 
 set(INCLUDE_DIRECTORIES
 ${BASE_INCLUDE_DIRECTORIES} 
+${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata 
 )
 
@@ -59,7 +60,8 @@ much/CbmMuchDigi.cxx
 much/CbmMuchDigiMatch.cxx
 much/CbmMuchTrack.cxx 
 much/CbmMuchStrawHit.cxx
-much/CbmMuchDigiLight.cxx
+much/CbmMuchStrawDigi.cxx
+much/CbmMuchAddress.cxx
 
 trd/CbmTrdHit.cxx		 
 trd/CbmTrdTrack.cxx		 

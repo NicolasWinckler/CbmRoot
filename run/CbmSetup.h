@@ -26,16 +26,30 @@ class CbmSetup : public TObject
 
 
     /** Default constructor **/
-    CbmSetup() { };
+ CbmSetup() 
+   : TObject(), 
+    fGeoTags(), 
+    fActive(), 
+    fFieldTag(""), 
+    fFieldScale(1.0),
+    fFieldPosition(0., 0., 0.)
+    { };
 
 
     /** Constructor with pre-defined setup
      ** @param  setup   Name of setup
      **/
-    CbmSetup(const char* setup) {
+ CbmSetup(const char* setup) 
+   : TObject(), 
+    fGeoTags(), 
+    fActive(), 
+    fFieldTag(""), 
+    fFieldScale(1.0),
+    fFieldPosition(0., 0., 0.)
+    {
       ReadSetup(setup);
     };
-
+  
 
     /** Destructor **/
     ~CbmSetup() { };

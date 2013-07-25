@@ -20,6 +20,8 @@ CbmDaqQa::CbmDaqQa(TChain* mcChain)
  : FairTask("DaqQa"),
    fMCChain(mcChain),
    fTimeSlice(NULL),
+   fMuchHits(NULL),
+   fClusters(NULL),
    fTimeSTS(NULL),
    fTimeMUCH(NULL),
    fSignalShape(NULL),         

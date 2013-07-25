@@ -70,6 +70,7 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   vMCParticles(),
   MCtoRParticleId(),
   RtoMCParticleId(),
+  vIsBkgWithSamePDG(),
   flistStsPts(0),
   flistMvdPts(0),
   flistMCTracks(0),

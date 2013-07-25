@@ -36,7 +36,8 @@ CbmMuchDigiMatch::CbmMuchDigiMatch()
     fTimePerPrimaryElectron(0),
     fMCtimePerPrimaryElectron(0),
     fSignalShape(0),
-    fT0(0)
+    fT0(0),
+    fDeadTime(0.)
 {
 };
 // -------------------------------------------------------------------------
@@ -52,7 +53,9 @@ CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match)
     fTimePerPrimaryElectron(match->fTimePerPrimaryElectron),
     fMCtimePerPrimaryElectron(match->fMCtimePerPrimaryElectron),
     fSignalShape(match->fSignalShape),
-    fT0(match->fT0){
+    fT0(match->fT0),
+    fDeadTime(match->fDeadTime)
+{
 }
 // -------------------------------------------------------------------------
 

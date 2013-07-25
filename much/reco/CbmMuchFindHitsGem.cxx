@@ -35,7 +35,9 @@ CbmMuchFindHitsGem::CbmMuchFindHitsGem(const char* digiFileName)
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiIndices(),
     fFiredPads(),
-    fDaq()
+    fDaq(),
+    fTimeSlice(NULL),
+    fDigiData()
 {
 }
 

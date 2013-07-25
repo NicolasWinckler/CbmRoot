@@ -17,7 +17,10 @@
 #include "KFParticleMatch.h"
 
 
-KFParticleMatch::KFParticleMatch(): fMatch(-1)
+KFParticleMatch::KFParticleMatch()
+ : TObject(),
+   fMatch(-1),
+   fMatchType(-1)
 {
 }
 

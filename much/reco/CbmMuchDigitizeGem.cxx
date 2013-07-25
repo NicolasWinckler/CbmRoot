@@ -47,6 +47,7 @@ using std::map;
 // -------------------------------------------------------------------------
 CbmMuchDigitizeGem::CbmMuchDigitizeGem(const char* digiFileName) 
   : FairTask("MuchDigitizeGem",1),
+    fgDeltaResponse(),
     fAlgorithm(1),
     fGeoScheme(CbmMuchGeoScheme::Instance()),
     fDigiFile(digiFileName),

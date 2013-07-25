@@ -13,6 +13,8 @@
 #include "CbmMuchAddress.h"
 #include "CbmMuchDigiMatch.h"
 
+#include <memory>
+
 // -------------------------------------------------------------------------
 const Int_t CbmMuchDigi::fgkCharBits = 12;
 const Int_t CbmMuchDigi::fgkTimeBits = 14;

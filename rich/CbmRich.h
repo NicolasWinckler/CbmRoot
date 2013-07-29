@@ -172,8 +172,9 @@ private:
 
    Int_t fPosIndex;
 
-   TClonesArray* fRichCollection; // Hit collection (photodetector)
-   TClonesArray* fRichRefPlaneCollection; // Hit collection (reference plane)
+   TClonesArray* fRichPoints; // MC points onto the photodetector plane
+   TClonesArray* fRichRefPlanePoints; // points on the reference plane
+   TClonesArray* fRichMirrorPoints; // mirror points
 
    // GDML geometry
    static std::map<TString, Int_t> fFixedMats; // materials for the GDML geometry
@@ -182,7 +183,7 @@ private:
    TGeoCombiTrans* fPositionRotation;  // Full combined matrix for position and rotation of the RICH detector
 
    /**
-    * \brief Adds a RichPoint to the HitCollection.
+    * \brief Adds a RichPoint to the TClonesArray.
     */
    CbmRichPoint* AddHit(
          Int_t trackID,
@@ -194,7 +195,7 @@ private:
          Double_t eLoss);
 
    /**
-    * \brief Adds a RichRefPlanePoint to the HitCollection.
+    * \brief Adds a RichRefPlanePoint to the TClonesArray.
     */
    CbmRichPoint* AddRefPlaneHit(
          Int_t trackID,
@@ -204,6 +205,18 @@ private:
          Double_t time,
          Double_t length,
          Double_t eLoss);
+
+   /**
+    * \brief Adds a RichMirrorPoint to the TClonesArray.
+    */
+   CbmRichPoint* AddMirrorHit(
+            Int_t trackID,
+            Int_t detID,
+            TVector3 pos,
+            TVector3 mom,
+            Double_t time,
+            Double_t length,
+            Double_t eLoss);
 
    /**
     * \brief Copy constructor.

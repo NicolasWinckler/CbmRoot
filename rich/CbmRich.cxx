@@ -46,13 +46,15 @@ CbmRich::CbmRich() :
    FairDetector("RICH", kTRUE, kRICH),
    fPosIndex(0),
 
-   fRichCollection(NULL),
-   fRichRefPlaneCollection(NULL),
+   fRichPoints(NULL),
+   fRichRefPlanePoints(NULL),
+   fRichMirrorPoints(NULL),
    fRotation(),
    fPositionRotation()
 {
-   fRichCollection = new TClonesArray("CbmRichPoint");
-   fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");
+   fRichPoints = new TClonesArray("CbmRichPoint");
+   fRichRefPlanePoints = new TClonesArray("CbmRichPoint");
+   fRichMirrorPoints = new TClonesArray("CbmRichPoint");
    fPosIndex = 0;
 
    fVerboseLevel = 1;
@@ -69,8 +71,9 @@ CbmRich::CbmRich(
       Double_t rz):
    FairDetector(name, active, kRICH),
    fPosIndex(0),
-   fRichCollection(new TClonesArray("CbmRichPoint")),
-   fRichRefPlaneCollection(new TClonesArray("CbmRichPoint")),
+   fRichPoints(new TClonesArray("CbmRichPoint")),
+   fRichRefPlanePoints(new TClonesArray("CbmRichPoint")),
+   fRichMirrorPoints(new TClonesArray("CbmRichPoint")),
 
    fRotation(new TGeoRotation("", rx, ry, rz)),
    fPositionRotation(new TGeoCombiTrans(px, py, pz, fRotation))
@@ -80,13 +83,18 @@ CbmRich::CbmRich(
 
 CbmRich::~CbmRich()
 {
-   if (NULL != fRichCollection) {
-      fRichCollection->Delete();
-      delete fRichCollection;
+   if (NULL != fRichPoints) {
+      fRichPoints->Delete();
+      delete fRichPoints;
    }
-   if (NULL != fRichRefPlaneCollection) {
-      fRichRefPlaneCollection->Delete();
-      delete fRichRefPlaneCollection;
+   if (NULL != fRichRefPlanePoints) {
+      fRichRefPlanePoints->Delete();
+      delete fRichRefPlanePoints;
+   }
+
+   if (NULL != fRichMirrorPoints) {
+      fRichMirrorPoints->Delete();
+      delete fRichMirrorPoints;
    }
 }
 
@@ -182,6 +190,40 @@ Bool_t CbmRich::ProcessHits(
       }
    }
 
+   // Treat mirror points
+   if (volName.Contains("rich1mgl") || volName.Contains("rich1mglLU") || volName.Contains("rich1mglRU") ) {
+
+      // Collecting points of tracks and imaginary plane intersection
+      if (gMC->IsTrackEntering()) {
+         TParticle* part = gMC->GetStack()->GetCurrentTrack();
+         Double_t charge = part->GetPDG()->Charge() / 3.;
+         if (charge == 0.) {
+            return kFALSE; // no neutrals
+         } else {
+
+            Int_t trackID = gMC->GetStack()->GetCurrentTrackNumber();
+
+            Double_t time = gMC->TrackTime() * 1.0e09;
+            Double_t length = gMC->TrackLength();
+            Double_t eLoss = gMC->Edep();
+            TLorentzVector tPos, tMom;
+
+            gMC->TrackPosition(tPos);
+            gMC->TrackMomentum(tMom);
+
+            // check number of STS points
+            //UInt_t points = gMC->GetStack()->GetCurrentTrack()->GetMother(1);
+            //Int_t nStsPoints = (points & 15);
+
+            //if (nStsPoints > 0) { // store only particles with STSpoints (at least 1)
+               AddMirrorHit(trackID, iVol, TVector3(tPos.X(), tPos.Y(), tPos.Z()), TVector3(tMom.Px(), tMom.Py(), tMom.Pz()), time, length, eLoss);
+               return kTRUE;
+            //}
+         }
+      }
+   }
+
+
    return kFALSE;
 }
 
@@ -193,30 +235,33 @@ void CbmRich::EndOfEvent()
 
 void CbmRich::Register()
 {
-   FairRootManager::Instance()->Register("RichPoint","Rich", fRichCollection, kTRUE);
-   FairRootManager::Instance()->Register("RefPlanePoint","RichRefPlane", fRichRefPlaneCollection, kTRUE);
+   FairRootManager::Instance()->Register("RichPoint","Rich", fRichPoints, kTRUE);
+   FairRootManager::Instance()->Register("RefPlanePoint","RichRefPlane", fRichRefPlanePoints, kTRUE);
+   FairRootManager::Instance()->Register("RichMirrorPoint","RichMirror", fRichMirrorPoints, kFALSE);
 }
 
 TClonesArray* CbmRich::GetCollection(
       Int_t iColl) const
 {
-   if (iColl == 0) return fRichCollection;
-   if (iColl == 1) return fRichRefPlaneCollection;
+   if (iColl == 0) return fRichPoints;
+   if (iColl == 1) return fRichRefPlanePoints;
+   if (iColl == 2) return fRichMirrorPoints;
    return NULL;
 }
 
 void CbmRich::Print() const
 {
-   Int_t nHits = fRichCollection->GetEntriesFast();
+   Int_t nHits = fRichPoints->GetEntriesFast();
    cout << "-I- CbmRich: " << nHits << " points registered in this event." << endl;
 	
-   if (fVerboseLevel > 1) for (Int_t i=0; i<nHits; i++) (*fRichCollection)[i]->Print();
+   if (fVerboseLevel > 1) for (Int_t i=0; i<nHits; i++) (*fRichPoints)[i]->Print();
 }
 
 void CbmRich::Reset()
 {
-   fRichCollection->Delete();
-   fRichRefPlaneCollection->Delete();
+   fRichPoints->Delete();
+   fRichRefPlanePoints->Delete();
+   fRichMirrorPoints->Delete();
    fPosIndex = 0;
 }
 
@@ -403,7 +448,7 @@ CbmRichPoint* CbmRich::AddHit(
 	   Double_t length,
 	   Double_t eLoss)
 {
-   TClonesArray& clref = *fRichCollection;
+   TClonesArray& clref = *fRichPoints;
    Int_t size = clref.GetEntriesFast();
    return new(clref[size]) CbmRichPoint(trackID, detID, pos, mom, time,length, eLoss);
 }
@@ -417,7 +462,21 @@ CbmRichPoint* CbmRich::AddRefPlaneHit(
 		Double_t length,
 		Double_t eLoss)
 {
-   TClonesArray& clref = *fRichRefPlaneCollection;
+   TClonesArray& clref = *fRichRefPlanePoints;
+   Int_t tsize = clref.GetEntriesFast();
+   return new(clref[tsize]) CbmRichPoint(trackID, detID, pos, mom, time,length, eLoss);
+}
+
+CbmRichPoint* CbmRich::AddMirrorHit(
+         Int_t trackID,
+         Int_t detID,
+         TVector3 pos,
+         TVector3 mom,
+         Double_t time,
+         Double_t length,
+         Double_t eLoss)
+{
+   TClonesArray& clref = *fRichMirrorPoints;
    Int_t tsize = clref.GetEntriesFast();
    return new(clref[tsize]) CbmRichPoint(trackID, detID, pos, mom, time,length, eLoss);
 }

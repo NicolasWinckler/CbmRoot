@@ -207,7 +207,7 @@ void CbmMuchDigitizeGem::Finish(){
 // ------- Private method ExecAdvanced -------------------------------------
 Bool_t CbmMuchDigitizeGem::ExecPoint(const CbmMuchPoint* point) {
   // TODO workaround to extract point index - to be reconsidered
-  Int_t iPoint = point->GetLink(1).GetIndex();
+  Int_t iPoint = point->GetLink(0).GetIndex();
   TVector3 v1,v2,dv;
   point->PositionIn(v1);
   point->PositionOut(v2);

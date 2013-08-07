@@ -79,6 +79,11 @@ LitStatus CbmLitTrackFinderNN::DoFind(
       fHitData.Clear();
    }
 
+//   std::cout << "tracks.size()=" << tracks.size() << std::endl;
+//   for (Int_t i = 0; i < tracks.size(); i++) {
+//	   std::cout << i << " " << tracks[i]->ToString();
+//   }
+
    static Int_t eventNo = 0;
    std::cout << "CbmLitTrackFinderNN::DoFind: " << eventNo++ << " events processed" << std::endl;
    return kLITSUCCESS;
@@ -90,7 +95,7 @@ void CbmLitTrackFinderNN::ArrangeHits(
 {
    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
       CbmLitHit* hit = *it;
-      if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) { continue; }
+      if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) { continue; } // FIXME Check if it works correctly for MUCH-TRD
       fHitData.AddHit(hit);
    }
    fHitData.Arrange();

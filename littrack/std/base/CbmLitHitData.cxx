@@ -166,7 +166,7 @@ void CbmLitHitData::Arrange()
 string CbmLitHitData::ToString() const
 {
    stringstream ss;
-   ss << "HitData:" << endl;
+   ss << "HitData: nofStations=" << fNofStations << endl;
    for(UInt_t i = 0; i < fHits.size(); i++) {
       ss << " station " << i << ": " << GetNofHits(i) << " hits, "
             << "maxerrx=" << GetMaxErrX(i) << ", maxerry=" << GetMaxErrY(i) << ", ";
@@ -174,7 +174,7 @@ string CbmLitHitData::ToString() const
       for (set<litfloat>::const_iterator it = fZPosSet[i].begin(); it != fZPosSet[i].end(); it++) {
          ss << *it << ", ";
       }
-      ss << ")" << endl;
+      ss << ") ";
       ss << "zposbins=(";
       for (vector<Int_t>::const_iterator it = fZPosBins[i].begin(); it != fZPosBins[i].end(); it++) {
          ss << "|" << *it << "," << GetZPosByBin(i, *it) << "| ";

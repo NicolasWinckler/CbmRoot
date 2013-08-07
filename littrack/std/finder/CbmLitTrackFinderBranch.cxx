@@ -36,7 +36,7 @@ CbmLitTrackFinderBranch::CbmLitTrackFinderBranch():
    fNofIterations(0),
    fIteration(0),
    fMaxNofHitsInValidationGate(3),
-   fMaxNofBranches(2048),
+   fMaxNofBranches(512),
    fMaxNofMissingHits(),
    fPDG(),
    fChiSqStripHitCut(),
@@ -125,7 +125,7 @@ void CbmLitTrackFinderBranch::FollowTracks(
       // Initially start with one branch which is the same as track seed
       branches.push_back(new CbmLitTrack(*track));
 
-      for (Int_t iStation = 0; iStation < fNofStations; iStation++) {
+      for (Int_t iStation = 0; iStation < fNofStations; iStation++) { // Loop over stations
          litfloat zMin = fHitData.GetMinZPos(iStation);
          const vector<Int_t>& bins = fHitData.GetZPosBins(iStation);
          // map<bin index, pair<track parameter for the bin, true if track was propagated correctly >>
@@ -138,7 +138,7 @@ void CbmLitTrackFinderBranch::FollowTracks(
          // since branches array is filled with additional track branches
          // which were created on current station
          Int_t nofBranches = branches.size();
-         for (Int_t iBranch = 0; iBranch < nofBranches; iBranch++) {
+         for (Int_t iBranch = 0; iBranch < nofBranches; iBranch++) { // Loop over branches
             CbmLitTrack* branch = branches[iBranch];
             // Check for the missing hits
             if (branch->GetNofMissingHits() > fMaxNofMissingHits[fIteration]) { continue; }
@@ -223,12 +223,17 @@ void CbmLitTrackFinderBranch::FollowTracks(
                   counter++;
                   // Stop if number of hits in the validation gate is too high
                   if (counter > fMaxNofHitsInValidationGate) break;
+            	  // Check if number of branches exceeds the limit.
+            	  // Do not create additional branches in this case and continue propagation of all current branches.
+            	  // Use the best hit as in case of nearest neighbor tracking.
+            	  if (nofBranches > fMaxNofBranches) break;
+            	  //if (branches.size() > fMaxNofBranches) break;
                }
             } else { // Missing hit
                branch->SetNofMissingHits(branch->GetNofMissingHits() + 1);
             }
-         }
-      }
+         } // Loop over branches
+      } // Loop over stations
       // Put somewhere a cut on maximum number of branches for one input seed
 
       // Select the best branch

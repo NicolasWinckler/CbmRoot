@@ -224,13 +224,13 @@ void CbmLitFindGlobalTracks::ConvertInputData()
    if (fTrdHits) {
       CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitHits);
       //If MUCH-TRD setup, than shift plane id for the TRD hits
-//      if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
-//         Int_t nofPlanes = CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchStations();
-//         for (Int_t i = 0; i < fLitHits.size(); i++) {
-//            CbmLitHit* hit = fLitHits[i];
-////            if (hit->GetDetectorId() == kLITTRD) { hit->SetPlaneId(hit->GetPlaneId() + nofPlanes); } TODO No planeIDs now
-//         }
-//      }
+      if (fDet.GetDet(kMUCH) && fDet.GetDet(kTRD)) {
+         Int_t nofStations = CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchStations();
+         for (Int_t i = 0; i < fLitHits.size(); i++) {
+            CbmLitHit* hit = fLitHits[i];
+            if (hit->GetSystem() == kLITTRD) { hit->SetDetectorId(kLITTRD, hit->GetStation() + nofStations); }
+         }
+      }
    }
    std::cout << "-I- CbmLitFindGlobalTracks: Number of hits: " << fLitHits.size() << std::endl;
 

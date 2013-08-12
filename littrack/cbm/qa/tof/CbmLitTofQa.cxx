@@ -12,13 +12,17 @@
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 #include "CbmMCTrack.h"
+#include "CbmKFVertex.h"
 #include "TClonesArray.h"
 #include "TH2F.h"
 #include <boost/assign/list_of.hpp>
 #include <vector>
+#include <cmath>
 using std::vector;
 using std::pair;
 using boost::assign::list_of;
+using std::min;
+using std::sqrt;
 
 Bool_t AllTrackAcceptanceFunctionTof(
       const TClonesArray* mcTracks,
@@ -51,7 +55,16 @@ Bool_t ProtonTrackAcceptanceFunctionTof(
 {
    if (index < 0) return false;
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 2212;
+   return mcTrack->GetPdgCode() == 2212;
+}
+
+Bool_t AntiProtonTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return mcTrack->GetPdgCode() == -2212;
 }
 
 Bool_t PionTrackAcceptanceFunctionTof(
@@ -77,8 +90,8 @@ CbmLitTofQa::CbmLitTofQa():
    fOutputDir("./test/"),
    fHM(NULL),
    fPRangeMin(0.),
-   fPRangeMax(10.),
-   fPRangeBins(20),
+   fPRangeMax(15.),
+   fPRangeBins(400),
    fGlobalTracks(NULL),
    fStsTracks(NULL),
    fStsTrackMatches(NULL),
@@ -140,12 +153,13 @@ void CbmLitTofQa::ReadDataBranches()
 
 void CbmLitTofQa::FillTrackCategoriesAndAcceptanceFunctions()
 {
-   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("Pion")("Kaon");
+   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("AntiProton")("Pion")("Kaon");
    // List of all supported track categories
    fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Electron"] = ElectronTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Muon"] = MuonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["AntiProton"] = AntiProtonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunctionTof;
 }
@@ -155,14 +169,32 @@ void CbmLitTofQa::CreateHistograms()
    Int_t nofTrackCategories = fTrackCategories.size();
    for (Int_t iCat = 0; iCat < nofTrackCategories; iCat++) {
 	  string name = "hmp_Tof_Reco_" + fTrackCategories[iCat] + "_m2p";
-      fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 100, -0.2, 1.8));
+      fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 400, -0.2, 1.8));
       name = "hmp_Tof_RecoMCID_" + fTrackCategories[iCat] + "_m2p";
-      fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 100, -0.2, 1.8));
+      fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 400, -0.2, 1.8));
    }
+   string name = "hmp_Tof_dTime";
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "dt [ns];Counter").c_str(), 1000, -1., 1.));
+   name = "hmp_Tof_TimeZero_a";
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 34., 36.));
+   name = "hmp_Tof_TimeZero_reco";
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, -5.,15. ));
+   name = "hmp_Tof_TimeZero_mc";
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, -5.,15. ));
+   name = "hmp_Tof_TimeZero_NofTracks";
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Number of tracks;Counter").c_str(), 100, 0., 100.));
+   name = "hmp_Tof_Time_FirstTrack";
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 34., 36.));
 }
 
 void CbmLitTofQa::ProcessGlobalTracks()
 {
+   Double_t timeZeroReco = 0.0;
+   Double_t timeZeroMC = 0.0;
+   Double_t timeFirstTrack = 100.; // ns
+   Double_t timeZeroA = 0.; // ns
+   Int_t nofTracksForTimeZero = 0;
+
    Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
    for (Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
       const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(fGlobalTracks->At(iTrack));
@@ -181,12 +213,29 @@ void CbmLitTofQa::ProcessGlobalTracks()
 
       FairTrackParam vtxTrack;
       fKFFitter.FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
-
-      Double_t ct = 0.2998 * tofHit->GetTime(); // time in ns -> transfrom to ct in m
-      Double_t trackLength = globalTrack->GetLength() / 100.;
+      Double_t chiSqPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
+      Bool_t chiSqPrimaryOk = chiSqPrimary < 3.;
+      
+      Double_t ctCorrection = -0.007;
+      Double_t ctReco = 0.299792458 * tofHit->GetTime() + ctCorrection; // ToF time in ns -> transfrom to ct in m
+      Double_t ctMC = 0.299792458 * tofPoint->GetTime() ; // mc time in ns -> transfrom to ct in m
+      Double_t trackLengthReco = globalTrack->GetLength() / 100.; //global length
+     // Double_t trackLengthMC = tofPoint->GetLength() / 100.; //mc length
       Double_t preco = (vtxTrack.GetQp() != 0) ? std::abs(1. / vtxTrack.GetQp()) : 0;
-      Double_t t = (trackLength != 0) ? (ct / trackLength) : 0;
+      Double_t t = (trackLengthReco != 0) ? (ctReco / trackLengthReco) : 0;
       Double_t m2reco = preco * preco * (t * t - 1);
+      Double_t radialPos = sqrt(tofHit->GetX() * tofHit->GetX() + tofHit->GetY() * tofHit->GetY());
+
+      if (chiSqPrimaryOk && radialPos < 50.) {
+         nofTracksForTimeZero++;
+         Double_t beta = 1.;
+         if (m2reco > 0.6) beta = preco / sqrt(preco * preco + 0.93827231 * 0.93827231);
+         if (m2reco <= 0.6) beta = preco / sqrt(preco * preco + 0.1395679 * 0.1395679);
+         timeZeroReco += tofHit->GetTime() - trackLengthReco / (beta * 0.299792458);
+         timeZeroMC += tofPoint->GetTime() - trackLengthReco / (beta * 0.299792458);
+         timeZeroA += trackLengthReco / 0.299792458;
+         timeFirstTrack = std::min(timeFirstTrack, trackLengthReco / 0.299792458);
+      }
 
       Int_t nofTrackCategories = fTrackCategories.size();
       for (Int_t iCat = 0; iCat < nofTrackCategories; iCat++) {
@@ -194,21 +243,30 @@ void CbmLitTofQa::ProcessGlobalTracks()
     	  LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(category)->second;
     	  Bool_t accOk = function(fMCTracks, stsMCTrackId);
 
-    	  if (accOk) {
+    	  if (accOk && chiSqPrimaryOk) {
     		  fHM->H1("hmp_Tof_Reco_" + category + "_m2p")->Fill(preco, m2reco);
 
     		  if (stsMCTrackId == tofMCTrackId) {
     		     fHM->H1("hmp_Tof_RecoMCID_" + category + "_m2p")->Fill(preco, m2reco);
+    		     fHM->H1("hmp_Tof_dTime")->Fill(ctMC - ctReco);
     		  }
     	  }
       }
    }
+   if (nofTracksForTimeZero > 0) {
+      timeZeroReco /= nofTracksForTimeZero;
+      timeZeroMC /= nofTracksForTimeZero;
+      timeZeroA /= nofTracksForTimeZero;
+   }
+   fHM->H1("hmp_Tof_TimeZero_reco")->Fill(timeZeroReco);
+   fHM->H1("hmp_Tof_TimeZero_mc")->Fill(timeZeroMC);
+   fHM->H1("hmp_Tof_TimeZero_a")->Fill(timeZeroA);
+   fHM->H1("hmp_Tof_TimeZero_NofTracks")->Fill(nofTracksForTimeZero);
+   fHM->H1("hmp_Tof_Time_FirstTrack")->Fill(timeFirstTrack);
 }
 
 void CbmLitTofQa::FitHistograms()
 {
-	//TCanvas* canvas3 = CreateCanvas("fit_qa_momentum_momres_mom_sigma", "fit_qa_momentum_momres_mom_sigma", 600, 600);
-	//canvas3->cd(1);
 	fHM->H2("hmp_Tof_RecoMCID_Pion_m2p")->FitSlicesY();
 	TH1* meanHist = (TH1*) gDirectory->Get("hmp_Tof_RecoMCID_Pion_m2p_1"); // mean
 	TH1* sigmaHist = (TH1*) gDirectory->Get("hmp_Tof_RecoMCID_Pion_m2p_2"); // sigma

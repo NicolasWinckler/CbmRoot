@@ -37,12 +37,14 @@ set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 
 Option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used."OFF)
 If(USE_PATH_INFO)
-  Set(PATH $ENV{PATH})
+  Set(PATH "$PATH")
   If (APPLE)
     Set(LD_LIBRARY_PATH $ENV{DYLD_LIBRARY_PATH})
   Else (APPLE)
     Set(LD_LIBRARY_PATH $ENV{LD_LIBRARY_PATH})
   EndIf (APPLE)
+Else(USE_PATH_INFO)
+  STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 EndIf(USE_PATH_INFO)
 
 # Check if the user wants to build the project in the source
@@ -68,7 +70,6 @@ else(NOT CBMROOT_MINIMAL)
   endif(NOT DEFINED ENV{ROOTSYS})
 endif(NOT CBMROOT_MINIMAL)
 
-STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
 # Check if the external packages are installed into a separate install
 # directory
@@ -171,7 +172,6 @@ add_subdirectory (trd)
 add_subdirectory (ecal) 
 add_subdirectory (psd)
 add_subdirectory (much)
-#add_subdirectory (much_feb07)
 #add_subdirectory (lhetrack) 
 add_subdirectory (littrack) 
 add_subdirectory (htrack)

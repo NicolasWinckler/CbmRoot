@@ -88,27 +88,39 @@ void maxMorphSearch::filteringHistogram(std::streambuf* terminal) {
  * Default constructor											*
  ****************************************************************/
 
-maxMorphSearch::maxMorphSearch() : histogramTransformation() {
-
+maxMorphSearch::maxMorphSearch() 
+  : histogramTransformation(),
+    firstFilter(NULL),
+    secondFilter(NULL),
+    combiFilter(NULL),
+    thirdFilter(NULL)
+{
+  /*
 	firstFilter  = NULL;
 	secondFilter = NULL;
 	combiFilter  = NULL;
 	thirdFilter  = NULL;
-
+*/
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-maxMorphSearch::maxMorphSearch(histogramData** histogram, trackData** tracks, tables** ratings,
+maxMorphSearch::maxMorphSearch(histogramData** _histogram, trackData** _tracks, tables** _ratings,
 							   unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
 							   unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 							   unsigned short firstFilterDim1ClearRadius,
 							   unsigned short firstFilterDim2ClearRadius,
 							   unsigned short secondFilterDim1ClearRadius,
 							   unsigned short secondFilterDim2ClearRadius,
-							   unsigned short secondFilterDim3ClearRadius) : histogramTransformation(histogram, tracks, ratings) {
+							   unsigned short secondFilterDim3ClearRadius) 
+  : histogramTransformation(_histogram, _tracks, _ratings),
+    firstFilter(NULL),
+    secondFilter(NULL),
+    combiFilter(NULL),
+    thirdFilter(NULL)
+{
 
 	unsigned short firstFilterNeighborhoodDim1ClearRadius;
 	unsigned short firstFilterNeighborhoodDim1LocalRadius;
@@ -132,99 +144,99 @@ maxMorphSearch::maxMorphSearch(histogramData** histogram, trackData** tracks, ta
 	secondFilterNeighborhoodDim3ClearRadius = 2 * secondFilterDim3ClearRadius + 1;
 	secondFilterNeighborhoodDim3LocalRadius = 2 * (secondFilterDim3ClearRadius / 2) + 1;
 
-	if (ratings == NULL)
+	if (_ratings == NULL)
 		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
-	if (*ratings == NULL)
+	if (*_ratings == NULL)
 		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
 
 	switch(firstFilterGeometry) {
 
 		case FIRST21GEOMETRY:
-			firstFilter  = new filterDim2( histogram,
+			firstFilter  = new filterDim2( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
-			secondFilter = new filterDim1( histogram,
+						   (*_ratings)->getCodingTableMaximumClassification());
+			secondFilter = new filterDim1( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			combiFilter  = NULL;
 			break;
 
 		case FIRST122GEOMETRY:
-			firstFilter  = new filterDim12( histogram,
+			firstFilter  = new filterDim12( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
-			secondFilter = new filterDim2( histogram,
+						   (*_ratings)->getCodingTableMaximumClassification());
+			secondFilter = new filterDim2( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			combiFilter  = NULL;
 			break;
 
 		case FIRST12GEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new filterDim1Dim2( histogram,
+			combiFilter  = new filterDim1Dim2( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRST12MODGEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new filterDim1Dim2Mod( histogram,
+			combiFilter  = new filterDim1Dim2Mod( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRST121GEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new filterDim12Dim1( histogram,
+			combiFilter  = new filterDim12Dim1( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRSTFINALGEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new firstFilterFinal( histogram,
+			combiFilter  = new firstFilterFinal( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRSTFINALMODGEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new firstFilterFinalMod( histogram,
+			combiFilter  = new firstFilterFinalMod( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		default:
@@ -238,15 +250,15 @@ maxMorphSearch::maxMorphSearch(histogramData** histogram, trackData** tracks, ta
 	switch(secondFilterGeometry) {
 
 		case SECOND3MODGEOMETRY:
-			thirdFilter  = new filterDim3Mod( tracks,
+			thirdFilter  = new filterDim3Mod( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim3ClearRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case SECONDFINALGEOMETRY:
-			thirdFilter = new secondFilterFinal( tracks,
+			thirdFilter = new secondFilterFinal( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim1ClearRadius,
 						   secondFilterNeighborhoodDim2ClearRadius,
@@ -254,11 +266,11 @@ maxMorphSearch::maxMorphSearch(histogramData** histogram, trackData** tracks, ta
 						   secondFilterNeighborhoodDim1LocalRadius,
 						   secondFilterNeighborhoodDim2LocalRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case SECONDFINALMODGEOMETRY:
-			thirdFilter = new secondFilterFinalMod( tracks,
+			thirdFilter = new secondFilterFinalMod( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim1ClearRadius,
 						   secondFilterNeighborhoodDim2ClearRadius,
@@ -266,15 +278,15 @@ maxMorphSearch::maxMorphSearch(histogramData** histogram, trackData** tracks, ta
 						   secondFilterNeighborhoodDim1LocalRadius,
 						   secondFilterNeighborhoodDim2LocalRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case SECOND3GEOMETRY:
-			thirdFilter = new filterDim3( tracks,
+			thirdFilter = new filterDim3( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim3ClearRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		default:
@@ -314,8 +326,8 @@ maxMorphSearch::~maxMorphSearch() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void maxMorphSearch::init( histogramData** histogram, trackData** tracks,
-						   tables** ratings,
+void maxMorphSearch::init( histogramData** _histogram, trackData** _tracks,
+						   tables** _ratings,
 						   unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
 						   unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 						   unsigned short firstFilterDim1ClearRadius,
@@ -335,7 +347,7 @@ void maxMorphSearch::init( histogramData** histogram, trackData** tracks,
 	unsigned short secondFilterNeighborhoodDim3ClearRadius;
 	unsigned short secondFilterNeighborhoodDim3LocalRadius;
 
-	histogramTransformation::init(histogram, tracks, ratings);
+	histogramTransformation::init(_histogram, _tracks, _ratings);
 
 	firstFilterNeighborhoodDim1ClearRadius  = 2 * firstFilterDim1ClearRadius + 1;
 	firstFilterNeighborhoodDim1LocalRadius  = 2 * (firstFilterDim1ClearRadius / 2) + 1;
@@ -348,99 +360,99 @@ void maxMorphSearch::init( histogramData** histogram, trackData** tracks,
 	secondFilterNeighborhoodDim3ClearRadius = 2 * secondFilterDim3ClearRadius + 1;
 	secondFilterNeighborhoodDim3LocalRadius = 2 * (secondFilterDim3ClearRadius / 2) + 1;
 
-	if (ratings == NULL)
+	if (_ratings == NULL)
 		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
-	if (*ratings == NULL)
+	if (*_ratings == NULL)
 		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
 
 	switch(firstFilterGeometry) {
 
 		case FIRST21GEOMETRY:
-			firstFilter  = new filterDim2( histogram,
+			firstFilter  = new filterDim2( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
-			secondFilter = new filterDim1( histogram,
+						   (*_ratings)->getCodingTableMaximumClassification());
+			secondFilter = new filterDim1( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			combiFilter  = NULL;
 			break;
 
 		case FIRST122GEOMETRY:
-			firstFilter  = new filterDim12( histogram,
+			firstFilter  = new filterDim12( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			secondFilter = new filterDim2( histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			combiFilter  = NULL;
 			break;
 
 		case FIRST12GEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new filterDim1Dim2( histogram,
+			combiFilter  = new filterDim1Dim2( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRST12MODGEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new filterDim1Dim2Mod( histogram,
+			combiFilter  = new filterDim1Dim2Mod( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRST121GEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new filterDim12Dim1( histogram,
+			combiFilter  = new filterDim12Dim1( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRSTFINALGEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new firstFilterFinal( histogram,
+			combiFilter  = new firstFilterFinal( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case FIRSTFINALMODGEOMETRY:
 			firstFilter  = NULL;
 			secondFilter = NULL;
-			combiFilter  = new firstFilterFinalMod( histogram,
+			combiFilter  = new firstFilterFinalMod( _histogram,
 						   firstFilterArithmetic,
 						   firstFilterNeighborhoodDim1ClearRadius,
 						   firstFilterNeighborhoodDim2ClearRadius,
 						   firstFilterNeighborhoodDim1LocalRadius,
 						   firstFilterNeighborhoodDim2LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		default:
@@ -454,15 +466,15 @@ void maxMorphSearch::init( histogramData** histogram, trackData** tracks,
 	switch(secondFilterGeometry) {
 
 		case SECOND3MODGEOMETRY:
-			thirdFilter  = new filterDim3Mod( tracks,
+			thirdFilter  = new filterDim3Mod( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim3ClearRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case SECONDFINALGEOMETRY:
-			thirdFilter = new secondFilterFinal( tracks,
+			thirdFilter = new secondFilterFinal( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim1ClearRadius,
 						   secondFilterNeighborhoodDim2ClearRadius,
@@ -470,11 +482,11 @@ void maxMorphSearch::init( histogramData** histogram, trackData** tracks,
 						   secondFilterNeighborhoodDim1LocalRadius,
 						   secondFilterNeighborhoodDim2LocalRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case SECONDFINALMODGEOMETRY:
-			thirdFilter = new secondFilterFinalMod( tracks,
+			thirdFilter = new secondFilterFinalMod( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim1ClearRadius,
 						   secondFilterNeighborhoodDim2ClearRadius,
@@ -482,15 +494,15 @@ void maxMorphSearch::init( histogramData** histogram, trackData** tracks,
 						   secondFilterNeighborhoodDim1LocalRadius,
 						   secondFilterNeighborhoodDim2LocalRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		case SECOND3GEOMETRY:
-			thirdFilter = new filterDim3( tracks,
+			thirdFilter = new filterDim3( _tracks,
 						   secondFilterArithmetic,
 						   secondFilterNeighborhoodDim3ClearRadius,
 						   secondFilterNeighborhoodDim3LocalRadius,
-						   (*ratings)->getCodingTableMaximumClassification());
+						   (*_ratings)->getCodingTableMaximumClassification());
 			break;
 
 		default:

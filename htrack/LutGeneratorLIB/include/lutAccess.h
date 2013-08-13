@@ -47,6 +47,11 @@
 
 class lutAccess : public lut {
 
+ private:
+
+  lutAccess(const lutAccess&);
+  lutAccess& operator=(const lutAccess&);
+
 protected:
 
 	lutHoughBorder* memory;					/**< Memory which stores the whole look up table. */

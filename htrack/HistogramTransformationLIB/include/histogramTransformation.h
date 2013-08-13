@@ -73,6 +73,11 @@
 
 class histogramTransformation {
 
+ private:
+
+  histogramTransformation(const histogramTransformation&);
+  histogramTransformation& operator=(const histogramTransformation&);
+
 protected:
 
 	histogramData**       histogram;								/**< Object to access the histogram. */

@@ -37,24 +37,32 @@
  * Default constructor											*
  ****************************************************************/
 
-peakfindingGeometryAnalysis::peakfindingGeometryAnalysis() {
-
+peakfindingGeometryAnalysis::peakfindingGeometryAnalysis() 
+  : histogram(NULL),
+    actualPeakfindingLayerGeometry(),
+    actualPeakfindingGeometry()
+{
+  /*
 	histogram = NULL;
+  */
 	actualPeakfindingLayerGeometry.reset();
 	actualPeakfindingGeometry.reset();
-
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-peakfindingGeometryAnalysis::peakfindingGeometryAnalysis(histogramData** histogram) {
-
-	this->histogram = histogram;
+peakfindingGeometryAnalysis::peakfindingGeometryAnalysis(histogramData** _histogram) 
+  : histogram(_histogram),
+    actualPeakfindingLayerGeometry(),
+    actualPeakfindingGeometry()
+{
+  /*
+	this->histogram = _histogram;
+  */
 	actualPeakfindingLayerGeometry.reset();
 	actualPeakfindingGeometry.reset();
-
 }
 
 /****************************************************************
@@ -72,9 +80,9 @@ peakfindingGeometryAnalysis::~peakfindingGeometryAnalysis() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void peakfindingGeometryAnalysis::init(histogramData** histogram) {
+void peakfindingGeometryAnalysis::init(histogramData** _histogram) {
 
-	this->histogram = histogram;
+	this->histogram = _histogram;
 	actualPeakfindingLayerGeometry.reset();
 	actualPeakfindingGeometry.reset();
 

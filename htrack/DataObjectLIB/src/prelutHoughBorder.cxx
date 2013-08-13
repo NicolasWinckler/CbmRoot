@@ -45,7 +45,7 @@
  * Default constructor											*
  ****************************************************************/
 
-prelutHoughBorder::prelutHoughBorder() {
+prelutHoughBorder::prelutHoughBorder() : start(0), stop(0) {
 
 	clear();
 
@@ -55,10 +55,12 @@ prelutHoughBorder::prelutHoughBorder() {
  * Constructor													*
  ****************************************************************/
 
-prelutHoughBorder::prelutHoughBorder(const prelutHoughBorder& value) {
+prelutHoughBorder::prelutHoughBorder(const prelutHoughBorder& value) 
+  : start(value.start), stop(value.stop)
+{
 
-	this->start = value.start;
-	this->stop  = value.stop;
+  //	this->start = value.start;
+  //	this->stop  = value.stop;
 
 }
 

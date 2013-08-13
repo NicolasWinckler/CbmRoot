@@ -45,6 +45,12 @@
 
 class filterDimX {
 
+ private:
+
+  filterDimX(const filterDimX&);
+  filterDimX& operator=(const filterDimX&);
+
+
 protected:
 
 	histogramData**   histogram;			/**< Object for accessing the histogram. */

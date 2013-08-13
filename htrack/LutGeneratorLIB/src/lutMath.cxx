@@ -61,12 +61,19 @@ double lutMath::evaluateMagnetfieldFactor(trackfinderInputHit* hit) {
  * Default constructor											*
  ****************************************************************/
 
-lutMath::lutMath() : lut() {
-
+lutMath::lutMath() 
+  : lut(), 
+    numberOfCorrections(0),
+    numberOfCoordCorrections(0),
+    magneticField(NULL),
+    magneticFieldFactor(1),
+    formula()
+{
+  /*
 	resetCorrectionCounter();
 	magneticField       = NULL;
 	magneticFieldFactor = 1;
-
+  */
 }
 
 /****************************************************************
@@ -75,12 +82,19 @@ lutMath::lutMath() : lut() {
  * - memoryAllocationError										*
  ****************************************************************/
 
-lutMath::lutMath(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) : lut(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step) {
-
+lutMath::lutMath(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) 
+  : lut(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step), 
+    numberOfCorrections(0),
+    numberOfCoordCorrections(0),
+    magneticField(NULL),
+    magneticFieldFactor(1),
+    formula()
+{
+  /*
 	resetCorrectionCounter();
 	magneticField       = NULL;
 	magneticFieldFactor = 1;
-
+  */
 }
 
 /****************************************************************
@@ -116,11 +130,11 @@ double lutMath::getMagneticFieldFactor() {
  * This method sets the magnetic field to use.					*
  ****************************************************************/
 
-void lutMath::setMagneticField(trackfinderInputMagneticField* magneticField) {
+void lutMath::setMagneticField(trackfinderInputMagneticField* _magneticField) {
 
-	if (this->magneticField != magneticField) {
+	if (this->magneticField != _magneticField) {
 
-		this->magneticField       = magneticField;
+		this->magneticField       = _magneticField;
 		this->magneticFieldFactor = 1;
 
 	}
@@ -132,14 +146,14 @@ void lutMath::setMagneticField(trackfinderInputMagneticField* magneticField) {
  * the magneticField.											*
  ****************************************************************/
 
-void lutMath::setMagneticFieldFactor(double magneticFieldFactor) {
+void lutMath::setMagneticFieldFactor(double _magneticFieldFactor) {
 
-	if (magneticFieldFactor != 0) {
+	if (_magneticFieldFactor != 0) {
 
-		if (this->magneticFieldFactor != magneticFieldFactor) {
+		if (this->magneticFieldFactor != _magneticFieldFactor) {
 
 			this->magneticField       = NULL;
-			this->magneticFieldFactor = magneticFieldFactor;
+			this->magneticFieldFactor = _magneticFieldFactor;
 
 		}
 

@@ -230,10 +230,10 @@ unsigned short trackCoordinates::get(unsigned short dimension) {
  * sets the value in the dimension								*
  ****************************************************************/
 
-void trackCoordinates::set(unsigned short set, unsigned short dimension) {
+void trackCoordinates::set(unsigned short _set, unsigned short dimension) {
 
 	if (dimension < DIMENSIONS)
-		dim[dimension] = set;
+		dim[dimension] = _set;
 	else
 		throw notExistingDimensionError(dimension, DIMENSIONS);
 

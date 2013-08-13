@@ -184,14 +184,21 @@ void trackPropagationDAnalysis::writeDisplay(TH1D* display, trackPropagationDisp
  * Default constructor											*
  ****************************************************************/
 
-trackPropagationDAnalysis::trackPropagationDAnalysis() {
+trackPropagationDAnalysis::trackPropagationDAnalysis() 
+  : numberOfDisplays(0),
+    distanceDisplaysInfo(NULL),
+    distanceDisplays(NULL),
+    windowPadColumn(0),
+    writeToFile(false)
 
+{
+  /*
 	numberOfDisplays                       = 0;
 	distanceDisplaysInfo                   = NULL;
 	distanceDisplays                       = NULL;
 	windowPadColumn                        = 0;
 	writeToFile                            = false;
-
+  */
 }
 
 /****************************************************************

@@ -49,6 +49,9 @@ class trackfinder {
 
 private:
 
+  trackfinder(const trackfinder&);
+  trackfinder& operator=(const trackfinder&);
+
 	houghTransformation*     houghTransform;				/**< Object which fills the histogram by transforming the hits */
 	histogramTransformation* histoTransform;				/**< Object which evaluates the tracks basing on the histogram */
 	unsigned short           filterType;					/**< Variable to store the general filter type. */

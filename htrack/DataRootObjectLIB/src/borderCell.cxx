@@ -40,9 +40,9 @@
  * Default constructor											*
  ****************************************************************/
 
-borderCell::borderCell() {
+borderCell::borderCell() : layer() {
 
-	layer.clear();
+  //	layer.clear();
 
 }
 
@@ -50,9 +50,9 @@ borderCell::borderCell() {
  * Constructor													*
  ****************************************************************/
 
-borderCell::borderCell(const borderCell& value) {
+borderCell::borderCell(const borderCell& value) : layer(value.layer) {
 
-	this->layer = value.layer;
+  //	this->layer = value.layer;
 
 }
 

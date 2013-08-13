@@ -45,6 +45,10 @@
 
 class magnetfieldFactorAnalysis {
 
+ private:
+  magnetfieldFactorAnalysis(const magnetfieldFactorAnalysis&);
+  magnetfieldFactorAnalysis& operator=(const magnetfieldFactorAnalysis&);
+
 protected:
 
 	bool           analysisEnabled;				/**< Variable to store if the analysis is enabled. */

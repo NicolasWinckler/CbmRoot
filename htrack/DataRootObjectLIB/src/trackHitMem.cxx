@@ -51,7 +51,10 @@ int trackHitMem::getTrackIndex() {
  * Default constructor											*
  ****************************************************************/
 
-trackHitMem::trackHitMem() {
+trackHitMem::trackHitMem() 
+  : hits(),
+    trackPattern()
+{
 
 	hits.clear();
 	trackPattern.reset();
@@ -62,11 +65,15 @@ trackHitMem::trackHitMem() {
  * Constructor													*
  ****************************************************************/
 
-trackHitMem::trackHitMem(const trackHitMem& value) {
-
+trackHitMem::trackHitMem(const trackHitMem& value) 
+  : hits(value.hits),
+    trackPattern(value.trackPattern)
+{
+  // Böser Code
+  //TODO: fix the problem
 	hits         = value.hits;
 	trackPattern = value.trackPattern;
-
+ 
 }
 
 /****************************************************************

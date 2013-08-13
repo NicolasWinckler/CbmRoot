@@ -37,15 +37,23 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputTrack::trackfinderInputTrack() : TObject() {
+trackfinderInputTrack::trackfinderInputTrack() 
+  : TObject(),
+    track(NULL),
+    hits(),
+    info(),
+    isPointer(true),
+    trackIndex(0),
+    charge(0)
+{
 
-	track                    = NULL;
-	hits.clear();
-	info.frequency           = 0;
-	info.maximumNumberOfHits = 0;
-	isPointer                = true;
-	trackIndex               = 0;
-	charge                   = 0;
+  //	track                    = NULL;
+  //	hits.clear();
+  //	info.frequency           = 0;
+  //	info.maximumNumberOfHits = 0;
+  //	isPointer                = true;
+  //	trackIndex               = 0;
+  //	charge                   = 0;
 
 }
 
@@ -53,48 +61,74 @@ trackfinderInputTrack::trackfinderInputTrack() : TObject() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputTrack::trackfinderInputTrack(const trackfinderInputTrack& value) : TObject(value) {
+trackfinderInputTrack::trackfinderInputTrack(const trackfinderInputTrack& value) 
+  : TObject(value), 
+    track(NULL),
+    hits(value.hits),
+    info(),
+    isPointer(value.isPointer),
+    trackIndex(value.trackIndex),
+    charge(value.charge)
+{
 
 	if (value.isPointer)
 		this->track                = value.track;
 	else
 		this->track                = new CbmMCTrack(*value.track);
-	this->hits                     = value.hits;
+
+	//	this->hits                     = value.hits;
 	this->info.frequency           = value.info.frequency;
 	this->info.maximumNumberOfHits = value.info.maximumNumberOfHits;
-	this->isPointer                = value.isPointer;
-	this->trackIndex               = value.trackIndex;
-	this->charge                   = value.charge;
+	//	this->isPointer                = value.isPointer;
+	//	this->trackIndex               = value.trackIndex;
+	//	this->charge                   = value.charge;
 
 }
-trackfinderInputTrack::trackfinderInputTrack(CbmMCTrack* mcTrack, int newTrackIndex, double newCharge) : TObject() {
+trackfinderInputTrack::trackfinderInputTrack(CbmMCTrack* mcTrack, int newTrackIndex, double newCharge) 
+  : TObject(), 
+    track(mcTrack),
+    hits(),
+    info(),
+    isPointer(true),
+    trackIndex(newTrackIndex),
+    charge(newCharge)
+{
 
-	track                    = mcTrack;
+  //	track                    = mcTrack;
 	if (track == NULL)
 		throw cannotAccessHitsOrTracksError(DATAOBJECTLIB);
-
+	/*
 	hits.clear();
 	info.frequency           = 0;
 	info.maximumNumberOfHits = 0;
 	isPointer                = true;
 	trackIndex               = newTrackIndex;
 	charge                   = newCharge;
-
+	*/
 }
-trackfinderInputTrack::trackfinderInputTrack(int pdgId, double momX, double momY, double momZ, int newTrackIndex, double newCharge) : TObject() {
+trackfinderInputTrack::trackfinderInputTrack(int pdgId, double momX, double momY, double momZ, int newTrackIndex, double newCharge) 
+  : TObject(),
+    track(new CbmMCTrack(pdgId, -1, momX, momY, momZ, -1.0, -1.0, -1.0, -1.0, 0)),
+    hits(),
+    info(),
+    isPointer(false),
+    trackIndex(newTrackIndex),
+    charge(newCharge)
+{
 
-	track                    = new CbmMCTrack(pdgId, -1, momX, momY, momZ, -1.0, -1.0, -1.0, -1.0, 0);
+  //	track                    = new CbmMCTrack(pdgId, -1, momX, momY, momZ, -1.0, -1.0, -1.0, -1.0, 0);
 	if (track == NULL)
 		throw cannotAccessHitsOrTracksError(DATAOBJECTLIB);
-
+	/*
 	hits.clear();
 	info.frequency           = 0;
 	info.maximumNumberOfHits = 0;
 	isPointer                = false;
 	trackIndex               = newTrackIndex;
 	charge                   = newCharge;
-
+	*/
 }
+
 
 /****************************************************************
  * Destructor													*

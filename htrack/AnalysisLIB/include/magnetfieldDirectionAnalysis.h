@@ -51,7 +51,9 @@
 /**
  * struct stores the basic information for one display
  */
-typedef struct {
+struct magnetfieldDisplayInfo {
+
+magnetfieldDisplayInfo() : constValDim1(0.), constValDim2(0.), min(0.), max(0.),  numberOfUnderflows(0), numberOfOverflows(0), baseName(), baseTitle(), subDirName() {};
 
 	double         constValDim1;		/**< Variable stores the constant value in the first constant dimension */
 	double         constValDim2;		/**< Variable stores the constant value in the second constant dimension */
@@ -63,7 +65,7 @@ typedef struct {
 	std::string    baseTitle;			/**< Variable stores the basic title for the display which is constant over all events */
 	std::string    subDirName;			/**< Variable stores the name of the subdirectory to store the analysis results */
 
-} magnetfieldDisplayInfo;
+};
 
 
 /* **************************************************************
@@ -71,6 +73,10 @@ typedef struct {
  * **************************************************************/
 
 class magnetfieldDirectionAnalysis {
+
+ private:
+  magnetfieldDirectionAnalysis(const magnetfieldDirectionAnalysis&);
+  magnetfieldDirectionAnalysis& operator=(const magnetfieldDirectionAnalysis&);
 
 protected:
 

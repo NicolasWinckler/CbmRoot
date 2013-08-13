@@ -177,8 +177,26 @@ void projectionEFGCNAnalysis::writeDisplay(TH2S* display, projectionEFGCNDisplay
  * Default constructor											*
  ****************************************************************/
 
-projectionEFGCNAnalysis::projectionEFGCNAnalysis() {
-
+projectionEFGCNAnalysis::projectionEFGCNAnalysis() 
+  : eDisplay(NULL),
+    eGraphicEFGCNDisplayInfo(),
+    fDisplay(NULL),
+    fGraphicEFGCNDisplayInfo(),
+    gDisplay(NULL),
+    gGraphicEFGCNDisplayInfo(),
+    cDisplay(NULL),
+    cGraphicEFGCNDisplayInfo(),
+    nDisplay(NULL),
+    nGraphicEFGCNDisplayInfo(),
+    windowPadColumn(0),
+    eWindowPadRow((unsigned short)-1),
+    fWindowPadRow((unsigned short)-1),
+    gWindowPadRow((unsigned short)-1),
+    cWindowPadRow((unsigned short)-1),
+    nWindowPadRow((unsigned short)-1),
+    writeToFile(false)
+{
+  /*
 	eDisplay                                    = NULL;
 	eGraphicEFGCNDisplayInfo.numberOfXBins      = 0;
 	eGraphicEFGCNDisplayInfo.numberOfYBins      = 0;
@@ -216,7 +234,7 @@ projectionEFGCNAnalysis::projectionEFGCNAnalysis() {
 	cWindowPadRow                               = (unsigned short)-1;
 	nWindowPadRow                               = (unsigned short)-1;
 	writeToFile                                 = false;
-
+  */
 }
 
 /****************************************************************

@@ -44,12 +44,14 @@
  * Struct to store the information of a filter-deleted object
  */
 
-typedef struct {
+struct removingInformation {
+
+removingInformation() : element(), layer(0) {};
 
 	trackLayer::iterator element;
 	unsigned short       layer;
 
-} removingInformation;
+};
 
 
 /* **************************************************************

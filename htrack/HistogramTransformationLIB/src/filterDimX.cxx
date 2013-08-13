@@ -38,28 +38,40 @@
  * Default constructor											*
  ****************************************************************/
 
-filterDimX::filterDimX() {
-
+filterDimX::filterDimX() 
+  : histogram(NULL),
+    filterMem(NULL),
+    baseFilter(NULL),
+    filterSize(0),
+    filterLocalSize(0)
+{
+  /*
 	histogram       = NULL;
-	filterMem       = NULL;	/* allocation in derived class */
-	baseFilter      = NULL;	/* allocation in derived class */
+	filterMem       = NULL;	// allocation in derived class 
+  baseFilter      = NULL;	// allocation in derived class 
 	filterSize      = 0;
 	filterLocalSize = 0;
-
+*/
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-filterDimX::filterDimX( histogramData** histogram,
-						unsigned short  size,
-						unsigned short  localSize) {
-
-	init(histogram, size, localSize);
+filterDimX::filterDimX( histogramData** _histogram,
+			unsigned short  size,
+			unsigned short  localSize) 
+  : histogram(NULL),
+    filterMem(NULL),
+    baseFilter(NULL),
+    filterSize(0),
+    filterLocalSize(0)
+{
+  /*
+	init(_histogram, size, localSize);
 	filterMem       = NULL;
 	baseFilter      = NULL;
-
+  */
 }
 
 /****************************************************************
@@ -85,11 +97,11 @@ filterDimX::~filterDimX() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDimX::init( histogramData** histogram,
+void filterDimX::init( histogramData** _histogram,
 					   unsigned short  size,
 					   unsigned short  localSize) {
 
-	this->histogram = histogram;
+	this->histogram = _histogram;
 	filterSize      = size;
 	filterLocalSize = localSize;
 

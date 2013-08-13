@@ -1539,8 +1539,47 @@ void houghPictures::createHoughAnalyticFormulaLut() {
  * Default constructor											*
  ****************************************************************/
 
-houghPictures::houghPictures() {
-
+houghPictures::houghPictures() 
+ : window(NULL),
+   numberOfWindows(0),
+   display(NULL),
+   numberOfDisplays(0),
+   marker(NULL),
+   numberOfMarkers(0),
+   arrow(NULL),
+   numberOfArrows(0),
+   ellipse(NULL),
+   numberOfEllipses(0),
+   text(NULL),
+   numberOfTexts(0),
+   coordinateStraightLineWindow(NULL),
+   coordinateStraightLineDisplay(NULL),
+   houghStraightLineWindow(NULL),
+   houghStraightLineDisplay(NULL),
+   coordinateHesseLineWindow(NULL),
+   coordinateHesseLineDisplay(NULL),
+   houghPhiHesseLineWindow(NULL),
+   houghPhiHesseLineDisplay(NULL),
+   houghThetaHesseLineWindow(NULL),
+   houghThetaHesseLineDisplay(NULL),
+   oneCoordinateHitAnalyticFormulaWindow(NULL),
+   oneCoordinateHitAnalyticFormulaDisplay(NULL),
+   oneHoughCurveAnalyticFormulaWindow(NULL),
+   oneHoughCurveAnalyticFormulaDisplay(NULL),
+   oneCoordinateTrackAnalyticFormulaWindow(NULL),
+   oneCoordinateTrackAnalyticFormulaDisplay(NULL),
+   oneHoughPointAnalyticFormulaWindow(NULL),
+   oneHoughPointAnalyticFormulaDisplay(NULL),
+   coordinateAnalyticFormulaPrelutWindow(NULL),
+   coordinateAnalyticFormulaPrelutDisplay(NULL),
+   coordinateAnalyticFormulaLutWindow(NULL),
+   coordinateAnalyticFormulaLutDisplay(NULL),
+   houghAnalyticFormulaPrelutWindow(NULL),
+   houghAnalyticFormulaPrelutDisplay(NULL),
+   houghAnalyticFormulaLutWindow(NULL),
+   houghAnalyticFormulaLutDisplay(NULL)
+{
+  /*
 	window                                   = NULL;
 	numberOfWindows                          = 0;
 	display                                  = NULL;
@@ -1579,7 +1618,7 @@ houghPictures::houghPictures() {
 	houghAnalyticFormulaPrelutDisplay        = NULL;
 	houghAnalyticFormulaLutWindow            = NULL;
 	houghAnalyticFormulaLutDisplay           = NULL;
-
+  */
 }
 
 /* **************************************************************

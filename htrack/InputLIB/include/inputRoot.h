@@ -70,6 +70,10 @@
 
 class inputRoot : public inputData {
 
+ private:
+  inputRoot(const inputRoot&);
+  inputRoot& operator=(const inputRoot&);
+
 protected:
 
 	TClonesArray*  inputStsPoints;				/**< Object to store all STS points which are read from file. */

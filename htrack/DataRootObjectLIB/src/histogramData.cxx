@@ -170,12 +170,12 @@ void histogramData::deleteMemory(std::streambuf* terminal) {
  * Default constructor											*
  ****************************************************************/
 
-histogramData::histogramData() {
+histogramData::histogramData() : space(NULL), valueDimSH(0), cell(NULL), hitBorders(NULL) {
 
-	space       = NULL;
-	valueDimSH  = 0;
-	cell        = NULL;
-	hitBorders  = NULL;
+  //	space       = NULL;
+  //	valueDimSH  = 0;
+  //	cell        = NULL;
+  //	hitBorders  = NULL;
 
 }
 
@@ -204,20 +204,20 @@ histogramData::histogramData(const histogramData& value) {
 		this->hitBorders[k]  = value.hitBorders[k];
 
 }
-histogramData::histogramData(histogramSpace** space) {
+histogramData::histogramData(histogramSpace** _space) : space(_space), valueDimSH(0), cell(NULL), hitBorders(NULL) {
 
-	this->space = space;			/* histogramData size in all dimensions */
-	valueDimSH  = 0;				/* histogramData stationHit size */
-	cell        = NULL;
-	hitBorders  = NULL;
+  //	this->space = _space;			/* histogramData size in all dimensions */
+  //	valueDimSH  = 0;				/* histogramData stationHit size */
+  //	cell        = NULL;
+  //	hitBorders  = NULL;
 
 }
-histogramData::histogramData(histogramSpace** space, unsigned short stationStep) {
+histogramData::histogramData(histogramSpace** _space, unsigned short stationStep) : space(_space), valueDimSH(stationStep), cell(NULL), hitBorders(NULL) {
 
-	this->space = space;			/* histogramData size in all dimensions */
-	valueDimSH  = stationStep;		/* histogramData stationHit size */
-	cell        = NULL;
-	hitBorders  = NULL;
+  //	this->space = _space;			/* histogramData size in all dimensions */
+  //	valueDimSH  = stationStep;		/* histogramData stationHit size */
+  //	cell        = NULL;
+  //	hitBorders  = NULL;
 
 }
 
@@ -284,25 +284,25 @@ void histogramData::init(unsigned short stationStep, std::streambuf* terminal) {
 	allocateMemory(terminal);
 
 }
-void histogramData::init(histogramSpace** space, std::streambuf* terminal) {
+void histogramData::init(histogramSpace** _space, std::streambuf* terminal) {
 
 	/* free the old allocated space */
 	deleteMemory(terminal);
 
 	/* set new parameter */
-	this->space = space;				/* histogramData size in all dimensions */
+	this->space = _space;				/* histogramData size in all dimensions */
 
 	/* allocate new space */
 	allocateMemory(terminal);
 
 }
-void histogramData::init(histogramSpace** space, unsigned short stationStep, std::streambuf* terminal) {
+void histogramData::init(histogramSpace** _space, unsigned short stationStep, std::streambuf* terminal) {
 
 	/* free the old allocated space */
 	deleteMemory(terminal);
 
 	/* set new parameter */
-	this->space = space;				/* histogramData size in all dimensions */
+	this->space = _space;				/* histogramData size in all dimensions */
 	valueDimSH  = stationStep;			/* histogramData stationHit size */
 
 	/* allocate new space */

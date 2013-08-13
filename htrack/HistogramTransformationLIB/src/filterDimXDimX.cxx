@@ -37,28 +37,34 @@
  * Default constructor											*
  ****************************************************************/
 
-filterDimXDimX::filterDimXDimX() : filterDimX() {
-
+filterDimXDimX::filterDimXDimX() 
+  : filterDimX(),
+    filterSize1(0),
+    filterSize2(0)
+{
+  /*
 	filterSize1 = 0;
 	filterSize2 = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-filterDimXDimX::filterDimXDimX( histogramData** histogram,
-							    unsigned short  size1,
-							    unsigned short  size2,
-							    unsigned short  size,
-								unsigned short  localSize) :
-								filterDimX(
-								histogram, size, localSize) {
-
+filterDimXDimX::filterDimXDimX( histogramData** _histogram,
+				unsigned short  size1,
+				unsigned short  size2,
+				unsigned short  size,
+				unsigned short  localSize) 
+  : filterDimX(_histogram, size, localSize),
+    filterSize1(size1),
+    filterSize2(size2)
+{
+  /*
 	filterSize1 = size1;
 	filterSize2 = size2;
-
+  */
 }
 
 /****************************************************************
@@ -73,13 +79,13 @@ filterDimXDimX::~filterDimXDimX() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDimXDimX::init( histogramData** histogram,
+void filterDimXDimX::init( histogramData** _histogram,
 						   unsigned short  size1,
 						   unsigned short  size2,
 						   unsigned short  size,
 						   unsigned short  localSize) {
 
-	filterDimX::init(histogram, size, localSize);
+	filterDimX::init(_histogram, size, localSize);
 	filterSize1 = size1;
 	filterSize2 = size2;
 

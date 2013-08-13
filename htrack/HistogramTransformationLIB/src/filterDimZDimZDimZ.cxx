@@ -37,9 +37,12 @@
  * Default constructor											*
  ****************************************************************/
 
-filterDimZDimZDimZ::filterDimZDimZDimZ() : filterDimZDimZ() {
+filterDimZDimZDimZ::filterDimZDimZDimZ() 
+  : filterDimZDimZ(), 
+    filterSize3(0)
+{
 
-	filterSize3 = 0;
+  //	filterSize3 = 0;
 
 }
 
@@ -47,17 +50,17 @@ filterDimZDimZDimZ::filterDimZDimZDimZ() : filterDimZDimZ() {
  * Constructor													*
  ****************************************************************/
 
-filterDimZDimZDimZ::filterDimZDimZDimZ( trackData**    tracks,
-									    unsigned short size1,
-									    unsigned short size2,
-									    unsigned short size3,
-									    unsigned short size,
-										unsigned short localSize) :
-										filterDimZDimZ(
-										tracks, size1, size2,
-										size, localSize) {
+filterDimZDimZDimZ::filterDimZDimZDimZ( trackData**    _tracks,
+					unsigned short size1,
+					unsigned short size2,
+					unsigned short size3,
+					unsigned short size,
+					unsigned short localSize) 
+  : filterDimZDimZ(_tracks, size1, size2, size, localSize), 
+    filterSize3(size3)
+{
 
-	filterSize3 = size3;
+  //	filterSize3 = size3;
 
 }
 
@@ -73,14 +76,14 @@ filterDimZDimZDimZ::~filterDimZDimZDimZ() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDimZDimZDimZ::init( trackData**    tracks,
+void filterDimZDimZDimZ::init( trackData**    _tracks,
 							   unsigned short size1,
 							   unsigned short size2,
 							   unsigned short size3,
 							   unsigned short size,
 							   unsigned short localSize) {
 
-	filterDimZDimZ::init(tracks, size1, size2, size, localSize);
+	filterDimZDimZ::init(_tracks, size1, size2, size, localSize);
 	filterSize3 = size3;
 
 }

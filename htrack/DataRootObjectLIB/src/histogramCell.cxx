@@ -40,33 +40,45 @@
  * Default constructor											*
  ****************************************************************/
 
-histogramCell::histogramCell() {
-
-	value = 0;
-
 #ifndef NOANALYSIS
+histogramCell::histogramCell() : value(0), hits() {
+
+  //	value = 0;
+
 
 	hits.reset();
 
-#endif
 
 }
+#else
+histogramCell::histogramCell() : value(0) {
+
+  //	value = 0;
+}
+
+#endif
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-histogramCell::histogramCell(const histogramCell& value) {
-
-	this->value = value.value;
-
 #ifndef NOANALYSIS
+histogramCell::histogramCell(const histogramCell& _value) : value(_value.value), hits(_value.hits) {
 
-	this->hits  = value.hits;
+  //	this->value = _value.value;
 
-#endif
+
+  //	this->hits  = _value.hits;
+
 
 }
+#else
+histogramCell::histogramCell(const histogramCell& _value) : value(_value.value) {
+
+  //	this->value = _value.value;
+
+}
+#endif
 
 /****************************************************************
  * Destructor													*
@@ -80,13 +92,13 @@ histogramCell::~histogramCell() {
  * operator = ()												*
  ****************************************************************/
 
-const histogramCell& histogramCell::operator = (const histogramCell& value) {
+const histogramCell& histogramCell::operator = (const histogramCell& _value) {
 
-	this->value = value.value;
+	this->value = _value.value;
 
 #ifndef NOANALYSIS
 
-	this->hits  = value.hits;
+	this->hits  = _value.hits;
 
 #endif
 

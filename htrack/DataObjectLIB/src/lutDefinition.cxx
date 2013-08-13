@@ -42,39 +42,61 @@
  * Default constructor											*
  ****************************************************************/
 
-lutDefinition::lutDefinition() {
-
+lutDefinition::lutDefinition() 
+  : dim2Min(0),
+    dim2Max(0),
+    dim2Step(0),
+    dim1Min(0),
+    dim1Max(0),
+    dim1Step(0)
+{
+  /*
 	dim2Min  = 0;
 	dim2Max  = 0;
 	dim2Step = 0;
 	dim1Min  = 0;
 	dim1Max  = 0;
 	dim1Step = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-lutDefinition::lutDefinition(const lutDefinition& value) {
-
+lutDefinition::lutDefinition(const lutDefinition& value) 
+  : dim2Min(value.dim2Min),
+    dim2Max(value.dim2Max),
+    dim2Step(value.dim2Step),
+    dim1Min(value.dim1Min),
+    dim1Max(value.dim1Max),
+    dim1Step(value.dim1Step)
+{
+/*
 	this->dim2Min  = value.dim2Min;
 	this->dim2Max  = value.dim2Max;
 	this->dim2Step = value.dim2Step;
 	this->dim1Min  = value.dim1Min;
 	this->dim1Max  = value.dim1Max;
 	this->dim1Step = value.dim1Step;
+*/
 }
-lutDefinition::lutDefinition(double dim2Min, double dim2Max, int dim2Step, double dim1Min, double dim1Max, int dim1Step) {
-
-	this->dim2Min  = dim2Min;
-	this->dim2Max  = dim2Max;
-	this->dim2Step = dim2Step;
-	this->dim1Min  = dim1Min;
-	this->dim1Max  = dim1Max;
-	this->dim1Step = dim1Step;
-
+lutDefinition::lutDefinition(double _dim2Min, double _dim2Max, int _dim2Step, double _dim1Min, double _dim1Max, int _dim1Step) 
+  : dim2Min(_dim2Min),
+    dim2Max(_dim2Max),
+    dim2Step(_dim2Step),
+    dim1Min(_dim1Min),
+    dim1Max(_dim1Max),
+    dim1Step(_dim1Step)
+{
+  /*
+	this->dim2Min  = _dim2Min;
+	this->dim2Max  = _dim2Max;
+	this->dim2Step = _dim2Step;
+	this->dim1Min  = _dim1Min;
+	this->dim1Max  = _dim1Max;
+	this->dim1Step = _dim1Step;
+  */
 }
 
 /****************************************************************

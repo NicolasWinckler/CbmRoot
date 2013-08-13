@@ -275,9 +275,9 @@ void digitalHitAccessFile::setHeaderDefValues() {
  * Default constructor											*
  ****************************************************************/
 
-digitalHitAccessFile::digitalHitAccessFile() : io() {
+digitalHitAccessFile::digitalHitAccessFile() : io(), header(), localMemory(false) {
 
-	localMemory = false;
+  //	localMemory = false;
 
 	init();
 

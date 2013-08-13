@@ -152,7 +152,7 @@ void tooBigStartIdError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotFindMiddleSeparatorError::cannotFindMiddleSeparatorError() : dataObjectError() {
+cannotFindMiddleSeparatorError::cannotFindMiddleSeparatorError() : dataObjectError(), searchedString(), middleSeparator() {
 
 }
 
@@ -160,10 +160,10 @@ cannotFindMiddleSeparatorError::cannotFindMiddleSeparatorError() : dataObjectErr
  * Constructor													*
  ****************************************************************/
 
-cannotFindMiddleSeparatorError::cannotFindMiddleSeparatorError(std::string searchedString, std::string middleSeparator) : dataObjectError() {
+cannotFindMiddleSeparatorError::cannotFindMiddleSeparatorError(std::string _searchedString, std::string _middleSeparator) : dataObjectError(), searchedString(_searchedString), middleSeparator(_middleSeparator)  {
 
-	this->searchedString  = searchedString;
-	this->middleSeparator = middleSeparator;
+  //	this->searchedString  = _searchedString;
+  //	this->middleSeparator = _middleSeparator;
 
 }
 
@@ -201,10 +201,10 @@ void cannotFindMiddleSeparatorError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-notExistingDimensionError::notExistingDimensionError() : dataObjectError() {
+notExistingDimensionError::notExistingDimensionError() : dataObjectError(), actualDimension(0), numberOfDimensions(0) {
 
-	actualDimension    = 0;
-	numberOfDimensions = 0;
+  //	actualDimension    = 0;
+  //	numberOfDimensions = 0;
 
 }
 
@@ -212,10 +212,10 @@ notExistingDimensionError::notExistingDimensionError() : dataObjectError() {
  * Constructor													*
  ****************************************************************/
 
-notExistingDimensionError::notExistingDimensionError(unsigned short actualDimension, unsigned short numberOfDimensions) : dataObjectError() {
+notExistingDimensionError::notExistingDimensionError(unsigned short _actualDimension, unsigned short _numberOfDimensions) : dataObjectError(), actualDimension(_actualDimension), numberOfDimensions(_numberOfDimensions)   {
 
-	this->actualDimension    = actualDimension;
-	this->numberOfDimensions = numberOfDimensions;
+  //	this->actualDimension    = _actualDimension;
+  //	this->numberOfDimensions = _numberOfDimensions;
 
 }
 
@@ -256,11 +256,11 @@ void notExistingDimensionError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-analogValueIsNotInRangeError::analogValueIsNotInRangeError() : dataObjectError() {
+analogValueIsNotInRangeError::analogValueIsNotInRangeError() : dataObjectError(), actualValue(0), minValue(0), maxValue(0) {
 
-	actualValue = 0;
-	minValue    = 0;
-	maxValue    = 0;
+  //	actualValue = 0;
+  //	minValue    = 0;
+  //	maxValue    = 0;
 
 }
 
@@ -268,11 +268,11 @@ analogValueIsNotInRangeError::analogValueIsNotInRangeError() : dataObjectError()
  * Constructor													*
  ****************************************************************/
 
-analogValueIsNotInRangeError::analogValueIsNotInRangeError(double actualValue, double minValue, double maxValue) : dataObjectError() {
+analogValueIsNotInRangeError::analogValueIsNotInRangeError(double _actualValue, double _minValue, double _maxValue) : dataObjectError(), actualValue(_actualValue), minValue(_minValue), maxValue(_maxValue)  {
 
-	this->actualValue = actualValue;
-	this->minValue    = minValue;
-	this->maxValue    = maxValue;
+  //	this->actualValue = _actualValue;
+  //	this->minValue    = _minValue;
+  //	this->maxValue    = _maxValue;
 
 }
 
@@ -316,10 +316,10 @@ void analogValueIsNotInRangeError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigCellError::tooBigCellError() : dataObjectError() {
+tooBigCellError::tooBigCellError() : dataObjectError(), actualCell(0), numberOfCells(0) {
 
-	actualCell    = 0;
-	numberOfCells = 0;
+  //	actualCell    = 0;
+  //	numberOfCells = 0;
 
 }
 
@@ -327,10 +327,10 @@ tooBigCellError::tooBigCellError() : dataObjectError() {
  * Constructor													*
  ****************************************************************/
 
-tooBigCellError::tooBigCellError(unsigned short actualCell, unsigned short numberOfCells) : dataObjectError() {
+tooBigCellError::tooBigCellError(unsigned short _actualCell, unsigned short _numberOfCells) : dataObjectError(), actualCell(_actualCell), numberOfCells(_numberOfCells)  {
 
-	this->actualCell    = actualCell;
-	this->numberOfCells = numberOfCells;
+  //	this->actualCell    = _actualCell;
+  //	this->numberOfCells = _numberOfCells;
 
 }
 

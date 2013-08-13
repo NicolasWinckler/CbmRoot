@@ -59,6 +59,10 @@ typedef struct {
 
 class prelutRangeAnalysis {
 
+ private:
+  prelutRangeAnalysis(const prelutRangeAnalysis&);
+  prelutRangeAnalysis& operator=(const prelutRangeAnalysis&);
+
 protected:
 
 	bool            analysisEnabled;			/**< Variable to store if the analysis is enabled. */

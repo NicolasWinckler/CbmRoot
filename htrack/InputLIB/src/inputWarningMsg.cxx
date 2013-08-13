@@ -85,21 +85,29 @@ void inputWarningMsg::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-noHitWarningMsg::noHitWarningMsg() : inputWarningMsg() {
-
+noHitWarningMsg::noHitWarningMsg() 
+  : inputWarningMsg(),
+    branchNameHit(),
+    branchNamePoint()
+{
+  /*
 	branchNameHit.clear();
 	branchNamePoint.clear();
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-noHitWarningMsg::noHitWarningMsg(std::string actualBranchNameHit, std::string actualBranchNamePoint) : inputWarningMsg() {
+noHitWarningMsg::noHitWarningMsg(std::string actualBranchNameHit, std::string actualBranchNamePoint) 
+  : inputWarningMsg(),
+    branchNameHit(actualBranchNameHit),
+    branchNamePoint(actualBranchNamePoint)
+{
 
-	branchNameHit   = actualBranchNameHit;
-	branchNamePoint = actualBranchNamePoint;
+  //	branchNameHit   = actualBranchNameHit;
+  //	branchNamePoint = actualBranchNamePoint;
 
 }
 
@@ -138,9 +146,12 @@ void noHitWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-stationShapeNotFoundWarningMsg::stationShapeNotFoundWarningMsg() : inputWarningMsg() {
+stationShapeNotFoundWarningMsg::stationShapeNotFoundWarningMsg() 
+  : inputWarningMsg(),
+    stationName()
+{
 
-	stationName.clear();
+  //	stationName.clear();
 
 }
 
@@ -148,9 +159,12 @@ stationShapeNotFoundWarningMsg::stationShapeNotFoundWarningMsg() : inputWarningM
  * Constructor													*
  ****************************************************************/
 
-stationShapeNotFoundWarningMsg::stationShapeNotFoundWarningMsg(std::string actualStationName) : inputWarningMsg() {
+stationShapeNotFoundWarningMsg::stationShapeNotFoundWarningMsg(std::string actualStationName) 
+  : inputWarningMsg(),
+    stationName(actualStationName)
+{
 
-	stationName = actualStationName;
+  //	stationName = actualStationName;
 
 }
 
@@ -186,9 +200,12 @@ void stationShapeNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-stationMaterialNotFoundWarningMsg::stationMaterialNotFoundWarningMsg() : inputWarningMsg() {
+stationMaterialNotFoundWarningMsg::stationMaterialNotFoundWarningMsg() 
+  : inputWarningMsg(),
+    stationName()
+{
 
-	stationName.clear();
+  //	stationName.clear();
 
 }
 
@@ -196,9 +213,12 @@ stationMaterialNotFoundWarningMsg::stationMaterialNotFoundWarningMsg() : inputWa
  * Constructor													*
  ****************************************************************/
 
-stationMaterialNotFoundWarningMsg::stationMaterialNotFoundWarningMsg(std::string actualStationName) : inputWarningMsg() {
+stationMaterialNotFoundWarningMsg::stationMaterialNotFoundWarningMsg(std::string actualStationName) 
+  : inputWarningMsg(), 
+    stationName(actualStationName)
+{
 
-	stationName = actualStationName;
+  //	stationName = actualStationName;
 
 }
 
@@ -265,9 +285,12 @@ void asciiFilesNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-asciiFileNotFoundWarningMsg::asciiFileNotFoundWarningMsg() : inputWarningMsg() {
+asciiFileNotFoundWarningMsg::asciiFileNotFoundWarningMsg() 
+  : inputWarningMsg(), 
+    fileName()
+{
 
-	fileName.clear();
+  //	fileName.clear();
 
 }
 
@@ -275,9 +298,12 @@ asciiFileNotFoundWarningMsg::asciiFileNotFoundWarningMsg() : inputWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-asciiFileNotFoundWarningMsg::asciiFileNotFoundWarningMsg(std::string fileName) : inputWarningMsg() {
+asciiFileNotFoundWarningMsg::asciiFileNotFoundWarningMsg(std::string _fileName) 
+  : inputWarningMsg(), 
+    fileName(_fileName)
+{
 
-	this->fileName = fileName;
+  //	this->fileName = _fileName;
 
 }
 
@@ -313,9 +339,12 @@ void asciiFileNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cbmrootEnvironmentVariableNotFoundWarningMsg::cbmrootEnvironmentVariableNotFoundWarningMsg() : inputWarningMsg() {
+cbmrootEnvironmentVariableNotFoundWarningMsg::cbmrootEnvironmentVariableNotFoundWarningMsg() 
+  : inputWarningMsg(), 
+    defaultValue()
+{
 
-	defaultValue.clear();
+  //	defaultValue.clear();
 
 }
 
@@ -323,9 +352,12 @@ cbmrootEnvironmentVariableNotFoundWarningMsg::cbmrootEnvironmentVariableNotFound
  * Default constructor											*
  ****************************************************************/
 
-cbmrootEnvironmentVariableNotFoundWarningMsg::cbmrootEnvironmentVariableNotFoundWarningMsg(std::string actualDefaultValue) : inputWarningMsg() {
+cbmrootEnvironmentVariableNotFoundWarningMsg::cbmrootEnvironmentVariableNotFoundWarningMsg(std::string actualDefaultValue) 
+  : inputWarningMsg(), 
+    defaultValue(actualDefaultValue)
+{
 
-	defaultValue = actualDefaultValue;
+  //	defaultValue = actualDefaultValue;
 
 }
 
@@ -643,9 +675,12 @@ void cannotGetMvdGeoSensitiveNodesWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotGetLabTransformWarningMsg::cannotGetLabTransformWarningMsg() : inputWarningMsg() {
+cannotGetLabTransformWarningMsg::cannotGetLabTransformWarningMsg() 
+  : inputWarningMsg(), 
+    stationId(0)
+{
 
-	stationId = 0;
+  //	stationId = 0;
 
 }
 
@@ -653,9 +688,12 @@ cannotGetLabTransformWarningMsg::cannotGetLabTransformWarningMsg() : inputWarnin
  * Constructor													*
  ****************************************************************/
 
-cannotGetLabTransformWarningMsg::cannotGetLabTransformWarningMsg(int stationId) : inputWarningMsg() {
+cannotGetLabTransformWarningMsg::cannotGetLabTransformWarningMsg(int _stationId) 
+  : inputWarningMsg(), 
+    stationId(_stationId)
+{
 
-	this->stationId = stationId;
+  //	this->stationId = _stationId;
 
 }
 
@@ -914,9 +952,12 @@ void digiSchemeIsNotSupportedInAsciiWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotGetStsStationWithIndexWarningMsg::cannotGetStsStationWithIndexWarningMsg() : inputWarningMsg() {
+cannotGetStsStationWithIndexWarningMsg::cannotGetStsStationWithIndexWarningMsg() 
+  : inputWarningMsg(), 
+    stationId(0)
+{
 
-	stationId = 0;
+  //	stationId = 0;
 
 }
 
@@ -924,9 +965,12 @@ cannotGetStsStationWithIndexWarningMsg::cannotGetStsStationWithIndexWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-cannotGetStsStationWithIndexWarningMsg::cannotGetStsStationWithIndexWarningMsg(int stationId) : inputWarningMsg() {
+cannotGetStsStationWithIndexWarningMsg::cannotGetStsStationWithIndexWarningMsg(int _stationId) 
+  : inputWarningMsg(),
+    stationId(_stationId)
+{
 
-	this->stationId = stationId;
+  //	this->stationId = _stationId;
 
 }
 
@@ -964,9 +1008,12 @@ void cannotGetStsStationWithIndexWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotGetMvdStationWithIndexWarningMsg::cannotGetMvdStationWithIndexWarningMsg() : inputWarningMsg() {
+cannotGetMvdStationWithIndexWarningMsg::cannotGetMvdStationWithIndexWarningMsg() 
+  : inputWarningMsg(), 
+    stationId(0)
+{
 
-	stationId = 0;
+  //	stationId = 0;
 
 }
 
@@ -974,9 +1021,12 @@ cannotGetMvdStationWithIndexWarningMsg::cannotGetMvdStationWithIndexWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-cannotGetMvdStationWithIndexWarningMsg::cannotGetMvdStationWithIndexWarningMsg(int stationId) : inputWarningMsg() {
+cannotGetMvdStationWithIndexWarningMsg::cannotGetMvdStationWithIndexWarningMsg(int _stationId) 
+  : inputWarningMsg(), 
+    stationId(_stationId)
+{
 
-	this->stationId = stationId;
+  //	this->stationId = _stationId;
 
 }
 

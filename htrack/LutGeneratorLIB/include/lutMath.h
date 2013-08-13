@@ -44,6 +44,11 @@
 
 class lutMath : public lut {
 
+ private:
+
+  lutMath(const lutMath&);
+  lutMath& operator=(const lutMath&);
+
 protected:
 
 	unsigned long                  numberOfCorrections;			/**< Variable stores the number of corrections, if at least one coordinate is corrected. */

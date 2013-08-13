@@ -65,6 +65,9 @@ private:
 	std::string fileName;					/**< Variable stores the name of the file to access */
 	bool*       commandID;					/**< Variable to review which parameter comes from the file. */
 
+	//       fileio(const fileio&);
+	//        fileio operator=(const fileio&);
+
 /**
  * allocates memory
  */
@@ -97,6 +100,8 @@ private:
 
 	char legalizedCommentChar(char value);
 
+	fileio(const fileio&);
+	fileio& operator=(const fileio&);
 protected:
 
 /**

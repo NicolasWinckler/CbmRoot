@@ -183,50 +183,23 @@ void momentumEFGCAnalysis::writeDisplay(TProfile* display, momentumEFGCDisplayIn
  * Default constructor											*
  ****************************************************************/
 
-momentumEFGCAnalysis::momentumEFGCAnalysis() {
-
-	emDisplay                                   = NULL;
-	emGraphicEFGCDisplayInfo.min                = 0;
-	emGraphicEFGCDisplayInfo.max                = 0;
-	emGraphicEFGCDisplayInfo.numberOfBins       = 0;
-	emGraphicEFGCDisplayInfo.numberOfUnderflows = 0;
-	emGraphicEFGCDisplayInfo.numberOfOverflows  = 0;
-	emGraphicEFGCDisplayInfo.baseName           = "";
-	emGraphicEFGCDisplayInfo.baseTitle          = "";
-	emGraphicEFGCDisplayInfo.subDirName         = "";
-	fmDisplay                                   = NULL;
-	fmGraphicEFGCDisplayInfo.min                = 0;
-	fmGraphicEFGCDisplayInfo.max                = 0;
-	fmGraphicEFGCDisplayInfo.numberOfBins       = 0;
-	fmGraphicEFGCDisplayInfo.numberOfUnderflows = 0;
-	fmGraphicEFGCDisplayInfo.numberOfOverflows  = 0;
-	fmGraphicEFGCDisplayInfo.baseName           = "";
-	fmGraphicEFGCDisplayInfo.baseTitle          = "";
-	fmGraphicEFGCDisplayInfo.subDirName         = "";
-	gmDisplay                                   = NULL;
-	gmGraphicEFGCDisplayInfo.min                = 0;
-	gmGraphicEFGCDisplayInfo.max                = 0;
-	gmGraphicEFGCDisplayInfo.numberOfBins       = 0;
-	gmGraphicEFGCDisplayInfo.numberOfUnderflows = 0;
-	gmGraphicEFGCDisplayInfo.numberOfOverflows  = 0;
-	gmGraphicEFGCDisplayInfo.baseName           = "";
-	gmGraphicEFGCDisplayInfo.baseTitle          = "";
-	gmGraphicEFGCDisplayInfo.subDirName         = "";
-	cmDisplay                                   = NULL;
-	cmGraphicEFGCDisplayInfo.min                = 0;
-	cmGraphicEFGCDisplayInfo.max                = 0;
-	cmGraphicEFGCDisplayInfo.numberOfBins       = 0;
-	cmGraphicEFGCDisplayInfo.numberOfUnderflows = 0;
-	cmGraphicEFGCDisplayInfo.numberOfOverflows  = 0;
-	cmGraphicEFGCDisplayInfo.baseName           = "";
-	cmGraphicEFGCDisplayInfo.baseTitle          = "";
-	cmGraphicEFGCDisplayInfo.subDirName         = "";
-	windowPadColumn                             = 0;
-	emWindowPadRow                              = (unsigned short)-1;
-	fmWindowPadRow                              = (unsigned short)-1;
-	gmWindowPadRow                              = (unsigned short)-1;
-	cmWindowPadRow                              = (unsigned short)-1;
-	writeToFile                                 = false;
+momentumEFGCAnalysis::momentumEFGCAnalysis() 
+  : emDisplay(NULL),
+    emGraphicEFGCDisplayInfo(),
+    fmDisplay(NULL),
+    fmGraphicEFGCDisplayInfo(),
+    gmDisplay(NULL),
+    gmGraphicEFGCDisplayInfo(),
+    cmDisplay(NULL),
+    cmGraphicEFGCDisplayInfo(),
+    formula(),
+    windowPadColumn(0),
+    emWindowPadRow((unsigned short)-1),
+    fmWindowPadRow((unsigned short)-1),
+    gmWindowPadRow((unsigned short)-1),
+    cmWindowPadRow((unsigned short)-1),
+    writeToFile(false)
+{
 
 }
 

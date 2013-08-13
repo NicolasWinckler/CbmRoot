@@ -42,13 +42,20 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputStation::trackfinderInputStation() : TObject() {
+trackfinderInputStation::trackfinderInputStation() 
+  : TObject(),
+    id(0),
+    distance(0),
+    type(0),
+    masked(false),
+    index(0)
+{
 
-	id       = 0;
-	distance = 0;
-	removeType();
-	masked   = false;
-	index    = 0;
+   //	id       = 0;
+   //	distance = 0;
+   removeType();
+   //	masked   = false;
+   //	index    = 0;
 
 }
 
@@ -56,30 +63,44 @@ trackfinderInputStation::trackfinderInputStation() : TObject() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputStation::trackfinderInputStation(const trackfinderInputStation& value) : TObject(value) {
-
+trackfinderInputStation::trackfinderInputStation(const trackfinderInputStation& value) 
+  : TObject(value), 
+    id(value.id),
+    distance(value.distance),
+    type(value.type),
+    masked(value.masked),
+    index(value.index)
+{
+  /*
 	this->id       = value.id;
 	this->distance = value.distance;
 	this->type     = value.type;
 	this->masked   = value.masked;
 	this->index    = value.index;
-
+  */
 }
 trackfinderInputStation::trackfinderInputStation(double stationDistance,
 												  int stationId,
 												  bool stationMaps,
 												  bool stationHybrid,
 												  bool stationStrip,
-												  bool mask) : TObject() {
+												  bool mask) 
+  : TObject(),
+    id(stationId),
+    distance(stationDistance),
+    type(),
+    masked(mask),
+    index(0)
+{
 
-	distance = stationDistance;
-	id       = stationId;
+  //	distance = stationDistance;
+  //	id       = stationId;
 	removeType();
 	setMapsType(stationMaps);
 	setHybridType(stationHybrid);
 	setStripType(stationStrip);
-	masked   = mask;
-	index    = 0;
+	//	masked   = mask;
+	//	index    = 0;
 
 }
 
@@ -96,6 +117,7 @@ trackfinderInputStation::~trackfinderInputStation() {
  ****************************************************************/
 
 const trackfinderInputStation& trackfinderInputStation::operator = (const trackfinderInputStation& value) {
+
 
 	this->id       = value.id;
 	this->distance = value.distance;

@@ -41,37 +41,55 @@
  * Default constructor											*
  ****************************************************************/
 
-prelutDefinition::prelutDefinition() {
-
+prelutDefinition::prelutDefinition() 
+  : dim3Min(0),
+    dim3Max(0),
+    dim3Step(0),
+    dim3StartEntry(0),
+    dim3StopEntry(0)
+{
+  /*
 	dim3Min        = 0;
 	dim3Max        = 0;
 	dim3Step       = 0;
 	dim3StartEntry = 0;
 	dim3StopEntry  = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-prelutDefinition::prelutDefinition(const prelutDefinition& value) {
-
+prelutDefinition::prelutDefinition(const prelutDefinition& value) 
+  : dim3Min(value.dim3Min),
+    dim3Max(value.dim3Max),
+    dim3Step(value.dim3Step),
+    dim3StartEntry(value.dim3StartEntry),
+    dim3StopEntry(value.dim3StopEntry)
+{
+  /*
 	this->dim3Min        = value.dim3Min;
 	this->dim3Max        = value.dim3Max;
 	this->dim3Step       = value.dim3Step;
 	this->dim3StartEntry = value.dim3StartEntry;
 	this->dim3StopEntry  = value.dim3StopEntry;
-
+  */
 }
-prelutDefinition::prelutDefinition(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) {
-
-	this->dim3Min        = dim3Min;
-	this->dim3Max        = dim3Max;
-	this->dim3Step       = dim3Step;
-	this->dim3StartEntry = dim3StartEntry;
-	this->dim3StopEntry  = dim3StopEntry;
-
+prelutDefinition::prelutDefinition(double _dim3Min, double _dim3Max, int _dim3Step, double _dim3StartEntry, double _dim3StopEntry) 
+  : dim3Min(_dim3Min),
+    dim3Max(_dim3Max),
+    dim3Step(_dim3Step),
+    dim3StartEntry(_dim3StartEntry),
+    dim3StopEntry(_dim3StopEntry)
+{
+  /*
+	this->dim3Min        = _dim3Min;
+	this->dim3Max        = _dim3Max;
+	this->dim3Step       = _dim3Step;
+	this->dim3StartEntry = _dim3StartEntry;
+	this->dim3StopEntry  = _dim3StopEntry;
+  */
 }
 
 /****************************************************************

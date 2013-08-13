@@ -40,8 +40,9 @@
 /**
  * struct stores the basic information for one display
  */
-typedef struct {
+struct trackPropagationDisplayInfo {
 
+trackPropagationDisplayInfo() : min(0), max(0), numberOfBins(), numberOfUnderflows(0), numberOfOverflows(0), baseName(), baseTitle(), subDirName(), windowPadRow(0) {};
 	int            min;					/**< Variable stores the minimal value in x-dimension */
 	int            max;					/**< Variable stores the maximal value in x-dimension */
 	int            numberOfBins;		/**< Variable stores the steps of the grid in x-dimension */
@@ -52,7 +53,7 @@ typedef struct {
 	std::string    subDirName;			/**< Variable stores the name of the subdirectory to store the analysis results */
 	unsigned short windowPadRow;		/**< Variable to store the number of the row pad of the global window to place the track propagation display */
 
-} trackPropagationDisplayInfo;
+};
 
 
 /* **************************************************************
@@ -60,6 +61,10 @@ typedef struct {
  * **************************************************************/
 
 class trackPropagationDAnalysis {
+
+ private:
+  trackPropagationDAnalysis(const trackPropagationDAnalysis&);
+  trackPropagationDAnalysis& operator=(const trackPropagationDAnalysis&);
 
 protected:
 

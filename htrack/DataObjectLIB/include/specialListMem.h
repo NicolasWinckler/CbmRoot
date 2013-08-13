@@ -317,7 +317,8 @@ template<class objectClass> typename std::list<objectClass>::iterator specialLis
  * Default constructor
  */
 
-template<class objectClass> specialListMem<objectClass>::specialListMem() {
+template<class objectClass> specialListMem<objectClass>::specialListMem() 
+: stackMem(), activeObjectPointer() {
 
 	stackMem.clear();
 	resetActiveObject();
@@ -328,9 +329,10 @@ template<class objectClass> specialListMem<objectClass>::specialListMem() {
  * Constructor
  */
 
-template<class objectClass> specialListMem<objectClass>::specialListMem(const specialListMem<objectClass>& value) {
+template<class objectClass> specialListMem<objectClass>::specialListMem(const specialListMem<objectClass>& value) 
+: stackMem(value.stackMem), activeObjectPointer(value.activeObjectPointer) {
 
-	*this = value;
+  //	*this = value;
 
 }
 

@@ -62,6 +62,8 @@ private:
 
 #endif
 
+	rungeKuttaInterface(const rungeKuttaInterface&);
+	rungeKuttaInterface& operator=(const rungeKuttaInterface&);
 
 public:
 

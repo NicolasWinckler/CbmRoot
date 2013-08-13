@@ -105,10 +105,13 @@ void FairHitProducer::produceSmear(double* xPosOut, double* yPosOut, double xPos
  * Default constructor											*
  ****************************************************************/
 
-FairHitProducer::FairHitProducer() {
+FairHitProducer::FairHitProducer() 
+  : typeOfHitProducer(NONEHITPRODUCER),
+    detector(NULL)
+{
 
-	typeOfHitProducer = NONEHITPRODUCER;
-	detector          = NULL;
+  //	typeOfHitProducer = NONEHITPRODUCER;
+  //	detector          = NULL;
 
 }
 
@@ -116,10 +119,13 @@ FairHitProducer::FairHitProducer() {
  * Constructor													*
  ****************************************************************/
 
-FairHitProducer::FairHitProducer(int hitProducer, trackfinderInputDetector* actualDetector) {
+FairHitProducer::FairHitProducer(int hitProducer, trackfinderInputDetector* actualDetector) 
+  : typeOfHitProducer(hitProducer),
+    detector(actualDetector)
+{
 
-	typeOfHitProducer = hitProducer;
-	detector          = actualDetector;
+  //	typeOfHitProducer = hitProducer;
+  //	detector          = actualDetector;
 
 }
 

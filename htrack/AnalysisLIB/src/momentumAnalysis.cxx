@@ -256,8 +256,20 @@ void momentumAnalysis::drawWindowPads(unsigned short columnId) {
  * Default constructor											*
  ****************************************************************/
 
-momentumAnalysis::momentumAnalysis() {
-
+momentumAnalysis::momentumAnalysis() 
+ : window(NULL),
+   numberOfWindowPadColumns(0),
+   numberOfWindowPadRows(0),
+   enableDisplay(false),
+   efgcEventPz(NULL),
+   efgcEventPt(NULL),
+   efgcTotalPz(NULL),
+   efgcTotalPt(NULL),
+   efgcEventAnalysis(false),
+   efgcTotalAnalysis(false),
+   outputFileName()
+{
+  /*
 	window                   = NULL;
 	numberOfWindowPadColumns = 0;
 	numberOfWindowPadRows    = 0;
@@ -269,7 +281,7 @@ momentumAnalysis::momentumAnalysis() {
 	efgcEventAnalysis         = false;
 	efgcTotalAnalysis         = false;
 	outputFileName.clear();
-
+  */
 }
 
 /****************************************************************

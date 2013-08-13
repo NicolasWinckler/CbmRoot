@@ -49,6 +49,10 @@ class houghTransformation {
 
 private:
 
+  houghTransformation(const houghTransformation&);
+  houghTransformation& operator=(const houghTransformation&);
+
+
 	trackfinderInputData** eventData;			/**< Object for accessing the input data. */
 	histogramData**        histogram;			/**< Object for accessing the histogram. */
 	lutImplementation**    lut;					/**< Object for computing the borders of both look-up-tables. */

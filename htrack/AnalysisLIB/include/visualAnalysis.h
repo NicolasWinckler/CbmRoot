@@ -58,6 +58,10 @@ typedef struct {
 
 class visualAnalysis {
 
+ private:
+  visualAnalysis(const visualAnalysis&);
+  visualAnalysis& operator=(const visualAnalysis&);
+
 protected:
 
 	TCanvas*                window;				/**< Object to handle the window for the display. */

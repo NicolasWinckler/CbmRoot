@@ -236,6 +236,10 @@ static const initialFileParameter defaultFileParameters = {
 
 class analysis {
 
+ private:
+  analysis(const analysis&);
+  analysis& operator=(const analysis&);
+
 protected:
 
 	trackfinderInputData**            eventData;						/**< Object for accessing the input data. */

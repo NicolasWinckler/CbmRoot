@@ -448,9 +448,10 @@ template<class objectClass, bool isPrintable, bool isFindable, bool isModifiable
  * Default constructor
  */
 
-template<class objectClass, bool isPrintable, bool isFindable, bool isModifiable, bool isSorted, bool noDuplicates> specialList<objectClass, isPrintable, isFindable, isModifiable, isSorted, noDuplicates>::specialList() {
+template<class objectClass, bool isPrintable, bool isFindable, bool isModifiable, bool isSorted, bool noDuplicates> specialList<objectClass, isPrintable, isFindable, isModifiable, isSorted, noDuplicates>::specialList() :  stackMem(), activeObjectPointer(), possibleOrderCorruption(false)
+{
 
-	possibleOrderCorruption = false;
+  //	possibleOrderCorruption = false;
 
 	stackMem.clear();
 	resetActiveObject();
@@ -461,9 +462,11 @@ template<class objectClass, bool isPrintable, bool isFindable, bool isModifiable
  * Constructor
  */
 
-template<class objectClass, bool isPrintable, bool isFindable, bool isModifiable, bool isSorted, bool noDuplicates> specialList<objectClass, isPrintable, isFindable, isModifiable, isSorted, noDuplicates>::specialList(const specialList<objectClass, isPrintable, isFindable, isModifiable, isSorted, noDuplicates>& value) {
+template<class objectClass, bool isPrintable, bool isFindable, bool isModifiable, bool isSorted, bool noDuplicates> specialList<objectClass, isPrintable, isFindable, isModifiable, isSorted, noDuplicates>::specialList(const specialList<objectClass, isPrintable, isFindable, isModifiable, isSorted, noDuplicates>& value) 
+:  stackMem(value.stackMem), activeObjectPointer(value.activeObjectPointer), possibleOrderCorruption(value.possibleOrderCorruption)
+{
 
-	*this = value;
+  //	*this = value;
 
 }
 

@@ -291,8 +291,22 @@ void projectionAnalysis::drawWindowPads(unsigned short columnId) {
  * Default constructor											*
  ****************************************************************/
 
-projectionAnalysis::projectionAnalysis() {
-
+projectionAnalysis::projectionAnalysis() 
+ : window(NULL),
+   numberOfWindowPadColumns(0),
+   numberOfWindowPadRows(0),
+   enableDisplay(false),
+   efgcnEvent12(NULL),
+   efgcnEvent13(NULL),
+   efgcnEvent32(NULL),
+   efgcnTotal12(NULL),
+   efgcnTotal13(NULL),
+   efgcnTotal32(NULL),
+   efgcnEventAnalysis(false),
+   efgcnTotalAnalysis(false),
+   outputFileName()
+{
+  /*
 	window                    = NULL;
 	numberOfWindowPadColumns  = 0;
 	numberOfWindowPadRows     = 0;
@@ -306,7 +320,7 @@ projectionAnalysis::projectionAnalysis() {
 	efgcnEventAnalysis        = false;
 	efgcnTotalAnalysis        = false;
 	outputFileName.clear();
-
+  */
 }
 
 /****************************************************************

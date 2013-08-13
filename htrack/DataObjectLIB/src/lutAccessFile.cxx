@@ -415,9 +415,9 @@ void lutAccessFile::setHeaderDefValues() {
  * Default constructor											*
  ****************************************************************/
 
-lutAccessFile::lutAccessFile() : io() {
+lutAccessFile::lutAccessFile() : io(), header(), localMemory(false) {
 
-	localMemory = false;
+  //	localMemory = false;
 
 	init();
 

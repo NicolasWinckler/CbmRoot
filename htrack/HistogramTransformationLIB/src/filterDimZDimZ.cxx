@@ -37,28 +37,34 @@
  * Default constructor											*
  ****************************************************************/
 
-filterDimZDimZ::filterDimZDimZ() : filterDimZ() {
-
+filterDimZDimZ::filterDimZDimZ() 
+  : filterDimZ(), 
+    filterSize1(0),
+    filterSize2(0)
+{
+  /*
 	filterSize1 = 0;
 	filterSize2 = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-filterDimZDimZ::filterDimZDimZ( trackData**    tracks,
-							    unsigned short size1,
-							    unsigned short size2,
-							    unsigned short size,
-								unsigned short localSize) :
-								filterDimZ(
-								tracks, size, localSize) {
-
+filterDimZDimZ::filterDimZDimZ( trackData**    _tracks,
+				unsigned short size1,
+				unsigned short size2,
+				unsigned short size,
+				unsigned short localSize) 
+  : filterDimZ(_tracks, size, localSize),
+    filterSize1(size1),
+    filterSize2(size2)
+{
+  /*
 	filterSize1 = size1;
 	filterSize2 = size2;
-
+  */
 }
 
 /****************************************************************
@@ -73,13 +79,13 @@ filterDimZDimZ::~filterDimZDimZ() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDimZDimZ::init( trackData**    tracks,
+void filterDimZDimZ::init( trackData**    _tracks,
 						   unsigned short size1,
 						   unsigned short size2,
 						   unsigned short size,
 						   unsigned short localSize) {
 
-	filterDimZ::init(tracks, size, localSize);
+	filterDimZ::init(_tracks, size, localSize);
 	filterSize1 = size1;
 	filterSize2 = size2;
 

@@ -76,6 +76,11 @@ typedef struct {
 
 class lutImplementation {
 
+
+ private:
+  lutImplementation(const lutImplementation&);
+  lutImplementation& operator=(const lutImplementation&);
+
 protected:
 
 	histogramSpace** space;				/**< Object to store the needed values to compute the trackAnalogInformation object based on the trackDigitalInformation object. */

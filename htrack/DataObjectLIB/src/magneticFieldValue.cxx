@@ -48,11 +48,11 @@ magneticFieldValue::magneticFieldValue() {
  * Constructor
  */
 
-magneticFieldValue::magneticFieldValue(const magneticFieldValue& value) {
+magneticFieldValue::magneticFieldValue(const magneticFieldValue& _value) {
 
-	this->value[0] = value.value[0];
-	this->value[1] = value.value[1];
-	this->value[2] = value.value[2];
+	this->value[0] = _value.value[0];
+	this->value[1] = _value.value[1];
+	this->value[2] = _value.value[2];
 
 }
 
@@ -68,11 +68,11 @@ magneticFieldValue::~magneticFieldValue() {
  * operator = ()
  */
 
-const magneticFieldValue& magneticFieldValue::operator = (const magneticFieldValue& value) {
+const magneticFieldValue& magneticFieldValue::operator = (const magneticFieldValue& _value) {
 
-	this->value[0] = value.value[0];
-	this->value[1] = value.value[1];
-	this->value[2] = value.value[2];
+	this->value[0] = _value.value[0];
+	this->value[1] = _value.value[1];
+	this->value[2] = _value.value[2];
 
 	return *this;
 
@@ -112,9 +112,9 @@ double magneticFieldValue::getFieldZ() {
  * This method sets the magnetic field value of the x-dimension
  */
 
-void magneticFieldValue::setFieldX(double value) {
+void magneticFieldValue::setFieldX(double _value) {
 
-	this->value[0] = value;
+	this->value[0] = _value;
 
 }
 
@@ -122,9 +122,9 @@ void magneticFieldValue::setFieldX(double value) {
  * This method sets the magnetic field value of the y-dimension
  */
 
-void magneticFieldValue::setFieldY(double value) {
+void magneticFieldValue::setFieldY(double _value) {
 
-	this->value[1] = value;
+	this->value[1] = _value;
 
 }
 
@@ -132,8 +132,8 @@ void magneticFieldValue::setFieldY(double value) {
  * This method sets the magnetic field value of the z-dimension
  */
 
-void magneticFieldValue::setFieldZ(double value) {
+void magneticFieldValue::setFieldZ(double _value) {
 
-	this->value[2] = value;
+	this->value[2] = _value;
 
 }

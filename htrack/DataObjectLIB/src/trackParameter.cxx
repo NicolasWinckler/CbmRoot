@@ -108,10 +108,10 @@ double trackParameter::get(unsigned short dimension) {
  * sets the value in the dimension								*
  ****************************************************************/
 
-void trackParameter::set(double set, unsigned short dimension) {
+void trackParameter::set(double _set, unsigned short dimension) {
 
 	if (dimension < DIMENSIONS)
-		dim[dimension] = set;
+		dim[dimension] = _set;
 	else
 		throw notExistingDimensionError(dimension, DIMENSIONS);
 

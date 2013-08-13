@@ -102,7 +102,7 @@ void CbmLitConverterParallel::CbmPixelHitToLitScalPixelHit(
    lhit->refId = hit->GetRefId();
 
    if (hit->GetType() == kTRDHIT) {
-      lhit->stationId = hit->GetPlaneId() - 1;
+      lhit->stationId = hit->GetPlaneId();
    } else if (hit->GetType() == kMUCHPIXELHIT) {
       lhit->stationId = (hit->GetPlaneId() - 1) / 2;
    } else if (hit->GetType() == kTOFHIT) {

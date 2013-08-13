@@ -199,7 +199,7 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
 
    // Read file with TProfile2D containing silicon equivalent of the material
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-   TString matBudgetFile = parDir + "/littrack/trd_v13c.silicon.root";
+   TString matBudgetFile = parDir + "/littrack/trd_v13g.silicon.root";
    TFile* oldFile = gFile;
    TDirectory* oldDirectory = gDirectory;
    TFile* file = new TFile(matBudgetFile, "READ");
@@ -260,7 +260,7 @@ void CbmLitTrackingGeometryConstructor::GetRichMaterial(
    if (!fDet.GetDet(kRICH)) return;
    // Read file with TProfile2D containing silicon equivalent of the material
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-   TString matBudgetFile = parDir + "/littrack/rich.silicon.root";
+   TString matBudgetFile = parDir + "/littrack/rich_v08a.silicon.root";
    TFile* oldFile = gFile;
    TDirectory* oldDirectory = gDirectory;
    TFile* file = new TFile(matBudgetFile, "READ");

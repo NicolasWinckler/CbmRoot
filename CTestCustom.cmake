@@ -54,8 +54,12 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
 
  	# -- htrack warnings
         # should be switched on, but there are so many
-        "/htrack/"
-
+        "bitfield::operator"
+        "bytefield::operator"
+        "bitfield operator"
+        "bytefield operator"
+        "DataRootObjectLIB/src/histogramData.cxx"
+ 
 
         # -- warnings from ubuntu systems which are a little to much
         # -- probably defined warn-unused-result. ignoring the result

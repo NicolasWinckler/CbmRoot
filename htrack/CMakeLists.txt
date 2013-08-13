@@ -19,7 +19,7 @@ ${CBMROOT_SOURCE_DIR}/trackbase
 
 ${CBMROOT_SOURCE_DIR}/geane
 
-${CBMROOT_SOURCE_DIR}/changed
+${CBMROOT_SOURCE_DIR}/htrack
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

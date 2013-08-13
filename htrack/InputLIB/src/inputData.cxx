@@ -46,19 +46,14 @@
  * Default constructor											*
  ****************************************************************/
 
-inputData::inputData()
-  : TObject(),
-    data(),
-    detectorMask(0),
-    typeOfHitProducer(NONEHITPRODUCER)
-{
+inputData::inputData() {
 
 	data.removeDetector();
 	data.removeAllHits();
 	data.removeAllTracks();
 
-	//	detectorMask      = 0;
-	//	typeOfHitProducer = NONEHITPRODUCER;
+	detectorMask      = 0;
+	typeOfHitProducer = NONEHITPRODUCER;
 
 }
 
@@ -66,49 +61,34 @@ inputData::inputData()
  * Constructor													*
  ****************************************************************/
 
-inputData::inputData(bitArray detMask) 
-  : TObject(),
-    data(),
-    detectorMask(detMask),
-    typeOfHitProducer(NONEHITPRODUCER)
-{
+inputData::inputData(bitArray detMask) {
 
 	data.removeDetector();
 	data.removeAllHits();
 	data.removeAllTracks();
 
-	//	detectorMask      = detMask;
-	//	typeOfHitProducer = NONEHITPRODUCER;
+	detectorMask      = detMask;
+	typeOfHitProducer = NONEHITPRODUCER;
 
 }
-inputData::inputData(int hitProducer) 
-  : TObject(),
-    data(),
-    detectorMask(0),
-    typeOfHitProducer(hitProducer)
-{
+inputData::inputData(int hitProducer) {
 
 	data.removeDetector();
 	data.removeAllHits();
 	data.removeAllTracks();
 
-	//	detectorMask      = 0;
-	//	typeOfHitProducer = hitProducer;
+	detectorMask      = 0;
+	typeOfHitProducer = hitProducer;
 
 }
-inputData::inputData(bitArray detMask, int hitProducer) 
-  : TObject(),
-    data(),
-    detectorMask(detMask),
-    typeOfHitProducer(hitProducer)
-{
+inputData::inputData(bitArray detMask, int hitProducer) {
 
 	data.removeDetector();
 	data.removeAllHits();
 	data.removeAllTracks();
 
-	//	detectorMask      = detMask;
-	//	typeOfHitProducer = hitProducer;
+	detectorMask      = detMask;
+	typeOfHitProducer = hitProducer;
 
 }
 

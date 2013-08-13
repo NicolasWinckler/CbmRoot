@@ -64,7 +64,7 @@ secondFilterFinalMod::secondFilterFinalMod() : filterDimZDimZDimZ() {
  * Constructor													*
  ****************************************************************/
 
-secondFilterFinalMod::secondFilterFinalMod( trackData**    _tracks,
+secondFilterFinalMod::secondFilterFinalMod( trackData**    tracks,
 									  unsigned short  filterArithmetic,
 									  unsigned short size1,
 									  unsigned short size2,
@@ -82,7 +82,7 @@ secondFilterFinalMod::secondFilterFinalMod( trackData**    _tracks,
 	if (localSize > size)
 		localSize = size;
 
-	filterDimZDimZDimZ::init(_tracks, size1, size2, size3, size, localSize);
+	filterDimZDimZDimZ::init(tracks, size1, size2, size3, size, localSize);
 
 	switch(filterArithmetic) {
 
@@ -131,7 +131,7 @@ secondFilterFinalMod::~secondFilterFinalMod() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void secondFilterFinalMod::init( trackData**    _tracks,
+void secondFilterFinalMod::init( trackData**    tracks,
 								 unsigned short  filterArithmetic,
 								 unsigned short   size1,
 								 unsigned short   size2,
@@ -161,7 +161,7 @@ void secondFilterFinalMod::init( trackData**    _tracks,
 	if (localSize > size)
 		localSize = size;
 
-	filterDimZDimZDimZ::init(_tracks, size1, size2, size3, size, localSize);
+	filterDimZDimZDimZ::init(tracks, size1, size2, size3, size, localSize);
 
 	switch(filterArithmetic) {
 
@@ -273,10 +273,10 @@ void secondFilterFinalMod::filter(std::streambuf* terminal) {
 				elementCoordinate1   = element->position.get(DIM1);
 				elementCoordinate2   = element->position.get(DIM2);
 
-				for (trackLayer::iterator _filter = trackAccess[j].begin; _filter != trackAccess[j].end; _filter++) {
+				for (trackLayer::iterator filter = trackAccess[j].begin; filter != trackAccess[j].end; filter++) {
 
-					filterCoordinate1    = _filter->position.get(DIM1);
-					filterCoordinate2    = _filter->position.get(DIM2);
+					filterCoordinate1    = filter->position.get(DIM1);
+					filterCoordinate2    = filter->position.get(DIM2);
 
 					if ((filterCoordinate1 <= elementCoordinate1) && (filterCoordinate1 >= elementCoordinate1 - filterSize1/2) && (filterCoordinate2 < elementCoordinate2) && (filterCoordinate2 >= elementCoordinate2 - filterSize2/2))
 						dim1Reset = true;
@@ -299,7 +299,7 @@ void secondFilterFinalMod::filter(std::streambuf* terminal) {
 						dim3Reset = false;
 
 					if (dim1Reset || dim2Reset || dim3Reset) {
-						filterMem[filterCounter] = _filter->value;
+						filterMem[filterCounter] = filter->value;
 						filterCounter++;
 					}
 

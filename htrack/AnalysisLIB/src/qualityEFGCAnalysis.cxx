@@ -36,9 +36,8 @@
  * resets the info structs for the peaks and the tracks			*
  ****************************************************************/
 
-void qualityEFGCAnalysis::resetPeakAndTrackInfo() 
-{
-  
+void qualityEFGCAnalysis::resetPeakAndTrackInfo() {
+
 	peakInfo.peakToFakeTrack           = 0;
 	peakInfo.peakToNoTrack             = 0;
 	peakInfo.peakToOneTrack            = 0;
@@ -55,17 +54,14 @@ void qualityEFGCAnalysis::resetPeakAndTrackInfo()
 	trackInfo.numberOfWrongFoundTracks = 0;
 	trackInfo.numberOfTracksWithP      = 0;
 	trackInfo.numberOfHits             = 0;
- 
+
 }
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-qualityEFGCAnalysis::qualityEFGCAnalysis() 
-  : peakInfo(),
-    trackInfo()
-{
+qualityEFGCAnalysis::qualityEFGCAnalysis() {
 
 	resetPeakAndTrackInfo();
 

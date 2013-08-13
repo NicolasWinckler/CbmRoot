@@ -41,9 +41,9 @@
  * Default constructor											*
  ****************************************************************/
 
-errorHandling::errorHandling() : errorSource() {
+errorHandling::errorHandling() {
 
-  //	errorSource.clear();
+	errorSource.clear();
 
 }
 
@@ -51,9 +51,9 @@ errorHandling::errorHandling() : errorSource() {
  * Constructor													*
  ****************************************************************/
 
-errorHandling::errorHandling(std::string _errorSource) : errorSource(_errorSource) {
+errorHandling::errorHandling(std::string errorSource) {
 
-  //	this->errorSource = _errorSource;
+	this->errorSource = errorSource;
 
 }
 
@@ -97,9 +97,9 @@ void errorHandling::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-cannotOpenFileError::cannotOpenFileError() : errorHandling(), fileName()  {
+cannotOpenFileError::cannotOpenFileError() : errorHandling() {
 
-  //	this->fileName.clear();
+	this->fileName.clear();
 
 }
 
@@ -107,14 +107,14 @@ cannotOpenFileError::cannotOpenFileError() : errorHandling(), fileName()  {
  * Constructor													*
  ****************************************************************/
 
-cannotOpenFileError::cannotOpenFileError(std::string _errorSource, std::string _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+cannotOpenFileError::cannotOpenFileError(std::string errorSource, std::string fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
-cannotOpenFileError::cannotOpenFileError(std::string _errorSource, const char* _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+cannotOpenFileError::cannotOpenFileError(std::string errorSource, const char* fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
 
@@ -157,9 +157,9 @@ void cannotOpenFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotCloseFileError::cannotCloseFileError() : errorHandling(), fileName() {
+cannotCloseFileError::cannotCloseFileError() : errorHandling() {
 
-  //	this->fileName.clear();
+	this->fileName.clear();
 
 }
 
@@ -167,14 +167,14 @@ cannotCloseFileError::cannotCloseFileError() : errorHandling(), fileName() {
  * Constructor													*
  ****************************************************************/
 
-cannotCloseFileError::cannotCloseFileError(std::string _errorSource, std::string _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+cannotCloseFileError::cannotCloseFileError(std::string errorSource, std::string fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
-cannotCloseFileError::cannotCloseFileError(std::string _errorSource, const char* _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+cannotCloseFileError::cannotCloseFileError(std::string errorSource, const char* fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
 
@@ -217,9 +217,9 @@ void cannotCloseFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotCreateFileError::cannotCreateFileError() : errorHandling(), fileName() {
+cannotCreateFileError::cannotCreateFileError() : errorHandling() {
 
-  //	this->fileName.clear();
+	this->fileName.clear();
 
 }
 
@@ -227,14 +227,14 @@ cannotCreateFileError::cannotCreateFileError() : errorHandling(), fileName() {
  * Constructor													*
  ****************************************************************/
 
-cannotCreateFileError::cannotCreateFileError(std::string _errorSource, std::string _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+cannotCreateFileError::cannotCreateFileError(std::string errorSource, std::string fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
-cannotCreateFileError::cannotCreateFileError(std::string _errorSource, const char* _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+cannotCreateFileError::cannotCreateFileError(std::string errorSource, const char* fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
 
@@ -277,9 +277,9 @@ void cannotCreateFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-unexpectedEofFoundError::unexpectedEofFoundError() : errorHandling(), fileName() {
+unexpectedEofFoundError::unexpectedEofFoundError() : errorHandling() {
 
-  //	this->fileName.clear();
+	this->fileName.clear();
 
 }
 
@@ -287,14 +287,14 @@ unexpectedEofFoundError::unexpectedEofFoundError() : errorHandling(), fileName()
  * Constructor													*
  ****************************************************************/
 
-unexpectedEofFoundError::unexpectedEofFoundError(std::string _errorSource, std::string _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+unexpectedEofFoundError::unexpectedEofFoundError(std::string errorSource, std::string fileName) : errorHandling(errorSource) {
 
-  //	this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
-unexpectedEofFoundError::unexpectedEofFoundError(std::string _errorSource, const char* _fileName) : errorHandling(_errorSource), fileName(_fileName) {
+unexpectedEofFoundError::unexpectedEofFoundError(std::string errorSource, const char* fileName) : errorHandling(errorSource) {
 
-  // this->fileName = _fileName;
+	this->fileName = fileName;
 
 }
 
@@ -345,7 +345,7 @@ noFilenameSpecifiedError::noFilenameSpecifiedError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-noFilenameSpecifiedError::noFilenameSpecifiedError(std::string _errorSource) : errorHandling(_errorSource) {
+noFilenameSpecifiedError::noFilenameSpecifiedError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -384,7 +384,7 @@ memoryAllocationError::memoryAllocationError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-memoryAllocationError::memoryAllocationError(std::string _errorSource) : errorHandling(_errorSource) {
+memoryAllocationError::memoryAllocationError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -423,7 +423,7 @@ cannotAccessHitsOrTracksError::cannotAccessHitsOrTracksError() : errorHandling()
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessHitsOrTracksError::cannotAccessHitsOrTracksError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessHitsOrTracksError::cannotAccessHitsOrTracksError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -462,7 +462,7 @@ cannotAccessEventDataError::cannotAccessEventDataError() : errorHandling() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessEventDataError::cannotAccessEventDataError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessEventDataError::cannotAccessEventDataError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -501,7 +501,7 @@ cannotAccessHistogramDataError::cannotAccessHistogramDataError() : errorHandling
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessHistogramDataError::cannotAccessHistogramDataError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessHistogramDataError::cannotAccessHistogramDataError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -540,7 +540,7 @@ cannotAccessTrackDataError::cannotAccessTrackDataError() : errorHandling() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessTrackDataError::cannotAccessTrackDataError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessTrackDataError::cannotAccessTrackDataError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -579,7 +579,7 @@ cannotAccessRootManagerError::cannotAccessRootManagerError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-cannotAccessRootManagerError::cannotAccessRootManagerError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessRootManagerError::cannotAccessRootManagerError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -618,7 +618,7 @@ noDetectorError::noDetectorError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-noDetectorError::noDetectorError(std::string _errorSource) : errorHandling(_errorSource) {
+noDetectorError::noDetectorError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -657,7 +657,7 @@ outOfRangeError::outOfRangeError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-outOfRangeError::outOfRangeError(std::string _errorSource) : errorHandling(_errorSource) {
+outOfRangeError::outOfRangeError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -696,7 +696,7 @@ zeroDivisionError::zeroDivisionError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-zeroDivisionError::zeroDivisionError(std::string _errorSource) : errorHandling(_errorSource) {
+zeroDivisionError::zeroDivisionError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -735,7 +735,7 @@ zeroModuloError::zeroModuloError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-zeroModuloError::zeroModuloError(std::string _errorSource) : errorHandling(_errorSource) {
+zeroModuloError::zeroModuloError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -774,7 +774,7 @@ cannotAccessStationError::cannotAccessStationError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-cannotAccessStationError::cannotAccessStationError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessStationError::cannotAccessStationError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -813,7 +813,7 @@ cannotReadEmptyMemoryError::cannotReadEmptyMemoryError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-cannotReadEmptyMemoryError::cannotReadEmptyMemoryError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotReadEmptyMemoryError::cannotReadEmptyMemoryError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -852,7 +852,7 @@ cannotAccessHistogramSpaceError::cannotAccessHistogramSpaceError() : errorHandli
  * Constructor													*
  ****************************************************************/
 
-cannotAccessHistogramSpaceError::cannotAccessHistogramSpaceError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessHistogramSpaceError::cannotAccessHistogramSpaceError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -891,7 +891,7 @@ cannotAccessMagneticFieldObjectError::cannotAccessMagneticFieldObjectError() : e
  * Constructor													*
  ****************************************************************/
 
-cannotAccessMagneticFieldObjectError::cannotAccessMagneticFieldObjectError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessMagneticFieldObjectError::cannotAccessMagneticFieldObjectError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -930,7 +930,7 @@ cannotAccessTablesError::cannotAccessTablesError() : errorHandling() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessTablesError::cannotAccessTablesError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessTablesError::cannotAccessTablesError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -969,7 +969,7 @@ functionIsDeprecatedError::functionIsDeprecatedError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-functionIsDeprecatedError::functionIsDeprecatedError(std::string _errorSource) : errorHandling(_errorSource) {
+functionIsDeprecatedError::functionIsDeprecatedError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -1008,7 +1008,7 @@ cannotAccessLutsError::cannotAccessLutsError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-cannotAccessLutsError::cannotAccessLutsError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessLutsError::cannotAccessLutsError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -1047,7 +1047,7 @@ cannotAccessDistributionMemoryError::cannotAccessDistributionMemoryError() : err
  * Constructor													*
  ****************************************************************/
 
-cannotAccessDistributionMemoryError::cannotAccessDistributionMemoryError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessDistributionMemoryError::cannotAccessDistributionMemoryError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -1086,7 +1086,7 @@ cannotAccessHistogramError::cannotAccessHistogramError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-cannotAccessHistogramError::cannotAccessHistogramError(std::string _errorSource) : errorHandling(_errorSource) {
+cannotAccessHistogramError::cannotAccessHistogramError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -1125,7 +1125,7 @@ windowDivisionError::windowDivisionError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-windowDivisionError::windowDivisionError(std::string _errorSource) : errorHandling(_errorSource) {
+windowDivisionError::windowDivisionError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 

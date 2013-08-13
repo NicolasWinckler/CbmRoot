@@ -716,7 +716,7 @@ void bitfield::valueFromString(std::string value) {
  * Default constructor											*
  ****************************************************************/
 
-bitfield::bitfield() : bits() {
+bitfield::bitfield() {
 
 	reset();
 
@@ -726,18 +726,17 @@ bitfield::bitfield() : bits() {
  * Constructor													*
  ****************************************************************/
 
-bitfield::bitfield(const bitfield& value) : bits(value.bits) {
+bitfield::bitfield(const bitfield& value) {
 
-  //	this->bits = value.bits;
-
-}
-bitfield::bitfield(unsigned long value) : bits(std::bitset<numberOfBits>(value))
-{
-
-  //	bits = std::bitset<numberOfBits>(value);
+	this->bits = value.bits;
 
 }
-bitfield::bitfield(std::string value) : bits() {
+bitfield::bitfield(unsigned long value) {
+
+	bits = std::bitset<numberOfBits>(value);
+
+}
+bitfield::bitfield(std::string value) {
 
 	valueFromString(value);
 

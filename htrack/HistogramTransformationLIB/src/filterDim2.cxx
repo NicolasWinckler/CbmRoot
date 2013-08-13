@@ -61,12 +61,12 @@ filterDim2::filterDim2() : filterDimX() {
  * Constructor													*
  ****************************************************************/
 
-filterDim2::filterDim2( histogramData** _histogram,
+filterDim2::filterDim2( histogramData** histogram,
 						unsigned short  filterArithmetic,
 						unsigned short  size,
 						unsigned short  localSize,
 						bitArray maximumClass) : filterDimX(
-						_histogram, size, localSize) {
+						histogram, size, localSize) {
 
 	switch(filterArithmetic) {
 
@@ -115,7 +115,7 @@ filterDim2::~filterDim2() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDim2::init( histogramData** _histogram,
+void filterDim2::init( histogramData** histogram,
 					   unsigned short  filterArithmetic,
 					   unsigned short   size,
 					   unsigned short   localSize,
@@ -132,7 +132,7 @@ void filterDim2::init( histogramData** _histogram,
 	}
 
 	/* set new parameter */
-	filterDimX::init(_histogram, size, localSize);
+	filterDimX::init(histogram, size, localSize);
 
 	switch(filterArithmetic) {
 

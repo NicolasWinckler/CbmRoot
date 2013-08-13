@@ -139,45 +139,31 @@ void houghTransformation::doHistogramLayerEntry(lutHoughBorder& secondBorder, tr
  * Default constructor											*
  ****************************************************************/
 
-houghTransformation::houghTransformation() 
-  : eventData(NULL),
-    histogram(NULL),
-    lut(NULL),
-    actualLayer(0),
-    dynamicLayerMemory(),
-    debugTrackIndex(INVALIDTRACKINDEX)
-{
-  /*
+houghTransformation::houghTransformation() {
+
 	eventData       = NULL;
 	histogram       = NULL;
 	lut             = NULL;
 	actualLayer     = 0;
 	dynamicLayerMemory.clear();
 	debugTrackIndex = INVALIDTRACKINDEX;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-houghTransformation::houghTransformation(trackfinderInputData** _eventData, histogramData** _histogram, lutImplementation** _lut) 
-  : eventData(_eventData),
-    histogram(_histogram),
-    lut(_lut),
-    actualLayer(0),
-    dynamicLayerMemory(),
-    debugTrackIndex(INVALIDTRACKINDEX)
-{
-  /*
-	this->eventData = _eventData;
-	this->histogram = _histogram;
-	this->lut       = _lut;
+houghTransformation::houghTransformation(trackfinderInputData** eventData, histogramData** histogram, lutImplementation** lut) {
+
+	this->eventData = eventData;
+	this->histogram = histogram;
+	this->lut       = lut;
 
 	actualLayer     = 0;
 	dynamicLayerMemory.clear();
 	debugTrackIndex = INVALIDTRACKINDEX;
-  */
+
 }
 
 /****************************************************************
@@ -194,12 +180,12 @@ houghTransformation::~houghTransformation() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void houghTransformation::init(trackfinderInputData** _eventData, histogramData** _histogram, lutImplementation** _lut) {
+void houghTransformation::init(trackfinderInputData** eventData, histogramData** histogram, lutImplementation** lut) {
 
 	/* allocate new space */
-	this->eventData = _eventData;
-	this->histogram = _histogram;
-	this->lut       = _lut;
+	this->eventData = eventData;
+	this->histogram = histogram;
+	this->lut       = lut;
 
 	dynamicLayerMemory.clear();
 	actualLayer = 0;

@@ -46,11 +46,6 @@
 
 class maxMorphSearch : public histogramTransformation {
 
- private:
-
-  maxMorphSearch(const maxMorphSearch&);
-  maxMorphSearch& operator=(const maxMorphSearch&);
-
 protected:
 
 	filterDimX*     firstFilter;								/**< Object to filter the histogram layer at first. */

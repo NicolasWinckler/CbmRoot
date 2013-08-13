@@ -48,27 +48,7 @@
  * default constructor											*
  ****************************************************************/
 
-CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() 
-  : CbmStsTrackFinder(),
-    eventNumber(0),	       
-    configurationFile(NULL),       
-    isFirstEvent(false),   
-    input(NULL),	       
-    space(NULL),       
-    eventData(NULL),       
-    histogram(NULL),	       
-    tracks(NULL),
-    ratings(NULL),       
-    luts(NULL),       
-    houghTrackfinder(NULL),       
-    output(NULL),  
-#ifndef NOANALYSIS
-    setAnalysisOutputFileName(),
-    analyser(NULL)                   
-#else
-    setAnalysisOutputFileName()
-#endif
-{
+CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() : CbmStsTrackFinder() {
 
 	initialParameter analysisParameters;
 
@@ -283,27 +263,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder()
  * constructor													*
  ****************************************************************/
 
-CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) 
-  : CbmStsTrackFinder(),
-    eventNumber(0),	       
-    configurationFile(NULL),       
-    isFirstEvent(false),
-    input(NULL),	       
-    space(NULL),       
-    eventData(NULL),       
-    histogram(NULL),	       
-    tracks(NULL),
-    ratings(NULL),       
-    luts(NULL),       
-    houghTrackfinder(NULL),       
-    output(NULL),  
-#ifndef NOANALYSIS
-    setAnalysisOutputFileName(),
-    analyser(NULL)                   
-#else
-    setAnalysisOutputFileName()
-#endif
-{
+CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) : CbmStsTrackFinder() {
 
 	initialParameter analysisParameters;
 
@@ -523,27 +483,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 						unsigned short trackfinderSecondFilterNeighborhoodDim1ClearRadius,
 						unsigned short trackfinderSecondFilterNeighborhoodDim2ClearRadius,
 						unsigned short trackfinderSecondFilterNeighborhoodDim3ClearRadius,
-						bool initStatus, const char* analysisOutputFileName) 
-  : CbmStsTrackFinder(),
-    eventNumber(0),	       
-    configurationFile(NULL),       
-    isFirstEvent(false),   
-    input(NULL),	       
-    space(NULL),       
-    eventData(NULL),       
-    histogram(NULL),	       
-    tracks(NULL),
-    ratings(NULL),       
-    luts(NULL),       
-    houghTrackfinder(NULL),       
-    output(NULL),  
-#ifndef NOANALYSIS
-    setAnalysisOutputFileName(),
-    analyser(NULL)                   
-#else
-    setAnalysisOutputFileName()
-#endif
-{
+						bool initStatus, const char* analysisOutputFileName) : CbmStsTrackFinder()  {
 
 	initialParameter analysisParameters;
 	InfData          configuration;
@@ -920,27 +860,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name,
 						unsigned short trackfinderSecondFilterNeighborhoodDim1ClearRadius,
 						unsigned short trackfinderSecondFilterNeighborhoodDim2ClearRadius,
 						unsigned short trackfinderSecondFilterNeighborhoodDim3ClearRadius,
-						bool initStatus, const char* analysisOutputFileName) 
-  : CbmStsTrackFinder(),
-    eventNumber(0),	       
-    configurationFile(NULL),       
-    isFirstEvent(false),
-    input(NULL),	       
-    space(NULL),       
-    eventData(NULL),       
-    histogram(NULL),	       
-    tracks(NULL),
-    ratings(NULL),       
-    luts(NULL),       
-    houghTrackfinder(NULL),       
-    output(NULL),  
-#ifndef NOANALYSIS
-    setAnalysisOutputFileName(),
-    analyser(NULL)                   
-#else
-    setAnalysisOutputFileName()
-#endif
- {
+						bool initStatus, const char* analysisOutputFileName) : CbmStsTrackFinder() {
 
 	initialParameter analysisParameters;
 
@@ -1234,18 +1154,18 @@ void CbmHoughStsTrackFinder::SetOutputFile(const char* name) {
  * This method shows the specified histogram layer if possible.	*
  ****************************************************************/
 
-void CbmHoughStsTrackFinder::ShowHistogramLayer(unsigned int _eventNumber, unsigned short layer, const char* drawOption) {
+void CbmHoughStsTrackFinder::ShowHistogramLayer(unsigned int eventNumber, unsigned short layer, const char* drawOption) {
 
 #ifndef NOANALYSIS
 
 	if (analyser != NULL) {
 
 		if (analyser->isShowingCreatedHistogramLayerEnabled())
-			analyser->createdHistogramLayerShow(_eventNumber, layer, drawOption);
+			analyser->createdHistogramLayerShow(eventNumber, layer, drawOption);
 		if (analyser->isShowingEncodedHistogramLayerEnabled())
-			analyser->encodedHistogramLayerShow(_eventNumber, layer, drawOption);
+			analyser->encodedHistogramLayerShow(eventNumber, layer, drawOption);
 		if (analyser->isShowingFilteredHistogramLayerEnabled())
-			analyser->filteredHistogramLayerShow(_eventNumber, layer, drawOption);
+			analyser->filteredHistogramLayerShow(eventNumber, layer, drawOption);
 
 	}
 	else {

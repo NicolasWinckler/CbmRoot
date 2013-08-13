@@ -53,11 +53,6 @@
 
 class CbmHoughStsTrackFinder : public CbmStsTrackFinder {
 
- private:
-
-  CbmHoughStsTrackFinder(const CbmHoughStsTrackFinder&);
-  CbmHoughStsTrackFinder& operator=(const CbmHoughStsTrackFinder&);
-
 protected:
 
 	unsigned int              eventNumber;						/**< Variable to store the number of the actual event. */

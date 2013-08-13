@@ -108,19 +108,13 @@ void visualAnalysis::initWindowStyle() {
  * Default constructor											*
  ****************************************************************/
 
-visualAnalysis::visualAnalysis() 
-  : window(NULL),
-    tracks(NULL),
-    numberOfTracks(0),
-    actualTrack(NULL)
+visualAnalysis::visualAnalysis() {
 
-{
-  /*
 	window         = NULL;
 	tracks         = NULL;
 	numberOfTracks = 0;
 	actualTrack    = NULL;
-  */
+
 }
 
 /****************************************************************

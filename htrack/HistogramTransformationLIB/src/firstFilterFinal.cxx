@@ -64,7 +64,7 @@ firstFilterFinal::firstFilterFinal() : filterDimXDimX() {
  * Constructor													*
  ****************************************************************/
 
-firstFilterFinal::firstFilterFinal( histogramData** _histogram,
+firstFilterFinal::firstFilterFinal( histogramData** histogram,
 								    unsigned short  filterArithmetic,
 									unsigned short  size1,
 									unsigned short  size2,
@@ -80,7 +80,7 @@ firstFilterFinal::firstFilterFinal( histogramData** _histogram,
 	if (localSize > size)
 		localSize = size;
 
-	filterDimXDimX::init(_histogram, size1, size2, size, localSize);
+	filterDimXDimX::init(histogram, size1, size2, size, localSize);
 
 	switch(filterArithmetic) {
 
@@ -129,7 +129,7 @@ firstFilterFinal::~firstFilterFinal() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void firstFilterFinal::init( histogramData** _histogram,
+void firstFilterFinal::init( histogramData** histogram,
 							 unsigned short  filterArithmetic,
 							 unsigned short  size1,
 							 unsigned short  size2,
@@ -156,7 +156,7 @@ void firstFilterFinal::init( histogramData** _histogram,
 	if (localSize > size)
 		localSize = size;
 
-	filterDimXDimX::init(_histogram, size1, size2, size, localSize);
+	filterDimXDimX::init(histogram, size1, size2, size, localSize);
 
 	switch(filterArithmetic) {
 

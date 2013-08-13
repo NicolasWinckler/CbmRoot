@@ -252,12 +252,7 @@ void eraser::clearPeakNeighborhood(unsigned short dim1, unsigned short dim2) {
  * Default constructor											*
  ****************************************************************/
 
-eraser::eraser() 
-  : histogramTransformation(),
-    firstFilterNeighborhoodDim1ClearRadius(0),
-    firstFilterNeighborhoodDim2ClearRadius(0),
-    secondFilterNeighborhoodDim3ClearRadius(0)
-{
+eraser::eraser() : histogramTransformation() {
 
 }
 
@@ -265,17 +260,12 @@ eraser::eraser()
  * Constructor													*
  ****************************************************************/
 
-eraser::eraser(histogramData** _histogram, trackData** _tracks, tables** _ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) 
-  : histogramTransformation(_histogram, _tracks, _ratings),
-    firstFilterNeighborhoodDim1ClearRadius(dim1ClearRadius),
-    firstFilterNeighborhoodDim2ClearRadius(dim2ClearRadius),
-    secondFilterNeighborhoodDim3ClearRadius(dim3ClearRadius)
-{
-  /*
+eraser::eraser(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) : histogramTransformation(histogram, tracks, ratings){
+
 	firstFilterNeighborhoodDim1ClearRadius  = dim1ClearRadius;
 	firstFilterNeighborhoodDim2ClearRadius  = dim2ClearRadius;
 	secondFilterNeighborhoodDim3ClearRadius = dim3ClearRadius;
-  */
+
 }
 
 /****************************************************************
@@ -290,9 +280,9 @@ eraser::~eraser() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void eraser::init(histogramData** _histogram, trackData** _tracks, tables** _ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) {
+void eraser::init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) {
 
-	histogramTransformation::init(_histogram, _tracks, _ratings);
+	histogramTransformation::init(histogram, tracks, ratings);
 
 	firstFilterNeighborhoodDim1ClearRadius  = dim1ClearRadius;
 	firstFilterNeighborhoodDim2ClearRadius  = dim2ClearRadius;

@@ -45,10 +45,6 @@
 
 class showAnalysis {
 
- private:
-  showAnalysis(const showAnalysis&);
-  showAnalysis& operator=(const showAnalysis&);
-
 protected:
 
 	TCanvas**      window;

@@ -1336,28 +1336,8 @@ std::string inputRoot::getGeometryFileRelativePath() {
  * Default constructor											*
  ****************************************************************/
 
-inputRoot::inputRoot() 
-  : inputData(), 
-    inputTracks    (NULL),
-    inputStsPoints (NULL),
-    inputMvdPoints (NULL),
-    inputMapsHits  (NULL),
-    inputStripHits (NULL),
-    inputHybridHits(NULL),
-    inputStsHits   (NULL),
-    inputMvdHits   (NULL),
-    detectorFileName(),
-    numberOfVolumesInfrontOfSTS(0),
-    geometryFileDirectory(),
-    topnode(),
-    hitsProduced(false),
-    readPointsFromFile(false),
-    readHitsFromFile(false),
-    readMapsHits   (false),
-    readHybridHits (false),
-    readStripHits  (false)
-{
-  /*
+inputRoot::inputRoot() : inputData() {
+
 	inputTracks        = NULL;
 	inputStsPoints     = NULL;
 	inputMvdPoints     = NULL;
@@ -1376,97 +1356,15 @@ inputRoot::inputRoot()
 	readMapsHits       = false;
 	readHybridHits     = false;
 	readStripHits      = false;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-inputRoot::inputRoot(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputData(detMask), 
-    inputTracks    (NULL),
-    inputStsPoints (NULL),
-    inputMvdPoints (NULL),
-    inputMapsHits  (NULL),
-    inputStripHits (NULL),
-    inputHybridHits(NULL),
-    inputStsHits   (NULL),
-    inputMvdHits   (NULL),
-    detectorFileName(),
-    numberOfVolumesInfrontOfSTS(0),
-    geometryFileDirectory(),
-    topnode(),
-    hitsProduced(false),
-    readPointsFromFile(enableJustPoints),
-    readHitsFromFile(enableHitsFromFile),
-    readMapsHits   (enableMapsHits),
-    readHybridHits (enableHybridHits),
-    readStripHits  (enableStripHits)
-{
+inputRoot::inputRoot(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask) {
 
-  /*	inputTracks        = NULL;
-	inputStsPoints     = NULL;
-	inputMvdPoints     = NULL;
-	inputMapsHits      = NULL;
-	inputStripHits     = NULL;
-	inputHybridHits    = NULL;
-	inputStsHits       = NULL;
-	inputMvdHits       = NULL;
-	detectorFileName.clear();
-	numberOfVolumesInfrontOfSTS = 0;
-	geometryFileDirectory.clear();
-	topnode.clear();
-	hitsProduced       = false;
-	readPointsFromFile = enableJustPoints;
-	readHitsFromFile   = enableHitsFromFile;
-	readMapsHits       = enableMapsHits;
-	readHybridHits     = enableHybridHits;
-	readStripHits      = enableStripHits;
-  */
-}
-
-/****************************************************************
- * Constructor													*
- ****************************************************************/
-
-inputRoot::inputRoot(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputData(detMask, hitProducer),
-    inputTracks    (NULL),
-    inputStsPoints (NULL),
-    inputMvdPoints (NULL),
-    inputMapsHits  (NULL),
-    inputStripHits (NULL),
-    inputHybridHits(NULL),
-    inputStsHits   (NULL),
-    inputMvdHits   (NULL),
-    detectorFileName(),
-    numberOfVolumesInfrontOfSTS(0),
-    geometryFileDirectory(),
-    topnode(),
-    hitsProduced(false),
-    readPointsFromFile(enableJustPoints),
-    readHitsFromFile(enableHitsFromFile),
-    readMapsHits   (enableMapsHits),
-    readHybridHits (enableHybridHits),
-    readStripHits  (enableStripHits)
-{
-
-	FairRootManager* manager;
-	std::string     fileName;
-
-	/* get pointer to ROOT manager */
-	manager  = FairRootManager::Instance();
-	if (manager == NULL)
-		throw cannotAccessRootManagerError(INPUTLIB);
-
-	fileName = generateFileName(name);
-
-        manager->SetInputFile(fileName.c_str());
-        manager->OpenInChain();
-//	manager->OpenInFile(fileName.c_str());
-
-/*
 	inputTracks        = NULL;
 	inputStsPoints     = NULL;
 	inputMvdPoints     = NULL;
@@ -1485,71 +1383,14 @@ inputRoot::inputRoot(const char* name, bitArray detMask, int hitProducer, bool e
 	readMapsHits       = enableMapsHits;
 	readHybridHits     = enableHybridHits;
 	readStripHits      = enableStripHits;
-*/
-}
-inputRoot::inputRoot(const char* _detectorFileName, unsigned short _numberOfVolumesInfrontOfSTS, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputData(detMask), 
-    inputTracks    (NULL),
-    inputStsPoints (NULL),
-    inputMvdPoints (NULL),
-    inputMapsHits  (NULL),
-    inputStripHits (NULL),
-    inputHybridHits(NULL),
-    inputStsHits   (NULL),
-    inputMvdHits   (NULL),
-    detectorFileName(_detectorFileName),
-    numberOfVolumesInfrontOfSTS(_numberOfVolumesInfrontOfSTS),
-    geometryFileDirectory(),
-    topnode(),
-    hitsProduced(false),
-    readPointsFromFile(enableJustPoints),
-    readHitsFromFile(enableHitsFromFile),
-    readMapsHits   (enableMapsHits),
-    readHybridHits (enableHybridHits),
-    readStripHits  (enableStripHits)
-{
 
-  /*	inputTracks                       = NULL;
-	inputStsPoints                    = NULL;
-	inputMvdPoints                    = NULL;
-	inputMapsHits                     = NULL;
-	inputStripHits                    = NULL;
-	inputHybridHits                   = NULL;
-	inputStsHits                      = NULL;
-	inputMvdHits                      = NULL;
-	this->detectorFileName            = _detectorFileName;
-	this->numberOfVolumesInfrontOfSTS = _numberOfVolumesInfrontOfSTS;
-	geometryFileDirectory.clear();
-	topnode.clear();
-	hitsProduced                      = false;
-	readPointsFromFile                = enableJustPoints;
-	readHitsFromFile                  = enableHitsFromFile;
-	readMapsHits                      = enableMapsHits;
-	readHybridHits                    = enableHybridHits;
-	readStripHits                     = enableStripHits;
-  */
 }
-inputRoot::inputRoot(const char* name, const char* _detectorFileName, unsigned short _numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputData(detMask, hitProducer),
-    inputTracks    (NULL),
-    inputStsPoints (NULL),
-    inputMvdPoints (NULL),
-    inputMapsHits  (NULL),
-    inputStripHits (NULL),
-    inputHybridHits(NULL),
-    inputStsHits   (NULL),
-    inputMvdHits   (NULL),
-    detectorFileName(_detectorFileName),
-    numberOfVolumesInfrontOfSTS(_numberOfVolumesInfrontOfSTS),
-    geometryFileDirectory(),
-    topnode(),
-    hitsProduced(false),
-    readPointsFromFile(enableJustPoints),
-    readHitsFromFile(enableHitsFromFile),
-    readMapsHits   (enableMapsHits),
-    readHybridHits (enableHybridHits),
-    readStripHits  (enableStripHits)
- {
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+inputRoot::inputRoot(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask, hitProducer) {
 
 	FairRootManager* manager;
 	std::string     fileName;
@@ -1565,7 +1406,29 @@ inputRoot::inputRoot(const char* name, const char* _detectorFileName, unsigned s
         manager->OpenInChain();
 //	manager->OpenInFile(fileName.c_str());
 
-/*	inputTracks                       = NULL;
+	inputTracks        = NULL;
+	inputStsPoints     = NULL;
+	inputMvdPoints     = NULL;
+	inputMapsHits      = NULL;
+	inputStripHits     = NULL;
+	inputHybridHits    = NULL;
+	inputStsHits       = NULL;
+	inputMvdHits       = NULL;
+	detectorFileName.clear();
+	numberOfVolumesInfrontOfSTS = 0;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced       = false;
+	readPointsFromFile = enableJustPoints;
+	readHitsFromFile   = enableHitsFromFile;
+	readMapsHits       = enableMapsHits;
+	readHybridHits     = enableHybridHits;
+	readStripHits      = enableStripHits;
+
+}
+inputRoot::inputRoot(const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask) {
+
+	inputTracks                       = NULL;
 	inputStsPoints                    = NULL;
 	inputMvdPoints                    = NULL;
 	inputMapsHits                     = NULL;
@@ -1573,8 +1436,8 @@ inputRoot::inputRoot(const char* name, const char* _detectorFileName, unsigned s
 	inputHybridHits                   = NULL;
 	inputStsHits                      = NULL;
 	inputMvdHits                      = NULL;
-	this->detectorFileName            = _detectorFileName;
-	this->numberOfVolumesInfrontOfSTS = _numberOfVolumesInfrontOfSTS;
+	this->detectorFileName            = detectorFileName;
+	this->numberOfVolumesInfrontOfSTS = numberOfVolumesInfrontOfSTS;
 	geometryFileDirectory.clear();
 	topnode.clear();
 	hitsProduced                      = false;
@@ -1583,7 +1446,43 @@ inputRoot::inputRoot(const char* name, const char* _detectorFileName, unsigned s
 	readMapsHits                      = enableMapsHits;
 	readHybridHits                    = enableHybridHits;
 	readStripHits                     = enableStripHits;
-*/
+
+}
+inputRoot::inputRoot(const char* name, const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask, hitProducer) {
+
+	FairRootManager* manager;
+	std::string     fileName;
+
+	/* get pointer to ROOT manager */
+	manager  = FairRootManager::Instance();
+	if (manager == NULL)
+		throw cannotAccessRootManagerError(INPUTLIB);
+
+	fileName = generateFileName(name);
+
+        manager->SetInputFile(fileName.c_str());
+        manager->OpenInChain();
+//	manager->OpenInFile(fileName.c_str());
+
+	inputTracks                       = NULL;
+	inputStsPoints                    = NULL;
+	inputMvdPoints                    = NULL;
+	inputMapsHits                     = NULL;
+	inputStripHits                    = NULL;
+	inputHybridHits                   = NULL;
+	inputStsHits                      = NULL;
+	inputMvdHits                      = NULL;
+	this->detectorFileName            = detectorFileName;
+	this->numberOfVolumesInfrontOfSTS = numberOfVolumesInfrontOfSTS;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced                      = false;
+	readPointsFromFile                = enableJustPoints;
+	readHitsFromFile                  = enableHitsFromFile;
+	readMapsHits                      = enableMapsHits;
+	readHybridHits                    = enableHybridHits;
+	readStripHits                     = enableStripHits;
+
 }
 
 /****************************************************************
@@ -1690,16 +1589,16 @@ void inputRoot::init(const char* name, int hitProducer) {
 	init();
 
 }
-void inputRoot::init(const char* _detectorFileName, unsigned int _numberOfVolumesInfrontOfSTS) {
+void inputRoot::init(const char* detectorFileName, unsigned int numberOfVolumesInfrontOfSTS) {
 
-	this->detectorFileName            = _detectorFileName;
-	this->numberOfVolumesInfrontOfSTS = _numberOfVolumesInfrontOfSTS;
+	this->detectorFileName            = detectorFileName;
+	this->numberOfVolumesInfrontOfSTS = numberOfVolumesInfrontOfSTS;
 
 }
-void inputRoot::init(const char* name, int hitProducer, const char* _detectorFileName, unsigned int _numberOfVolumesInfrontOfSTS) {
+void inputRoot::init(const char* name, int hitProducer, const char* detectorFileName, unsigned int numberOfVolumesInfrontOfSTS) {
 
 	init(name, hitProducer);
-	init(_detectorFileName, _numberOfVolumesInfrontOfSTS);
+	init(detectorFileName, numberOfVolumesInfrontOfSTS);
 
 }
 void inputRoot::init(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
@@ -1725,15 +1624,15 @@ void inputRoot::init(const char* name, bitArray detMask, int hitProducer, bool e
 	readStripHits      = enableStripHits;
 
 }
-void inputRoot::init(const char* _detectorFileName, unsigned short _numberOfVolumesInfrontOfSTS, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
+void inputRoot::init(const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
 
-	init(_detectorFileName, _numberOfVolumesInfrontOfSTS);
+	init(detectorFileName, numberOfVolumesInfrontOfSTS);
 	init(detMask, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits);
 
 }
-void inputRoot::init(const char* name, const char* _detectorFileName, unsigned short _numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
+void inputRoot::init(const char* name, const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
 
-	init(_detectorFileName, _numberOfVolumesInfrontOfSTS);
+	init(detectorFileName, numberOfVolumesInfrontOfSTS);
 	init(name, detMask, hitProducer, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits);
 
 }

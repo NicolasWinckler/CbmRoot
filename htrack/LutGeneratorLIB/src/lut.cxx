@@ -38,10 +38,7 @@
  * Default constructor											*
  ****************************************************************/
 
-lut::lut() 
-  : def(),
-    border()
-{
+lut::lut() {
 
 	def.dim1Min              = 0;
 	def.dim1Max              = 0;
@@ -57,10 +54,7 @@ lut::lut()
  * Constructor													*
  ****************************************************************/
 
-lut::lut(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) 
-  : def(),
-    border()
-{
+lut::lut(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) {
 
 	init(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step);
 	border.clear();

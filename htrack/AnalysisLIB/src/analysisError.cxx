@@ -405,30 +405,22 @@ void cannotAccessPrelutRangeAnalyserError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-indexIsOutOfDisplayRangeError::indexIsOutOfDisplayRangeError() 
-  : analysisError(), 
-    index(0),
-    numberOfDisplays(0)
-{
-  /*
+indexIsOutOfDisplayRangeError::indexIsOutOfDisplayRangeError() : analysisError() {
+
 	this->index            = 0;
 	this->numberOfDisplays = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-indexIsOutOfDisplayRangeError::indexIsOutOfDisplayRangeError(unsigned short _index, unsigned short _numberOfDisplays) 
-  : analysisError(), 
-    index(_index),
-    numberOfDisplays(_numberOfDisplays)
-{
-  /*
-  	this->index            = _index;
-	this->numberOfDisplays = _numberOfDisplays;
-  */
+indexIsOutOfDisplayRangeError::indexIsOutOfDisplayRangeError(unsigned short index, unsigned short numberOfDisplays) : analysisError() {
+
+	this->index            = index;
+	this->numberOfDisplays = numberOfDisplays;
+
 }
 
 /****************************************************************
@@ -468,30 +460,22 @@ void indexIsOutOfDisplayRangeError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-indexIsOutOfFactorRangeError::indexIsOutOfFactorRangeError() 
-  : analysisError(),
-    index(0),
-    numberOfFactors(0)
-{
-  /*
+indexIsOutOfFactorRangeError::indexIsOutOfFactorRangeError() : analysisError() {
+
 	this->index           = 0;
 	this->numberOfFactors = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-indexIsOutOfFactorRangeError::indexIsOutOfFactorRangeError(unsigned short _index, unsigned short _numberOfFactors) 
-  : analysisError(), 
-    index(_index),
-    numberOfFactors(_numberOfFactors)
-{
-  /*
-	this->index           = _index;
-	this->numberOfFactors = _numberOfFactors;
-  */
+indexIsOutOfFactorRangeError::indexIsOutOfFactorRangeError(unsigned short index, unsigned short numberOfFactors) : analysisError() {
+
+	this->index           = index;
+	this->numberOfFactors = numberOfFactors;
+
 }
 
 /****************************************************************
@@ -531,29 +515,21 @@ void indexIsOutOfFactorRangeError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooManyActiveStationsError::tooManyActiveStationsError() 
-  : analysisError(),
-    actualNumberOfStations(0),
-    maximumNumberOfStations(0)
-{
-  /*
+tooManyActiveStationsError::tooManyActiveStationsError() : analysisError() {
+
 	this->actualNumberOfStations  = 0;
 	this->maximumNumberOfStations = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-tooManyActiveStationsError::tooManyActiveStationsError(unsigned short _actualNumberOfStations, unsigned short _maximumNumberOfStations) 
-  : analysisError(), 
-    actualNumberOfStations(_actualNumberOfStations),
-    maximumNumberOfStations(_maximumNumberOfStations)
-{
+tooManyActiveStationsError::tooManyActiveStationsError(unsigned short actualNumberOfStations, unsigned short maximumNumberOfStations) : analysisError() {
 
-  //	this->actualNumberOfStations  = _actualNumberOfStations;
-  //	this->maximumNumberOfStations = _maximumNumberOfStations;
+	this->actualNumberOfStations  = actualNumberOfStations;
+	this->maximumNumberOfStations = maximumNumberOfStations;
 
 }
 
@@ -656,30 +632,22 @@ void cannotAccessTrackCoordinatesError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-indexIsOutOfTrackRangeError::indexIsOutOfTrackRangeError() 
-  : analysisError(), 
-    index(0),
-    numberOfTracks(0)
-{
-  /*
+indexIsOutOfTrackRangeError::indexIsOutOfTrackRangeError() : analysisError() {
+
 	this->index          = 0;
 	this->numberOfTracks = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-indexIsOutOfTrackRangeError::indexIsOutOfTrackRangeError(unsigned int _index, unsigned int _numberOfTracks) 
-  : analysisError(),
-    index(_index),
-    numberOfTracks(_numberOfTracks)
-{
-  /*
-	this->index          = _index;
-	this->numberOfTracks = _numberOfTracks;
-  */
+indexIsOutOfTrackRangeError::indexIsOutOfTrackRangeError(unsigned int index, unsigned int numberOfTracks) : analysisError() {
+
+	this->index          = index;
+	this->numberOfTracks = numberOfTracks;
+
 }
 
 /****************************************************************

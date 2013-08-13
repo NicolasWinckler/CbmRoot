@@ -158,7 +158,7 @@ void io::writeFileData(std::ofstream& fileStream, terminalSequence* statusSequen
  * This method legalizes a data string.							*
  ****************************************************************/
 
-std::string io::getDataString(std::string& _data, int index, char delimiter) {
+std::string io::getDataString(std::string& data, int index, char delimiter) {
 
 	char                                legalDelimiter;
 	std::string                         returnValue;
@@ -180,7 +180,7 @@ std::string io::getDataString(std::string& _data, int index, char delimiter) {
 	/* search for the start of the substring at position index	*/
 	for (int i = 0; i < index; i++) {
 
-		start_index = _data.find(legalDelimiter, start_index);
+		start_index = data.find(legalDelimiter, start_index);
 		/* index is out of range */
 		if (start_index == std::basic_string<char>::npos)
 			break;
@@ -193,18 +193,18 @@ std::string io::getDataString(std::string& _data, int index, char delimiter) {
 	/* search for the end of the substring at position index,	*
 	 * if start_index is not out of range						*/
 	if (start_index != std::basic_string<char>::npos)
-		stop_index = _data.find(legalDelimiter, start_index);
+		stop_index = data.find(legalDelimiter, start_index);
 	/* if stop index is out of range, the actual index is the	*
 	 * last accepted one										*/
 	if (stop_index == std::basic_string<char>::npos)
-		stop_index = _data.length();
+		stop_index = data.length();
 	
 	/* if index is out of range, an empty string is returned	*/
 	if (start_index == std::basic_string<char>::npos)
 		returnValue.clear();
 	/* if index is not out of range, the substring is returned	*/
 	else
-		returnValue = _data.substr(start_index, stop_index - start_index);
+		returnValue = data.substr(start_index, stop_index - start_index);
 
 	return returnValue;
 
@@ -214,7 +214,7 @@ std::string io::getDataString(std::string& _data, int index, char delimiter) {
  * Default constructor											*
  ****************************************************************/
 
-io::io() : fileio(), data(NULL), numberOfData(0) {
+io::io() : fileio() {
 
 	init();
 
@@ -224,7 +224,7 @@ io::io() : fileio(), data(NULL), numberOfData(0) {
  * Constructor													*
  ****************************************************************/
 
-io::io(std::string name) : fileio(name), data(NULL), numberOfData(0)  {
+io::io(std::string name) : fileio(name) {
 
 	init();
 
@@ -234,7 +234,7 @@ io::io(std::string name) : fileio(name), data(NULL), numberOfData(0)  {
  * Constructor													*
  ****************************************************************/
 
-io::io(char* name) : fileio(name), data(NULL), numberOfData(0)  {
+io::io(char* name) : fileio(name) {
 
 	init();
 

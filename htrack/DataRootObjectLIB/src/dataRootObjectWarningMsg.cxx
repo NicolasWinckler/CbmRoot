@@ -86,41 +86,37 @@ void dataRootObjectWarningMsg::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
+noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg() : dataRootObjectWarningMsg() {
+
+	trackId = 0;
+
 #if (ARCHITECTURE != PS3)
-noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg() : dataRootObjectWarningMsg(), trackId(0), hit(NULL) {
 
-	  //	trackId = 0;
-
-
-	  //	hit     = NULL;
-
-}
-#else
-noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg() : dataRootObjectWarningMsg(), trackId(0) {
-
-  //	trackId = 0;
-
-}
+	hit     = NULL;
 
 #endif
+
+}
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
+noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg(int actualTrackId) : dataRootObjectWarningMsg() {
+
+	trackId = actualTrackId;
+
+}
+
 #if (ARCHITECTURE != PS3)
-noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg(int actualTrackId, trackfinderInputHit* actualHit) : dataRootObjectWarningMsg(), trackId(actualTrackId), hit(actualHit)  {
 
-  //	trackId = actualTrackId;
-  //	hit     = actualHit;
+noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg(int actualTrackId, trackfinderInputHit* actualHit) : dataRootObjectWarningMsg() {
 
-}
-#else
-noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg(int actualTrackId) : dataRootObjectWarningMsg(), trackId(actualTrackId) {
-
-  //	trackId = actualTrackId;
+	trackId = actualTrackId;
+	hit     = actualHit;
 
 }
+
 #endif
 
 /****************************************************************
@@ -259,9 +255,9 @@ void noTrackWithIdFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tracksWithNoIdWarningMsg::tracksWithNoIdWarningMsg() : dataRootObjectWarningMsg(), quantum(0) {
+tracksWithNoIdWarningMsg::tracksWithNoIdWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	quantum = 0;
+	quantum = 0;
 
 }
 
@@ -269,9 +265,9 @@ tracksWithNoIdWarningMsg::tracksWithNoIdWarningMsg() : dataRootObjectWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-tracksWithNoIdWarningMsg::tracksWithNoIdWarningMsg(int actualQuantum) : dataRootObjectWarningMsg(), quantum(actualQuantum) {
+tracksWithNoIdWarningMsg::tracksWithNoIdWarningMsg(int actualQuantum) : dataRootObjectWarningMsg() {
 
-  //	quantum = actualQuantum;
+	quantum = actualQuantum;
 
 }
 
@@ -619,11 +615,11 @@ void cannotGetMagneticFieldWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-stationSetMapsTypeWarningMsg::stationSetMapsTypeWarningMsg() : dataRootObjectWarningMsg(), stationId(0), isHybridType(false), isStripType(false) {
+stationSetMapsTypeWarningMsg::stationSetMapsTypeWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	stationId    = 0;
-  //	isHybridType = false;
-  //	isStripType  = false;
+	stationId    = 0;
+	isHybridType = false;
+	isStripType  = false;
 
 }
 
@@ -631,11 +627,11 @@ stationSetMapsTypeWarningMsg::stationSetMapsTypeWarningMsg() : dataRootObjectWar
  * Constructor													*
  ****************************************************************/
 
-stationSetMapsTypeWarningMsg::stationSetMapsTypeWarningMsg(int _stationId, bool _isHybridType, bool _isStripType) : dataRootObjectWarningMsg(), stationId(_stationId), isHybridType(_isHybridType), isStripType(_isStripType)  {
+stationSetMapsTypeWarningMsg::stationSetMapsTypeWarningMsg(int stationId, bool isHybridType, bool isStripType) : dataRootObjectWarningMsg() {
 
-  //	this->stationId    = _stationId;
-  //	this->isHybridType = _isHybridType;
-  //	this->isStripType  = _isStripType;
+	this->stationId    = stationId;
+	this->isHybridType = isHybridType;
+	this->isStripType  = isStripType;
 
 }
 
@@ -678,11 +674,11 @@ void stationSetMapsTypeWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-stationSetHybridTypeWarningMsg::stationSetHybridTypeWarningMsg() : dataRootObjectWarningMsg(), stationId(0), isMapsType(false), isStripType(false) {
+stationSetHybridTypeWarningMsg::stationSetHybridTypeWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	stationId   = 0;
-  //	isMapsType  = false;
-  //	isStripType = false;
+	stationId   = 0;
+	isMapsType  = false;
+	isStripType = false;
 
 }
 
@@ -690,11 +686,11 @@ stationSetHybridTypeWarningMsg::stationSetHybridTypeWarningMsg() : dataRootObjec
  * Constructor													*
  ****************************************************************/
 
-stationSetHybridTypeWarningMsg::stationSetHybridTypeWarningMsg(int _stationId, bool _isMapsType, bool _isStripType) : dataRootObjectWarningMsg(), stationId(_stationId), isMapsType(_isMapsType), isStripType(_isStripType)  {
+stationSetHybridTypeWarningMsg::stationSetHybridTypeWarningMsg(int stationId, bool isMapsType, bool isStripType) : dataRootObjectWarningMsg() {
 
-	this->stationId   = _stationId;
-	this->isMapsType  = _isMapsType;
-	this->isStripType = _isStripType;
+	this->stationId   = stationId;
+	this->isMapsType  = isMapsType;
+	this->isStripType = isStripType;
 
 }
 
@@ -737,11 +733,11 @@ void stationSetHybridTypeWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-stationSetStripTypeWarningMsg::stationSetStripTypeWarningMsg() : dataRootObjectWarningMsg(), stationId(0), isMapsType(false), isHybridType(false)  {
+stationSetStripTypeWarningMsg::stationSetStripTypeWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	stationId    = 0;
-  //	isMapsType   = false;
-  //	isHybridType = false;
+	stationId    = 0;
+	isMapsType   = false;
+	isHybridType = false;
 
 }
 
@@ -749,11 +745,11 @@ stationSetStripTypeWarningMsg::stationSetStripTypeWarningMsg() : dataRootObjectW
  * Constructor													*
  ****************************************************************/
 
-stationSetStripTypeWarningMsg::stationSetStripTypeWarningMsg(int _stationId, bool _isMapsType, bool _isHybridType) : dataRootObjectWarningMsg(), stationId(_stationId), isMapsType(_isMapsType), isHybridType(_isHybridType)  {
+stationSetStripTypeWarningMsg::stationSetStripTypeWarningMsg(int stationId, bool isMapsType, bool isHybridType) : dataRootObjectWarningMsg() {
 
-  //	this->stationId    = _stationId;
-  //	this->isMapsType   = _isMapsType;
-  //	this->isHybridType = _isHybridType;
+	this->stationId    = stationId;
+	this->isMapsType   = isMapsType;
+	this->isHybridType = isHybridType;
 
 }
 
@@ -796,9 +792,9 @@ void stationSetStripTypeWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithNoPointWarningMsg::trackWithNoPointWarningMsg() : dataRootObjectWarningMsg(), trackIndex(0) {
+trackWithNoPointWarningMsg::trackWithNoPointWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	trackIndex = 0;
+	trackIndex = 0;
 
 }
 
@@ -806,9 +802,9 @@ trackWithNoPointWarningMsg::trackWithNoPointWarningMsg() : dataRootObjectWarning
  * Constructor													*
  ****************************************************************/
 
-trackWithNoPointWarningMsg::trackWithNoPointWarningMsg(int _trackIndex) : dataRootObjectWarningMsg(), trackIndex(_trackIndex) {
+trackWithNoPointWarningMsg::trackWithNoPointWarningMsg(int trackIndex) : dataRootObjectWarningMsg() {
 
-  //	this->trackIndex = _trackIndex;
+	this->trackIndex = trackIndex;
 
 }
 
@@ -846,9 +842,9 @@ void trackWithNoPointWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithNoHitWarningMsg::trackWithNoHitWarningMsg() : dataRootObjectWarningMsg(), trackIndex(0) {
+trackWithNoHitWarningMsg::trackWithNoHitWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	trackIndex = 0;
+	trackIndex = 0;
 
 }
 
@@ -856,9 +852,9 @@ trackWithNoHitWarningMsg::trackWithNoHitWarningMsg() : dataRootObjectWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-trackWithNoHitWarningMsg::trackWithNoHitWarningMsg(int _trackIndex) : dataRootObjectWarningMsg(), trackIndex(_trackIndex) {
+trackWithNoHitWarningMsg::trackWithNoHitWarningMsg(int trackIndex) : dataRootObjectWarningMsg() {
 
-  //	this->trackIndex = _trackIndex;
+	this->trackIndex = trackIndex;
 
 }
 
@@ -896,11 +892,11 @@ void trackWithNoHitWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithWrongNumberOfHitsToPointsWarningMsg::trackWithWrongNumberOfHitsToPointsWarningMsg() : dataRootObjectWarningMsg(), trackIndex(0), numberOfPoints(0), numberOfHits(0) {
+trackWithWrongNumberOfHitsToPointsWarningMsg::trackWithWrongNumberOfHitsToPointsWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	trackIndex     = 0;
-  //	numberOfPoints = 0;
-  //	numberOfHits   = 0;
+	trackIndex     = 0;
+	numberOfPoints = 0;
+	numberOfHits   = 0;
 
 }
 
@@ -908,11 +904,11 @@ trackWithWrongNumberOfHitsToPointsWarningMsg::trackWithWrongNumberOfHitsToPoints
  * Constructor													*
  ****************************************************************/
 
-trackWithWrongNumberOfHitsToPointsWarningMsg::trackWithWrongNumberOfHitsToPointsWarningMsg(int _trackIndex, int _numberOfPoints, int _numberOfHits) : dataRootObjectWarningMsg(), trackIndex(_trackIndex), numberOfPoints(_numberOfPoints), numberOfHits(_numberOfHits)  {
+trackWithWrongNumberOfHitsToPointsWarningMsg::trackWithWrongNumberOfHitsToPointsWarningMsg(int trackIndex, int numberOfPoints, int numberOfHits) : dataRootObjectWarningMsg() {
 
-  //	this->trackIndex     = _trackIndex;
-  //	this->numberOfPoints = _numberOfPoints;
-  //	this->numberOfHits   = _numberOfHits;
+	this->trackIndex     = trackIndex;
+	this->numberOfPoints = numberOfPoints;
+	this->numberOfHits   = numberOfHits;
 
 }
 
@@ -956,9 +952,9 @@ void trackWithWrongNumberOfHitsToPointsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tracksWithNoPointWarningMsg::tracksWithNoPointWarningMsg() : dataRootObjectWarningMsg(), tracksWithNoPoints(0) {
+tracksWithNoPointWarningMsg::tracksWithNoPointWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	tracksWithNoPoints = 0;
+	tracksWithNoPoints = 0;
 
 }
 
@@ -966,9 +962,9 @@ tracksWithNoPointWarningMsg::tracksWithNoPointWarningMsg() : dataRootObjectWarni
  * Constructor													*
  ****************************************************************/
 
-tracksWithNoPointWarningMsg::tracksWithNoPointWarningMsg(unsigned short _tracksWithNoPoints) : dataRootObjectWarningMsg(), tracksWithNoPoints(_tracksWithNoPoints)  {
+tracksWithNoPointWarningMsg::tracksWithNoPointWarningMsg(unsigned short tracksWithNoPoints) : dataRootObjectWarningMsg() {
 
-  //	this->tracksWithNoPoints = _tracksWithNoPoints;
+	this->tracksWithNoPoints = tracksWithNoPoints;
 
 }
 
@@ -1006,9 +1002,9 @@ void tracksWithNoPointWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tracksWithNoHitWarningMsg::tracksWithNoHitWarningMsg() : dataRootObjectWarningMsg(), tracksWithNoHits(0)  {
+tracksWithNoHitWarningMsg::tracksWithNoHitWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	tracksWithNoHits = 0;
+	tracksWithNoHits = 0;
 
 }
 
@@ -1016,9 +1012,9 @@ tracksWithNoHitWarningMsg::tracksWithNoHitWarningMsg() : dataRootObjectWarningMs
  * Constructor													*
  ****************************************************************/
 
-tracksWithNoHitWarningMsg::tracksWithNoHitWarningMsg(unsigned short _tracksWithNoHits) : dataRootObjectWarningMsg(), tracksWithNoHits(_tracksWithNoHits)  {
+tracksWithNoHitWarningMsg::tracksWithNoHitWarningMsg(unsigned short tracksWithNoHits) : dataRootObjectWarningMsg() {
 
-  //	this->tracksWithNoHits = _tracksWithNoHits;
+	this->tracksWithNoHits = tracksWithNoHits;
 
 }
 
@@ -1056,9 +1052,9 @@ void tracksWithNoHitWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tracksWithWrongNumberOfHitsToPointsWarningMsg::tracksWithWrongNumberOfHitsToPointsWarningMsg() : dataRootObjectWarningMsg(), trackWithWrongNumberOfHitsToPoints(0) {
+tracksWithWrongNumberOfHitsToPointsWarningMsg::tracksWithWrongNumberOfHitsToPointsWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	trackWithWrongNumberOfHitsToPoints = 0;
+	trackWithWrongNumberOfHitsToPoints = 0;
 
 }
 
@@ -1066,9 +1062,9 @@ tracksWithWrongNumberOfHitsToPointsWarningMsg::tracksWithWrongNumberOfHitsToPoin
  * Constructor													*
  ****************************************************************/
 
-tracksWithWrongNumberOfHitsToPointsWarningMsg::tracksWithWrongNumberOfHitsToPointsWarningMsg(unsigned short _trackWithWrongNumberOfHitsToPoints) : dataRootObjectWarningMsg(), trackWithWrongNumberOfHitsToPoints(_trackWithWrongNumberOfHitsToPoints) {
+tracksWithWrongNumberOfHitsToPointsWarningMsg::tracksWithWrongNumberOfHitsToPointsWarningMsg(unsigned short trackWithWrongNumberOfHitsToPoints) : dataRootObjectWarningMsg() {
 
-  //	this->trackWithWrongNumberOfHitsToPoints = _trackWithWrongNumberOfHitsToPoints;
+	this->trackWithWrongNumberOfHitsToPoints = trackWithWrongNumberOfHitsToPoints;
 
 }
 
@@ -1106,10 +1102,10 @@ void tracksWithWrongNumberOfHitsToPointsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-stationIndexIsBiggerThanLastStationIndexWarningMsg::stationIndexIsBiggerThanLastStationIndexWarningMsg() : dataRootObjectWarningMsg(), stationIndex(0), lastStationIndex(0) {
+stationIndexIsBiggerThanLastStationIndexWarningMsg::stationIndexIsBiggerThanLastStationIndexWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	stationIndex     = 0;
-  //	lastStationIndex = 0;
+	stationIndex     = 0;
+	lastStationIndex = 0;
 
 }
 
@@ -1117,10 +1113,10 @@ stationIndexIsBiggerThanLastStationIndexWarningMsg::stationIndexIsBiggerThanLast
  * Constructor													*
  ****************************************************************/
 
-stationIndexIsBiggerThanLastStationIndexWarningMsg::stationIndexIsBiggerThanLastStationIndexWarningMsg(unsigned short _stationIndex, unsigned short _lastStationIndex) : dataRootObjectWarningMsg(), stationIndex(_stationIndex), lastStationIndex(_lastStationIndex)  {
+stationIndexIsBiggerThanLastStationIndexWarningMsg::stationIndexIsBiggerThanLastStationIndexWarningMsg(unsigned short stationIndex, unsigned short lastStationIndex) : dataRootObjectWarningMsg() {
 
-  //	this->stationIndex     = _stationIndex;
-  //	this->lastStationIndex = _lastStationIndex;
+	this->stationIndex     = stationIndex;
+	this->lastStationIndex = lastStationIndex;
 
 }
 
@@ -1254,9 +1250,9 @@ void hitAnalysisNotSupportedWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-hitWithNoPointWarningMsg::hitWithNoPointWarningMsg() : dataRootObjectWarningMsg(), hitIndex(0) {
+hitWithNoPointWarningMsg::hitWithNoPointWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	hitIndex = 0;
+	hitIndex = 0;
 
 }
 
@@ -1264,9 +1260,9 @@ hitWithNoPointWarningMsg::hitWithNoPointWarningMsg() : dataRootObjectWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-hitWithNoPointWarningMsg::hitWithNoPointWarningMsg(int _hitIndex) : dataRootObjectWarningMsg(), hitIndex(_hitIndex) {
+hitWithNoPointWarningMsg::hitWithNoPointWarningMsg(int hitIndex) : dataRootObjectWarningMsg() {
 
-  //	this->hitIndex = _hitIndex;
+	this->hitIndex = hitIndex;
 
 }
 
@@ -1304,9 +1300,9 @@ void hitWithNoPointWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-hitWithNoTrackWarningMsg::hitWithNoTrackWarningMsg() : dataRootObjectWarningMsg(), hitIndex(0) {
+hitWithNoTrackWarningMsg::hitWithNoTrackWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	hitIndex = 0;
+	hitIndex = 0;
 
 }
 
@@ -1314,9 +1310,9 @@ hitWithNoTrackWarningMsg::hitWithNoTrackWarningMsg() : dataRootObjectWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-hitWithNoTrackWarningMsg::hitWithNoTrackWarningMsg(int _hitIndex) : dataRootObjectWarningMsg(), hitIndex(_hitIndex) {
+hitWithNoTrackWarningMsg::hitWithNoTrackWarningMsg(int hitIndex) : dataRootObjectWarningMsg() {
 
-  //	this->hitIndex = _hitIndex;
+	this->hitIndex = hitIndex;
 
 }
 
@@ -1354,9 +1350,9 @@ void hitWithNoTrackWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-hitsWithNoPointWarningMsg::hitsWithNoPointWarningMsg() : dataRootObjectWarningMsg(), hitsWithNoPoint(0) {
+hitsWithNoPointWarningMsg::hitsWithNoPointWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	hitsWithNoPoint = 0;
+	hitsWithNoPoint = 0;
 
 }
 
@@ -1364,9 +1360,9 @@ hitsWithNoPointWarningMsg::hitsWithNoPointWarningMsg() : dataRootObjectWarningMs
  * Constructor													*
  ****************************************************************/
 
-hitsWithNoPointWarningMsg::hitsWithNoPointWarningMsg(unsigned short _hitsWithNoPoint) : dataRootObjectWarningMsg(), hitsWithNoPoint(_hitsWithNoPoint) {
+hitsWithNoPointWarningMsg::hitsWithNoPointWarningMsg(unsigned short hitsWithNoPoint) : dataRootObjectWarningMsg() {
 
-  //	this->hitsWithNoPoint = _hitsWithNoPoint;
+	this->hitsWithNoPoint = hitsWithNoPoint;
 
 }
 
@@ -1404,9 +1400,9 @@ void hitsWithNoPointWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-hitsWithNoTrackWarningMsg::hitsWithNoTrackWarningMsg() : dataRootObjectWarningMsg(), hitsWithNoTrack(0) {
+hitsWithNoTrackWarningMsg::hitsWithNoTrackWarningMsg() : dataRootObjectWarningMsg() {
 
-  //	hitsWithNoTrack = 0;
+	hitsWithNoTrack = 0;
 
 }
 
@@ -1414,9 +1410,9 @@ hitsWithNoTrackWarningMsg::hitsWithNoTrackWarningMsg() : dataRootObjectWarningMs
  * Constructor													*
  ****************************************************************/
 
-hitsWithNoTrackWarningMsg::hitsWithNoTrackWarningMsg(unsigned short _hitsWithNoTrack) : dataRootObjectWarningMsg(), hitsWithNoTrack(_hitsWithNoTrack) {
+hitsWithNoTrackWarningMsg::hitsWithNoTrackWarningMsg(unsigned short hitsWithNoTrack) : dataRootObjectWarningMsg() {
 
-  //	this->hitsWithNoTrack = _hitsWithNoTrack;
+	this->hitsWithNoTrack = hitsWithNoTrack;
 
 }
 

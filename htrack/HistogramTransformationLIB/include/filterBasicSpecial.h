@@ -50,9 +50,6 @@ class filterBasicSpecial : public filterBasicStyle {
 
 private:
 
-  filterBasicSpecial(const filterBasicSpecial&);
-  filterBasicSpecial& operator=(const filterBasicSpecial&);
-
 	bitArray          maxClass;			/**> Object to store the maximum classification which can occur. */
 	filterBasicStyle* filterMax;		/**< Object to use a filter for a maximum value. */
 	filterBasicStyle* filterElse;		/**< Object to use a filter for all other values. */

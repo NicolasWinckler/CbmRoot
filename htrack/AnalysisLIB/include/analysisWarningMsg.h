@@ -93,8 +93,6 @@ private:
 
 	trackfinderInputTrack* track;
 
-        trackNotFoundWarningMsg(const trackNotFoundWarningMsg&);
-        trackNotFoundWarningMsg& operator=(const trackNotFoundWarningMsg&);
 public:
 
 /**
@@ -670,8 +668,6 @@ private:
 	histogramSpace*   space;
 	trackCoordinates* coordinates;
 
-        positionIsOutOfSpaceWarningMsg(const positionIsOutOfSpaceWarningMsg&);
-        positionIsOutOfSpaceWarningMsg& operator=(const positionIsOutOfSpaceWarningMsg&);
 public:
 
 /**
@@ -964,8 +960,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithHitsInCorrectLayerDistributionWarningMsg(const trackWithHitsInCorrectLayerDistributionWarningMsg&);
-        trackWithHitsInCorrectLayerDistributionWarningMsg& operator=(const trackWithHitsInCorrectLayerDistributionWarningMsg&);
 public:
 
 /**
@@ -1011,8 +1005,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithHitsWithCorrectSlopeDistributionWarningMsg(const trackWithHitsWithCorrectSlopeDistributionWarningMsg&);
-        trackWithHitsWithCorrectSlopeDistributionWarningMsg& operator=(const trackWithHitsWithCorrectSlopeDistributionWarningMsg&);
 public:
 
 /**
@@ -1058,8 +1050,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithHitsInLayerDistributionWarningMsg(const trackWithHitsInLayerDistributionWarningMsg&);
-        trackWithHitsInLayerDistributionWarningMsg& operator=(const trackWithHitsInLayerDistributionWarningMsg&);
 public:
 
 /**
@@ -1139,8 +1129,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithSignatureDistributionWarningMsg(const trackWithSignatureDistributionWarningMsg&);
-        trackWithSignatureDistributionWarningMsg& operator=(const trackWithSignatureDistributionWarningMsg&);
 public:
 
 /**
@@ -1186,8 +1174,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithHitsInCorrectCellDistributionWarningMsg(const trackWithHitsInCorrectCellDistributionWarningMsg&);
-        trackWithHitsInCorrectCellDistributionWarningMsg& operator=(const trackWithHitsInCorrectCellDistributionWarningMsg&);
 public:
 
 /**
@@ -1233,8 +1219,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithHitsInCellDistributionWarningMsg(const trackWithHitsInCellDistributionWarningMsg&);
-        trackWithHitsInCellDistributionWarningMsg& operator=(const trackWithHitsInCellDistributionWarningMsg&);
 public:
 
 /**
@@ -1652,8 +1636,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        trackWithMomentaErrorDistributionWarningMsg(const trackWithMomentaErrorDistributionWarningMsg&);
-        trackWithMomentaErrorDistributionWarningMsg& operator=(const trackWithMomentaErrorDistributionWarningMsg&);
 public:
 
 /**
@@ -1698,11 +1680,9 @@ private:
 
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
-	double         minimum;
-	double         maximum;
+	double         min;
+	double         max;
 
-        quantizedMomentaXDistributionWarningMsg(const quantizedMomentaXDistributionWarningMsg&);
-        quantizedMomentaXDistributionWarningMsg& operator=(const quantizedMomentaXDistributionWarningMsg&);
 public:
 
 /**
@@ -1747,11 +1727,9 @@ private:
 
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
-	double         minimum;
-	double         maximum;
+	double         min;
+	double         max;
 
-        quantizedMomentaYDistributionWarningMsg(const quantizedMomentaYDistributionWarningMsg&);
-        quantizedMomentaYDistributionWarningMsg& operator=(const quantizedMomentaYDistributionWarningMsg&);
 public:
 
 /**
@@ -1796,11 +1774,9 @@ private:
 
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
-	double         minimum;
-	double         maximum;
+	double         min;
+	double         max;
 
-        quantizedMomentaZDistributionWarningMsg(const quantizedMomentaZDistributionWarningMsg&);
-        quantizedMomentaZDistributionWarningMsg& operator=(const quantizedMomentaZDistributionWarningMsg&);
 public:
 
 /**
@@ -1846,8 +1822,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        quantizedHoughspaceDim1DistributionWarningMsg(const quantizedHoughspaceDim1DistributionWarningMsg&);
-        quantizedHoughspaceDim1DistributionWarningMsg& operator=(const quantizedHoughspaceDim1DistributionWarningMsg&);
 public:
 
 /**
@@ -1893,8 +1867,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        quantizedHoughspaceDim2DistributionWarningMsg(const quantizedHoughspaceDim2DistributionWarningMsg&);
-        quantizedHoughspaceDim2DistributionWarningMsg& operator=(const quantizedHoughspaceDim2DistributionWarningMsg&);
 public:
 
 /**
@@ -1940,8 +1912,6 @@ private:
 	unsigned int*  distribution;
 	unsigned short numberOfEntries;
 
-        quantizedHoughspaceDim3DistributionWarningMsg(const quantizedHoughspaceDim3DistributionWarningMsg&);
-        quantizedHoughspaceDim3DistributionWarningMsg& operator=(const quantizedHoughspaceDim3DistributionWarningMsg&);
 public:
 
 /**
@@ -1987,8 +1957,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        quantizedMomentaDistributionWarningMsg(const quantizedMomentaDistributionWarningMsg&);
-        quantizedMomentaDistributionWarningMsg& operator=(const quantizedMomentaDistributionWarningMsg&);
 public:
 
 /**
@@ -2034,8 +2002,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        quantizedHoughspaceDistributionWarningMsg(const quantizedHoughspaceDistributionWarningMsg&);
-        quantizedHoughspaceDistributionWarningMsg& operator=(const quantizedHoughspaceDistributionWarningMsg&);
 public:
 
 /**
@@ -2125,9 +2091,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        dim1PeakDistanceDistributionWarningMsg(const dim1PeakDistanceDistributionWarningMsg&);
-        dim1PeakDistanceDistributionWarningMsg& operator=(const dim1PeakDistanceDistributionWarningMsg&);
-        
 public:
 
 /**
@@ -2173,8 +2136,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        dim2PeakDistanceDistributionWarningMsg(const dim2PeakDistanceDistributionWarningMsg&);
-        dim2PeakDistanceDistributionWarningMsg& operator=(const dim2PeakDistanceDistributionWarningMsg&);
 public:
 
 /**
@@ -2220,8 +2181,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        dim3PeakDistanceDistributionWarningMsg(const dim3PeakDistanceDistributionWarningMsg&);
-        dim3PeakDistanceDistributionWarningMsg& operator=(const dim3PeakDistanceDistributionWarningMsg&);
 public:
 
 /**
@@ -2267,8 +2226,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        accumulatedPeakDistanceDistributionWarningMsg(const accumulatedPeakDistanceDistributionWarningMsg&);
-        accumulatedPeakDistanceDistributionWarningMsg& operator=(const accumulatedPeakDistanceDistributionWarningMsg&);
 public:
 
 /**
@@ -2622,8 +2579,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        sameHoughspaceCellDistributionWarningMsg(const sameHoughspaceCellDistributionWarningMsg&);
-        sameHoughspaceCellDistributionWarningMsg& operator=(const sameHoughspaceCellDistributionWarningMsg&);
 public:
 
 /**
@@ -2817,8 +2772,6 @@ private:
 	unsigned int  numberOfEntries;
 	unsigned int  numberOfSummedEventsToAverage;
 
-        numberOfTracksInAllLayersWarningMsg(const numberOfTracksInAllLayersWarningMsg&);
-        numberOfTracksInAllLayersWarningMsg& operator=(const numberOfTracksInAllLayersWarningMsg&);
 public:
 
 /**
@@ -2865,8 +2818,6 @@ private:
 	unsigned int  numberOfEntries;
 	unsigned int  numberOfSummedEventsToAverage;
 
-        numberOfTrackDensitiesInAllLayersWarningMsg(const numberOfTrackDensitiesInAllLayersWarningMsg&);
-        numberOfTrackDensitiesInAllLayersWarningMsg& operator=(const numberOfTrackDensitiesInAllLayersWarningMsg&);
 public:
 
 /**
@@ -2912,8 +2863,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        numberOfMinimalTracksInAllColumnsWarningMsg(const numberOfMinimalTracksInAllColumnsWarningMsg&);
-        numberOfMinimalTracksInAllColumnsWarningMsg& operator=(const numberOfMinimalTracksInAllColumnsWarningMsg&);
 public:
 
 /**
@@ -2960,8 +2909,6 @@ private:
 	unsigned int numberOfEntries;
 	unsigned int numberOfSummedEventsToAverage;
 
-        numberOfAverageTracksInAllColumnsWarningMsg(const numberOfAverageTracksInAllColumnsWarningMsg&);
-        numberOfAverageTracksInAllColumnsWarningMsg& operator=(const numberOfAverageTracksInAllColumnsWarningMsg&);
 public:
 
 /**
@@ -3007,8 +2954,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        numberOfMaximalTracksInAllColumnsWarningMsg(const numberOfMaximalTracksInAllColumnsWarningMsg&);
-        numberOfMaximalTracksInAllColumnsWarningMsg& operator=(const numberOfMaximalTracksInAllColumnsWarningMsg&);
 public:
 
 /**
@@ -3054,8 +2999,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        sizeOfColumnSeparatorFifosWarningMsg(const sizeOfColumnSeparatorFifosWarningMsg&);
-        sizeOfColumnSeparatorFifosWarningMsg& operator=(const sizeOfColumnSeparatorFifosWarningMsg&);
 public:
 
 /**
@@ -3100,9 +3043,7 @@ private:
 
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
-       
-        numberOfMinimalTracksInAllRowsWarningMsg(const numberOfMinimalTracksInAllRowsWarningMsg&);
-        numberOfMinimalTracksInAllRowsWarningMsg& operator=(const numberOfMinimalTracksInAllRowsWarningMsg&);
+
 public:
 
 /**
@@ -3149,8 +3090,6 @@ private:
 	unsigned int numberOfEntries;
 	unsigned int numberOfSummedEventsToAverage;
 
-        numberOfAverageTracksInAllRowsWarningMsg(const numberOfAverageTracksInAllRowsWarningMsg&);
-        numberOfAverageTracksInAllRowsWarningMsg& operator=(const numberOfAverageTracksInAllRowsWarningMsg&);
 public:
 
 /**
@@ -3196,8 +3135,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        numberOfMaximalTracksInAllRowsWarningMsg(const numberOfMaximalTracksInAllRowsWarningMsg&);
-        numberOfMaximalTracksInAllRowsWarningMsg& operator=(const numberOfMaximalTracksInAllRowsWarningMsg&);
 public:
 
 /**
@@ -3243,8 +3180,6 @@ private:
 	unsigned int* distribution;
 	unsigned int  numberOfEntries;
 
-        sizeOfRowSeparatorFifosWarningMsg(const sizeOfRowSeparatorFifosWarningMsg&);
-        sizeOfRowSeparatorFifosWarningMsg& operator=(const sizeOfRowSeparatorFifosWarningMsg&);
 public:
 
 /**
@@ -3491,8 +3426,6 @@ private:
 	unsigned int  numberOfEntries;
 	unsigned int  numberOfSummedEventsToAverage;
 
-        hitReadoutDistributionWarningMsg(const hitReadoutDistributionWarningMsg&);
-        hitReadoutDistributionWarningMsg& operator=(const hitReadoutDistributionWarningMsg&);
 public:
 
 /**
@@ -3539,8 +3472,6 @@ private:
 	unsigned int  numberOfEntries;
 	unsigned int  numberOfSummedEventsToAverage;
 
-        hitReadoutMeanDistributionWarningMsg(const hitReadoutMeanDistributionWarningMsg&);
-        hitReadoutMeanDistributionWarningMsg& operator=(const hitReadoutMeanDistributionWarningMsg&);
 public:
 
 /**
@@ -3589,9 +3520,6 @@ private:
 	bool           readoutColumnsInParallel;
 	unsigned short histogramDim1;
 	unsigned short histogramDim2;
-
-        fpgaHistogramProcessingTimeDistributionWarningMsg(const fpgaHistogramProcessingTimeDistributionWarningMsg&);
-	fpgaHistogramProcessingTimeDistributionWarningMsg& operator=(const fpgaHistogramProcessingTimeDistributionWarningMsg&);
 
 public:
 

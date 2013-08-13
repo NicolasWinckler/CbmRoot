@@ -559,10 +559,7 @@ bool inputFRoot::readStsDetectorByHand() {
  * Default constructor											*
  ****************************************************************/
 
-inputFRoot::inputFRoot() 
-  : inputRoot(),
-    disableAutomaticDetector()
-{
+inputFRoot::inputFRoot() : inputRoot() {
 
 }
 
@@ -570,36 +567,24 @@ inputFRoot::inputFRoot()
  * Constructor													*
  ****************************************************************/
 
-inputFRoot::inputFRoot(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputRoot(detMask, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits), 
-    disableAutomaticDetector(false)
-{
+inputFRoot::inputFRoot(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputRoot(detMask, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits) {
 
-  //	this->disableAutomaticDetector = false;
+	this->disableAutomaticDetector = false;
 
 }
-inputFRoot::inputFRoot(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputRoot(name, detMask, hitProducer, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits), 
-    disableAutomaticDetector(false)
-{
+inputFRoot::inputFRoot(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputRoot(name, detMask, hitProducer, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits) {
 
-  //	this->disableAutomaticDetector = false;
+	this->disableAutomaticDetector = false;
 
 }
-inputFRoot::inputFRoot(const char* _detectorFileName, unsigned short _numberOfVolumesInfrontOfSTS, bool _disableAutomaticDetector, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputRoot(_detectorFileName, _numberOfVolumesInfrontOfSTS, detMask, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits), disableAutomaticDetector(_disableAutomaticDetector)
+inputFRoot::inputFRoot(const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bool disableAutomaticDetector, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputRoot(detectorFileName, numberOfVolumesInfrontOfSTS, detMask, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits) {
 
-{
-
-  //	this->disableAutomaticDetector = _disableAutomaticDetector;
+	this->disableAutomaticDetector = disableAutomaticDetector;
 
 }
-inputFRoot::inputFRoot(const char* name, const char* _detectorFileName, unsigned short _numberOfVolumesInfrontOfSTS, bool _disableAutomaticDetector, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) 
-  : inputRoot(name, _detectorFileName, _numberOfVolumesInfrontOfSTS, detMask, hitProducer, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits),
-    disableAutomaticDetector(_disableAutomaticDetector)
- {
+inputFRoot::inputFRoot(const char* name, const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bool disableAutomaticDetector, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputRoot(name, detectorFileName, numberOfVolumesInfrontOfSTS, detMask, hitProducer, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits) {
 
-   //	this->disableAutomaticDetector = _disableAutomaticDetector;
+	this->disableAutomaticDetector = disableAutomaticDetector;
 
 }
 

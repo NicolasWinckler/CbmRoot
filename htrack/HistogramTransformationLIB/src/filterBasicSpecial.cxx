@@ -40,17 +40,12 @@
  * Default constructor											*
  ****************************************************************/
 
-filterBasicSpecial::filterBasicSpecial(bitArray maximumClass) 
-  : filterBasicStyle(),
-    maxClass(maximumClass),
-    filterMax(new filterBasicSimpleMod()),
-    filterElse(new filterBasicSimple())
-{
-  /*
+filterBasicSpecial::filterBasicSpecial(bitArray maximumClass) {
+
 	maxClass   = maximumClass;
 	filterMax  = new filterBasicSimpleMod();
 	filterElse = new filterBasicSimple();
-  */
+
 }
 
 /****************************************************************

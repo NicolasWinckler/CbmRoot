@@ -36,17 +36,8 @@
  * Default constructor											*
  ****************************************************************/
 
-peakToTrack::peakToTrack() 
-  : peakToFakeTrack(0),
-    peakToNoTrack(0),
-    peakToOneTrack(0),
-    peakToMoreTracks(0),
-    numberOfPeaks(0),
-    numberOfIdentifiedPeaks(0),
-    numberOfClonePeaks(0),
-    numberOfWrongPeaks(0)
-{
-  /*
+peakToTrack::peakToTrack() {
+
 	peakToFakeTrack         = 0;
 	peakToNoTrack           = 0;
 	peakToOneTrack          = 0;
@@ -55,24 +46,15 @@ peakToTrack::peakToTrack()
 	numberOfIdentifiedPeaks = 0;
 	numberOfClonePeaks      = 0;
 	numberOfWrongPeaks      = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-peakToTrack::peakToTrack(const peakToTrack& value) 
-  : peakToFakeTrack(value.peakToFakeTrack),
-    peakToNoTrack(value.peakToNoTrack),
-    peakToOneTrack(value.peakToOneTrack),
-    peakToMoreTracks(value.peakToMoreTracks),
-    numberOfPeaks(value.numberOfPeaks),
-    numberOfIdentifiedPeaks(value.numberOfIdentifiedPeaks),
-    numberOfClonePeaks(value.numberOfClonePeaks),
-    numberOfWrongPeaks(value.numberOfWrongPeaks)
-{
-  /*
+peakToTrack::peakToTrack(const peakToTrack& value) {
+
 	peakToFakeTrack         = value.peakToFakeTrack;
 	peakToNoTrack           = value.peakToNoTrack;
 	peakToOneTrack          = value.peakToOneTrack;
@@ -81,7 +63,7 @@ peakToTrack::peakToTrack(const peakToTrack& value)
 	numberOfIdentifiedPeaks = value.numberOfIdentifiedPeaks;
 	numberOfClonePeaks      = value.numberOfClonePeaks;
 	numberOfWrongPeaks      = value.numberOfWrongPeaks;
-  */
+
 }
 
 /****************************************************************

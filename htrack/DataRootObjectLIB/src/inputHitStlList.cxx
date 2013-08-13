@@ -37,10 +37,7 @@
  * Default constructor											*
  ****************************************************************/
 
-inputHitStlList::inputHitStlList() 
-  : stlList(), 
-    activeObjectPointer()
-{
+inputHitStlList::inputHitStlList() {
 
 	clear();
 
@@ -50,13 +47,10 @@ inputHitStlList::inputHitStlList()
  * Constructor													*
  ****************************************************************/
 
-inputHitStlList::inputHitStlList(const inputHitStlList& value) 
-  : stlList(value.stlList), 
-    activeObjectPointer(stlList.begin())
-{
+inputHitStlList::inputHitStlList(const inputHitStlList& value) {
 
-  //	this->stlList             = value.stlList;
-  //	this->activeObjectPointer = this->stlList.begin();
+	this->stlList             = value.stlList;
+	this->activeObjectPointer = this->stlList.begin();
 
 }
 

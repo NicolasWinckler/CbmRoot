@@ -63,9 +63,9 @@ dataRootObjectError::~dataRootObjectError() {
  * Default constructor											*
  ****************************************************************/
 
-cannotFindStationIdError::cannotFindStationIdError() : dataRootObjectError(), stationId(-1) {
+cannotFindStationIdError::cannotFindStationIdError() : dataRootObjectError() {
 
-  //	stationId = -1;
+	stationId = -1;
 
 }
 
@@ -73,9 +73,9 @@ cannotFindStationIdError::cannotFindStationIdError() : dataRootObjectError(), st
  * Constructor													*
  ****************************************************************/
 
-cannotFindStationIdError::cannotFindStationIdError(int id) : dataRootObjectError(), stationId(id) {
+cannotFindStationIdError::cannotFindStationIdError(int id) : dataRootObjectError() {
 
-  //	stationId = id;
+	stationId = id;
 
 }
 
@@ -144,9 +144,9 @@ void detectorIsNotDefinedError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigStationOrderNumberError::tooBigStationOrderNumberError() : dataRootObjectError(), orderNumber(0) {
+tooBigStationOrderNumberError::tooBigStationOrderNumberError() : dataRootObjectError() {
 
-  //	orderNumber = 0;
+	orderNumber = 0;
 
 }
 
@@ -154,9 +154,9 @@ tooBigStationOrderNumberError::tooBigStationOrderNumberError() : dataRootObjectE
  * Constructor													*
  ****************************************************************/
 
-tooBigStationOrderNumberError::tooBigStationOrderNumberError(unsigned int _orderNumber) : dataRootObjectError(), orderNumber(_orderNumber) {
+tooBigStationOrderNumberError::tooBigStationOrderNumberError(unsigned int orderNumber) : dataRootObjectError() {
 
-  //	this->orderNumber = _orderNumber;
+	this->orderNumber = orderNumber;
 
 }
 
@@ -194,9 +194,9 @@ void tooBigStationOrderNumberError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-twoTracksWithSameIdError::twoTracksWithSameIdError() : dataRootObjectError(), trackId(-1) {
+twoTracksWithSameIdError::twoTracksWithSameIdError() : dataRootObjectError() {
 
-  //	trackId = -1;
+	trackId = -1;
 
 }
 
@@ -204,7 +204,7 @@ twoTracksWithSameIdError::twoTracksWithSameIdError() : dataRootObjectError(), tr
  * Constructor													*
  ****************************************************************/
 
-twoTracksWithSameIdError::twoTracksWithSameIdError(int actualTrackId) : dataRootObjectError(), trackId(actualTrackId) {
+twoTracksWithSameIdError::twoTracksWithSameIdError(int actualTrackId) : dataRootObjectError() {
 
 	trackId = actualTrackId;
 
@@ -274,10 +274,10 @@ void tooBigHitMemoryIndexError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessHistogramCellError::cannotAccessHistogramCellError() : dataRootObjectError(), index1((unsigned short)-1), index2((unsigned short)-1) {
+cannotAccessHistogramCellError::cannotAccessHistogramCellError() : dataRootObjectError() {
 
-  //	index1 = (unsigned short)-1;
-  //	index2 = (unsigned short)-1;
+	index1 = (unsigned short)-1;
+	index2 = (unsigned short)-1;
 
 }
 
@@ -285,10 +285,10 @@ cannotAccessHistogramCellError::cannotAccessHistogramCellError() : dataRootObjec
  * Constructor													*
  ****************************************************************/
 
-cannotAccessHistogramCellError::cannotAccessHistogramCellError(unsigned short _index1, unsigned short _index2) : dataRootObjectError(), index1(_index1), index2(_index2) {
+cannotAccessHistogramCellError::cannotAccessHistogramCellError(unsigned short index1, unsigned short index2) : dataRootObjectError() {
 
-  //	this->index1 = _index1;
-  //	this->index2 = _index2;
+	this->index1 = index1;
+	this->index2 = index2;
 
 }
 
@@ -329,9 +329,9 @@ void cannotAccessHistogramCellError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessHistogramBorderError::cannotAccessHistogramBorderError() : dataRootObjectError(), index((unsigned short)-1) {
+cannotAccessHistogramBorderError::cannotAccessHistogramBorderError() : dataRootObjectError() {
 
-  //	index = (unsigned short)-1;
+	index = (unsigned short)-1;
 
 }
 
@@ -339,9 +339,9 @@ cannotAccessHistogramBorderError::cannotAccessHistogramBorderError() : dataRootO
  * Constructor													*
  ****************************************************************/
 
-cannotAccessHistogramBorderError::cannotAccessHistogramBorderError(unsigned short _index) : dataRootObjectError(), index(_index) {
+cannotAccessHistogramBorderError::cannotAccessHistogramBorderError(unsigned short index) : dataRootObjectError() {
 
-  //	this->index = _index;
+	this->index = index;
 
 }
 
@@ -565,10 +565,10 @@ void cannotAccessTrackInformationError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigTrackIndexError::tooBigTrackIndexError() : dataRootObjectError(), index(0), maximum(0) {
+tooBigTrackIndexError::tooBigTrackIndexError() : dataRootObjectError() {
 
-  //	index   = 0;
-  //	maximum = 0;
+	index   = 0;
+	maximum = 0;
 
 }
 
@@ -576,10 +576,10 @@ tooBigTrackIndexError::tooBigTrackIndexError() : dataRootObjectError(), index(0)
  * Constructor													*
  ****************************************************************/
 
-tooBigTrackIndexError::tooBigTrackIndexError(unsigned int _index, unsigned int _maximum) : dataRootObjectError(), index(_index), maximum(_maximum) {
+tooBigTrackIndexError::tooBigTrackIndexError(unsigned int index, unsigned int maximum) : dataRootObjectError() {
 
-	this->index   = _index;
-	this->maximum = _maximum;
+	this->index   = index;
+	this->maximum = maximum;
 
 }
 

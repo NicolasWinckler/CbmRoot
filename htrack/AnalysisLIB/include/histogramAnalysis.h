@@ -45,10 +45,6 @@
 
 class histogramAnalysis {
 
- private:
-  histogramAnalysis(const histogramAnalysis&);
-  histogramAnalysis& operator=(const histogramAnalysis&);
-
 protected:
 
 	histogramData** histogram;

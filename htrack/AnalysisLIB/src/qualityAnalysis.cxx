@@ -38,22 +38,16 @@
  * Default constructor											*
  ****************************************************************/
 
-qualityAnalysis::qualityAnalysis() 
-  : qualityEFGCEvent(NULL),
-    qualityEFGCEventAbsolute(false),
-    qualityEFGCEventRelative(false),
-    qualityEFGCTotal(NULL),
-    qualityEFGCTotalAbsolute(false),
-    qualityEFGCTotalRelative(false)
-{
-  /*
+qualityAnalysis::qualityAnalysis() {
+
 	qualityEFGCEvent         = NULL;
 	qualityEFGCEventAbsolute = false;
 	qualityEFGCEventRelative = false;
 	qualityEFGCTotal         = NULL;
 	qualityEFGCTotalAbsolute = false;
 	qualityEFGCTotalRelative = false;
-  */
+
+
 }
 
 /****************************************************************

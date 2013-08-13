@@ -306,17 +306,8 @@ void magnetfieldAnalysis::drawWindowPads(unsigned short columnId) {
  * Default constructor											*
  ****************************************************************/
 
-magnetfieldAnalysis::magnetfieldAnalysis() 
- : window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   magnetfieldX(NULL),
-   magnetfieldY(NULL),
-   magnetfieldZ(NULL),
-   outputFileName()
-{
-  /*
+magnetfieldAnalysis::magnetfieldAnalysis() {
+
 	window                   = NULL;
 	numberOfWindowPadColumns = 0;
 	numberOfWindowPadRows    = 0;
@@ -325,7 +316,7 @@ magnetfieldAnalysis::magnetfieldAnalysis()
 	magnetfieldY             = NULL;
 	magnetfieldZ             = NULL;
 	outputFileName.clear();
-*/
+
 }
 
 /****************************************************************

@@ -85,10 +85,10 @@ void dataObjectWarningMsg::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-cannotDoQuineMcCluskyWithDifferentLengthWarningMsg::cannotDoQuineMcCluskyWithDifferentLengthWarningMsg() : dataObjectWarningMsg(), length1(0), length2(0) {
+cannotDoQuineMcCluskyWithDifferentLengthWarningMsg::cannotDoQuineMcCluskyWithDifferentLengthWarningMsg() : dataObjectWarningMsg() {
 
-  //	length1 = 0;
-  //	length2 = 0;
+	length1 = 0;
+	length2 = 0;
 
 }
 
@@ -96,10 +96,10 @@ cannotDoQuineMcCluskyWithDifferentLengthWarningMsg::cannotDoQuineMcCluskyWithDif
  * Constructor													*
  ****************************************************************/
 
-cannotDoQuineMcCluskyWithDifferentLengthWarningMsg::cannotDoQuineMcCluskyWithDifferentLengthWarningMsg(unsigned int _length1, unsigned int _length2) : dataObjectWarningMsg(), length1(_length1), length2(_length2)  {
+cannotDoQuineMcCluskyWithDifferentLengthWarningMsg::cannotDoQuineMcCluskyWithDifferentLengthWarningMsg(unsigned int length1, unsigned int length2) : dataObjectWarningMsg() {
 
-  //	this->length1 = _length1;
-  //	this->length2 = _length2;
+	this->length1 = length1;
+	this->length2 = length2;
 
 }
 
@@ -234,12 +234,12 @@ void minClassIsBiggerThanMaxClassWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-rangeLutHoughBorderWarningMsg::rangeLutHoughBorderWarningMsg() : dataObjectWarningMsg(), maxFirstDim(0), maxSecondDim(0), actualFirstDim(0), actualSecondDim(0)  {
+rangeLutHoughBorderWarningMsg::rangeLutHoughBorderWarningMsg() : dataObjectWarningMsg() {
 
-  //	maxFirstDim     = 0;
-  //	maxSecondDim    = 0;
-  //	actualFirstDim  = 0;
-  //	actualSecondDim = 0;
+	maxFirstDim     = 0;
+	maxSecondDim    = 0;
+	actualFirstDim  = 0;
+	actualSecondDim = 0;
 
 }
 
@@ -247,12 +247,12 @@ rangeLutHoughBorderWarningMsg::rangeLutHoughBorderWarningMsg() : dataObjectWarni
  * Constructor													*
  ****************************************************************/
 
-rangeLutHoughBorderWarningMsg::rangeLutHoughBorderWarningMsg(unsigned short _maxFirstDim, unsigned short _maxSecondDim, unsigned short _actualFirstDim, unsigned short _actualSecondDim) : dataObjectWarningMsg(), maxFirstDim(_maxFirstDim), maxSecondDim(_maxSecondDim), actualFirstDim(_actualFirstDim), actualSecondDim(_actualSecondDim)  {
+rangeLutHoughBorderWarningMsg::rangeLutHoughBorderWarningMsg(unsigned short maxFirstDim, unsigned short maxSecondDim, unsigned short actualFirstDim, unsigned short actualSecondDim) : dataObjectWarningMsg() {
 
-  //	this->maxFirstDim     = _maxFirstDim;
-  //	this->maxSecondDim    = _maxSecondDim;
-  //	this->actualFirstDim  = _actualFirstDim;
-  //	this->actualSecondDim = _actualSecondDim;
+	this->maxFirstDim     = maxFirstDim;
+	this->maxSecondDim    = maxSecondDim;
+	this->actualFirstDim  = actualFirstDim;
+	this->actualSecondDim = actualSecondDim;
 
 }
 
@@ -331,9 +331,9 @@ void overflowByAddingClassificationsFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarningMsg() : dataObjectWarningMsg(), value() {
+tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarningMsg() : dataObjectWarningMsg() {
 
-  //	value.clear();
+	value.clear();
 
 }
 
@@ -341,9 +341,9 @@ tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarnin
  * Constructor													*
  ****************************************************************/
 
-tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarningMsg(std::string _value) : dataObjectWarningMsg(), value(_value) {
+tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarningMsg(std::string value) : dataObjectWarningMsg() {
 
-  //	this->value = _value;
+	this->value = value;
 
 }
 

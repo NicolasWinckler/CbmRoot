@@ -147,12 +147,9 @@ void magneticFieldRenewWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-differentPrelutDefinitionAsFileDetectedWarningMsg::differentPrelutDefinitionAsFileDetectedWarningMsg() 
-  : lutGeneratorWarningMsg(), 
-    numberOfDifferences(0)
-{
+differentPrelutDefinitionAsFileDetectedWarningMsg::differentPrelutDefinitionAsFileDetectedWarningMsg() : lutGeneratorWarningMsg() {
 
-  //	numberOfDifferences = 0;
+	numberOfDifferences = 0;
 
 }
 
@@ -160,12 +157,9 @@ differentPrelutDefinitionAsFileDetectedWarningMsg::differentPrelutDefinitionAsFi
  * Constructor													*
  ****************************************************************/
 
-differentPrelutDefinitionAsFileDetectedWarningMsg::differentPrelutDefinitionAsFileDetectedWarningMsg(unsigned short _numberOfDifferences) 
-  : lutGeneratorWarningMsg(),
-    numberOfDifferences(_numberOfDifferences)
-{
+differentPrelutDefinitionAsFileDetectedWarningMsg::differentPrelutDefinitionAsFileDetectedWarningMsg(unsigned short numberOfDifferences) : lutGeneratorWarningMsg() {
 
-  //	this->numberOfDifferences = _numberOfDifferences;
+	this->numberOfDifferences = numberOfDifferences;
 
 }
 
@@ -273,12 +267,9 @@ void differentPrelutUsageAsFileDetectedWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-differentLutDefinitionAsFileDetectedWarningMsg::differentLutDefinitionAsFileDetectedWarningMsg() 
-  : lutGeneratorWarningMsg(), 
-    numberOfDifferences(0)
-{
+differentLutDefinitionAsFileDetectedWarningMsg::differentLutDefinitionAsFileDetectedWarningMsg() : lutGeneratorWarningMsg() {
 
-  //	numberOfDifferences = 0;
+	numberOfDifferences = 0;
 
 }
 
@@ -286,12 +277,9 @@ differentLutDefinitionAsFileDetectedWarningMsg::differentLutDefinitionAsFileDete
  * Constructor													*
  ****************************************************************/
 
-differentLutDefinitionAsFileDetectedWarningMsg::differentLutDefinitionAsFileDetectedWarningMsg(unsigned short _numberOfDifferences) 
-  : lutGeneratorWarningMsg(), 
-    numberOfDifferences(_numberOfDifferences)
-{
+differentLutDefinitionAsFileDetectedWarningMsg::differentLutDefinitionAsFileDetectedWarningMsg(unsigned short numberOfDifferences) : lutGeneratorWarningMsg() {
 
-  //	this->numberOfDifferences = _numberOfDifferences;
+	this->numberOfDifferences = numberOfDifferences;
 
 }
 

@@ -49,10 +49,6 @@ class analysis;
 
 class tables {
 
- private:
-  tables(const tables&);
-  tables& operator=(const tables&);
-
 protected:
 
 	int         codingTableMode;

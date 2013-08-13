@@ -46,12 +46,9 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputFMagneticField::trackfinderInputFMagneticField() 
-  : trackfinderInputMagneticField(),
-    disableAutomaticMagneticField(false)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField() : trackfinderInputMagneticField() {
 
-  //	disableAutomaticMagneticField = false;
+	disableAutomaticMagneticField = false;
 
 }
 
@@ -59,60 +56,39 @@ trackfinderInputFMagneticField::trackfinderInputFMagneticField()
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(const trackfinderInputFMagneticField& value) 
-  : trackfinderInputMagneticField(value), 
-    disableAutomaticMagneticField(value.disableAutomaticMagneticField)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(const trackfinderInputFMagneticField& value) : trackfinderInputMagneticField(value) {
 	
-  //	this->disableAutomaticMagneticField = value.disableAutomaticMagneticField;
+	this->disableAutomaticMagneticField = value.disableAutomaticMagneticField;
 
 }
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(const char* _fileName, bool _isRootFile, const char* _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, bool _disableAutomaticMagneticField) 
-  : trackfinderInputMagneticField(_fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor),
-    disableAutomaticMagneticField(_disableAutomaticMagneticField)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, bool disableAutomaticMagneticField) : trackfinderInputMagneticField(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor) {
 
-  //	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
 
 }
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(std::string _fileName, bool _isRootFile, std::string _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, bool _disableAutomaticMagneticField) 
-  : trackfinderInputMagneticField(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor),
-    disableAutomaticMagneticField(_disableAutomaticMagneticField)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, bool disableAutomaticMagneticField) : trackfinderInputMagneticField(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor){
 
-  //	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
 
 }
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(unsigned short _numberOfMagnetfieldFactors) 
-  : trackfinderInputMagneticField(_numberOfMagnetfieldFactors),
-    disableAutomaticMagneticField(false)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(unsigned short numberOfMagnetfieldFactors) : trackfinderInputMagneticField(numberOfMagnetfieldFactors) {
 
-  //	this->disableAutomaticMagneticField = false;
+	this->disableAutomaticMagneticField = false;
 
 }
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(FairField* field, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, bool _disableAutomaticMagneticField) 
-  : trackfinderInputMagneticField(field, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor),
-    disableAutomaticMagneticField(_disableAutomaticMagneticField)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, bool disableAutomaticMagneticField) : trackfinderInputMagneticField(field, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor) {
 
-  //	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
 
 }
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(FairField* field, const char* _fileName, bool _isRootFile, const char* _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) 
-  : trackfinderInputMagneticField(),
-    disableAutomaticMagneticField(_disableAutomaticMagneticField)
- {
-   
-   init(field, _fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors, _disableAutomaticMagneticField);
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(FairField* field, const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) : trackfinderInputMagneticField() {
+
+	init(field, fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors, disableAutomaticMagneticField);
 
 }
-trackfinderInputFMagneticField::trackfinderInputFMagneticField(FairField* field, std::string _fileName, bool _isRootFile, std::string _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) 
-  : trackfinderInputMagneticField(),
-    disableAutomaticMagneticField(_disableAutomaticMagneticField)
-{
+trackfinderInputFMagneticField::trackfinderInputFMagneticField(FairField* field, std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) : trackfinderInputMagneticField() {
 
-  init(field, _fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors, _disableAutomaticMagneticField);
+	init(field, fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors, disableAutomaticMagneticField);
 
 }
 
@@ -278,27 +254,27 @@ void trackfinderInputFMagneticField::initialize() {
 	}
 
 }
-void trackfinderInputFMagneticField::init(const char* _fileName, bool _isRootFile, const char* _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) {
+void trackfinderInputFMagneticField::init(const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) {
 
-	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
-	trackfinderInputMagneticField::init(_fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
-
-}
-void trackfinderInputFMagneticField::init(std::string _fileName, bool _isRootFile, std::string _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) {
-
-	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
-	trackfinderInputMagneticField::init(_fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
+	trackfinderInputMagneticField::init(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputFMagneticField::init(FairField* field, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) {
+void trackfinderInputFMagneticField::init(std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) {
 
-	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
-	trackfinderInputMagneticField::init(field, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
+	trackfinderInputMagneticField::init(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputFMagneticField::init(FairField* field, const char* _fileName, bool _isRootFile, const char* _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) {
+void trackfinderInputFMagneticField::init(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) {
 
-	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
+	trackfinderInputMagneticField::init(field, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
+
+}
+void trackfinderInputFMagneticField::init(FairField* field, const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) {
+
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
 	if ((field == NULL) || (disableAutomaticMagneticField)) {
 
 		if (field == NULL) {
@@ -312,16 +288,16 @@ void trackfinderInputFMagneticField::init(FairField* field, const char* _fileNam
 
 		}
 
-		trackfinderInputMagneticField::init(_fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
+		trackfinderInputMagneticField::init(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
 
 	}
 	else
-		trackfinderInputMagneticField::init(field, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
+		trackfinderInputMagneticField::init(field, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputFMagneticField::init(FairField* field, std::string _fileName, bool _isRootFile, std::string _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors, bool _disableAutomaticMagneticField) {
+void trackfinderInputFMagneticField::init(FairField* field, std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors, bool disableAutomaticMagneticField) {
 
-	this->disableAutomaticMagneticField = _disableAutomaticMagneticField;
+	this->disableAutomaticMagneticField = disableAutomaticMagneticField;
 	if ((field == NULL) || (disableAutomaticMagneticField)) {
 
 		if (field == NULL) {
@@ -335,11 +311,11 @@ void trackfinderInputFMagneticField::init(FairField* field, std::string _fileNam
 
 		}
 
-		trackfinderInputMagneticField::init(_fileName, _isRootFile, _mapName, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
+		trackfinderInputMagneticField::init(fileName, isRootFile, mapName, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
 
 	}
 	else
-		trackfinderInputMagneticField::init(field, _magneticFieldIntegrationStepwidthPerStation, _magneticFieldIntegrationFactor, _numberOfMagnetfieldFactors);
+		trackfinderInputMagneticField::init(field, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
 
 }
 

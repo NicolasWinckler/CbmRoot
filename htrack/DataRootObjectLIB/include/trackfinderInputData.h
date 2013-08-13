@@ -93,14 +93,12 @@
  * Struct consisting of pointers to the tracks at the position of track->getTrackIndex().
  * It is used to setup the pointers from tracks to hits and from hits to tracks.
  */
-struct trackListFromId {
+typedef struct {
 
-trackListFromId() : maxEntry(0), list(NULL) {};
-  //tracklistFromId(int _maxEntry, trackfinderInputTrack** _list) : maxEntry(_maxEntry, list(_list) {};
 	int                       maxEntry;		/**< Variable to store the number of the actual maximum entries. */
 	trackfinderInputTrack**   list;			/**< Memory to store the pointers to the tracks. */
 
-};
+} trackListFromId;
 
 
 /* **************************************************************

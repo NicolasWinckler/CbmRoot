@@ -41,10 +41,10 @@
  * Default constructor											*
  ****************************************************************/
 
-inputHitSpecialArray::inputHitSpecialArray() : specialAddArray(NULL), numberOfEntries(0), activeObjectPointer() {
+inputHitSpecialArray::inputHitSpecialArray() {
 
-  //	specialAddArray = NULL;
-  //	numberOfEntries = 0;
+	specialAddArray = NULL;
+	numberOfEntries = 0;
 
 	resetActiveObject();
 
@@ -54,9 +54,7 @@ inputHitSpecialArray::inputHitSpecialArray() : specialAddArray(NULL), numberOfEn
  * Constructor													*
  ****************************************************************/
 
-inputHitSpecialArray::inputHitSpecialArray(const inputHitSpecialArray& value) 
-  : specialAddArray(NULL), numberOfEntries(0), activeObjectPointer() 
-{
+inputHitSpecialArray::inputHitSpecialArray(const inputHitSpecialArray& value) {
 
 	unsigned short numberOfCopyingEntries = value.numberOfEntries;
 

@@ -43,29 +43,19 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderOutputData::trackfinderOutputData() 
-  : TObject(), 
-    tracks(NULL),
-    actualTrack(NULL),
-    tracksAreLocal(true)
-{
-  /*
+trackfinderOutputData::trackfinderOutputData() : TObject() {
+
 	tracks         = NULL;
 	actualTrack    = NULL;
 	tracksAreLocal = true;
-*/
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackfinderOutputData::trackfinderOutputData(const trackfinderOutputData& value) 
-  : TObject(value),
-    tracks(NULL),
-    actualTrack(NULL),
-    tracksAreLocal(true)
-{
+trackfinderOutputData::trackfinderOutputData(const trackfinderOutputData& value) : TObject(value) {
 
 	int index;
 
@@ -183,7 +173,7 @@ void trackfinderOutputData::init() {
 	tracksAreLocal = true;
 
 }
-void trackfinderOutputData::init(TClonesArray* _tracks) {
+void trackfinderOutputData::init(TClonesArray* tracks) {
 
 	if (tracksAreLocal) {
 
@@ -195,7 +185,7 @@ void trackfinderOutputData::init(TClonesArray* _tracks) {
 
 	}
 
-	this->tracks   = _tracks;
+	this->tracks   = tracks;
 
 	tracksAreLocal = false;
 

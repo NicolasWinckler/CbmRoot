@@ -49,30 +49,33 @@
  * Default constructor											*
  ****************************************************************/
 
+rungeKuttaInterface::rungeKuttaInterface() {
+
+	detector = NULL;
+
 #if (ARCHITECTURE == CBMROOT)
-rungeKuttaInterface::rungeKuttaInterface() : detector(NULL), geane(NULL) 
-{
-}
-#else
-rungeKuttaInterface::rungeKuttaInterface() : detector(NULL)
-{
-}
+
+	geane    = NULL;
+
 #endif
+
+}
+
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
+rungeKuttaInterface::rungeKuttaInterface(trackfinderInputDetector* detector) {
+
+	this->detector = detector;
+
 #if (ARCHITECTURE == CBMROOT)
-rungeKuttaInterface::rungeKuttaInterface(trackfinderInputDetector* _detector) 
-  : detector(_detector), geane(new FairGeanePro())
-{
-}
-#else
-rungeKuttaInterface::rungeKuttaInterface(trackfinderInputDetector* _detector) 
-  : detector(_detector)
-{
-}
+
+	geane          = new FairGeanePro();
+
 #endif
+
+}
 
 /****************************************************************
  * Destructor													*
@@ -95,9 +98,9 @@ rungeKuttaInterface::~rungeKuttaInterface() {
  * method initializes the object								*
  ****************************************************************/
 
-void rungeKuttaInterface::init(trackfinderInputDetector* _detector) {
+void rungeKuttaInterface::init(trackfinderInputDetector* detector) {
 
-	this->detector = _detector;
+	this->detector = detector;
 
 #if (ARCHITECTURE == CBMROOT)
 

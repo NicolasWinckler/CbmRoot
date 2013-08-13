@@ -42,9 +42,7 @@
  * the overwriting sequence.
  */
 
-struct terminalSequence {
-
-terminalSequence() : terminal(), startText(), overwriteText(), endText(), newline(false), relativityCoefficient(0.), relativeInsertion(0), absoluteInsertion(0) {};
+typedef struct {
 
 	std::streambuf* terminal;				/**< Pointer to the buffer for the output. */
 	std::string     startText;				/**< Variable to store the constant beginning of the printed text. */
@@ -55,11 +53,7 @@ terminalSequence() : terminal(), startText(), overwriteText(), endText(), newlin
 	unsigned int    relativeInsertion;		/**< Variable to store the last relative insertion which updates printing. This value prevents printing of the same number. So only changes are printed. */
 	unsigned int    absoluteInsertion;		/**< Variable to store the last absolute insertion. */
 
-private:
-  terminalSequence(const terminalSequence&);
-  terminalSequence& operator=(const terminalSequence&);
-};
-
+} terminalSequence;
 
 
 /**

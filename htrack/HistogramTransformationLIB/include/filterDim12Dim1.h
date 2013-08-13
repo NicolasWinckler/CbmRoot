@@ -52,11 +52,6 @@
 
 class filterDim12Dim1 : public filterDimXDimX {
 
- private:
-
-  filterDim12Dim1(const filterDim12Dim1&);
-  filterDim12Dim1& operator=(const filterDim12Dim1&);
-
 protected:
 
 	bitArray***  filterTempMem;			/**< Array for easier constructing the geometry of the filter. */

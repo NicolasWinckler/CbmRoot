@@ -41,10 +41,10 @@
  * Default constructor											*
  ****************************************************************/
 
-inputHitSpecialList::inputHitSpecialList() : specialArray(), specialAddArray(), numberOfEntries(0), activeObjectPointer(0), internalListObjectPointer(0), specialAddArrayIterator() {
+inputHitSpecialList::inputHitSpecialList() {
 
-  	specialAddArray.clear();
-	//	numberOfEntries = 0;
+	specialAddArray.clear();
+	numberOfEntries = 0;
 
 	resetActiveObject();
 
@@ -54,17 +54,15 @@ inputHitSpecialList::inputHitSpecialList() : specialArray(), specialAddArray(), 
  * Constructor													*
  ****************************************************************/
 
-inputHitSpecialList::inputHitSpecialList(const inputHitSpecialList& value) 
-  : specialArray(), specialAddArray(value.specialAddArray), numberOfEntries(value.numberOfEntries), activeObjectPointer(0), internalListObjectPointer(0), specialAddArrayIterator() 
-{
+inputHitSpecialList::inputHitSpecialList(const inputHitSpecialList& value) {
 
 	specialAddArray.clear();
-	//	this->numberOfEntries           = value.numberOfEntries;
+	this->numberOfEntries           = value.numberOfEntries;
 
 	for (unsigned short i = 0; i < min(minimalArraySize, value.numberOfEntries); i++)
 		this->specialArray[i]       = value.specialArray[i];
 
-	//	this->specialAddArray = value.specialAddArray;
+	this->specialAddArray = value.specialAddArray;
 	
 	this->resetActiveObject();
 

@@ -51,13 +51,12 @@ class trackfinderInputHit;
  * The struct consists of the information how often a track is found and with how many hits.
  * This struct is used just for internal analysis.
  */
-struct trackfindingTrackInfo{
+typedef struct {
 
-trackfindingTrackInfo() : frequency(0), maximumNumberOfHits(0) {};
 	unsigned short frequency;				/**< Variable to store the number how often this track is found by the trackfinder. */
 	unsigned short maximumNumberOfHits;		/**< Variable to store the number of hits from that peak with the biggest number. */
 
-};
+} trackfindingTrackInfo;
 
 
 /* **************************************************************

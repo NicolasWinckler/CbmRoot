@@ -801,25 +801,10 @@ void autoFinder::filteringHistogramWithDirectOverwriting(std::streambuf* termina
  * Default constructor											*
  ****************************************************************/
 
-autoFinder::autoFinder() 
-  : histogramTransformation(),
-    geometry(),
-    useFirstFilterMod(false),
-    firstFilterMiddleIndex(0),
-    sizeOfFirstFilterMem(0),
-    firstFilterMem(NULL),
-    sizeOfFirstBufferMem(0),
-    firstBufferMem(NULL),
-    firstBaseFilter(NULL),
-    useSecondFilterMod(false),
-    secondFilterMiddleIndex(0),
-    sizeOfSecondFilterMem  (0),
-    secondFilterMem(NULL),
-    secondBaseFilter(NULL)
-{
+autoFinder::autoFinder() : histogramTransformation() {
 
 	geometry.reset();
-	/*
+
 	useFirstFilterMod       = false;
 	firstFilterMiddleIndex  = 0;
 	sizeOfFirstFilterMem    = 0;
@@ -832,46 +817,31 @@ autoFinder::autoFinder()
 	sizeOfSecondFilterMem   = 0;
 	secondFilterMem         = NULL;
 	secondBaseFilter        = NULL;
-	*/
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-autoFinder::autoFinder(histogramData** _histogram, trackData** _tracks, tables** _ratings, unsigned short _firstFilterArithmetic, bool _useFirstFilterMod, unsigned short _secondFilterArithmetic, bool _useSecondFilterMod) 
-  : histogramTransformation(histogram, tracks, ratings),
-    geometry(),
-    useFirstFilterMod(_useFirstFilterMod),
-    firstFilterMiddleIndex(0),
-    sizeOfFirstFilterMem(0),
-    firstFilterMem(NULL),
-    sizeOfFirstBufferMem(0),
-    firstBufferMem(NULL),
-    firstBaseFilter(NULL),
-    useSecondFilterMod(_useSecondFilterMod),
-    secondFilterMiddleIndex(0),
-    sizeOfSecondFilterMem  (0),
-    secondFilterMem(NULL),
-    secondBaseFilter(NULL)
-{
+autoFinder::autoFinder(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short firstFilterArithmetic, bool useFirstFilterMod, unsigned short secondFilterArithmetic, bool useSecondFilterMod) : histogramTransformation(histogram, tracks, ratings){
 
 	geometry.reset();
-	/*
-	this->useFirstFilterMod  = _useFirstFilterMod;
+
+	this->useFirstFilterMod  = useFirstFilterMod;
 	firstFilterMiddleIndex   = 0;
 	sizeOfFirstFilterMem     = 0;
 	firstFilterMem           = NULL;
 	sizeOfFirstBufferMem     = 0;
 	firstBufferMem           = NULL;
 	firstBaseFilter          = NULL;
-	this->useSecondFilterMod = _useSecondFilterMod;
+	this->useSecondFilterMod = useSecondFilterMod;
 	secondFilterMiddleIndex  = 0;
 	sizeOfSecondFilterMem    = 0;
 	secondFilterMem          = NULL;
 	secondBaseFilter         = NULL;
-	*/
-	switch(_firstFilterArithmetic) {
+
+	switch(firstFilterArithmetic) {
 
 		case FIRSTSIMPLEARITHMETIC:
 			firstBaseFilter = new filterBasicSimple();
@@ -890,9 +860,9 @@ autoFinder::autoFinder(histogramData** _histogram, trackData** _tracks, tables**
 			break;
 
 		case FIRSTSPECIALARITHMETIC:
-			if (_ratings == NULL)
+			if (ratings == NULL)
 				throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
-			if (*_ratings == NULL)
+			if (*ratings == NULL)
 				throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
 			firstBaseFilter = new filterBasicSpecial((*ratings)->getCodingTableMaximumClassification());
 			break;
@@ -903,7 +873,7 @@ autoFinder::autoFinder(histogramData** _histogram, trackData** _tracks, tables**
 
 	}
 
-	switch(_secondFilterArithmetic) {
+	switch(secondFilterArithmetic) {
 
 		case SECONDSIMPLEARITHMETIC:
 			secondBaseFilter = new filterBasicSimple();
@@ -959,7 +929,7 @@ autoFinder::~autoFinder() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void autoFinder::init(histogramData** _histogram, trackData** _tracks, tables** _ratings, unsigned short _firstFilterArithmetic, bool _useFirstFilterMod, unsigned short _secondFilterArithmetic, bool _useSecondFilterMod) {
+void autoFinder::init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short firstFilterArithmetic, bool useFirstFilterMod, unsigned short secondFilterArithmetic, bool useSecondFilterMod) {
 
 	geometry.reset();
 
@@ -975,14 +945,14 @@ void autoFinder::init(histogramData** _histogram, trackData** _tracks, tables** 
 		secondBaseFilter = NULL;
 	}
 
-	histogramTransformation::init(_histogram, _tracks, _ratings);
+	histogramTransformation::init(histogram, tracks, ratings);
 
-	this->useFirstFilterMod  = _useFirstFilterMod;
+	this->useFirstFilterMod  = useFirstFilterMod;
 	firstFilterMiddleIndex   = 0;
-	this->useSecondFilterMod = _useSecondFilterMod;
+	this->useSecondFilterMod = useSecondFilterMod;
 	secondFilterMiddleIndex  = 0;
 
-	switch(_firstFilterArithmetic) {
+	switch(firstFilterArithmetic) {
 
 		case FIRSTSIMPLEARITHMETIC:
 			firstBaseFilter = new filterBasicSimple();
@@ -1001,11 +971,11 @@ void autoFinder::init(histogramData** _histogram, trackData** _tracks, tables** 
 			break;
 
 		case FIRSTSPECIALARITHMETIC:
-			if (_ratings == NULL)
+			if (ratings == NULL)
 				throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
-			if (*_ratings == NULL)
+			if (*ratings == NULL)
 				throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
-			firstBaseFilter = new filterBasicSpecial((*_ratings)->getCodingTableMaximumClassification());
+			firstBaseFilter = new filterBasicSpecial((*ratings)->getCodingTableMaximumClassification());
 			break;
 
 		default:
@@ -1014,7 +984,7 @@ void autoFinder::init(histogramData** _histogram, trackData** _tracks, tables** 
 
 	}
 
-	switch(_secondFilterArithmetic) {
+	switch(secondFilterArithmetic) {
 
 		case SECONDSIMPLEARITHMETIC:
 			secondBaseFilter = new filterBasicSimple();
@@ -1033,7 +1003,7 @@ void autoFinder::init(histogramData** _histogram, trackData** _tracks, tables** 
 			break;
 
 		case SECONDSPECIALARITHMETIC:
-			secondBaseFilter = new filterBasicSpecial((*_ratings)->getCodingTableMaximumClassification());
+			secondBaseFilter = new filterBasicSpecial((*ratings)->getCodingTableMaximumClassification());
 			break;
 
 		default:

@@ -336,9 +336,9 @@ void prelutAccessFile::setHeaderDefValues() {
  * Default constructor											*
  ****************************************************************/
 
-prelutAccessFile::prelutAccessFile() : io(), header(), localMemory(false) {
+prelutAccessFile::prelutAccessFile() : io() {
 
-  //	localMemory = false;
+	localMemory = false;
 
 	init();
 

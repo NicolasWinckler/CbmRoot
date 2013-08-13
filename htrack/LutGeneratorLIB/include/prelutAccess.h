@@ -47,11 +47,6 @@
 
 class prelutAccess : public prelut {
 
- private:
-
-  prelutAccess(const prelutAccess&);
-  prelutAccess& operator=(const prelutAccess&);
-
 protected:
 
 	prelutHoughBorder* memory;				/**< Memory which stores the whole look up table. */

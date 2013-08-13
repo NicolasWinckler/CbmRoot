@@ -44,13 +44,11 @@
  * Default constructor											*
  ****************************************************************/
 
-trackData::trackData() 
-  : space(NULL), tracks(NULL), accessor(), accessLayer(0) 
-{
+trackData::trackData() {
 
-  //	space       = NULL;
-  //	tracks      = NULL;
-  //	accessLayer = 0;
+	space       = NULL;
+	tracks      = NULL;
+	accessLayer = 0;
 
 }
 
@@ -58,13 +56,10 @@ trackData::trackData()
  * Constructor													*
  ****************************************************************/
 
-trackData::trackData(const trackData& value) 
-  : space(value.space), tracks(NULL), accessor(value.accessor),
-    accessLayer(value.accessLayer) 
-{
+trackData::trackData(const trackData& value) {
 
-  //	this->space  = value.space;
-  //	this->tracks = NULL;
+	this->space  = value.space;
+	this->tracks = NULL;
 
 	if ((this->space != NULL) && (*(this->space) != NULL)) {
 		if ((*(this->space))->getStep(DIM3) > 0) {
@@ -75,18 +70,16 @@ trackData::trackData(const trackData& value)
 		}
 	}
 
-	//	this->accessor    = value.accessor;
-	//	this->accessLayer = value.accessLayer;
+	this->accessor    = value.accessor;
+	this->accessLayer = value.accessLayer;
 
 }
-trackData::trackData(histogramSpace** _space) 
-  : space(NULL), tracks(NULL), accessor(), accessLayer(0) 
-{
+trackData::trackData(histogramSpace** space) {
 
-  //	this->space        = NULL;
-  //	this->tracks       = NULL;
-  //	this->accessLayer  = 0;
-	init(_space);
+	this->space        = NULL;
+	this->tracks       = NULL;
+	this->accessLayer  = 0;
+	init(space);
 
 }
 
@@ -146,7 +139,7 @@ const trackData& trackData::operator = (const trackData& value) {
  * This method initializes the object.							*
  ****************************************************************/
 
-void trackData::init(histogramSpace** _space) {
+void trackData::init(histogramSpace** space) {
 
 	if (tracks != NULL) {
 		if ((this->space == NULL) || (*(this->space) == NULL))
@@ -157,7 +150,7 @@ void trackData::init(histogramSpace** _space) {
 		tracks = NULL;
 	}
 
-	this->space = _space;
+	this->space = space;
 
 	if ((space != NULL) && (*space != NULL)) {
 		if ((*(this->space))->getStep(DIM3) > 0) {

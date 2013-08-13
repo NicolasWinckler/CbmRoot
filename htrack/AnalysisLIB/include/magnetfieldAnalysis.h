@@ -46,10 +46,6 @@
 
 class magnetfieldAnalysis {
 
- private:
-  magnetfieldAnalysis(const magnetfieldAnalysis&);
-  magnetfieldAnalysis& operator=(const magnetfieldAnalysis&);
-
 protected:
 
 	TCanvas*              window;						/**< Object for the main window */

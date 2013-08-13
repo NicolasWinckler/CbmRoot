@@ -46,13 +46,9 @@
  * Default constructor											*
  ****************************************************************/
 
-histogramTransformation::histogramTransformation() 
-  : histogram(NULL),
-    tracks(NULL),	
-    ratings(NULL)
-{
+histogramTransformation::histogramTransformation() {
 
-  //	init(NULL, NULL, NULL);
+	init(NULL, NULL, NULL);
 
 }
 
@@ -60,13 +56,9 @@ histogramTransformation::histogramTransformation()
  * Constructor													*
  ****************************************************************/
 
-histogramTransformation::histogramTransformation(histogramData** _histogram, trackData** _tracks, tables** _ratings) 
-  : histogram(_histogram),
-    tracks(_tracks),	
-    ratings(_ratings)
-{
+histogramTransformation::histogramTransformation(histogramData** histogram, trackData** tracks, tables** ratings) {
 
-  //	init(_histogram, _tracks, _ratings);
+	init(histogram, tracks, ratings);
 
 }
 
@@ -82,11 +74,11 @@ histogramTransformation::~histogramTransformation() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void histogramTransformation::init(histogramData** _histogram, trackData** _tracks, tables** _ratings) {
+void histogramTransformation::init(histogramData** histogram, trackData** tracks, tables** ratings) {
 
-	this->histogram = _histogram;
-	this->tracks    = _tracks;
-	this->ratings   = _ratings;
+	this->histogram = histogram;
+	this->tracks    = tracks;
+	this->ratings   = ratings;
 
 }
 

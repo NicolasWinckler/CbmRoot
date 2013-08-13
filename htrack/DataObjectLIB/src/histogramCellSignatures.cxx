@@ -47,11 +47,11 @@
  * Default constructor											*
  ****************************************************************/
 
-histogramCellSignatures::histogramCellSignatures() : numberOfSignatures(0), signatures(NULL), just2DFlag(false) {
+histogramCellSignatures::histogramCellSignatures() {
 
-  //	numberOfSignatures = 0;
-  //	signatures         = NULL;
-  //	just2DFlag         = false;
+	numberOfSignatures = 0;
+	signatures         = NULL;
+	just2DFlag         = false;
 
 }
 
@@ -59,7 +59,7 @@ histogramCellSignatures::histogramCellSignatures() : numberOfSignatures(0), sign
  * Constructor													*
  ****************************************************************/
 
-histogramCellSignatures::histogramCellSignatures(const histogramCellSignatures& value) : numberOfSignatures(0), signatures(NULL), just2DFlag(false) {
+histogramCellSignatures::histogramCellSignatures(const histogramCellSignatures& value) {
 
 	if (value.numberOfSignatures > 0) {
 

@@ -52,11 +52,6 @@
 
 class firstFilterFinalMod : public filterDimXDimX {
 
- private:
-
-  firstFilterFinalMod(const firstFilterFinalMod&);
-  firstFilterFinalMod& operator=(const firstFilterFinalMod&);
-
 protected:
 
 	unsigned short filterResultSize;	/**< Variable to store the size of the memory for storing the computed filter-values. */

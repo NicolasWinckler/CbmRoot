@@ -54,17 +54,8 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputHit::trackfinderInputHit() 
-  : TObject(),
-    hit(NULL),
-    point(NULL),
-    track(NULL),
-    station(NULL),
-    isPointer(true),
-    hitIndex(0),
-    hitOrder(0)
-{
-  /*
+trackfinderInputHit::trackfinderInputHit() {
+
 	hit       = NULL;
 	point     = NULL;
 	track     = NULL;
@@ -72,23 +63,14 @@ trackfinderInputHit::trackfinderInputHit()
 	isPointer = true;
 	hitIndex  = 0;
 	hitOrder  = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) 
-  : TObject(value),
-    hit(NULL),
-    point(value.point),
-    track(value.track),
-    station(value.station),
-    isPointer(value.isPointer),
-    hitIndex(value.hitIndex),
-    hitOrder(value.hitOrder)
-{
+trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) : TObject(value) {
 
 	if (value.isPointer)
 		this->hit   = value.hit;
@@ -114,26 +96,16 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value)
 		if (hit == NULL)
 			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
 	}
-	/*
 	this->point     = value.point;
 	this->track     = value.track;
 	this->station   = value.station;
 	this->isPointer = value.isPointer;
 	this->hitIndex  = value.hitIndex;
 	this->hitOrder  = value.hitOrder;
-	*/
+
 }
 
-trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsigned int order) 
-  : TObject(),
-    hit(NULL),
-    point(value.point),
-    track(value.track),
-    station(value.station),
-    isPointer(value.isPointer),
-    hitIndex(value.hitIndex),
-    hitOrder(order)
-{
+trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsigned int order) : TObject() {
 
 	if (value.isPointer)
 		this->hit   = value.hit;
@@ -159,50 +131,30 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsig
 		if (hit == NULL)
 			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
 	}
-	/*
 	this->point     = value.point;
 	this->track     = value.track;
 	this->station   = value.station;
 	this->isPointer = value.isPointer;
 	this->hitIndex  = value.hitIndex;
 	this->hitOrder  = order;
-	*/
-}
-trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order) 
-  : TObject(),
-    hit(hitPointer),
-    point(NULL),
-    track(NULL),
-    station(NULL),
-    isPointer(true),
-    hitIndex(index),
-    hitOrder(order)
- {
 
-   //	hit       = hitPointer;
+}
+trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order) : TObject() {
+
+	hit       = hitPointer;
 
 	if (hit == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
 
-	/*
 	point     = NULL;
 	track     = NULL;
 	station   = NULL;
 	isPointer = true;
 	hitIndex  = index;
 	hitOrder  = order;
-	*/
+
 }
-trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid) 
-  : TObject(),
-    hit(NULL),
-    point(NULL),
-    track(NULL),
-    station(NULL),
-    isPointer(false),
-    hitIndex(index),
-    hitOrder(order)
- {
+trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid) : TObject() {
 
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);
@@ -226,14 +178,14 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 
 		if (hit == NULL)
 			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
-		/*
+
 		point     = NULL;
 		track     = NULL;
 		station   = NULL;
 		isPointer = false;
 		hitIndex  = index;
 		hitOrder  = order;
-		*/
+	
 	}
 	else {
 
@@ -247,16 +199,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	}
 
 }
-trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex) 
-  : TObject(), 
-    hit(NULL),
-    point(NULL),
-    track(NULL),
-    station(NULL),
-    isPointer(false),
-    hitIndex(index),
-    hitOrder(order)
-{
+trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex) : TObject() {
 
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);
@@ -274,14 +217,14 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 
 	if (hit == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
-	/*
+
 	point     = NULL;
 	track     = NULL;
 	station   = NULL;
 	isPointer = false;
 	hitIndex  = index;
 	hitOrder  = order;
-	*/
+
 }
 /****************************************************************
  * Destructor													*

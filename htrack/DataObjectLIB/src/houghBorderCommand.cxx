@@ -47,10 +47,10 @@
  * Default constructor											*
  ****************************************************************/
 
-houghBorderCommand::houghBorderCommand() : startPos(0), cmd() {
+houghBorderCommand::houghBorderCommand() {
 
-  	cmd.clear();
-	//	startPos = 0;
+	cmd.clear();
+	startPos = 0;
 
 }
 
@@ -58,10 +58,10 @@ houghBorderCommand::houghBorderCommand() : startPos(0), cmd() {
  * Constructor													*
  ****************************************************************/
 
-houghBorderCommand::houghBorderCommand(const houghBorderCommand& value)  : startPos(value.startPos), cmd(value.cmd) {
+houghBorderCommand::houghBorderCommand(const houghBorderCommand& value) {
 
-  //	this->cmd      = value.cmd;
-  //	this->startPos = value.startPos;
+	this->cmd      = value.cmd;
+	this->startPos = value.startPos;
 
 }
 

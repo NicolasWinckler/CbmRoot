@@ -85,38 +85,26 @@ void houghTransformationWarningMsg::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-tooMuchHitEntriesInHistCellWarningMsg::tooMuchHitEntriesInHistCellWarningMsg() 
-  : houghTransformationWarningMsg(), 
-    indexDim1(0),
-    indexDim2(0),
-    indexDim3(0),
-    indexDim4(0)
-{
-  /*
+tooMuchHitEntriesInHistCellWarningMsg::tooMuchHitEntriesInHistCellWarningMsg() : houghTransformationWarningMsg() {
+
 	indexDim1 = 0;
 	indexDim2 = 0;
 	indexDim3 = 0;
 	indexDim4 = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-tooMuchHitEntriesInHistCellWarningMsg::tooMuchHitEntriesInHistCellWarningMsg(int index1, int index2, int index3, int index4) 
-  : houghTransformationWarningMsg(), 
-    indexDim1(index1),
-    indexDim2(index2),
-    indexDim3(index3),
-    indexDim4(index4)
-{
-  /*
+tooMuchHitEntriesInHistCellWarningMsg::tooMuchHitEntriesInHistCellWarningMsg(int index1, int index2, int index3, int index4) {
+
 	indexDim1 = index1;
 	indexDim2 = index2;
 	indexDim3 = index3;
 	indexDim4 = index4;
-  */
+
 }
 
 /****************************************************************

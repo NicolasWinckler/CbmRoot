@@ -50,10 +50,6 @@
 
 class projectionAnalysis {
 
- private:
-  projectionAnalysis(const projectionAnalysis&);
-  projectionAnalysis& operator=(const projectionAnalysis&);
-
 protected:
 
 	TCanvas*                        window;						/**< Object for the main window */

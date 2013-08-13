@@ -44,11 +44,11 @@
  * Default constructor											*
  ****************************************************************/
 
-trackFrameworkMomentum::trackFrameworkMomentum() : tx(0.), ty(0.), qp(0.) {
+trackFrameworkMomentum::trackFrameworkMomentum() {
 
-  //	setTx(0);
-  //	setTy(0);
-  //	setQp(0);
+	setTx(0);
+	setTy(0);
+	setQp(0);
 
 }
 
@@ -56,18 +56,18 @@ trackFrameworkMomentum::trackFrameworkMomentum() : tx(0.), ty(0.), qp(0.) {
  * Constructor													*
  ****************************************************************/
 
-trackFrameworkMomentum::trackFrameworkMomentum(const trackFrameworkMomentum& value) : tx(value.tx), ty(value.ty), qp(value.qp) {
+trackFrameworkMomentum::trackFrameworkMomentum(const trackFrameworkMomentum& value) {
 
-  //	this->tx = value.tx;
-  //	this->ty = value.ty;
-  //	this->qp = value.qp;
+	this->tx = value.tx;
+	this->ty = value.ty;
+	this->qp = value.qp;
 
 }
-trackFrameworkMomentum::trackFrameworkMomentum(double _tx, double _ty, double _qp) : tx(_tx), ty(_ty), qp(_qp) {
+trackFrameworkMomentum::trackFrameworkMomentum(double tx, double ty, double qp) {
 
-  //	setTx(_tx);
-  //	setTy(_ty);
-  //	setQp(_qp);
+	setTx(tx);
+	setTy(ty);
+	setQp(qp);
 
 }
 

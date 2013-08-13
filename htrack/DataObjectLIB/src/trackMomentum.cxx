@@ -125,10 +125,10 @@ double trackMomentum::get(unsigned short dimension) {
  * sets the value in the dimension								*
  ****************************************************************/
 
-void trackMomentum::set(double _set, unsigned short dimension) {
+void trackMomentum::set(double set, unsigned short dimension) {
 
 	if (dimension < DIMENSIONS)
-		dim[dimension] = _set;
+		dim[dimension] = set;
 	else
 		throw notExistingDimensionError(dimension, DIMENSIONS);
 

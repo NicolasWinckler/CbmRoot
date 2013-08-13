@@ -125,30 +125,22 @@ void magneticFieldFactorCannotBeZero::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigIndexForDigitalHitLutError::tooBigIndexForDigitalHitLutError() 
-  : lutGeneratorError(), 
-    index(0),
-    numberOfEntries(0)
-{
-  /*
+tooBigIndexForDigitalHitLutError::tooBigIndexForDigitalHitLutError() : lutGeneratorError() {
+
 	index           = 0;
 	numberOfEntries = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-tooBigIndexForDigitalHitLutError::tooBigIndexForDigitalHitLutError(unsigned long _index, unsigned long _numberOfEntries) 
-  : lutGeneratorError(), 
-    index(_index),
-    numberOfEntries(_numberOfEntries)
-{
-  /*
-	this->index           = _index;
-	this->numberOfEntries = _numberOfEntries;
-  */
+tooBigIndexForDigitalHitLutError::tooBigIndexForDigitalHitLutError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
+
+	this->index           = index;
+	this->numberOfEntries = numberOfEntries;
+
 }
 
 /****************************************************************
@@ -188,29 +180,21 @@ void tooBigIndexForDigitalHitLutError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigIndexForPrelutError::tooBigIndexForPrelutError() 
-  : lutGeneratorError(),
-    index(0),
-    numberOfEntries(0)
-{
-  /*
+tooBigIndexForPrelutError::tooBigIndexForPrelutError() : lutGeneratorError() {
+
 	index           = 0;
 	numberOfEntries = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-tooBigIndexForPrelutError::tooBigIndexForPrelutError(unsigned long _index, unsigned long _numberOfEntries) 
-  : lutGeneratorError(), 
-    index(_index),
-    numberOfEntries(_numberOfEntries)
-{
+tooBigIndexForPrelutError::tooBigIndexForPrelutError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
 
-  //	this->index           = _index;
-  //	this->numberOfEntries = _numberOfEntries;
+	this->index           = index;
+	this->numberOfEntries = numberOfEntries;
 
 }
 
@@ -251,30 +235,22 @@ void tooBigIndexForPrelutError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-tooBigIndexForLutError::tooBigIndexForLutError() 
-  : lutGeneratorError(),
-    index(0),
-    numberOfEntries(0)
-{
-  /*
+tooBigIndexForLutError::tooBigIndexForLutError() : lutGeneratorError() {
+
 	index           = 0;
 	numberOfEntries = 0;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-tooBigIndexForLutError::tooBigIndexForLutError(unsigned long _index, unsigned long _numberOfEntries) 
-  : lutGeneratorError(), 
-    index(_index),
-    numberOfEntries(_numberOfEntries)
-{
-  /*
-	this->index           = _index;
-	this->numberOfEntries = _numberOfEntries;
-  */
+tooBigIndexForLutError::tooBigIndexForLutError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
+
+	this->index           = index;
+	this->numberOfEntries = numberOfEntries;
+
 }
 
 /****************************************************************

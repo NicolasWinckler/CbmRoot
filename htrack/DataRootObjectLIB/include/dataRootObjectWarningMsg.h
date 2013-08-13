@@ -96,16 +96,13 @@ class noTrackWithIdFoundWarningMsg : public dataRootObjectWarningMsg {
 
 private:
 
-  int                  trackId;
+	int                  trackId;
 
 #if (ARCHITECTURE != PS3)
 
-  trackfinderInputHit* hit;
+	trackfinderInputHit* hit;
 
 #endif
-
-  noTrackWithIdFoundWarningMsg(const noTrackWithIdFoundWarningMsg&);
-  noTrackWithIdFoundWarningMsg& operator=(const noTrackWithIdFoundWarningMsg&);
 
 public:
 
@@ -138,7 +135,6 @@ public:
  */
 
 	void warningMsg();
-
 
 };
 

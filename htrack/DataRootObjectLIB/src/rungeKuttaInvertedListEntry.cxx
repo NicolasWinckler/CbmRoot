@@ -43,11 +43,10 @@
  * Default constructor											*
  ****************************************************************/
 
-rungeKuttaInvertedListEntry::rungeKuttaInvertedListEntry() : hit(), positions() 
-{
+rungeKuttaInvertedListEntry::rungeKuttaInvertedListEntry() {
 
-  //	hit.setHitIndex(0);
-  //	positions.clear();
+	hit.setHitIndex(0);
+	positions.clear();
 
 }
 
@@ -55,10 +54,10 @@ rungeKuttaInvertedListEntry::rungeKuttaInvertedListEntry() : hit(), positions()
  * Constructor													*
  ****************************************************************/
 
-rungeKuttaInvertedListEntry::rungeKuttaInvertedListEntry(const rungeKuttaInvertedListEntry& value) : hit(value.hit), positions(value.positions) {
+rungeKuttaInvertedListEntry::rungeKuttaInvertedListEntry(const rungeKuttaInvertedListEntry& value) {
 
-  //	this->hit       = value.hit;
-  //	this->positions = value.positions;
+	this->hit       = value.hit;
+	this->positions = value.positions;
 
 }
 

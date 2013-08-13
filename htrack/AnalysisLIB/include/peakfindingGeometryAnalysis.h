@@ -43,10 +43,6 @@
 
 class peakfindingGeometryAnalysis {
 
- private:
-  peakfindingGeometryAnalysis(const peakfindingGeometryAnalysis&);
-  peakfindingGeometryAnalysis& operator=(const peakfindingGeometryAnalysis&);
-
 protected:
 
 	histogramData**      histogram;

@@ -209,9 +209,9 @@ void cannotOpenFileWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-writeDefaultFileWarningMsg::writeDefaultFileWarningMsg() : fileioWarningMsg(), fileName() {
+writeDefaultFileWarningMsg::writeDefaultFileWarningMsg() : fileioWarningMsg() {
 
-  //	fileName.clear();
+	fileName.clear();
 
 }
 
@@ -219,9 +219,9 @@ writeDefaultFileWarningMsg::writeDefaultFileWarningMsg() : fileioWarningMsg(), f
  * Constructor													*
  ****************************************************************/
 
-writeDefaultFileWarningMsg::writeDefaultFileWarningMsg(std::string name) : fileioWarningMsg(), fileName(name) {
+writeDefaultFileWarningMsg::writeDefaultFileWarningMsg(std::string name) {
 
-  //	fileName = name;
+	fileName = name;
 
 }
 
@@ -319,10 +319,10 @@ void tooMuchDataWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg() : fileioWarningMsg(), lockId(0), numberOfLocks(0)  {
+lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg() : fileioWarningMsg() {
 
-  //	lockId        = 0;
-  //	numberOfLocks = 0;
+	lockId        = 0;
+	numberOfLocks = 0;
 
 }
 
@@ -330,10 +330,10 @@ lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg() : fileioWarningMsg(), lockI
  * Constructor													*
  ****************************************************************/
 
-lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg(unsigned int _lockId, unsigned int _numberOfLocks) : fileioWarningMsg(), lockId(_lockId), numberOfLocks(_numberOfLocks) {
+lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg(unsigned int lockId, unsigned int numberOfLocks) : fileioWarningMsg() {
 
-  //	this->lockId        = _lockId;
-  //	this->numberOfLocks = _numberOfLocks;
+	this->lockId        = lockId;
+	this->numberOfLocks = numberOfLocks;
 
 }
 

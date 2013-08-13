@@ -48,10 +48,6 @@
 
 class trackPropagationAnalysis {
 
- private:
-  trackPropagationAnalysis(const trackPropagationAnalysis&);
-  trackPropagationAnalysis& operator=(const trackPropagationAnalysis&);
-
 protected:
 
 	TCanvas*                            window;								/**< Object for the main window */

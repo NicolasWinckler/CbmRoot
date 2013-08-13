@@ -38,10 +38,7 @@
  * Default constructor											*
  ****************************************************************/
 
-prelutMath::prelutMath() 
-  : prelut(),
-    formula()
-{
+prelutMath::prelutMath() : prelut() {
 
 }
 
@@ -49,10 +46,7 @@ prelutMath::prelutMath()
  * Constructor													*
  ****************************************************************/
 
-prelutMath::prelutMath(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) 
-  : prelut(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry),
-    formula()
-{
+prelutMath::prelutMath(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) : prelut(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry) {
 
 }
 

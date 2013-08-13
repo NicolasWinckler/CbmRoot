@@ -42,12 +42,11 @@
 /*
  * struct consisting of all parameters which should be read from file
  */
-struct digitalHitAccessFileHeader {
-digitalHitAccessFileHeader() : name(), usage(), numberOfEntries(0) {};
+typedef struct {
 	std::string   name;						/**< Variable to store the name of the lut */
 	std::string   usage;					/**< Variable to store the usage of the lut */
 	unsigned long numberOfEntries;			/**< Variable to store the number of entries of the lut */
-};
+} digitalHitAccessFileHeader;
 
 
 /* **************************************************************

@@ -36,10 +36,10 @@
  * Default constructor											*
  ****************************************************************/
 
-tableEntry::tableEntry() : signature(bitArray(0)), classification(bitArray(0)) {
+tableEntry::tableEntry() {
 
-  //	signature      = bitArray(0);
-  //	classification = bitArray(0);
+	signature      = bitArray(0);
+	classification = bitArray(0);
 
 }
 
@@ -47,10 +47,10 @@ tableEntry::tableEntry() : signature(bitArray(0)), classification(bitArray(0)) {
  * Copy constructor
  ****************************************************************/
 
-tableEntry::tableEntry(const tableEntry& value) : signature(value.signature), classification(value.classification) {
+tableEntry::tableEntry(const tableEntry& value) {
 
-  //	signature      = value.signature;
-  //	classification = value.classification;
+	signature      = value.signature;
+	classification = value.classification;
 
 }
 
@@ -58,10 +58,10 @@ tableEntry::tableEntry(const tableEntry& value) : signature(value.signature), cl
  * Constructor
  */
 
-tableEntry::tableEntry(bitArray& _signature, bitArray& _classification) : signature(_signature), classification(_classification) {
+tableEntry::tableEntry(bitArray& signature, bitArray& classification) {
 
-  //	this->signature      = _signature;
-  //	this->classification = _classification;
+	this->signature      = signature;
+	this->classification = classification;
 
 }
 

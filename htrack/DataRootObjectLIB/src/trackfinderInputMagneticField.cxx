@@ -93,19 +93,8 @@ void trackfinderInputMagneticField::readField() {
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputMagneticField::trackfinderInputMagneticField() 
-  : TObject(), 
-    magneticField(NULL),
-    isLocalField(false),
-    fileName(),
-    isRootFile(false),
-    mapName(),
-    magneticFieldIntegrationStepwidthPerStation(1),
-    magneticFieldIntegrationFactor(1),
-    numberOfMagnetfieldFactors(0),
-    magnetfieldFactors(NULL)
-{
-  /*
+trackfinderInputMagneticField::trackfinderInputMagneticField() : TObject() {
+
 	magneticField                               = NULL;
 	isLocalField                                = false;
 	fileName.clear();
@@ -115,31 +104,19 @@ trackfinderInputMagneticField::trackfinderInputMagneticField()
 	magneticFieldIntegrationFactor              = 1;
 	numberOfMagnetfieldFactors                  = 0;
 	magnetfieldFactors                          = NULL;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputMagneticField::trackfinderInputMagneticField(const trackfinderInputMagneticField& value) 
-  : TObject(value),
-    magneticField(NULL),
-    isLocalField(value.isLocalField),
-    fileName(value.fileName),
-    isRootFile(value.isRootFile),
-    mapName(value.mapName),
-    magneticFieldIntegrationStepwidthPerStation(value.magneticFieldIntegrationStepwidthPerStation),
-    magneticFieldIntegrationFactor(value.magneticFieldIntegrationFactor),
-    numberOfMagnetfieldFactors(value.numberOfMagnetfieldFactors),
-    magnetfieldFactors(value.magnetfieldFactors)
-{
+trackfinderInputMagneticField::trackfinderInputMagneticField(const trackfinderInputMagneticField& value) : TObject(value) {
 
 	if (value.isLocalField)
 		*(this->magneticField)                        = *(value.magneticField);
 	else
 		this->magneticField                           = value.magneticField;
-	/*
 	this->isLocalField                                = value.isLocalField;
 	this->fileName                                    = value.fileName;
 	this->isRootFile                                  = value.isRootFile;
@@ -148,81 +125,42 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(const trackfinderIn
 	this->magneticFieldIntegrationFactor              = value.magneticFieldIntegrationFactor;
 	this->numberOfMagnetfieldFactors                  = value.numberOfMagnetfieldFactors;
 	this->magnetfieldFactors                          = value.magnetfieldFactors;
-	*/
-}
-trackfinderInputMagneticField::trackfinderInputMagneticField(const char* _fileName, bool _isRootFile, const char* _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor) 
-  : TObject(), 
-    magneticField(NULL),
-    isLocalField(false),
-    fileName(_fileName),
-    isRootFile(_isRootFile),
-    mapName(_mapName),
-    magneticFieldIntegrationStepwidthPerStation(1),
-    magneticFieldIntegrationFactor(_magneticFieldIntegrationFactor),
-    numberOfMagnetfieldFactors(0),
-    magnetfieldFactors(NULL)
-{
 
-  /*
+}
+trackfinderInputMagneticField::trackfinderInputMagneticField(const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) : TObject() {
+
 	this->magneticField                                   = NULL;
 	this->isLocalField                                    = false;
-	this->fileName                                        = _fileName;
-	this->isRootFile                                      = _isRootFile;
-	this->mapName                                         = _mapName;
-  */
-	if (_magneticFieldIntegrationStepwidthPerStation > 0)
-		this->magneticFieldIntegrationStepwidthPerStation = _magneticFieldIntegrationStepwidthPerStation;
+	this->fileName                                        = fileName;
+	this->isRootFile                                      = isRootFile;
+	this->mapName                                         = mapName;
+	if (magneticFieldIntegrationStepwidthPerStation > 0)
+		this->magneticFieldIntegrationStepwidthPerStation = magneticFieldIntegrationStepwidthPerStation;
 	else
 		this->magneticFieldIntegrationStepwidthPerStation = 1;
-	/*
-	this->magneticFieldIntegrationFactor                  = _magneticFieldIntegrationFactor;
+	this->magneticFieldIntegrationFactor                  = magneticFieldIntegrationFactor;
 	this->numberOfMagnetfieldFactors                      = 0;
 	this->magnetfieldFactors                              = NULL;
-	*/
-}
-trackfinderInputMagneticField::trackfinderInputMagneticField(std::string _fileName, bool _isRootFile, std::string _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor) 
-  : TObject(),
-    magneticField(NULL),
-    isLocalField(false),
-    fileName(_fileName),
-    isRootFile(_isRootFile),
-    mapName(_mapName.c_str()),
-    magneticFieldIntegrationStepwidthPerStation(1),
-    magneticFieldIntegrationFactor(_magneticFieldIntegrationFactor),
-    numberOfMagnetfieldFactors(0),
-    magnetfieldFactors(NULL)
-{
 
-   /*
+}
+trackfinderInputMagneticField::trackfinderInputMagneticField(std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) : TObject() {
+
 	this->magneticField                                   = NULL;
 	this->isLocalField                                    = false;
-	this->fileName                                        = _fileName;
-	this->isRootFile                                      = _isRootFile;
-	this->mapName                                         = _mapName.c_str();
-   */
-	if (_magneticFieldIntegrationStepwidthPerStation > 0)
-		this->magneticFieldIntegrationStepwidthPerStation = _magneticFieldIntegrationStepwidthPerStation;
+	this->fileName                                        = fileName;
+	this->isRootFile                                      = isRootFile;
+	this->mapName                                         = mapName.c_str();
+	if (magneticFieldIntegrationStepwidthPerStation > 0)
+		this->magneticFieldIntegrationStepwidthPerStation = magneticFieldIntegrationStepwidthPerStation;
 	else
 		this->magneticFieldIntegrationStepwidthPerStation = 1;
-	/*
-	this->magneticFieldIntegrationFactor                  = _magneticFieldIntegrationFactor;
+	this->magneticFieldIntegrationFactor                  = magneticFieldIntegrationFactor;
 	this->numberOfMagnetfieldFactors                      = 0;
 	this->magnetfieldFactors                              = NULL;
-	*/
+
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short _numberOfMagnetfieldFactors) 
-  : TObject(),
-    magneticField(NULL),
-    isLocalField(false),
-    fileName(),
-    isRootFile(false),
-    mapName(),
-    magneticFieldIntegrationStepwidthPerStation(1),
-    magneticFieldIntegrationFactor(1),
-    numberOfMagnetfieldFactors(0),
-    magnetfieldFactors(NULL)
-{
-   /*
+trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short numberOfMagnetfieldFactors) : TObject() {
+
 	magneticField                               = NULL;
 	isLocalField                                = false;
 	fileName.clear();
@@ -232,38 +170,25 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short _num
 	magneticFieldIntegrationFactor              = 1;
 	numberOfMagnetfieldFactors                  = 0;
 	magnetfieldFactors                          = NULL;
-   */
-	setNumberOfMagnetfieldFactors(_numberOfMagnetfieldFactors);
+
+	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(FairField* field, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor) 
-  : TObject(),
-    magneticField(field),
-    isLocalField(false),
-    fileName(),
-    isRootFile(false),
-    mapName(),
-    magneticFieldIntegrationStepwidthPerStation(1),
-    magneticFieldIntegrationFactor(_magneticFieldIntegrationFactor),
-    numberOfMagnetfieldFactors(0),
-    magnetfieldFactors(NULL)
-{
-  /*
+trackfinderInputMagneticField::trackfinderInputMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) : TObject() {
+
 	this->magneticField                                   = field;
 	this->isLocalField                                    = false;
 	this->fileName.clear();
 	this->isRootFile                                      = false;
 	this->mapName.clear();
-  */
-	if (_magneticFieldIntegrationStepwidthPerStation > 0)
-		this->magneticFieldIntegrationStepwidthPerStation = _magneticFieldIntegrationStepwidthPerStation;
+	if (magneticFieldIntegrationStepwidthPerStation > 0)
+		this->magneticFieldIntegrationStepwidthPerStation = magneticFieldIntegrationStepwidthPerStation;
 	else
 		this->magneticFieldIntegrationStepwidthPerStation = 1;
-	/*
-	this->magneticFieldIntegrationFactor                  = _magneticFieldIntegrationFactor;
+	this->magneticFieldIntegrationFactor                  = magneticFieldIntegrationFactor;
 	this->numberOfMagnetfieldFactors                      = 0;
 	this->magnetfieldFactors                              = NULL;
-	*/
+
 }
 
 /****************************************************************
@@ -331,7 +256,7 @@ const trackfinderInputMagneticField& trackfinderInputMagneticField::operator = (
  * method inits the field.										*
  ****************************************************************/
 
-void trackfinderInputMagneticField::init(const char* _fileName, bool _isRootFile, const char* _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors) {
+void trackfinderInputMagneticField::init(const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors) {
 
 	if (isLocalField) {
 
@@ -347,23 +272,23 @@ void trackfinderInputMagneticField::init(const char* _fileName, bool _isRootFile
 		magnetfieldFactors = NULL;
 	}
 
-	this->fileName                                        = _fileName;
-	this->isRootFile                                      = _isRootFile;
-	this->mapName                                         = _mapName;
-	if (_magneticFieldIntegrationStepwidthPerStation > 0)
-		this->magneticFieldIntegrationStepwidthPerStation = _magneticFieldIntegrationStepwidthPerStation;
+	this->fileName                                        = fileName;
+	this->isRootFile                                      = isRootFile;
+	this->mapName                                         = mapName;
+	if (magneticFieldIntegrationStepwidthPerStation > 0)
+		this->magneticFieldIntegrationStepwidthPerStation = magneticFieldIntegrationStepwidthPerStation;
 	else
 		this->magneticFieldIntegrationStepwidthPerStation = 1;
-	this->magneticFieldIntegrationFactor                  = _magneticFieldIntegrationFactor;
+	this->magneticFieldIntegrationFactor                  = magneticFieldIntegrationFactor;
 	initialize();
 
 	this->numberOfMagnetfieldFactors                      = 0;
 	this->magnetfieldFactors                              = NULL;
 
-	setNumberOfMagnetfieldFactors(_numberOfMagnetfieldFactors);
+	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputMagneticField::init(std::string _fileName, bool _isRootFile, std::string _mapName, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors) {
+void trackfinderInputMagneticField::init(std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors) {
 
 	if (isLocalField) {
 
@@ -379,23 +304,23 @@ void trackfinderInputMagneticField::init(std::string _fileName, bool _isRootFile
 		magnetfieldFactors = NULL;
 	}
 
-	this->fileName                                        = _fileName;
-	this->isRootFile                                      = _isRootFile;
-	this->mapName                                         = _mapName;
-	if (_magneticFieldIntegrationStepwidthPerStation > 0)
-		this->magneticFieldIntegrationStepwidthPerStation = _magneticFieldIntegrationStepwidthPerStation;
+	this->fileName                                        = fileName;
+	this->isRootFile                                      = isRootFile;
+	this->mapName                                         = mapName;
+	if (magneticFieldIntegrationStepwidthPerStation > 0)
+		this->magneticFieldIntegrationStepwidthPerStation = magneticFieldIntegrationStepwidthPerStation;
 	else
 		this->magneticFieldIntegrationStepwidthPerStation = 1;
-	this->magneticFieldIntegrationFactor                  = _magneticFieldIntegrationFactor;
+	this->magneticFieldIntegrationFactor                  = magneticFieldIntegrationFactor;
 	initialize();
 
 	this->numberOfMagnetfieldFactors                      = 0;
 	this->magnetfieldFactors                              = NULL;
 
-	setNumberOfMagnetfieldFactors(_numberOfMagnetfieldFactors);
+	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputMagneticField::init(unsigned short _numberOfMagnetfieldFactors) {
+void trackfinderInputMagneticField::init(unsigned short numberOfMagnetfieldFactors) {
 
 	if (isLocalField) {
 
@@ -419,10 +344,10 @@ void trackfinderInputMagneticField::init(unsigned short _numberOfMagnetfieldFact
 	numberOfMagnetfieldFactors                  = 0;
 	magnetfieldFactors                          = NULL;
 
-	setNumberOfMagnetfieldFactors(_numberOfMagnetfieldFactors);
+	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputMagneticField::init(FairField* field, unsigned short _magneticFieldIntegrationStepwidthPerStation, double _magneticFieldIntegrationFactor, unsigned short _numberOfMagnetfieldFactors) {
+void trackfinderInputMagneticField::init(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors) {
 
 	if (isLocalField) {
 
@@ -443,15 +368,15 @@ void trackfinderInputMagneticField::init(FairField* field, unsigned short _magne
 	this->fileName.clear();
 	this->isRootFile                                  = false;
 	this->mapName.clear();
-	if (_magneticFieldIntegrationStepwidthPerStation > 0)
-		this->magneticFieldIntegrationStepwidthPerStation = _magneticFieldIntegrationStepwidthPerStation;
+	if (magneticFieldIntegrationStepwidthPerStation > 0)
+		this->magneticFieldIntegrationStepwidthPerStation = magneticFieldIntegrationStepwidthPerStation;
 	else
 		this->magneticFieldIntegrationStepwidthPerStation = 1;
-	this->magneticFieldIntegrationFactor              = _magneticFieldIntegrationFactor;
+	this->magneticFieldIntegrationFactor              = magneticFieldIntegrationFactor;
 	this->numberOfMagnetfieldFactors                  = 0;
 	this->magnetfieldFactors                          = NULL;
 
-	setNumberOfMagnetfieldFactors(_numberOfMagnetfieldFactors);
+	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
 
@@ -668,7 +593,7 @@ double trackfinderInputMagneticField::getFieldFactor(double hitPosX, double hitP
  * method sets the number of magnetfield factors (stations)		*
  ****************************************************************/
 
-void trackfinderInputMagneticField::setNumberOfMagnetfieldFactors(unsigned short _numberOfMagnetfieldFactors) {
+void trackfinderInputMagneticField::setNumberOfMagnetfieldFactors(unsigned short numberOfMagnetfieldFactors) {
 
 	if (magnetfieldFactors != NULL) {
 
@@ -677,7 +602,7 @@ void trackfinderInputMagneticField::setNumberOfMagnetfieldFactors(unsigned short
 
 	}
 
-	this->numberOfMagnetfieldFactors = _numberOfMagnetfieldFactors;
+	this->numberOfMagnetfieldFactors = numberOfMagnetfieldFactors;
 
 	if (this->numberOfMagnetfieldFactors > 0) {
 

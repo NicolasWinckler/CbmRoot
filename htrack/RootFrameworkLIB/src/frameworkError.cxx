@@ -41,9 +41,7 @@
  * Default constructor											*
  ****************************************************************/
 
-frameworkError::frameworkError() 
-  : errorHandling(ROOTFRAMEWORKLIB)
-{
+frameworkError::frameworkError() : errorHandling(ROOTFRAMEWORKLIB) {
 
 }
 
@@ -64,11 +62,9 @@ frameworkError::~frameworkError() {
  * Default constructor											*
  ****************************************************************/
 
-folderNameNotFoundError::folderNameNotFoundError() 
-  : frameworkError(), folderName()
-{
+folderNameNotFoundError::folderNameNotFoundError() : frameworkError() {
 
-  //	folderName.clear();
+	folderName.clear();
 
 }
 
@@ -76,11 +72,9 @@ folderNameNotFoundError::folderNameNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-folderNameNotFoundError::folderNameNotFoundError(std::string actualFolderName) 
-  : frameworkError(), folderName(actualFolderName) 
-{
+folderNameNotFoundError::folderNameNotFoundError(std::string actualFolderName) : frameworkError() {
 
-  //	folderName = actualFolderName;
+	folderName = actualFolderName;
 
 }
 
@@ -116,12 +110,9 @@ void folderNameNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-listOfBranchesNotFoundError::listOfBranchesNotFoundError() 
-  : frameworkError(),
-    branchName()
-{
+listOfBranchesNotFoundError::listOfBranchesNotFoundError() : frameworkError() {
 
-  //	branchName.clear();
+	branchName.clear();
 
 }
 
@@ -129,10 +120,7 @@ listOfBranchesNotFoundError::listOfBranchesNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-listOfBranchesNotFoundError::listOfBranchesNotFoundError(std::string actualBranchName) 
-  : frameworkError(),
-    branchName(actualBranchName)
-{
+listOfBranchesNotFoundError::listOfBranchesNotFoundError(std::string actualBranchName) : frameworkError() {
 
 	branchName = actualBranchName;
 
@@ -170,12 +158,9 @@ void listOfBranchesNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-listOfFoldersNotFoundError::listOfFoldersNotFoundError() 
-  : frameworkError(),
-    folderName()
-{
+listOfFoldersNotFoundError::listOfFoldersNotFoundError() : frameworkError() {
 
-  //	folderName.clear();
+	folderName.clear();
 
 }
 
@@ -183,12 +168,9 @@ listOfFoldersNotFoundError::listOfFoldersNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-listOfFoldersNotFoundError::listOfFoldersNotFoundError(std::string actualFolderName) 
-  : frameworkError(),
-    folderName(actualFolderName)
-{
+listOfFoldersNotFoundError::listOfFoldersNotFoundError(std::string actualFolderName) : frameworkError() {
 
-  //	folderName = actualFolderName;
+	folderName = actualFolderName;
 
 }
 
@@ -224,9 +206,7 @@ void listOfFoldersNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotMakeListIteratorError::cannotMakeListIteratorError() 
-: frameworkError() 
-{
+cannotMakeListIteratorError::cannotMakeListIteratorError() : frameworkError() {
 
 }
 
@@ -257,12 +237,9 @@ void cannotMakeListIteratorError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAddFolderError::cannotAddFolderError() 
-  : frameworkError(),
-    folderName()
-{
+cannotAddFolderError::cannotAddFolderError() {
 
-  //	folderName.clear();
+	folderName.clear();
 
 }
 
@@ -270,12 +247,9 @@ cannotAddFolderError::cannotAddFolderError()
  * Constructor													*
  ****************************************************************/
 
-cannotAddFolderError::cannotAddFolderError(std::string actualFolderName) 
-  : frameworkError(),
-    folderName(actualFolderName)
-{
+cannotAddFolderError::cannotAddFolderError(std::string actualFolderName) {
 
-  //	folderName = actualFolderName;
+	folderName = actualFolderName;
 
 }
 
@@ -311,12 +285,9 @@ void cannotAddFolderError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-treeNameNotFoundError::treeNameNotFoundError() 
-  : frameworkError(),
-    treeName()
- {
+treeNameNotFoundError::treeNameNotFoundError() : frameworkError() {
 
-   //	treeName.clear();
+	treeName.clear();
 
 }
 
@@ -324,12 +295,9 @@ treeNameNotFoundError::treeNameNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-treeNameNotFoundError::treeNameNotFoundError(std::string actualTreeName) 
-  : frameworkError(),
-    treeName(actualTreeName)
-{
+treeNameNotFoundError::treeNameNotFoundError(std::string actualTreeName) : frameworkError() {
 
-  //	treeName = actualTreeName;
+	treeName = actualTreeName;
 
 }
 
@@ -365,9 +333,7 @@ void treeNameNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessBranchesError::cannotAccessBranchesError() 
-  : frameworkError() 
-{
+cannotAccessBranchesError::cannotAccessBranchesError() : frameworkError() {
 
 }
 
@@ -398,9 +364,7 @@ void cannotAccessBranchesError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noOutputTreeError::noOutputTreeError() 
-  : frameworkError() 
-{
+noOutputTreeError::noOutputTreeError() : frameworkError() {
 
 }
 
@@ -431,9 +395,7 @@ void noOutputTreeError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noOutputFileError::noOutputFileError() 
-  : frameworkError() 
-{
+noOutputFileError::noOutputFileError() : frameworkError() {
 
 }
 
@@ -464,9 +426,7 @@ void noOutputFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessHitsError::cannotAccessHitsError() 
-  : frameworkError() 
-{
+cannotAccessHitsError::cannotAccessHitsError() : frameworkError() {
 
 }
 
@@ -497,9 +457,7 @@ void cannotAccessHitsError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessPointError::cannotAccessPointError() 
-  : frameworkError() 
-{
+cannotAccessPointError::cannotAccessPointError() : frameworkError() {
 
 }
 
@@ -530,9 +488,7 @@ void cannotAccessPointError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotSmearError::cannotSmearError() 
-  : frameworkError() 
-{
+cannotSmearError::cannotSmearError() : frameworkError() {
 
 }
 
@@ -563,9 +519,7 @@ void cannotSmearError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noInputFileError::noInputFileError() 
-  : frameworkError() 
-{
+noInputFileError::noInputFileError() : frameworkError() {
 
 }
 
@@ -596,9 +550,7 @@ void noInputFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noOutputFolderError::noOutputFolderError() 
-  : frameworkError() 
-{
+noOutputFolderError::noOutputFolderError() : frameworkError() {
 
 }
 
@@ -629,9 +581,7 @@ void noOutputFolderError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noTreeError::noTreeError() 
-  : frameworkError() 
-{
+noTreeError::noTreeError() : frameworkError() {
 
 }
 
@@ -662,9 +612,7 @@ void noTreeError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noDetectorTypeError::noDetectorTypeError() 
-  : frameworkError() 
-{
+noDetectorTypeError::noDetectorTypeError() : frameworkError() {
 
 }
 

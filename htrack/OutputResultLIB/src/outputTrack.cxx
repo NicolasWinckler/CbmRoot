@@ -64,13 +64,13 @@ void outputTrack::initialize() {
 #endif
 
 }
-void outputTrack::initialize(trackData** _tracks) {
+void outputTrack::initialize(trackData** tracks) {
 
-	this->tracks = _tracks;
+	this->tracks = tracks;
 
 }
 
-void outputTrack::initialize(const char* name, trackData** _tracks) {
+void outputTrack::initialize(const char* name, trackData** tracks) {
 
 	std::string     tempName;
 	std::string     fileName;
@@ -98,7 +98,7 @@ void outputTrack::initialize(const char* name, trackData** _tracks) {
 
 	manager->OpenOutFile(fileName.c_str());
 
-	initialize(_tracks);
+	initialize(tracks);
 
 }
 
@@ -255,13 +255,9 @@ void outputTrack::writeTracks(std::streambuf* terminal) {
  * Default constructor											*
  ****************************************************************/
 
-outputTrack::outputTrack() 
-  : tracks(NULL),
-    formula(),
-    data()
-{
+outputTrack::outputTrack() {
 
-  //	tracks = NULL;
+	tracks = NULL;
 
 }
 
@@ -269,22 +265,14 @@ outputTrack::outputTrack()
  * Constructor													*
  ****************************************************************/
 
-outputTrack::outputTrack(trackData** _tracks) 
-  : tracks(NULL),
-    formula(),
-    data()
-{
+outputTrack::outputTrack(trackData** tracks) {
 
-	initialize(_tracks);
+	initialize(tracks);
 
 }
-outputTrack::outputTrack(const char* name, trackData** _tracks) 
-  : tracks(NULL),
-    formula(),
-    data()
-{
+outputTrack::outputTrack(const char* name, trackData** tracks) {
 
-	initialize(name, _tracks);
+	initialize(name, tracks);
 
 }
 
@@ -300,17 +288,17 @@ outputTrack::~outputTrack() {
  * Method inits the variables.									*
  ****************************************************************/
 
-void outputTrack::init(trackData** _tracks) {
+void outputTrack::init(trackData** tracks) {
 
-	initialize(_tracks);
+	initialize(tracks);
 
 	init();
 
 }
 
-void outputTrack::init(const char* name, trackData** _tracks) {
+void outputTrack::init(const char* name, trackData** tracks) {
 
-	initialize(name, _tracks);
+	initialize(name, tracks);
 
 	init();
 

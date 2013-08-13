@@ -181,8 +181,8 @@ void trackPropagationAnalysis::evaluateWindowDivisionFactors(unsigned short* num
 			globalSignature = (bool*)realloc(globalSignature, sizeOfLocalSignature * sizeof(bool));
 			if (globalSignature == NULL)
 				throw memoryAllocationError(ANALYSISLIB);
-			for (unsigned short _i = sizeOfGlobalSignature; _i < sizeOfLocalSignature; _i++)
-				globalSignature[_i] = false;
+			for (unsigned short i = sizeOfGlobalSignature; i < sizeOfLocalSignature; i++)
+				globalSignature[i] = false;
 			sizeOfGlobalSignature = sizeOfLocalSignature;
 		}
 		evaluateWindowDivisionSignatures(globalSignature, sizeOfGlobalSignature, localSignature, sizeOfLocalSignature);
@@ -204,8 +204,8 @@ void trackPropagationAnalysis::evaluateWindowDivisionFactors(unsigned short* num
 			globalSignature = (bool*)realloc(globalSignature, sizeOfLocalSignature * sizeof(bool));
 			if (globalSignature == NULL)
 				throw memoryAllocationError(ANALYSISLIB);
-			for (unsigned short _i = sizeOfGlobalSignature; _i < sizeOfLocalSignature; _i++)
-				globalSignature[_i] = false;
+			for (unsigned short i = sizeOfGlobalSignature; i < sizeOfLocalSignature; i++)
+				globalSignature[i] = false;
 			sizeOfGlobalSignature = sizeOfLocalSignature;
 		}
 		evaluateWindowDivisionSignatures(globalSignature, sizeOfGlobalSignature, localSignature, sizeOfLocalSignature);
@@ -283,18 +283,8 @@ void trackPropagationAnalysis::drawWindowPads(unsigned short columnId) {
  * Default constructor											*
  ****************************************************************/
 
-trackPropagationAnalysis::trackPropagationAnalysis() 
- : window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   trackPropagationEventPoint(NULL),
-   trackPropagationEventHit(NULL),
-   trackPropagationTotalPoint(NULL),
-   trackPropagationTotalHit(NULL),
-   outputFileName()
-{
-  /*
+trackPropagationAnalysis::trackPropagationAnalysis() {
+
 	window                     = NULL;
 	numberOfWindowPadColumns   = 0;
 	numberOfWindowPadRows      = 0;
@@ -304,7 +294,7 @@ trackPropagationAnalysis::trackPropagationAnalysis()
 	trackPropagationTotalPoint = NULL;
 	trackPropagationTotalHit   = NULL;
 	outputFileName.clear();
-  */
+
 }
 
 /****************************************************************

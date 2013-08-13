@@ -40,13 +40,9 @@
  * Default constructor											*
  ****************************************************************/
 
-trackLayerAccess::trackLayerAccess() 
-  : begin(),
-    end(),
-    isValid(false)
-{
+trackLayerAccess::trackLayerAccess() {
 
-  //	isValid  = false;
+	isValid  = false;
 
 }
 
@@ -54,16 +50,12 @@ trackLayerAccess::trackLayerAccess()
  * Constructor													*
  ****************************************************************/
 
-trackLayerAccess::trackLayerAccess(const trackLayerAccess& value) 
-  : begin(value.begin),
-    end(value.end),
-    isValid(value.isValid)
-{
-  /*
-  	this->begin    = value.begin;
+trackLayerAccess::trackLayerAccess(const trackLayerAccess& value) {
+
+	this->begin    = value.begin;
 	this->end      = value.end;
 	this->isValid  = value.isValid;
-  */
+
 }
 
 /****************************************************************

@@ -528,23 +528,8 @@ void magnetfieldFactorAnalysis::evaluateWindowDivisionFactors(unsigned short* nu
  * Default constructor											*
  * **************************************************************/
 
-magnetfieldFactorAnalysis::magnetfieldFactorAnalysis() 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   displays(NULL),
-   distances(NULL),
-   factors(NULL),
-   numberOfDisplays(0),
-   numberOfFactors(0),
-   factorMin(0),
-   factorMax(0)
-{
-  /*
+magnetfieldFactorAnalysis::magnetfieldFactorAnalysis() {
+
 	analysisEnabled          = false;
 	window                   = NULL;
 	numberOfWindowPadColumns = 0;
@@ -559,30 +544,15 @@ magnetfieldFactorAnalysis::magnetfieldFactorAnalysis()
 	numberOfFactors          = 0;
 	factorMin                = 0;
 	factorMax                = 0;
-  */
+
 }
 
 /* **************************************************************
  * Constructor													*
  * **************************************************************/
 
-magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short _numberOfDisplays) 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   displays(NULL),
-   distances(NULL),
-   factors(NULL),
-   numberOfDisplays(_numberOfDisplays),
-   numberOfFactors(0),
-   factorMin(0),
-   factorMax(0)
-{
-  /*
+magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short numberOfDisplays) {
+
 	this->analysisEnabled          = false;
 	this->window                   = NULL;
 	this->numberOfWindowPadColumns = 0;
@@ -593,30 +563,14 @@ magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short _numberOfDis
 	this->displays                 = NULL;
 	this->distances                = NULL;
 	this->factors                  = NULL;
-	this->numberOfDisplays         = _numberOfDisplays;
+	this->numberOfDisplays         = numberOfDisplays;
 	this->numberOfFactors          = 0;
 	this->factorMin                = 0;
 	this->factorMax                = 0;
-  */
-}
 
-magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned int _numberOfFactors, double _factorMin, double _factorMax) 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   displays(NULL),
-   distances(NULL),
-   factors(NULL),
-   numberOfDisplays(0),
-   numberOfFactors(_numberOfFactors),
-   factorMin(_factorMin),
-   factorMax(_factorMax)
-{
-  /*
+}
+magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned int numberOfFactors, double factorMin, double factorMax) {
+
 	this->analysisEnabled          = false;
 	this->window                   = NULL;
 	this->numberOfWindowPadColumns = 0;
@@ -628,29 +582,13 @@ magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned int _numberOfFacto
 	this->distances                = NULL;
 	this->factors                  = NULL;
 	this->numberOfDisplays         = 0;
-	this->numberOfFactors          = _numberOfFactors;
-	this->factorMin                = _factorMin;
-	this->factorMax                = _factorMax;
-  */
-}
+	this->numberOfFactors          = numberOfFactors;
+	this->factorMin                = factorMin;
+	this->factorMax                = factorMax;
 
-magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short _numberOfDisplays, unsigned int _numberOfFactors, double _factorMin, double _factorMax) 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   displays(NULL),
-   distances(NULL),
-   factors(NULL),
-   numberOfDisplays(_numberOfDisplays),
-   numberOfFactors(_numberOfFactors),
-   factorMin(_factorMin),
-   factorMax(_factorMax)
-{
-  /*
+}
+magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short numberOfDisplays, unsigned int numberOfFactors, double factorMin, double factorMax) {
+
 	this->analysisEnabled          = false;
 	this->window                   = NULL;
 	this->numberOfWindowPadColumns = 0;
@@ -661,11 +599,11 @@ magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short _numberOfDis
 	this->displays                 = NULL;
 	this->distances                = NULL;
 	this->factors                  = NULL;
-	this->numberOfDisplays         = _numberOfDisplays;
-	this->numberOfFactors          = _numberOfFactors;
-	this->factorMin                = _factorMin;
-	this->factorMax                = _factorMax;
-  */
+	this->numberOfDisplays         = numberOfDisplays;
+	this->numberOfFactors          = numberOfFactors;
+	this->factorMin                = factorMin;
+	this->factorMax                = factorMax;
+
 	allocateMemory();
 
 }
@@ -689,34 +627,34 @@ magnetfieldFactorAnalysis::~magnetfieldFactorAnalysis() {
  * Method inits the variables.									*
  * **************************************************************/
 
-void magnetfieldFactorAnalysis::init(unsigned short _numberOfDisplays) {
+void magnetfieldFactorAnalysis::init(unsigned short numberOfDisplays) {
 
 	deleteMemory();
 
-	this->numberOfDisplays = _numberOfDisplays;
+	this->numberOfDisplays = numberOfDisplays;
 
 	allocateMemory();
 
 }
-void magnetfieldFactorAnalysis::init(unsigned int _numberOfFactors, double _factorMin, double _factorMax) {
+void magnetfieldFactorAnalysis::init(unsigned int numberOfFactors, double factorMin, double factorMax) {
 
 	deleteMemory();
 
-	this->numberOfFactors = _numberOfFactors;
-	this->factorMin       = _factorMin;
-	this->factorMax       = _factorMax;
+	this->numberOfFactors = numberOfFactors;
+	this->factorMin       = factorMin;
+	this->factorMax       = factorMax;
 
 	allocateMemory();
 
 }
-void magnetfieldFactorAnalysis::init(unsigned short _numberOfDisplays, unsigned int _numberOfFactors, double _factorMin, double _factorMax) {
+void magnetfieldFactorAnalysis::init(unsigned short numberOfDisplays, unsigned int numberOfFactors, double factorMin, double factorMax) {
 
 	deleteMemory();
 
-	this->numberOfDisplays = _numberOfDisplays;
-	this->numberOfFactors  = _numberOfFactors;
-	this->factorMin        = _factorMin;
-	this->factorMax        = _factorMax;
+	this->numberOfDisplays = numberOfDisplays;
+	this->numberOfFactors  = numberOfFactors;
+	this->factorMin        = factorMin;
+	this->factorMax        = factorMax;
 
 	allocateMemory();
 
@@ -726,29 +664,29 @@ void magnetfieldFactorAnalysis::init(unsigned short _numberOfDisplays, unsigned 
  * Method sets the variables.									*
  * **************************************************************/
 
-void magnetfieldFactorAnalysis::set(unsigned short _numberOfDisplays) {
+void magnetfieldFactorAnalysis::set(unsigned short numberOfDisplays) {
 
-	if (this->numberOfDisplays != _numberOfDisplays) {
+	if (this->numberOfDisplays != numberOfDisplays) {
 
-		init(_numberOfDisplays);
-
-	}
-
-}
-void magnetfieldFactorAnalysis::set(unsigned int _numberOfFactors, double _factorMin, double _factorMax) {
-
-	if ((this->numberOfFactors != _numberOfFactors) || (this->factorMin != _factorMin) || (this->factorMax != _factorMax)) {
-
-		init(_numberOfFactors, _factorMin, _factorMax);
+		init(numberOfDisplays);
 
 	}
 
 }
-void magnetfieldFactorAnalysis::set(unsigned short _numberOfDisplays, unsigned int _numberOfFactors, double _factorMin, double _factorMax) {
+void magnetfieldFactorAnalysis::set(unsigned int numberOfFactors, double factorMin, double factorMax) {
 
-	if ((this->numberOfDisplays != _numberOfDisplays) || (this->numberOfFactors != _numberOfFactors) || (this->factorMin != _factorMin) || (this->factorMax != _factorMax)) {
+	if ((this->numberOfFactors != numberOfFactors) || (this->factorMin != factorMin) || (this->factorMax != factorMax)) {
 
-		init(_numberOfDisplays, _numberOfFactors, _factorMin, _factorMax);
+		init(numberOfFactors, factorMin, factorMax);
+
+	}
+
+}
+void magnetfieldFactorAnalysis::set(unsigned short numberOfDisplays, unsigned int numberOfFactors, double factorMin, double factorMax) {
+
+	if ((this->numberOfDisplays != numberOfDisplays) || (this->numberOfFactors != numberOfFactors) || (this->factorMin != factorMin) || (this->factorMax != factorMax)) {
+
+		init(numberOfDisplays, numberOfFactors, factorMin, factorMax);
 
 	}
 

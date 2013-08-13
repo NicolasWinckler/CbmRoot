@@ -45,11 +45,6 @@
 
 class filterDimZ {
 
- private:
-
-  filterDimZ(const filterDimZ&);
-  filterDimZ& operator=(const filterDimZ&);
-
 protected:
 
 	trackData**       tracks;				/**< Object for accessing the tracks. */

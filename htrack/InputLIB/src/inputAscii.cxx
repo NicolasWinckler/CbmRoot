@@ -59,13 +59,9 @@
  * Default constructor											*
  ****************************************************************/
 
-inputAscii::inputAscii() 
-  : inputData(),
-    dataValidation(false),
-    sourceFile()
-{
+inputAscii::inputAscii() : inputData() {
 
-   //	dataValidation = false;
+	dataValidation = false;
 
 }
 
@@ -75,11 +71,7 @@ inputAscii::inputAscii()
  * - cannotOpenFileError										*
  ****************************************************************/
 
-inputAscii::inputAscii(const char* name, bitArray detMask, int hitProducer) 
-  : inputData(detMask, hitProducer),
-    dataValidation(false),
-    sourceFile()
-{
+inputAscii::inputAscii(const char* name, bitArray detMask, int hitProducer) : inputData(detMask, hitProducer) {
 
 	dataValidation = false;
 

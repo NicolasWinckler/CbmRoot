@@ -56,15 +56,11 @@
  * Default constructor											*
  ****************************************************************/
 
-firstFilterFinalMod::firstFilterFinalMod() 
-  : filterDimXDimX(),
-    filterResultSize(0),
-    filterResultMem(NULL)
-{
-  /*
+firstFilterFinalMod::firstFilterFinalMod() : filterDimXDimX() {
+
 	filterResultSize = 0;
 	filterResultMem  = NULL;
-  */
+
 }
 
 /****************************************************************
@@ -73,17 +69,13 @@ firstFilterFinalMod::firstFilterFinalMod()
  * - memoryAllocationError										*
  ****************************************************************/
 
-firstFilterFinalMod::firstFilterFinalMod( histogramData** _histogram,
+firstFilterFinalMod::firstFilterFinalMod( histogramData** histogram,
 										  unsigned short  filterArithmetic,
 										  unsigned short  size1,
 										  unsigned short  size2,
 										  unsigned short  localSize1,
 										  unsigned short  localSize2,
-										  bitArray maximumClass) 
-  : filterDimXDimX(), 
-    filterResultSize(0),
-    filterResultMem(NULL)
-{
+										  bitArray maximumClass) : filterDimXDimX() {
 
 	unsigned short size;
 	unsigned short localSize;
@@ -93,8 +85,8 @@ firstFilterFinalMod::firstFilterFinalMod( histogramData** _histogram,
 	if (localSize > size)
 		localSize = size;
 
-	filterDimXDimX::init(_histogram, size1, size2, size, localSize);
-	filterResultSize = (*_histogram)->getValueDim1() * ((size2 + 1) / 2);
+	filterDimXDimX::init(histogram, size1, size2, size, localSize);
+	filterResultSize = (*histogram)->getValueDim1() * ((size2 + 1) / 2);
 
 	switch(filterArithmetic) {
 
@@ -152,7 +144,7 @@ firstFilterFinalMod::~firstFilterFinalMod() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void firstFilterFinalMod::init( histogramData** _histogram,
+void firstFilterFinalMod::init( histogramData** histogram,
 							    unsigned short  filterArithmetic,
 							    unsigned short  size1,
 							    unsigned short  size2,
@@ -183,8 +175,8 @@ void firstFilterFinalMod::init( histogramData** _histogram,
 	if (localSize > size)
 		localSize = size;
 
-	filterDimXDimX::init(_histogram, size1, size2, size, localSize);
-	filterResultSize = (*_histogram)->getValueDim1() * ((size2 + 1) / 2);
+	filterDimXDimX::init(histogram, size1, size2, size, localSize);
+	filterResultSize = (*histogram)->getValueDim1() * ((size2 + 1) / 2);
 
 	switch(filterArithmetic) {
 

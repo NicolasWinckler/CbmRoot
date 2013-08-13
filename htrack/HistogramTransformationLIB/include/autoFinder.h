@@ -59,11 +59,6 @@ typedef struct {
 
 class autoFinder : public histogramTransformation {
 
- private:
-
-  autoFinder(const autoFinder&);
-  autoFinder& operator=(const autoFinder&);
-
 protected:
 
 	peakfindingGeometry    geometry;					/**< Object implements the geometry which should be used for peak finding. */

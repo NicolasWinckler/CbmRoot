@@ -249,7 +249,7 @@ template<class objectClass> objectClass specialMemClass<objectClass>::popIntern(
  * Default constructor
  */
 
-template<class objectClass> specialMemClass<objectClass>::specialMemClass() : stackMem(), activeObjectPointer() {
+template<class objectClass> specialMemClass<objectClass>::specialMemClass() {
 
 	stackMem.clear();
 	resetActiveObject();
@@ -260,9 +260,9 @@ template<class objectClass> specialMemClass<objectClass>::specialMemClass() : st
  * Constructor
  */
 
-template<class objectClass> specialMemClass<objectClass>::specialMemClass(const specialMemClass<objectClass>& value) : stackMem(value.stackMem), activeObjectPointer(value.activeObjectPointer) {
+template<class objectClass> specialMemClass<objectClass>::specialMemClass(const specialMemClass<objectClass>& value) {
 
-  //	*this = value;
+	*this = value;
 
 }
 

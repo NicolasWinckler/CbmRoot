@@ -292,9 +292,9 @@ void peakfindingGeometryFile::setHeaderDefValues() {
  * Default constructor											*
  ****************************************************************/
 
-peakfindingGeometryFile::peakfindingGeometryFile() : io(), header(), localMemory(false) {
+peakfindingGeometryFile::peakfindingGeometryFile() : io() {
 
-  //	localMemory = false;
+	localMemory = false;
 
 	init();
 

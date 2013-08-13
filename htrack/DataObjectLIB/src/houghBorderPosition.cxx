@@ -108,17 +108,17 @@ std::string houghBorderPosition::removeBackString(std::string& basicString, std:
  * Default constructor											*
  ****************************************************************/
 
-houghBorderPosition::houghBorderPosition() : pos1(0), pos2(0) {
+houghBorderPosition::houghBorderPosition() {
 
-  //	pos1 = 0;
-  //	pos2 = 0;
+	pos1 = 0;
+	pos2 = 0;
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-houghBorderPosition::houghBorderPosition(std::string& value, bool identifiedString) : pos1(0), pos2(0) {
+houghBorderPosition::houghBorderPosition(std::string& value, bool identifiedString) {
 
 	if (identifiedString)
 		fromIdentifiedString(value);
@@ -131,10 +131,10 @@ houghBorderPosition::houghBorderPosition(std::string& value, bool identifiedStri
  * Copy constructor												*
  ****************************************************************/
 
-houghBorderPosition::houghBorderPosition(const houghBorderPosition& value) : pos1(value.pos1), pos2(value.pos2) {
+houghBorderPosition::houghBorderPosition(const houghBorderPosition& value) {
 
-  //	this->pos1 = value.pos1;
-  //	this->pos2 = value.pos2;
+	this->pos1 = value.pos1;
+	this->pos2 = value.pos2;
 
 }
 

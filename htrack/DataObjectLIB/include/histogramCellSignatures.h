@@ -39,15 +39,13 @@
 #include "trackCoordinates.h"
 
 
-struct histogramCellSignature {
-  
-histogramCellSignature() : pos(), value(), distance(0.) {};
+typedef struct {
 
 	trackCoordinates pos;
 	bitArray         value;
 	double           distance;
 
-};
+} histogramCellSignature;
 
 
 /* **************************************************************

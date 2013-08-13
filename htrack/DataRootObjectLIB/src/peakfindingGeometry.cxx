@@ -529,65 +529,65 @@ specialListMem<peakfindingGeometryElement> peakfindingGeometry::buildCoveredGeom
  * Default constructor											*
  ****************************************************************/
 
-peakfindingGeometry::peakfindingGeometry() 
-  : percentageOfCoverage(0),
-    geometry(),
-    canvas(NULL),
-    numberOfCanvasPadColumns(0),
-    numberOfCanvasPadRows(0),
-    displays(NULL),
-    numberOfDisplays(0),
-    projectionCanvas(NULL),
-    numberOfProjectionCanvasPadColumns(0),
-    numberOfProjectionCanvasPadRows(0),
-    projectionDisplays(NULL),
-    numberOfProjectionDisplays(0),
-    coverageCanvas(NULL),
-    numberOfCoverageCanvasPadColumns(0),
-    numberOfCoverageCanvasPadRows(0),
-    coverageDisplays(NULL),
-    numberOfCoverageDisplays(0),
-    coverageProjectionCanvas(NULL),
-    numberOfCoverageProjectionCanvasPadColumns(0),
-    numberOfCoverageProjectionCanvasPadRows(0),
-    coverageProjectionDisplays(NULL),
-    numberOfCoverageProjectionDisplays(0)
-{
-  reset();
+peakfindingGeometry::peakfindingGeometry() {
+
+	reset();
+
+	canvas                                     = NULL;
+	numberOfCanvasPadColumns                   = 0;
+	numberOfCanvasPadRows                      = 0;
+	displays                                   = NULL;
+	numberOfDisplays                           = 0;
+	projectionCanvas                           = NULL;
+	numberOfProjectionCanvasPadColumns         = 0;
+	numberOfProjectionCanvasPadRows            = 0;
+	projectionDisplays                         = NULL;
+	numberOfProjectionDisplays                 = 0;
+	coverageCanvas                             = NULL;
+	numberOfCoverageCanvasPadColumns           = 0;
+	numberOfCoverageCanvasPadRows              = 0;
+	coverageDisplays                           = NULL;
+	numberOfCoverageDisplays                   = 0;
+	coverageProjectionCanvas                   = NULL;
+	numberOfCoverageProjectionCanvasPadColumns = 0;
+	numberOfCoverageProjectionCanvasPadRows    = 0;
+	coverageProjectionDisplays                 = NULL;
+	numberOfCoverageProjectionDisplays         = 0;
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-peakfindingGeometry::peakfindingGeometry(const peakfindingGeometry& value) 
-  : percentageOfCoverage(0),
-    geometry(),
-    canvas(NULL),
-    numberOfCanvasPadColumns(0),
-    numberOfCanvasPadRows(0),
-    displays(NULL),
-    numberOfDisplays(0),
-    projectionCanvas(NULL),
-    numberOfProjectionCanvasPadColumns(0),
-    numberOfProjectionCanvasPadRows(0),
-    projectionDisplays(NULL),
-    numberOfProjectionDisplays(0),
-    coverageCanvas(NULL),
-    numberOfCoverageCanvasPadColumns(0),
-    numberOfCoverageCanvasPadRows(0),
-    coverageDisplays(NULL),
-    numberOfCoverageDisplays(0),
-    coverageProjectionCanvas(NULL),
-    numberOfCoverageProjectionCanvasPadColumns(0),
-    numberOfCoverageProjectionCanvasPadRows(0),
-    coverageProjectionDisplays(NULL),
-    numberOfCoverageProjectionDisplays(0)
-{
-  reset();
+peakfindingGeometry::peakfindingGeometry(const peakfindingGeometry& value) {
 
-  setCoverage(value.percentageOfCoverage);
-  this->geometry = value.geometry;
+	reset();
+
+	canvas                                     = NULL;
+	numberOfCanvasPadColumns                   = 0;
+	numberOfCanvasPadRows                      = 0;
+	displays                                   = NULL;
+	numberOfDisplays                           = 0;
+	projectionCanvas                           = NULL;
+	numberOfProjectionCanvasPadColumns         = 0;
+	numberOfProjectionCanvasPadRows            = 0;
+	projectionDisplays                         = NULL;
+	numberOfProjectionDisplays                 = 0;
+	coverageCanvas                             = NULL;
+	numberOfCoverageCanvasPadColumns           = 0;
+	numberOfCoverageCanvasPadRows              = 0;
+	coverageDisplays                           = NULL;
+	numberOfCoverageDisplays                   = 0;
+	coverageProjectionCanvas                   = NULL;
+	numberOfCoverageProjectionCanvasPadColumns = 0;
+	numberOfCoverageProjectionCanvasPadRows    = 0;
+	coverageProjectionDisplays                 = NULL;
+	numberOfCoverageProjectionDisplays         = 0;
+
+	setCoverage(value.percentageOfCoverage);
+	this->geometry = value.geometry;
+
 }
 
 /****************************************************************
@@ -672,12 +672,12 @@ unsigned short peakfindingGeometry::getCoverage() {
  * set percentage of coverage
  ****************************************************************/
 
-void peakfindingGeometry::setCoverage(unsigned short _percentageOfCoverage) {
+void peakfindingGeometry::setCoverage(unsigned short percentageOfCoverage) {
 
-	if (_percentageOfCoverage > 100)
+	if (percentageOfCoverage > 100)
 		this->percentageOfCoverage = 100;
 	else
-		this->percentageOfCoverage = _percentageOfCoverage;
+		this->percentageOfCoverage = percentageOfCoverage;
 
 }
 

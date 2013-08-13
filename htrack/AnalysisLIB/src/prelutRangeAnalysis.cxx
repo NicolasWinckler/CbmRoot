@@ -736,28 +736,8 @@ void prelutRangeAnalysis::evaluateWindowDivisionFactors(unsigned short* numberOf
  * Default constructor											*
  * **************************************************************/
 
-prelutRangeAnalysis::prelutRangeAnalysis() 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   relative(),
-   constraint(),
-   value(),
-   modifiedValueDisplays(NULL),
-   numberOfDisplays(0),
-   numberOfMinFactors(0),
-   factorMinMin(0),
-   factorMinMax(0),
-   numberOfMaxFactors(0),
-   factorMaxMin(0),
-   factorMaxMax(0),
-   prelutRangeCut(100)
-{
-  /*
+prelutRangeAnalysis::prelutRangeAnalysis() {
+
 	analysisEnabled          = false;
 	window                   = NULL;
 	numberOfWindowPadColumns = 0;
@@ -779,35 +759,15 @@ prelutRangeAnalysis::prelutRangeAnalysis()
 	factorMaxMin             = 0;
 	factorMaxMax             = 0;
 	prelutRangeCut           = 100;
-  */
+
 }
 
 /* **************************************************************
  * Constructor													*
  * **************************************************************/
 
-prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _numberOfDisplays) 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   relative(),
-   constraint(),
-   value(),
-   modifiedValueDisplays(NULL),
-   numberOfDisplays(_numberOfDisplays + 1),
-   numberOfMinFactors(0),
-   factorMinMin(0),
-   factorMinMax(0),
-   numberOfMaxFactors(0),
-   factorMaxMin(0),
-   factorMaxMax(0),
-   prelutRangeCut(100)
-{
-  /*
+prelutRangeAnalysis::prelutRangeAnalysis(unsigned short numberOfDisplays) {
+
 	this->analysisEnabled          = false;
 	this->window                   = NULL;
 	this->numberOfWindowPadColumns = 0;
@@ -821,7 +781,7 @@ prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _numberOfDisplays)
 	this->value.displays           = NULL;
 	this->value.padNumbers         = NULL;
 	this->modifiedValueDisplays    = NULL;
-	this->numberOfDisplays         = _numberOfDisplays + 1;
+	this->numberOfDisplays         = numberOfDisplays + 1;
 	this->numberOfMinFactors       = 0;
 	this->factorMinMin             = 0;
 	this->factorMinMax             = 0;
@@ -829,30 +789,10 @@ prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _numberOfDisplays)
 	this->factorMaxMin             = 0;
 	this->factorMaxMax             = 0;
 	this->prelutRangeCut           = 100;
-  */
+
 }
-prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _prelutRangeCut, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   relative(),
-   constraint(),
-   value(),
-   modifiedValueDisplays(NULL),
-   numberOfDisplays(0),
-   numberOfMinFactors(_numberOfMinFactors),
-   factorMinMin(_factorMinMin),
-   factorMinMax(_factorMinMax),
-   numberOfMaxFactors(_numberOfMaxFactors),
-   factorMaxMin(_factorMaxMin),
-   factorMaxMax(_factorMaxMax),
-   prelutRangeCut(_prelutRangeCut)
-{
-  /*
+prelutRangeAnalysis::prelutRangeAnalysis(unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
+
 	this->analysisEnabled          = false;
 	this->window                   = NULL;
 	this->numberOfWindowPadColumns = 0;
@@ -867,39 +807,17 @@ prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _prelutRangeCut, unsigne
 	this->value.padNumbers         = NULL;
 	this->modifiedValueDisplays    = NULL;
 	this->numberOfDisplays         = 0;
-	this->numberOfMinFactors       = _numberOfMinFactors;
-	this->factorMinMin             = _factorMinMin;
-	this->factorMinMax             = _factorMinMax;
-	this->numberOfMaxFactors       = _numberOfMaxFactors;
-	this->factorMaxMin             = _factorMaxMin;
-	this->factorMaxMax             = _factorMaxMax;
-	this->prelutRangeCut           = _prelutRangeCut;
-  */
+	this->numberOfMinFactors       = numberOfMinFactors;
+	this->factorMinMin             = factorMinMin;
+	this->factorMinMax             = factorMinMax;
+	this->numberOfMaxFactors       = numberOfMaxFactors;
+	this->factorMaxMin             = factorMaxMin;
+	this->factorMaxMax             = factorMaxMax;
+	this->prelutRangeCut           = prelutRangeCut;
+
 }
+prelutRangeAnalysis::prelutRangeAnalysis(unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
 
-prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _prelutRangeCut, unsigned short _numberOfDisplays, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) 
- : analysisEnabled(false),
-   window(NULL),
-   numberOfWindowPadColumns(0),
-   numberOfWindowPadRows(0),
-   enableDisplay(false),
-   outputFileName(),
-   writeToFile(false),
-   relative(),
-   constraint(),
-   value(),
-   modifiedValueDisplays(NULL),
-   numberOfDisplays(_numberOfDisplays + 1),
-   numberOfMinFactors(_numberOfMinFactors),
-   factorMinMin(_factorMinMin),
-   factorMinMax(_factorMinMax),
-   numberOfMaxFactors(_numberOfMaxFactors),
-   factorMaxMin(_factorMaxMin),
-   factorMaxMax(_factorMaxMax),
-   prelutRangeCut(_prelutRangeCut)
-
-{
-  /*
 	this->analysisEnabled          = false;
 	this->window                   = NULL;
 	this->numberOfWindowPadColumns = 0;
@@ -913,15 +831,15 @@ prelutRangeAnalysis::prelutRangeAnalysis(unsigned short _prelutRangeCut, unsigne
 	this->value.displays           = NULL;
 	this->value.padNumbers         = NULL;
 	this->modifiedValueDisplays    = NULL;
-	this->numberOfDisplays         = _numberOfDisplays + 1;
-	this->numberOfMinFactors       = _numberOfMinFactors;
-	this->factorMinMin             = _factorMinMin;
-	this->factorMinMax             = _factorMinMax;
-	this->numberOfMaxFactors       = _numberOfMaxFactors;
-	this->factorMaxMin             = _factorMaxMin;
-	this->factorMaxMax             = _factorMaxMax;
-	this->prelutRangeCut           = _prelutRangeCut;
-  */
+	this->numberOfDisplays         = numberOfDisplays + 1;
+	this->numberOfMinFactors       = numberOfMinFactors;
+	this->factorMinMin             = factorMinMin;
+	this->factorMinMax             = factorMinMax;
+	this->numberOfMaxFactors       = numberOfMaxFactors;
+	this->factorMaxMin             = factorMaxMin;
+	this->factorMaxMax             = factorMaxMax;
+	this->prelutRangeCut           = prelutRangeCut;
+
 	allocateMemory();
 
 }
@@ -940,42 +858,42 @@ prelutRangeAnalysis::~prelutRangeAnalysis() {
  * Method inits the variables.									*
  * **************************************************************/
 
-void prelutRangeAnalysis::init(unsigned short _numberOfDisplays) {
+void prelutRangeAnalysis::init(unsigned short numberOfDisplays) {
 
 	deleteMemory();
 
-	this->numberOfDisplays         = _numberOfDisplays + 1;
+	this->numberOfDisplays         = numberOfDisplays + 1;
 
 	allocateMemory();
 
 }
-void prelutRangeAnalysis::init(unsigned short _prelutRangeCut, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) {
+void prelutRangeAnalysis::init(unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
 
 	deleteMemory();
 
-	this->numberOfMinFactors       = _numberOfMinFactors;
-	this->factorMinMin             = _factorMinMin;
-	this->factorMinMax             = _factorMinMax;
-	this->numberOfMaxFactors       = _numberOfMaxFactors;
-	this->factorMaxMin             = _factorMaxMin;
-	this->factorMaxMax             = _factorMaxMax;
-	this->prelutRangeCut           = _prelutRangeCut;
+	this->numberOfMinFactors       = numberOfMinFactors;
+	this->factorMinMin             = factorMinMin;
+	this->factorMinMax             = factorMinMax;
+	this->numberOfMaxFactors       = numberOfMaxFactors;
+	this->factorMaxMin             = factorMaxMin;
+	this->factorMaxMax             = factorMaxMax;
+	this->prelutRangeCut           = prelutRangeCut;
 
 	allocateMemory();
 
 }
-void prelutRangeAnalysis::init(unsigned short _prelutRangeCut, unsigned short _numberOfDisplays, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) {
+void prelutRangeAnalysis::init(unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
 
 	deleteMemory();
 
-	this->numberOfDisplays         = _numberOfDisplays + 1;
-	this->numberOfMinFactors       = _numberOfMinFactors;
-	this->factorMinMin             = _factorMinMin;
-	this->factorMinMax             = _factorMinMax;
-	this->numberOfMaxFactors       = _numberOfMaxFactors;
-	this->factorMaxMin             = _factorMaxMin;
-	this->factorMaxMax             = _factorMaxMax;
-	this->prelutRangeCut           = _prelutRangeCut;
+	this->numberOfDisplays         = numberOfDisplays + 1;
+	this->numberOfMinFactors       = numberOfMinFactors;
+	this->factorMinMin             = factorMinMin;
+	this->factorMinMax             = factorMinMax;
+	this->numberOfMaxFactors       = numberOfMaxFactors;
+	this->factorMaxMin             = factorMaxMin;
+	this->factorMaxMax             = factorMaxMax;
+	this->prelutRangeCut           = prelutRangeCut;
 
 	allocateMemory();
 
@@ -985,29 +903,29 @@ void prelutRangeAnalysis::init(unsigned short _prelutRangeCut, unsigned short _n
  * Method sets the variables.									*
  * **************************************************************/
 
-void prelutRangeAnalysis::set(unsigned short _numberOfDisplays) {
+void prelutRangeAnalysis::set(unsigned short numberOfDisplays) {
 
-	if (this->numberOfDisplays != _numberOfDisplays + 1) {
+	if (this->numberOfDisplays != numberOfDisplays + 1) {
 
-		init(_numberOfDisplays);
-
-	}
-
-}
-void prelutRangeAnalysis::set(unsigned short _prelutRangeCut, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) {
-
-	if ((this->numberOfMinFactors != _numberOfMinFactors) || (this->factorMinMin != _factorMinMin) || (this->factorMinMax != _factorMinMax) || (this->numberOfMaxFactors != _numberOfMaxFactors) || (this->factorMaxMin != _factorMaxMin) || (this->factorMaxMax != _factorMaxMax)) {
-
-		init(_prelutRangeCut, _numberOfMinFactors, _factorMinMin, _factorMinMax, _numberOfMaxFactors, _factorMaxMin, _factorMaxMax);
+		init(numberOfDisplays);
 
 	}
 
 }
-void prelutRangeAnalysis::set(unsigned short _prelutRangeCut, unsigned short _numberOfDisplays, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) {
+void prelutRangeAnalysis::set(unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
 
-	if ((this->numberOfDisplays != _numberOfDisplays + 1) || (this->numberOfMinFactors != _numberOfMinFactors) || (this->factorMinMin != _factorMinMin) || (this->factorMinMax != _factorMinMax) || (this->numberOfMaxFactors != _numberOfMaxFactors) || (this->factorMaxMin != factorMaxMin) || (this->factorMaxMax != factorMaxMax)) {
+	if ((this->numberOfMinFactors != numberOfMinFactors) || (this->factorMinMin != factorMinMin) || (this->factorMinMax != factorMinMax) || (this->numberOfMaxFactors != numberOfMaxFactors) || (this->factorMaxMin != factorMaxMin) || (this->factorMaxMax != factorMaxMax)) {
 
-		init(_prelutRangeCut, _numberOfDisplays, _numberOfMinFactors, _factorMinMin, _factorMinMax, _numberOfMaxFactors, _factorMaxMin, _factorMaxMax);
+		init(prelutRangeCut, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
+
+	}
+
+}
+void prelutRangeAnalysis::set(unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
+
+	if ((this->numberOfDisplays != numberOfDisplays + 1) || (this->numberOfMinFactors != numberOfMinFactors) || (this->factorMinMin != factorMinMin) || (this->factorMinMax != factorMinMax) || (this->numberOfMaxFactors != numberOfMaxFactors) || (this->factorMaxMin != factorMaxMin) || (this->factorMaxMax != factorMaxMax)) {
+
+		init(prelutRangeCut, numberOfDisplays, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
 
 	}
 

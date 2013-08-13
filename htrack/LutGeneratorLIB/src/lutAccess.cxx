@@ -76,13 +76,9 @@ void lutAccess::allocateNewMemory(unsigned long number) {
  * Default constructor											*
  ****************************************************************/
 
-lutAccess::lutAccess() 
-  : lut(), 
-    memory(NULL),
-    numberOfEntries(0)
-{
+lutAccess::lutAccess() : lut() {
 
-  //	memory = NULL;
+	memory = NULL;
 
 	clear();
 
@@ -92,13 +88,9 @@ lutAccess::lutAccess()
  * constructor													*
  ****************************************************************/
 
-lutAccess::lutAccess(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) 
-  : lut(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step), 
-    memory(NULL),
-    numberOfEntries(0)
-{
+lutAccess::lutAccess(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) : lut(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step) {
 
-  //	memory = NULL;
+	memory = NULL;
 
 	clear();
 

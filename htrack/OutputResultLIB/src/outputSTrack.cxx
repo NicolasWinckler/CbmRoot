@@ -45,10 +45,10 @@ outputSTrack::outputSTrack() : outputTrack() {
  * Constructor													*
  ****************************************************************/
 
-outputSTrack::outputSTrack(trackData** _tracks) : outputTrack(_tracks) {
+outputSTrack::outputSTrack(trackData** tracks) : outputTrack(tracks) {
 
 }
-outputSTrack::outputSTrack(const char* name, trackData** _tracks) : outputTrack(name, _tracks) {
+outputSTrack::outputSTrack(const char* name, trackData** tracks) : outputTrack(name, tracks) {
 
 }
 

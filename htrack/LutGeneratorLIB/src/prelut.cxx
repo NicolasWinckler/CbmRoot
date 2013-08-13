@@ -36,10 +36,7 @@
  * Default constructor											*
  ****************************************************************/
 
-prelut::prelut() 
-  : def(),
-    border()
-{
+prelut::prelut() {
 
 	init(0, 0, 0, 0, 0);
 
@@ -49,26 +46,17 @@ prelut::prelut()
  * Constructor													*
  ****************************************************************/
 
-prelut::prelut(double dim3Min, double dim3Max, int dim3Step) 
-  : def(),
-    border()
-{
+prelut::prelut(double dim3Min, double dim3Max, int dim3Step) {
 
 	init(dim3Min, dim3Max, dim3Step, 0, 0);
 
 }
-prelut::prelut(double dim3StartEntry, double dim3StopEntry) 
-  : def(),
-    border()
-{
+prelut::prelut(double dim3StartEntry, double dim3StopEntry) {
 
 	init(0, 0, 0, dim3StartEntry, dim3StopEntry);
 
 }
-prelut::prelut(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) 
-  : def(),
-    border()
-{
+prelut::prelut(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) {
 
 	init(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry);
 

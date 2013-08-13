@@ -66,12 +66,9 @@ void digitalHitAccess::allocateNewMemory(unsigned long number) {
  * Default Constructor											*
  ****************************************************************/
 
-digitalHitAccess::digitalHitAccess() 
-  : memory(NULL),
-    numberOfEntries(0)
-{
+digitalHitAccess::digitalHitAccess() {
 
-  //	memory = NULL;
+	memory = NULL;
 
 	clear();
 

@@ -2058,10 +2058,7 @@ bool inf::getCellAnalysisHeaderValue(std::string& specifier, std::string& value)
  * Default constructor											*
  ****************************************************************/
 
-inf::inf() 
-  : configuration(),
-    config()
-{
+inf::inf() : configuration() {
 
 	resetHeader();
 
@@ -2073,10 +2070,7 @@ inf::inf()
  * Default constructor											*
  ****************************************************************/
 
-inf::inf(InfData& setup) 
-  : configuration(),
-    config()
-{
+inf::inf(InfData& setup) : configuration() {
 
 	resetHeader();
 
@@ -2261,30 +2255,21 @@ inf::inf(InfData& setup)
  * Constructor													*
  ****************************************************************/
 
-inf::inf(int numberOfTchars, char** tchars) 
-  : configuration(),
-    config()
-{
+inf::inf(int numberOfTchars, char** tchars) : configuration() {
 
 	resetHeader();
 
 	init(numberOfTchars, tchars);
 
 }
-inf::inf(std::string name) 
-  : configuration(),
-    config()
-{
+inf::inf(std::string name) : configuration() {
 
 	resetHeader();
 
 	init(name);
 
 }
-inf::inf(char* name) 
-  : configuration(),
-    config()
-{
+inf::inf(char* name) : configuration() {
 
 	resetHeader();
 

@@ -53,35 +53,29 @@
  * Default constructor											*
  ****************************************************************/
 
-filterDim1Dim2::filterDim1Dim2() 
-  : filterDimXDimX(), 
-    filterTempMem(NULL),
-    memValues(NULL),
-    allocaterMarker(NULL)
-{
-  /*
+filterDim1Dim2::filterDim1Dim2() : filterDimXDimX() {
+
 	filterTempMem   = NULL;
 	memValues       = NULL;
 	allocaterMarker = NULL;
-  */
+
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-filterDim1Dim2::filterDim1Dim2( histogramData** _histogram,
-				unsigned short  filterArithmetic,
-				unsigned short  size1,
-				unsigned short  size2,
-				unsigned short  localSize1,
-				unsigned short  localSize2,
-				bitArray maximumClass) 
-  : filterDimXDimX(_histogram, size1, size2, (size1+1)*(size2/2)+1, (localSize1+1)*(localSize2/2)+1),
-    filterTempMem(NULL),
-    memValues(NULL),
-    allocaterMarker(NULL)
-{
+filterDim1Dim2::filterDim1Dim2( histogramData** histogram,
+								unsigned short  filterArithmetic,
+								unsigned short  size1,
+								unsigned short  size2,
+								unsigned short  localSize1,
+								unsigned short  localSize2,
+								bitArray maximumClass) :
+								filterDimXDimX(
+								histogram, size1, size2,
+								(size1+1)*(size2/2)+1,
+								(localSize1+1)*(localSize2/2)+1) {
 
 	int          m;
 	int          n;
@@ -260,7 +254,7 @@ filterDim1Dim2::~filterDim1Dim2() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDim1Dim2::init( histogramData** _histogram,
+void filterDim1Dim2::init( histogramData** histogram,
 						   unsigned short  filterArithmetic,
 						   unsigned short  size1,
 						   unsigned short  size2,
@@ -319,7 +313,7 @@ void filterDim1Dim2::init( histogramData** _histogram,
 	}
 
 	/* set new parameter */
-	filterDimXDimX::init(_histogram, size1, size2, (size1/2)*(size2+1)+1, (localSize1/2)*(localSize2+1)+1);
+	filterDimXDimX::init(histogram, size1, size2, (size1/2)*(size2+1)+1, (localSize1/2)*(localSize2+1)+1);
 
 	switch(filterArithmetic) {
 
@@ -432,7 +426,7 @@ void filterDim1Dim2::init( histogramData** _histogram,
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
 	for (m = 0; m < filterSize2/2; m++) {
-		memValues[m] = new bitArray[(*_histogram)->getValueDim1() - filterSize1 / 2];
+		memValues[m] = new bitArray[(*histogram)->getValueDim1() - filterSize1 / 2];
 
 		if (memValues[m] == NULL)
 			throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);

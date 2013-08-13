@@ -140,20 +140,7 @@ void trackfinder::evaluatePeakfindingGeometry(std::streambuf* terminal) {
  * Default constructor											*
  ****************************************************************/
 
-trackfinder::trackfinder() 
-  : houghTransform(NULL),
-    histoTransform(NULL),
-    filterType(NOFILTER),
-    sourceDataPercentage(100),
-#ifndef NOANALYSIS
-    filterFileName(),
-    analyser(NULL)
-#else
-    filterFileName()
-#endif
-
-{
-  /*
+trackfinder::trackfinder() {
 
 	houghTransform       = NULL;
 	histoTransform       = NULL;
@@ -166,7 +153,7 @@ trackfinder::trackfinder()
 	analyser             = NULL;
 
 #endif
-  */
+
 }
 
 /****************************************************************
@@ -175,30 +162,19 @@ trackfinder::trackfinder()
 
 trackfinder::trackfinder( trackfinderInputData** eventData, histogramData** histogram,
 						  trackData** tracks, tables** ratings, lutImplementation** lut,
-						  unsigned short _filterType, unsigned short _sourceDataPercentage,
-						  std::string _filterFileName,
+						  unsigned short filterType, unsigned short sourceDataPercentage,
+						  std::string filterFileName,
 						  unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
 						  unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 						  unsigned short firstFilterDim1ClearRadius,
 						  unsigned short firstFilterDim2ClearRadius,
 						  unsigned short secondFilterDim1ClearRadius,
 						  unsigned short secondFilterDim2ClearRadius,
-						  unsigned short secondFilterDim3ClearRadius) 
-  : houghTransform(new houghTransformation(eventData, histogram, lut)),
-    histoTransform(NULL),
-    filterType(_filterType),
-    sourceDataPercentage(_sourceDataPercentage),
-#ifndef NOANALYSIS
-    filterFileName(_filterFileName),
-    analyser(NULL)
-#else
-    filterFileName(_filterFileName)
-#endif
-{
+						  unsigned short secondFilterDim3ClearRadius) {
 
-  //	houghTransform         = new houghTransformation(eventData, histogram, lut);
+	houghTransform         = new houghTransformation(eventData, histogram, lut);
 
-	switch(_filterType) {
+	switch(filterType) {
 
 		case NOFILTER:
 			histoTransform = new maxMorphSearch(histogram, tracks, ratings, NOFIRSTARITHMETIC, firstFilterArithmetic, NOSECONDGEOMETRY, secondFilterArithmetic, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
@@ -215,16 +191,16 @@ trackfinder::trackfinder( trackfinderInputData** eventData, histogramData** hist
 
 	}
 
-	//	this->filterType       = _filterType;
-	if (_sourceDataPercentage < 100)
-		this->sourceDataPercentage = _sourceDataPercentage;
+	this->filterType       = filterType;
+	if (sourceDataPercentage < 100)
+		this->sourceDataPercentage = sourceDataPercentage;
 	else
 		this->sourceDataPercentage = 100;
-	//	this->filterFileName   = _filterFileName;
+	this->filterFileName   = filterFileName;
 
 #ifndef NOANALYSIS
 
-	//	analyser               = NULL;
+	analyser               = NULL;
 
 #endif
 
@@ -256,8 +232,8 @@ trackfinder::~trackfinder() {
 
 void trackfinder::init(trackfinderInputData** eventData, histogramData** histogram,
 					   trackData** tracks, tables** ratings, lutImplementation** lut,
-					   unsigned short _filterType, unsigned short _sourceDataPercentage,
-					   std::string _filterFileName,
+					   unsigned short filterType, unsigned short sourceDataPercentage,
+					   std::string filterFileName,
 					   unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
 					   unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 					   unsigned short firstFilterDim1ClearRadius,
@@ -280,7 +256,7 @@ void trackfinder::init(trackfinderInputData** eventData, histogramData** histogr
 
 	houghTransform->init(eventData, histogram, lut);
 
-	switch(_filterType) {
+	switch(filterType) {
 
 		case NOFILTER:
 			histoTransform = new maxMorphSearch(histogram, tracks, ratings, NOFIRSTGEOMETRY, firstFilterArithmetic, NOSECONDGEOMETRY, secondFilterArithmetic, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
@@ -297,12 +273,12 @@ void trackfinder::init(trackfinderInputData** eventData, histogramData** histogr
 
 	}
 
-	this->filterType       = _filterType;
-	if (_sourceDataPercentage < 100)
-		this->sourceDataPercentage = _sourceDataPercentage;
+	this->filterType       = filterType;
+	if (sourceDataPercentage < 100)
+		this->sourceDataPercentage = sourceDataPercentage;
 	else
 		this->sourceDataPercentage = 100;
-	this->filterFileName   = _filterFileName;
+	this->filterFileName   = filterFileName;
 
 }
 
@@ -311,11 +287,11 @@ void trackfinder::init(trackfinderInputData** eventData, histogramData** histogr
  * algorithm													*
  ****************************************************************/
 
-void trackfinder::setAnalyser(analysis* _analyser) {
+void trackfinder::setAnalyser(analysis* analyser) {
 
 #ifndef NOANALYSIS
 
-	this->analyser = _analyser;
+	this->analyser = analyser;
 
 #endif
 

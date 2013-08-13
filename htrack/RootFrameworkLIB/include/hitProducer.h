@@ -51,11 +51,6 @@
 
 class FairHitProducer {
 
- private:
-
-  FairHitProducer(const FairHitProducer&);
-  FairHitProducer& operator=(const FairHitProducer&);
-
 protected:
 
 	int                            typeOfHitProducer;	/**< Variable stores the type of the hitproducer */

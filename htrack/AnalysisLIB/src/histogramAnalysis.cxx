@@ -600,27 +600,8 @@ void histogramAnalysis::writeDisplay(std::string& eventFolder, std::string& laye
  * Default constructor											*
  * **************************************************************/
 
-histogramAnalysis::histogramAnalysis() 
- : histogram(NULL),
-   writeCreated(false),
-   writeEncoded(false),
-   writeFiltered(false),
-   justOneCreated(false),
-   justOneEncoded(false),
-   justOneFiltered(false),
-   showCreated(false),
-   showEncoded(false),
-   showFiltered(false),
-   layerIndex(0),
-   outputFileName(),
-   writeToFile(false),
-   displayToFile(NULL),
-   window(NULL),
-   numberOfWindows(0),
-   displaysFromFile(NULL),
-   numberOfDisplays(0)
-{
-  /*
+histogramAnalysis::histogramAnalysis() {
+
 	histogram        = NULL;
 	writeCreated     = false;
 	writeEncoded     = false;
@@ -639,35 +620,16 @@ histogramAnalysis::histogramAnalysis()
 	numberOfWindows  = 0;
 	displaysFromFile = NULL;
 	numberOfDisplays = 0;
-  */
+
 }
 
 /* **************************************************************
  * Constructor													*
  * **************************************************************/
 
-histogramAnalysis::histogramAnalysis(histogramData** _histogram) 
- : histogram(_histogram),
-   writeCreated(false),
-   writeEncoded(false),
-   writeFiltered(false),
-   justOneCreated(false),
-   justOneEncoded(false),
-   justOneFiltered(false),
-   showCreated(false),
-   showEncoded(false),
-   showFiltered(false),
-   layerIndex(0),
-   outputFileName(),
-   writeToFile(false),
-   displayToFile(NULL),
-   window(NULL),
-   numberOfWindows(0),
-   displaysFromFile(NULL),
-   numberOfDisplays(0)
-{
-  /*
-	this->histogram  = _histogram;
+histogramAnalysis::histogramAnalysis(histogramData** histogram) {
+
+	this->histogram  = histogram;
 	writeCreated     = false;
 	writeEncoded     = false;
 	writeFiltered    = false;
@@ -685,7 +647,7 @@ histogramAnalysis::histogramAnalysis(histogramData** _histogram)
 	numberOfWindows  = 0;
 	displaysFromFile = NULL;
 	numberOfDisplays = 0;
-  */
+
 }
 
 /* **************************************************************
@@ -743,9 +705,9 @@ histogramAnalysis::~histogramAnalysis() {
  * This method initializes the object.							*
  * **************************************************************/
 
-void histogramAnalysis::init(histogramData** _histogram) {
+void histogramAnalysis::init(histogramData** histogram) {
 
-	this->histogram = _histogram;
+	this->histogram = histogram;
 
 }
 
@@ -753,14 +715,14 @@ void histogramAnalysis::init(histogramData** _histogram) {
  * This method initializes the root directory for the analysis.	*
  * **************************************************************/
 
-void histogramAnalysis::initHistogramAnalysisToRoot(bool enableCreated, bool enableEncoded, bool enableFiltered, bool _justOneCreated, bool _justOneEncoded, bool _justOneFiltered, const char* name, bool justUpdate) {
+void histogramAnalysis::initHistogramAnalysisToRoot(bool enableCreated, bool enableEncoded, bool enableFiltered, bool justOneCreated, bool justOneEncoded, bool justOneFiltered, const char* name, bool justUpdate) {
 
 	this->writeCreated    = enableCreated;
 	this->writeEncoded    = enableEncoded;
 	this->writeFiltered   = enableFiltered;
-	this->justOneCreated  = _justOneCreated;
-	this->justOneEncoded  = _justOneEncoded;
-	this->justOneFiltered = _justOneFiltered;
+	this->justOneCreated  = justOneCreated;
+	this->justOneEncoded  = justOneEncoded;
+	this->justOneFiltered = justOneFiltered;
 
 	if (writeCreated || writeEncoded || writeFiltered) {
 
@@ -806,11 +768,11 @@ void histogramAnalysis::initHistogramLayer(unsigned short layer) {
  * This method initializes the root directory for the analysis.	*
  * **************************************************************/
 
-void histogramAnalysis::initHistogramAnalysisToShow(bool _showCreated, bool _showEncoded, bool _showFiltered) {
+void histogramAnalysis::initHistogramAnalysisToShow(bool showCreated, bool showEncoded, bool showFiltered) {
 
-	this->showCreated  = _showCreated;
-	this->showEncoded  = _showEncoded;
-	this->showFiltered = _showFiltered;
+	this->showCreated  = showCreated;
+	this->showEncoded  = showEncoded;
+	this->showFiltered = showFiltered;
 
 }
 

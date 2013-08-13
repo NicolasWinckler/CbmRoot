@@ -64,12 +64,9 @@ inputError::~inputError() {
  * Default constructor											*
  ****************************************************************/
 
-eventNotFoundError::eventNotFoundError() 
-  : inputError(),
-    eventID(0)
-{
+eventNotFoundError::eventNotFoundError() : inputError() {
 
-  //	eventID = 0;
+	eventID = 0;
 
 }
 
@@ -77,12 +74,9 @@ eventNotFoundError::eventNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-eventNotFoundError::eventNotFoundError(int event) 
-  : inputError(),
-    eventID(event)
-{
+eventNotFoundError::eventNotFoundError(int event) : inputError() {
 
-  //	eventID = event;
+	eventID = event;
 
 }
 
@@ -120,14 +114,10 @@ void eventNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-zeroTracksOrHitsError::zeroTracksOrHitsError() 
-  : inputError(), 
-    numberOfTracks(0),
-    numberOfHits(0)
-{
+zeroTracksOrHitsError::zeroTracksOrHitsError() : inputError() {
 
-  //	numberOfTracks = 0;
-  //	numberOfHits   = 0;
+	numberOfTracks = 0;
+	numberOfHits   = 0;
 
 }
 
@@ -135,15 +125,10 @@ zeroTracksOrHitsError::zeroTracksOrHitsError()
  * Constructor													*
  ****************************************************************/
 
-zeroTracksOrHitsError::zeroTracksOrHitsError(int tracks, int hits) 
-  : inputError(),
-    numberOfTracks(tracks),
-    numberOfHits(hits)
+zeroTracksOrHitsError::zeroTracksOrHitsError(int tracks, int hits) : inputError() {
 
-{
-
-  //	numberOfTracks = tracks;
-  //	numberOfHits   = hits;
+	numberOfTracks = tracks;
+	numberOfHits   = hits;
 
 }
 
@@ -184,12 +169,9 @@ void zeroTracksOrHitsError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-detectorNodeNotFoundError::detectorNodeNotFoundError() 
-  : inputError(),
-    nodeName()
-{
+detectorNodeNotFoundError::detectorNodeNotFoundError() : inputError() {
 
-  //	nodeName.clear();
+	nodeName.clear();
 
 }
 
@@ -197,12 +179,9 @@ detectorNodeNotFoundError::detectorNodeNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-detectorNodeNotFoundError::detectorNodeNotFoundError(std::string actualNodeName) 
-  : inputError(),
-    nodeName(actualNodeName) 
-{
+detectorNodeNotFoundError::detectorNodeNotFoundError(std::string actualNodeName) : inputError() {
 
-  //	nodeName = actualNodeName;
+	nodeName = actualNodeName;
 
 }
 
@@ -238,12 +217,9 @@ void detectorNodeNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noTrackInFileError::noTrackInFileError() 
-  : inputError(), 
-    branchName()
-{
+noTrackInFileError::noTrackInFileError() : inputError() {
 
-  //	branchName.clear();
+	branchName.clear();
 
 }
 
@@ -251,12 +227,9 @@ noTrackInFileError::noTrackInFileError()
  * Constructor													*
  ****************************************************************/
 
-noTrackInFileError::noTrackInFileError(std::string actualBranchName) 
-  : inputError(),
-    branchName(actualBranchName)
-{
+noTrackInFileError::noTrackInFileError(std::string actualBranchName) : inputError() {
 
-  //	branchName = actualBranchName;
+	branchName = actualBranchName;
 
 }
 
@@ -292,12 +265,9 @@ void noTrackInFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noPointInFileError::noPointInFileError() 
-  : inputError(),
-    branchNamePoint()
-{
+noPointInFileError::noPointInFileError() : inputError() {
 
-  //	branchNamePoint.clear();
+	branchNamePoint.clear();
 
 }
 
@@ -305,12 +275,9 @@ noPointInFileError::noPointInFileError()
  * Constructor													*
  ****************************************************************/
 
-noPointInFileError::noPointInFileError(std::string actualBranchNamePoint) 
-  : inputError(),
-    branchNamePoint(actualBranchNamePoint)
-{
+noPointInFileError::noPointInFileError(std::string actualBranchNamePoint) : inputError() {
 
-  //	branchNamePoint = actualBranchNamePoint;
+	branchNamePoint = actualBranchNamePoint;
 
 }
 
@@ -346,12 +313,9 @@ void noPointInFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-detectorMatrixNotFoundError::detectorMatrixNotFoundError() 
-  : inputError(),
-    nodeName()
-{
+detectorMatrixNotFoundError::detectorMatrixNotFoundError() : inputError() {
 
-  //	nodeName.clear();
+	nodeName.clear();
 
 }
 
@@ -359,12 +323,9 @@ detectorMatrixNotFoundError::detectorMatrixNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-detectorMatrixNotFoundError::detectorMatrixNotFoundError(std::string actualNodeName) 
-  : inputError(),
-    nodeName(actualNodeName)
-{
+detectorMatrixNotFoundError::detectorMatrixNotFoundError(std::string actualNodeName) : inputError() {
 
-  //	nodeName = actualNodeName;
+	nodeName = actualNodeName;
 
 }
 
@@ -400,12 +361,9 @@ void detectorMatrixNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-detectorTranslationNotFoundError::detectorTranslationNotFoundError() 
-  : inputError(), 
-    nodeName()
-{
+detectorTranslationNotFoundError::detectorTranslationNotFoundError() : inputError() {
 
-  //	nodeName.clear();
+	nodeName.clear();
 
 }
 
@@ -413,12 +371,9 @@ detectorTranslationNotFoundError::detectorTranslationNotFoundError()
  * Constructor													*
  ****************************************************************/
 
-detectorTranslationNotFoundError::detectorTranslationNotFoundError(std::string actualNodeName) 
-  : inputError(),
-    nodeName(actualNodeName)
-{
+detectorTranslationNotFoundError::detectorTranslationNotFoundError(std::string actualNodeName) : inputError() {
 
-  //	nodeName = actualNodeName;
+	nodeName = actualNodeName;
 
 }
 

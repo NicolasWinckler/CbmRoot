@@ -54,6 +54,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
 
  	# -- htrack warnings
         # should be switched on, but there are so many
+        "htrack"
         "bitfield::operator"
         "bytefield::operator"
         "bitfield operator"

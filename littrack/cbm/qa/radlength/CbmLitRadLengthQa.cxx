@@ -328,7 +328,7 @@ Int_t CbmLitRadLengthQa::GetTrdStationId(
 //      nodeExists = true;
 //   }
    Int_t layerId = -1;
-   if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/layer[0-9][0-9]_[0-9][0-9][0-9]/module[0-9]_.+"))) { // trd_v13x NEW
+   if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/layer[0-9][0-9]_[0-9][0-9][0-9][0-9][0-9]/module[0-9]_.+"))) { // trd_v13x NEW
       layerId = std::atoi(string(nodePath.Data() + 24, 2).c_str()) - 1;
    }
    return layerId;

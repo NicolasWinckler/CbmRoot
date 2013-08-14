@@ -385,7 +385,7 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
   Double_t xHit, yHit, zHit, tHit, xHitErr, yHitErr, zHitErr;
   Double_t tl_new, tr_new;
   Double_t Dz=2.04;  //FIXME: Introduce also Dz and Z as (constant) parameters 
-  Float_t sigma_T=0.07, sigma_Y=0.7, sigma_t_gap, t_o, T_smearing = 0, sigma_el=0.04, 
+  Float_t sigma_T=0.098, sigma_Y=0.7, sigma_t_gap, t_o, T_smearing = 0, sigma_el=0.04, 
     vprop = 15., Pgap = 0.75;
   //time[ns], position[cm], velocity[cm/ns]
   //FIXME: these parameters must be provided externally
@@ -477,7 +477,7 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
     }
 
 //    T_smearing      = gRandom->Gaus(t_o, sigma_t_gap);
-    T_smearing      = gRandom->Gaus(0.12, sigma_T);
+    T_smearing      = gRandom->Gaus(1.23*sigma_T, sigma_T);
 
     Float_t X_local = pos.X()-X[smtype][smodule][module][cell];
     Float_t Y_local = pos.Y()-Y[smtype][smodule][module][cell];

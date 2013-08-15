@@ -54,8 +54,8 @@
 /**
  * struct stores the basic information for one display
  */
-typedef struct {
-
+struct momentumEFGCDisplayInfo {
+momentumEFGCDisplayInfo() : min(0), max(0), numberOfBins(0), numberOfUnderflows(0), numberOfOverflows(0), baseName(), baseTitle(), subDirName() {};
 	int            min;					/**< Variable stores the minimal value in x-dimension */
 	int            max;					/**< Variable stores the maximal value in x-dimension */
 	int            numberOfBins;		/**< Variable stores the steps of the grid in x-dimension */
@@ -65,7 +65,7 @@ typedef struct {
 	std::string    baseTitle;			/**< Variable stores the basic title for the display which is constant over all events */
 	std::string    subDirName;			/**< Variable stores the name of the subdirectory to store the analysis results */
 
-} momentumEFGCDisplayInfo;
+};
 
 
 /* **************************************************************
@@ -73,6 +73,10 @@ typedef struct {
  * **************************************************************/
 
 class momentumEFGCAnalysis {
+
+ private:
+  momentumEFGCAnalysis(const momentumEFGCAnalysis&);
+  momentumEFGCAnalysis& operator=(const momentumEFGCAnalysis&);
 
 protected:
 

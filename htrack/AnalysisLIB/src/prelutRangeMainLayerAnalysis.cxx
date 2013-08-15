@@ -90,13 +90,13 @@ prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis() : prelutRangeAnalys
  * Constructor													*
  ****************************************************************/
 
-prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis(unsigned short numberOfDisplays) : prelutRangeAnalysis(numberOfDisplays) {
+prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis(unsigned short _numberOfDisplays) : prelutRangeAnalysis(_numberOfDisplays) {
 
 }
-prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis(unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) : prelutRangeAnalysis(prelutRangeCut, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax) {
+prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis(unsigned short _prelutRangeCut, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) : prelutRangeAnalysis(_prelutRangeCut, _numberOfMinFactors, _factorMinMin, _factorMinMax, _numberOfMaxFactors, _factorMaxMin, _factorMaxMax) {
 
 }
-prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis(unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) : prelutRangeAnalysis(prelutRangeCut, numberOfDisplays, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax) {
+prelutRangeMainLayerAnalysis::prelutRangeMainLayerAnalysis(unsigned short _prelutRangeCut, unsigned short _numberOfDisplays, unsigned int _numberOfMinFactors, double _factorMinMin, double _factorMinMax, unsigned int _numberOfMaxFactors, double _factorMaxMin, double _factorMaxMax) : prelutRangeAnalysis(_prelutRangeCut, _numberOfDisplays, _numberOfMinFactors, _factorMinMin, _factorMinMax, _numberOfMaxFactors, _factorMaxMin, _factorMaxMax) {
 
 }
 

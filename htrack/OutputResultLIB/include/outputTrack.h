@@ -65,6 +65,11 @@
 
 class outputTrack {
 
+ private:
+
+  outputTrack(const outputTrack&);
+  outputTrack& operator=(const outputTrack&);
+
 protected:
 
 	trackData**           tracks;				/**< Object to access the computed tracks. */

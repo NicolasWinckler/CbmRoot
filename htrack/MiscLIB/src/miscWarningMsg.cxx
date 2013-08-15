@@ -84,10 +84,10 @@ void miscWarningMsg::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-valueBiggerThanRadixWarningMsg::valueBiggerThanRadixWarningMsg() : miscWarningMsg() {
+valueBiggerThanRadixWarningMsg::valueBiggerThanRadixWarningMsg() : miscWarningMsg(), value(0), radix(0) {
 
-	value = 0;
-	radix = 0;
+  //	value = 0;
+  //	radix = 0;
 
 }
 
@@ -95,10 +95,10 @@ valueBiggerThanRadixWarningMsg::valueBiggerThanRadixWarningMsg() : miscWarningMs
  * Constructor													*
  ****************************************************************/
 
-valueBiggerThanRadixWarningMsg::valueBiggerThanRadixWarningMsg(long value, int radix) : miscWarningMsg() {
+valueBiggerThanRadixWarningMsg::valueBiggerThanRadixWarningMsg(long _value, int _radix) : miscWarningMsg(), value(_value), radix(_radix) {
 
-	this->value = value;
-	this->radix = radix;
+  //	this->value = _value;
+  //	this->radix = _radix;
 
 }
 

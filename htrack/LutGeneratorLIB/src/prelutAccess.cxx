@@ -70,9 +70,13 @@ void prelutAccess::allocateNewMemory(unsigned long number) {
  * Default Constructor											*
  ****************************************************************/
 
-prelutAccess::prelutAccess() : prelut() {
+prelutAccess::prelutAccess() 
+  : prelut(), 
+    memory(NULL),
+    numberOfEntries(0)
+{
 
-	memory = NULL;
+  //	memory = NULL;
 
 	clear();
 
@@ -82,9 +86,13 @@ prelutAccess::prelutAccess() : prelut() {
  * Constructor													*
  ****************************************************************/
 
-prelutAccess::prelutAccess(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) : prelut(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry) {
+prelutAccess::prelutAccess(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) 
+  : prelut(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry),
+    memory(NULL),
+    numberOfEntries(0)
+ {
 
-	memory = NULL;
+   //	memory = NULL;
 
 	clear();
 

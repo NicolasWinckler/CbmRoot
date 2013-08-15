@@ -43,8 +43,8 @@
  * HINT: Use the one which is finally faster!!!
  */
 
-#define hitArray inputHitSpecialMem		/**< Definition sets all hitArray objects to inputHitSpecialMem objects. */
-//#define hitArray inputHitStlMem		/**< Definition sets all hitArray objects to inputHitStlMem objects. */
+//#define hitArray inputHitSpecialMem		/**< Definition sets all hitArray objects to inputHitSpecialMem objects. */
+#define hitArray inputHitStlMem		/**< Definition sets all hitArray objects to inputHitStlMem objects. */
 
 
 #endif

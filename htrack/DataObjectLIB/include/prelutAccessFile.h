@@ -42,7 +42,9 @@
 /*
  * struct consisting of all parameters which should be read from file
  */
-typedef struct {
+struct prelutAccessFileHeader {
+
+prelutAccessFileHeader() : name(), usage(), numberOfEntries(0), dimMin(0.), dimMax(0.), dimStep(0), dimStartEntry(0.), dimStopEntry(0.) {};
 	std::string   name;						/**< Variable to store the name of the lut */
 	std::string   usage;					/**< Variable to store the usage of the lut */
 	unsigned long numberOfEntries;			/**< Variable to store the number of entries of the lut */
@@ -51,7 +53,7 @@ typedef struct {
 	int           dimStep;					/**< Variable to store the stepwidth of the third dimension. */
 	double        dimStartEntry;			/**< Variable to store the minimal starting entry in the third dimension. */
 	double        dimStopEntry;				/**< Variable to store the maximal stop entry in the third dimension. */
-} prelutAccessFileHeader;
+};
 
 
 /* **************************************************************

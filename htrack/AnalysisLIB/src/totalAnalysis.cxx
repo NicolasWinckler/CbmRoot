@@ -38,7 +38,15 @@
  * Default constructor											*
  ****************************************************************/
 
-totalAnalysis::totalAnalysis() {
+totalAnalysis::totalAnalysis() 
+  : numberOfCorrections(0),			
+    numberOfCoordCorrections(0),			
+    numberOfTracksWhichCannotBeFound(0),		
+    numberOfTracksWithGoodPrelutSignature(0),	
+    numberOfTracksWithGoodLutSignature(0),
+    prelutSignatures(),		
+    lutSignatures()				
+{
 
 	reset();
 
@@ -374,11 +382,11 @@ void totalAnalysis::printCorrectionCounter() {
 
 void totalAnalysis::printNumberOfTracksWhichCannotBeFound() {
 
-	numberOfTracksWhichCannotBeFoundWarningMsg* numberOfTracksWhichCannotBeFound = new numberOfTracksWhichCannotBeFoundWarningMsg(this->numberOfTracksWhichCannotBeFound);
-	numberOfTracksWhichCannotBeFound->warningMsg();
-	if(numberOfTracksWhichCannotBeFound != NULL) {
-		delete numberOfTracksWhichCannotBeFound;
-		numberOfTracksWhichCannotBeFound = NULL;
+	numberOfTracksWhichCannotBeFoundWarningMsg* _numberOfTracksWhichCannotBeFound = new numberOfTracksWhichCannotBeFoundWarningMsg(this->numberOfTracksWhichCannotBeFound);
+	_numberOfTracksWhichCannotBeFound->warningMsg();
+	if(_numberOfTracksWhichCannotBeFound != NULL) {
+		delete _numberOfTracksWhichCannotBeFound;
+		_numberOfTracksWhichCannotBeFound = NULL;
 	}
 
 }
@@ -390,11 +398,11 @@ void totalAnalysis::printNumberOfTracksWhichCannotBeFound() {
 
 void totalAnalysis::printNumberOfTracksWithGoodPrelutSignature() {
 
-	numberOfTracksWithGoodPrelutSignatureWarningMsg* numberOfTracksWithGoodPrelutSignature = new numberOfTracksWithGoodPrelutSignatureWarningMsg(this->numberOfTracksWithGoodPrelutSignature);
-	numberOfTracksWithGoodPrelutSignature->warningMsg();
-	if(numberOfTracksWithGoodPrelutSignature != NULL) {
-		delete numberOfTracksWithGoodPrelutSignature;
-		numberOfTracksWithGoodPrelutSignature = NULL;
+	numberOfTracksWithGoodPrelutSignatureWarningMsg* _numberOfTracksWithGoodPrelutSignature = new numberOfTracksWithGoodPrelutSignatureWarningMsg(this->numberOfTracksWithGoodPrelutSignature);
+	_numberOfTracksWithGoodPrelutSignature->warningMsg();
+	if(_numberOfTracksWithGoodPrelutSignature != NULL) {
+		delete _numberOfTracksWithGoodPrelutSignature;
+		_numberOfTracksWithGoodPrelutSignature = NULL;
 	}
 
 }
@@ -406,11 +414,11 @@ void totalAnalysis::printNumberOfTracksWithGoodPrelutSignature() {
 
 void totalAnalysis::printNumberOfTracksWithGoodLutSignature() {
 
-	numberOfTracksWithGoodLutSignatureWarningMsg* numberOfTracksWithGoodLutSignature = new numberOfTracksWithGoodLutSignatureWarningMsg(this->numberOfTracksWithGoodLutSignature);
-	numberOfTracksWithGoodLutSignature->warningMsg();
-	if(numberOfTracksWithGoodLutSignature != NULL) {
-		delete numberOfTracksWithGoodLutSignature;
-		numberOfTracksWithGoodLutSignature = NULL;
+	numberOfTracksWithGoodLutSignatureWarningMsg* _numberOfTracksWithGoodLutSignature = new numberOfTracksWithGoodLutSignatureWarningMsg(this->numberOfTracksWithGoodLutSignature);
+	_numberOfTracksWithGoodLutSignature->warningMsg();
+	if(_numberOfTracksWithGoodLutSignature != NULL) {
+		delete _numberOfTracksWithGoodLutSignature;
+		_numberOfTracksWithGoodLutSignature = NULL;
 	}
 
 }

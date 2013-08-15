@@ -42,8 +42,32 @@
  * Default Constructor											*
  ****************************************************************/
 
-hardwareAnalysis::hardwareAnalysis() {
-
+hardwareAnalysis::hardwareAnalysis() 
+ : numberOfColumns(0),
+   numberOfRows(0),
+   isTracksPerColumnEnabled(false),
+   numberOfColumnAnalysis(0),
+   minimalNumberOfTracksPerColumn(NULL),
+   averageNumberOfTracksPerColumn(NULL),
+   maximalNumberOfTracksPerColumn(NULL),
+   numberOfFifoSizesPerColumn(NULL),
+   isTracksPerRowEnabled(false),
+   numberOfRowAnalysis(0),
+   minimalNumberOfTracksPerRow(NULL),
+   averageNumberOfTracksPerRow(NULL),
+   maximalNumberOfTracksPerRow(NULL),
+   numberOfFifoSizesPerRow(NULL),
+   isTracksPerLayerEnabled(false),
+   numberOfLayerAnalysis(0),
+   numberOfTracksInAllLayerEntries(0),
+   numberOfTracksPerLayer(NULL),
+   numberOfTrackDensitiesPerLayer(NULL),
+   isHistogramLayerDistributionEnabled(false),
+   numberOfHitReadoutDistributionAnalysis(0),
+   numberOfHitReadoutDistributionEntries (0),
+   hitReadoutDistribution(NULL)
+{
+  /*
 	numberOfColumns                        = 0;
 	numberOfRows                           = 0;
 	isTracksPerColumnEnabled               = false;
@@ -67,7 +91,7 @@ hardwareAnalysis::hardwareAnalysis() {
 	numberOfHitReadoutDistributionAnalysis = 0;
 	numberOfHitReadoutDistributionEntries  = 0;
 	hitReadoutDistribution                 = NULL;
-
+  */
 }
 
 /****************************************************************
@@ -289,10 +313,10 @@ unsigned int* hardwareAnalysis::getNumberOfFifoSizesInAllRowsDistribution() {
  * method initializes the hardware histogram dimensions.		*
  ****************************************************************/
 
-void hardwareAnalysis::initHardwareHistogramDimensions(unsigned short numberOfColumns, unsigned short numberOfRows) {
+void hardwareAnalysis::initHardwareHistogramDimensions(unsigned short _numberOfColumns, unsigned short _numberOfRows) {
 
-	this->numberOfColumns = numberOfColumns;
-	this->numberOfRows    = numberOfRows;
+	this->numberOfColumns = _numberOfColumns;
+	this->numberOfRows    = _numberOfRows;
 
 }
 
@@ -760,7 +784,7 @@ int* hardwareAnalysis::getNumberOfTrackDensitiesPerLayerDistribution() {
  * method initializes the hardwareTracksPerLayer-Analysis.		*
  ****************************************************************/
 
-void hardwareAnalysis::initHardwareTracksPerLayerAnalysis(unsigned int numberOfTracksInAllLayerEntries, bool enable) {
+void hardwareAnalysis::initHardwareTracksPerLayerAnalysis(unsigned int _numberOfTracksInAllLayerEntries, bool enable) {
 
 	this->numberOfLayerAnalysis           = 0;
 	this->numberOfTracksInAllLayerEntries = 0;
@@ -783,7 +807,7 @@ void hardwareAnalysis::initHardwareTracksPerLayerAnalysis(unsigned int numberOfT
 
 	if (isTracksPerLayerEnabled) {
 
-		this->numberOfTracksInAllLayerEntries = numberOfTracksInAllLayerEntries;
+		this->numberOfTracksInAllLayerEntries = _numberOfTracksInAllLayerEntries;
 
 		numberOfTracksPerLayer = (unsigned int*)calloc(this->numberOfTracksInAllLayerEntries, sizeof(unsigned int));
 		if (numberOfTracksPerLayer == NULL)

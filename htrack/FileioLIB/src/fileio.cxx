@@ -876,9 +876,9 @@ void fileio::writeComment(std::ofstream& fileStream, std::string comment) {
  * Default constructor											*
  ****************************************************************/
 
-fileio::fileio() {
+fileio::fileio() : fileName(), commandID(NULL) {
 
-	commandID = NULL;
+  //	commandID = NULL;
 
 }
 
@@ -886,9 +886,9 @@ fileio::fileio() {
  * Constructor													*
  ****************************************************************/
 
-fileio::fileio(std::string name) {
+fileio::fileio(std::string name) : fileName(), commandID(NULL) {
 
-	commandID = NULL;
+  //	commandID = NULL;
 
 	init(name);
 
@@ -898,9 +898,9 @@ fileio::fileio(std::string name) {
  * Constructor													*
  ****************************************************************/
 
-fileio::fileio(char* name) {
+fileio::fileio(char* name) : fileName(), commandID(NULL) {
 
-	commandID = NULL;
+  //	commandID = NULL;
 
 	init(name);
 

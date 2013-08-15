@@ -43,11 +43,11 @@
  * Default constructor											*
  ****************************************************************/
 
-peakfindingGeometryElement::peakfindingGeometryElement() {
+peakfindingGeometryElement::peakfindingGeometryElement() : dim(), value(0) {
 
 	for (unsigned short i = 0; i < DIMENSIONS; i++)
 		dim[i] = 0;
-	value      = 0;
+	//	value      = 0;
 
 }
 
@@ -55,19 +55,19 @@ peakfindingGeometryElement::peakfindingGeometryElement() {
  * Constructor													*
  ****************************************************************/
 
-peakfindingGeometryElement::peakfindingGeometryElement(const peakfindingGeometryElement& value) {
+peakfindingGeometryElement::peakfindingGeometryElement(const peakfindingGeometryElement& _value) : dim(), value(_value.value) {
 
 	for (unsigned short i = 0; i < DIMENSIONS; i++)
-		this->dim[i] = value.dim[i];
-	this->value      = value.value;
+		this->dim[i] = _value.dim[i];
+	//	this->value      = _value.value;
 
 }
-peakfindingGeometryElement::peakfindingGeometryElement(short dim1, short dim2, short dim3, unsigned short value) {
+peakfindingGeometryElement::peakfindingGeometryElement(short dim1, short dim2, short dim3, unsigned short _value) : dim(), value(_value) {
 
 	set(dim1, DIM1);
 	set(dim2, DIM2);
 	set(dim3, DIM3);
-	setValue(value);
+	//	setValue(_value);
 
 }
 
@@ -82,11 +82,11 @@ peakfindingGeometryElement::~peakfindingGeometryElement() {
  * operator = ()												*
  ****************************************************************/
 
-const peakfindingGeometryElement& peakfindingGeometryElement::operator = (const peakfindingGeometryElement& value) {
+const peakfindingGeometryElement& peakfindingGeometryElement::operator = (const peakfindingGeometryElement& _value) {
 
 	for (unsigned short i = 0; i < DIMENSIONS; i++)
-		this->dim[i] = value.dim[i];
-	this->value      = value.value;
+		this->dim[i] = _value.dim[i];
+	this->value      = _value.value;
 
 	return *this;
 
@@ -165,20 +165,20 @@ std::string peakfindingGeometryElement::getValueString() {
  * sets the value in the dimension								*
  ****************************************************************/
 
-void peakfindingGeometryElement::set(short set, unsigned short dimension) {
+void peakfindingGeometryElement::set(short _set, unsigned short dimension) {
 
 	if (dimension < DIMENSIONS)
-		dim[dimension] = set;
+		dim[dimension] = _set;
 	else
 		throw notExistingDimensionError(dimension, DIMENSIONS);
 
 }
-void peakfindingGeometryElement::setString(std::string& set, unsigned short dimension) {
+void peakfindingGeometryElement::setString(std::string& _set, unsigned short dimension) {
 
 	std::string temp;
 	int         radix;
 
-	temp           = set;
+	temp           = _set;
 	extractRadix(&radix, &temp);
 	dim[dimension] = stos(temp, radix);
 
@@ -188,17 +188,17 @@ void peakfindingGeometryElement::setString(std::string& set, unsigned short dime
  * set value													*
  ****************************************************************/
 
-void peakfindingGeometryElement::setValue(unsigned short value) {
+void peakfindingGeometryElement::setValue(unsigned short _value) {
 
-	this->value = value;
+	this->value = _value;
 
 }
-void peakfindingGeometryElement::setValueString(std::string& value) {
+void peakfindingGeometryElement::setValueString(std::string& _value) {
 
 	std::string temp;
 	int         radix;
 
-	temp         = value;
+	temp         = _value;
 	extractRadix(&radix, &temp);
 	this->value  = stous(temp, radix);
 

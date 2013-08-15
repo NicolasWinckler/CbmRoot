@@ -37,9 +37,12 @@
  * Default constructor											*
  ****************************************************************/
 
-outputFTrack::outputFTrack() : outputTrack() {
+outputFTrack::outputFTrack() 
+  : outputTrack(),
+    writeTracksToFile(true)
+{
 
-	writeTracksToFile = true;
+  //	writeTracksToFile = true;
 
 }
 
@@ -47,24 +50,36 @@ outputFTrack::outputFTrack() : outputTrack() {
  * Constructor													*
  ****************************************************************/
 
-outputFTrack::outputFTrack(trackData** tracks) : outputTrack(tracks) {
+outputFTrack::outputFTrack(trackData** _tracks) 
+  : outputTrack(_tracks), 
+    writeTracksToFile(true)
+{
 
-	writeTracksToFile = true;
-
-}
-outputFTrack::outputFTrack(trackData** tracks, bool writeTracksToFile) : outputTrack(tracks) {
-
-	this->writeTracksToFile = writeTracksToFile;
+  //	writeTracksToFile = true;
 
 }
-outputFTrack::outputFTrack(const char* name, trackData** tracks) : outputTrack(name, tracks) {
+outputFTrack::outputFTrack(trackData** _tracks, bool _writeTracksToFile) 
+  : outputTrack(_tracks),
+    writeTracksToFile(_writeTracksToFile)
+{
 
-	writeTracksToFile = true;
+  //	this->writeTracksToFile = _writeTracksToFile;
 
 }
-outputFTrack::outputFTrack(const char* name, trackData** tracks, bool writeTracksToFile) : outputTrack(name, tracks) {
+outputFTrack::outputFTrack(const char* name, trackData** _tracks) 
+  : outputTrack(name, _tracks),
+    writeTracksToFile(true)
+{
 
-	this->writeTracksToFile = writeTracksToFile;
+  //	writeTracksToFile = true;
+
+}
+outputFTrack::outputFTrack(const char* name, trackData** _tracks, bool _writeTracksToFile) 
+  : outputTrack(name, _tracks),
+    writeTracksToFile(_writeTracksToFile)
+{
+
+  //	this->writeTracksToFile = _writeTracksToFile;
 
 }
 
@@ -91,25 +106,25 @@ void outputFTrack::init() {
  * Method inits the variables.									*
  ****************************************************************/
 
-void outputFTrack::init(bool writeTracksToFile) {
+void outputFTrack::init(bool _writeTracksToFile) {
 
-	this->writeTracksToFile = writeTracksToFile;
+	this->writeTracksToFile = _writeTracksToFile;
 
 	init();
 
 }
-void outputFTrack::init(trackData** tracks, bool writeTracksToFile) {
+void outputFTrack::init(trackData** _tracks, bool _writeTracksToFile) {
 
-	this->writeTracksToFile = writeTracksToFile;
+	this->writeTracksToFile = _writeTracksToFile;
 
-	outputTrack::init(tracks);
+	outputTrack::init(_tracks);
 
 }
-void outputFTrack::init(const char* name, trackData** tracks, bool writeTracksToFile) {
+void outputFTrack::init(const char* name, trackData** _tracks, bool _writeTracksToFile) {
 
-	this->writeTracksToFile = writeTracksToFile;
+	this->writeTracksToFile = _writeTracksToFile;
 
-	outputTrack::init(name, tracks);
+	outputTrack::init(name, _tracks);
 
 }
 

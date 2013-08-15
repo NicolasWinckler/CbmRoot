@@ -87,9 +87,9 @@ void globalWarningMsg::printMsg(std::string source, std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-gStyleNotFoundWarningMsg::gStyleNotFoundWarningMsg() : globalWarningMsg() {
+gStyleNotFoundWarningMsg::gStyleNotFoundWarningMsg() : globalWarningMsg(), warningSource() {
 
-	warningSource.clear();
+  //	warningSource.clear();
 
 }
 
@@ -97,9 +97,9 @@ gStyleNotFoundWarningMsg::gStyleNotFoundWarningMsg() : globalWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-gStyleNotFoundWarningMsg::gStyleNotFoundWarningMsg(std::string actualWarningSource) : globalWarningMsg() {
+gStyleNotFoundWarningMsg::gStyleNotFoundWarningMsg(std::string actualWarningSource) : globalWarningMsg(), warningSource(actualWarningSource) {
 
-	warningSource = actualWarningSource;
+  //	warningSource = actualWarningSource;
 
 }
 
@@ -130,9 +130,9 @@ void gStyleNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-gDirectoryNotFoundWarningMsg::gDirectoryNotFoundWarningMsg() : globalWarningMsg() {
+gDirectoryNotFoundWarningMsg::gDirectoryNotFoundWarningMsg() : globalWarningMsg(), warningSource() {
 
-	warningSource.clear();
+  //	warningSource.clear();
 
 }
 
@@ -140,9 +140,9 @@ gDirectoryNotFoundWarningMsg::gDirectoryNotFoundWarningMsg() : globalWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-gDirectoryNotFoundWarningMsg::gDirectoryNotFoundWarningMsg(std::string actualWarningSource) : globalWarningMsg() {
+gDirectoryNotFoundWarningMsg::gDirectoryNotFoundWarningMsg(std::string actualWarningSource) : globalWarningMsg(), warningSource(actualWarningSource) {
 
-	warningSource = actualWarningSource;
+  //	warningSource = actualWarningSource;
 
 }
 
@@ -173,9 +173,9 @@ void gDirectoryNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-geoManagerNotFoundWarningMsg::geoManagerNotFoundWarningMsg() : globalWarningMsg() {
+geoManagerNotFoundWarningMsg::geoManagerNotFoundWarningMsg() : globalWarningMsg(), warningSource() {
 
-	warningSource.clear();
+  //	warningSource.clear();
 
 }
 
@@ -183,9 +183,9 @@ geoManagerNotFoundWarningMsg::geoManagerNotFoundWarningMsg() : globalWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-geoManagerNotFoundWarningMsg::geoManagerNotFoundWarningMsg(std::string actualWarningSource) : globalWarningMsg() {
+geoManagerNotFoundWarningMsg::geoManagerNotFoundWarningMsg(std::string actualWarningSource) : globalWarningMsg(), warningSource(actualWarningSource) {
 
-	warningSource = actualWarningSource;
+  //	warningSource = actualWarningSource;
 
 }
 
@@ -216,11 +216,11 @@ void geoManagerNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-houghLutCorrectionWarningMsg::houghLutCorrectionWarningMsg() : globalWarningMsg() {
+houghLutCorrectionWarningMsg::houghLutCorrectionWarningMsg() : globalWarningMsg(), warningSource(), borderCorrections(0), borderPosCorrections(0) {
 
-	warningSource.clear();
-	borderCorrections    = 0;
-	borderPosCorrections = 0;
+  //	warningSource.clear();
+  //	borderCorrections    = 0;
+  //	borderPosCorrections = 0;
 
 }
 
@@ -228,11 +228,11 @@ houghLutCorrectionWarningMsg::houghLutCorrectionWarningMsg() : globalWarningMsg(
  * Constructor													*
  ****************************************************************/
 
-houghLutCorrectionWarningMsg::houghLutCorrectionWarningMsg(std::string actualWarningSource, unsigned long corrections, unsigned long posCorrections) : globalWarningMsg() {
+houghLutCorrectionWarningMsg::houghLutCorrectionWarningMsg(std::string actualWarningSource, unsigned long corrections, unsigned long posCorrections) : globalWarningMsg(), warningSource(actualWarningSource), borderCorrections(corrections), borderPosCorrections(posCorrections) {
 
-	warningSource        = actualWarningSource;
-	borderCorrections    = corrections;
-	borderPosCorrections = posCorrections;
+  //	warningSource        = actualWarningSource;
+  //	borderCorrections    = corrections;
+  //	borderPosCorrections = posCorrections;
 
 }
 
@@ -282,9 +282,9 @@ void houghLutCorrectionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotDrawWarningMsg::cannotDrawWarningMsg() : globalWarningMsg() {
+cannotDrawWarningMsg::cannotDrawWarningMsg() : globalWarningMsg(), warningSource() {
 
-	warningSource.clear();
+  //	warningSource.clear();
 
 }
 
@@ -292,9 +292,9 @@ cannotDrawWarningMsg::cannotDrawWarningMsg() : globalWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-cannotDrawWarningMsg::cannotDrawWarningMsg(std::string actualWarningSource) : globalWarningMsg() {
+cannotDrawWarningMsg::cannotDrawWarningMsg(std::string actualWarningSource) : globalWarningMsg(), warningSource(actualWarningSource) {
 
-	warningSource = actualWarningSource;
+  //	warningSource = actualWarningSource;
 
 }
 

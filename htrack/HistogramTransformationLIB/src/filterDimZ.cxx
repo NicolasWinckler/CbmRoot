@@ -38,27 +38,39 @@
  * Default constructor											*
  ****************************************************************/
 
-filterDimZ::filterDimZ() {
-
+filterDimZ::filterDimZ() 
+  : tracks(NULL),
+    filterMem(NULL),
+    baseFilter(NULL),
+    filterSize(0),
+    filterLocalSize(0)
+{
+  /*
 	tracks          = NULL;
-	filterMem       = NULL;	/* allocation in derived class */
-	baseFilter      = NULL;	/* allocation in derived class */
+	filterMem       = NULL;	// allocation in derived class 
+	baseFilter      = NULL;	// allocation in derived class 
 	filterSize      = 0;
 	filterLocalSize = 0;
-
+*/
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-filterDimZ::filterDimZ( trackData**    tracks,
-						unsigned short size,
-						unsigned short localSize) {
+filterDimZ::filterDimZ( trackData**    _tracks,
+			unsigned short size,
+			unsigned short localSize) 
+  : tracks(NULL),
+    filterMem(NULL),
+    baseFilter(NULL),
+    filterSize(0),
+    filterLocalSize(0)
+{
 
-	init(tracks, size, localSize);
-	filterMem       = NULL;
-	baseFilter      = NULL;
+	init(_tracks, size, localSize);
+	//	filterMem       = NULL;
+	//	baseFilter      = NULL;
 
 }
 
@@ -85,11 +97,11 @@ filterDimZ::~filterDimZ() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDimZ::init( trackData**    tracks,
+void filterDimZ::init( trackData**    _tracks,
 					   unsigned short size,
 					   unsigned short localSize) {
 
-	this->tracks    = tracks;
+	this->tracks    = _tracks;
 	filterSize      = size;
 	filterLocalSize = localSize;
 

@@ -254,7 +254,7 @@ void table::quineMcClusky(std::list<tableStringEntry>& list, bool useClassificat
  * Default constructor											*
  ****************************************************************/
 
-table::table() {
+table::table() : members(), minimumClassification(), maximumClassification() {
 
 	clear();
 

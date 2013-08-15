@@ -42,6 +42,11 @@
 
 class digitalHitAccess {
 
+ private:
+
+  digitalHitAccess(const digitalHitAccess&);
+  digitalHitAccess& operator=(const digitalHitAccess&);
+
 protected:
 
 	digitalHit*    memory;				/**< Memory which stores the whole digital hit data. */

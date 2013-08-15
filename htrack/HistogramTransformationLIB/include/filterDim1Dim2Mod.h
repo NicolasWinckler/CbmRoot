@@ -52,6 +52,11 @@
 
 class filterDim1Dim2Mod : public filterDimXDimX {
 
+ private:
+
+  filterDim1Dim2Mod(const filterDim1Dim2Mod&);
+  filterDim1Dim2Mod& operator=(const filterDim1Dim2Mod&);
+
 protected:
 
 	bitArray***  filterTempMem;			/**< Array for easier constructing the geometry of the filter. */

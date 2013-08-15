@@ -42,9 +42,13 @@
  * Default constructor											*
  * **************************************************************/
 
-prelutRangeLayerAnalysis::prelutRangeLayerAnalysis() {
+prelutRangeLayerAnalysis::prelutRangeLayerAnalysis() 
+  : displayMode(CUTMAINRELATIVEDISPLAYMODE),
+    prelutRangeCorrectLayerAnalyser(),
+    prelutRangeMainLayerAnalyser()
+{
 
-	displayMode = CUTMAINRELATIVEDISPLAYMODE;
+  //	displayMode = CUTMAINRELATIVEDISPLAYMODE;
 
 }
 
@@ -52,23 +56,35 @@ prelutRangeLayerAnalysis::prelutRangeLayerAnalysis() {
  * Constructor													*
  * **************************************************************/
 
-prelutRangeLayerAnalysis::prelutRangeLayerAnalysis(unsigned short numberOfDisplays) {
+prelutRangeLayerAnalysis::prelutRangeLayerAnalysis(unsigned short numberOfDisplays) 
+  : displayMode(CUTMAINRELATIVEDISPLAYMODE),
+    prelutRangeCorrectLayerAnalyser(),
+    prelutRangeMainLayerAnalyser()
+{
 
-	displayMode = CUTMAINRELATIVEDISPLAYMODE;
+  //	displayMode = CUTMAINRELATIVEDISPLAYMODE;
 	prelutRangeCorrectLayerAnalyser.init(numberOfDisplays);
 	prelutRangeMainLayerAnalyser.init(numberOfDisplays);
 
 }
-prelutRangeLayerAnalysis::prelutRangeLayerAnalysis(unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
+prelutRangeLayerAnalysis::prelutRangeLayerAnalysis(unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) 
+  : displayMode(CUTMAINRELATIVEDISPLAYMODE),
+    prelutRangeCorrectLayerAnalyser(),
+    prelutRangeMainLayerAnalyser()
+{
 
-	displayMode = CUTMAINRELATIVEDISPLAYMODE;
+  //	displayMode = CUTMAINRELATIVEDISPLAYMODE;
 	prelutRangeCorrectLayerAnalyser.init(prelutRangeCut, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
 	prelutRangeMainLayerAnalyser.init(prelutRangeCut, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
 
 }
-prelutRangeLayerAnalysis::prelutRangeLayerAnalysis(unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
+prelutRangeLayerAnalysis::prelutRangeLayerAnalysis(unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) 
+  : displayMode(CUTMAINRELATIVEDISPLAYMODE),
+    prelutRangeCorrectLayerAnalyser(),
+    prelutRangeMainLayerAnalyser()
+{
 
-	displayMode = CUTMAINRELATIVEDISPLAYMODE;
+  //	displayMode = CUTMAINRELATIVEDISPLAYMODE;
 	prelutRangeCorrectLayerAnalyser.init(prelutRangeCut, numberOfDisplays, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
 	prelutRangeMainLayerAnalyser.init(prelutRangeCut, numberOfDisplays, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
 
@@ -369,9 +385,9 @@ void prelutRangeLayerAnalysis::prelutRangeAnalysisWrite(int eventNumber) {
  * This method initializes the magnetfield factor's display.	*
  ****************************************************************/
 
-void prelutRangeLayerAnalysis::initPrelutRangeAnalysisDisplay(bool enable, unsigned short displayMode) {
+void prelutRangeLayerAnalysis::initPrelutRangeAnalysisDisplay(bool enable, unsigned short _displayMode) {
 
-	this->displayMode = displayMode;
+	this->displayMode = _displayMode;
 
 	switch(this->displayMode) {
 

@@ -41,12 +41,12 @@
  * Default constructor											*
  ****************************************************************/
 
-lutBorder::lutBorder() {
+lutBorder::lutBorder() : firstBorder(), secondBorder(), hit(NULL) {
 
-	firstBorder.start = 0;
-	firstBorder.stop  = 0;
-	secondBorder.houghCoord.clear();
-	hit               = NULL;
+  //	firstBorder.start = 0;
+  //	firstBorder.stop  = 0;
+  //	secondBorder.houghCoord.clear();
+  //	hit               = NULL;
 
 }
 
@@ -54,11 +54,15 @@ lutBorder::lutBorder() {
  * Copy constructor												*
  ****************************************************************/
 
-lutBorder::lutBorder(const lutBorder& value) {
+lutBorder::lutBorder(const lutBorder& value) 
+  : firstBorder(value.firstBorder),
+    secondBorder(value.secondBorder),
+    hit(value.hit)
+{
 
-	this->firstBorder  = value.firstBorder;
-	this->secondBorder = value.secondBorder;
-	this->hit          = value.hit;
+  //	this->firstBorder  = value.firstBorder;
+  //	this->secondBorder = value.secondBorder;
+  //	this->hit          = value.hit;
 
 }
 
@@ -160,9 +164,9 @@ void lutBorder::setLutHoughBorder(lutHoughBorder& border) {
  * method sets the hit corresponding to the borders				*
  ****************************************************************/
 
-void lutBorder::setHit(trackfinderInputHit* hit) {
+void lutBorder::setHit(trackfinderInputHit* _hit) {
 
-	this->hit = hit;
+	this->hit = _hit;
 
 }
 

@@ -94,7 +94,7 @@ void bytefield::valueFromString(std::string value) {
  * Default constructor											*
  ****************************************************************/
 
-bytefield::bytefield() {
+bytefield::bytefield() : byte(0), position(0) {
 
 	reset();
 
@@ -104,25 +104,25 @@ bytefield::bytefield() {
  * Constructor													*
  ****************************************************************/
 
-bytefield::bytefield(const bytefield& value) {
+bytefield::bytefield(const bytefield& value) : byte(value.byte), position(value.position) {
 	
-	this->byte     = value.byte;
-	this->position = value.position;
+  //	this->byte     = value.byte;
+  //	this->position = value.position;
 
 }
-bytefield::bytefield(unsigned long value) {
+bytefield::bytefield(unsigned long value) : byte((byteSourceType)value), position(0) {
 
-	byte     = (byteSourceType)value;	/* reduction to the used number of bits */
+  //	byte     = (byteSourceType)value;	/* reduction to the used number of bits */
 
 	byte   <<= cutBits;
 	byte   >>= cutBits;
-	position = 0;
+	//	position = 0;
 
 }
-bytefield::bytefield(std::string value) {
+bytefield::bytefield(std::string value) : byte(), position(0) {
 
 	valueFromString(value);	/* reduction to the used number of bits */
-	position = 0;
+	//	position = 0;
 
 }
 
@@ -517,14 +517,14 @@ bool bytefield::operator == (unsigned long value) {
 }
 bool bytefield::operator == (bytefield& value) {
 
-	unsigned char length;
+	unsigned char _length;
 	bool          returnValue;
 
-	length = (unsigned char)this->length();
+	_length = (unsigned char)this->length();
 
-	if ((unsigned char)(value.position - 1) < length)
+	if ((unsigned char)(value.position - 1) < _length)
 		returnValue = ((*this) == (bool)value); 
-	else if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(value.position - 1) >= length))
+	else if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(value.position - 1) >= _length))
 		returnValue = (value == (bool)(*this)); 
 	else
 		returnValue = (value.byte == (*this).byte);
@@ -744,9 +744,9 @@ bytefield bytefield::operator ^ (bytefield& operand) {
 	bool          operand1;
 	bool          operand2;
 	bytefield     returnValue;
-	unsigned char length = (unsigned char)this->length();
+	unsigned char _length = (unsigned char)this->length();
 
-	if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(operand.position - 1) < length)) {
+	if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(operand.position - 1) < _length)) {
 
 		operand1             = (bool)(*this);
 		operand2             = (bool)operand;
@@ -754,13 +754,13 @@ bytefield bytefield::operator ^ (bytefield& operand) {
 		returnValue.position = 1;
 
 	}
-	else if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(operand.position - 1) >= length)) {
+	else if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(operand.position - 1) >= _length)) {
 
 		operand1    = (bool)(*this);
 		returnValue = operand.operator ^ (operand1);
 
 	}
-	else if (((unsigned char)(this->position - 1) >= length) && ((unsigned char)(operand.position - 1) < length)) {
+	else if (((unsigned char)(this->position - 1) >= _length) && ((unsigned char)(operand.position - 1) < _length)) {
 
 		operand2    = (bool)operand;
 		returnValue = this->operator ^ (operand2);
@@ -849,9 +849,9 @@ bytefield bytefield::operator & (bytefield& operand) {
 	bool          operand1;
 	bool          operand2;
 	bytefield     returnValue;
-	unsigned char length = (unsigned char)this->length();
+	unsigned char _length = (unsigned char)this->length();
 
-	if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(operand.position - 1) < length)) {
+	if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(operand.position - 1) < _length)) {
 
 		operand1             = (bool)(*this);
 		operand2             = (bool)operand;
@@ -859,13 +859,13 @@ bytefield bytefield::operator & (bytefield& operand) {
 		returnValue.position = 1;
 
 	}
-	else if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(operand.position - 1) >= length)) {
+	else if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(operand.position - 1) >= _length)) {
 
 		operand1    = (bool)(*this);
 		returnValue = operand.operator & (operand1);
 
 	}
-	else if (((unsigned char)(this->position - 1) >= length) && ((unsigned char)(operand.position - 1) < length)) {
+	else if (((unsigned char)(this->position - 1) >= _length) && ((unsigned char)(operand.position - 1) < _length)) {
 
 		operand2    = (bool)operand;
 		returnValue = this->operator & (operand2);
@@ -974,9 +974,9 @@ bytefield bytefield::operator | (bytefield& operand) {
 	bool          operand1;
 	bool          operand2;
 	bytefield     returnValue;
-	unsigned char length = (unsigned char)this->length();
+	unsigned char _length = (unsigned char)this->length();
 
-	if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(operand.position - 1) < length)) {
+	if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(operand.position - 1) < _length)) {
 
 		operand1             = (bool)(*this);
 		operand2             = (bool)operand;
@@ -984,13 +984,13 @@ bytefield bytefield::operator | (bytefield& operand) {
 		returnValue.position = 1;
 
 	}
-	else if (((unsigned char)(this->position - 1) < length) && ((unsigned char)(operand.position - 1) >= length)) {
+	else if (((unsigned char)(this->position - 1) < _length) && ((unsigned char)(operand.position - 1) >= _length)) {
 
 		operand1    = (bool)(*this);
 		returnValue = operand.operator | (operand1);
 
 	}
-	else if (((unsigned char)(this->position - 1) >= length) && ((unsigned char)(operand.position - 1) < length)) {
+	else if (((unsigned char)(this->position - 1) >= _length) && ((unsigned char)(operand.position - 1) < _length)) {
 
 		operand2    = (bool)operand;
 		returnValue = this->operator | (operand2);

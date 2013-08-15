@@ -48,6 +48,10 @@
 
 class momentumAnalysis {
 
+ private:
+  momentumAnalysis(const momentumAnalysis&);
+  momentumAnalysis& operator=(const momentumAnalysis&);
+
 protected:
 
 	TCanvas*                     window;					/**< Object for the main window */

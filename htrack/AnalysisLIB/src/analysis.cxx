@@ -1030,9 +1030,54 @@ bool analysis::computeCoordinates(trackfinderInputTrack& track, trackCoordinates
  * Default constructor											*
  ****************************************************************/
 
-analysis::analysis() {
-
-	eventData                      = NULL;
+analysis::analysis() 
+  : eventData(NULL),
+    tracks(NULL),
+    ratings(NULL),
+    space(NULL),
+    luts(NULL),
+    trackPropagationAnalyser(NULL),
+    qualityAnalyser(NULL),
+    momentumAnalyser(NULL),
+    projectionAnalyser(NULL),
+    magnetfieldAnalyser(NULL),
+    magnetfieldFactorAnalyser(NULL),
+    prelutRangeLayerAnalyser(NULL),
+    histogramAnalyser(NULL),
+    showAnalyser(NULL),
+    totalAnalyser(NULL),
+    hardwareAnalyser(NULL),
+    mcTrackVisualAnalyser(NULL),
+    foundTrackVisualAnalyser(NULL),
+    peakfindingGeometryAnalyser(NULL),
+    minimumP(0),
+    configuration(false),
+    detector(false),
+    memory(false),
+    time(false),
+    event(false),
+    classPriority(false),
+    percentageOfHitsInSignature(0),
+    percentageOfTracksForSignature(0),
+    analysisResultWarnings(0),
+    analysisResultDisplays(0),
+    analysisMoreResultWarnings(0),
+    analysisMoreResultDisplays(0),
+    pictures(NULL),
+    borderCreationTimer(NULL),
+    histogramCreationTimer(NULL),
+    histogramEncodingTimer(NULL),
+    histogramDiagonalizingTimer(NULL),
+    histogramPeakfindingTimer(NULL),
+    histogramFinalizingTimer(NULL),
+    histogramResettingTimer(NULL),
+    trackPeakfindingTimer(NULL),
+    reservedSizeOfLBufferData(0),
+    allocatedSizeOfLBufferData(0),
+    usedSizeOfLBufferData(0)
+{
+  /*
+        eventData                      = NULL;
 	tracks                         = NULL;
 	ratings                        = NULL;
 	space                          = NULL;
@@ -1081,7 +1126,7 @@ analysis::analysis() {
 	reservedSizeOfLBufferData      = 0;
 	allocatedSizeOfLBufferData     = 0;
 	usedSizeOfLBufferData          = 0;
-
+  */
 }
 
 /****************************************************************
@@ -1089,8 +1134,53 @@ analysis::analysis() {
  ****************************************************************/
 
 analysis::analysis(initialParameter parameters,
-				   bool initHistogramAnalysisToRoot) {
-
+				   bool initHistogramAnalysisToRoot) 
+  : eventData(parameters.eventData),
+    tracks(parameters.tracks),
+    ratings(parameters.ratings),
+    space(parameters.space),
+    luts(parameters.luts),
+    trackPropagationAnalyser(NULL),
+    qualityAnalyser(NULL),
+    momentumAnalyser(NULL),
+    projectionAnalyser(NULL),
+    magnetfieldAnalyser(NULL),
+    magnetfieldFactorAnalyser(NULL),
+    prelutRangeLayerAnalyser(NULL),
+    histogramAnalyser(NULL),
+    showAnalyser(NULL),
+    totalAnalyser(NULL),
+    hardwareAnalyser(NULL),
+    mcTrackVisualAnalyser(NULL),
+    foundTrackVisualAnalyser(NULL),
+    peakfindingGeometryAnalyser(NULL),
+    minimumP(parameters.minP),
+    configuration(parameters.initConfiguration),
+    detector(parameters.initDetector),
+    memory(parameters.initMemory),
+    time(parameters.initTime),
+    event(parameters.initEvent),
+    classPriority(parameters.initClassPriority),
+    percentageOfHitsInSignature(parameters.percentageOfHitsInSignature),
+    percentageOfTracksForSignature(parameters.percentageOfTracksForSignature),
+    analysisResultWarnings(parameters.analysisResultWarnings),
+    analysisResultDisplays(parameters.analysisResultDisplays),
+    analysisMoreResultWarnings(parameters.analysisMoreResultWarnings),
+    analysisMoreResultDisplays(parameters.analysisMoreResultDisplays),
+    pictures(NULL),
+    borderCreationTimer(NULL),
+    histogramCreationTimer(NULL),
+    histogramEncodingTimer(NULL),
+    histogramDiagonalizingTimer(NULL),
+    histogramPeakfindingTimer(NULL),
+    histogramFinalizingTimer(NULL),
+    histogramResettingTimer(NULL),
+    trackPeakfindingTimer(NULL),
+    reservedSizeOfLBufferData(0),
+    allocatedSizeOfLBufferData(0),
+    usedSizeOfLBufferData(0)
+{
+  /*
 	this->eventData                = parameters.eventData;
 	this->tracks                   = parameters.tracks;
 	this->ratings                  = parameters.ratings;
@@ -1141,7 +1231,7 @@ analysis::analysis(initialParameter parameters,
 	reservedSizeOfLBufferData      = 0;
 	allocatedSizeOfLBufferData     = 0;
 	usedSizeOfLBufferData          = 0;
-
+*/
 	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
 
 	initTrackPropagationEventPointAnalysis(parameters.initPropagationEventPoint);
@@ -1196,10 +1286,57 @@ analysis::analysis(initialParameter parameters,
 
 }
 analysis::analysis(initialParameter parameters,
-				   initialFileParameter fileParameters,
-				   bool initCreatedHistogramToShow, bool initEncodedHistogramToShow,
-				   bool initFilteredHistogramToShow, unsigned short initHistogramLayer) {
-
+		   initialFileParameter fileParameters,
+		   bool initCreatedHistogramToShow, 
+                   bool initEncodedHistogramToShow,
+		   bool initFilteredHistogramToShow, 
+		   unsigned short initHistogramLayer) 
+  : eventData(parameters.eventData),
+    tracks(parameters.tracks),
+    ratings(parameters.ratings),
+    space(parameters.space),
+    luts(parameters.luts),
+    trackPropagationAnalyser(NULL),
+    qualityAnalyser(NULL),
+    momentumAnalyser(NULL),
+    projectionAnalyser(NULL),
+    magnetfieldAnalyser(NULL),
+    magnetfieldFactorAnalyser(NULL),
+    prelutRangeLayerAnalyser(NULL),
+    histogramAnalyser(NULL),
+    showAnalyser(NULL),
+    totalAnalyser(NULL),
+    hardwareAnalyser(NULL),
+    mcTrackVisualAnalyser(NULL),
+    foundTrackVisualAnalyser(NULL),
+    peakfindingGeometryAnalyser(NULL),
+    minimumP(parameters.minP),
+    configuration(parameters.initConfiguration),
+    detector(parameters.initDetector),
+    memory(parameters.initMemory),
+    time(parameters.initTime),
+    event(parameters.initEvent),
+    classPriority(parameters.initClassPriority),
+    percentageOfHitsInSignature(parameters.percentageOfHitsInSignature),
+    percentageOfTracksForSignature(parameters.percentageOfTracksForSignature),
+    analysisResultWarnings(parameters.analysisResultWarnings),
+    analysisResultDisplays(parameters.analysisResultDisplays),
+    analysisMoreResultWarnings(parameters.analysisMoreResultWarnings),
+    analysisMoreResultDisplays(parameters.analysisMoreResultDisplays),
+    pictures(NULL),
+    borderCreationTimer(NULL),
+    histogramCreationTimer(NULL),
+    histogramEncodingTimer(NULL),
+    histogramDiagonalizingTimer(NULL),
+    histogramPeakfindingTimer(NULL),
+    histogramFinalizingTimer(NULL),
+    histogramResettingTimer(NULL),
+    trackPeakfindingTimer(NULL),
+    reservedSizeOfLBufferData(0),
+    allocatedSizeOfLBufferData(0),
+    usedSizeOfLBufferData(0)
+{
+  /*
 	this->eventData                = parameters.eventData;
 	this->tracks                   = parameters.tracks;
 	this->ratings                  = parameters.ratings;
@@ -1250,7 +1387,7 @@ analysis::analysis(initialParameter parameters,
 	reservedSizeOfLBufferData      = 0;
 	allocatedSizeOfLBufferData     = 0;
 	usedSizeOfLBufferData          = 0;
-
+  */
 	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
 
 	initTrackPropagationEventPointAnalysis(parameters.initPropagationEventPoint);
@@ -1770,7 +1907,7 @@ bool analysis::isFindableTrack(trackfinderInputTrack* track, bitArray minClassPr
 	bitArray               localTrackPattern;
 	trackfinderInputHit*   hit;
 	unsigned short         detectorIndex;
-	bitArray               classPriority;
+	bitArray               _classPriority;
 	bool                   returnValue;
 
 	localTrackPattern = bitArray(0);
@@ -1796,8 +1933,8 @@ bool analysis::isFindableTrack(trackfinderInputTrack* track, bitArray minClassPr
 
 	}
 
-	classPriority = evaluateTrackPatternGradingP(localTrackPattern);
-	if((classPriority >= minClassPriority) && (track->getMomZ() > minimumP))
+	_classPriority = evaluateTrackPatternGradingP(localTrackPattern);
+	if((_classPriority >= minClassPriority) && (track->getMomZ() > minimumP))
 		returnValue = true;
 	else
 		returnValue = false;

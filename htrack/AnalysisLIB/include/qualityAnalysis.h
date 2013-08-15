@@ -44,6 +44,10 @@
 
 class qualityAnalysis {
 
+ private:
+  qualityAnalysis(const qualityAnalysis&);
+  qualityAnalysis& operator=(const qualityAnalysis&);
+
 protected:
 
 	qualityEFGCEventAnalysis* qualityEFGCEvent;			/**< Object for analysing the quality per event and writing on the standard output stream. */

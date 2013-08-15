@@ -326,9 +326,20 @@ void tables::generateOnlineTable(table& actualTable) {
  * Default constructor											*
  * **************************************************************/
 
-tables::tables() {
+tables::tables() 
+  : codingTableMode(0),
+  codingTable(),
+  codingTableName(),
+  gradingPTableMode(0),
+  gradingPTable(),
+  gradingPTableName(),
+  gradingRTableMode(0),
+  gradingRTable(),
+  gradingRTableName(),
+  analyser(NULL)
+{
 
-	analyser = NULL;
+  //	analyser = NULL;
 
 	init(NOTABLE, NOTABLE, NOTABLE, "", "", "");
 
@@ -338,11 +349,22 @@ tables::tables() {
  * Constructor													*
  * **************************************************************/
 
-tables::tables(int codingTableMode, int gradingPTableMode, int gradingRTableMode, std::string codingTableName, std::string gradingPTableName, std::string gradingRTableName) {
+tables::tables(int _codingTableMode, int _gradingPTableMode, int _gradingRTableMode, std::string _codingTableName, std::string _gradingPTableName, std::string _gradingRTableName) 
+  : codingTableMode(_codingTableMode),
+  codingTable(),
+  codingTableName(_codingTableName),
+  gradingPTableMode(_gradingPTableMode),
+  gradingPTable(),
+  gradingPTableName(_gradingPTableName),
+  gradingRTableMode(_gradingRTableMode),
+  gradingRTable(),
+  gradingRTableName(_gradingRTableName),
+  analyser(NULL)
+{
 
-	analyser = NULL;
+  //	analyser = NULL;
 
-	init(codingTableMode, gradingPTableMode, gradingRTableMode, codingTableName, gradingPTableName, gradingRTableName);
+	init(_codingTableMode, _gradingPTableMode, _gradingRTableMode, _codingTableName, _gradingPTableName, _gradingRTableName);
 
 }
 
@@ -365,11 +387,11 @@ tables::~tables() {
  * method initializes the tables								*
  * **************************************************************/
 
-void tables::initCoding(int codingTableMode, std::string codingTableName) {
+void tables::initCoding(int _codingTableMode, std::string _codingTableName) {
 
-	this->codingTableMode   = codingTableMode;
+	this->codingTableMode   = _codingTableMode;
 	codingTable.clear();
-	this->codingTableName   = codingTableName;
+	this->codingTableName   = _codingTableName;
 
 	switch (this->codingTableMode) {
 
@@ -392,11 +414,11 @@ void tables::initCoding(int codingTableMode, std::string codingTableName) {
 	}
 
 }
-void tables::initGradingP(int gradingPTableMode, std::string gradingPTableName) {
+void tables::initGradingP(int _gradingPTableMode, std::string _gradingPTableName) {
 
-	this->gradingPTableMode = gradingPTableMode;
+	this->gradingPTableMode = _gradingPTableMode;
 	gradingPTable.clear();
-	this->gradingPTableName = gradingPTableName;
+	this->gradingPTableName = _gradingPTableName;
 
 	switch (this->gradingPTableMode) {
 
@@ -430,11 +452,11 @@ void tables::initGradingP(int gradingPTableMode, std::string gradingPTableName) 
 	}
 
 }
-void tables::initGradingR(int gradingRTableMode, std::string gradingRTableName) {
+void tables::initGradingR(int _gradingRTableMode, std::string _gradingRTableName) {
 
-	this->gradingRTableMode = gradingRTableMode;
+	this->gradingRTableMode = _gradingRTableMode;
 	gradingRTable.clear();
-	this->gradingRTableName = gradingRTableName;
+	this->gradingRTableName = _gradingRTableName;
 
 	switch (this->gradingRTableMode) {
 
@@ -457,11 +479,11 @@ void tables::initGradingR(int gradingRTableMode, std::string gradingRTableName) 
 	}
 
 }
-void tables::init(int codingTableMode, int gradingPTableMode, int gradingRTableMode, std::string codingTableName, std::string gradingPTableName, std::string gradingRTableName) {
+void tables::init(int _codingTableMode, int _gradingPTableMode, int _gradingRTableMode, std::string _codingTableName, std::string _gradingPTableName, std::string _gradingRTableName) {
 
-	initGradingP(gradingPTableMode, gradingPTableName);
-	initCoding(codingTableMode, codingTableName);
-	initGradingR(gradingRTableMode, gradingRTableName);
+	initGradingP(_gradingPTableMode, _gradingPTableName);
+	initCoding(_codingTableMode, _codingTableName);
+	initGradingR(_gradingRTableMode, _gradingRTableName);
 
 }
 
@@ -484,9 +506,9 @@ void tables::update() {
  * LUTGOODNESSTABLE and ONLINETABLE								*
  * **************************************************************/
 
-void tables::setAnalyser(analysis* analyser) {
+void tables::setAnalyser(analysis* _analyser) {
 
-	this->analyser = analyser;
+	this->analyser = _analyser;
 
 }
 

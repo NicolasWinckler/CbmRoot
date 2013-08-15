@@ -280,9 +280,9 @@ void tableFile::setHeaderDefValues() {
  * - memoryAllocationError										*
  ****************************************************************/
 
-tableFile::tableFile() : io() {
+tableFile::tableFile() : io(), header(), localMemory(false) {
 
-	localMemory = false;
+  //	localMemory = false;
 
 	init();
 

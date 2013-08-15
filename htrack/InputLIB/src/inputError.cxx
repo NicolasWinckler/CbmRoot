@@ -64,9 +64,12 @@ inputError::~inputError() {
  * Default constructor											*
  ****************************************************************/
 
-eventNotFoundError::eventNotFoundError() : inputError() {
+eventNotFoundError::eventNotFoundError() 
+  : inputError(),
+    eventID(0)
+{
 
-	eventID = 0;
+  //	eventID = 0;
 
 }
 
@@ -74,9 +77,12 @@ eventNotFoundError::eventNotFoundError() : inputError() {
  * Constructor													*
  ****************************************************************/
 
-eventNotFoundError::eventNotFoundError(int event) : inputError() {
+eventNotFoundError::eventNotFoundError(int event) 
+  : inputError(),
+    eventID(event)
+{
 
-	eventID = event;
+  //	eventID = event;
 
 }
 
@@ -114,10 +120,14 @@ void eventNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-zeroTracksOrHitsError::zeroTracksOrHitsError() : inputError() {
+zeroTracksOrHitsError::zeroTracksOrHitsError() 
+  : inputError(), 
+    numberOfTracks(0),
+    numberOfHits(0)
+{
 
-	numberOfTracks = 0;
-	numberOfHits   = 0;
+  //	numberOfTracks = 0;
+  //	numberOfHits   = 0;
 
 }
 
@@ -125,10 +135,15 @@ zeroTracksOrHitsError::zeroTracksOrHitsError() : inputError() {
  * Constructor													*
  ****************************************************************/
 
-zeroTracksOrHitsError::zeroTracksOrHitsError(int tracks, int hits) : inputError() {
+zeroTracksOrHitsError::zeroTracksOrHitsError(int tracks, int hits) 
+  : inputError(),
+    numberOfTracks(tracks),
+    numberOfHits(hits)
 
-	numberOfTracks = tracks;
-	numberOfHits   = hits;
+{
+
+  //	numberOfTracks = tracks;
+  //	numberOfHits   = hits;
 
 }
 
@@ -169,9 +184,12 @@ void zeroTracksOrHitsError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-detectorNodeNotFoundError::detectorNodeNotFoundError() : inputError() {
+detectorNodeNotFoundError::detectorNodeNotFoundError() 
+  : inputError(),
+    nodeName()
+{
 
-	nodeName.clear();
+  //	nodeName.clear();
 
 }
 
@@ -179,9 +197,12 @@ detectorNodeNotFoundError::detectorNodeNotFoundError() : inputError() {
  * Constructor													*
  ****************************************************************/
 
-detectorNodeNotFoundError::detectorNodeNotFoundError(std::string actualNodeName) : inputError() {
+detectorNodeNotFoundError::detectorNodeNotFoundError(std::string actualNodeName) 
+  : inputError(),
+    nodeName(actualNodeName) 
+{
 
-	nodeName = actualNodeName;
+  //	nodeName = actualNodeName;
 
 }
 
@@ -217,9 +238,12 @@ void detectorNodeNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noTrackInFileError::noTrackInFileError() : inputError() {
+noTrackInFileError::noTrackInFileError() 
+  : inputError(), 
+    branchName()
+{
 
-	branchName.clear();
+  //	branchName.clear();
 
 }
 
@@ -227,9 +251,12 @@ noTrackInFileError::noTrackInFileError() : inputError() {
  * Constructor													*
  ****************************************************************/
 
-noTrackInFileError::noTrackInFileError(std::string actualBranchName) : inputError() {
+noTrackInFileError::noTrackInFileError(std::string actualBranchName) 
+  : inputError(),
+    branchName(actualBranchName)
+{
 
-	branchName = actualBranchName;
+  //	branchName = actualBranchName;
 
 }
 
@@ -265,9 +292,12 @@ void noTrackInFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noPointInFileError::noPointInFileError() : inputError() {
+noPointInFileError::noPointInFileError() 
+  : inputError(),
+    branchNamePoint()
+{
 
-	branchNamePoint.clear();
+  //	branchNamePoint.clear();
 
 }
 
@@ -275,9 +305,12 @@ noPointInFileError::noPointInFileError() : inputError() {
  * Constructor													*
  ****************************************************************/
 
-noPointInFileError::noPointInFileError(std::string actualBranchNamePoint) : inputError() {
+noPointInFileError::noPointInFileError(std::string actualBranchNamePoint) 
+  : inputError(),
+    branchNamePoint(actualBranchNamePoint)
+{
 
-	branchNamePoint = actualBranchNamePoint;
+  //	branchNamePoint = actualBranchNamePoint;
 
 }
 
@@ -313,9 +346,12 @@ void noPointInFileError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-detectorMatrixNotFoundError::detectorMatrixNotFoundError() : inputError() {
+detectorMatrixNotFoundError::detectorMatrixNotFoundError() 
+  : inputError(),
+    nodeName()
+{
 
-	nodeName.clear();
+  //	nodeName.clear();
 
 }
 
@@ -323,9 +359,12 @@ detectorMatrixNotFoundError::detectorMatrixNotFoundError() : inputError() {
  * Constructor													*
  ****************************************************************/
 
-detectorMatrixNotFoundError::detectorMatrixNotFoundError(std::string actualNodeName) : inputError() {
+detectorMatrixNotFoundError::detectorMatrixNotFoundError(std::string actualNodeName) 
+  : inputError(),
+    nodeName(actualNodeName)
+{
 
-	nodeName = actualNodeName;
+  //	nodeName = actualNodeName;
 
 }
 
@@ -361,9 +400,12 @@ void detectorMatrixNotFoundError::errorMsg() {
  * Default constructor											*
  ****************************************************************/
 
-detectorTranslationNotFoundError::detectorTranslationNotFoundError() : inputError() {
+detectorTranslationNotFoundError::detectorTranslationNotFoundError() 
+  : inputError(), 
+    nodeName()
+{
 
-	nodeName.clear();
+  //	nodeName.clear();
 
 }
 
@@ -371,9 +413,12 @@ detectorTranslationNotFoundError::detectorTranslationNotFoundError() : inputErro
  * Constructor													*
  ****************************************************************/
 
-detectorTranslationNotFoundError::detectorTranslationNotFoundError(std::string actualNodeName) : inputError() {
+detectorTranslationNotFoundError::detectorTranslationNotFoundError(std::string actualNodeName) 
+  : inputError(),
+    nodeName(actualNodeName)
+{
 
-	nodeName = actualNodeName;
+  //	nodeName = actualNodeName;
 
 }
 

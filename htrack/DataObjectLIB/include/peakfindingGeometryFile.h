@@ -42,11 +42,12 @@
 /*
  * struct consisting of all parameters which should be read from file
  */
-typedef struct {
+struct peakfindingGeometryFileHeader {
+peakfindingGeometryFileHeader() : name(), numberOfEntries(0), percentageOfCoverage(0) {};
 	std::string    name;					/**< Variable to store the name of the peakfinding geometry */
 	unsigned long  numberOfEntries;			/**< Variable to store the number of entries of the lut */
 	unsigned short percentageOfCoverage;	/**< Variable to store the percentage of coverage for the peak finding geometry. */
-} peakfindingGeometryFileHeader;
+};
 
 
 /* **************************************************************

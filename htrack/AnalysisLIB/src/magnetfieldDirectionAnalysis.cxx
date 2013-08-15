@@ -255,7 +255,19 @@ void magnetfieldDirectionAnalysis::writeDisplay(TGraph* display, magnetfieldDisp
  * Default constructor											*
  ****************************************************************/
 
-magnetfieldDirectionAnalysis::magnetfieldDirectionAnalysis() {
+magnetfieldDirectionAnalysis::magnetfieldDirectionAnalysis() 
+ : bxDisplay(NULL),
+   bxMagnetfieldDisplayInfo(),
+   byDisplay(NULL),
+   byMagnetfieldDisplayInfo(),
+   bzDisplay(NULL),
+   bzMagnetfieldDisplayInfo(),
+   windowPadColumn(0),
+   bxWindowPadRow((unsigned short)-1),
+   byWindowPadRow((unsigned short)-1),
+   bzWindowPadRow((unsigned short)-1),
+   writeToFile(false)
+{
 
 	bxDisplay                                   = NULL;
 	bxMagnetfieldDisplayInfo.constValDim1       = 0;

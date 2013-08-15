@@ -40,9 +40,9 @@
  * Default constructor											*
  ****************************************************************/
 
-findableTrack::findableTrack() {
+findableTrack::findableTrack() : mcTrack(NULL), position() {
 
-	mcTrack = NULL;
+  //	mcTrack = NULL;
 
 }
 
@@ -50,16 +50,16 @@ findableTrack::findableTrack() {
  * Constructor													*
  ****************************************************************/
 
-findableTrack::findableTrack(const findableTrack& value) {
+findableTrack::findableTrack(const findableTrack& value) : mcTrack(value.mcTrack), position(value.position) {
 
-	this->mcTrack  = value.mcTrack;
-	this->position = value.position;
+  //	this->mcTrack  = value.mcTrack;
+  //	this->position = value.position;
 
 }
-findableTrack::findableTrack(trackfinderInputTrack* mcTrack, trackCoordinates& position) {
+findableTrack::findableTrack(trackfinderInputTrack* _mcTrack, trackCoordinates& _position) : mcTrack(_mcTrack), position(_position) {
 
-	this->mcTrack  = mcTrack;
-	this->position = position;
+	this->mcTrack  = _mcTrack;
+	this->position = _position;
 
 }
 
@@ -111,9 +111,9 @@ trackCoordinates& findableTrack::getPosition() {
  * Monte Carlo and sets the position in the Hough space			*
  ****************************************************************/
 
-void findableTrack::setParameter(trackfinderInputTrack* mcTrack, trackCoordinates& position) {
+void findableTrack::setParameter(trackfinderInputTrack* _mcTrack, trackCoordinates& _position) {
 
-	this->mcTrack  = mcTrack;
-	this->position = position;
+	this->mcTrack  = _mcTrack;
+	this->position = _position;
 
 }

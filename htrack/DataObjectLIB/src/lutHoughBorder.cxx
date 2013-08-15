@@ -45,9 +45,9 @@
  * Default constructor											*
  ****************************************************************/
 
-lutHoughBorder::lutHoughBorder() {
+lutHoughBorder::lutHoughBorder() : houghCoord() {
 
-	houghCoord.clear();
+  	houghCoord.clear();
 
 }
 
@@ -55,9 +55,9 @@ lutHoughBorder::lutHoughBorder() {
  * Constructor													*
  ****************************************************************/
 
-lutHoughBorder::lutHoughBorder(const lutHoughBorder& value) {
+lutHoughBorder::lutHoughBorder(const lutHoughBorder& value) : houghCoord(value.houghCoord) {
 
-	this->houghCoord = value.houghCoord;
+  //	this->houghCoord = value.houghCoord;
 
 }
 

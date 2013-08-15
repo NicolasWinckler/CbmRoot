@@ -40,35 +40,33 @@
  * Default constructor											*
  ****************************************************************/
 
-trackDigitalInformation::trackDigitalInformation() {
-
-	position = trackCoordinates(0, 0, 0);
-	value    = bitArray(0);
-
 #ifndef NOANALYSIS
-
-	hits     = hitArray();
-
-#endif
-
+trackDigitalInformation::trackDigitalInformation() 
+  : position(trackCoordinates(0, 0, 0)), value(bitArray(0)), hits(hitArray()) 
+{  
 }
+#else
+trackDigitalInformation::trackDigitalInformation() 
+  : position(trackCoordinates(0, 0, 0)), value(bitArray(0))
+{  
+}
+#endif
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackDigitalInformation::trackDigitalInformation(const trackDigitalInformation& value) {
-
-	this->position = value.position;
-	this->value    = value.value;
-
 #ifndef NOANALYSIS
-
-	this->hits     = value.hits;
-
-#endif
-
+trackDigitalInformation::trackDigitalInformation(const trackDigitalInformation& _value) 
+  : position(_value.position), value(_value.value), hits(_value.hits) 
+{
 }
+#else
+trackDigitalInformation::trackDigitalInformation(const trackDigitalInformation& _value) 
+  : position(_value.position), value(_value.value) 
+{
+}
+#endif
 
 /****************************************************************
  * Destructor													*
@@ -82,14 +80,14 @@ trackDigitalInformation::~trackDigitalInformation() {
  * operator = ()												*
  ****************************************************************/
 
-const trackDigitalInformation& trackDigitalInformation::operator = (const trackDigitalInformation& value) {
+const trackDigitalInformation& trackDigitalInformation::operator = (const trackDigitalInformation& _value) {
 
-	this->position = value.position;
-	this->value    = value.value;
+	this->position = _value.position;
+	this->value    = _value.value;
 
 #ifndef NOANALYSIS
 
-	this->hits     = value.hits;
+	this->hits     = _value.hits;
 
 #endif
 

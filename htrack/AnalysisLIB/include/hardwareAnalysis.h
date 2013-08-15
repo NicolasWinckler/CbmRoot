@@ -43,6 +43,10 @@
 
 class hardwareAnalysis {
 
+ private:
+  hardwareAnalysis(const hardwareAnalysis&);
+  hardwareAnalysis& operator=(const hardwareAnalysis&);
+
 protected:
 
 	unsigned int  numberOfColumns;							/**< Variable to store the number of entries for all column distributions. */

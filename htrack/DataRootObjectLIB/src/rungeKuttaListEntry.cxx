@@ -41,12 +41,12 @@
  * Default constructor											*
  ****************************************************************/
 
-rungeKuttaListEntry::rungeKuttaListEntry() {
+rungeKuttaListEntry::rungeKuttaListEntry() : position(), hits() {
 
-	position.set(0, DIM1);
-	position.set(0, DIM2);
-	position.set(0, DIM3);
-	hits.clear();
+  //	position.set(0, DIM1);
+  //	position.set(0, DIM2);
+  //	position.set(0, DIM3);
+  //	hits.clear();
 
 }
 
@@ -54,7 +54,8 @@ rungeKuttaListEntry::rungeKuttaListEntry() {
  * Constructor													*
  ****************************************************************/
 
-rungeKuttaListEntry::rungeKuttaListEntry(const rungeKuttaListEntry& value) {
+rungeKuttaListEntry::rungeKuttaListEntry(const rungeKuttaListEntry& value) 
+ : position(value.position), hits(value.hits) {
 
 	this->position = value.position;
 	this->hits     = value.hits;

@@ -47,6 +47,10 @@
 
 class houghPictures {
 
+ private:
+  houghPictures(const houghPictures&);
+  houghPictures& operator=(const houghPictures&);
+
 protected:
 
 	TCanvas**      window;

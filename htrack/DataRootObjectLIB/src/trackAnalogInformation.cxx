@@ -40,33 +40,38 @@
  * Default constructor											*
  ****************************************************************/
 
-trackAnalogInformation::trackAnalogInformation() {
-
-	position = trackParameter(0, 0, 0);
-
 #ifndef NOANALYSIS
+trackAnalogInformation::trackAnalogInformation() 
+: position(trackParameter(0, 0, 0)), hits() 
+{
+  //	position = trackParameter(0, 0, 0);
+  //	hits     = hitArray();
+}
+#else
+trackAnalogInformation::trackAnalogInformation() : position(trackParameter(0, 0, 0)) {
 
-	hits     = hitArray();
+  //	position = trackParameter(0, 0, 0);
+
 
 #endif
-
-}
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackAnalogInformation::trackAnalogInformation(const trackAnalogInformation& value) {
-
-	this->position = value.position;
-
 #ifndef NOANALYSIS
-
-	this->hits     = value.hits;
-
-#endif
-
+trackAnalogInformation::trackAnalogInformation(const trackAnalogInformation& value) 
+  : position(value.position), hits(value.hits)
+{
+  //	this->position = value.position;
+  //	this->hits     = value.hits;
 }
+#else
+trackAnalogInformation::trackAnalogInformation(const trackAnalogInformation& value) 
+  : position(value.position),
+{
+  //	this->position = value.position;
+#endif
 
 /****************************************************************
  * Destructor													*

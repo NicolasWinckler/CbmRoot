@@ -54,15 +54,16 @@
 /**
  * struct stores the basic information for one display
  */
-typedef struct {
+struct projectionEFGCNDisplayInfo{
 
+projectionEFGCNDisplayInfo() : numberOfXBins(0), numberOfYBins(0), baseName(), baseTitle(), subDirName() {};
 	int            numberOfXBins;		/**< Variable stores the steps of the grid in x-dimension */
 	int            numberOfYBins;		/**< Variable stores the steps of the grid in y-dimension */
 	std::string    baseName;			/**< Variable stores the basic name for the display which is constant over all events */
 	std::string    baseTitle;			/**< Variable stores the basic title for the display which is constant over all events */
 	std::string    subDirName;			/**< Variable stores the name of the subdirectory to store the analysis results */
 
-} projectionEFGCNDisplayInfo;
+};
 
 
 /* **************************************************************
@@ -70,6 +71,10 @@ typedef struct {
  * **************************************************************/
 
 class projectionEFGCNAnalysis {
+
+ private:
+  projectionEFGCNAnalysis(const projectionEFGCNAnalysis&);
+  projectionEFGCNAnalysis& operator=(const projectionEFGCNAnalysis&);
 
 protected:
 

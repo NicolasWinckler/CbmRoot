@@ -37,10 +37,10 @@
  * Default constructor											*
  ****************************************************************/
 
-tableStringEntry::tableStringEntry() {
+tableStringEntry::tableStringEntry() : signature(), classification() {
 
-	signature.clear();
-	classification.clear();
+  //	signature.clear();
+  //	classification.clear();
 
 }
 
@@ -48,10 +48,10 @@ tableStringEntry::tableStringEntry() {
  * Copy constructor
  ****************************************************************/
 
-tableStringEntry::tableStringEntry(const tableStringEntry& value) {
+tableStringEntry::tableStringEntry(const tableStringEntry& value) : signature(value.signature), classification(value.classification) {
 
-	signature      = value.signature;
-	classification = value.classification;
+  //	signature      = value.signature;
+  //	classification = value.classification;
 
 }
 
@@ -173,11 +173,11 @@ void tableStringEntry::setClassification(std::string& value) {
 
 void tableStringEntry::setup(tableEntry& value) {
 
-	std::string signature;
-	std::string classification;
+	std::string _signature;
+	std::string _classification;
 
-	signature      = value.getSignature().toString(2);
-	classification = value.getClassification().toString(10);
+	_signature      = value.getSignature().toString(2);
+	_classification = value.getClassification().toString(10);
 	
 	setSignature(signature);
 	setClassification(classification);

@@ -47,6 +47,9 @@ private:
 	void*          data;			/**< Pointer to the data which should be accessed */
 	unsigned long  numberOfData;	/**< Variable to store the size of the data */
 
+	//	io(const io&);
+	//	io operator=(const io&);
+
 protected:
 
 /**
@@ -96,6 +99,8 @@ protected:
 
 	virtual std::string setDataValue(unsigned long index) = 0;
 
+	io(const io&);
+	io& operator=(const io&);
 public:
 
 /**

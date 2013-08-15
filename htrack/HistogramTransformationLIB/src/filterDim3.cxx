@@ -61,12 +61,12 @@ filterDim3::filterDim3() : filterDimZ() {
  * Constructor													*
  ****************************************************************/
 
-filterDim3::filterDim3( trackData**    tracks,
+filterDim3::filterDim3( trackData**    _tracks,
 						unsigned short  filterArithmetic,
 						unsigned short size,
 						unsigned short localSize,
 						bitArray maximumClass) : filterDimZ(
-						tracks, size, localSize) {
+						_tracks, size, localSize) {
 
 	switch(filterArithmetic) {
 
@@ -115,7 +115,7 @@ filterDim3::~filterDim3() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void filterDim3::init( trackData**    tracks,
+void filterDim3::init( trackData**    _tracks,
 					   unsigned short  filterArithmetic,
 					   unsigned short size,
 					   unsigned short localSize,
@@ -132,7 +132,7 @@ void filterDim3::init( trackData**    tracks,
 	}
 
 	/* set new parameter */
-	filterDimZ::init(tracks, size, localSize);
+	filterDimZ::init(_tracks, size, localSize);
 
 	switch(filterArithmetic) {
 
@@ -228,10 +228,10 @@ void filterDim3::filter(std::streambuf* terminal) {
 					continue;
 				}
 
-				for (trackLayer::iterator filter = trackAccess[j].begin; filter != trackAccess[j].end; filter++) {
+				for (trackLayer::iterator _filter = trackAccess[j].begin; _filter != trackAccess[j].end; _filter++) {
 
 					elementCoordinate    = element->position.get(DIM1);
-					filterCoordinate     = filter->position.get(DIM1);
+					filterCoordinate     = _filter->position.get(DIM1);
 					if (filterCoordinate == elementCoordinate)
 						dim1Reset = true;
 					else
@@ -241,14 +241,14 @@ void filterDim3::filter(std::streambuf* terminal) {
 						continue;
 
 					elementCoordinate    = element->position.get(DIM2);
-					filterCoordinate     = filter->position.get(DIM2);
+					filterCoordinate     = _filter->position.get(DIM2);
 					if (filterCoordinate == elementCoordinate)
 						dim2Reset = true;
 					else
 						dim2Reset = false;
 
 					if (dim1Reset && dim2Reset) {
-						filterMem[j] = filter->value;
+						filterMem[j] = _filter->value;
 						break;
 					}
 

@@ -188,31 +188,51 @@ void trackfinderInputData::initMagneticField() {
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputData::trackfinderInputData() : TObject() {
-
+trackfinderInputData::trackfinderInputData() 
+  : TObject(),
+    eventNumber(0),
+    hits(NULL),
+    tracks(NULL),
+    detector(NULL),
+    magneticField(NULL),
+    trackFromId(),
+    numberOfHitsWithWrongTrackId(0)
+{
+  /*
 	eventNumber                  = 0;
 	hits                         = NULL;
 	tracks                       = NULL;
 	detector                     = NULL;
 	magneticField                = NULL;
+  */
 	trackFromId.maxEntry         = 0;
 	trackFromId.list             = NULL;
+	/*
 	numberOfHitsWithWrongTrackId = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputData::trackfinderInputData(const trackfinderInputData& value) : TObject(value) {
+trackfinderInputData::trackfinderInputData(const trackfinderInputData& value) 
+  : TObject(value),
+    eventNumber(value.eventNumber),
+    hits(NULL),
+    tracks(NULL),
+    detector(new trackfinderInputDetector(*value.detector)),
+    magneticField(NULL),
+    trackFromId(),
+    numberOfHitsWithWrongTrackId(value.numberOfHitsWithWrongTrackId)
+ {
 
 	int i;
 
 	this->initHits();
 	this->initTracks();
 
-	this->eventNumber                  = value.eventNumber;
+	//	this->eventNumber                  = value.eventNumber;
 
 	if (value.hits == NULL) {
 
@@ -246,12 +266,12 @@ trackfinderInputData::trackfinderInputData(const trackfinderInputData& value) : 
 
 	}
 
-	this->detector                     = new trackfinderInputDetector(*value.detector);
+	//	this->detector                     = new trackfinderInputDetector(*value.detector);
 	this->initMagneticField();
 	*(this->magneticField)             = *value.magneticField;
 	this->trackFromId.maxEntry         = value.trackFromId.maxEntry;
 	this->trackFromId.list             = value.trackFromId.list;
-	this->numberOfHitsWithWrongTrackId = value.numberOfHitsWithWrongTrackId;
+	//	this->numberOfHitsWithWrongTrackId = value.numberOfHitsWithWrongTrackId;
 
 }
 

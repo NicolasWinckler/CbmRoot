@@ -45,7 +45,10 @@ enum {SOFTWAREFORMAT, HARDWAREFORMAT};
 /*
  * struct consisting of all parameters which should be read from file
  */
-typedef struct {
+struct lutAccessFileHeader {
+
+lutAccessFileHeader() : name(), usage(), format(0), numberOfEntries(0), dim1Min(0.), dim1Max(0.), dim1Step(0.), dim2Min(0.), dim2Max(0.), dim2Step(0.) {};
+
 	std::string    name;					/**< Variable to store the name of the lut */
 	std::string    usage;					/**< Variable to store the usage of the lut */
 	unsigned short format;					/**< Variable to store the format of the file */
@@ -56,7 +59,7 @@ typedef struct {
 	double         dim2Min;					/**< Variable to store the minimal value for the second dimension to compute the prelut value. */
 	double         dim2Max;					/**< Variable to store the maximal value for the second dimension to compute the prelut value. */
 	int            dim2Step;				/**< Variable to store the stepwidth of the second dimension. */
-} lutAccessFileHeader;
+};
 
 
 /* **************************************************************

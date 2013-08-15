@@ -88,9 +88,12 @@ void analysisWarningMsg::printMsg(std::string message) {
  * Default constructor											*
  ****************************************************************/
 
-trackNotFoundWarningMsg::trackNotFoundWarningMsg() : analysisWarningMsg() {
+trackNotFoundWarningMsg::trackNotFoundWarningMsg() 
+  : analysisWarningMsg(),
+    track(NULL)
+{
 
-	track = NULL;
+  //	track = NULL;
 
 }
 
@@ -98,9 +101,12 @@ trackNotFoundWarningMsg::trackNotFoundWarningMsg() : analysisWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-trackNotFoundWarningMsg::trackNotFoundWarningMsg(trackfinderInputTrack* actualTrack) : analysisWarningMsg() {
+trackNotFoundWarningMsg::trackNotFoundWarningMsg(trackfinderInputTrack* actualTrack) 
+  : analysisWarningMsg(),
+    track(actualTrack)
+{
 
-	track = actualTrack;
+  //	track = actualTrack;
 
 }
 
@@ -149,7 +155,6 @@ void trackNotFoundWarningMsg::warningMsg() {
 	printMsg(temp);
 
 }
-
 
 /****************************************************************
  * CLASS displayAnalyserNotFoundWarningMsg		 				*
@@ -469,9 +474,12 @@ void cannotGetDisplayEntriesWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-noHitInDetectorStationWarningMsg::noHitInDetectorStationWarningMsg() : analysisWarningMsg() {
+noHitInDetectorStationWarningMsg::noHitInDetectorStationWarningMsg() 
+  : analysisWarningMsg(),
+    index((unsigned short)-1)
+{
 
-	index = (unsigned short)-1;
+  //	index = (unsigned short)-1;
 
 }
 
@@ -479,9 +487,12 @@ noHitInDetectorStationWarningMsg::noHitInDetectorStationWarningMsg() : analysisW
  * Constructor													*
  ****************************************************************/
 
-noHitInDetectorStationWarningMsg::noHitInDetectorStationWarningMsg(unsigned short actualIndex) : analysisWarningMsg() {
+noHitInDetectorStationWarningMsg::noHitInDetectorStationWarningMsg(unsigned short actualIndex) 
+  : analysisWarningMsg(),
+    index(actualIndex)
+{
 
-	index = actualIndex;
+  //	index = actualIndex;
 
 }
 
@@ -612,9 +623,12 @@ void enableJustOneDisplayWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotSetPointWarningMsg::cannotSetPointWarningMsg() : analysisWarningMsg() {
+cannotSetPointWarningMsg::cannotSetPointWarningMsg() 
+  : analysisWarningMsg(),
+    index(0)
+{
 
-	index = 0;
+  //	index = 0;
 
 }
 
@@ -622,9 +636,12 @@ cannotSetPointWarningMsg::cannotSetPointWarningMsg() : analysisWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-cannotSetPointWarningMsg::cannotSetPointWarningMsg(int index) : analysisWarningMsg() {
+cannotSetPointWarningMsg::cannotSetPointWarningMsg(int _index) 
+  : analysisWarningMsg(),
+    index(_index)
+{
 
-	this->index = index;
+  //	this->index = _index;
 
 }
 
@@ -662,10 +679,14 @@ void cannotSetPointWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-positionIsOutOfSpaceWarningMsg::positionIsOutOfSpaceWarningMsg() : analysisWarningMsg() {
+positionIsOutOfSpaceWarningMsg::positionIsOutOfSpaceWarningMsg() 
+  : analysisWarningMsg(),
+    space(NULL),
+    coordinates(NULL)
+{
 
-	space       = NULL;
-	coordinates = NULL;
+  //	space       = NULL;
+  //	coordinates = NULL;
 
 }
 
@@ -673,10 +694,14 @@ positionIsOutOfSpaceWarningMsg::positionIsOutOfSpaceWarningMsg() : analysisWarni
  * Constructor													*
  ****************************************************************/
 
-positionIsOutOfSpaceWarningMsg::positionIsOutOfSpaceWarningMsg(histogramSpace* space, trackCoordinates* coordinates) : analysisWarningMsg() {
+positionIsOutOfSpaceWarningMsg::positionIsOutOfSpaceWarningMsg(histogramSpace* _space, trackCoordinates* _coordinates) 
+  : analysisWarningMsg(),
+    space(_space),
+    coordinates(_coordinates)
+{
 
-	this->space       = space;
-	this->coordinates = coordinates;
+  //	this->space       = _space;
+  //	this->coordinates = _coordinates;
 
 }
 
@@ -737,9 +762,12 @@ void positionIsOutOfSpaceWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfWrongThirdDimensionBordersFoundWarningMsg::numberOfWrongThirdDimensionBordersFoundWarningMsg() : analysisWarningMsg() {
+numberOfWrongThirdDimensionBordersFoundWarningMsg::numberOfWrongThirdDimensionBordersFoundWarningMsg() 
+  : analysisWarningMsg(),
+    number(0)
+{
 
-	number = 0;
+  //	number = 0;
 
 }
 
@@ -747,9 +775,12 @@ numberOfWrongThirdDimensionBordersFoundWarningMsg::numberOfWrongThirdDimensionBo
  * Constructor													*
  ****************************************************************/
 
-numberOfWrongThirdDimensionBordersFoundWarningMsg::numberOfWrongThirdDimensionBordersFoundWarningMsg(int number) : analysisWarningMsg() {
+numberOfWrongThirdDimensionBordersFoundWarningMsg::numberOfWrongThirdDimensionBordersFoundWarningMsg(int _number) 
+  : analysisWarningMsg(),
+    number(_number)
+{
 
-	this->number = number;
+  //	this->number = _number;
 
 }
 
@@ -787,10 +818,14 @@ void numberOfWrongThirdDimensionBordersFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-setMagnetfieldFactorWarningMsg::setMagnetfieldFactorWarningMsg() : analysisWarningMsg() {
+setMagnetfieldFactorWarningMsg::setMagnetfieldFactorWarningMsg() 
+  : analysisWarningMsg(),
+    stationIndex(0),
+    magnetfieldFactor(0)
+{
 
-	stationIndex      = 0;
-	magnetfieldFactor = 0;
+  //	stationIndex      = 0;
+  //	magnetfieldFactor = 0;
 
 }
 
@@ -798,10 +833,14 @@ setMagnetfieldFactorWarningMsg::setMagnetfieldFactorWarningMsg() : analysisWarni
  * Constructor													*
  ****************************************************************/
 
-setMagnetfieldFactorWarningMsg::setMagnetfieldFactorWarningMsg(unsigned short stationIndex, double magnetfieldFactor) : analysisWarningMsg() {
+setMagnetfieldFactorWarningMsg::setMagnetfieldFactorWarningMsg(unsigned short _stationIndex, double _magnetfieldFactor) 
+  : analysisWarningMsg(),
+    stationIndex(_stationIndex),
+    magnetfieldFactor(_magnetfieldFactor)
+{
 
-	this->stationIndex      = stationIndex;
-	this->magnetfieldFactor = magnetfieldFactor;
+  //	this->stationIndex      = _stationIndex;
+  //	this->magnetfieldFactor = _magnetfieldFactor;
 
 }
 
@@ -843,10 +882,14 @@ void setMagnetfieldFactorWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-setPrelutRangeWarningMsg::setPrelutRangeWarningMsg() : analysisWarningMsg() {
+setPrelutRangeWarningMsg::setPrelutRangeWarningMsg() 
+  : analysisWarningMsg(),
+    rangeStart(0),
+    rangeStop(0)
+{
 
-	rangeStart = 0;
-	rangeStop  = 0;
+  //	rangeStart = 0;
+  //	rangeStop  = 0;
 
 }
 
@@ -854,10 +897,14 @@ setPrelutRangeWarningMsg::setPrelutRangeWarningMsg() : analysisWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-setPrelutRangeWarningMsg::setPrelutRangeWarningMsg(double rangeStart, double rangeStop) : analysisWarningMsg() {
+setPrelutRangeWarningMsg::setPrelutRangeWarningMsg(double _rangeStart, double _rangeStop) 
+  : analysisWarningMsg(),
+    rangeStart(_rangeStart),
+    rangeStop(_rangeStop)
+{
 
-	this->rangeStart = rangeStart;
-	this->rangeStop  = rangeStop;
+  //	this->rangeStart = _rangeStart;
+  //	this->rangeStop  = _rangeStop;
 
 }
 
@@ -898,10 +945,14 @@ void setPrelutRangeWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-analysisLutCorrectionWarningMsg::analysisLutCorrectionWarningMsg() : analysisWarningMsg() {
+analysisLutCorrectionWarningMsg::analysisLutCorrectionWarningMsg() 
+  : analysisWarningMsg(),
+    borderCorrections(0),
+    borderPosCorrections(0)
+{
 
-	borderCorrections    = 0;
-	borderPosCorrections = 0;
+  //	borderCorrections    = 0;
+  //	borderPosCorrections = 0;
 
 }
 
@@ -909,10 +960,14 @@ analysisLutCorrectionWarningMsg::analysisLutCorrectionWarningMsg() : analysisWar
  * Constructor													*
  ****************************************************************/
 
-analysisLutCorrectionWarningMsg::analysisLutCorrectionWarningMsg(unsigned long corrections, unsigned long posCorrections) : analysisWarningMsg() {
+analysisLutCorrectionWarningMsg::analysisLutCorrectionWarningMsg(unsigned long corrections, unsigned long posCorrections) 
+  : analysisWarningMsg(),
+    borderCorrections(corrections),
+    borderPosCorrections(posCorrections)
+{
 
-	borderCorrections    = corrections;
-	borderPosCorrections = posCorrections;
+  //	borderCorrections    = corrections;
+  //	borderPosCorrections = posCorrections;
 
 }
 
@@ -1018,10 +1073,14 @@ void cannotUseToRootBeforeInitializingWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithHitsInCorrectLayerDistributionWarningMsg::trackWithHitsInCorrectLayerDistributionWarningMsg() : analysisWarningMsg() {
+trackWithHitsInCorrectLayerDistributionWarningMsg::trackWithHitsInCorrectLayerDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -1029,10 +1088,14 @@ trackWithHitsInCorrectLayerDistributionWarningMsg::trackWithHitsInCorrectLayerDi
  * Constructor													*
  ****************************************************************/
 
-trackWithHitsInCorrectLayerDistributionWarningMsg::trackWithHitsInCorrectLayerDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithHitsInCorrectLayerDistributionWarningMsg::trackWithHitsInCorrectLayerDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -1123,10 +1186,14 @@ void trackWithHitsInCorrectLayerDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithHitsWithCorrectSlopeDistributionWarningMsg::trackWithHitsWithCorrectSlopeDistributionWarningMsg() : analysisWarningMsg() {
+trackWithHitsWithCorrectSlopeDistributionWarningMsg::trackWithHitsWithCorrectSlopeDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -1134,10 +1201,14 @@ trackWithHitsWithCorrectSlopeDistributionWarningMsg::trackWithHitsWithCorrectSlo
  * Constructor													*
  ****************************************************************/
 
-trackWithHitsWithCorrectSlopeDistributionWarningMsg::trackWithHitsWithCorrectSlopeDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithHitsWithCorrectSlopeDistributionWarningMsg::trackWithHitsWithCorrectSlopeDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -1228,10 +1299,14 @@ void trackWithHitsWithCorrectSlopeDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithHitsInLayerDistributionWarningMsg::trackWithHitsInLayerDistributionWarningMsg() : analysisWarningMsg() {
+trackWithHitsInLayerDistributionWarningMsg::trackWithHitsInLayerDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -1239,10 +1314,14 @@ trackWithHitsInLayerDistributionWarningMsg::trackWithHitsInLayerDistributionWarn
  * Constructor													*
  ****************************************************************/
 
-trackWithHitsInLayerDistributionWarningMsg::trackWithHitsInLayerDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithHitsInLayerDistributionWarningMsg::trackWithHitsInLayerDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -1364,10 +1443,14 @@ void arrayToDisplayIsNotAccessibleWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithSignatureDistributionWarningMsg::trackWithSignatureDistributionWarningMsg() : analysisWarningMsg() {
+trackWithSignatureDistributionWarningMsg::trackWithSignatureDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -1375,10 +1458,14 @@ trackWithSignatureDistributionWarningMsg::trackWithSignatureDistributionWarningM
  * Constructor													*
  ****************************************************************/
 
-trackWithSignatureDistributionWarningMsg::trackWithSignatureDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithSignatureDistributionWarningMsg::trackWithSignatureDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -1455,10 +1542,14 @@ void trackWithSignatureDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithHitsInCorrectCellDistributionWarningMsg::trackWithHitsInCorrectCellDistributionWarningMsg() : analysisWarningMsg() {
+trackWithHitsInCorrectCellDistributionWarningMsg::trackWithHitsInCorrectCellDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -1466,10 +1557,14 @@ trackWithHitsInCorrectCellDistributionWarningMsg::trackWithHitsInCorrectCellDist
  * Constructor													*
  ****************************************************************/
 
-trackWithHitsInCorrectCellDistributionWarningMsg::trackWithHitsInCorrectCellDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithHitsInCorrectCellDistributionWarningMsg::trackWithHitsInCorrectCellDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -1546,10 +1641,14 @@ void trackWithHitsInCorrectCellDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithHitsInCellDistributionWarningMsg::trackWithHitsInCellDistributionWarningMsg() : analysisWarningMsg() {
+trackWithHitsInCellDistributionWarningMsg::trackWithHitsInCellDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -1557,10 +1656,14 @@ trackWithHitsInCellDistributionWarningMsg::trackWithHitsInCellDistributionWarnin
  * Constructor													*
  ****************************************************************/
 
-trackWithHitsInCellDistributionWarningMsg::trackWithHitsInCellDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithHitsInCellDistributionWarningMsg::trackWithHitsInCellDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -1637,9 +1740,12 @@ void trackWithHitsInCellDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-middleDistanceOfMaximumAndCorrectCellWarningMsg::middleDistanceOfMaximumAndCorrectCellWarningMsg() : analysisWarningMsg() {
+middleDistanceOfMaximumAndCorrectCellWarningMsg::middleDistanceOfMaximumAndCorrectCellWarningMsg() 
+  : analysisWarningMsg(),
+    distance(0)
+{
 
-	distance = 0;
+  //	distance = 0;
 
 }
 
@@ -1647,9 +1753,12 @@ middleDistanceOfMaximumAndCorrectCellWarningMsg::middleDistanceOfMaximumAndCorre
  * Constructor													*
  ****************************************************************/
 
-middleDistanceOfMaximumAndCorrectCellWarningMsg::middleDistanceOfMaximumAndCorrectCellWarningMsg(double distance) : analysisWarningMsg() {
+middleDistanceOfMaximumAndCorrectCellWarningMsg::middleDistanceOfMaximumAndCorrectCellWarningMsg(double _distance) 
+  : analysisWarningMsg(),
+    distance(_distance)
+{
 
-	this->distance = distance;
+  //	this->distance = _distance;
 
 }
 
@@ -1687,9 +1796,12 @@ void middleDistanceOfMaximumAndCorrectCellWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-middleDistanceOfMaximumAndCorrectLayerWarningMsg::middleDistanceOfMaximumAndCorrectLayerWarningMsg() : analysisWarningMsg() {
+middleDistanceOfMaximumAndCorrectLayerWarningMsg::middleDistanceOfMaximumAndCorrectLayerWarningMsg() 
+  : analysisWarningMsg(),
+    distance(0)
+{
 
-	distance = 0;
+  //	distance = 0;
 
 }
 
@@ -1697,9 +1809,12 @@ middleDistanceOfMaximumAndCorrectLayerWarningMsg::middleDistanceOfMaximumAndCorr
  * Constructor													*
  ****************************************************************/
 
-middleDistanceOfMaximumAndCorrectLayerWarningMsg::middleDistanceOfMaximumAndCorrectLayerWarningMsg(double distance) : analysisWarningMsg() {
+middleDistanceOfMaximumAndCorrectLayerWarningMsg::middleDistanceOfMaximumAndCorrectLayerWarningMsg(double _distance) 
+  : analysisWarningMsg(),
+    distance(_distance)
+{
 
-	this->distance = distance;
+  //	this->distance = _distance;
 
 }
 
@@ -1768,24 +1883,34 @@ void cannotFillNotExistingDisplayWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-displayCannotBeReadFromFileWarningMsg::displayCannotBeReadFromFileWarningMsg() : analysisWarningMsg() {
-
+displayCannotBeReadFromFileWarningMsg::displayCannotBeReadFromFileWarningMsg() 
+  : analysisWarningMsg(),
+    name(),
+    title(),
+    fileName()
+{
+  /*
 	name.clear();
 	title.clear();
 	fileName.clear();
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-displayCannotBeReadFromFileWarningMsg::displayCannotBeReadFromFileWarningMsg(std::string name, std::string title, std::string fileName) : analysisWarningMsg() {
-
-	this->name     = name;
-	this->title    = title;
-	this->fileName = fileName;
-
+displayCannotBeReadFromFileWarningMsg::displayCannotBeReadFromFileWarningMsg(std::string _name, std::string _title, std::string _fileName) 
+  : analysisWarningMsg(),
+    name(_name),
+    title(_title),
+    fileName(_fileName)
+{
+  /*
+	this->name     = _name;
+	this->title    = _title;
+	this->fileName = _fileName;
+  */
 }
 
 /****************************************************************
@@ -1856,10 +1981,14 @@ void displayNotAccessibleWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotWriteNotEnabledLayerWarningMsg::cannotWriteNotEnabledLayerWarningMsg() : analysisWarningMsg() {
+cannotWriteNotEnabledLayerWarningMsg::cannotWriteNotEnabledLayerWarningMsg() 
+  : analysisWarningMsg(),
+    layerToWrite(0),
+    enabledLayer(0)
+{
 
-	layerToWrite = 0;
-	enabledLayer = 0;
+  //	layerToWrite = 0;
+  //	enabledLayer = 0;
 
 }
 
@@ -1867,10 +1996,14 @@ cannotWriteNotEnabledLayerWarningMsg::cannotWriteNotEnabledLayerWarningMsg() : a
  * Constructor													*
  ****************************************************************/
 
-cannotWriteNotEnabledLayerWarningMsg::cannotWriteNotEnabledLayerWarningMsg(unsigned short layerToWrite, unsigned short enabledLayer) : analysisWarningMsg() {
+cannotWriteNotEnabledLayerWarningMsg::cannotWriteNotEnabledLayerWarningMsg(unsigned short _layerToWrite, unsigned short _enabledLayer) 
+  : analysisWarningMsg(),
+    layerToWrite(_layerToWrite),
+    enabledLayer(_enabledLayer)
+{
 
-	this->layerToWrite = layerToWrite;
-	this->enabledLayer = enabledLayer;
+  //	this->layerToWrite = _layerToWrite;
+  //	this->enabledLayer = _enabledLayer;
 
 }
 
@@ -1911,10 +2044,14 @@ void cannotWriteNotEnabledLayerWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-cannotShowNotEnabledLayerWarningMsg::cannotShowNotEnabledLayerWarningMsg() : analysisWarningMsg() {
+cannotShowNotEnabledLayerWarningMsg::cannotShowNotEnabledLayerWarningMsg() 
+  : analysisWarningMsg(),
+    layerToShow(0),
+    enabledLayer(0)
+{
 
-	layerToShow  = 0;
-	enabledLayer = 0;
+  //	layerToShow  = 0;
+  //	enabledLayer = 0;
 
 }
 
@@ -1922,11 +2059,15 @@ cannotShowNotEnabledLayerWarningMsg::cannotShowNotEnabledLayerWarningMsg() : ana
  * Constructor													*
  ****************************************************************/
 
-cannotShowNotEnabledLayerWarningMsg::cannotShowNotEnabledLayerWarningMsg(unsigned short layerToShow, unsigned short enabledLayer) : analysisWarningMsg() {
-
-	this->layerToShow  = layerToShow;
-	this->enabledLayer = enabledLayer;
-
+cannotShowNotEnabledLayerWarningMsg::cannotShowNotEnabledLayerWarningMsg(unsigned short _layerToShow, unsigned short _enabledLayer) 
+  : analysisWarningMsg(),
+    layerToShow(_layerToShow),
+    enabledLayer(_enabledLayer)
+{
+  /*
+	this->layerToShow  = _layerToShow;
+	this->enabledLayer = _enabledLayer;
+  */
 }
 
 /****************************************************************
@@ -1966,24 +2107,34 @@ void cannotShowNotEnabledLayerWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-enableLayerIsOutOfRangeWarningMsg::enableLayerIsOutOfRangeWarningMsg() : analysisWarningMsg() {
-
+enableLayerIsOutOfRangeWarningMsg::enableLayerIsOutOfRangeWarningMsg() 
+  : analysisWarningMsg(),
+    layer(0),
+    layerMin(0),
+    layerMax(0)
+{
+  /*
 	layer    = 0;
 	layerMin = 0;
 	layerMax = 0;
-
+*/
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-enableLayerIsOutOfRangeWarningMsg::enableLayerIsOutOfRangeWarningMsg(unsigned short layer, unsigned short layerMin, unsigned short layerMax) : analysisWarningMsg() {
-
-	this->layer    = layer;
-	this->layerMin = layerMin;
-	this->layerMax = layerMax;
-
+enableLayerIsOutOfRangeWarningMsg::enableLayerIsOutOfRangeWarningMsg(unsigned short _layer, unsigned short _layerMin, unsigned short _layerMax) 
+  : analysisWarningMsg(),
+    layer(_layer),
+    layerMin(_layerMin),
+    layerMax(_layerMax)
+{
+  /*
+	this->layer    = _layer;
+	this->layerMin = _layerMin;
+	this->layerMax = _layerMax;
+  */
 }
 
 /****************************************************************
@@ -2057,10 +2208,14 @@ void cannotShowHistogramWithoutWritingToRootWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithMomentaErrorDistributionWarningMsg::trackWithMomentaErrorDistributionWarningMsg() : analysisWarningMsg() {
+trackWithMomentaErrorDistributionWarningMsg::trackWithMomentaErrorDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(0),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2068,10 +2223,14 @@ trackWithMomentaErrorDistributionWarningMsg::trackWithMomentaErrorDistributionWa
  * Constructor													*
  ****************************************************************/
 
-trackWithMomentaErrorDistributionWarningMsg::trackWithMomentaErrorDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+trackWithMomentaErrorDistributionWarningMsg::trackWithMomentaErrorDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -2162,26 +2321,38 @@ void trackWithMomentaErrorDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedMomentaXDistributionWarningMsg::quantizedMomentaXDistributionWarningMsg() : analysisWarningMsg() {
-
+quantizedMomentaXDistributionWarningMsg::quantizedMomentaXDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    minimum(0),
+    maximum(0)
+{
+  /*
 	distribution    = NULL;
 	numberOfEntries = 0;
 	min             = 0;
 	max             = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-quantizedMomentaXDistributionWarningMsg::quantizedMomentaXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
-
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
-	this->min             = min;
-	this->max             = max;
-
+quantizedMomentaXDistributionWarningMsg::quantizedMomentaXDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries, double _min, double _max) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    minimum(_min),
+    maximum(_max)
+{
+  /*
+	this->distribution    = _distribution;
+	this->numberOfEntries = _numberOfEntries;
+	this->min             = _min;
+	this->max             = _max;
+  */
 }
 
 /****************************************************************
@@ -2224,7 +2395,7 @@ void quantizedMomentaXDistributionWarningMsg::warningMsg() {
 
 				zeroDistribution = false;
 				temp += "Momentum: ";
-				dtos(((double)i * (max - min)) / (double)(numberOfEntries - 1) + min, doubleBuffer, doubleConversionDigits);
+				dtos(((double)i * (maximum - minimum)) / (double)(numberOfEntries - 1) + minimum, doubleBuffer, doubleConversionDigits);
 				temp += doubleBuffer;
 				temp += "GeV/c\t=> #Tracks: ";
 
@@ -2257,26 +2428,38 @@ void quantizedMomentaXDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedMomentaYDistributionWarningMsg::quantizedMomentaYDistributionWarningMsg() : analysisWarningMsg() {
-
+quantizedMomentaYDistributionWarningMsg::quantizedMomentaYDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    minimum(0),
+    maximum(0)
+{
+  /*
 	distribution    = NULL;
 	numberOfEntries = 0;
 	min             = 0;
 	max             = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-quantizedMomentaYDistributionWarningMsg::quantizedMomentaYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
-
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
-	this->min             = min;
-	this->max             = max;
-
+quantizedMomentaYDistributionWarningMsg::quantizedMomentaYDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries, double _min, double _max) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    minimum(_min),
+    maximum(_max)
+{
+  /*
+	this->distribution    = _distribution;
+	this->numberOfEntries = _numberOfEntries;
+	this->min             = _min;
+	this->max             = _max;
+  */
 }
 
 /****************************************************************
@@ -2319,7 +2502,7 @@ void quantizedMomentaYDistributionWarningMsg::warningMsg() {
 
 				zeroDistribution = false;
 				temp += "Momentum: ";
-				dtos(((double)i * (max - min)) / (double)(numberOfEntries - 1) + min, doubleBuffer, doubleConversionDigits);
+				dtos(((double)i * (maximum - minimum)) / (double)(numberOfEntries - 1) + minimum, doubleBuffer, doubleConversionDigits);
 				temp += doubleBuffer;
 				temp += "GeV/c\t=> #Tracks: ";
 
@@ -2352,26 +2535,38 @@ void quantizedMomentaYDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedMomentaZDistributionWarningMsg::quantizedMomentaZDistributionWarningMsg() : analysisWarningMsg() {
-
+quantizedMomentaZDistributionWarningMsg::quantizedMomentaZDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    minimum(0),
+    maximum(0)
+{
+  /*
 	distribution    = NULL;
 	numberOfEntries = 0;
 	min             = 0;
 	max             = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-quantizedMomentaZDistributionWarningMsg::quantizedMomentaZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
-
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
-	this->min             = min;
-	this->max             = max;
-
+quantizedMomentaZDistributionWarningMsg::quantizedMomentaZDistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries, double _min, double _max) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    minimum(_min),
+    maximum(_max)
+{
+  /*
+	this->distribution    = _distribution;
+	this->numberOfEntries = _numberOfEntries;
+	this->min             = _min;
+	this->max             = _max;
+  */
 }
 
 /****************************************************************
@@ -2414,7 +2609,7 @@ void quantizedMomentaZDistributionWarningMsg::warningMsg() {
 
 				zeroDistribution = false;
 				temp += "Momentum: ";
-				dtos(((double)i * (max - min)) / (double)(numberOfEntries - 1) + min, doubleBuffer, doubleConversionDigits);
+				dtos(((double)i * (maximum - minimum)) / (double)(numberOfEntries - 1) + minimum, doubleBuffer, doubleConversionDigits);
 				temp += doubleBuffer;
 				temp += "GeV/c\t=> #Tracks: ";
 
@@ -2447,10 +2642,14 @@ void quantizedMomentaZDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1DistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1DistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2458,10 +2657,14 @@ quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1Distributi
  * Constructor													*
  ****************************************************************/
 
-quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1DistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -2537,10 +2740,14 @@ void quantizedHoughspaceDim1DistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2DistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2DistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2548,10 +2755,14 @@ quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2Distributi
  * Constructor													*
  ****************************************************************/
 
-quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2DistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -2627,10 +2838,14 @@ void quantizedHoughspaceDim2DistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3DistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3DistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2638,10 +2853,14 @@ quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3Distributi
  * Constructor													*
  ****************************************************************/
 
-quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3DistributionWarningMsg(unsigned int* _distribution, unsigned short _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -2717,10 +2936,14 @@ void quantizedHoughspaceDim3DistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg() : analysisWarningMsg() {
+quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2728,10 +2951,14 @@ quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -2794,10 +3021,14 @@ void quantizedMomentaDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2805,11 +3036,15 @@ quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarnin
  * Constructor													*
  ****************************************************************/
 
-quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
-
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
-
+quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
+  /*
+	this->distribution    = _distribution;
+	this->numberOfEntries = _numberOfEntries;
+  */
 }
 
 /****************************************************************
@@ -2871,9 +3106,12 @@ void quantizedHoughspaceDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfTracksWhichCannotBeFoundWarningMsg::numberOfTracksWhichCannotBeFoundWarningMsg() : analysisWarningMsg() {
+numberOfTracksWhichCannotBeFoundWarningMsg::numberOfTracksWhichCannotBeFoundWarningMsg() 
+  : analysisWarningMsg(),
+    numberOfTracks(0)
+{
 
-	numberOfTracks = 0;
+  //	numberOfTracks = 0;
 
 }
 
@@ -2881,9 +3119,12 @@ numberOfTracksWhichCannotBeFoundWarningMsg::numberOfTracksWhichCannotBeFoundWarn
  * Constructor													*
  ****************************************************************/
 
-numberOfTracksWhichCannotBeFoundWarningMsg::numberOfTracksWhichCannotBeFoundWarningMsg(unsigned long numberOfTracks) : analysisWarningMsg() {
+numberOfTracksWhichCannotBeFoundWarningMsg::numberOfTracksWhichCannotBeFoundWarningMsg(unsigned long _numberOfTracks) 
+  : analysisWarningMsg(),
+    numberOfTracks(_numberOfTracks)
+{
 
-	this->numberOfTracks = numberOfTracks;
+  //	this->numberOfTracks = _numberOfTracks;
 
 }
 
@@ -2922,10 +3163,14 @@ void numberOfTracksWhichCannotBeFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -2933,10 +3178,14 @@ dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -3024,10 +3273,14 @@ void dim1PeakDistanceDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -3035,10 +3288,14 @@ dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -3126,10 +3383,14 @@ void dim2PeakDistanceDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -3137,10 +3398,14 @@ dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -3228,10 +3493,14 @@ void dim3PeakDistanceDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -3239,10 +3508,14 @@ accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributi
  * Constructor													*
  ****************************************************************/
 
-accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -3330,9 +3603,12 @@ void accumulatedPeakDistanceDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfTracksWithGoodPrelutSignatureWarningMsg::numberOfTracksWithGoodPrelutSignatureWarningMsg() : analysisWarningMsg() {
+numberOfTracksWithGoodPrelutSignatureWarningMsg::numberOfTracksWithGoodPrelutSignatureWarningMsg() 
+  : analysisWarningMsg(),
+    numberOfTracks(0)
+{
 
-	numberOfTracks = 0;
+  //	numberOfTracks = 0;
 
 }
 
@@ -3340,9 +3616,12 @@ numberOfTracksWithGoodPrelutSignatureWarningMsg::numberOfTracksWithGoodPrelutSig
  * Constructor													*
  ****************************************************************/
 
-numberOfTracksWithGoodPrelutSignatureWarningMsg::numberOfTracksWithGoodPrelutSignatureWarningMsg(unsigned long numberOfTracks) : analysisWarningMsg() {
+numberOfTracksWithGoodPrelutSignatureWarningMsg::numberOfTracksWithGoodPrelutSignatureWarningMsg(unsigned long _numberOfTracks) 
+  : analysisWarningMsg(),
+    numberOfTracks(_numberOfTracks)
+{
 
-	this->numberOfTracks = numberOfTracks;
+  //	this->numberOfTracks = _numberOfTracks;
 
 }
 
@@ -3381,9 +3660,12 @@ void numberOfTracksWithGoodPrelutSignatureWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfTracksWithGoodLutSignatureWarningMsg::numberOfTracksWithGoodLutSignatureWarningMsg() : analysisWarningMsg() {
+numberOfTracksWithGoodLutSignatureWarningMsg::numberOfTracksWithGoodLutSignatureWarningMsg() 
+  : analysisWarningMsg(),
+    numberOfTracks(0)
+{
 
-	numberOfTracks = 0;
+  //	numberOfTracks = 0;
 
 }
 
@@ -3391,9 +3673,12 @@ numberOfTracksWithGoodLutSignatureWarningMsg::numberOfTracksWithGoodLutSignature
  * Constructor													*
  ****************************************************************/
 
-numberOfTracksWithGoodLutSignatureWarningMsg::numberOfTracksWithGoodLutSignatureWarningMsg(unsigned long numberOfTracks) : analysisWarningMsg() {
+numberOfTracksWithGoodLutSignatureWarningMsg::numberOfTracksWithGoodLutSignatureWarningMsg(unsigned long _numberOfTracks) 
+  : analysisWarningMsg(),
+    numberOfTracks(_numberOfTracks)
+{
 
-	this->numberOfTracks = numberOfTracks;
+  //	this->numberOfTracks = _numberOfTracks;
 
 }
 
@@ -3432,9 +3717,12 @@ void numberOfTracksWithGoodLutSignatureWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfGoodPrelutSignatureWarningMsg::numberOfGoodPrelutSignatureWarningMsg() : analysisWarningMsg() {
+numberOfGoodPrelutSignatureWarningMsg::numberOfGoodPrelutSignatureWarningMsg() 
+  : analysisWarningMsg(),
+    numberOfSignatures(0)
+{
 
-	numberOfSignatures = 0;
+  //	numberOfSignatures = 0;
 
 }
 
@@ -3442,9 +3730,12 @@ numberOfGoodPrelutSignatureWarningMsg::numberOfGoodPrelutSignatureWarningMsg() :
  * Constructor													*
  ****************************************************************/
 
-numberOfGoodPrelutSignatureWarningMsg::numberOfGoodPrelutSignatureWarningMsg(unsigned long numberOfSignatures) : analysisWarningMsg() {
+numberOfGoodPrelutSignatureWarningMsg::numberOfGoodPrelutSignatureWarningMsg(unsigned long _numberOfSignatures) 
+  : analysisWarningMsg(),
+    numberOfSignatures(_numberOfSignatures)
+{
 
-	this->numberOfSignatures = numberOfSignatures;
+  //	this->numberOfSignatures = _numberOfSignatures;
 
 }
 
@@ -3483,9 +3774,12 @@ void numberOfGoodPrelutSignatureWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfGoodLutSignatureWarningMsg::numberOfGoodLutSignatureWarningMsg() : analysisWarningMsg() {
+numberOfGoodLutSignatureWarningMsg::numberOfGoodLutSignatureWarningMsg() 
+  : analysisWarningMsg(),
+    numberOfSignatures(0)
+{
 
-	numberOfSignatures = 0;
+  //	numberOfSignatures = 0;
 
 }
 
@@ -3493,9 +3787,12 @@ numberOfGoodLutSignatureWarningMsg::numberOfGoodLutSignatureWarningMsg() : analy
  * Constructor													*
  ****************************************************************/
 
-numberOfGoodLutSignatureWarningMsg::numberOfGoodLutSignatureWarningMsg(unsigned long numberOfSignatures) : analysisWarningMsg() {
+numberOfGoodLutSignatureWarningMsg::numberOfGoodLutSignatureWarningMsg(unsigned long _numberOfSignatures) 
+  : analysisWarningMsg(),
+    numberOfSignatures(_numberOfSignatures)
+{
 
-	this->numberOfSignatures = numberOfSignatures;
+  //	this->numberOfSignatures = _numberOfSignatures;
 
 }
 
@@ -3534,9 +3831,12 @@ void numberOfGoodLutSignatureWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-goodPrelutSignatureWarningMsg::goodPrelutSignatureWarningMsg() : analysisWarningMsg() {
+goodPrelutSignatureWarningMsg::goodPrelutSignatureWarningMsg() 
+  : analysisWarningMsg(),
+    stringTable()
+{
 
-	stringTable.clear();
+  //	stringTable.clear();
 
 }
 
@@ -3544,9 +3844,12 @@ goodPrelutSignatureWarningMsg::goodPrelutSignatureWarningMsg() : analysisWarning
  * Constructor													*
  ****************************************************************/
 
-goodPrelutSignatureWarningMsg::goodPrelutSignatureWarningMsg(std::string stringTable) : analysisWarningMsg() {
+goodPrelutSignatureWarningMsg::goodPrelutSignatureWarningMsg(std::string _stringTable) 
+  : analysisWarningMsg(),
+    stringTable(_stringTable)
+{
 
-	this->stringTable = stringTable;
+  //	this->stringTable = _stringTable;
 
 }
 
@@ -3582,9 +3885,12 @@ void goodPrelutSignatureWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-goodLutSignatureWarningMsg::goodLutSignatureWarningMsg() : analysisWarningMsg() {
+goodLutSignatureWarningMsg::goodLutSignatureWarningMsg() 
+  : analysisWarningMsg(),
+    stringTable()
+{
 
-	stringTable.clear();
+  //	stringTable.clear();
 
 }
 
@@ -3592,9 +3898,12 @@ goodLutSignatureWarningMsg::goodLutSignatureWarningMsg() : analysisWarningMsg() 
  * Constructor													*
  ****************************************************************/
 
-goodLutSignatureWarningMsg::goodLutSignatureWarningMsg(std::string stringTable) : analysisWarningMsg() {
+goodLutSignatureWarningMsg::goodLutSignatureWarningMsg(std::string _stringTable) 
+  : analysisWarningMsg(),
+    stringTable(_stringTable)
+{
 
-	this->stringTable = stringTable;
+  //	this->stringTable = _stringTable;
 
 }
 
@@ -3630,9 +3939,12 @@ void goodLutSignatureWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-usedTablesWarningMsg::usedTablesWarningMsg() : analysisWarningMsg() {
+usedTablesWarningMsg::usedTablesWarningMsg() 
+  : analysisWarningMsg(),
+    stringTable()
+{
 
-	stringTable.clear();
+  //	stringTable.clear();
 
 }
 
@@ -3640,9 +3952,12 @@ usedTablesWarningMsg::usedTablesWarningMsg() : analysisWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-usedTablesWarningMsg::usedTablesWarningMsg(std::string stringTable) : analysisWarningMsg() {
+usedTablesWarningMsg::usedTablesWarningMsg(std::string _stringTable) 
+  : analysisWarningMsg(),
+    stringTable(_stringTable)
+{
 
-	this->stringTable = stringTable;
+  //	this->stringTable = _stringTable;
 
 }
 
@@ -3678,10 +3993,14 @@ void usedTablesWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningMsg() : analysisWarningMsg() {
+sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -3689,10 +4008,14 @@ sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningM
  * Constructor													*
  ****************************************************************/
 
-sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -3850,10 +4173,14 @@ void actualTrackNotFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-timeViolationWarningMsg::timeViolationWarningMsg() : analysisWarningMsg() {
+timeViolationWarningMsg::timeViolationWarningMsg() 
+  : analysisWarningMsg(),
+    time1(0),
+    time2(0)
+{
 
-	time1 = 0;
-	time2 = 0;
+  //	time1 = 0;
+  //	time2 = 0;
 
 }
 
@@ -3861,10 +4188,14 @@ timeViolationWarningMsg::timeViolationWarningMsg() : analysisWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-timeViolationWarningMsg::timeViolationWarningMsg(double time1, double time2) : analysisWarningMsg() {
+timeViolationWarningMsg::timeViolationWarningMsg(double _time1, double _time2) 
+  : analysisWarningMsg(),
+    time1(_time1),
+    time2(_time2)
+{
 
-	this->time1 = time1;
-	this->time2 = time2;
+  //	this->time1 = _time1;
+  //	this->time2 = _time2;
 
 }
 
@@ -3906,24 +4237,34 @@ void timeViolationWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfTracksInAllLayersWarningMsg::numberOfTracksInAllLayersWarningMsg() : analysisWarningMsg() {
-
+numberOfTracksInAllLayersWarningMsg::numberOfTracksInAllLayersWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-numberOfTracksInAllLayersWarningMsg::numberOfTracksInAllLayersWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-
+numberOfTracksInAllLayersWarningMsg::numberOfTracksInAllLayersWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage)
+{
+  /*
+	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+  */
 }
 
 /****************************************************************
@@ -4003,24 +4344,34 @@ void numberOfTracksInAllLayersWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfTrackDensitiesInAllLayersWarningMsg::numberOfTrackDensitiesInAllLayersWarningMsg() : analysisWarningMsg() {
-
+numberOfTrackDensitiesInAllLayersWarningMsg::numberOfTrackDensitiesInAllLayersWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-numberOfTrackDensitiesInAllLayersWarningMsg::numberOfTrackDensitiesInAllLayersWarningMsg(int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-
+numberOfTrackDensitiesInAllLayersWarningMsg::numberOfTrackDensitiesInAllLayersWarningMsg(int* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage)
+{
+  /*
+	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+  */
 }
 
 /****************************************************************
@@ -4088,10 +4439,14 @@ void numberOfTrackDensitiesInAllLayersWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfMinimalTracksInAllColumnsWarningMsg::numberOfMinimalTracksInAllColumnsWarningMsg() : analysisWarningMsg() {
+numberOfMinimalTracksInAllColumnsWarningMsg::numberOfMinimalTracksInAllColumnsWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -4099,10 +4454,14 @@ numberOfMinimalTracksInAllColumnsWarningMsg::numberOfMinimalTracksInAllColumnsWa
  * Constructor													*
  ****************************************************************/
 
-numberOfMinimalTracksInAllColumnsWarningMsg::numberOfMinimalTracksInAllColumnsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+numberOfMinimalTracksInAllColumnsWarningMsg::numberOfMinimalTracksInAllColumnsWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -4180,24 +4539,34 @@ void numberOfMinimalTracksInAllColumnsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfAverageTracksInAllColumnsWarningMsg::numberOfAverageTracksInAllColumnsWarningMsg() : analysisWarningMsg() {
-
+numberOfAverageTracksInAllColumnsWarningMsg::numberOfAverageTracksInAllColumnsWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-numberOfAverageTracksInAllColumnsWarningMsg::numberOfAverageTracksInAllColumnsWarningMsg(double* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-
+numberOfAverageTracksInAllColumnsWarningMsg::numberOfAverageTracksInAllColumnsWarningMsg(double* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage)
+{
+  /*
+	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+  */
 }
 
 /****************************************************************
@@ -4264,7 +4633,11 @@ void numberOfAverageTracksInAllColumnsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfMaximalTracksInAllColumnsWarningMsg::numberOfMaximalTracksInAllColumnsWarningMsg() : analysisWarningMsg() {
+numberOfMaximalTracksInAllColumnsWarningMsg::numberOfMaximalTracksInAllColumnsWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -4275,10 +4648,14 @@ numberOfMaximalTracksInAllColumnsWarningMsg::numberOfMaximalTracksInAllColumnsWa
  * Constructor													*
  ****************************************************************/
 
-numberOfMaximalTracksInAllColumnsWarningMsg::numberOfMaximalTracksInAllColumnsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+numberOfMaximalTracksInAllColumnsWarningMsg::numberOfMaximalTracksInAllColumnsWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+	this->distribution    = _distribution;
+	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -4356,10 +4733,14 @@ void numberOfMaximalTracksInAllColumnsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg() : analysisWarningMsg() {
+sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -4367,10 +4748,14 @@ sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg() : a
  * Constructor													*
  ****************************************************************/
 
-sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -4456,10 +4841,14 @@ void sizeOfColumnSeparatorFifosWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningMsg() : analysisWarningMsg() {
+numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -4467,10 +4856,14 @@ numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningM
  * Constructor													*
  ****************************************************************/
 
-numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -4548,24 +4941,34 @@ void numberOfMinimalTracksInAllRowsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfAverageTracksInAllRowsWarningMsg::numberOfAverageTracksInAllRowsWarningMsg() : analysisWarningMsg() {
-
+numberOfAverageTracksInAllRowsWarningMsg::numberOfAverageTracksInAllRowsWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-numberOfAverageTracksInAllRowsWarningMsg::numberOfAverageTracksInAllRowsWarningMsg(double* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-
+numberOfAverageTracksInAllRowsWarningMsg::numberOfAverageTracksInAllRowsWarningMsg(double* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage)
+{
+  /*
+	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+  */
 }
 
 /****************************************************************
@@ -4632,10 +5035,14 @@ void numberOfAverageTracksInAllRowsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningMsg() : analysisWarningMsg() {
+numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -4643,10 +5050,14 @@ numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningM
  * Constructor													*
  ****************************************************************/
 
-numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -4724,10 +5135,14 @@ void numberOfMaximalTracksInAllRowsWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg() : analysisWarningMsg() {
+sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0)
+{
 
-	distribution    = NULL;
-	numberOfEntries = 0;
+  //	distribution    = NULL;
+  //	numberOfEntries = 0;
 
 }
 
@@ -4735,10 +5150,14 @@ sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg() : analysi
  * Constructor													*
  ****************************************************************/
 
-sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries)
+{
 
-	this->distribution    = distribution;
-	this->numberOfEntries = numberOfEntries;
+  //	this->distribution    = _distribution;
+  //	this->numberOfEntries = _numberOfEntries;
 
 }
 
@@ -4886,9 +5305,12 @@ void relativeDisplayNotAccessibleWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg() : analysisWarningMsg() {
+numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg() 
+  : analysisWarningMsg(),
+    numberofPrelutRanges(0)
+{
 
-	numberofPrelutRanges = 0;
+  //	numberofPrelutRanges = 0;
 
 }
 
@@ -4896,9 +5318,12 @@ numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg() : ana
  * Constructor													*
  ****************************************************************/
 
-numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg(unsigned short numberofPrelutRanges) : analysisWarningMsg() {
+numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg(unsigned short _numberofPrelutRanges) 
+  : analysisWarningMsg(),
+    numberofPrelutRanges(_numberofPrelutRanges)
+{
 
-	this->numberofPrelutRanges = numberofPrelutRanges;
+  //	this->numberofPrelutRanges = _numberofPrelutRanges;
 
 }
 
@@ -4936,9 +5361,12 @@ void numberOfPrelutRangesFoundWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg() : analysisWarningMsg() {
+maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg() 
+  : analysisWarningMsg(),
+    percentage(0)
+{
 
-	percentage = 0;
+  //	percentage = 0;
 
 }
 
@@ -4946,9 +5374,12 @@ maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg(unsigned short percentage) : analysisWarningMsg() {
+maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg(unsigned short _percentage) 
+  : analysisWarningMsg(),
+    percentage(_percentage)
+{
 
-	this->percentage = percentage;
+  //	this->percentage = _percentage;
 
 }
 
@@ -4986,9 +5417,12 @@ void maximumPrelutRangePercentageWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg() : analysisWarningMsg() {
+meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg() 
+  : analysisWarningMsg(),
+    mean(0)
+{
 
-	mean = 0;
+  //	mean = 0;
 
 }
 
@@ -4996,9 +5430,12 @@ meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg(double mean) : analysisWarningMsg() {
+meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg(double _mean) 
+  : analysisWarningMsg(),
+    mean(_mean)
+{
 
-	this->mean = mean;
+  //	this->mean = _mean;
 
 }
 
@@ -5036,24 +5473,34 @@ void meanPrelutRangeEntriesPerHitWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-hitReadoutDistributionWarningMsg::hitReadoutDistributionWarningMsg() : analysisWarningMsg() {
-
+hitReadoutDistributionWarningMsg::hitReadoutDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-hitReadoutDistributionWarningMsg::hitReadoutDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-
+hitReadoutDistributionWarningMsg::hitReadoutDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage)
+{
+  /*
+	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+  */
 }
 
 /****************************************************************
@@ -5122,24 +5569,34 @@ void hitReadoutDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-hitReadoutMeanDistributionWarningMsg::hitReadoutMeanDistributionWarningMsg() : analysisWarningMsg() {
-
+hitReadoutMeanDistributionWarningMsg::hitReadoutMeanDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-hitReadoutMeanDistributionWarningMsg::hitReadoutMeanDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-
+hitReadoutMeanDistributionWarningMsg::hitReadoutMeanDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage)
+{
+  /*
+	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+  */
 }
 
 /****************************************************************
@@ -5234,30 +5691,46 @@ void hitReadoutMeanDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-fpgaHistogramProcessingTimeDistributionWarningMsg::fpgaHistogramProcessingTimeDistributionWarningMsg() : analysisWarningMsg() {
-
+fpgaHistogramProcessingTimeDistributionWarningMsg::fpgaHistogramProcessingTimeDistributionWarningMsg() 
+  : analysisWarningMsg(),
+    distribution(NULL),
+    numberOfEntries(0),
+    numberOfSummedEventsToAverage(0),
+    readoutColumnsInParallel(false),
+    histogramDim1(0),
+    histogramDim2(0)
+{
+  /*
 	distribution                  = NULL;
 	numberOfEntries               = 0;
 	numberOfSummedEventsToAverage = 0;
 	readoutColumnsInParallel      = false;
 	histogramDim1                 = 0;
 	histogramDim2                 = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-fpgaHistogramProcessingTimeDistributionWarningMsg::fpgaHistogramProcessingTimeDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage, bool readoutColumnsInParallel, unsigned short histogramDim1, unsigned short histogramDim2) : analysisWarningMsg() {
-
-	this->distribution                  = distribution;
-	this->numberOfEntries               = numberOfEntries;
-	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
-	this->readoutColumnsInParallel      = readoutColumnsInParallel;
-	this->histogramDim1                 = histogramDim1;
-	this->histogramDim2                 = histogramDim2;
-
+fpgaHistogramProcessingTimeDistributionWarningMsg::fpgaHistogramProcessingTimeDistributionWarningMsg(unsigned int* _distribution, unsigned int _numberOfEntries, unsigned int _numberOfSummedEventsToAverage, bool _readoutColumnsInParallel, unsigned short _histogramDim1, unsigned short _histogramDim2) 
+  : analysisWarningMsg(),
+    distribution(_distribution),
+    numberOfEntries(_numberOfEntries),
+    numberOfSummedEventsToAverage(_numberOfSummedEventsToAverage),
+    readoutColumnsInParallel(_readoutColumnsInParallel),
+    histogramDim1(_histogramDim1),
+    histogramDim2(_histogramDim2)
+{
+  /*
+  	this->distribution                  = _distribution;
+	this->numberOfEntries               = _numberOfEntries;
+	this->numberOfSummedEventsToAverage = _numberOfSummedEventsToAverage;
+	this->readoutColumnsInParallel      = _readoutColumnsInParallel;
+	this->histogramDim1                 = _histogramDim1;
+	this->histogramDim2                 = _histogramDim2;
+  */
 }
 
 /****************************************************************
@@ -5349,10 +5822,14 @@ void fpgaHistogramProcessingTimeDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-meanValueWarningMsg::meanValueWarningMsg() : analysisWarningMsg() {
+meanValueWarningMsg::meanValueWarningMsg() 
+  : analysisWarningMsg(),
+    mean(0),
+    dimension()
+{
 
-	mean = 0;
-	dimension.clear();
+  //	mean = 0;
+  //	dimension.clear();
 
 }
 
@@ -5360,10 +5837,14 @@ meanValueWarningMsg::meanValueWarningMsg() : analysisWarningMsg() {
  * Constructor													*
  ****************************************************************/
 
-meanValueWarningMsg::meanValueWarningMsg(double mean, std::string dimension) : analysisWarningMsg() {
+meanValueWarningMsg::meanValueWarningMsg(double _mean, std::string _dimension) 
+  : analysisWarningMsg(),
+    mean(_mean),
+    dimension(_dimension)
+{
 
-	this->mean      = mean;
-	this->dimension = dimension;
+  //	this->mean      = _mean;
+  //	this->dimension = _dimension;
 
 }
 

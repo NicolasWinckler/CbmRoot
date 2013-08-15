@@ -36,8 +36,17 @@
  * Default constructor											*
  ****************************************************************/
 
-trackToPeak::trackToPeak() {
-
+trackToPeak::trackToPeak() 
+  : trackToNoPeak(0),
+    trackToOnePeak(0),
+    trackToMorePeaks(0),
+    numberOfTracks(0),
+    numberOfWellFoundTracks(0),
+    numberOfWrongFoundTracks(0),
+    numberOfTracksWithP(0),
+    numberOfHits(0)
+{
+  /*
 	trackToNoPeak            = 0;
 	trackToOnePeak           = 0;
 	trackToMorePeaks         = 0;
@@ -45,23 +54,32 @@ trackToPeak::trackToPeak() {
 	numberOfWellFoundTracks  = 0;
 	numberOfWrongFoundTracks = 0;
 	numberOfTracksWithP      = 0;
-
+  */
 }
 
 /****************************************************************
  * Constructor													*
  ****************************************************************/
 
-trackToPeak::trackToPeak(const trackToPeak& value) {
-
+trackToPeak::trackToPeak(const trackToPeak& value) 
+  : trackToNoPeak(value.trackToNoPeak),		  
+    trackToOnePeak(value.trackToOnePeak),	  
+    trackToMorePeaks(value.trackToMorePeaks),	  
+    numberOfTracks(value.numberOfTracks),	  
+    numberOfWellFoundTracks(value.numberOfWellFoundTracks), 
+    numberOfWrongFoundTracks(value.numberOfWrongFoundTracks),
+    numberOfTracksWithP(value.numberOfTracksWithP),
+    numberOfHits(value.numberOfHits)
+{
+  /*
 	trackToNoPeak            = value.trackToNoPeak;
 	trackToOnePeak           = value.trackToOnePeak;
 	trackToMorePeaks         = value.trackToMorePeaks;
 	numberOfTracks           = value.numberOfTracks;
 	numberOfWellFoundTracks  = value.numberOfWellFoundTracks;
 	numberOfWrongFoundTracks = value.numberOfWrongFoundTracks;
-	numberOfTracksWithP      = value.numberOfTracksWithP;
-
+	numberOfTracksWithP      = value.numberOfTracksWithP;     
+  */
 }
 
 /****************************************************************

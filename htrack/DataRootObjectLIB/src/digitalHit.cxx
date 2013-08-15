@@ -44,10 +44,10 @@
  * Default constructor											*
  ****************************************************************/
 
-digitalHit::digitalHit() {
+digitalHit::digitalHit() : hitIndex(0), stationIndex(0) {
 
-	hitIndex     = 0;
-	stationIndex = 0;
+  //	hitIndex     = 0;
+  //	stationIndex = 0;
 
 }
 
@@ -55,10 +55,10 @@ digitalHit::digitalHit() {
  * Constructor													*
  ****************************************************************/
 
-digitalHit::digitalHit(const digitalHit& value) {
+digitalHit::digitalHit(const digitalHit& value) : hitIndex(value.hitIndex), stationIndex(value.stationIndex)   {
 
-	this->hitIndex     = value.hitIndex;
-	this->stationIndex = value.stationIndex;
+  //	this->hitIndex     = value.hitIndex;
+  //	this->stationIndex = value.stationIndex;
 
 }
 

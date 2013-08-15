@@ -67,22 +67,40 @@ Bool_t AntiProtonTrackAcceptanceFunctionTof(
    return mcTrack->GetPdgCode() == -2212;
 }
 
-Bool_t PionTrackAcceptanceFunctionTof(
+Bool_t PionPlusTrackAcceptanceFunctionTof(
       const TClonesArray* mcTracks,
       Int_t index)
 {
    if (index < 0) return false;
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 211;
+   return mcTrack->GetPdgCode() == 211;
 }
 
-Bool_t KaonTrackAcceptanceFunctionTof(
+Bool_t PionMinusTrackAcceptanceFunctionTof(
       const TClonesArray* mcTracks,
       Int_t index)
 {
    if (index < 0) return false;
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 321;
+   return mcTrack->GetPdgCode() == -211;
+}
+
+Bool_t KaonPlusTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return mcTrack->GetPdgCode() == 321;
+}
+
+Bool_t KaonMinusTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return mcTrack->GetPdgCode() == -321;
 }
 
 CbmLitTofQa::CbmLitTofQa():
@@ -153,15 +171,17 @@ void CbmLitTofQa::ReadDataBranches()
 
 void CbmLitTofQa::FillTrackCategoriesAndAcceptanceFunctions()
 {
-   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("AntiProton")("Pion")("Kaon");
+   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("AntiProton")("PionPlus")("PionMinus")("KaonPlus")("KaonMinus");
    // List of all supported track categories
    fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Electron"] = ElectronTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Muon"] = MuonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["AntiProton"] = AntiProtonTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunctionTof;
 }
 
 void CbmLitTofQa::CreateHistograms()
@@ -174,7 +194,7 @@ void CbmLitTofQa::CreateHistograms()
       fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 400, -0.2, 1.8));
    }
    string name = "hmp_Tof_dTime";
-   fHM->Add(name, new TH1F(name.c_str(), string(name + "dt [ns];Counter").c_str(), 1000, -1., 1.));
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "dt [ns];Counter").c_str(), 1000, -100., 100.));
    name = "hmp_Tof_TimeZero_a";
    fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 34., 36.));
    name = "hmp_Tof_TimeZero_reco";
@@ -248,7 +268,7 @@ void CbmLitTofQa::ProcessGlobalTracks()
 
     		  if (stsMCTrackId == tofMCTrackId) {
     		     fHM->H1("hmp_Tof_RecoMCID_" + category + "_m2p")->Fill(preco, m2reco);
-    		     fHM->H1("hmp_Tof_dTime")->Fill(ctMC - ctReco);
+    		     fHM->H1("hmp_Tof_dTime")->Fill(tofPoint->GetTime() - tofHit->GetTime());
     		  }
     	  }
       }

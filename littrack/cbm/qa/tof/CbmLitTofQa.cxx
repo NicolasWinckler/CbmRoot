@@ -67,6 +67,15 @@ Bool_t AntiProtonTrackAcceptanceFunctionTof(
    return mcTrack->GetPdgCode() == -2212;
 }
 
+Bool_t PionTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 211;
+}
+
 Bool_t PionPlusTrackAcceptanceFunctionTof(
       const TClonesArray* mcTracks,
       Int_t index)
@@ -83,6 +92,15 @@ Bool_t PionMinusTrackAcceptanceFunctionTof(
    if (index < 0) return false;
    const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
    return mcTrack->GetPdgCode() == -211;
+}
+
+Bool_t KaonTrackAcceptanceFunctionTof(
+      const TClonesArray* mcTracks,
+      Int_t index)
+{
+   if (index < 0) return false;
+   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
+   return std::abs(mcTrack->GetPdgCode()) == 321;
 }
 
 Bool_t KaonPlusTrackAcceptanceFunctionTof(
@@ -171,15 +189,17 @@ void CbmLitTofQa::ReadDataBranches()
 
 void CbmLitTofQa::FillTrackCategoriesAndAcceptanceFunctions()
 {
-   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("AntiProton")("PionPlus")("PionMinus")("KaonPlus")("KaonMinus");
+   fTrackCategories = list_of("All")("Electron")("Muon")("Proton")("AntiProton")("Pion")("PionPlus")("PionMinus")("Kaon")("KaonPlus")("KaonMinus");
    // List of all supported track categories
    fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Electron"] = ElectronTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Muon"] = MuonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["AntiProton"] = AntiProtonTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunctionTof;
    fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunctionTof;
 }

@@ -120,7 +120,7 @@ class CbmKFParticlesFinderQA :public FairTask
   TH1F *hFitDaughtersQA[CbmKFPartEfficiencies::nParticles][nFitQA];
   TH1F *hFitQA[CbmKFPartEfficiencies::nParticles][nFitQA];
 
-  static const int nHistoPartParam = 12;
+  static const int nHistoPartParam = 13;
   TH1F *hPartParam[CbmKFPartEfficiencies::nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
   TH1F *hPartParamBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
   TH1F *hPartParamGhost[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
@@ -150,9 +150,9 @@ class CbmKFParticlesFinderQA :public FairTask
     else return -1;
   }
 
-  static const int nHistosTP = 1;
+  static const int nHistosTP = CbmKFPartEfficiencies::nParticles + 1;
   TH1F *hTrackParameters[nHistosTP];
-
+  
   ClassDef(CbmKFParticlesFinderQA,1);
 
  private:

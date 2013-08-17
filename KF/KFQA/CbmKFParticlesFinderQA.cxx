@@ -188,14 +188,14 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
         gDirectory->mkdir("Parameters");
         gDirectory->cd("Parameters");
         {
-          TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","prob","#theta","phi","z","l/dl"};
+          TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","chi2ndfTopo","prob","#theta","phi","z","l/dl"};
           TString parAxisName[nHistoPartParam] = {"m [GeV/c^{2}]","p [GeV/c]","p_{t} [GeV/c]",
                                                   "y","Decay length [cm]","Life time c#tau [cm]",
-                                                  "chi2/ndf","prob","#theta [rad]",
+                                                  "chi2/ndf","chi2/ndf topo","prob","#theta [rad]",
                                                   "phi [rad]","z [cm]", "l/dl"};
-          int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100,100};
-          float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0., -5.,  0.,  0., 0., -2., -2., -5., -1.};
-          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 1.,  2.,  2., 55., 35.};
+          int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100,100,100};
+          float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0., -5.,  0.,  0.,  0., 0., -2., -2., -5., -1.};
+          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 20., 1.,  2.,  2., 55., 35.};
 
           for(int iH=0; iH<nHistoPartParam; iH++)
           {
@@ -328,13 +328,24 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
     for(int iMP=0; iMP<nHistoMotherPdg; iMP++)
       hMotherPdg[iMP] = new TH1F(partNames[iMP].Data(), partNames[iMP].Data(), 10000, -5000, 5000);
   }
+  gDirectory->cd(".."); //particle directory
 
-  gDirectory->cd(".."); //L1
   gDirectory->mkdir("TrackParameters");
   gDirectory->cd("TrackParameters");
   {
-    hTrackParameters[0] = new TH1F("Chi2Prim", "Chi2Prim", 1000, 0, 100);
+    TString chi2Name = "Chi2Prim";
+    for(int iPart=0; iPart < CbmKFPartEfficiencies::nParticles; iPart++)
+    {
+      TString chi2NamePart = "Chi2Prim";
+      chi2NamePart += "_";
+      chi2NamePart += fParteff.partName[iPart].Data();
+      hTrackParameters[iPart] = new TH1F(chi2NamePart.Data(), chi2NamePart.Data(), 1000, 0, 100);
+
+    }
+    hTrackParameters[CbmKFPartEfficiencies::nParticles] = new TH1F("Chi2Prim", "Chi2Prim", 1000, 0, 100);
   }
+  gDirectory->cd(".."); //particle directory
+    
   gDirectory = currentDir;
 }
 
@@ -938,6 +949,10 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     tempSIMDPart.GetDistanceToVertexLine(pv, l, dl);
     dL = sqrt(TempPart.X()*TempPart.X() + TempPart.Y()*TempPart.Y() + TempPart.Z()*TempPart.Z() );
 
+    
+    tempSIMDPart.SetProductionVertex(pv);
+    fvec chi2topo = tempSIMDPart.Chi2()/tempSIMDPart.GetNDF();
+    
     hPartParam[iParticle][ 0]->Fill(M);
     hPartParam[iParticle][ 1]->Fill(P);
     hPartParam[iParticle][ 2]->Fill(Pt);
@@ -945,11 +960,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     hPartParam[iParticle][ 4]->Fill(dL);
     hPartParam[iParticle][ 5]->Fill(cT);
     hPartParam[iParticle][ 6]->Fill(chi2/ndf);
-    hPartParam[iParticle][ 7]->Fill(prob);
-    hPartParam[iParticle][ 8]->Fill(Theta);
-    hPartParam[iParticle][ 9]->Fill(Phi);
-    hPartParam[iParticle][10]->Fill(Z);
-    hPartParam[iParticle][11]->Fill(l[0]/dl[0]);
+    hPartParam[iParticle][ 7]->Fill(chi2topo[0]);
+    hPartParam[iParticle][ 8]->Fill(prob);
+    hPartParam[iParticle][ 9]->Fill(Theta);
+    hPartParam[iParticle][10]->Fill(Phi);
+    hPartParam[iParticle][11]->Fill(Z);
+    hPartParam[iParticle][12]->Fill(l[0]/dl[0]);
 
 
     hPartParam2D[iParticle][0]->Fill(Rapidity,Pt,1);
@@ -965,11 +981,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
         hPartParamGhost[iParticle][ 4]->Fill(dL);
         hPartParamGhost[iParticle][ 5]->Fill(cT);
         hPartParamGhost[iParticle][ 6]->Fill(chi2/ndf);
-        hPartParamGhost[iParticle][ 7]->Fill(prob);
-        hPartParamGhost[iParticle][ 8]->Fill(Theta);
-        hPartParamGhost[iParticle][ 9]->Fill(Phi);
-        hPartParamGhost[iParticle][10]->Fill(Z);
-        hPartParamGhost[iParticle][11]->Fill(l[0]/dl[0]);
+        hPartParamGhost[iParticle][ 7]->Fill(chi2topo[0]);
+        hPartParamGhost[iParticle][ 8]->Fill(prob);
+        hPartParamGhost[iParticle][ 9]->Fill(Theta);
+        hPartParamGhost[iParticle][10]->Fill(Phi);
+        hPartParamGhost[iParticle][11]->Fill(Z);
+        hPartParamGhost[iParticle][12]->Fill(l[0]/dl[0]);
 
         hPartParam2DGhost[iParticle][0]->Fill(Rapidity,Pt,1);
 
@@ -999,11 +1016,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
         hPartParamBG[iParticle][ 4]->Fill(dL);
         hPartParamBG[iParticle][ 5]->Fill(cT);
         hPartParamBG[iParticle][ 6]->Fill(chi2/ndf);
-        hPartParamBG[iParticle][ 7]->Fill(prob);
-        hPartParamBG[iParticle][ 8]->Fill(Theta);
-        hPartParamBG[iParticle][ 9]->Fill(Phi);
-        hPartParamBG[iParticle][10]->Fill(Z);
-        hPartParamBG[iParticle][11]->Fill(l[0]/dl[0]);
+        hPartParamBG[iParticle][ 7]->Fill(chi2topo[0]);
+        hPartParamBG[iParticle][ 8]->Fill(prob);
+        hPartParamBG[iParticle][ 9]->Fill(Theta);
+        hPartParamBG[iParticle][10]->Fill(Phi);
+        hPartParamBG[iParticle][11]->Fill(Z);
+        hPartParamBG[iParticle][12]->Fill(l[0]/dl[0]);
 
         hPartParam2DBG[iParticle][0]->Fill(Rapidity,Pt,1);
       }
@@ -1016,11 +1034,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     hPartParamSignal[iParticle][ 4]->Fill(dL);
     hPartParamSignal[iParticle][ 5]->Fill(cT);
     hPartParamSignal[iParticle][ 6]->Fill(chi2/ndf);
-    hPartParamSignal[iParticle][ 7]->Fill(prob);
-    hPartParamSignal[iParticle][ 8]->Fill(Theta);
-    hPartParamSignal[iParticle][ 9]->Fill(Phi);
-    hPartParamSignal[iParticle][10]->Fill(Z);
-    hPartParamSignal[iParticle][11]->Fill(l[0]/dl[0]);
+    hPartParamSignal[iParticle][ 7]->Fill(chi2topo[0]);
+    hPartParamSignal[iParticle][ 8]->Fill(prob);
+    hPartParamSignal[iParticle][ 9]->Fill(Theta);
+    hPartParamSignal[iParticle][10]->Fill(Phi);
+    hPartParamSignal[iParticle][11]->Fill(Z);
+    hPartParamSignal[iParticle][12]->Fill(l[0]/dl[0]);
 
     hPartParam2DSignal[iParticle][0]->Fill(Rapidity,Pt,1);
 
@@ -1158,24 +1177,27 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
         hMotherPdg[histoIndex]->Fill(-1);
     }
   }
-
+  
   //fill histo with chi2_prim
+  for(unsigned int iP=0; iP<fPF->GetParticles().size(); iP++)
   {
-    vector<CbmStsTrack> vRTracks;
-    int nTracks = flistStsTracks->GetEntries();
-    vRTracks.resize(nTracks);
-    for(int iTr=0; iTr<nTracks; iTr++)
-      vRTracks[iTr] = *( (CbmStsTrack*) flistStsTracks->At(iTr));
+    const KFParticle &rPart = fPF->GetParticles()[iP];
+    const unsigned int NRDaughters = rPart.NDaughters();
+    if (NRDaughters > 1) break;
+    if( RtoMCParticleId[iP].GetBestMatch()<0 ) continue;
+    KFMCParticle &mPart = vMCParticles[ RtoMCParticleId[iP].GetBestMatch() ];
 
-    CbmKFVertex kfVertex;
-    CbmL1PFFitter fitter;
-//    fitter.Fit(vRTracks);
+    if(mPart.GetMotherId() < 0)
+    {
+      hTrackParameters[CbmKFPartEfficiencies::nParticles]->Fill(fPF->GetChiPrim()[iP] );
+      continue;
+    }
 
-    vector<float> ChiToPrimVtx;
-    vector<L1FieldRegion> vField;
-    fitter.GetChiToVertex(vRTracks, vField, ChiToPrimVtx, kfVertex);
+    KFMCParticle &mMotherPart = vMCParticles[mPart.GetMotherId()];
 
-    for(unsigned int i=0; i<vRTracks.size(); i++)
-      hTrackParameters[0]->Fill(ChiToPrimVtx[i]);
+    int iParticle = fParteff.GetParticleIndex(mMotherPart.GetPDG());
+    float chiPrim = fPF->GetChiPrim()[iP];
+    if(iParticle > -1 && iParticle<CbmKFPartEfficiencies::nParticles)
+      hTrackParameters[iParticle]->Fill(chiPrim );
   }
 } // void CbmKFParticlesFinderQA::ParticlesEfficienciesPerformance()

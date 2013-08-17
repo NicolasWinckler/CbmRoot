@@ -304,14 +304,14 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
   TStopwatch timerSelect;
 
   fParticles.clear();
+  fChiToPrimVtx.clear();
 
   CbmL1PFFitter fitter;
 
 //  fitter.Fit(vRTracks); //assumed, that the initial fit should be fixed and must return good results!!!
 
   vector<L1FieldRegion> vField;
-  vector<float> ChiToPrimVtx;
-  fitter.GetChiToVertex(vRTracks, vField, ChiToPrimVtx, kfVertex, 3);
+  fitter.GetChiToVertex(vRTracks, vField, fChiToPrimVtx, kfVertex, 3);
 
 //  fitter.CalculateFieldRegion(vRTracks, vField);
 
@@ -320,7 +320,7 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
     vKFTrack[iTr] = CbmKFTrack(vRTracks[iTr]);
 
   KFParticleSIMD pVtx(kfVertex);
-  KFParticleFinder::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, pVtx, vTrackPDG, fCuts);
+  KFParticleFinder::FindParticles(vKFTrack, fChiToPrimVtx, vField, fParticles, pVtx, vTrackPDG, fCuts);
 //  CbmKFParticleInterface::FindParticles(vKFTrack, ChiToPrimVtx, vField, fParticles, kfVertex, vTrackPDG, fCuts);
 
   timerSelect.Stop();

@@ -44,6 +44,7 @@ class CbmKFParticlesFinder: public FairTask
 
 //  vector<CbmKFParticle>& GetParticles()  {return fParticles;}
   std::vector<KFParticle>& GetParticles()  {return fParticles;}
+  std::vector<float>& GetChiPrim()  {return fChiToPrimVtx;}
 
   ClassDef(CbmKFParticlesFinder,1);
 
@@ -57,6 +58,7 @@ class CbmKFParticlesFinder: public FairTask
 
 //  vector<CbmKFParticle> fParticles;
   std::vector<KFParticle> fParticles;
+  std::vector<float> fChiToPrimVtx;
 
 // for the particle id
   TClonesArray* flistStsTracksMatch;

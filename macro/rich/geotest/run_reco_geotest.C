@@ -5,7 +5,7 @@ void run_reco_geotest(Int_t nEvents = 1000)
    TString script = TString(gSystem->Getenv("SCRIPT"));
    gRandom->SetSeed(10);
 
-   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richgeotest/";
+   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/geotest/";
    TString inFile = outDir + "mc.0000.root";
    TString parFile = outDir + "param.0000.root";
    TString outFile = outDir + "reco.00000.root";

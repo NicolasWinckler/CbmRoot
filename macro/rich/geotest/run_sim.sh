@@ -23,19 +23,17 @@ export MAGNET_GEOM=magnet/magnet_v12a.geo
 export FIELD_MAP_SCALE=1.0
 
 #number of events for each thread
-export NEVENTS=2
+export NEVENTS=200
 
-for Z in 1600; do
-   export DIR=/Users/slebedev/Development/cbm/data/simulations/richgeotest/
-   
-   #export RICH_GEOM=rich/rich_compact_${Z}.geo
-   
-   export RICH_GEO_TEST_RESULT_DIR=results_richshift_geo_${Z}/
+for Z in 1; do
+   export DIR=/Users/slebedev/Development/cbm/data/simulations/rich/geotest/
+
+   export RICH_GEO_TEST_RESULT_DIR=results_geotest_${Z}/
    mkdir -p ${RICH_GEO_TEST_RESULT_DIR}
 
-   export MC_FILE=${DIR}/test.richshift.mc.000${Z}.root
-   export PAR_FILE=${DIR}/test.richshift.param.000${Z}.root
-   export RECO_FILE=${DIR}/test.richshift.reco.000${Z}.root  
+   export MC_FILE=${DIR}/mc.000${Z}.root
+   export PAR_FILE=${DIR}/param.000${Z}.root
+   export RECO_FILE=${DIR}/reco.000${Z}.root  
    
    ./sim.sh
   # xterm -hold -e ". ./sim.sh"&

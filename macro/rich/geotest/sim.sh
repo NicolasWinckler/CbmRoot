@@ -5,4 +5,4 @@ cd -
 
 root -l "./run_sim_geotest.C($NEVENTS)"
 
-#root  -l "./run_reco_geotest.C($NEVENTS)"
+root  -l "./run_reco_geotest.C($NEVENTS)"

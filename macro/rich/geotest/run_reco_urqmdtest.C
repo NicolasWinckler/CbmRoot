@@ -8,10 +8,10 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    gRandom->SetSeed(10);
 
    TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/";
-   TString inFile = outDir + "8gev.mc.0000.root";
-   TString parFile = outDir + "8gev.param.0000.root";
-   TString outFile = outDir + "8gev.reco.0000.root";
-   std::string resultDir = "results_urqmd_8gev/";
+   TString inFile = outDir + "35gev.mbias.mc.0000.root";
+   TString parFile = outDir + "35gev.mbias.param.0000.root";
+   TString outFile = outDir + "35gev.mbias.reco.0000.root";
+   std::string resultDir = "results_urqmd_35gev_mbias/";
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
@@ -21,10 +21,8 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    TStopwatch timer;
    timer.Start();
 
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-   cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 
    FairRunAna *run= new FairRunAna();
    run->SetInputFile(inFile);

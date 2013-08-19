@@ -6,8 +6,8 @@ void run_sim_geotest(Int_t nEvents = 10)
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richgeotest/";
-   TString parFile =  outDir + "mc.0000.root";
-   TString outFile = outDir + "param.0000.root";
+   TString parFile =  outDir + "test.mc.0000.root";
+   TString outFile = outDir + "test.param.0000.root";
    TString caveGeom = "cave.geo";
    TString targetGeom = "target_au_250mu.geo";
    TString pipeGeom   = "pipe_standard.geo";
@@ -37,11 +37,8 @@ void run_sim_geotest(Int_t nEvents = 10)
    TStopwatch timer;
    timer.Start();
 
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-
-   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-   cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 
    FairRunSim* fRun = new FairRunSim();
    fRun->SetName("TGeant3"); // Transport engine

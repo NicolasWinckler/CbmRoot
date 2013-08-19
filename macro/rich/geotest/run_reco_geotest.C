@@ -24,10 +24,8 @@ void run_reco_geotest(Int_t nEvents = 1000)
    TStopwatch timer;
    timer.Start();
 
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-   cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 
    FairRunAna *run= new FairRunAna();
    run->SetInputFile(inFile);

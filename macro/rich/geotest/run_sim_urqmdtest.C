@@ -24,11 +24,8 @@ void run_sim_urqmdtest(Int_t nEvents = 1000)
    TStopwatch timer;
    timer.Start();
 
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-
-   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-   cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 
    FairRunSim* fRun = new FairRunSim();
    fRun->SetName("TGeant3"); // Transport engine

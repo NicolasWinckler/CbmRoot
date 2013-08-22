@@ -87,7 +87,7 @@ void CbmLitFitQa::Exec(
 void CbmLitFitQa::Finish()
 {
    fHM->WriteToFile();
-   fHM->ShrinkEmptyBinsByPattern("htf_.+_WrongCov_.+");
+   fHM->ShrinkEmptyBinsH1ByPattern("htf_.+_WrongCov_.+");
    CbmSimulationReport* report = new CbmLitFitQaReport();
    report->Create(fHM, fOutputDir);
    delete report;

@@ -288,11 +288,11 @@ void CbmLitClusteringQaReport::ScaleHistogramsByNofEvents()
    Int_t nofEvents = HM()->H1("hen_EventNo_ClusteringQa")->GetEntries();
 
    HM()->ScaleByPattern("hno_NofObjects_.*_Station", 1. / nofEvents);
-   HM()->ShrinkEmptyBinsByPattern("hno_NofObjects_.*_Station");
+   HM()->ShrinkEmptyBinsH1ByPattern("hno_NofObjects_.*_Station");
 
    if(HM()->Exists("hno_NofObjects_MuchHits_Station")){
       HM()->ScaleByPattern("(hss_Much_|hsc_Much_).+", 1. / nofEvents);
-      HM()->ShrinkEmptyBinsByPattern("(hss_Much_|hsh_Much_).+");
+      HM()->ShrinkEmptyBinsH1ByPattern("(hss_Much_|hsh_Much_).+");
    }
 }
 

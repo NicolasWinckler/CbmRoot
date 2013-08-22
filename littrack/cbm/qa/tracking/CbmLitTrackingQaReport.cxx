@@ -254,7 +254,7 @@ void CbmLitTrackingQaReport::DrawEfficiencyHistos()
    DrawYPt("tracking_qa_Rich_Rich_Electron_Eff_RingXcYc", "hte_Rich_Rich_Electron_Eff_RingXcYc", true);
 
 	// Draw local accepted and reconstructed tracks vs number of points
-	HM()->ShrinkEmptyBinsByPattern("hte_.+_.+_.+_.+_Np");
+	HM()->ShrinkEmptyBinsH1ByPattern("hte_.+_.+_.+_.+_Np");
 	vector<string> accRecTracks = list_of("Sts")("Trd")("Much")("Tof");
 	for (UInt_t i = 0; i < accRecTracks.size(); i++) {
 		string variant = accRecTracks[i];
@@ -423,7 +423,7 @@ void CbmLitTrackingQaReport::DrawYPt(
 
 void CbmLitTrackingQaReport::DrawHitsHistos()
 {
-   HM()->ShrinkEmptyBinsByPattern("hth_.*(_All|_True|_Fake)");
+   HM()->ShrinkEmptyBinsH1ByPattern("hth_.*(_All|_True|_Fake)");
    DrawHitsHistos("tracking_qa_mvd_hits", "hth_Mvd_TrackHits");
    DrawHitsHistos("tracking_qa_sts_hits", "hth_Sts_TrackHits");
    DrawHitsHistos("tracking_qa_trd_hits", "hth_Trd_TrackHits");

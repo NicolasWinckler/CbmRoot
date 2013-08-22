@@ -97,6 +97,7 @@ public:
       // Check bound conditions and if out of bounds return zero.
       // Can be removed considering performance!
       if (x < fXMin || x > fXMax || y < fYMin || y > fXMax) {
+      //   std::cout << "LitMaterialGrid::GetMaterial: out of bounds x=" << x << " y=" << y << std::endl;
          return 0.;
       }
       // Calculate bin indices for X and Y
@@ -106,7 +107,8 @@ public:
       // Check bound conditions and if out of bounds return zero.
       // Can be removed considering performance!
       if (ix < 0 || iy < 0 || ix >= fNofBinsX - 1 || iy >= fNofBinsY - 1) {
-        return 0.;
+       //  std::cout << "LitMaterialGrid::GetMaterial: out of bounds ix=" << ix << " iy=" << iy << std::endl;
+         return 0.;
       }
 
       return fMaterial[ix][iy];
@@ -173,17 +175,20 @@ public:
     */
    string ToString() const {
       stringstream ss;
-      ss << "LitMaterialGrid: Z=" /* << fZ*/ << " Xmin=" << fXMin << " Xmax=" << fXMax
+      ss << "LitMaterialGrid:" /*Z=" << fZ*/ << " Xmin=" << fXMin << " Xmax=" << fXMax
          << " Ymin=" << fYMin << " Ymax=" << fYMax << " nofBinsX=" << fNofBinsX
          << " nofBinsY=" << fNofBinsY << " binSizeX=" << fBinSizeX
          << " binSizeY=" << fBinSizeY << " material.size=" << fMaterial.size();
       if (fNofBinsX > 0 && fNofBinsY > 0) {
-         ss << "\nGrid:\n";
          unsigned int stepX = fNofBinsX / 10;
          unsigned int stepY = fNofBinsY / 10;
-         for (unsigned int i = 0; i < 10; i++) {
-            for (unsigned int j = 0; j < 10; j++) {
-               ss << right << setfill(' ') << setw(10) << fMaterial[i * stepX][j * stepY] << " ";
+         ss << "\nGrid: stepX=" << stepX << " stepY=" << stepY << "\n";
+         for (unsigned int i = 0; i < 11; i++) {
+            for (unsigned int j = 0; j < 11; j++) {
+               if (i < 10 && j < 10) ss << right << setfill(' ') << setw(10) << fMaterial[i * stepX][j * stepY] << " ";
+               if (j == 10 && i != 10) ss << right << setfill(' ') << setw(10) << fMaterial[i * stepX][fNofBinsY - 1] << " ";
+               if (i == 10 && j != 10) ss << right << setfill(' ') << setw(10) << fMaterial[fNofBinsX - 1][j * stepY] << " ";
+               if (i == 10 && j == 10) ss << right << setfill(' ') << setw(10) << fMaterial[fNofBinsX - 1][fNofBinsY - 1] << " ";
             }
             ss << "\n";
          }

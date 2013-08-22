@@ -89,6 +89,7 @@ set(SRCS
    cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.cxx
    cbm/qa/radlength/CbmLitRadLengthQa.cxx
    cbm/qa/radlength/CbmLitRadLengthQaReport.cxx
+   cbm/qa/radlength/CbmLitRadLengthGenerator.cxx
    cbm/qa/tof/CbmLitTofQa.cxx
    cbm/qa/tof/CbmLitTofQaReport.cxx
 )
@@ -121,6 +122,7 @@ set(HEADERS
    cbm/qa/fieldapr/CbmLitFieldApproximationQaReport.h
    cbm/qa/radlength/CbmLitRadLengthQa.h
    cbm/qa/radlength/CbmLitRadLengthQaReport.h
+   cbm/qa/radlength/CbmLitRadLengthGenerator.h
    cbm/qa/tof/CbmLitTofQa.h
    cbm/qa/tof/CbmLitTofQaReport.h
 )

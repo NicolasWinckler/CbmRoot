@@ -60,7 +60,7 @@ inline void LitAddMaterial(
 
    // Scale material thickness
    T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
-   T thickness = 0.7 * norm * siliconThickness;
+   T thickness = norm * siliconThickness;
    T radThick = thickness / SILICON_RAD_LENGTH;
    T sqrtRadThick = sqrt(radThick);
    T logRadThick = log(radThick);

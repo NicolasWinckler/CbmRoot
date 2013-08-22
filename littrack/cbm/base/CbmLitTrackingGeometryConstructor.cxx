@@ -199,7 +199,7 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
 
    // Read file with TProfile2D containing silicon equivalent of the material
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-   TString matBudgetFile = parDir + "/littrack/trd_v13g.silicon.root";
+   TString matBudgetFile = parDir + "/littrack/trd_v13g.30M.silicon.root";
    TFile* oldFile = gFile;
    TDirectory* oldDirectory = gDirectory;
    TFile* file = new TFile(matBudgetFile, "READ");
@@ -235,7 +235,7 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
    for (Int_t iStation = 0; iStation < nofStations; iStation++) {
       // Convert material for this station
       TProfile2D* profile = hm.P2("hrl_ThicknessSilicon_Trd_" + lit::ToString<Int_t>(iStation) + "_P2");
-      profile->Rebin2D(8, 8);
+      //profile->Rebin2D(200, 200);
       lit::parallel::LitMaterialGrid material;
       ConvertTProfile2DToLitMaterialGrid(profile, &material);
 
@@ -268,7 +268,7 @@ void CbmLitTrackingGeometryConstructor::GetRichMaterial(
    hm.ReadFromFile(file);
 
    TProfile2D* profile = hm.P2("hrl_ThicknessSilicon_Rich_P2");
-//   profile->Rebin2D(8, 8);
+  // profile->Rebin2D(200, 200);
    ConvertTProfile2DToLitMaterialGrid(profile, material, 3.);
 
    gFile = oldFile;
@@ -282,58 +282,64 @@ void CbmLitTrackingGeometryConstructor::ConvertTProfile2DToLitMaterialGrid(
       lit::parallel::LitMaterialGrid* grid,
       Double_t maximumValue)
 {
+//   Int_t nofBinsX = profile->GetNbinsX();
+//   Int_t nofBinsY = profile->GetNbinsY();
+//   vector<vector<fscal> >material(nofBinsX);
+//   for (Int_t i = 0; i < nofBinsX; i++) material[i].resize(nofBinsY);
+//   for (Int_t iX = 1; iX <= nofBinsX; iX++) {
+//      for (Int_t iY = 1; iY <= nofBinsY; iY++) {
+//         Double_t content = profile->GetBinContent(iX, iY);
+//         if (maximumValue > 0 && content > maximumValue) content = maximumValue;
+//         material[iX - 1][iY - 1] = content;
+//      }
+//   }
+//   Double_t xmin = profile->GetXaxis()->GetXmin();
+//   Double_t xmax = profile->GetXaxis()->GetXmax();
+//   Double_t ymin = profile->GetYaxis()->GetXmin();
+//   Double_t ymax = profile->GetYaxis()->GetXmax();
+//   grid->SetMaterial(material, xmin, xmax, ymin, ymax, nofBinsX, nofBinsY);
+
    Int_t nofBinsX = profile->GetNbinsX();
    Int_t nofBinsY = profile->GetNbinsY();
-   vector<vector<fscal> >material(nofBinsX);
-   for (Int_t i = 0; i < nofBinsX; i++) material[i].resize(nofBinsY);
-   for (Int_t iX = 1; iX <= nofBinsX; iX++) {
-      for (Int_t iY = 1; iY <= nofBinsY; iY++) {
-         Double_t content = profile->GetBinContent(iX, iY);
-         if (maximumValue > 0 && content > maximumValue) content = maximumValue;
-         material[iX - 1][iY - 1] = content;
+   Int_t minShrinkBinX = std::numeric_limits<Double_t>::max();
+   Int_t maxShrinkBinX = std::numeric_limits<Double_t>::min();
+   Int_t minShrinkBinY = std::numeric_limits<Double_t>::max();
+   Int_t maxShrinkBinY = std::numeric_limits<Double_t>::min();
+   Bool_t isSet = false;
+   for (Int_t iBinX = 1; iBinX <= nofBinsX; iBinX++) {
+      for (Int_t iBinY = 1; iBinY <= nofBinsY; iBinY++) {
+         Double_t content = profile->GetBinContent(iBinX, iBinY);
+         if (content != 0.) {
+            minShrinkBinX = std::min(iBinX, minShrinkBinX);
+            maxShrinkBinX = std::max(iBinX, maxShrinkBinX);
+            minShrinkBinY = std::min(iBinY, minShrinkBinY);
+            maxShrinkBinY = std::max(iBinY, maxShrinkBinY);
+            isSet = true;
+         }
       }
    }
-   Double_t xmin = profile->GetXaxis()->GetXmin();
-   Double_t xmax = profile->GetXaxis()->GetXmax();
-   Double_t ymin = profile->GetYaxis()->GetXmin();
-   Double_t ymax = profile->GetYaxis()->GetXmax();
-   grid->SetMaterial(material, xmin, xmax, ymin, ymax, nofBinsX, nofBinsY);
-}
 
+   Int_t nofShrinkBinsX = maxShrinkBinX - minShrinkBinX + 1;
+   Int_t nofShrinkBinsY = maxShrinkBinY - minShrinkBinY + 1;
+   vector<vector<fscal> >material(nofShrinkBinsX);
+   for (Int_t i = 0; i < nofShrinkBinsX; i++) material[i].resize(nofShrinkBinsY);
+
+   for (Int_t iX = minShrinkBinX; iX <= maxShrinkBinX; iX++) {
+      for (Int_t iY = minShrinkBinY; iY <= maxShrinkBinY; iY++) {
+         Double_t content = profile->GetBinContent(iX, iY);
+         if (maximumValue > 0 && content > maximumValue) content = maximumValue;
+         material[iX - minShrinkBinX][iY - minShrinkBinY] = content;
+      }
+   }
+   Double_t xmin = profile->GetXaxis()->GetBinLowEdge(minShrinkBinX);
+   Double_t xmax = profile->GetXaxis()->GetBinUpEdge(maxShrinkBinX);
+   Double_t ymin = profile->GetYaxis()->GetBinLowEdge(minShrinkBinY);
+   Double_t ymax = profile->GetYaxis()->GetBinUpEdge(maxShrinkBinY);
+   grid->SetMaterial(material, xmin, xmax, ymin, ymax, nofShrinkBinsX, nofShrinkBinsY);
+}
 
 Int_t CbmLitTrackingGeometryConstructor::GetNofTrdStations()
 {
-//   static Bool_t firstTime = true;
-//   if (firstTime) {
-//      set<Int_t> planeIds;
-//      TObjArray* topNodes = fGeo->GetTopNode()->GetNodes();
-//      Int_t nofTopNodes = topNodes->GetEntriesFast();
-//      for (Int_t iTopNode = 0; iTopNode < nofTopNodes; iTopNode++) {
-//         TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
-//         if (TString(topNode->GetName()).Contains("trd")) {
-//            TObjArray* modules = topNode->GetNodes();
-//            for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
-//               TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
-//               TString moduleName = module->GetName();
-//               Int_t stationId = 0;
-//               Int_t layerId = 0;
-//               if (moduleName.Contains(TRegexp("trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]$"))) { // trd_v10b and trd_v11c
-//                  stationId = std::atoi(string(1, moduleName[3]).c_str()); // 3rd element is station number
-//                  layerId = std::atoi(string(1, moduleName[9]).c_str()); // 9th element is layer number
-//               } else if (moduleName.Contains(TRegexp("trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]"))) { // trd_v12x and trd_v13x
-//                  stationId = std::atoi(string(1, moduleName[9]).c_str()); // 9th element is station number
-//                  layerId = std::atoi(string(1, moduleName[10]).c_str()); // 10th element is layer number
-//               }
-//               Int_t planeId = 10 * stationId + layerId;
-//               planeIds.insert(planeId);
-//            }
-//         }
-//      }
-//      fNofTrdStations = planeIds.size();
-//      firstTime = false;
-//   }
-//   return fNofTrdStations;
-
    static Bool_t firstTime = true;
    if (firstTime) {
       Int_t layerCounter = 0;
@@ -354,7 +360,6 @@ Int_t CbmLitTrackingGeometryConstructor::GetNofTrdStations()
       firstTime = false;
    }
    return fNofTrdStations;
-
 }
 
 Int_t CbmLitTrackingGeometryConstructor::GetNofMuchStations()
@@ -422,48 +427,6 @@ Int_t CbmLitTrackingGeometryConstructor::GetNofStsStations()
    }
    return fNofStsStations;
 }
-
-//Int_t CbmLitTrackingGeometryConstructor::ConvertTrdToAbsoluteStationNr(
-//      Int_t station,
-//      Int_t layer)
-//{
-//   static Bool_t firstTime = true;
-//   static vector<Int_t> sumOfLayers;
-//   if (firstTime) {
-//      map<Int_t, set<Int_t> > stationLayerId;
-//      TObjArray* topNodes = fGeo->GetTopNode()->GetNodes();
-//      Int_t nofTopNodes = topNodes->GetEntriesFast();
-//      for (Int_t iTopNode = 0; iTopNode < nofTopNodes; iTopNode++) {
-//         TGeoNode* topNode = static_cast<TGeoNode*>(topNodes->At(iTopNode));
-//         if (TString(topNode->GetName()).Contains("trd")) {
-//            TObjArray* modules = topNode->GetNodes();
-//            for (Int_t iModule = 0; iModule < modules->GetEntriesFast(); iModule++) {
-//               TGeoNode* module = static_cast<TGeoNode*>(modules->At(iModule));
-//               TString moduleName = module->GetName();
-//               Int_t stationId = 0;
-//               Int_t layerId = 0;
-//               if (moduleName.Contains(TRegexp("trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]$"))) { // trd_v10b and trd_v11c
-//                  stationId = std::atoi(string(1, moduleName[3]).c_str()); // 3rd element is station number
-//                  layerId = std::atoi(string(1, moduleName[9]).c_str()); // 9th element is layer number
-//               } else if (moduleName.Contains(TRegexp("trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]"))) { // trd_v12x and trd_v13x
-//                  stationId = std::atoi(string(1, moduleName[9]).c_str()); // 9th element is station number
-//                  layerId = std::atoi(string(1, moduleName[10]).c_str()); // 10th element is layer number
-//               }
-//               stationLayerId[stationId].insert(layerId);
-//            }
-//         }
-//      }
-//      map<Int_t, set<Int_t> >::const_iterator it;
-//      Int_t sum = 0;
-//      sumOfLayers.push_back(0);
-//      for (it = stationLayerId.begin(); it != stationLayerId.end(); it++) {
-//         sum += (*it).second.size();
-//         sumOfLayers.push_back(sum);
-//      }
-//      firstTime = false;
-//   }
-//   return sumOfLayers[station] + layer;
-//}
 
 Int_t CbmLitTrackingGeometryConstructor::ConvertMuchToAbsoluteStationNr(
       Int_t station,

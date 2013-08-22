@@ -38,5 +38,6 @@
 #pragma link C++ class CbmLitFieldApproximationQaReport+;
 #pragma link C++ class CbmLitRadLengthQaReport+;
 #pragma link C++ class CbmLitTofQaReport+;
+#pragma link C++ class CbmLitRadLengthGenerator+;
 
 #endif

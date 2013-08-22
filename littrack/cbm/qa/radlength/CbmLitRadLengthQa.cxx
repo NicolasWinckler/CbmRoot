@@ -83,6 +83,7 @@ void CbmLitRadLengthQa::Exec(
 
 void CbmLitRadLengthQa::Finish()
 {
+   fHM->ShrinkEmptyBinsH2ByPattern("hrl_.+_P2");
    fHM->WriteToFile();
    CbmSimulationReport* report = new CbmLitRadLengthQaReport();
    report->Create(fHM, fOutputDir);
@@ -100,7 +101,15 @@ void CbmLitRadLengthQa::ReadDataBranches()
 
 void CbmLitRadLengthQa::CreateHistograms()
 {
-   const Int_t nofBins = 200;
+   const Int_t nofBins = 1000;
+   const Int_t nofBinsX = 1000;
+   const Int_t nofBinsY = 1000;
+   const Int_t nofBinsSiliconThicknessX = 5500;
+   const Int_t nofBinsSiliconThicknessY = 5500;
+   const Double_t minX = -550.1;
+   const Double_t maxX = 549.9;
+   const Double_t minY = -550.1;
+   const Double_t maxY = 549.9;
    vector<string> detNames = list_of("Total")("Mvd")("Sts")("Rich")("Trd")("Much")("Tof");
    Int_t nofDetNames = detNames.size();
    for (Int_t iDet = 0; iDet < nofDetNames; iDet++) {
@@ -111,13 +120,13 @@ void CbmLitRadLengthQa::CreateHistograms()
       if (!createHistograms) continue; // Create histograms only for the detectors wich are in the setup
       string rtname = "hrl_RadThickness_" + detName;
       fHM->Add(rtname + "_H1", new TH1D(string(rtname + "_H1").c_str(), string(rtname + "_H1;Radiation thickness [%];Entries").c_str(), nofBins, 0, 0));
-      fHM->Add(rtname + "_P2", new TProfile2D(string(rtname + "_P2").c_str(), string(rtname + "_P2;X [cm];Y [cm];Radiation thickness [%]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+      fHM->Add(rtname + "_P2", new TProfile2D(string(rtname + "_P2").c_str(), string(rtname + "_P2;X [cm];Y [cm];Radiation thickness [%]").c_str(), nofBinsX, minX, maxX, nofBinsY, minY, maxY));
       string tname = "hrl_Thickness_" + detName;
       fHM->Add(tname + "_H1", new TH1D(string(tname + "_H1").c_str(), string(tname + "_H1;Thickness [cm];Entries").c_str(), nofBins, 0, 0));
-      fHM->Add(tname + "_P2", new TProfile2D(string(tname + "_P2").c_str(), string(tname + "_P2;X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+      fHM->Add(tname + "_P2", new TProfile2D(string(tname + "_P2").c_str(), string(tname + "_P2;X [cm];Y [cm];Thickness [cm]").c_str(), nofBinsX, minX, maxX, nofBinsY, minY, maxY));
       string tsname = "hrl_ThicknessSilicon_" + detName;
       fHM->Add(tsname + "_H1", new TH1D(string(tsname + "_H1").c_str(), string(tsname + "_H1;Thickness [cm];Entries").c_str(), nofBins, 0, 0));
-      fHM->Add(tsname + "_P2", new TProfile2D(string(tsname + "_P2").c_str(), string(tsname + "_P2;X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+      fHM->Add(tsname + "_P2", new TProfile2D(string(tsname + "_P2").c_str(), string(tsname + "_P2;X [cm];Y [cm];Thickness [cm]").c_str(), nofBinsSiliconThicknessX, minX, maxX, nofBinsSiliconThicknessY, minY, maxY));
    }
 
    // Additional histograms for each station in tracking detectors
@@ -133,15 +142,15 @@ void CbmLitRadLengthQa::CreateHistograms()
          string name = "hrl_RadThickness_" + dname + "_" + ToString<Int_t>(iStation) + "_H1";
          fHM->Add(name, new TH1D(name.c_str(), string(name + ";Radiation thickness [%];Entries").c_str(), nofBins, 0, 0));
          name = "hrl_RadThickness_" + dname + "_" + ToString<Int_t>(iStation) + "_P2";
-         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Radiation thickness [%]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Radiation thickness [%]").c_str(), nofBinsX, minX, maxX, nofBinsY, minY, maxY));
          name = "hrl_Thickness_" + dname + "_" + ToString<Int_t>(iStation) + "_H1";
          fHM->Add(name, new TH1D(name.c_str(), string(name + ";Thickness [cm];Entries").c_str(), nofBins, 0, 0));
          name = "hrl_Thickness_" + dname + "_" + ToString<Int_t>(iStation) + "_P2";
-         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBinsX, minX, maxX, nofBinsY, minY, maxY));
          name = "hrl_ThicknessSilicon_" + dname + "_" + ToString<Int_t>(iStation) + "_H1";
          fHM->Add(name, new TH1D(name.c_str(), string(name + ";Thickness [cm];Entries").c_str(), nofBins, 0, 0));
          name = "hrl_ThicknessSilicon_" + dname + "_" + ToString<Int_t>(iStation) + "_P2";
-         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBins, 0., 0., nofBins, 0., 0.));
+         fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBinsSiliconThicknessX, minX, maxX, nofBinsSiliconThicknessY, minY, maxY));
       }
    }
 
@@ -311,28 +320,11 @@ Int_t CbmLitRadLengthQa::GetStsStationId(
 Int_t CbmLitRadLengthQa::GetTrdStationId(
       const TString& nodePath)
 {
-//   Int_t station = 0;
-//   Int_t layer = 0;
-//   Bool_t nodeExists = false;
-//   if (nodePath.Contains(TRegexp("/cave_1/trd[1-3]_0/trd[1-3]mod[0-9]_[0-9][0-9][0-9][0-9]/trd[1-3]mod.+"))) { // trd_v10b and trd_v11c
-//      station = std::atoi(string(1, *(gGeoManager->GetPath() + 18)).c_str()); // 18th element is station number
-//      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is layer number
-//      nodeExists = true;
-//   } else if (nodePath.Contains(TRegexp("/cave_1/trd1_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v12x
-//      station = std::atoi(string(1, *(gGeoManager->GetPath() + 24)).c_str()); // 24th element is station number
-//      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 25)).c_str()); // 25th element is layer number
-//      nodeExists = true;
-//   } else if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/trd1mod[0-9]_[0-9][0-9][0-9][0-9][0-9]/trd1mod.+"))) { // trd_v13x
-//      station = std::atoi(string(1, *(gGeoManager->GetPath() + 28)).c_str()); // 28th element is station number
-//      layer = std::atoi(string(1, *(gGeoManager->GetPath() + 29)).c_str()); // 29th element is layer number
-//      nodeExists = true;
-//   }
    Int_t layerId = -1;
    if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/layer[0-9][0-9]_[0-9][0-9][0-9][0-9][0-9]/module[0-9]_.+"))) { // trd_v13x NEW
       layerId = std::atoi(string(nodePath.Data() + 24, 2).c_str()) - 1;
    }
    return layerId;
-   //return (nodeExists) ? CbmLitTrackingGeometryConstructor::Instance()->ConvertTrdToAbsoluteStationNr(station - 1, layer - 1) : -1;
 }
 
 Int_t CbmLitRadLengthQa::GetMuchStationId(

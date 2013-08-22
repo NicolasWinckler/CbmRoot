@@ -16,7 +16,7 @@ void global_fit(Int_t nEvents = 100)
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-   TString dir = "events/sts_rich_trd_parallel/"; // Output directory
+   TString dir = "events/trd_v13g/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Reconstructed tracks and hits

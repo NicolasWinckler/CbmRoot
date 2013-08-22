@@ -12,7 +12,7 @@ using std::endl;
 using std::vector;
 using std::string;
 
-void global_reco_qa(Int_t nEvents = 10000,
+void global_reco_qa(Int_t nEvents = 100,
       TString opt = "reco")
 // opt == "reco" in case of one input file with all reconstructed data
 // opt == "ht" (hitas and tracks) in case of two input files with reconstructed hits and tracks
@@ -21,7 +21,7 @@ void global_reco_qa(Int_t nEvents = 10000,
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "events/much_v12c_omega_8gev_10k/"; // Output directory
+	TString dir = "events/trd_v13g/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
@@ -108,8 +108,8 @@ void global_reco_qa(Int_t nEvents = 10000,
    // ----- Reconstruction QA tasks -----------------------------------------
 	vector<string> trackCategories;
 	trackCategories.push_back("All");
-	//trackCategories.push_back("Electron");
-	trackCategories.push_back("Muon");
+	trackCategories.push_back("Electron");
+	//trackCategories.push_back("Muon");
 	vector<string> ringCategories;
 	ringCategories.push_back("Electron");
 	ringCategories.push_back("ElectronReference");
@@ -140,7 +140,7 @@ void global_reco_qa(Int_t nEvents = 10000,
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);
+  // run->AddTask(clusteringQa);
 
    CbmLitTofQa* tofQa = new CbmLitTofQa();
    tofQa->SetOutputDir(std::string(resultDir));

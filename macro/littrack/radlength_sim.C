@@ -1,12 +1,13 @@
 #include <iostream>
+#include <algorithm>
 using std::cout;
 using std::endl;
 
-void radlength_sim(Int_t nEvents = 1000000)
+void radlength_sim(Int_t nEvents = 30250000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir  = "events/radlen_trd_v13c/";
+   TString dir  = "events/radlen_trd_v13g_30M/";
    TString mcFile = dir + "radlength.mc.0000.root";
    TString parFile = dir + "radlength.param.0000.root";
 
@@ -14,7 +15,7 @@ void radlength_sim(Int_t nEvents = 1000000)
    TString mvdGeom = "";//"mvd/mvd_v07a.geo";
    TString stsGeom = "";//"sts/sts_v12b.geo.root";
    TString richGeom = "";//"rich/rich_v08a.geo";
-   TString trdGeom = "trd/trd_v13c.root";
+   TString trdGeom = "trd/trd_v13g.geo.root";
    TString muchGeom = "";//"much/much_v12b.geo";
    TString tofGeom = "";//"tof/tof_v13b.root";
 
@@ -88,6 +89,34 @@ void radlength_sim(Int_t nEvents = 1000000)
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
    run->SetGenerator(primGen);
 
+   const Double_t minX = -550; // cm
+   const Double_t maxX = 550; // cm
+   const Double_t stepX = 0.2; // cm
+   const Int_t nofBinsX = (maxX - minX) / stepX;
+   const Double_t minY = -550; // cm
+   const Double_t maxY = 550; // cm
+   const Double_t stepY = 0.2; // cm
+   const Int_t nofBinsY = (maxY - minY) / stepY;
+   const Int_t nofEvents = nofBinsX * nofBinsY;
+
+   std::vector<Double_t> vectorX, vectorY;
+   for (Int_t iX = 0; iX < nofBinsX; iX++) {
+      Double_t x = minX + iX * stepX;
+      for (Int_t iY = 0; iY < nofBinsY; iY++) {
+         Double_t y = minY + iY * stepY;
+         vectorX.push_back(x);
+         vectorY.push_back(y);
+      }
+   }
+
+   std::cout << "CbmLitRadLengthGenerator:\n";
+   std::cout << "nofBinX=" << nofBinsX << " nofBinsY=" << nofBinsY << " nofEvents=" << nofEvents << std::endl;
+
+   CbmLitRadLengthGenerator* generator = new CbmLitRadLengthGenerator();
+   generator->SetXY(vectorX, vectorY);
+   primGen->AddGenerator(generator);
+
+/*
    const int RMax = 700; // Maximum radius of the station
    FairBoxGenerator* box = new FairBoxGenerator(0, 1);
    box->SetBoxXYZ(-RMax, -RMax, RMax, RMax, 0.);
@@ -95,6 +124,7 @@ void radlength_sim(Int_t nEvents = 1000000)
    box->SetThetaRange(0., 0.);
    box->SetPhiRange(0., 0.);
    primGen->AddGenerator(box);
+   */
 
 /*
    FairBoxGenerator* box = new FairBoxGenerator(0, 1);

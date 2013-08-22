@@ -266,17 +266,31 @@ public:
    void Clear();
 
    /**
-    * \brief Shrink empty bins in histogram for Xaxis from right side.
+    * \brief Shrink empty bins in H1.
     * \param[in] histName Name of histogram.
     */
-   void ShrinkEmptyBins(
+   void ShrinkEmptyBinsH1(
          const string& histName);
 
    /**
-    * \brief Shrink empty bins in histograms for Xaxis from right side.
+    * \brief Shrink empty bins in H1.
     * \param[in] histPatternName Regular expression for histogram name.
     */
-   void ShrinkEmptyBinsByPattern(
+   void ShrinkEmptyBinsH1ByPattern(
+         const string& pattern);
+
+   /**
+    * \brief Shrink empty bins in H2.
+    * \param[in] histName Name of histogram.
+    */
+   void ShrinkEmptyBinsH2(
+         const string& histName);
+
+   /**
+    * \brief Shrink empty bins in H2.
+    * \param[in] histPatternName Regular expression for histogram name.
+    */
+   void ShrinkEmptyBinsH2ByPattern(
          const string& pattern);
 
    /**

@@ -147,30 +147,75 @@ void CbmHistManager::Clear()
    fMap.clear();
 }
 
-void CbmHistManager::ShrinkEmptyBins(
+void CbmHistManager::ShrinkEmptyBinsH1(
       const string& histName)
 {
    TH1* hist = H1(histName);
    Int_t nofBins = hist->GetNbinsX();
-   Int_t shrinkBin = 0;
-   for (Int_t iBin = nofBins; iBin > 0; iBin--) {
+   Int_t minShrinkBin = std::numeric_limits<Double_t>::max();
+   Int_t maxShrinkBin = std::numeric_limits<Double_t>::min();
+   Bool_t isSet = false;
+   for (Int_t iBin = 1; iBin <= nofBins; iBin++) {
       Double_t content = hist->GetBinContent(iBin);
       if (content != 0.) {
-         shrinkBin = iBin;
-         break;
+         minShrinkBin = std::min(iBin, minShrinkBin);
+         maxShrinkBin = std::max(iBin, maxShrinkBin);
+         isSet = true;
       }
    }
-   hist->GetXaxis()->SetRange(1, shrinkBin + 1);
+   if (isSet) {
+      hist->GetXaxis()->SetRange(minShrinkBin, maxShrinkBin);
+      hist->GetYaxis()->SetRange(minShrinkBin, maxShrinkBin);
+   }
 }
 
-void CbmHistManager::ShrinkEmptyBinsByPattern(
+void CbmHistManager::ShrinkEmptyBinsH1ByPattern(
       const string& pattern)
 {
 	vector<TH1*> effHistos = H1Vector(pattern);
 	Int_t nofEffHistos = effHistos.size();
 	for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
-		ShrinkEmptyBins(effHistos[iHist]->GetName());
+		ShrinkEmptyBinsH1(effHistos[iHist]->GetName());
 	}
+}
+
+void CbmHistManager::ShrinkEmptyBinsH2(
+      const string& histName)
+{
+   TH1* hist = H2(histName);
+   Int_t nofBinsX = hist->GetNbinsX();
+   Int_t nofBinsY = hist->GetNbinsY();
+   Int_t minShrinkBinX = std::numeric_limits<Double_t>::max();
+   Int_t maxShrinkBinX = std::numeric_limits<Double_t>::min();
+   Int_t minShrinkBinY = std::numeric_limits<Double_t>::max();
+   Int_t maxShrinkBinY = std::numeric_limits<Double_t>::min();
+   Bool_t isSet = false;
+   for (Int_t iBinX = 1; iBinX <= nofBinsX; iBinX++) {
+      for (Int_t iBinY = 1; iBinY <= nofBinsY; iBinY++) {
+         Double_t content = hist->GetBinContent(iBinX, iBinY);
+         if (content != 0.) {
+            minShrinkBinX = std::min(iBinX, minShrinkBinX);
+            maxShrinkBinX = std::max(iBinX, maxShrinkBinX);
+            minShrinkBinY = std::min(iBinY, minShrinkBinY);
+            maxShrinkBinY = std::max(iBinY, maxShrinkBinY);
+            isSet = true;
+         }
+      }
+   }
+   if (isSet) {
+      hist->GetXaxis()->SetRange(minShrinkBinX, maxShrinkBinX);
+      hist->GetYaxis()->SetRange(minShrinkBinY, maxShrinkBinY);
+   }
+}
+
+void CbmHistManager::ShrinkEmptyBinsH2ByPattern(
+      const string& pattern)
+{
+   vector<TH1*> effHistos = H1Vector(pattern);
+   Int_t nofEffHistos = effHistos.size();
+   for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+      ShrinkEmptyBinsH2(effHistos[iHist]->GetName());
+   }
 }
 
 void CbmHistManager::Scale(

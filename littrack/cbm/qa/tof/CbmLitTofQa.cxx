@@ -214,9 +214,9 @@ void CbmLitTofQa::CreateHistograms()
       fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 400, -0.2, 1.8));
    }
    string name = "hmp_Tof_dTime";
-   fHM->Add(name, new TH1F(name.c_str(), string(name + "dt [ns];Counter").c_str(), 1000, -100., 100.));
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "dt [ps];Counter").c_str(), 1000, -500., 500.));
    name = "hmp_Tof_TimeZero_a";
-   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 34., 36.));
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 0., 36.));
    name = "hmp_Tof_TimeZero_reco";
    fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, -5.,15. ));
    name = "hmp_Tof_TimeZero_mc";
@@ -224,7 +224,7 @@ void CbmLitTofQa::CreateHistograms()
    name = "hmp_Tof_TimeZero_NofTracks";
    fHM->Add(name, new TH1F(name.c_str(), string(name + "Number of tracks;Counter").c_str(), 100, 0., 100.));
    name = "hmp_Tof_Time_FirstTrack";
-   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 34., 36.));
+   fHM->Add(name, new TH1F(name.c_str(), string(name + "Time [ns];Counter").c_str(), 2000, 0., 36.));
 }
 
 void CbmLitTofQa::ProcessGlobalTracks()
@@ -256,7 +256,8 @@ void CbmLitTofQa::ProcessGlobalTracks()
       Double_t chiSqPrimary = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
       Bool_t chiSqPrimaryOk = chiSqPrimary < 3.;
       
-      Double_t ctCorrection = -0.007;
+//      Double_t ctCorrection = -0.007; 
+      Double_t ctCorrection = 0.0;
       Double_t ctReco = 0.299792458 * tofHit->GetTime() + ctCorrection; // ToF time in ns -> transfrom to ct in m
       Double_t ctMC = 0.299792458 * tofPoint->GetTime() ; // mc time in ns -> transfrom to ct in m
       Double_t trackLengthReco = globalTrack->GetLength() / 100.; //global length
@@ -288,7 +289,7 @@ void CbmLitTofQa::ProcessGlobalTracks()
 
     		  if (stsMCTrackId == tofMCTrackId) {
     		     fHM->H1("hmp_Tof_RecoMCID_" + category + "_m2p")->Fill(preco, m2reco);
-    		     fHM->H1("hmp_Tof_dTime")->Fill(tofPoint->GetTime() - tofHit->GetTime());
+    		     fHM->H1("hmp_Tof_dTime")->Fill(1000*(tofPoint->GetTime() - tofHit->GetTime()));
     		  }
     	  }
       }

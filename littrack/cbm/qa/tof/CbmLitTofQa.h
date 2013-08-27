@@ -13,6 +13,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 
 class CbmHistManager;
 class CbmVertex;
@@ -21,6 +22,7 @@ class FairTrackParam;
 using std::string;
 using std::map;
 using std::vector;
+using std::set;
 
 /**
  * \class CbmLitTofQa
@@ -86,7 +88,11 @@ private:
     */
    void CreateHistograms();
 
+   void ProcessMC();
+
    void ProcessGlobalTracks();
+
+   void ProcessTofHits();
 
    void FitHistograms();
 
@@ -116,6 +122,9 @@ private:
 
    vector<string> fTrackCategories; // Vector of track category names
    map<string, LitTrackAcceptanceFunction> fTrackAcceptanceFunctions; // maps track category name to track acceptance function
+
+   set<Int_t> fMCTrackIdForTofHits; // Set of MC track IDs for all existing TOF hits
+   set<Int_t> fMCTrackIdForTofPoints; // Set of MC track IDs for all existing TOF points
 
    ClassDef(CbmLitTofQa, 1)
 };

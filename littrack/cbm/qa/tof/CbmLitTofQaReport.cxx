@@ -51,6 +51,8 @@ void CbmLitTofQaReport::Draw()
 {
 	DrawH2ByPattern("hmp_Tof_Reco_.+_m2p", kLinear, kLinear, kLog, "colz");
 	DrawH2ByPattern("hmp_Tof_RecoMCID_.+_m2p", kLinear, kLinear, kLog, "colz");
+   DrawH2ByPattern("hmp_Tof_RecoAccTof_.+_m2p", kLinear, kLinear, kLog, "colz");
+   DrawH2ByPattern("hmp_Tof_RecoMCIDAccTof_.+_m2p", kLinear, kLinear, kLog, "colz");
 	DrawH1ByPattern("hmp_Tof_TimeZero_.+");
 	DrawH1ByPattern("hmp_Tof_dTime");
 	DrawH1ByPattern("hmp_Tof_Time_FirstTrack");

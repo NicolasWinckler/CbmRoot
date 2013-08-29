@@ -14,6 +14,11 @@
 #include "FairDetector.h"
 
 #include "TVector3.h"
+#include "TString.h"
+#include "Rtypes.h"
+#include "TGeoMatrix.h"
+
+#include <map>
 
 class TClonesArray;
 class CbmRichRefPlanePoint;

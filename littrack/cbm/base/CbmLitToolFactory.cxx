@@ -110,7 +110,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
       return TrackSelectionPtr(momSelection);
    } else if (name == "momentum_seed") {
       CbmLitTrackSelectionCuts* momSelection = new CbmLitTrackSelectionCuts();
-      momSelection->SetMinMomentum(1.0);
+      momSelection->SetMinMomentum(0.1);
       return TrackSelectionPtr(momSelection);
    } else if (name == "chi_square") {
       CbmLitTrackSelectionCuts* chiSqSelection = new CbmLitTrackSelectionCuts();

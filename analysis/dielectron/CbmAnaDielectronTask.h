@@ -64,6 +64,7 @@ public:
    Double_t dSts;
    Bool_t isTtCutElectron;
    Bool_t isStCutElectron;
+   Bool_t isRtCutElectron;
    Bool_t isApmCutElectron;
    Bool_t isMvd1CutElectron;
    Bool_t isMvd2CutElectron;
@@ -200,12 +201,12 @@ public:
           double maxY);
 
     KinematicParams CalculateKinematicParams(
-        CbmMCTrack* mctrackP, 
-        CbmMCTrack* mctrackM);
+        const CbmMCTrack* mctrackP,
+        const CbmMCTrack* mctrackM);
 
     KinematicParams CalculateKinematicParams(
-        DielectronCandidate* candP, 
-        DielectronCandidate* candM);
+        const DielectronCandidate* candP,
+        const DielectronCandidate* candM);
 
     void CalculateArmPodParams(
         DielectronCandidate* candP, 
@@ -254,16 +255,14 @@ public:
 
     void PairAcceptance();
 
-    void FillSegmentCandidatesArray();
+    void FillTopologyCandidates();
 
-    void FillCandidateArray();
+    void FillCandidates();
+
 
     void AssignMcToCandidates();
 
     void DifferenceSignalAndBg();
-
-
-    void NofGammaAndPi0Pairs();
 
     void SetDefaultIdParameters();
 
@@ -291,9 +290,18 @@ public:
           double y,
           int stationNum);
 
-    void CheckTrackTopologyCut();
-
-    void CheckTrackTopologyRecoCut();
+    /*
+     * \brief Set cut values and fill histograms for topology cut
+     * \param[in] cutName ST or TT
+     */
+    void CheckTopologyCut(
+          const string& cutName,
+          const vector<DielectronCandidate>& cutCandidates,
+          const vector<TH2D*>& hcut,
+          const vector<TH2D*>& hcutPion,
+          const vector<TH2D*>& hcutTruepair,
+          Double_t angleCut,
+          Double_t ppCut);
 
     Bool_t CheckArmPod(
         Double_t alfa, 
@@ -370,7 +378,9 @@ private:
     Bool_t fUseTof;
 
     vector<DielectronCandidate> fCandidates;
-    vector<DielectronCandidate> fSegmentCandidates;
+    vector<DielectronCandidate> fSTCandidates; // STCut Segmented tracks, reconstructed only in STS
+    vector<DielectronCandidate> fTTCandidates; // TTCut Reconstructed tracks, reconstructed in all detectors but not identified as electrons
+    vector<DielectronCandidate> fRTCandidates; // RTCut Reconstructed tracks, reconstructed in STS + at least in one of the  detectro (RICH, TRD, TOF)
 
     Double_t fWeight; //Multiplicity*BR
 
@@ -400,6 +410,8 @@ private:
     Double_t fStCutPP;
     Double_t fTtCutAngle;
     Double_t fTtCutPP;
+    Double_t fRtCutAngle;
+    Double_t fRtCutPP;
     Double_t fMvd1CutP;
     Double_t fMvd1CutD;
     Double_t fMvd2CutP;
@@ -453,6 +465,7 @@ private:
    vector<TH1D*> fh_chi2prim; // Chi2 of the primary vertex
    vector <TH2D*> fh_ttcut; // TT cut
    vector <TH2D*> fh_stcut; // ST cut
+   vector <TH2D*> fh_rtcut; // RT cut
    vector<TH2D*> fh_apcut; // Armanteros-Podalyanski
    vector<TH2D*> fh_apmcut; // AP modified
    vector<TH2D*> fh_mvd1cut; // MVD cut at the first station
@@ -464,7 +477,8 @@ private:
    vector<TH2D*> fh_ttcut_truepair;
    vector<TH2D*> fh_stcut_pion;
    vector<TH2D*> fh_stcut_truepair;
-
+   vector<TH2D*> fh_rtcut_pion;
+   vector<TH2D*> fh_rtcut_truepair;
 
    vector<TH1D*> fh_nofMvdHits; // number of MVD hits
    vector<TH1D*> fh_nofStsHits; // number of STS hits

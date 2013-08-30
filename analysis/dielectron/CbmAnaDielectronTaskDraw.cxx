@@ -979,16 +979,17 @@ void CbmAnaDielectronTaskDraw::DrawElPiMomHis()
          H1("fh_piprim_plus_rapidity_mc")->Integral(H1("fh_piprim_plus_rapidity_mc")->FindFixBin(1), H1("fh_piprim_plus_rapidity_mc")->FindFixBin(3)) << endl;
 
 
-   double binWRapidity = H1("fh_piprim_rapidity_mc")->GetBinWidth(1);
+   double binWRapidity = H1("fh_piprim_minus_rapidity_mc")->GetBinWidth(1);
    H1("fh_pi_rapidity_mc")->Scale(1/binWRapidity);
-   H1("fh_piprim_rapidity_mc")->Scale(1/binWRapidity);
-   TCanvas *cPiY = CreateCanvas("lmvm_pi_rapidity", "lmvm_pi_rapidity", 800, 800);
-   DrawH1(H1("fh_pi_rapidity_mc"));
+   H1("fh_piprim_minus_rapidity_mc")->Scale(1/binWRapidity);
+   H1("fh_piprim_plus_rapidity_mc")->Scale(1/binWRapidity);
+   H1("fh_pi0prim_rapidity_mc")->Scale(1/binWRapidity);
+   H1("fh_etaprim_rapidity_mc")->Scale(1/binWRapidity);
+
    TCanvas *cPiPrimPlusY = CreateCanvas("lmvm_piprim_plus_rapidity", "lmvm_piprim_plus_rapidity", 800, 800);
    DrawH1(H1("fh_piprim_plus_rapidity_mc"));
    TCanvas *cPiPrimMinusY = CreateCanvas("lmvm_piprim_minus_rapidity", "lmvm_piprim_minus_rapidity", 800, 800);
    DrawH1(H1("fh_piprim_minus_rapidity_mc"));
-
    TCanvas *cPi0PrimY = CreateCanvas("lmvm_pi0prim_rapidity", "lmvm_pi0prim_rapidity", 800, 800);
    DrawH1(H1("fh_pi0prim_rapidity_mc"));
    TCanvas *cEtaPrimY = CreateCanvas("lmvm_etaprim_rapidity", "lmvm_etaprim_rapidity", 800, 800);

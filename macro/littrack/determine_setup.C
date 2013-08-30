@@ -20,8 +20,23 @@ Bool_t CheckDetectorPresence(
 {
 	TFile *currentfile = gFile;
 	TFile* f = new TFile(parFile);
-	f->Get("FairBaseParSet");
-       
+
+        // In fairbase trunk the geometry is moved into a separate container, 
+        // so we have to check which version of paramtere file we have
+
+        if (!gGeoManager) {
+          f->Get("FairBaseParSet"); 
+          TGeoManager *geoMan = gGeoManager;
+          if(!geoMan) {
+	    f->Get("FairGeoParSet"); 
+            geoMan = gGeoManager;
+            if(!geoMan) {
+              std::cout<<"Could not find valid GeoManager. Abort now!"<<std::endl;
+              exit(1);
+            }
+          }
+        }
+
 	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
 		TGeoNode* node = (TGeoNode*) nodes->At(iNode);

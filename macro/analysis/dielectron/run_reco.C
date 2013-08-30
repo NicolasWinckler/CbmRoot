@@ -15,7 +15,7 @@ void run_reco(Int_t nEvents = 1000)
 
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v10b.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13c.digi.par"; // TRD digi file
 
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
@@ -240,7 +240,7 @@ void run_reco(Int_t nEvents = 1000)
       run->AddTask(matchRings);
 
 	}//isRich
-
+ /*
    // Reconstruction Qa
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
    trackingQa->SetMinNofPointsSts(4);
@@ -271,7 +271,7 @@ void run_reco(Int_t nEvents = 1000)
    fitQa->SetMvdMinNofHits(0);
    fitQa->SetStsMinNofHits(4);
    fitQa->SetMuchMinNofHits(10);
-   fitQa->SetTrdMinNofHits(minNofHitsTrd);
+   fitQa->SetTrdMinNofHits(minNofPointsTrd);
    fitQa->SetPRange(30, 0., 3.);
    fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
@@ -280,6 +280,7 @@ void run_reco(Int_t nEvents = 1000)
    clusteringQa->SetOutputDir(std::string(resultDir));
    run->AddTask(clusteringQa);
 
+   */
 
     // -----  Parameter database   --------------------------------------------
    FairRuntimeDb* rtdb = run->GetRuntimeDb();

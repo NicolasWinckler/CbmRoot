@@ -1,5 +1,5 @@
 
-dir=/hera/cbm/users/slebedev/mc/dielectron/apr13/25gev/trd/
+dir=/hera/cbm/users/slebedev/mc/dielectron/apr13_2/8gev/trd4/
 
 function create_dir() {
     mkdir -p ${1}/log

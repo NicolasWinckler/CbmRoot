@@ -36,6 +36,7 @@ TList *FileList;
 TFile *Target;
 
 void MergeRootfile( TDirectory *target, TList *sourcelist );
+bool CheckFile(TFile* fileAna, TFile* fileReco);
 
 
 void hadd() {
@@ -48,12 +49,14 @@ void hadd() {
 
     string fileArray[8] = {"analysis.pisupp0.01.25gev.centr.", "analysis.pisupp0.002.25gev.centr.", "analysis.pisupp0.001.25gev.centr.",
     "analysis.pisupp0.0004.25gev.centr.","analysis.pisupp0.0002.25gev.centr.",
-    "analysis.pisupp0.0001.25gev.centr.", "analysis.pisupp0.0.25gev.centr.", "reco.auau.8gev.centr."};
+    "analysis.pisupp0.0001.25gev.centr.", "analysis.pisupp0.0.25gev.centr.", ".auau.8gev.centr."};
+
+    string addString = "analysis"; //analysis or reco
 
     for (int iPs = 7; iPs < 8; iPs++){
        cout << "-I- " << fileArray[iPs] << endl;
 
-   for (int iF = 0; iF < 4; iF++){
+   for (int iF = 3; iF < 4; iF++){
 
       if (iF == 0) {
          particle = "omegaepem";
@@ -67,35 +70,50 @@ void hadd() {
 	  particle = "urqmd";
       }
 
-      std::string dir = "/hera/cbm/users/slebedev/mc/dielectron/jan13/8gev/trd/1.0field/nomvd/" + particle + "/";
-      std::string fileName = dir + fileArray[iPs];
-      //std::string fileName = dir + "analysis.25gev.centr.";
-     // std::string fileName = dir + "reco.auau.8gev.centr.";
-     // std::string outputDir = dir + "results/all/";
-
-     // string fileName = "analysis.pi_misid_0.0001.";
-     // string fileName = "analysis.";
-     // string dir = "/lustre/cbm/user/ebelolap/aug11/sep12/25gev/100field/nomvd/"+particle+"/";
+      string dir = "/hera/cbm/users/slebedev/mc/dielectron/apr13_2/8gev/notrd/1.0field/nomvd/" + particle + "/";
+      string fileNameAna = dir + string("analysis") + fileArray[iPs];
+      string fileNameReco = dir + string("reco") + fileArray[iPs];
       cout << "-I- " << dir << endl;
 
-      TFile* Target = TFile::Open( string(fileName+"all.root").c_str(), "RECREATE" );
+      string outputFile = fileNameAna;
+      if (addString == "reco") outputFile = fileNameReco;
+      outputFile += "all.root";
+      cout << "-I- OUTPUT: " << outputFile << endl;
+      TFile* Target = TFile::Open( outputFile.c_str(), "RECREATE" );
 
       int count = 0;
       TList* FileList = new TList();
       for (int i = 1; i < 201; i++){
-         stringstream ss;
-         ss << fileName ;
-         ss.fill('0');
-         ss.width(5);
-         ss  << i << ".root";
-         TFile* file = TFile::Open(ss.str().c_str());
-         if ( file != NULL && file->GetEND() > 4000){
-            FileList->Add( file );
-	    count++;
+         stringstream ssAna, ssReco;
+         ssAna << fileNameAna ;
+         ssAna.fill('0');
+         ssAna.width(5);
+	 ssAna  << i << ".root";
+         ssReco << fileNameReco ;
+         ssReco.fill('0');
+         ssReco.width(5);
+	 ssReco  << i << ".root";
+
+	 TFile* fileAna = TFile::Open(ssAna.str().c_str());
+	 TFile* fileReco = TFile::Open(ssReco.str().c_str());
+        // cout << ssAna.str() << endl << ssReco.str() << endl << endl;;
+	 if ( CheckFile(fileAna, fileReco) ){
+           //  cout << "-I- Add file " << ss.str() << endl;
+	     if (addString == "analysis"){
+		 FileList->Add( fileAna );
+                 count++;
+	     }
+	     if (addString == "reco"){
+                 FileList->Add( fileReco );
+                 count++;
+	     }
             //cout<< count<<endl;
 	 } else {
-	     if (file != NULL) {
-                 file->Close();
+	     if (fileAna != NULL) {
+                 fileAna->Close();
+	     }
+	     if ( fileReco != NULL) {
+		 fileReco->Close();
 	     }
 	 }
       }
@@ -119,6 +137,25 @@ void hadd() {
 
 }
 
+bool CheckFile(TFile* fileAna, TFile* fileReco) {
+
+    if (fileAna == NULL || fileReco == NULL)  return false;
+
+    if (fileAna->GetEND() < 4000 || fileReco->GetEND() < 4000) return false;
+
+    TTree* treeAna = (TTree*)fileAna->Get("cbmsim");
+    TTree* treeReco = (TTree*)fileReco->Get("cbmsim");
+
+    if (treeAna == NULL || treeReco == NULL) return false;
+
+    Long64_t treeSizeAna = treeAna->GetEntriesFast();
+    Long64_t treeSizeReco = treeReco->GetEntriesFast();
+
+    if (treeSizeAna == 1000 && treeSizeReco == 1000) return true;
+
+    return false;
+}
+
 void MergeRootfile( TDirectory *target, TList *sourcelist ) {
 
    //  cout << "Target path: " << target->GetPath() << endl;
@@ -137,7 +174,6 @@ void MergeRootfile( TDirectory *target, TList *sourcelist ) {
    TIter nextkey( current_sourcedir->GetListOfKeys() );
    TKey *key, *oldkey=0;
    while ( (key = (TKey*)nextkey())) {
-
       //keep only the highest cycle number for each key
       if (oldkey && !strcmp(oldkey->GetName(),key->GetName())) continue;
 
@@ -155,7 +191,6 @@ void MergeRootfile( TDirectory *target, TList *sourcelist ) {
          // correspondant histogram to the one pointed to by "h1"
          TFile *nextsource = (TFile*)sourcelist->After( first_source );
          while ( nextsource ) {
-
             // make sure we are at the correct directory level by cd'ing to path
             nextsource->cd( path );
             TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(h1->GetName());

@@ -10,8 +10,7 @@ void run_analysis(Int_t nEvents = 1000)
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    //gRandom->SetSeed(10);
-
-	TString dir = "/hera/cbm/users/slebedev/mc/dielectron/jan13/25gev/1.0field/nomvd/rho0/";
+	TString dir = "/hera/cbm/users/slebedev/mc/dielectron/apr13_2/25gev/trd/1.0field/nomvd/rho0/";
 	TString mcFile = dir + "mc.auau.25gev.centr.00001.root";
 	TString parFile = dir + "/params.auau.25gev.centr.00001.root";
 	TString recoFile = dir + "/reco.auau.25gev.centr.00001.root";
@@ -55,7 +54,7 @@ void run_analysis(Int_t nEvents = 1000)
    fRun->AddTask(kf);
 
    CbmAnaDielectronTask *task = new CbmAnaDielectronTask();
-   if (energy == "8gev") {
+   if (energy == "8gev" || energy == "10gev") {
       // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy
       if (plutoParticle == "rho0") task->SetWeight(0.000423);
       // weight omega = Multiplicity * Branching Ratio = 19 * 7.07e-5 for 10 AGeV beam energy

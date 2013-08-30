@@ -252,8 +252,8 @@ void global_reco(Int_t nEvents = 100, // number of events
 
 	if (opt == "all" || opt == "tracking") {
 		// ------ Global track reconstruction -------------------------------------
-		//CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
-		CbmLitFindGlobalTracksParallel* finder = new CbmLitFindGlobalTracksParallel();
+		CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+		//CbmLitFindGlobalTracksParallel* finder = new CbmLitFindGlobalTracksParallel();
 		// Tracking method to be used
 		// "branch" - branching tracking
 		// "nn" - nearest neighbor tracking

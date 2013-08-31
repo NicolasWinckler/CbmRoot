@@ -104,7 +104,7 @@ Bool_t CbmMuchModuleGemRadial::InitModule(){
       neighbours.clear();
     }
   }
-  gLogger->Debug(MESSAGE_ORIGIN,"Init module successful");
+  gLogger->Debug4(MESSAGE_ORIGIN,"Init module successful");
   return kTRUE;
 }
 // -------------------------------------------------------------------------

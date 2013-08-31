@@ -103,6 +103,7 @@ class CbmTimeSlice : public TNamed
      ** @return MUCH raw data container (vector of digis) 
      */
     vector<CbmMuchDigi> GetMuchData() {return fMuchData; } 
+    vector<CbmStsDigiLight>  GetStsData()  {return fStsData; } 
     
   private:
 

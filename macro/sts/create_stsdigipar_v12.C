@@ -43,7 +43,7 @@ Double_t gkStereoBack  =   8.;
 
 // ---> Geometry and digitisation tags
 TString gkGeoTag = "v12b";
-TString gkDigiTag = "pm8";
+TString gkDigiTag = "std";
 // ----------------------------------------------------------------------------
 
 
@@ -65,7 +65,10 @@ void create_stsdigipar_v12(const char* geoTag = gkGeoTag,
 
   // ---> Open parameter file
   TString parFileName = "sts_";
-  parFileName = parFileName + geoTag + "_" + digiTag + ".digi.par";
+  if ( digiTag != "")
+    parFileName = parFileName + geoTag + "_" + digiTag + ".digi.par";
+  else
+    parFileName = parFileName + geoTag + ".digi.par";
   FILE* parFile;
   parFile = fopen(parFileName.Data(), "w");
   if ( ! parFile ) {

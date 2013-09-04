@@ -2,7 +2,7 @@ void drawField()
 {
 
 
-  TString fieldName = "field_v12a";
+  TString fieldName = "field_v12b";
   Double_t fzmin =  -300.;    // along z axis
   Double_t fzmax =   300.;
 
@@ -18,8 +18,10 @@ void drawField()
   gSystem->Load("libField");
   // ----------------------------------------------------------------------
 
-  CbmFieldMap* field = new CbmFieldMapSym2(fieldName.Data());
+  CbmFieldMap* field = new CbmFieldMapSym3(fieldName.Data());
   field->SetPosition(0., 0., 50.);
+
+  field->SetFieldRegionNew(-1000.,1000.,-1000., 1000, 30.,1000.);
 
   field->Init();
   field->Print();
@@ -40,9 +42,16 @@ void drawField()
 
   // ---> Loop over z axis (x=y=0)
   x = y = 0.;
+  Double_t fieldval[3];
+  Double_t point[3];
   for (Int_t iz=0; iz<=fnz; iz++) {
     z[iz] = fzmin + Double_t(iz) * fdz;
-    By[iz] = field->GetBy(x,y,z[iz]) / 10.;
+//    By[iz] = field->GetBy(x,y,z[iz]) / 10.;
+    point[0]=x;
+    point[1]=y;
+    point[2]=z[iz];
+    field->GetFieldValue(point, fieldval);
+    By[iz] = fieldval[1];
   }
 
   TCanvas* c1 = new TCanvas("c1", "canvas", 768, 1152);

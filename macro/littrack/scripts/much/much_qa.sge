@@ -190,6 +190,7 @@ export LIT_RESULT_DIR=
 root -b -l -q "/hera/cbm/users/andrey/scripts/much/global_sim.C(${nevents}, ${XXXXX})"
 root -b -l -q "/hera/cbm/users/andrey/scripts/much/global_reco.C(${nevents}, ${XXXXX})"
 root -b -l -q "/hera/cbm/users/andrey/scripts/much/global_reco_qa.C(${nevents})"
+root -b -l -q "/hera/cbm/users/andrey/scripts/much/much_ana.C(${nevents})"
 
 cp -v ${SGE_STDOUT_PATH} ${outdir}/log/${JOB_ID}.${SGE_TASK_ID}.log
 

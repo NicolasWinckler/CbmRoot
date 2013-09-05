@@ -1,8 +1,9 @@
 #$ -wd /tmp 
 #$ -j y
-# Number of subtasks to start
-#$ -t 1
-dir=/hera/cbm/users/andrey/mc/much/${geometry}/urqmd${particle}/auau/${energy}/${centrality}/
+
+dir=/hera/cbm/users/andrey/mc/much/${geometry}/urqmd${particle}/auau/${energy}/${centrality}
+
+source /hera/cbm/users/andrey/cbmroot/jul13/build/config.sh
 
 #for i in {0..50..1}
 #do
@@ -16,5 +17,8 @@ dir=/hera/cbm/users/andrey/mc/much/${geometry}/urqmd${particle}/auau/${energy}/$
 outfile=${dir}/qa.auau.${energy}.${centrality}.all.root
 infiles=${dir}/qa.auau.${energy}.${centrality}.*.root
 hadd -T -f -k ${outfile} ${infiles}
+
+cp -v ${SGE_STDOUT_PATH} ${outdir}/log/qa.${JOB_ID}.${SGE_TASK_ID}.log
+
 
   

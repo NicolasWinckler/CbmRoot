@@ -11,7 +11,7 @@ void qa_simulation_report()
    loadlibs();
 
    std::string outputDir = "test/";
-   std::string fileName = "qa.auau.25gev.centr.all.root";
+   std::string fileName = "/hera/cbm/users/andrey/mc/much/sis100a/urqmdjpsi/auau/10gev/centr/qa.auau.10gev.centr.all.root";
 
 
    CbmSimulationReport* trackingQaReport = new CbmLitTrackingQaReport();

@@ -1,0 +1,4 @@
+qsub -l mem=3G,ct=20:00:00 -v energy=25gev -v centrality=centr -v geometry=sis300a ./much_qa.sge
+qsub -l mem=3G,ct=20:00:00 -v energy=8gev -v centrality=centr -v geometry=sis100a ./much_qa.sge
+qsub -l mem=3G,ct=20:00:00 -v energy=8gev -v centrality=centr -v geometry=sis100b ./much_qa.sge
+

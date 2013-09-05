@@ -12,8 +12,10 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 10000)
+void global_reco(Int_t nEvents = 100, Int_t seed = 555)
 {
+	gRandom->SetSeed(seed);
+
    TTree::SetMaxTreeSize(90000000000);
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");

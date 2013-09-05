@@ -1,10 +1,25 @@
-void much_ana(TString dir="data", int nEvents=1000){
-  TString mcFile   = Form("%s/mc.root",dir.Data());
-  TString parFile  = Form("%s/par.root",dir.Data());
-  TString stsFile  = Form("%s/sts.root",dir.Data());
-  TString recFile  = Form("%s/rec.root",dir.Data());
-  TString outFile  = Form("%s/ana.root",dir.Data());
-  TString digiFile = Form("%s/much_digi.root",dir.Data());
+
+void much_ana(Int_t nEvents=1000){
+  TTree::SetMaxTreeSize(90000000000);
+  TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
+  TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+
+  // Input and output data
+  TString dir = "events/much_anna_omega_8gev_10k/"; // Output directory
+  TString mcFile = dir + "mc.0000.root"; // MC transport file
+  TString parFile = dir + "param.0000.root"; // Parameters file
+  TString globalRecoFile = dir + "global.reco.0000.root"; // File with reconstructed tracks and hits
+  TString analysisFile = dir + "analysis.0000.root"; // Output analysis file
+
+  TString muchDigiFile = parDir + "/much/much_v12c.digi.root"; // MUCH digi file
+
+  if (script == "yes") {
+     mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
+     parFile = TString(gSystem->Getenv("LIT_PAR_FILE"));
+     globalRecoFile = TString(gSystem->Getenv("LIT_GLOBAL_RECO_FILE"));
+     analysisFile = TString(gSystem->Getenv("LIT_ANALYSIS_FILE"));
+     muchDigiFile = TString(gSystem->Getenv("LIT_MUCH_DIGI"));
+  }
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -13,9 +28,8 @@ void much_ana(TString dir="data", int nEvents=1000){
   
   FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(mcFile);
-  fRun->AddFriend(stsFile);
-  fRun->AddFriend(recFile);
-  fRun->SetOutputFile(outFile);
+  fRun->AddFriend(globalRecoFile);
+  fRun->SetOutputFile(analysisFile);
 
   TString muchDigiFile = gSystem->Getenv("VMCWORKDIR");
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
@@ -24,11 +38,10 @@ void much_ana(TString dir="data", int nEvents=1000){
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
   CbmKF* kf = new CbmKF();
-  CbmAnaDimuonAnalysis* ana = new CbmAnaDimuonAnalysis("DimuonAnalysis",digiFile,10);
+  CbmAnaDimuonAnalysis* ana = new CbmAnaDimuonAnalysis("DimuonAnalysis", muchDigiFile, 1);
   ana->SetVerbose(0);
   ana->SetStsPointsAccQuota(4);
   ana->SetStsTrueHitQuota(0.7);

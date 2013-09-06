@@ -58,6 +58,8 @@ private:
     double fGammaCut;
     double fStCutAngle;
     double fStCutPP;
+    double fRtCutAngle;
+    double fRtCutPP;
     double fTtCutAngle;
     double fTtCutPP;
     double fMvd1CutP;

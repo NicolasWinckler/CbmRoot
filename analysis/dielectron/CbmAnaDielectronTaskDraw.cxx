@@ -55,7 +55,9 @@ CbmAnaDielectronTaskDraw::CbmAnaDielectronTaskDraw()
    fStCutAngle(0.),	    
    fStCutPP(0.),	    
    fTtCutAngle(0.),	    
-   fTtCutPP(0.),	    
+   fTtCutPP(0.),
+   fRtCutAngle(0.),
+   fRtCutPP(0.),
    fMvd1CutP(0.),	    
    fMvd1CutD(0.),	    
    fMvd2CutP(0.),	    
@@ -88,6 +90,8 @@ void CbmAnaDielectronTaskDraw::DrawHistFromFile(
    fStCutPP = 1.5;
    fTtCutAngle = 0.75;
    fTtCutPP = 4.0;
+   fRtCutAngle = 1.25;
+   fRtCutPP = 2.0;
    fMvd1CutP = 1.2;
    fMvd1CutD = 0.4;
    fMvd2CutP = 1.5;
@@ -524,11 +528,14 @@ void CbmAnaDielectronTaskDraw::DrawCutDistributions()
 
    Draw2DCut("fh_stcut", fStCutPP, fStCutAngle);
    Draw2DCut("fh_ttcut", fTtCutPP, fTtCutAngle);
+   Draw2DCut("fh_rtcut", fRtCutPP, fRtCutAngle);
 
    Draw2DCut("fh_stcut_pion", fStCutPP, fStCutAngle);
    Draw2DCut("fh_ttcut_pion", fTtCutPP, fTtCutAngle);
+   Draw2DCut("fh_rtcut_pion", fRtCutPP, fRtCutAngle);
    Draw2DCut("fh_stcut_truepair", fStCutPP, fStCutAngle);
    Draw2DCut("fh_ttcut_truepair", fTtCutPP, fTtCutAngle);
+   Draw2DCut("fh_rtcut_truepair", fRtCutPP, fRtCutAngle);
 
  /*  TH2D* st = H2("fh_stcut_signal");
    double sumT = 0.;
@@ -1110,6 +1117,12 @@ void CbmAnaDielectronTaskDraw::DrawBgSourceTracks()
    DrawBgSource2D("lmvm_source_tracks_2d", "fh_source_tracks",
          list_of("#gamma")("#pi^{0}")("#pi^{#pm}")("p")("K")("e^{#pm}_{sec}")("oth."),
          100., "Tracks per event x10^{2}");
+
+
+   TCanvas *c4 = CreateCanvas("lmvm_nof_topology_pairs", "lmvm_nof_topology_pairs", 600, 600);
+   TH1D* htopology = (TH1D*)H1("fh_nof_topology_pairs")->Clone();
+   DrawH1( htopology, kLinear, kLinear, "hist text0");
+   htopology->SetMarkerSize(2.);
 }
 
 void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()

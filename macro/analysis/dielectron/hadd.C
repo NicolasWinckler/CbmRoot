@@ -49,92 +49,88 @@ void hadd() {
 
     string fileArray[8] = {"analysis.pisupp0.01.25gev.centr.", "analysis.pisupp0.002.25gev.centr.", "analysis.pisupp0.001.25gev.centr.",
     "analysis.pisupp0.0004.25gev.centr.","analysis.pisupp0.0002.25gev.centr.",
-    "analysis.pisupp0.0001.25gev.centr.", "analysis.pisupp0.0.25gev.centr.", ".auau.8gev.centr."};
+    "analysis.pisupp0.0001.25gev.centr.", "analysis.pisupp0.0.25gev.centr.", ".auau.25gev.centr."};
 
     string addString = "analysis"; //analysis or reco
 
     for (int iPs = 7; iPs < 8; iPs++){
        cout << "-I- " << fileArray[iPs] << endl;
 
-   for (int iF = 3; iF < 4; iF++){
+       for (int iF = 0; iF < 4; iF++){
 
-      if (iF == 0) {
-         particle = "omegaepem";
-      } else if (iF == 1) {
-         particle = "phi";
-      } else if (iF == 2) {
-         particle = "omegadalitz";
-      } else if (iF == 3) {
-         particle = "rho0";
-      } else if (iF == 4) {
-	  particle = "urqmd";
-      }
+          if (iF == 0) {
+             particle = "omegaepem";
+          } else if (iF == 1) {
+             particle = "phi";
+          } else if (iF == 2) {
+             particle = "omegadalitz";
+          } else if (iF == 3) {
+             particle = "rho0";
+          } else if (iF == 4) {
+             particle = "urqmd";
+          }
 
-      string dir = "/hera/cbm/users/slebedev/mc/dielectron/apr13_2/8gev/notrd/1.0field/nomvd/" + particle + "/";
-      string fileNameAna = dir + string("analysis") + fileArray[iPs];
-      string fileNameReco = dir + string("reco") + fileArray[iPs];
-      cout << "-I- " << dir << endl;
+          string dir = "/hera/cbm/users/slebedev/mc/dielectron/sep13/25gev/trd/1.0field/nomvd/" + particle + "/";
+          string fileNameAna = dir + string("analysis") + fileArray[iPs];
+          string fileNameReco = dir + string("reco") + fileArray[iPs];
+          cout << "-I- " << dir << endl;
 
-      string outputFile = fileNameAna;
-      if (addString == "reco") outputFile = fileNameReco;
-      outputFile += "all.root";
-      cout << "-I- OUTPUT: " << outputFile << endl;
-      TFile* Target = TFile::Open( outputFile.c_str(), "RECREATE" );
+          string outputFile = fileNameAna;
+          if (addString == "reco") outputFile = fileNameReco;
+          outputFile += "all.root";
+          cout << "-I- OUTPUT: " << outputFile << endl;
+          TFile* Target = TFile::Open( outputFile.c_str(), "RECREATE" );
 
-      int count = 0;
-      TList* FileList = new TList();
-      for (int i = 1; i < 201; i++){
-         stringstream ssAna, ssReco;
-         ssAna << fileNameAna ;
-         ssAna.fill('0');
-         ssAna.width(5);
-	 ssAna  << i << ".root";
-         ssReco << fileNameReco ;
-         ssReco.fill('0');
-         ssReco.width(5);
-	 ssReco  << i << ".root";
+          int count = 0;
+          TList* FileList = new TList();
+          for (int i = 1; i < 201; i++){
+             stringstream ssAna, ssReco;
+             ssAna << fileNameAna ;
+             ssAna.fill('0');
+             ssAna.width(5);
+             ssAna  << i << ".root";
+             ssReco << fileNameReco ;
+             ssReco.fill('0');
+             ssReco.width(5);
+             ssReco  << i << ".root";
 
-	 TFile* fileAna = TFile::Open(ssAna.str().c_str());
-	 TFile* fileReco = TFile::Open(ssReco.str().c_str());
-        // cout << ssAna.str() << endl << ssReco.str() << endl << endl;;
-	 if ( CheckFile(fileAna, fileReco) ){
-           //  cout << "-I- Add file " << ss.str() << endl;
-	     if (addString == "analysis"){
-		 FileList->Add( fileAna );
-                 count++;
-	     }
-	     if (addString == "reco"){
-                 FileList->Add( fileReco );
-                 count++;
-	     }
-            //cout<< count<<endl;
-	 } else {
-	     if (fileAna != NULL) {
-                 fileAna->Close();
-	     }
-	     if ( fileReco != NULL) {
-		 fileReco->Close();
-	     }
-	 }
-      }
-      cout << endl<< "-I- number of files to merge = " << count << endl << endl;
+             TFile* fileAna = TFile::Open(ssAna.str().c_str());
+             TFile* fileReco = TFile::Open(ssReco.str().c_str());
+             // cout << ssAna.str() << endl << ssReco.str() << endl << endl;;
+             if ( CheckFile(fileAna, fileReco) ){
+                //  cout << "-I- Add file " << ss.str() << endl;
+                if (addString == "analysis"){
+                   FileList->Add( fileAna );
+                   count++;
+                }
+                if (addString == "reco"){
+                   FileList->Add( fileReco );
+                   count++;
+                }
+             } else {
+                if (fileAna != NULL) {
+                   fileAna->Close();
+                }
+                if ( fileReco != NULL) {
+                   fileReco->Close();
+                }
+             }
+          }
+          cout << endl<< "-I- number of files to merge = " << count << endl << endl;
 
-      MergeRootfile( Target, FileList );
+          MergeRootfile( Target, FileList );
 
-      Target->Close();
-      int nFL = FileList->GetEntries();
-      for (int iFL = 0; iFL < nFL; iFL++){
-	  TFile* f = (TFile*)FileList->At(iFL);
-	  f->Close();
-          delete f;
-      }
-      delete Target;
-      delete FileList;
-   }//iF
-
-
+          Target->Close();
+          int nFL = FileList->GetEntries();
+          for (int iFL = 0; iFL < nFL; iFL++){
+             TFile* f = (TFile*)FileList->At(iFL);
+             f->Close();
+             delete f;
+          }
+          delete Target;
+          delete FileList;
+       }//iF
     } //iPs
-
 }
 
 bool CheckFile(TFile* fileAna, TFile* fileReco) {

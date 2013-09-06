@@ -314,6 +314,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
     fh_event_number(NULL),
     fh_nof_bg_tracks(NULL),
     fh_nof_el_tracks(NULL),
+    fh_nof_topology_pairs(NULL),
     fh_source_tracks(NULL),
     fh_nof_rec_pairs_gamma(NULL),
     fh_nof_rec_pairs_pi0(NULL),
@@ -408,6 +409,9 @@ void CbmAnaDielectronTask::InitHists()
    fHistoList.push_back(fh_nof_el_tracks);
    fh_source_tracks = new TH2D("fh_source_tracks","fh_source_tracks;Analysis steps;Particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 7, 0., 7.);
    fHistoList.push_back(fh_source_tracks);
+
+   fh_nof_topology_pairs = new TH1D("fh_nof_topology_pairs","fh_nof_topology_pairs;Pair type;Pairs/event", 5, 0., 5);
+   fHistoList.push_back(fh_nof_topology_pairs);
 
    //Number of mismatches and ghosts after each cut
    fh_nof_mismatches = new TH1D("fh_nof_mismatches","fh_nof_mismatches;Analysis steps;Tracks/event", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps);
@@ -698,6 +702,7 @@ void CbmAnaDielectronTask::Exec(
     PairAcceptance();
     FillTopologyCandidates();
     FillCandidates();
+    CalculateNofTopologyPairs();
     DifferenceSignalAndBg();
     SignalAndBgReco();
     FillElPiMomHist();
@@ -1012,6 +1017,9 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
     }//gTracks
     cout << "fSTCandidates.size() = " << fSTCandidates.size() << endl;
     cout << "fRTCandidates.size() = " << fRTCandidates.size() << endl;
+
+    AssignMcToTopologyCandidates(fSTCandidates);
+    AssignMcToTopologyCandidates(fRTCandidates);
 }
 
 void CbmAnaDielectronTask::FillCandidates()
@@ -1112,6 +1120,7 @@ void CbmAnaDielectronTask::FillCandidates()
    cout << "fTTCandidates.size() = " << fTTCandidates.size() << endl;
 
    AssignMcToCandidates();
+   AssignMcToTopologyCandidates(fTTCandidates);
 }
 
 void CbmAnaDielectronTask::AssignMcToCandidates()
@@ -1195,6 +1204,53 @@ void CbmAnaDielectronTask::AssignMcToCandidates()
     //  CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMcTrackId);
     //  if (mcTrack4 == NULL) continue;
    }// candidates
+}
+
+void CbmAnaDielectronTask::AssignMcToTopologyCandidates(
+      vector<DielectronCandidate>& cutCandidates)
+{
+   int nCand = cutCandidates.size();
+   for (int i = 0; i < nCand; i++){
+      cutCandidates[i].isMcSignalElectron = false;
+      cutCandidates[i].isMcPi0Electron = false;
+      cutCandidates[i].isMcGammaElectron = false;
+      cutCandidates[i].isMcEtaElectron = false;
+      cutCandidates[i].McMotherId = -1;
+      cutCandidates[i].stsMcTrackId = -1;
+      cutCandidates[i].richMcTrackId = -1;
+      cutCandidates[i].trdMcTrackId = -1;
+      cutCandidates[i].tofMcTrackId = -1;
+
+      int stsInd = cutCandidates[i].stsInd;
+      if (stsInd < 0) continue;
+      CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+      if (stsMatch == NULL) continue;
+      int stsMcTrackId = stsMatch->GetMCTrackId();
+      cutCandidates[i].stsMcTrackId = stsMcTrackId;
+      if (stsMcTrackId < 0) continue;
+      CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
+      if (mcTrack1 == NULL) continue;
+      int pdg = TMath::Abs(mcTrack1->GetPdgCode());
+      int motherId = mcTrack1->GetMotherId();
+      cutCandidates[i].McMotherId = motherId;
+      cutCandidates[i].mcPdg = pdg;
+
+      if (pdg == 11 && motherId == -1) cutCandidates[i].isMcSignalElectron = true;
+
+      if (motherId >=0){
+         CbmMCTrack* mct1 = (CbmMCTrack*) fMCTracks->At(motherId);
+         int motherPdg = mct1->GetPdgCode();
+         if (mct1 != NULL && motherPdg == 111 && pdg == 11) {
+            cutCandidates[i].isMcPi0Electron = true;
+         }
+         if (mct1 != NULL && motherPdg == 22 && pdg == 11){
+            cutCandidates[i].isMcGammaElectron = true;
+         }
+         if(mct1 != NULL && motherPdg == 221 && pdg == 11){
+            cutCandidates[i].isMcEtaElectron = true;
+         }
+      }
+   }
 }
 
 void CbmAnaDielectronTask::PairSource(
@@ -1586,14 +1642,8 @@ void CbmAnaDielectronTask::CheckTopologyCut(
 
          int stsInd = cutCandidates[ candInd[minInd] ].stsInd;
          if (stsInd < 0) continue;
-         CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
-         if (stsMatch == NULL) continue;
-         int stsMcTrackId = stsMatch->GetMCTrackId();
-         if (stsMcTrackId < 0) continue;
-         CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
-         if (mcTrack1 == NULL) continue;
-         int pdg = TMath::Abs(mcTrack1->GetPdgCode());
-         int motherId = mcTrack1->GetMotherId();
+         int pdg =  TMath::Abs(cutCandidates[ candInd[minInd] ].mcPdg);
+         int motherId = cutCandidates[ candInd[minInd] ].McMotherId;
 
          if (fCandidates[iP].isMcSignalElectron){
             hcut[kSignal]->Fill(sqrt_mom, minAng, fWeight);
@@ -1616,6 +1666,56 @@ void CbmAnaDielectronTask::CheckTopologyCut(
          }
       }//if electron
    } //iP
+}
+
+void CbmAnaDielectronTask::CalculateNofTopologyPairs()
+{
+   Int_t nCand = fCandidates.size();
+   for (Int_t iP = 0; iP < nCand; iP++){
+      if (fCandidates[iP].McMotherId == -1) continue;
+      if (fCandidates[iP].isMcPi0Electron == -1) continue;
+      if (fCandidates[iP].isMcGammaElectron == -1) continue;
+      if ( !(fCandidates[iP].chi2Prim < fChiPrimCut && fCandidates[iP].isElectron) ) continue;
+
+      Bool_t cAdded =false;
+      for (Int_t iM = 0; iM < fSTCandidates.size(); iM++){
+         if (fSTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
+            fh_nof_topology_pairs->Fill(1.5);
+            cAdded = true;
+            break;
+         }
+      }
+      if (cAdded) continue;
+
+      for (Int_t iM = 0; iM < fRTCandidates.size(); iM++){
+         if (fRTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
+            fh_nof_topology_pairs->Fill(2.5);
+            cAdded = true;
+            break;
+         }
+      }
+      if (cAdded) continue;
+
+      for (Int_t iM = 0; iM < fTTCandidates.size(); iM++){
+         if (fTTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
+            fh_nof_topology_pairs->Fill(3.5);
+            cAdded = true;
+            break;
+         }
+      }
+      if (cAdded) continue;
+
+      for (Int_t iM = 0; iM < fCandidates.size(); iM++){
+         if (iM != iP && fCandidates[iM].McMotherId == fCandidates[iP].McMotherId && fCandidates[iM].chi2Prim < fChiPrimCut && fCandidates[iM].isElectron) {
+            fh_nof_topology_pairs->Fill(4.5);
+            cAdded = true;
+            break;
+         }
+      }
+
+      if (cAdded) continue;
+      fh_nof_topology_pairs->Fill(0.5);
+   }
 }
 
 Bool_t CbmAnaDielectronTask::IsMismatch(

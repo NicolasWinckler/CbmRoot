@@ -262,6 +262,9 @@ public:
 
     void AssignMcToCandidates();
 
+    void AssignMcToTopologyCandidates(
+          vector<DielectronCandidate>& cutCandidates);
+
     void DifferenceSignalAndBg();
 
     void SetDefaultIdParameters();
@@ -302,6 +305,8 @@ public:
           const vector<TH2D*>& hcutTruepair,
           Double_t angleCut,
           Double_t ppCut);
+
+    void CalculateNofTopologyPairs();
 
     Bool_t CheckArmPod(
         Double_t alfa, 
@@ -513,6 +518,8 @@ private:
    TH1D* fh_nof_bg_tracks;
    TH1D* fh_nof_el_tracks;
    TH2D* fh_source_tracks;
+
+   TH1D* fh_nof_topology_pairs;
 
    //nof gamma and pi0 pairs for different track categories : global, only STS or partially reconstructed
    TH1D* fh_nof_rec_pairs_gamma;

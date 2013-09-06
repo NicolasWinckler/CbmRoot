@@ -9,7 +9,7 @@ XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
 # specify input and output directories
-outdir=/hera/cbm/users/slebedev/mc/dielectron/apr13_2/${coll_energy}/${trd}/${field_scale}field/${mvd}/${pluto_particle}/
+outdir=/hera/cbm/users/slebedev/mc/dielectron/sep13/${coll_energy}/${trd}/${field_scale}field/${mvd}/${pluto_particle}/
 cbmroot_config_path=/hera/cbm/users/slebedev/trunk/build/config.sh
 macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
 
@@ -20,7 +20,7 @@ export SCRIPT=yes
 # Number of events to run
 nevents=1000
 
-#create the needed directories
+#create needed directories
 mkdir -p ${outdir}/log
 
 #create directory for output results
@@ -37,7 +37,7 @@ export PION_MISIDENTIFICATION_LEVEL=-1.0
 export URQMD_FILE=/hera/cbm/prod/gen/urqmd/auau/${coll_energy}/centr/urqmd.auau.${coll_energy}.centr.${XXXXX}.root
 export MC_FILE=${outdir}/mc.auau.${coll_energy}.centr.${XXXXX}.root
 export PAR_FILE=${outdir}/params.auau.${coll_energy}.centr.${XXXXX}.root
-export RECO_FILE=${outdir}/reco2.auau.${coll_energy}.centr.${XXXXX}.root
+export RECO_FILE=${outdir}/reco.auau.${coll_energy}.centr.${XXXXX}.root
 export ANALYSIS_FILE=${outdir}/analysis.auau.${coll_energy}.centr.${XXXXX}.root
 #export ANALYSIS_FILE=${outdir}/analysis.auau.pisupp${PION_MISIDENTIFICATION_LEVEL}.${coll_energy}.centr.${XXXXX}.root 
 export RESULT_DIR=
@@ -53,19 +53,17 @@ export URQMD=yes
 # If "yes" PLUTO particles will be embedded
 export PLUTO=yes
 #Collision energy: 25gev or 8gev -> set proper weight into analysis
-
-#export ENERGY=${coll_energy}
+export ENERGY=${coll_energy}
 if [ ${coll_energy} = "8gev" ] ; then
    export ENERGY=10gev
 elif [ ${coll_energy} = "25gev" ]; then
-   export ENERGY=25gev
+   export ENERGY=25gev 
 fi
-#---------------------------------------------------
 
 #Geometries
 export CAVE_GEOM=cave.geo
-export TARGET_GEOM=target_au_025mu.geo
-export PIPE_GEOM=pipe_standard.geo
+export TARGET_GEOM=target/target_au_025mu.geo
+export PIPE_GEOM=pipe/pipe_standard.geo
 if [ ${mvd} = "mvd4" ] ; then
    export MVD_GEOM=mvd/mvd_Nov_2012.geo
 elif [ ${mvd} = "nomvd" ]; then
@@ -80,8 +78,8 @@ export RICH_GEOM=rich/rich_v08a.geo
 
 #Set TRD geometry
 if [ ${trd} = "trd" ] ; then
-    export TRD_GEOM=trd/trd_v13c.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13c.digi.par
+    export TRD_GEOM=trd/trd_v13g.geo.root
+    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13g.digi.par
     export TRD_ANN_CUT=0.85
     export MIN_NOF_POINTS_TRD=6
 elif [ ${trd} = "notrd" ] ; then
@@ -90,25 +88,27 @@ elif [ ${trd} = "notrd" ] ; then
     export TRD_ANN_CUT=0.0
     export MIN_NOF_POINTS_TRD=0
 elif [ ${trd} = "trd2" ] ; then
-    export TRD_GEOM=trd/trd_v13d.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13d.digi.par
+    export TRD_GEOM=trd/trd_v13i.geo.root
+    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13i.digi.par
     export TRD_ANN_CUT=-0.3
     export MIN_NOF_POINTS_TRD=2
 elif [ ${trd} = "trd3" ] ; then
-    export TRD_GEOM=trd/trd_v13e.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13e.digi.par
+    export TRD_GEOM=trd/trd_v13j.geo.root
+    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13j.digi.par
     export TRD_ANN_CUT=-0.2
     export MIN_NOF_POINTS_TRD=2
 elif [ ${trd} = "trd4" ] ; then
-    export TRD_GEOM=trd/trd_v13f.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13f.digi.par
+    export TRD_GEOM=trd/trd_v13k.geo.root
+    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13k.digi.par
     export TRD_ANN_CUT=-0.1
     export MIN_NOF_POINTS_TRD=2
 fi
 
-export TOF_GEOM=tof/tof_v07a.geo
+export TOF_GEOM=tof/tof_v13b.root
+export TOF_DIGI=${VMCWORKDIR}/parameters/trd/tof_v13b.digi.par
+
 export FIELD_MAP=field_v12a
-export MAGNET_GEOM=passive/magnet_v12a.geo
+export MAGNET_GEOM=magnet/magnet_v12a.geo
 export FIELD_MAP_SCALE=${field_scale}
 
 #If "yes" DELTA electrons will be embedded
@@ -144,8 +144,8 @@ mkdir -p $workdir
 cd $workdir
 
 # run the root simulation
-#root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
-#root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
+root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
+root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
 root -b -l -q "${macro_dir}/run_analysis.C(${nevents})"
 
 cp -v ${SGE_STDOUT_PATH} ${outdir}/log/${JOB_ID}.${SGE_TASK_ID}.log

@@ -11,9 +11,10 @@ void draw_analysis() {
 
     Bool_t useMvd = false;
     Bool_t drawSignificance = true;
-    std::string dir = "/hera/cbm/users/andrey/mc/dielectron/nov12/8gev/0.7field/nomvd/phi/";
+    std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/apr13_2/8gev/notrd/1.0field/nomvd/rho0/";
     std::string fileName = dir + "analysis.auau.8gev.centr.all.root";
-    std::string outputDir = dir + "results/all/";
+    std::string outputDir = dir + "results_ana/realpid/";
+  // std::string outputDir = "";
 
     CbmAnaDielectronTaskDraw *draw = new CbmAnaDielectronTaskDraw();
     draw->DrawHistFromFile(fileName, outputDir, useMvd);//, drawSignificance);

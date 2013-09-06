@@ -7,15 +7,17 @@ void run_reco(Int_t nEvents = 1000)
 
 	//gRandom->SetSeed(10);
 
-	TString mcFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-	TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-	TString recoFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+   TString parFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.param.root";
+   TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.mc.root";
+   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.reco.root";
+
 	TString delta = "no"; // if "yes" Delta electrons will be embedded
 	TString deltaFile = "";
 
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v13c.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par"; // TRD digi file
 
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
@@ -32,22 +34,24 @@ void run_reco(Int_t nEvents = 1000)
 
 		stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
 		trdDigiFile = TString(gSystem->Getenv("TRD_DIGI"));
+      tofDigiFile = TString(gSystem->Getenv("TOF_DIGI"));
 
-                resultDir = TString(gSystem->Getenv("RESULT_DIR"));
+      resultDir = TString(gSystem->Getenv("RESULT_DIR"));
 
 		stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
 		trdAnnCut = TString(gSystem->Getenv("TRD_ANN_CUT")).Atof();
-                minNofPointsTrd = TString(gSystem->Getenv("MIN_NOF_POINTS_TRD")).Atof();
+      minNofPointsTrd = TString(gSystem->Getenv("MIN_NOF_POINTS_TRD")).Atof();
 	}
 
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
+   parFileList->Add(&tofDigiFile);
 
    TStopwatch timer;
    timer.Start();
 
 	// ----  Load libraries   -------------------------------------------------
-        gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
 	loadlibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
@@ -172,11 +176,11 @@ void run_reco(Int_t nEvents = 1000)
 		Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
 		Bool_t simpleTR = kTRUE; // use fast and simple version for TR production
 
-	       // CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
-                CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , "H++");
+    // CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
+      CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , "H++");
 
-                CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
-                run->AddTask(trdHitProd);
+      CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
+      run->AddTask(trdHitProd);
 	}// isTRD
 
 	// =========================================================================
@@ -184,7 +188,7 @@ void run_reco(Int_t nEvents = 1000)
 	// =========================================================================
 	if (IsTof(parFile)) {
 		// ------   TOF hit producer   ---------------------------------------------
-		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", 1);
+		CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("CbmTofHitProducer", 1);
 		run->AddTask(tofHitProd);
 	} //isTof
 
@@ -204,7 +208,7 @@ void run_reco(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	if (IsTrd(parFile)) {
-		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
 		run->AddTask(trdMatchTracks);
 
 		//CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
@@ -212,7 +216,7 @@ void run_reco(Int_t nEvents = 1000)
 		//run->AddTask(trdSetTracksPidTask);
 
 		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
-                trdSetTracksPidAnnTask->SetTRDGeometryType("h++");
+      trdSetTracksPidAnnTask->SetTRDGeometryType("h++");
 		run->AddTask(trdSetTracksPidAnnTask);
 
 		//CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
@@ -240,7 +244,7 @@ void run_reco(Int_t nEvents = 1000)
       run->AddTask(matchRings);
 
 	}//isRich
- /*
+
    // Reconstruction Qa
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
    trackingQa->SetMinNofPointsSts(4);
@@ -280,7 +284,7 @@ void run_reco(Int_t nEvents = 1000)
    clusteringQa->SetOutputDir(std::string(resultDir));
    run->AddTask(clusteringQa);
 
-   */
+
 
     // -----  Parameter database   --------------------------------------------
    FairRuntimeDb* rtdb = run->GetRuntimeDb();

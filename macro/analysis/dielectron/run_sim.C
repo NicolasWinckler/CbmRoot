@@ -5,22 +5,21 @@ void run_sim(Int_t nEvents = 1000)
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	//gRandom->SetSeed(10);
+   TString urqmdFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+   TString parFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.param.root";
+   TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.mc.root";
 
-	TString urqmdFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
-	TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-	TString mcFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
 
 	TString caveGeom = "cave.geo";
-	TString targetGeom = "target_au_025mu.geo";
-	TString pipeGeom = "pipe_standard.geo";
+	TString targetGeom = "target/target_au_025mu.geo";
+	TString pipeGeom = "pipe/pipe_standard.geo";
 	TString mvdGeom = "";//"mvd/mvd_v08a.geo";
-	TString stsGeom = "sts/sts_v12b.geo";
+	TString stsGeom = "sts/sts_v12b.geo.root";
 	TString richGeom = "rich/rich_v08a.geo";
-	TString trdGeom = "trd/trd_v13c.root";
-	TString tofGeom = "tof/tof_v07a.geo";
+	TString trdGeom = "trd/trd_v13g.geo.root";
+	TString tofGeom = "tof/tof_v13b.root";
 	TString fieldMap = "field_v12a";
-	TString magnetGeom = "passive/magnet_v12a.geo";
+	TString magnetGeom = "magnet/magnet_v12a.geo";
 
 	Int_t nofElectrons = 5;
 	Int_t nofPositrons = 5;
@@ -63,7 +62,7 @@ void run_sim(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-        gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
 	loadlibs();
 
 	FairRunSim* fRun = new FairRunSim();
@@ -140,8 +139,8 @@ void run_sim(Int_t nEvents = 1000)
 	if (urqmd == "yes"){
 	       // FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(urqmdFile);
 	       // primGen->AddGenerator(urqmdGen);
-                CbmUnigenGenerator*  urqmdGen = new CbmUnigenGenerator(urqmdFile);
-	        primGen->AddGenerator(urqmdGen);
+       CbmUnigenGenerator*  urqmdGen = new CbmUnigenGenerator(urqmdFile);
+	    primGen->AddGenerator(urqmdGen);
 	}
 
 	// Add electrons

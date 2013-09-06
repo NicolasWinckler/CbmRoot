@@ -16,7 +16,7 @@ void qa_study_lmvm()
    std::vector<std::string> results, names;
    std::string outputDir;
 
-   std::string dir = "/u/slebedev/JUL09/trunk/macro/analysis/dielectron/results/mc_momentum/25gev/";
+ /*  std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/8gev/1.0field/nomvd/";
 
    results.push_back(dir + "100field/nomvd/all/real_pid/");
    results.push_back(dir + "100field/mvd/all/real_pid/");
@@ -26,16 +26,16 @@ void qa_study_lmvm()
    names.push_back("100field/nomvd");
    names.push_back("100field/mvd");
    names.push_back("70field/nomvd");
-   names.push_back("70field/mvd");
+   names.push_back("70field/mvd");*/
 
- /*  std::string dir = "/u/slebedev/JUL09/trunk/macro/analysis/dielectron/results/25gev/100field/nomvd/all/";
+   std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/8gev/1.0field/nomvd/results_all/";
    results.push_back(dir + "real_pid/");
-   results.push_back(dir + "pi_misid_0_01/");
-   results.push_back(dir + "pi_misid_0_002/");
-   results.push_back(dir + "pi_misid_0_001/");
-   results.push_back(dir + "pi_misid_0_0002/");
-   results.push_back(dir + "pi_misid_0_0001/");
-   results.push_back(dir + "pi_misid_0_0/");
+   results.push_back(dir + "pimisid.0.01/");
+   results.push_back(dir + "pimisid.0.002/");
+   results.push_back(dir + "pimisid.0.001/");
+   results.push_back(dir + "pimisid.0.0002/");
+   results.push_back(dir + "pimisid.0.0001/");
+   results.push_back(dir + "pimisid.0.0/");
 
    names.push_back("real pid");
    names.push_back("0.01");
@@ -44,9 +44,9 @@ void qa_study_lmvm()
    names.push_back("0.0002");
    names.push_back("0.0001");
    names.push_back("ideal pid");
-*/
 
-   outputDir = "/u/slebedev/JUL09/trunk/macro/analysis/dielectron/results/mc_momentum/25gev/study_report_setup/";
+
+   outputDir = "/Users/slebedev/Development/cbm/data/lmvm/8gev/1.0field/nomvd/study_report_pimisid/";
 
    CbmAnaDielectronReports reports;
    reports.CreateStudyReport("LMVM", results, names, outputDir);

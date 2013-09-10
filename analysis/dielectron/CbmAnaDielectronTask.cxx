@@ -689,6 +689,7 @@ void CbmAnaDielectronTask::Exec(
     		"fAngleCut = " << fAngleCut << endl <<
     		"fGammaCut = " << fGammaCut << endl <<
     		"fStCut (ang,pp) = (" << fStCutAngle << "," << fStCutPP << ")" << endl <<
+    		"fRtCut (ang,pp) = (" << fRtCutAngle << "," << fRtCutPP << ")" << endl <<
     		"fTtCut (ang,pp) = (" << fTtCutAngle << "," << fTtCutPP << ")" << endl <<
     		"fMvd1Cut (p,d) = (" << fMvd1CutP << "," << fMvd1CutD << ")" << endl <<
          "fMvd2Cut (p,d) = (" << fMvd2CutP << "," << fMvd2CutD << ")" << endl;
@@ -968,8 +969,6 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
     fSTCandidates.clear();
     fRTCandidates.clear();
     Int_t ngTracks = fGlobalTracks->GetEntriesFast();
-    fSTCandidates.reserve(ngTracks);
-    fRTCandidates.reserve(ngTracks);
 
     for (Int_t i = 0; i < ngTracks; i++) {
         DielectronCandidate cand;
@@ -1025,6 +1024,7 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
 void CbmAnaDielectronTask::FillCandidates()
 {
    fCandidates.clear();
+   fTTCandidates.clear();
    Int_t nGTracks = fGlobalTracks->GetEntriesFast();
    fCandidates.reserve(nGTracks);
 

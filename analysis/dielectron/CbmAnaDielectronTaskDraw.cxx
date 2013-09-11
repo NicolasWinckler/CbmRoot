@@ -400,8 +400,7 @@ void CbmAnaDielectronTaskDraw::DrawPtYDistributionAll()
       DrawPtYDistribution(step);
    }
 
-   TCanvas *cMc = CreateCanvas("lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut],
-         "lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 800, 800);
+   TCanvas *cMc = CreateCanvas("lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], "lmvm_pty_"+CbmAnaLmvmNames::fAnaSteps[kPtCut], 800, 800);
    //cMc->Divide(2,1);
    //cMc->cd(1);
   // DrawPtYDistribution(kMc, false);
@@ -466,8 +465,7 @@ void CbmAnaDielectronTaskDraw::DrawMomentumEfficiencyAll()
 void CbmAnaDielectronTaskDraw::DrawMotherPdg()
 {
    TCanvas *c = CreateCanvas("lmvm_mother_pdg", "lmvm_mother_pdg", 500, 500);
-   DrawH1(list_of(H1("fh_mc_mother_pdg"))(H1("fh_acc_mother_pdg")),
-         list_of("MC")("acc"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
+   DrawH1(list_of(H1("fh_mc_mother_pdg"))(H1("fh_acc_mother_pdg")), list_of("MC")("acc"), kLinear, kLog, true, 0.7, 0.7, 0.99, 0.99);
 }
 
 void CbmAnaDielectronTaskDraw::Draw1DSourceTypes(
@@ -1121,8 +1119,9 @@ void CbmAnaDielectronTaskDraw::DrawBgSourceTracks()
 
    TCanvas *c4 = CreateCanvas("lmvm_nof_topology_pairs", "lmvm_nof_topology_pairs", 600, 600);
    TH1D* htopology = (TH1D*)H1("fh_nof_topology_pairs")->Clone();
+   htopology->Scale(1. / htopology->Integral());
    DrawH1( htopology, kLinear, kLinear, "hist text0");
-   htopology->SetMarkerSize(2.);
+   htopology->SetMarkerSize(1.);
 }
 
 void CbmAnaDielectronTaskDraw::DrawMismatchesAndGhosts()

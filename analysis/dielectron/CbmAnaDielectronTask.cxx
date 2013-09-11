@@ -242,7 +242,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
     fElIdAnn(NULL),
     fUseRichAnn(kTRUE),
     fMomentumCut(-1.),
-    fChiPrimCut(0.),
+    fChiPrimCut(3.),
     fPtCut(.2),
     fAngleCut(1.),
     fGammaCut(0.025),
@@ -976,7 +976,6 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
         CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
         if(NULL == gTrack) continue;
 
-        //choose tracks which are ONLY in STS -> SEGMENT
         cand.stsInd = gTrack->GetStsTrackIndex();
         if (cand.stsInd < 0) continue;
         CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(cand.stsInd);

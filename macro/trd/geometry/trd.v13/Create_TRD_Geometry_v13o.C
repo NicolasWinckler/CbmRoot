@@ -737,6 +737,33 @@ void dump_info_file()
       fprintf(ifile,"v: %5.2f deg, h: %5.2f deg - vertical/horizontal - layer %2d\n", yangle, xangle, PlaneId[iLayer]);
     }  
 
+  // aperture
+  fprintf(ifile,"# inner aperture\n");
+
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+    {
+      if (iLayer < 4)
+      {	
+	//        fprintf(ifile,"y %10.4f cm   x %10.4f cm\n", 2.5 * DetectorSizeY[1], 3.5 * DetectorSizeX[1]);
+        yangle = atan(0.5 * DetectorSizeY[0] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+        xangle = atan(0.5 * DetectorSizeX[0] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+      }
+      if ((iLayer >= 4) && (iLayer < 8))
+      {	
+	//        fprintf(ifile,"y %10.4f cm   x %10.4f cm\n", 3.5 * DetectorSizeY[1], 4.5 * DetectorSizeX[1]);
+        yangle = atan(0.5 * DetectorSizeY[0] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+        xangle = atan(0.5 * DetectorSizeX[0] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+      }
+      if ((iLayer >= 8) && (iLayer <10))
+      {	
+	//        fprintf(ifile,"y %10.4f cm   x %10.4f cm\n", 4.5 * DetectorSizeY[1], 5.5 * DetectorSizeX[1]);
+        yangle = atan(0.5 * DetectorSizeY[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+        xangle = atan(0.5 * DetectorSizeX[1] / (LayerPosition[iLayer] + LayerThickness/2. + padplane_position)) * 180. / acos(-1.);
+      }
+      fprintf(ifile,"v: %5.2f deg, h: %5.2f deg - vertical/horizontal - layer %2d\n", yangle, xangle, PlaneId[iLayer]);
+    }  
+
   fclose(ifile);
 }
 

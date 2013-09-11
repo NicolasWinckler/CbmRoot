@@ -10,8 +10,8 @@ void draw_analysis_all() {
     gSystem->Load("libAnalysis");
 
     Bool_t useMvd = false;
-    std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/apr13_2/8gev/trd4/1.0field/nomvd/";
-    std::string fileName = "analysis.auau.8gev.centr.all.root";
+    std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/sep13/25gev/trd/1.0field/nomvd/";
+    std::string fileName = "analysis.auau.25gev.centr.all.root";
     //std::string fileName = "analysis.pimisid.0.0.auau.8gev.centr.all.root";
     std::string outputDir = dir + "results_all/";
 

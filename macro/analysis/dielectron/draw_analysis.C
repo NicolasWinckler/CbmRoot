@@ -11,8 +11,8 @@ void draw_analysis() {
 
     Bool_t useMvd = false;
     Bool_t drawSignificance = true;
-    std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/apr13_2/8gev/notrd/1.0field/nomvd/rho0/";
-    std::string fileName = dir + "analysis.auau.8gev.centr.all.root";
+    std::string dir = "/Users/slebedev/Development/cbm/data/lmvm/sep13/25gev/trd/1.0field/nomvd/rho0/";
+    std::string fileName = dir + "analysis.auau.25gev.centr.all.root";
     std::string outputDir = dir + "results_ana/realpid/";
   // std::string outputDir = "";
 

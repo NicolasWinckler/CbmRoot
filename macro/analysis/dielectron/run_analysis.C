@@ -10,16 +10,16 @@ void run_analysis(Int_t nEvents = 1000)
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    //gRandom->SetSeed(10);
-	/*TString dir = "/hera/cbm/users/slebedev/mc/dielectron/apr13_2/25gev/trd/1.0field/nomvd/rho0/";
+	TString dir = "/hera/cbm/users/slebedev/mc/dielectron/sep13/25gev/trd/1.0field/nomvd/rho0/";
 	TString mcFile = dir + "mc.auau.25gev.centr.00001.root";
 	TString parFile = dir + "/params.auau.25gev.centr.00001.root";
 	TString recoFile = dir + "/reco.auau.25gev.centr.00001.root";
-	TString analysisFile = dir + "/analysis.test.auau.25gev.centr.00001.root";*/
+	TString analysisFile = dir + "/test.analysis.test.auau.25gev.centr.00001.root";
 
-   TString parFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.param.root";
-   TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.mc.root";
-   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.reco.root";
-   TString analysisFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.analysis.root";
+  // TString parFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.param.root";
+  // TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.mc.root";
+  // TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.reco.root";
+  // TString analysisFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.analysis.root";
 
 	TString energy = "25gev";
 	TString plutoParticle = "rho0";
@@ -59,7 +59,7 @@ void run_analysis(Int_t nEvents = 1000)
    fRun->AddTask(kf);
 
    CbmL1* l1 = new CbmL1();
-   l1->SetMaterialBudgetFileName(stsMatBudgetFileName);
+    l1->SetMaterialBudgetFileName(stsMatBudgetFileName);
    fRun->AddTask(l1);
 
    CbmAnaDielectronTask *task = new CbmAnaDielectronTask();

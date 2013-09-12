@@ -25,6 +25,7 @@ void run_analysis(Int_t nEvents = 1000)
 	TString plutoParticle = "rho0";
 	Double_t pionMisidLevel = -1.;
    Double_t trdAnnCut = 0.85;
+   TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("MC_FILE"));
@@ -35,6 +36,7 @@ void run_analysis(Int_t nEvents = 1000)
       energy = TString(gSystem->Getenv("ENERGY"));
       plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
       trdAnnCut = TString(gSystem->Getenv("TRD_ANN_CUT")).Atof();
+      stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
    }
 
    // load libraries
@@ -57,6 +59,8 @@ void run_analysis(Int_t nEvents = 1000)
    fRun->AddTask(kf);
 
    CbmL1* l1 = new CbmL1();
+   l1->SetMaterialBudgetFileName(stsMatBudgetFileName);
+   fRun->AddTask(l1);
 
    CbmAnaDielectronTask *task = new CbmAnaDielectronTask();
    if (energy == "8gev" || energy == "10gev") {

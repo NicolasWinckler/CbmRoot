@@ -21,8 +21,12 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 
 ${CBMROOT_SOURCE_DIR}/sts 
 
-${CBMROOT_SOURCE_DIR}/KF 
+${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface 
+
+${CBMROOT_SOURCE_DIR}/L1
+${CBMROOT_SOURCE_DIR}/L1/L1Algo
+${CBMROOT_SOURCE_DIR}/L1/ParticleFinder 
 
 ${CBMROOT_SOURCE_DIR}/much/geo
 
@@ -87,11 +91,24 @@ dielectron/CbmAnaDielectronReports.cxx
 #photon/CbmTrdPhotonAnalysis.cxx
 )
 
+
 Set(HEADERS )
+
+IF (SSE_FOUND)
+  Message(STATUS "Analysis will be compiled with SSE support")
+  ADD_DEFINITIONS(-DHAVE_SSE)
+  SET_SOURCE_FILES_PROPERTIES(${SRCS} PROPERTIES COMPILE_FLAGS 
+  "-msse -O3")
+ELSE (SSE_FOUND)
+  MESSAGE(STATUS "Analysis will be compiled without SSE support")
+  SET_SOURCE_FILES_PROPERTIES(${SRCS} PROPERTIES COMPILE_FLAGS 
+  "-O3")
+ENDIF (SSE_FOUND)
+
 Set(LINKDEF AnalysisLinkDef.h)
 Set(LIBRARY_NAME Analysis)
 Set(DEPENDENCIES
-    Littrack KF Much Rich Sts CbmBase CbmData Base )
+    Littrack KF L1 Much Rich Sts CbmBase CbmData Base )
 
 GENERATE_LIBRARY()
 

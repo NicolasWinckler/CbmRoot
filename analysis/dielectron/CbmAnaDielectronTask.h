@@ -17,7 +17,8 @@
 #include "CbmMCTrack.h"
 #include "CbmGlobalTrack.h"
 #include "CbmRichElectronIdAnn.h"
-
+#include "CbmKFVertex.h"
+//#include "CbmL1PFFitter.h"
 
 #include <map>
 #include <fstream>
@@ -32,7 +33,6 @@ class TH2D;
 class TH1D;
 class TH2F;
 class TRandom3;
-
 class FairRootManager;
 
 class DielectronCandidate{
@@ -375,6 +375,7 @@ private:
     TClonesArray *fTofHits;
     TClonesArray *fTofPoints;
     CbmVertex *fPrimVertex;
+    CbmKFVertex fKFVertex;
     CbmStsKFTrackFitter fKFFitter;
 
     Bool_t fUseMvd;

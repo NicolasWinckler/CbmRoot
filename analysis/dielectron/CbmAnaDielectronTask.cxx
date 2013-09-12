@@ -27,6 +27,8 @@
 #include "CbmTrackMatch.h"
 #include "CbmKF.h"
 
+
+
 #include "CbmRichPoint.h"
 #include "CbmRichHit.h"
 #include "CbmTofPoint.h"
@@ -61,6 +63,10 @@
 #include "TString.h"
 #include "TSystem.h"
 #include "TStopwatch.h"
+
+#include "L1Field.h"
+#include "CbmL1PFFitter.h"
+
 
 #include <sstream>
 
@@ -697,6 +703,12 @@ void CbmAnaDielectronTask::Exec(
     cout << "fWeight = " << fWeight << endl;
     cout << "fMomentumCut = "<< fMomentumCut <<  endl;
 
+    if (fPrimVertex != NULL){
+       fKFVertex = CbmKFVertex(*fPrimVertex);
+    } else {
+       Fatal("CbmAnaDielectronTask::Exec","No PrimaryVertex array!");
+    }
+
     FillRichRingNofHits();
     MCPairs();   
     SingleParticleAcceptance();
@@ -985,17 +997,32 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
         cand.trdInd = gTrack->GetTrdTrackIndex();
         cand.tofInd = gTrack->GetTofHitIndex();
 
-        fKFFitter.DoFit(stsTrack,11);
+        CbmL1PFFitter fPFFitter;
+        vector<CbmStsTrack> stsTracks;
+        stsTracks.resize(1);
+        stsTracks[0] = *stsTrack;
+        vector<L1FieldRegion> vField;
+        vector<float> chiPrim;
+        fPFFitter.GetChiToVertex(stsTracks, vField, chiPrim, fKFVertex, 3e6);
+        cand.chi2sts = stsTracks[0].GetChi2() / stsTracks[0].GetNDF();
+        cand.chi2Prim = chiPrim[0];
+        FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
+
+
+      /*  fKFFitter.DoFit(stsTrack,11);
         cand.chi2Prim = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
         // Fit tracks to the primary vertex
         FairTrackParam vtxTrack;  
         fKFFitter.FitToVertex(stsTrack, fPrimVertex, &vtxTrack);
 
         vtxTrack.Position(cand.position);
-        vtxTrack.Momentum(cand.momentum);
+        vtxTrack.Momentum(cand.momentum);*/
+
+        vtxTrack->Position(cand.position);
+        vtxTrack->Momentum(cand.momentum);
 
         cand.mass = TDatabasePDG::Instance()->GetParticle(11)->Mass();
-        cand.charge = (vtxTrack.GetQp() > 0) ?1 :-1;
+        cand.charge = (vtxTrack->GetQp() > 0) ?1 :-1;
         cand.energy = sqrt(cand.momentum.Mag2() + cand.mass * cand.mass);
         cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) / (cand.energy - cand.momentum.Z()));
 
@@ -1046,16 +1073,33 @@ void CbmAnaDielectronTask::FillCandidates()
       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(cand.stsInd);
       if (stsTrack == NULL) continue;
 
-      fKFFitter.DoFit(stsTrack,11);
+      CbmL1PFFitter fPFFitter;
+      vector<CbmStsTrack> stsTracks;
+      stsTracks.resize(1);
+      stsTracks[0] = *stsTrack;
+      vector<L1FieldRegion> vField;
+      vector<float> chiPrim;
+      fPFFitter.GetChiToVertex(stsTracks, vField, chiPrim, fKFVertex, 3e6);
+      cand.chi2sts = stsTracks[0].GetChi2() / stsTracks[0].GetNDF();
+      cand.chi2Prim = chiPrim[0];
+      FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
+
+
+    /*  fKFFitter.DoFit(stsTrack,11);
       cand.chi2sts = stsTrack->GetChi2() / stsTrack->GetNDF();
       cand.chi2Prim = fKFFitter.GetChiToVertex(stsTrack, fPrimVertex);
       FairTrackParam vtxTrack;
       fKFFitter.FitToVertex(stsTrack, fPrimVertex, &vtxTrack);// Fit tracks to the primary vertex
 
       vtxTrack.Position(cand.position);
-      vtxTrack.Momentum(cand.momentum);
+      vtxTrack.Momentum(cand.momentum);*/
+
+      vtxTrack->Position(cand.position);
+      vtxTrack->Momentum(cand.momentum);
+
+
       cand.mass = TDatabasePDG::Instance()->GetParticle(11)->Mass();
-      cand.charge = (vtxTrack.GetQp() > 0) ?1 :-1;
+      cand.charge = (vtxTrack->GetQp() > 0) ?1 :-1;
       cand.energy = sqrt(cand.momentum.Mag2() + cand.mass * cand.mass);
       cand.rapidity = 0.5*TMath::Log((cand.energy + cand.momentum.Z()) / (cand.energy - cand.momentum.Z()));
 
@@ -1104,9 +1148,9 @@ void CbmAnaDielectronTask::FillCandidates()
 
       if (false) {
          // distance to vertex cut
-         double dx = vtxTrack.GetX() - fPrimVertex->GetX();
-         double dy = vtxTrack.GetY() - fPrimVertex->GetY();
-         double dz = vtxTrack.GetZ() - fPrimVertex->GetZ();
+         double dx = vtxTrack->GetX() - fPrimVertex->GetX();
+         double dy = vtxTrack->GetY() - fPrimVertex->GetY();
+         double dz = vtxTrack->GetZ() - fPrimVertex->GetZ();
          double r = TMath::Sqrt(dx*dx + dy*dy + dz*dz);
          if(r > 0.0025) continue;
       }

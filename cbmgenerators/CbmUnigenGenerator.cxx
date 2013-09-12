@@ -2,18 +2,23 @@
 // -----                     CbmUnigenGenerator                        -----
 // -----              Created 2006/Jul/04  by D. Kresan                -----
 // -------------------------------------------------------------------------
-#include <iostream>
-using namespace std;
 
-#include "TFile.h"
-#include "TTree.h"
+#include "CbmUnigenGenerator.h"
+
+#include "CbmMCEventHeader.h"
+
+#include "FairPrimaryGenerator.h"
 
 #include "URun.h"
 #include "UEvent.h"
 #include "UParticle.h"
 
-#include "FairPrimaryGenerator.h"
-#include "CbmUnigenGenerator.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TRandom.h"
+
+#include <iostream>
+using namespace std;
 
 
 // ------------------------------------------------------------------------
@@ -26,7 +31,10 @@ CbmUnigenGenerator::CbmUnigenGenerator()
     fEvent(NULL),
     fCM(kFALSE),
     fBetaCM(0.),
-    fGammaCM(1.)
+    fGammaCM(1.),
+    fPhiMin(0.), 
+    fPhiMax(0.),
+    fEventPlaneSet(kFALSE) 
 {
 }
 // ------------------------------------------------------------------------
@@ -42,8 +50,10 @@ CbmUnigenGenerator::CbmUnigenGenerator(TString fileName)
     fEvent(NULL),
     fCM(kFALSE),
     fBetaCM(0.),
-    fGammaCM(0.)
-
+    fGammaCM(0.),
+    fPhiMin(0.), 
+    fPhiMax(0.),
+    fEventPlaneSet(kFALSE) 
 {
     cout << "-I- CbmUnigenGenerator: Opening input file " << fileName << endl;
     fInputFile = new TFile(fFileName);
@@ -119,6 +129,20 @@ Bool_t CbmUnigenGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     UParticle *particle;
     Double_t pz;
     Double_t pz1;
+    Double_t phi = 0.;
+
+  // ---> Generate rotation angle  D
+  if ( fEventPlaneSet ) phi = gRandom->Uniform(fPhiMin, fPhiMax);
+
+  // Set event id and impact parameter in MCEvent if not yet done
+  CbmMCEventHeader* event = dynamic_cast<CbmMCEventHeader*>(primGen->GetEvent());
+  if ( event && (! event->IsSet()) ) {
+    event->SetEventID(fEvent->GetEventNr());
+    event->SetB(fEvent->GetB());
+    event->SetPhi(phi);
+    event->SetNPrim(fEvent->GetNpa());
+    event->MarkSet(kTRUE);
+  }
 
     // Loop over tracks in the current event
     for (Int_t itrack = 0; itrack < fEvent->GetNpa(); itrack++) {
@@ -131,10 +155,25 @@ Bool_t CbmUnigenGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	} else {
             pz1 = pz;
 	}
+	Double_t px = particle->Px();
+	Double_t py = particle->Py();
+	LOG(DEBUG2) << "Px before: "<< px << FairLogger::endl;
+	LOG(DEBUG2) << "Py before: "<< py << FairLogger::endl;
+	// Rotate momenta by event plane angle
+	if ( fEventPlaneSet ) {
+	  Double_t pt = TMath::Sqrt(px*px + py*py);
+	  Double_t azim = TMath::ATan2(py,px);
+	  azim += phi;
+	  px = pt * TMath::Cos(azim);
+	  py = pt * TMath::Sin(azim);
+	  LOG(DEBUG2) << "Px after: "<< px << FairLogger::endl;
+	  LOG(DEBUG2) << "Py after: "<< py << FairLogger::endl;
+	}
+
 	// Give track to PrimaryGenerator
 	primGen->AddTrack(particle->GetPdg(),
-			  particle->Px(),
-			  particle->Py(),
+			  px,
+			  py,
 			  pz1,
 			  0., 0., 0.);
     }
@@ -143,8 +182,13 @@ Bool_t CbmUnigenGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     return kTRUE;
 }
-// ------------------------------------------------------------------------
 
+// -----   Public method SetEventPlane   ----------------------------------
+void CbmUnigenGenerator::SetEventPlane(Double_t phiMin, Double_t phiMax) {
+  fPhiMin = phiMin;
+  fPhiMax = phiMax;
+  fEventPlaneSet = kTRUE;
+}
 
 // ------------------------------------------------------------------------
 void CbmUnigenGenerator::CloseInput()

@@ -26,6 +26,9 @@ private:
     Double_t      fBetaCM;           //! CM velocity
     Double_t      fGammaCM;          //! CM gamma factor
 
+    Double32_t fPhiMin, fPhiMax;          // Limits of event plane angle
+    Bool_t     fEventPlaneSet;            // Flag whether event plane angle is used
+
     void CloseInput();
 
     CbmUnigenGenerator(const CbmUnigenGenerator&);
@@ -36,9 +39,17 @@ public:
     CbmUnigenGenerator(TString fileName);
     virtual ~CbmUnigenGenerator();
 
+  /** Public method SetEventPlane 
+   **@param phiMin   Lower limit for event plane angle [rad]
+   **@param phiMax   Upper limit for event plane angle [rad]
+   **If set, an event plane angle will be generated with flat
+   **distrtibution between phiMin and phiMax. 
+   **/
+  void SetEventPlane(Double_t phiMin, Double_t phiMax);
+
     virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
 
-    ClassDef(CbmUnigenGenerator,1);
+    ClassDef(CbmUnigenGenerator,2);
 };
 
 

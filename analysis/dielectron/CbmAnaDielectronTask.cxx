@@ -1033,7 +1033,34 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
         if (cand.richInd < 0 && cand.trdInd < 0 && cand.tofInd < 0) fSTCandidates.push_back(cand);
 
         // RT cut candidates, STS + at least one detector (RICH, TRD, TOF) but not all
-        if (cand.richInd >= 0 || cand.trdInd >= 0 || cand.tofInd >= 0 ) {
+        // Candidates must be identified as electron in registered detectors:
+        // if it is registered in RICH it must be identified in the RICH as electron
+        // RICH
+        Bool_t isRichRT = (cand.richInd < 0)?false:true;
+        if ( isRichRT ){
+           CbmRichRing* richRing = (CbmRichRing*) fRichRings->At(cand.richInd);
+           if (richRing == NULL) isRichRT = false;
+           if ( isRichRT ) isRichRT = IsRichElectron(richRing, cand.momentum.Mag(), &cand);
+        }
+
+         // TRD
+        Bool_t isTrdRT = (cand.trdInd < 0)?false:true;
+        if ( isTrdRT ) isTrdRT = fUseTrd;
+        if ( isTrdRT ) {
+           CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(cand.trdInd);
+           if (trdTrack == NULL) isTrdRT = false;
+           if ( isTrdRT ) isTrdRT = IsTrdElectron(trdTrack, &cand);
+         }
+
+         // ToF
+        Bool_t isTofRT = (cand.tofInd < 0)?false:true;
+        if (isTofRT) {
+           CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(cand.tofInd);
+           if (tofHit == NULL) isTofRT = false;
+           if (isTofRT) isTofRT = IsTofElectron(gTrack, cand.momentum.Mag(), &cand);
+        }
+
+        if (isRichRT || isTrdRT || isTofRT ) {
            if ( !(cand.richInd >= 0 && cand.trdInd >= 0 && cand.tofInd >= 0) ) {
               fRTCandidates.push_back(cand);
            }

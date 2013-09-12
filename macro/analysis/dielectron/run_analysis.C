@@ -56,6 +56,8 @@ void run_analysis(Int_t nEvents = 1000)
    CbmKF* kf = new CbmKF();
    fRun->AddTask(kf);
 
+   CbmL1* l1 = new CbmL1();
+
    CbmAnaDielectronTask *task = new CbmAnaDielectronTask();
    if (energy == "8gev" || energy == "10gev") {
       // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy

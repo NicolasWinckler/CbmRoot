@@ -25,6 +25,12 @@ void run_analysis(Int_t nEvents = 1000)
 	TString plutoParticle = "rho0";
 	Double_t pionMisidLevel = -1.;
    Double_t trdAnnCut = 0.85;
+
+   TList *parFileList = new TList();
+   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par"; // TRD digi file
+
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
 
    if (script == "yes") {
@@ -37,6 +43,9 @@ void run_analysis(Int_t nEvents = 1000)
       plutoParticle = TString(gSystem->Getenv("PLUTO_PARTICLE"));
       trdAnnCut = TString(gSystem->Getenv("TRD_ANN_CUT")).Atof();
       stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
+      stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
+      trdDigiFile = TString(gSystem->Getenv("TRD_DIGI"));
+      tofDigiFile = TString(gSystem->Getenv("TOF_DIGI"));
    }
 
    // load libraries
@@ -96,12 +105,16 @@ void run_analysis(Int_t nEvents = 1000)
 
    fRun->AddTask(task);
 
-   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-   FairParRootFileIo* parIo1 = new FairParRootFileIo();
-   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-   parIo1->open(parFile.Data());
-   rtdb->setFirstInput(parIo1);
-   rtdb->setSecondInput(parIo2);
+
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+  parIo1->open(parFile.Data());
+  parIo2->open(parFileList, "in");
+  rtdb->setFirstInput(parIo1);
+  rtdb->setSecondInput(parIo2);
+  rtdb->setOutput(parIo1);
+  rtdb->saveOutput();
 
    fRun->Init();
    fRun->Run(0, nEvents);

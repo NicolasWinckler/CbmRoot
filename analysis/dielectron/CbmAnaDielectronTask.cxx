@@ -1083,7 +1083,8 @@ void CbmAnaDielectronTask::FillCandidates()
       cand.chi2sts = stsTracks[0].GetChi2() / stsTracks[0].GetNDF();
       cand.chi2Prim = chiPrim[0];
       FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
-
+      //cout << "-----I-----" << fKFVertex.GetRefX() << " " << fKFVertex.GetRefY() << " " << fKFVertex.GetRefZ() << endl;
+      
 
     /*  fKFFitter.DoFit(stsTrack,11);
       cand.chi2sts = stsTrack->GetChi2() / stsTrack->GetNDF();
@@ -1096,7 +1097,8 @@ void CbmAnaDielectronTask::FillCandidates()
 
       vtxTrack->Position(cand.position);
       vtxTrack->Momentum(cand.momentum);
-
+      //  cout << "------I------ " << cand.chi2Prim << " " << cand.chi2sts << " " <<
+      //        cand.momentum.Mag() << endl;
 
       cand.mass = TDatabasePDG::Instance()->GetParticle(11)->Mass();
       cand.charge = (vtxTrack->GetQp() > 0) ?1 :-1;
@@ -1154,6 +1156,11 @@ void CbmAnaDielectronTask::FillCandidates()
          double r = TMath::Sqrt(dx*dx + dy*dy + dz*dz);
          if(r > 0.0025) continue;
       }
+      // cout << cand.chi2Prim << endl;
+
+      //if (cand.chi2Prim > fChiPrimCut){
+	 
+      //}
 
       fCandidates.push_back(cand);
       if (!cand.isElectron && cand.chi2Prim < fChiPrimCut) fTTCandidates.push_back(cand);
@@ -1954,7 +1961,9 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
         } else {
             fh_chi2prim[kBg]->Fill(fCandidates[i].chi2Prim);
         }
-        if (fCandidates[i].isMcGammaElectron) fh_chi2prim[kGamma]->Fill(fCandidates[i].chi2Prim);
+	if (fCandidates[i].isMcGammaElectron){
+	    fh_chi2prim[kGamma]->Fill(fCandidates[i].chi2Prim);
+	}
         if (fCandidates[i].isMcPi0Electron) fh_chi2prim[kPi0]->Fill(fCandidates[i].chi2Prim);
 
         if (fCandidates[i].chi2Prim > fChiPrimCut ) continue;

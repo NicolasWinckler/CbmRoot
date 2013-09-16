@@ -118,7 +118,7 @@ const Int_t   MaxLayers = 10;   // max layers
 //
 const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
-Int_t    PlaneId[MaxLayers]; // automatiaclly filles with layer ID
+Int_t    PlaneId[MaxLayers]; // automatiaclly filled with layer ID
 
 const Int_t   LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/horizontal pads
 const Int_t   LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
@@ -501,6 +501,30 @@ void dump_info_file()
     if (ShowLayer[iLayer])
       fprintf(ifile,"%2d ", PlaneId[iLayer]);
   fprintf(ifile,"   planeID\n");
+  fprintf(ifile,"\n");
+
+  // Dimensions in x
+  fprintf(ifile,"# dimensions in x\n");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+      if (PlaneId[iLayer] < 5)
+        fprintf(ifile,"%5d cm to %5d cm x-dimension of layer %2d\n", -3.5 * DetectorSizeX[1], 3.5 * DetectorSizeX[1], PlaneId[iLayer]);
+      else if (PlaneId[iLayer] < 9)
+        fprintf(ifile,"%5d cm to %5d cm x-dimension of layer %2d\n", -4.5 * DetectorSizeX[1], 4.5 * DetectorSizeX[1], PlaneId[iLayer]);
+      else
+        fprintf(ifile,"%5d cm to %5d cm x-dimension of layer %2d\n", -5.5 * DetectorSizeX[1], 5.5 * DetectorSizeX[1], PlaneId[iLayer]);
+  fprintf(ifile,"\n");
+
+  // Dimensions in y
+  fprintf(ifile,"# dimensions in y\n");
+  for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
+    if (ShowLayer[iLayer])
+      if (PlaneId[iLayer] < 5)
+        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -2.5 * DetectorSizeX[1], 2.5 * DetectorSizeX[1], PlaneId[iLayer]);
+      else if (PlaneId[iLayer] < 9)
+        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -3.5 * DetectorSizeX[1], 3.5 * DetectorSizeX[1], PlaneId[iLayer]);
+      else
+        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -4.5 * DetectorSizeX[1], 4.5 * DetectorSizeX[1], PlaneId[iLayer]);
   fprintf(ifile,"\n");
 
   // Show layer positions

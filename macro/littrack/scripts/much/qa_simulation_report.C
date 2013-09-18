@@ -10,8 +10,8 @@ void qa_simulation_report()
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
    loadlibs();
 
-   std::string outputDir = "test/";
-   std::string fileName = "/hera/cbm/users/andrey/mc/much/sis100a/urqmdjpsi/auau/10gev/centr/qa.auau.10gev.centr.all.root";
+   std::string outputDir = "results/";
+   std::string fileName = "/hera/cbm/users/andrey/mc/much/v12b/omega/auau/25gev/centr/qa.auau.25gev.centr.all.root";
 
 
    CbmSimulationReport* trackingQaReport = new CbmLitTrackingQaReport();

@@ -1,7 +1,7 @@
 #$ -wd /tmp 
 #$ -j y
 
-dir=/hera/cbm/users/andrey/mc/much/${geometry}/urqmd${particle}/auau/${energy}/${centrality}
+dir=/hera/cbm/users/andrey/mc/much/${geometry}/${background}${particle}/auau/${energy}/${centrality}
 
 source /hera/cbm/users/andrey/cbmroot/jul13/build/config.sh
 

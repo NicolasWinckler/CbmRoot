@@ -4,6 +4,7 @@
 ///                                             
 
 
+// 2013-07-20 - DE - v13x - build lattice grid as VolumeAssembly instead of CompositeShape, saves 10% time in run_sim.C
 // 2013-06-25 - DE - v13g trd300_rich             (10 layers, z = 4100 ) - TRD right behind SIS300 RICH
 // 2013-06-25 - DE - v13h trd100_sts              ( 4 layers, z = 2600 ) - TRD completely on RICH/MUCH platform to allow TOF to move upstream
 // 2013-06-25 - DE - v13i trd100_rich             ( 2 layers, z = 4100 ) - TRD right behind RICH			      
@@ -47,7 +48,6 @@
 #include "TGeoMedium.h"
 #include "TGeoPgon.h"
 #include "TGeoMatrix.h"
-#include "TGeoCompositeShape.h"
 #include "TGeoXtru.h"
 #include "TFile.h"
 #include "TString.h"

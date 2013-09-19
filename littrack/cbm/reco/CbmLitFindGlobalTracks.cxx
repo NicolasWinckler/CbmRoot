@@ -427,7 +427,10 @@ void CbmLitFindGlobalTracks::SelectTracksForTofMerging()
    // with TOF hits.
 
    Int_t nofStations = CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchTrdStations();
-   Int_t stationCut = nofStations - 4;
+   //   Int_t stationCut = nofStations - 4;
+   // TODO: Fix this issue in a better way. This is done only as an ugly fix
+   // FU 19.09.13 
+   Int_t stationCut = nofStations - 3;
 
    for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++) {
       CbmLitTrack* track = *it;

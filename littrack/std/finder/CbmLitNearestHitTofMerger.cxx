@@ -52,7 +52,9 @@ LitStatus CbmLitNearestHitTofMerger::DoMerge(
          CbmLitTrackParam par(*track->GetParamLast());
 
          // Extrapolate track minimum Z position of hit using magnetic field propagator.
-         fFieldPropagator->Propagate(&par, zMin, fPDG);
+         if (fFieldPropagator->Propagate(&par, zMin, fPDG) == kLITERROR) {
+        	 break; // break if track propagation failed
+         }
 
          // Extrapolate track parameters to each Z position in the map.
          // This is done to improve calculation speed.

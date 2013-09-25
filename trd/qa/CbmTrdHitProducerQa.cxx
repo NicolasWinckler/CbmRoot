@@ -6,6 +6,8 @@
 #include "CbmTrdHitProducerQa.h"
 
 #include "CbmTrdHit.h"
+#include "CbmTrdDigi.h"
+#include "CbmTrdDigiMatch.h"
 #include "CbmTrdPoint.h"
 #include "CbmGeoTrdPar.h"
 
@@ -30,6 +32,8 @@ using std::endl;
 CbmTrdHitProducerQa::CbmTrdHitProducerQa() 
   : FairTask(),
     fTrdHitCollection(NULL),
+    fTrdDigiCollection(NULL),
+    fTrdDigiMatchCollection(NULL),
     fTrdPointCollection(NULL),
     fMCTrackArray(NULL),
     fNoTrdStations(-1),
@@ -59,6 +63,8 @@ CbmTrdHitProducerQa::CbmTrdHitProducerQa(const char* name,
 					 const char* title)
   : FairTask(name),
     fTrdHitCollection(NULL),
+    fTrdDigiCollection(NULL),
+    fTrdDigiMatchCollection(NULL),
     fTrdPointCollection(NULL),
     fMCTrackArray(NULL),
     fNoTrdStations(-1),
@@ -106,6 +112,22 @@ InitStatus CbmTrdHitProducerQa::Init()
     if(NULL == fTrdPointCollection) {
 	cout << "-W- CbmTrdHitProducerQa::Init : "
 	    << "no TRD point array !" << endl;
+	return kERROR;
+    }
+
+    // Get pointer to TRD digi array
+    fTrdDigiCollection = (TClonesArray*) rootMgr->GetObject("TrdDigi");
+    if(NULL == fTrdDigiCollection) {
+	cout << "-W- CbmTrdHitProducerQa::Init : "
+	    << "no TRD digi array !" << endl;
+	return kERROR;
+    }
+
+    // Get pointer to TRD digi array
+    fTrdDigiMatchCollection = (TClonesArray*) rootMgr->GetObject("TrdDigiMatch");
+    if(NULL == fTrdDigiMatchCollection) {
+	cout << "-W- CbmTrdHitProducerQa::Init : "
+	    << "no TRD digi match array !" << endl;
 	return kERROR;
     }
 
@@ -218,6 +240,8 @@ void CbmTrdHitProducerQa::Exec(Option_t* option)
 {
     // Declare variables
     CbmTrdHit* trdHit = NULL;
+    CbmTrdDigi* trdDigi = NULL;
+    CbmTrdDigiMatch* trdDigiMatch = NULL;
     CbmTrdPoint* trdPoint = NULL;
     //    CbmMCTrack* mctrack = NULL;
 
@@ -249,7 +273,10 @@ void CbmTrdHitProducerQa::Exec(Option_t* option)
 	// This will have to change in the future, when the creation of the poin
 	// will not be necessarily connected to existence of tyhe point
 
-	trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdHit->GetRefId());
+	trdDigiMatch = (CbmTrdDigiMatch*) fTrdDigiMatchCollection->At(trdHit->GetRefId());
+	if(NULL == trdDigiMatch) continue;
+
+	trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdDigiMatch->GetRefIndex());
 	if(NULL == trdPoint) continue;
 
         plane = trdHit->GetPlaneId();
@@ -300,26 +327,28 @@ void CbmTrdHitProducerQa::Exec(Option_t* option)
 
 
 
+        if (plane ==1 ) {
 	// compute the Hit pools for X and Y coordinate
 	hitPosX   = trdHit->GetX();
 	hitErrX   = trdHit->GetDx();
-        hitErrX  /= 10000;           // micrometers to centimeters
+	//        hitErrX  /= 10000;           // micrometers to centimeters
 	pointPosX = trdPoint->GetX();
-	hitPoolX  = (hitPosX - pointPosX)/hitErrX;
+	hitPoolX  = (hitPosX - pointPosX);///hitErrX;
 
 
 
 	hitPosY   = trdHit->GetY();
 	hitErrY   = trdHit->GetDy();
-        hitErrY  /= 10000;          // micrometers to centimeters
+	//        hitErrY  /= 10000;          // micrometers to centimeters
 	pointPosY = trdPoint->GetY();
-	hitPoolY  = (hitPosY - pointPosY)/hitErrY;
+	hitPoolY  = (hitPosY - pointPosY);///hitErrY;
 
 
        	// fill histograms
 	fHitPoolsX->Fill(hitPoolX);
 	fHitPoolsY->Fill(hitPoolY);
 
+	}
     }
 
 
@@ -358,8 +387,8 @@ void CbmTrdHitProducerQa::PrepareHistograms()
     S3L4pidE15=NULL;
     S3L4pidEall=NULL;
 
-    fHitPoolsX = new TH1F("fHitPoolsX", "", 500, -5, 5);
-    fHitPoolsY = new TH1F("fHitPoolsY", "", 500, -5, 5);
+    fHitPoolsX = new TH1F("fHitPoolsX", "", 500, -50, 50);
+    fHitPoolsY = new TH1F("fHitPoolsY", "", 500, -50, 50);
 
     S1L1eTR15   = new TH1F("S1L1eTR15","TR of e- for first layer ",600,0.,60.);
     S1L1edEdx15 = new TH1F("S1L1edEdx15","dEdx of e- for first layer ",600,0.,60.);

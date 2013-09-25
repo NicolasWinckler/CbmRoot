@@ -50,6 +50,8 @@ private:
 
     /* Data branches*/
     TClonesArray* fTrdHitCollection;
+    TClonesArray* fTrdDigiCollection;
+    TClonesArray* fTrdDigiMatchCollection;
     TClonesArray* fTrdPointCollection;
     TClonesArray* fMCTrackArray;
 

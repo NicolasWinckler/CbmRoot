@@ -102,6 +102,9 @@ void run_reco_digitizer(Int_t nEvents = 1)
   CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi(); 
   run->AddTask(trdHitProd);                                                  
 
+  CbmTrdHitProducerQa* trdHitProdQa = new CbmTrdHitProducerQa(); 
+  run->AddTask(trdHitProdQa);                                                  
+
   // -------------------------------------------------------------------------
   // ===                 End of TRD local reconstruction                   ===
   // =========================================================================

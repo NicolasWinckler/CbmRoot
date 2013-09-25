@@ -107,20 +107,15 @@ void run_reco(Int_t nEvents = 1)
 
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
+  // -----   TRD hit producer   ----------------------------------------------
   CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
   run->AddTask(trdHitProd);
 
-  //  // -----   TRD hit producer   ----------------------------------------------
-  //// fails in Rev 19311 - 20130514                                             
-  //  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",       
-  //                                                  "TRD task", radiator);     
-  //  run->AddTask(trdDigitizer);                                                
-  //                                                                             
-  //                                                                             
-  //  CbmTrdHitProducerDigi* trdHitProd =                                        
-  //                   new CbmTrdHitProducerDigi("TRD Hit Producer","TRD task"); 
-  //                                                                             
-  //  run->AddTask(trdHitProd);                                                  
+  //  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(radiator);
+  //  run->AddTask(trdDigitizer);
+  //
+  //  CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi();
+  //  run->AddTask(trdHitProd);
 
   // -------------------------------------------------------------------------
   // ===                 End of TRD local reconstruction                   ===

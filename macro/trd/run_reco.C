@@ -111,11 +111,6 @@ void run_reco(Int_t nEvents = 1)
   run->AddTask(trdHitProd);
 
   //  // -----   TRD hit producer   ----------------------------------------------
-  //  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-  //  // Resolutions in y - station and angle dependent [mum]                     
-  //  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-  //  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  //  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
   //// fails in Rev 19311 - 20130514                                             
   //  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer("TRD Digitizer",       
   //                                                  "TRD task", radiator);     

@@ -17,13 +17,16 @@ eventDisplay()
   if (digipar.Length() == 0) digipar = "trd_standard";
 
   TString  InputFile     ="data/test.mc.root";
+  TString  InputFile1    ="data/test.eds.root";
   TString  ParFile       ="data/params.root";
+  TString  OutFile       ="data/test.root";
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
 
   fRun->SetInputFile(InputFile.Data());
-  fRun->SetOutputFile("data/test.root");
+  fRun->AddFriend(InputFile1.Data());
+  fRun->SetOutputFile(OutFile.Data());
 
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parInput1 = new FairParRootFileIo();

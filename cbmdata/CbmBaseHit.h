@@ -64,13 +64,13 @@ public:
 	 * number of the detector. Can be calculated using unique detector identifier
 	 * or can use additional class member from the derived class to store the plane identifier.
 	 **/
-	virtual Int_t GetPlaneId() const = 0;
+	virtual Int_t GetPlaneId() const { return -1; }
 
 	/**
 	 * \brief Pure virtual function. Must be implemented in derived class.
 	 * Has to return string representation of the object.
 	 **/
-	virtual string ToString() const = 0;
+	virtual string ToString() const { return "Has to be implemented in derrived class"; }
 
 protected:
 	/**

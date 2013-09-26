@@ -33,7 +33,7 @@
 #ifndef CBMTRDPADS_H
 #define CBMTRDPADS_H
 
-// v2.8
+// v2.9
 Int_t fst1_sect_count = 1;
 Float_t fst1_pad_type[8][1][4] =   // array of pad geometries in the TRD (trd1mod[1-8])
   { { { 54., 54., 54., 54. } },

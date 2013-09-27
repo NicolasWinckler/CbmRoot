@@ -3,6 +3,7 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// 2013-09-27 - DE - v13y - do not use Xtru to build the supports
 // 2013-09-19 - DE - v13y - build lattice grid with BBox as keeping volume instead of VolumeAssembly, saves another 10% time in run_sim.C
 // 2013-07-20 - DE - v13x - build lattice grid as VolumeAssembly instead of CompositeShape, saves 10% time in run_sim.C
 // 2013-06-25 - DE - v13g trd300_rich             (10 layers, z = 4100 ) - TRD right behind SIS300 RICH
@@ -346,6 +347,7 @@ void create_materials_from_media_file();
 void create_trd_module_type(Int_t moduleType);
 void create_detector_layers(Int_t layer);
 void create_supports();
+void create_box_supports();
 void add_trd_labels();
 void dump_info_file();
 
@@ -403,8 +405,12 @@ void Create_TRD_Geometry_v13y() {
   printf("\n");
 
   if (IncludeSupports)
+  {
     create_supports();
-  
+    // DEDE
+    //    create_box_supports();
+  }
+
   gGeoMan->CloseGeometry();
 //  gGeoMan->CheckOverlaps(0.001);
 //  gGeoMan->PrintOverlaps();
@@ -2017,3 +2023,370 @@ add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
 
 }   
    
+
+void create_box_supports()
+{
+  const TString trd_01 = "support_trd1";
+  TGeoVolume* trd_1 = new TGeoVolumeAssembly(trd_01);
+
+  const TString trd_02 = "support_trd2";
+  TGeoVolume* trd_2 = new TGeoVolumeAssembly(trd_02);
+
+  const TString trd_03 = "support_trd3";
+  TGeoVolume* trd_3 = new TGeoVolumeAssembly(trd_03);
+
+//  const TString trdSupport = "supportframe";
+//  TGeoVolume* trdsupport = new TGeoVolumeAssembly(trdSupport);
+//
+//  trdsupport->AddNode(trd_1, 1);
+//  trdsupport->AddNode(trd_2, 2);
+//  trdsupport->AddNode(trd_3, 3);
+
+  TGeoMedium* keepVolMed        = gGeoMan->GetMedium(KeepingVolumeMedium);
+  TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
+
+  const Int_t I_height = 40;
+  const Int_t I_width  = 30;
+  const Int_t I_thick  =  2;
+
+  const Double_t Hhei = I_height;  // 40
+  const Double_t Hwid = I_width ;  // 30  
+
+  //  const Double_t x[12] = { -15,-15, -1, -1,-15,-15, 15, 15,  1,  1, 15, 15 };  // IPB 400
+  //  const Double_t y[12] = { -20,-18,-18, 18, 18, 20, 20, 18, 18,-18,-18,-20 };  // 30 x 40 cm in size, 2 cm wall thickness
+
+  Double_t AperX[3] = { 450., 550., 600.};  // inner aperture in X of support structure for stations 1,2,3
+  Double_t AperY[3] = { 350., 450., 500.};  // inner aperture in Y of support structure for stations 1,2,3
+  Double_t PilPosX;
+  Double_t BarPosY;
+
+  const Double_t BeamHeight = 570;  // beamline is at 5.7m above floor
+
+  Double_t PilPosZ[6];  // PilPosZ
+//  PilPosZ[0] = LayerPosition[0] + LayerThickness/2.;
+//  PilPosZ[1] = LayerPosition[3] + LayerThickness/2.;
+//  PilPosZ[2] = LayerPosition[4] + LayerThickness/2.;
+//  PilPosZ[3] = LayerPosition[7] + LayerThickness/2.;
+//  PilPosZ[4] = LayerPosition[8] + LayerThickness/2.;
+//  PilPosZ[5] = LayerPosition[9] + LayerThickness/2.;
+
+  PilPosZ[0] = LayerPosition[0] + 15;
+  PilPosZ[1] = LayerPosition[3] - 15 + LayerThickness;
+  PilPosZ[2] = LayerPosition[4] + 15;		      
+  PilPosZ[3] = LayerPosition[7] - 15 + LayerThickness;
+  PilPosZ[4] = LayerPosition[8] + 15;		      
+  PilPosZ[5] = LayerPosition[9] - 15 + LayerThickness;
+
+//  cout << "PilPosZ[0]: " << PilPosZ[0] << endl;
+//  cout << "PilPosZ[1]: " << PilPosZ[1] << endl;
+
+  TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX( 90.); // rotate  90 deg around x-axis                     
+  TGeoRotation  *roty090 = new TGeoRotation("roty090"); roty090->RotateY( 90.); // rotate  90 deg around y-axis                     
+  TGeoRotation  *rotz090 = new TGeoRotation("rotz090"); rotz090->RotateZ( 90.); // rotate  90 deg around y-axis                     
+  TGeoRotation  *roty270 = new TGeoRotation("roty270"); roty270->RotateY(270.); // rotate 270 deg around y-axis                     
+
+  TGeoRotation  *rotzx01 = new TGeoRotation("rotzx01"); 
+  rotzx01->RotateZ(  90.); // rotate  90 deg around z-axis
+  rotzx01->RotateX(  90.); // rotate  90 deg around x-axis
+
+//  TGeoRotation  *rotxz01 = new TGeoRotation("rotxz01"); 
+//  rotxz01->RotateX(  90.); // rotate  90 deg around x-axis
+//  rotxz01->RotateZ(  90.); // rotate  90 deg around z-axis
+
+  Double_t ang1 = atan(3./4.) * 180. / acos(-1.);
+  //  cout << "DEDE " << ang1 << endl;
+  //  Double_t sin1 = acos(-1.);
+  //  cout << "DEDE " << sin1 << endl;
+  TGeoRotation  *rotx080 = new TGeoRotation("rotx080"); rotx080->RotateX( 90.-ang1); // rotate  80 deg around x-axis                     
+  TGeoRotation  *rotx100 = new TGeoRotation("rotx100"); rotx100->RotateX( 90.+ang1); // rotate 100 deg around x-axis                     
+
+  TGeoRotation  *rotxy01 = new TGeoRotation("rotxy01"); 
+  rotxy01->RotateX(  90.); // rotate  90 deg around x-axis                     
+  rotxy01->RotateZ(-ang1); // rotate  ang1   around rotated y-axis                     
+
+  TGeoRotation  *rotxy02 = new TGeoRotation("rotxy02"); 
+  rotxy02->RotateX(  90.); // rotate  90 deg around x-axis                     
+  rotxy02->RotateZ( ang1); // rotate  ang1   around rotated y-axis                     
+
+
+//-------------------
+// vertical pillars (Y)
+//-------------------
+
+  // station 1
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+
+      TGeoBBox* trd_H_vert1_keep  = new TGeoBBox("", I_thick /2., I_height /2. - I_thick, (BeamHeight + (AperY[0]+Hhei) ) /2.);
+      TGeoVolume* trd_H_vert1     = new TGeoVolume("trd_H_y1", trd_H_vert1_keep, aluminiumVolMed);
+
+      TGeoBBox* trd_H_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (BeamHeight + (AperY[0]+Hhei) ) /2.);
+      TGeoVolume* trd_H_vert2     = new TGeoVolume("trd_H_y2", trd_H_vert2_keep, aluminiumVolMed);
+
+      trd_H_vert1->SetLineColor(kBlue);   // Orange);  // Yellow);  // kBlue);  
+      trd_H_vert2->SetLineColor(kBlue);   // Yellow);  // kOrange);
+    
+      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[0]+Hhei) ) /2.);
+      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[0]+Hhei) ) /2.);
+      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., (BeamHeight - (AperY[0]+Hhei) ) /2.);
+    
+      TGeoBBox* trd_H_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[0]+Hhei) ) /2.);
+      TGeoVolume* trd_H_vert_vol1    = new TGeoVolume("trd_H_y0", trd_H_vert_vol1_keep, keepVolMed);
+
+      // H-bar
+      trd_H_vert_vol1->AddNode(trd_H_vert1, 1, ty01);
+      trd_H_vert_vol1->AddNode(trd_H_vert2, 2, ty02);
+      trd_H_vert_vol1->AddNode(trd_H_vert2, 3, ty03);
+
+      PilPosX = AperX[0];
+    
+      TGeoCombiTrans* trd_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[0], rotzx01);
+      trd_1->AddNode(trd_H_vert_vol1, 11, trd_H_vert_combi01);
+      TGeoCombiTrans* trd_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[0], rotzx01);
+      trd_1->AddNode(trd_H_vert_vol1, 12, trd_H_vert_combi02);
+      TGeoCombiTrans* trd_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[1], rotzx01);
+      trd_1->AddNode(trd_H_vert_vol1, 13, trd_H_vert_combi03);
+      TGeoCombiTrans* trd_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[1], rotzx01);
+      trd_1->AddNode(trd_H_vert_vol1, 14, trd_H_vert_combi04);
+    }
+
+/*
+  // station 2
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      TGeoXtru* trd_H_vert1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_vert1->DefinePolygon(12,x,y);
+      trd_H_vert1->DefineSection( 0,-(AperY[1]+Hhei), 0, 0, 1.0);
+      trd_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);
+      TGeoVolume* trd_H_vert_vol1 = new TGeoVolume("trd_H_y_02", trd_H_vert1, aluminiumVolMed);
+      trd_H_vert_vol1->SetLineColor(kYellow);
+      PilPosX = AperX[1];
+    
+      TGeoCombiTrans* trd_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[2], rotzx01);
+      trd_2->AddNode(trd_H_vert_vol1, 21, trd_H_vert_combi01);
+      TGeoCombiTrans* trd_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[2], rotzx01);
+      trd_2->AddNode(trd_H_vert_vol1, 22, trd_H_vert_combi02);
+      TGeoCombiTrans* trd_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[3], rotzx01);
+      trd_2->AddNode(trd_H_vert_vol1, 23, trd_H_vert_combi03);
+      TGeoCombiTrans* trd_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[3], rotzx01);
+      trd_2->AddNode(trd_H_vert_vol1, 24, trd_H_vert_combi04);
+    }
+
+  // station 3
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      TGeoXtru* trd_H_vert1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_vert1->DefinePolygon(12,x,y);
+      trd_H_vert1->DefineSection( 0,-(AperY[2]+Hhei), 0, 0, 1.0);
+      trd_H_vert1->DefineSection( 1, BeamHeight,      0, 0, 1.0);
+      TGeoVolume* trd_H_vert_vol1 = new TGeoVolume("trd_H_y_03", trd_H_vert1, aluminiumVolMed);
+      trd_H_vert_vol1->SetLineColor(kYellow);
+      PilPosX = AperX[2];
+      
+      TGeoCombiTrans* trd_H_vert_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[4], rotzx01);
+      trd_3->AddNode(trd_H_vert_vol1, 31, trd_H_vert_combi01);
+      TGeoCombiTrans* trd_H_vert_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[4], rotzx01);
+      trd_3->AddNode(trd_H_vert_vol1, 32, trd_H_vert_combi02);
+      TGeoCombiTrans* trd_H_vert_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.), 0., PilPosZ[5], rotzx01);
+      trd_3->AddNode(trd_H_vert_vol1, 33, trd_H_vert_combi03);
+      TGeoCombiTrans* trd_H_vert_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), 0., PilPosZ[5], rotzx01);
+      trd_3->AddNode(trd_H_vert_vol1, 34, trd_H_vert_combi04);
+    }
+
+
+//-------------------
+// horizontal supports (X)
+//-------------------
+
+  // station 1
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      TGeoXtru* trd_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_hori1->DefinePolygon(12,x,y);
+      trd_H_hori1->DefineSection( 0,-AperX[0], 0, 0, 1.0);
+      trd_H_hori1->DefineSection( 1, AperX[0], 0, 0, 1.0);
+      TGeoVolume* trd_H_hori_vol1 = new TGeoVolume("trd_H_x_01", trd_H_hori1, aluminiumVolMed);
+      trd_H_hori_vol1->SetLineColor(kRed);
+      BarPosY = AperY[0];
+    
+      TGeoCombiTrans* trd_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[0], roty090);
+      trd_1->AddNode(trd_H_hori_vol1, 11, trd_H_hori_combi01);
+      TGeoCombiTrans* trd_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[0], roty090);
+      trd_1->AddNode(trd_H_hori_vol1, 12, trd_H_hori_combi02);
+      TGeoCombiTrans* trd_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[1], roty090);
+      trd_1->AddNode(trd_H_hori_vol1, 13, trd_H_hori_combi03);
+      TGeoCombiTrans* trd_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[1], roty090);
+      trd_1->AddNode(trd_H_hori_vol1, 14, trd_H_hori_combi04);
+    }
+
+  // station 2
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      TGeoXtru* trd_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_hori1->DefinePolygon(12,x,y);
+      trd_H_hori1->DefineSection( 0,-AperX[1], 0, 0, 1.0);
+      trd_H_hori1->DefineSection( 1, AperX[1], 0, 0, 1.0);
+      TGeoVolume* trd_H_hori_vol1 = new TGeoVolume("trd_H_x_02", trd_H_hori1, aluminiumVolMed);
+      trd_H_hori_vol1->SetLineColor(kRed);
+      BarPosY = AperY[1];
+    
+      TGeoCombiTrans* trd_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[2], roty090);
+      trd_2->AddNode(trd_H_hori_vol1, 21, trd_H_hori_combi01);
+      TGeoCombiTrans* trd_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[2], roty090);
+      trd_2->AddNode(trd_H_hori_vol1, 22, trd_H_hori_combi02);
+      TGeoCombiTrans* trd_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[3], roty090);
+      trd_2->AddNode(trd_H_hori_vol1, 23, trd_H_hori_combi03);
+      TGeoCombiTrans* trd_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[3], roty090);
+      trd_2->AddNode(trd_H_hori_vol1, 24, trd_H_hori_combi04);
+    }
+
+  // station 3
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      TGeoXtru* trd_H_hori1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_hori1->DefinePolygon(12,x,y);
+      trd_H_hori1->DefineSection( 0,-AperX[2], 0, 0, 1.0);
+      trd_H_hori1->DefineSection( 1, AperX[2], 0, 0, 1.0);
+      TGeoVolume* trd_H_hori_vol1 = new TGeoVolume("trd_H_x_03", trd_H_hori1, aluminiumVolMed);
+      trd_H_hori_vol1->SetLineColor(kRed);
+      BarPosY = AperY[2];
+    
+      TGeoCombiTrans* trd_H_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[4], roty090);
+      trd_3->AddNode(trd_H_hori_vol1, 31, trd_H_hori_combi01);
+      TGeoCombiTrans* trd_H_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[4], roty090);
+      trd_3->AddNode(trd_H_hori_vol1, 32, trd_H_hori_combi02);
+      TGeoCombiTrans* trd_H_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+Hhei/2.), PilPosZ[5], roty090);
+      trd_3->AddNode(trd_H_hori_vol1, 33, trd_H_hori_combi03);
+      TGeoCombiTrans* trd_H_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+Hhei/2.), PilPosZ[5], roty090);
+      trd_3->AddNode(trd_H_hori_vol1, 34, trd_H_hori_combi04);
+    }
+
+
+//-------------------
+// horizontal supports (Z)
+//-------------------
+
+  // station 1
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      TGeoXtru* trd_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_slope1->DefinePolygon(12,x,y);
+      trd_H_slope1->DefineSection( 0,-(PilPosZ[1]-PilPosZ[0]-Hwid)/2., 0, 0, 1.0);
+      trd_H_slope1->DefineSection( 1,+(PilPosZ[1]-PilPosZ[0]-Hwid)/2., 0, 0, 1.0);
+      TGeoVolume* trd_H_slope_vol1 = new TGeoVolume("trd_H_z_01", trd_H_slope1, aluminiumVolMed);
+      trd_H_slope_vol1->SetLineColor(kGreen);
+      PilPosX = AperX[0];
+      BarPosY = AperY[0];
+        
+      TGeoCombiTrans* trd_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      trd_1->AddNode(trd_H_slope_vol1, 11, trd_H_slope_combi01);
+      TGeoCombiTrans* trd_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      trd_1->AddNode(trd_H_slope_vol1, 12, trd_H_slope_combi02);
+      TGeoCombiTrans* trd_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      trd_1->AddNode(trd_H_slope_vol1, 13, trd_H_slope_combi03);
+      TGeoCombiTrans* trd_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      trd_1->AddNode(trd_H_slope_vol1, 14, trd_H_slope_combi04);
+    }
+
+  // station 2
+  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      TGeoXtru* trd_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_slope1->DefinePolygon(12,x,y);
+      trd_H_slope1->DefineSection( 0,-(PilPosZ[3]-PilPosZ[2]-Hwid)/2., 0, 0, 1.0);
+      trd_H_slope1->DefineSection( 1,+(PilPosZ[3]-PilPosZ[2]-Hwid)/2., 0, 0, 1.0);
+      TGeoVolume* trd_H_slope_vol1 = new TGeoVolume("trd_H_z_02", trd_H_slope1, aluminiumVolMed);
+      trd_H_slope_vol1->SetLineColor(kGreen);
+      PilPosX = AperX[1];
+      BarPosY = AperY[1];
+        
+      TGeoCombiTrans* trd_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      trd_2->AddNode(trd_H_slope_vol1, 21, trd_H_slope_combi01);
+      TGeoCombiTrans* trd_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      trd_2->AddNode(trd_H_slope_vol1, 22, trd_H_slope_combi02);
+      TGeoCombiTrans* trd_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      trd_2->AddNode(trd_H_slope_vol1, 23, trd_H_slope_combi03);
+      TGeoCombiTrans* trd_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      trd_2->AddNode(trd_H_slope_vol1, 24, trd_H_slope_combi04);
+    }
+
+  // station 3
+  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      TGeoXtru* trd_H_slope1 = new TGeoXtru(2);  // define Xtrusion of 2 planes
+      trd_H_slope1->DefinePolygon(12,x,y);
+      trd_H_slope1->DefineSection( 0,-(PilPosZ[5]-PilPosZ[4]-Hwid)/2., 0, 0, 1.0);
+      trd_H_slope1->DefineSection( 1,+(PilPosZ[5]-PilPosZ[4]-Hwid)/2., 0, 0, 1.0);
+      TGeoVolume* trd_H_slope_vol1 = new TGeoVolume("trd_H_z_03", trd_H_slope1, aluminiumVolMed);
+      trd_H_slope_vol1->SetLineColor(kGreen);
+      PilPosX = AperX[2];
+      BarPosY = AperY[2];
+        
+      TGeoCombiTrans* trd_H_slope_combi01 = new TGeoCombiTrans( (PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      trd_3->AddNode(trd_H_slope_vol1, 31, trd_H_slope_combi01);
+      TGeoCombiTrans* trd_H_slope_combi02 = new TGeoCombiTrans(-(PilPosX+Hhei/2.), (BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      trd_3->AddNode(trd_H_slope_vol1, 32, trd_H_slope_combi02);
+      TGeoCombiTrans* trd_H_slope_combi03 = new TGeoCombiTrans( (PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      trd_3->AddNode(trd_H_slope_vol1, 33, trd_H_slope_combi03);
+      TGeoCombiTrans* trd_H_slope_combi04 = new TGeoCombiTrans(-(PilPosX+Hhei/2.),-(BarPosY+Hhei-Hwid/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      trd_3->AddNode(trd_H_slope_vol1, 34, trd_H_slope_combi04);
+    }
+
+  if (IncludeLabels)
+  {
+
+    Int_t text_height    = 40;
+    Int_t text_thickness =  8;
+  
+    TGeoTranslation *tr200 = new TGeoTranslation(0., (AperY[0]+Hhei+ text_height/2.), PilPosZ[0]-15+ text_thickness/2.);
+    TGeoTranslation *tr201 = new TGeoTranslation(0., (AperY[1]+Hhei+ text_height/2.), PilPosZ[2]-15+ text_thickness/2.);
+    TGeoTranslation *tr202 = new TGeoTranslation(0., (AperY[2]+Hhei+ text_height/2.), PilPosZ[4]-15+ text_thickness/2.);
+  
+    TGeoCombiTrans  *tr203 = new TGeoCombiTrans(-(AperX[0]+Hhei+ text_thickness/2.), (AperY[0]+Hhei-Hwid-text_height/2.), (PilPosZ[0]+PilPosZ[1])/2., roty090);
+    TGeoCombiTrans  *tr204 = new TGeoCombiTrans(-(AperX[1]+Hhei+ text_thickness/2.), (AperY[1]+Hhei-Hwid-text_height/2.), (PilPosZ[2]+PilPosZ[3])/2., roty090);
+    TGeoCombiTrans  *tr205 = new TGeoCombiTrans(-(AperX[2]+Hhei+ text_thickness/2.), (AperY[2]+Hhei-Hwid-text_height/2.), (PilPosZ[4]+PilPosZ[5])/2., roty090);
+  
+    TGeoCombiTrans  *tr206 = new TGeoCombiTrans( (AperX[0]+Hhei+ text_thickness/2.), (AperY[0]+Hhei-Hwid-text_height/2.), (PilPosZ[0]+PilPosZ[1])/2., roty270);
+    TGeoCombiTrans  *tr207 = new TGeoCombiTrans( (AperX[1]+Hhei+ text_thickness/2.), (AperY[1]+Hhei-Hwid-text_height/2.), (PilPosZ[2]+PilPosZ[3])/2., roty270);
+    TGeoCombiTrans  *tr208 = new TGeoCombiTrans( (AperX[2]+Hhei+ text_thickness/2.), (AperY[2]+Hhei-Hwid-text_height/2.), (PilPosZ[4]+PilPosZ[5])/2., roty270);
+  
+    TGeoVolume* trdbox1 = new TGeoVolumeAssembly("trdbox1"); // volume for TRD text (108, 40, 8)
+    TGeoVolume* trdbox2 = new TGeoVolumeAssembly("trdbox2"); // volume for TRD text (108, 40, 8)
+    TGeoVolume* trdbox3 = new TGeoVolumeAssembly("trdbox3"); // volume for TRD text (108, 40, 8)
+    add_trd_labels(trdbox1, trdbox2, trdbox3);
+  
+    // final placement
+    if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    {
+      //    trd_1->AddNode(trdbox1, 1, tr200);
+      trd_1->AddNode(trdbox1, 4, tr203);
+      trd_1->AddNode(trdbox1, 7, tr206);
+    }
+    if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+    {
+      //    trd_2->AddNode(trdbox2, 2, tr201);
+      trd_2->AddNode(trdbox2, 5, tr204);
+      trd_2->AddNode(trdbox2, 8, tr207);
+    }
+    if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+    {
+      //    trd_3->AddNode(trdbox3, 3, tr202);
+      trd_3->AddNode(trdbox3, 6, tr205);
+      trd_3->AddNode(trdbox3, 9, tr208);
+    }
+  }
+
+  //  gGeoMan->GetVolume(geoVersion)->AddNode(trdsupport,1);
+  */
+  if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
+    //    gGeoMan->GetVolume(geoVersion)->AddNode(trd_1, 1);
+    gGeoMan->GetVolume(geoVersion)->AddNode(trd_1, 4);
+
+//  if (ShowLayer[4])  // if geometry contains layer 5 (1st layer of station 2)
+//    gGeoMan->GetVolume(geoVersion)->AddNode(trd_2, 2);
+//  if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
+//    gGeoMan->GetVolume(geoVersion)->AddNode(trd_3, 3);
+
+}
+
+

@@ -67,10 +67,10 @@ const TString FileNameInfo = geoVersion + ".geo.info";
 
 // display switches
 const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is included in geometry
-const Bool_t IncludeLattice  = false; // true;  // false;  // true, if lattice grid is included in geometry
-const Bool_t IncludeGasHoles = false; // false; // false;  // true, if gas holes to be pllotted in the lattice grid
-const Bool_t IncludeFebs     = false; // true;  // false;  // true, if FEBs are included in geometry
-const Bool_t IncludeAsics    = false; // true;  // false;  // true, if ASICs are included in geometry
+const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is included in geometry
+const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
+const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
+const Bool_t IncludeAsics    = true ; // false;  // true, if ASICs are included in geometry
 const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
 const Bool_t IncludeLabels   = true;  // false;  // true, if TRD (I, II, III) labels are plottoed in (VisLevel 5)
 

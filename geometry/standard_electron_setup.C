@@ -33,7 +33,7 @@ void standard_electron_setup()
   stsGeom    = "sts/sts_v12b.geo.root";
   richGeom   = "rich/rich_v08a.geo";
   trdGeom    = "trd/trd_v13g.geo.root";
-  tofGeom    = "tof/tof_v13b.root";
+  tofGeom    = "tof/tof_v13b.geo.root";
   ecalGeom   = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

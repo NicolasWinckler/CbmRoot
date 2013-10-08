@@ -7,6 +7,8 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
+#include <iomanip>
+
 CbmTrdModule::CbmTrdModule() 
   : TNamed(),
   fModuleAddress(0),
@@ -223,6 +225,19 @@ void CbmTrdModule::GetPadInfo(
    Double_t y_mean = 0.5 * (trdPoint->GetYIn() + trdPoint->GetYOut());
    Double_t z_mean = 0.5 * (trdPoint->GetZIn() + trdPoint->GetZOut());
    gGeoManager->FindNode(x_mean, y_mean, z_mean);
+
+   TString curNode = gGeoManager->GetPath();
+   if (! curNode.Contains("gas")) {
+     // if the point is not in the gas volume print warning
+     LOG(WARNING) << "This point is not in the trd gas" << FairLogger::endl;
+     /*
+     LOG(WARNING) << "x: " << std::setprecision(7) << trdPoint->GetXIn() << ", " << trdPoint->GetXOut()<< FairLogger::endl;
+     LOG(WARNING) << "y: " << std::setprecision(7) << trdPoint->GetYIn() << ", " << trdPoint->GetYOut()<< FairLogger::endl;
+     LOG(WARNING) << "z: " << std::setprecision(7) << trdPoint->GetZIn() << ", " << trdPoint->GetZOut()<< FairLogger::endl;
+     */
+     sectorId=-1;
+     return;
+   }
 
    // Get the local point in local MC coordinates from
    // the geomanager. This coordinate system is rotated

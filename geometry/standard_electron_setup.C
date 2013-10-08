@@ -20,7 +20,7 @@ void standard_electron_setup()
 
   // -----   Magnetic field   -----------------------------------------------
   fieldMap    = "field_v12b";   // name of field map
-  fieldZ     = 50.;             // field centre z position
+  fieldZ     = 40.;             // field centre z position
   fieldScale =  1.;             // field scaling factor
   fieldSymType = 3;
 

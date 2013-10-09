@@ -5,7 +5,8 @@
 
 #include "CbmTrdDigiDraw.h"
 
-#include "CbmTrdDetectorId.h"           // for CbmTrdDetectorId
+#include "CbmTrdAddress.h"           // for CbmTrdDetectorId
+//#include "CbmTrdDetectorId.h"           // for CbmTrdDetectorId
 #include "CbmTrdDigi.h"                 // for CbmTrdDigi
 #include "CbmTrdDigiPar.h"              // for CbmTrdDigiPar
 #include "CbmTrdModule.h"               // for CbmTrdModule
@@ -63,10 +64,8 @@ CbmTrdDigiDraw::CbmTrdDigiDraw(const char* name, Color_t color ,Style_t mstyle,I
     fStyle(mstyle),
     fActiveLayers()
 {
-  for(Int_t i=0; i<3; i++){
-    for(Int_t j=0; j<4; j++){
-      fActiveLayers[i][j]=kTRUE;
-    } 
+  for(Int_t i=0; i<15; i++){
+    fActiveLayers[i]=kTRUE;
   } 
 }
 // ----  Initialisation  ----------------------------------------------
@@ -105,50 +104,26 @@ InitStatus CbmTrdDigiDraw::Init()
 // -------------------------------------------------------------------------  
 void CbmTrdDigiDraw::Exec(Option_t* option)
 {
-   if (IsActive()){
+  if (IsActive()){
+    
+    CbmTrdDigi *digi=0;
+    
+    Int_t npoints=fPointList->GetEntriesFast();
+    Reset();
 
-   CbmTrdDigi *digi=0;
+    TEveBoxSet *q = new TEveBoxSet(GetName(),"");
+    q->Reset(TEveBoxSet::kBT_AABox, kTRUE, npoints);
+    q->SetMainColor(kBlue);
 
-   Int_t npoints=fPointList->GetEntriesFast();
-   Reset();
-
-   /*
-   Int_t digiCounter = 0;
-
-   for (Int_t i=0; i<npoints; ++i) {   
-     p=(CbmTrdDigi *)fPointList->At(i);
-     
-     if(p!=0) {       
-       Int_t   fDetId = p->GetDetId();
-       Int_t fStation = (Int_t) (fDetId/100000);
-       Int_t fLayer =  (Int_t) ((fDetId -(fStation*100000))/10000);
-       if ( fStation == 1 && fLayer == 1) digiCounter++;
-     }
-
-   }
-   */
-
-   TEveBoxSet *q = new TEveBoxSet(GetName(),"");
-   q->Reset(TEveBoxSet::kBT_AABox, kTRUE, npoints);
-   //q->Reset(TEveBoxSet::kBT_AABox, kTRUE, digiCounter);
-   //   q->SetMainAlpha(1.);
-   q->SetMainColor(kBlue);
-   //   q->SetMarkerSize(1.5);
-   //   q->SetMarkerStyle(fStyle);
-
-   //   q->SetDefDepth();
-   //   q->SetDefHeight();
-   //   q->SetDefDepth();
-
+    //   q->SetMainAlpha(1.);
+    //   q->SetMarkerSize(1.5);
+    //   q->SetMarkerStyle(fStyle);
+    
+    //   q->SetDefDepth();
+    //   q->SetDefHeight();
+    //   q->SetDefDepth();
+    
    Int_t refCounter=0;
-   Int_t Col, Row, DetId;
-   Double_t ELoss;
-   Int_t *bla;
-   Int_t Station, Layer, ModuleType, ModuleCopy;
-   Int_t Sector, moduleId;
-   TVector3 posHit, padSize;
-   Double_t padsizex, padsizy;
-   Double_t X, Y;
 
    for (Int_t i=0; i<npoints; ++i) {   
      
@@ -158,57 +133,38 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
      if(digi!=0) {
        
     
-       Col = digi->GetCol();
-       Row = digi->GetRow();
-       ELoss = digi-> GetCharge();
-       DetId = digi->GetDetId();
+       Double_t ELoss = digi-> GetCharge();
 
-       // The digi contains the information of the detector Id + the
-       // sector number. The digitization parameters are stored per
-       // module with arrays holding the information about the sectors.
-       // So we have to extract the information about the module Id and
-       // the sector from the detector Id.
-       Station = CbmTrdDetectorId::GetStationNr(DetId);
-       Layer = CbmTrdDetectorId::GetLayerNr(DetId);
-       ModuleType = CbmTrdDetectorId::GetModuleType(DetId);
-       ModuleCopy = CbmTrdDetectorId::GetCopyNr(DetId);
-       Sector = CbmTrdDetectorId::GetSectorNr(DetId);
-       moduleId= CbmTrdDetectorId::GetModuleId(DetId);
-
-       /*
-	 cout <<"##########################################"<<endl;
-	 cout <<"ID        : "<<DetId<<endl;
-	 cout <<"Module ID : "<<moduleId<<endl;
-	 cout <<"Sector    : "<<Sector<<endl;
-       */
-
+       Int_t address = digi->GetAddress();
+       Int_t Col = CbmTrdAddress::GetColumnId(address);
+       Int_t Row = CbmTrdAddress::GetRowId(address);
+       Int_t Sector = CbmTrdAddress::GetSectorId(address);
+       Int_t moduleId = CbmTrdAddress::GetModuleAddress(address);
+       Int_t layerId = CbmTrdAddress::GetLayerId(address);
 
        fModuleInfo = fDigiPar->GetModule(moduleId);
-       fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);
 
-
+       TVector3 posHit, padSize;
+       fModuleInfo->GetPosition(moduleId, Sector, Col, Row, posHit, padSize);
 
        // The given point is used as the edge of the box but it is
        // the middle point of the pad. So we have to do a transformation
      
       
-       X=posHit.X()-(padSize.X()/2);
-       Y=posHit.Y()-(padSize.Y()/2);
+       Double_t X = posHit.X()-(padSize.X()/2);
+       Double_t Y = posHit.Y()-(padSize.Y()/2);
 
 
-       if(fVerbose>1){
-         cout<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<endl;
-         cout<<"Col: "<< Col <<endl;
-         cout<<"Row: "<< Row <<endl;
-         cout<<setprecision(5)<<"fPadX: "<< padSize.X() <<endl;
-         cout<<setprecision(5)<<"fPadY: "<< padSize.Y() <<endl;
-         cout<<setprecision(5)<<"fPosX: "<< posHit.X() <<endl;
-         cout<<setprecision(5)<<"fPosY: "<< posHit.Y() <<endl;
-         cout<<setprecision(5)<<"fPosZ: "<< posHit.Z() <<endl;
-     }
-
-       if ( fActiveLayers[Station-1][Layer-1]) {
-       	 //cout <<"S,L: "<<fStation<<","<<fLayer<<endl;
+       LOG(DEBUG1)<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<FairLogger::endl;
+       LOG(DEBUG1)<<"Col: "<< Col <<FairLogger::endl;
+       LOG(DEBUG1)<<"Row: "<< Row <<FairLogger::endl;
+       LOG(DEBUG1)<<setprecision(5)<<"fPadX: "<< padSize.X() <<FairLogger::endl;
+       LOG(DEBUG1)<<setprecision(5)<<"fPadY: "<< padSize.Y() <<FairLogger::endl;
+       LOG(DEBUG1)<<setprecision(5)<<"fPosX: "<< posHit.X() <<FairLogger::endl;
+       LOG(DEBUG1)<<setprecision(5)<<"fPosY: "<< posHit.Y() <<FairLogger::endl;
+       LOG(DEBUG1)<<setprecision(5)<<"fPosZ: "<< posHit.Z() <<FairLogger::endl;
+       
+       if ( fActiveLayers[layerId]) {
 	 q->AddBox(X,Y,posHit.Z(), 
                    padSize.X(), padSize.Y(), 0.);
 	 refCounter++;
@@ -219,8 +175,6 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
    gEve->AddElement(q);
    gEve->Redraw3D(kFALSE); 
    fq=q;
-   //   cout<<"digiCounter: "<<digiCounter<<endl;
-   //   cout<<"refCounter : "<<refCounter<<endl;
    }
    
 }
@@ -243,29 +197,31 @@ void CbmTrdDigiDraw::Reset()
 	 }
 }
 
-void  CbmTrdDigiDraw::SetLayerStation1(Bool_t Layer1, Bool_t Layer2,
-                                       Bool_t Layer3, Bool_t Layer4)
+void CbmTrdDigiDraw::SetActiveLayer(Bool_t Layer1, Bool_t Layer2,
+				    Bool_t Layer3, Bool_t Layer4,
+				    Bool_t Layer5, Bool_t Layer6,
+				    Bool_t Layer7, Bool_t Layer8,
+				    Bool_t Layer9, Bool_t Layer10,
+				    Bool_t Layer11, Bool_t Layer12,
+				    Bool_t Layer13, Bool_t Layer14,
+				    Bool_t Layer15) 
+
 {
-  fActiveLayers[0][0]=Layer1;
-  fActiveLayers[0][1]=Layer2;
-  fActiveLayers[0][2]=Layer3;
-  fActiveLayers[0][3]=Layer4;
-}
-void  CbmTrdDigiDraw::SetLayerStation2(Bool_t Layer1, Bool_t Layer2,
-                                       Bool_t Layer3, Bool_t Layer4)
-{
-  fActiveLayers[1][0]=Layer1;
-  fActiveLayers[1][1]=Layer2;
-  fActiveLayers[1][2]=Layer3;
-  fActiveLayers[1][3]=Layer4;
-}
-void  CbmTrdDigiDraw::SetLayerStation3(Bool_t Layer1, Bool_t Layer2,
-                                       Bool_t Layer3, Bool_t Layer4)
-{
-  fActiveLayers[2][0]=Layer1;
-  fActiveLayers[2][1]=Layer2;
-  fActiveLayers[2][2]=Layer3;
-  fActiveLayers[2][3]=Layer4;
+  fActiveLayers[0]=Layer1;
+  fActiveLayers[1]=Layer2;
+  fActiveLayers[2]=Layer3;
+  fActiveLayers[3]=Layer4;
+  fActiveLayers[4]=Layer5;
+  fActiveLayers[5]=Layer6;
+  fActiveLayers[6]=Layer7;
+  fActiveLayers[7]=Layer8;
+  fActiveLayers[8]=Layer9;
+  fActiveLayers[9]=Layer10;
+  fActiveLayers[10]=Layer11;
+  fActiveLayers[11]=Layer12;
+  fActiveLayers[12]=Layer13;
+  fActiveLayers[13]=Layer14;
+  fActiveLayers[14]=Layer15;
 }
 
 

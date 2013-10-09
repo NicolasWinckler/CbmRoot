@@ -47,12 +47,14 @@ class CbmTrdDigiDraw : public FairTask {
   virtual void Exec(Option_t* option);
   void Reset();
 
-  void SetLayerStation1(Bool_t Layer1, Bool_t Layer2,
-                        Bool_t Layer3, Bool_t Layer4);
-  void SetLayerStation2(Bool_t Layer1, Bool_t Layer2,
-                        Bool_t Layer3, Bool_t Layer4);
-  void SetLayerStation3(Bool_t Layer1, Bool_t Layer2,
-                        Bool_t Layer3, Bool_t Layer4);
+void SetActiveLayer(Bool_t Layer1=kTRUE, Bool_t Layer2=kFALSE,
+		    Bool_t Layer3=kFALSE, Bool_t Layer4=kFALSE,
+		    Bool_t Layer5=kFALSE, Bool_t Layer6=kFALSE,
+		    Bool_t Layer7=kFALSE, Bool_t Layer8=kFALSE,
+		    Bool_t Layer9=kFALSE, Bool_t Layer10=kFALSE,
+		    Bool_t Layer11=kFALSE, Bool_t Layer12=kFALSE,
+		    Bool_t Layer13=kFALSE, Bool_t Layer14=kFALSE,
+		    Bool_t Layer15=kFALSE);
 
 protected:
 
@@ -69,12 +71,12 @@ protected:
   Color_t fColor; //!
   Style_t fStyle; //!
 
-  Bool_t fActiveLayers[3][4];
+  Bool_t fActiveLayers[15];
 
   CbmTrdDigiDraw(const CbmTrdDigiDraw&);
   CbmTrdDigiDraw& operator=(const CbmTrdDigiDraw&);
 
-  ClassDef(CbmTrdDigiDraw,1);
+  ClassDef(CbmTrdDigiDraw,2);
     
 };
 

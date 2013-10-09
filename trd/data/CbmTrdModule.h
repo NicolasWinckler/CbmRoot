@@ -72,64 +72,64 @@ public:
         TVector3& padPos,
         TVector3& padSize) const;
 
+  void TransformToLocalPad(
+        const Double_t* local_point,
+        Double_t& posX,
+        Double_t& posY) const;
+
+  void ProjectPositionToNextAnodeWire(
+        Double_t* local_point) const;
+
 private:
 
-   void GetModuleInformation(
-         Int_t moduleAddress,
-         const Double_t* local_point,
-         Int_t& sectorId,
-         Int_t& columnId,
-         Int_t& rowId) const;
+  void GetModuleInformation(
+        Int_t moduleAddress,
+        const Double_t* local_point,
+        Int_t& sectorId,
+        Int_t& columnId,
+        Int_t& rowId) const;
 
-   void TransformToLocalCorner(
-         const Double_t* local_point,
-         Double_t& posX,
-         Double_t& posY) const;
+  void TransformToLocalCorner(
+        const Double_t* local_point,
+        Double_t& posX,
+        Double_t& posY) const;
 
-   void TransformToLocalSector(
-         const Double_t* local_point,
-         Double_t& posX,
-         Double_t& posY) const;
+  void TransformToLocalSector(
+        const Double_t* local_point,
+        Double_t& posX,
+        Double_t& posY) const;
 
-   void TransformToLocalPad(
-         const Double_t* local_point,
-         Double_t& posX,
-         Double_t& posY) const;
+  Int_t GetSector(
+        const Double_t* local_point) const;
 
-   Int_t GetSector(
-         const Double_t* local_point) const;
+  Int_t fModuleAddress; // unique detector ID
+  Int_t fOrientation; // angle between long pad axis and y-axis in steps of 90 deg [0..3]
+  Double_t fX; // center of module in global c.s. [cm]
+  Double_t fY; // center of module in global c.s. [cm]
+  Double_t fZ; // center of module in global c.s. [cm]
+  Double_t fSizeX; // module half size in x [cm]
+  Double_t fSizeY; // module half size in y [cm]
+  Double_t fSizeZ; // module half size in z [cm]
 
-   void ProjectPositionToNextAnodeWire(
-         Double_t* local_point) const;
+  Double_t fAnodeWireOffset; // [cm]
+  Double_t fAnodeWireSpacing; // [cm]
+  Double_t fAnodeWireToPadPlaneDistance; // [cm]
 
-   Int_t fModuleAddress; // unique detector ID
-   Int_t fOrientation; // angle between long pad axis and y-axis in steps of 90 deg [0..3]
-   Double_t fX; // center of module in global c.s. [cm]
-   Double_t fY; // center of module in global c.s. [cm]
-   Double_t fZ; // center of module in global c.s. [cm]
-   Double_t fSizeX; // module half size in x [cm]
-   Double_t fSizeY; // module half size in y [cm]
-   Double_t fSizeZ; // module half size in z [cm]
+  Int_t fNofSectors; // number sectors for this module
+  TArrayD fSectorX; // center of sectors local c.s. [cm]
+  TArrayD fSectorY; // center of sectors local c.s. [cm]
+  TArrayD fSectorZ; // center of sectors local c.s. [cm]
+  TArrayD fSectorBeginX; // begin of sector [cm]
+  TArrayD fSectorBeginY; // begin of sector [cm]
+  TArrayD fSectorEndX; // end of sector [cm]
+  TArrayD fSectorEndY; // end of sector [cm]
+  TArrayD fSectorSizeX; // sector size in x [cm]
+  TArrayD fSectorSizeY; // sector size in y [cm]
 
-   Double_t fAnodeWireOffset; // [cm]
-   Double_t fAnodeWireSpacing; // [cm]
-   Double_t fAnodeWireToPadPlaneDistance; // [cm]
+  TArrayD fPadSizeX; // size of the readout pad in x [cm]
+  TArrayD fPadSizeY; // size of the readout pad in y [cm]
 
-   Int_t fNofSectors; // number sectors for this module
-   TArrayD fSectorX; // center of sectors local c.s. [cm]
-   TArrayD fSectorY; // center of sectors local c.s. [cm]
-   TArrayD fSectorZ; // center of sectors local c.s. [cm]
-   TArrayD fSectorBeginX; // begin of sector [cm]
-   TArrayD fSectorBeginY; // begin of sector [cm]
-   TArrayD fSectorEndX; // end of sector [cm]
-   TArrayD fSectorEndY; // end of sector [cm]
-   TArrayD fSectorSizeX; // sector size in x [cm]
-   TArrayD fSectorSizeY; // sector size in y [cm]
-
-   TArrayD fPadSizeX; // size of the readout pad in x [cm]
-   TArrayD fPadSizeY; // size of the readout pad in y [cm]
-
-   ClassDef(CbmTrdModule, 3);
+  ClassDef(CbmTrdModule, 3);
 };
 
 #endif

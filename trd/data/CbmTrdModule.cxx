@@ -139,10 +139,19 @@ void CbmTrdModule::ProjectPositionToNextAnodeWire(
       Double_t* local_point) const
 {
    // Move the local point along y to the next anode wire position.
-   if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {  // if wires are defined
+   if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {  // wires must be defined defined
+
       LOG(DEBUG2) << "local y before: " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
-      local_point[1] = Int_t(((local_point[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing + fAnodeWireOffset;
+
+      // make sure, local_point[1] is not negative - module center coordinate
+      // therefore transform to local corner and then back at the end of operation
+      local_point[1] = Int_t(((local_point[1] + fSizeY - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing + fAnodeWireOffset - fSizeY;  
+
       LOG(DEBUG2) << "local y after : " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
+
+      // check, if we have left the volume
+      if ( abs(local_point[1]) > fSizeY )
+        LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point projected out of plane" << FairLogger::endl;
    } else {
       LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used." << FairLogger::endl;
    }
@@ -269,7 +278,7 @@ void CbmTrdModule::GetPadInfo(
    LOG(INFO) << "local  x: " << std::setprecision(5) << local_point[0] 
                    << " y: " << std::setprecision(5) << local_point[1] 
                    << " z: " << std::setprecision(5) << local_point[2] << FairLogger::endl;
-
+   */
    Double_t proj_point[3];
    proj_point[0] = local_point[0];
    proj_point[1] = local_point[1];
@@ -281,7 +290,7 @@ void CbmTrdModule::GetPadInfo(
    LOG(INFO) << "proj   x: " << std::setprecision(5) << proj_point[0] 
                    << " y: " << std::setprecision(5) << proj_point[1] 
                    << " z: " << std::setprecision(5) << proj_point[2] << FairLogger::endl;
-
+   /*
    Double_t corner_point[3];
    corner_point[2] = local_point[2];
    TransformToLocalCorner(local_point, corner_point[0], corner_point[1]);

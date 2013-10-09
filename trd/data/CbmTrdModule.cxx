@@ -3,7 +3,6 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdAddress.h"
 #include "FairLogger.h"
-
 #include "TGeoManager.h"
 #include "TMath.h"
 
@@ -134,19 +133,22 @@ CbmTrdModule::~CbmTrdModule()
 }
 
 void CbmTrdModule::ProjectPositionToNextAnodeWire(
-      Double_t* local_point) const
+						  Double_t* local_point) const
 {
-   // Move the local point to the next anode wire position.
-   Double_t local_point_temp[2] = {local_point[0], local_point[1]};
-   if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {
-      if (fPadSizeX.At(0) < fPadSizeY.At(0)) {
-         local_point[1] = Int_t(((local_point_temp[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
-      } else {
-         local_point[0] = Int_t(((local_point_temp[0] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
-      }
-   } else {
-      LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used." << FairLogger::endl;
-   }
+  // Move the local point to the next anode wire position.
+  Double_t local_point_temp[2] = {local_point[0], local_point[1]};
+  if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {
+    //if (fPadSizeX.At(0) < fPadSizeY.At(0)) {
+    if (fOrientation == 0 || fOrientation == 2) {//0 or 180 deg
+      local_point[1] = Int_t(((local_point_temp[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
+    } else if (fOrientation == 1 || fOrientation == 3){//90 or 270 deg
+      local_point[0] = Int_t(((local_point_temp[0] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
+    } else {
+      LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fOrientation not within [0,4]." << FairLogger::endl;
+    }
+  } else {
+    LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used." << FairLogger::endl;
+  }
 }
 
 Int_t CbmTrdModule::GetSector(

@@ -3,6 +3,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdAddress.h"
 #include "FairLogger.h"
+
 #include "TGeoManager.h"
 #include "TMath.h"
 
@@ -132,24 +133,21 @@ CbmTrdModule::~CbmTrdModule()
 {
 }
 
+
+// 20131009 - DE - checked OK
 void CbmTrdModule::ProjectPositionToNextAnodeWire(
-						  Double_t* local_point) const
+      Double_t* local_point) const
 {
-  // Move the local point to the next anode wire position.
-  Double_t local_point_temp[2] = {local_point[0], local_point[1]};
-  if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {
-    //if (fPadSizeX.At(0) < fPadSizeY.At(0)) {
-    if (fOrientation == 0 || fOrientation == 2) {//0 or 180 deg
-      local_point[1] = Int_t(((local_point_temp[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
-    } else if (fOrientation == 1 || fOrientation == 3){//90 or 270 deg
-      local_point[0] = Int_t(((local_point_temp[0] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing;
-    } else {
-      LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fOrientation not within [0,4]." << FairLogger::endl;
-    }
-  } else {
-    LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used." << FairLogger::endl;
-  }
+   // Move the local point along y to the next anode wire position.
+   if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {  // if wires are defined
+      LOG(DEBUG2) << "local y before: " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
+      local_point[1] = Int_t(((local_point[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing + fAnodeWireOffset;
+      LOG(DEBUG2) << "local y after : " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
+   } else {
+      LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used." << FairLogger::endl;
+   }
 }
+
 
 Int_t CbmTrdModule::GetSector(
       const Double_t* local_point) const
@@ -159,12 +157,13 @@ Int_t CbmTrdModule::GetSector(
    // in the lower left corner of the chamber (looking upstream)
    // x goes to the left, looking in beam direction, y goes upward
 
-   Double_t posx = local_point[0] + fSizeX;
-   Double_t posy = local_point[1] + fSizeY;
+   Double_t posx, posy;
+
+   TransformToLocalCorner(local_point, posx, posy);
 
    for (Int_t i = 0; i < fNofSectors; i++) {
       if (posx >= fSectorBeginX.GetAt(i) && posx < fSectorEndX.GetAt(i)
-            && posy >= fSectorBeginY.GetAt(i) && posy < fSectorEndY.GetAt(i)) {
+       && posy >= fSectorBeginY.GetAt(i) && posy < fSectorEndY.GetAt(i)) {
          return i;
       } 
    }
@@ -174,7 +173,7 @@ Int_t CbmTrdModule::GetSector(
 }
 
 
-Int_t CbmTrdModule::GetNofColumns() const
+Int_t CbmTrdModule::GetNofColumns() const  // get total number of pad columns in module
 {
    Int_t nofColumns = 0;
    if (fSectorSizeX.At(0) < fSizeX) {
@@ -187,7 +186,8 @@ Int_t CbmTrdModule::GetNofColumns() const
    return nofColumns;
 }
 
-Int_t CbmTrdModule::GetNofRows() const
+
+Int_t CbmTrdModule::GetNofRows() const  // get total number of pad rows in module
 {
    Int_t nofRows = 0;
    if (fSectorSizeY.At(0) < fSizeY) {
@@ -200,15 +200,18 @@ Int_t CbmTrdModule::GetNofRows() const
    return nofRows;
 }
 
+
 Int_t CbmTrdModule::GetNofColumnsInSector(Int_t i) const
 {
    return (Int_t)(fSectorSizeX.At(i) / fPadSizeX.At(i) + 0.5);  // need to round for correct result
 }
 
+
 Int_t CbmTrdModule::GetNofRowsInSector(Int_t i) const
 {
    return (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);  // need to round for correct result
 }
+
 
 void CbmTrdModule::GetPadInfo(
       const CbmTrdPoint* trdPoint,
@@ -247,17 +250,91 @@ void CbmTrdModule::GetPadInfo(
    // GetModuleInformation to have a
    // the same local coordinate system in all the chambers
    const Double_t* global_point = gGeoManager->GetCurrentPoint();
-   Double_t local_point[3];  // global_point[3];
+   Double_t local_point[3];
+
    gGeoManager->MasterToLocal(global_point, local_point);
 
+   /* 
+   // 20131009 - DE - debuging output to check module orientation 0,1,2,3 with box generator
+
+   // print module orientation
+   LOG(INFO) << "module orientation: " << std::setprecision(5) << fOrientation << FairLogger::endl;
+
+   // print global coordinate
+   LOG(INFO) << "global x: " << std::setprecision(5) << global_point[0] 
+                   << " y: " << std::setprecision(5) << global_point[1] 
+                   << " z: " << std::setprecision(5) << global_point[2] << FairLogger::endl;
+
+   // print local coordinate - relative to module center
+   LOG(INFO) << "local  x: " << std::setprecision(5) << local_point[0] 
+                   << " y: " << std::setprecision(5) << local_point[1] 
+                   << " z: " << std::setprecision(5) << local_point[2] << FairLogger::endl;
+
+   Double_t proj_point[3];
+   proj_point[0] = local_point[0];
+   proj_point[1] = local_point[1];
+   proj_point[2] = local_point[2];
+
+   ProjectPositionToNextAnodeWire(proj_point);
+
+   // print local coordinate - relative to module center
+   LOG(INFO) << "proj   x: " << std::setprecision(5) << proj_point[0] 
+                   << " y: " << std::setprecision(5) << proj_point[1] 
+                   << " z: " << std::setprecision(5) << proj_point[2] << FairLogger::endl;
+
+   Double_t corner_point[3];
+   corner_point[2] = local_point[2];
+   TransformToLocalCorner(local_point, corner_point[0], corner_point[1]);
+
+   // print local coordinate - relative to module corner
+   LOG(INFO) << "corner x: " << std::setprecision(5) << corner_point[0] 
+                   << " y: " << std::setprecision(5) << corner_point[1] 
+                   << " z: " << std::setprecision(5) << corner_point[2] << FairLogger::endl;
+
+   LOG(INFO) << "pos    x: " << std::setprecision(5) << fX 
+                   << " y: " << std::setprecision(5) << fY 
+                   << " z: " << std::setprecision(5) << fZ 
+                 << " ori: " << std::setprecision(5) << fOrientation << FairLogger::endl;
+
+   LOG(INFO) << "size/2 x: " << std::setprecision(5) << fSizeX 
+                   << " y: " << std::setprecision(5) << fSizeY 
+                   << " z: " << std::setprecision(5) << fSizeZ << FairLogger::endl;
+
+   Double_t sector_point[3];
+   sector_point[2] = local_point[2];
+   TransformToLocalSector(local_point, sector_point[0], sector_point[1]);
+
+   // print local coordinate - relative to module sector
+   LOG(INFO) << "sector x: " << std::setprecision(5) << sector_point[0] 
+                   << " y: " << std::setprecision(5) << sector_point[1] 
+                   << " z: " << std::setprecision(5) << sector_point[2] << FairLogger::endl;
+
+   // calculate in which sector the point is
+   sectorId = GetSector(local_point);
+   LOG(INFO) << "sectornr: " << std::setprecision(5) << sectorId << FairLogger::endl;
+
+   LOG(INFO) << "ncol    : " << std::setprecision(5) << GetNofColumns() << FairLogger::endl;
+   LOG(INFO) << "nrow    : " << std::setprecision(5) << GetNofRows()    << FairLogger::endl;
+
+   // print local coordinate - relative to module sector
+   LOG(INFO) << "sec2   x: " << std::setprecision(5) << fSectorBeginX.GetAt(2)
+                   << " y: " << std::setprecision(5) << fSectorBeginY.GetAt(2) << FairLogger::endl;
+   LOG(INFO) << "sec1   x: " << std::setprecision(5) << fSectorBeginX.GetAt(1)
+	           << " y: " << std::setprecision(5) << fSectorBeginY.GetAt(1) << FairLogger::endl;
+   LOG(INFO) << "sec0   x: " << std::setprecision(5) << fSectorBeginX.GetAt(0)
+	           << " y: " << std::setprecision(5) << fSectorBeginY.GetAt(0) << FairLogger::endl
+	     << FairLogger::endl;
+   */
    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(trdPoint->GetDetectorID());
    GetModuleInformation(moduleAddress, local_point, sectorId, columnId, rowId);
 }
 
+
+// 20131009 - DE - checked OK for module orientations 0,1,2,3
 void CbmTrdModule::TransformToLocalCorner(
       const Double_t* local_point,
       Double_t& posX,
-		Double_t& posY) const
+      Double_t& posY) const
 {
    // Transformation from local coordinate system with origin
    // in the middle of the module into a system
@@ -268,11 +345,12 @@ void CbmTrdModule::TransformToLocalCorner(
    posY = local_point[1] + fSizeY;
 }
 
+
+// 20131009 - DE - checked OK for module orientations 0,1,2,3
 void CbmTrdModule::TransformToLocalSector(
       const Double_t* local_point,
-	   Int_t sector,
-	   Double_t& posX,
-	   Double_t& posY) const
+      Double_t& posX,
+      Double_t& posY) const
 {
    // Transformation of the module coordinate system with origin
    // in the middle of the chamber into a system
@@ -280,9 +358,11 @@ void CbmTrdModule::TransformToLocalSector(
    // of the sector the point is in. 
    // First, transform in a system with origin in the lower left corner.
    TransformToLocalCorner(local_point, posX, posY);
+   Int_t sector = GetSector(local_point);
    posX -= fSectorBeginX.GetAt(sector);
    posY -= fSectorBeginY.GetAt(sector);
 }
+
 
 void CbmTrdModule::GetModuleInformation(
       Int_t moduleAddress,
@@ -296,18 +376,16 @@ void CbmTrdModule::GetModuleInformation(
       LOG(ERROR) << "CbmTrdModule::GetModuleInformation: This is wrong!" << FairLogger::endl;
    }
 
+   Double_t posX, posY;
+   TransformToLocalSector(local_point, posX, posY);
+
    // calculate in which sector the point is
    sectorId = GetSector(local_point);
-
-   Double_t posX, posY;
-   Double_t fpadsizex = GetPadSizeX(sectorId);
-   Double_t fpadsizey = GetPadSizeY(sectorId);
-
-   TransformToLocalSector(local_point, sectorId, posX, posY);
 
    columnId = (Int_t)(posX / fPadSizeX.At(sectorId));
    rowId    = (Int_t)(posY / fPadSizeY.At(sectorId));
 }
+
 
 void CbmTrdModule::GetPosition(
       Int_t moduleAddress,

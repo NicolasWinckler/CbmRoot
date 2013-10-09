@@ -81,13 +81,12 @@ private:
          Int_t& columnId,
          Int_t& rowId) const;
 
-   void TransformToLocalSector(
+   void TransformToLocalCorner(
          const Double_t* local_point,
-         Int_t sector,
          Double_t& posX,
          Double_t& posY) const;
 
-   void TransformToLocalCorner(
+   void TransformToLocalSector(
          const Double_t* local_point,
          Double_t& posX,
          Double_t& posY) const;

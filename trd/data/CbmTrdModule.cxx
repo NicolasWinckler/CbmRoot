@@ -154,7 +154,7 @@ void CbmTrdModule::ProjectPositionToNextAnodeWire(
       // check, if we have left the volume
       if ( fabs(local_point[1]) > fSizeY )
         LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point projected out of plane, from " 
-                   << std::setprecision(5) << local_point[1] << " to "
+                   << std::setprecision(5) << ypos << " to "
                    << std::setprecision(5) << local_point[1] << " - fSizeY "
                    << std::setprecision(5) << fSizeY << FairLogger::endl;
    } else {

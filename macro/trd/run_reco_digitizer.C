@@ -28,6 +28,15 @@ void run_reco_digitizer(Int_t nEvents = 1)
   whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_standard";
 
+  FairLogger *logger = FairLogger::GetLogger();
+  logger->SetLogFileName("MyLog.log");
+  logger->SetLogToScreen(kTRUE);
+//  //  logger->SetLogToFile(kFALSE);
+//  //  logger->SetLogVerbosityLevel("HIGH");
+//  //  logger->SetLogFileLevel("DEBUG4");
+  //  logger->SetLogScreenLevel("DEBUG2");
+  logger->SetLogScreenLevel("INFO");
+
   // ========================================================================
   //          Adjust this part according to your requirements
 

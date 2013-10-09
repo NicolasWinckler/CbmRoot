@@ -51,7 +51,7 @@ function set_geometry_v12b() {
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v12b.digi.root
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
-    export LIT_TOF_GEOM= #tof/tof_v13b.root
+    export LIT_TOF_GEOM= #tof/tof_v13b.geo.root
     export LIT_TOF_DIGI= #${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
@@ -78,7 +78,7 @@ function set_geometry_v12c() {
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v12c.digi.root
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
-    export LIT_TOF_GEOM= #tof/tof_v13b.root
+    export LIT_TOF_GEOM= #tof/tof_v13b.geo.root
     export LIT_TOF_DIGI= #${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
@@ -105,7 +105,7 @@ function set_geometry_sis300a() {
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_sis300a.digi.root
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
-    export LIT_TOF_GEOM= #tof/tof_v13b.root
+    export LIT_TOF_GEOM= #tof/tof_v13b.geo.root
     export LIT_TOF_DIGI= #${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
@@ -132,7 +132,7 @@ function set_geometry_sis100a() {
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_sis100a.digi.root
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
-    export LIT_TOF_GEOM= #tof/tof_v13b.root
+    export LIT_TOF_GEOM= #tof/tof_v13b.geo.root
     export LIT_TOF_DIGI= #${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
@@ -159,7 +159,7 @@ function set_geometry_sis100b() {
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_sis100b.digi.root
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
-    export LIT_TOF_GEOM= #tof/tof_v13b.root
+    export LIT_TOF_GEOM= #tof/tof_v13b.geo.root
     export LIT_TOF_DIGI= #${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
@@ -186,7 +186,7 @@ function set_geometry_sis100c() {
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_sis100c.digi.root
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
-    export LIT_TOF_GEOM= #tof/tof_v13b.root
+    export LIT_TOF_GEOM= #tof/tof_v13b.geo.root
     export LIT_TOF_DIGI= #${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_FIELD_MAP=field_v12a
     export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo

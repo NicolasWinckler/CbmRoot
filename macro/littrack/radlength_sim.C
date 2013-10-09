@@ -17,7 +17,7 @@ void radlength_sim(Int_t nEvents = 30250000)
    TString richGeom = "";//"rich/rich_v08a.geo";
    TString trdGeom = "trd/trd_v13g.geo.root";
    TString muchGeom = "";//"much/much_v12b.geo";
-   TString tofGeom = "";//"tof/tof_v13b.root";
+   TString tofGeom = "";//"tof/tof_v13b.geo.root";
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));

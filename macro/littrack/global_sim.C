@@ -52,7 +52,7 @@ void global_sim(Int_t nEvents = 100)
 		stsGeom    = "sts/sts_v12b.geo.root";
 		muchGeom   = "much/much_v12c.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
-		tofGeom    = "tof/tof_v13b.root";
+		tofGeom    = "tof/tof_v13b.geo.root";
 		fieldMap   = "field_v12a";
 		magnetGeom = "magnet/magnet_v12a.geo";
 	} else if (setup == "electron") {
@@ -63,7 +63,7 @@ void global_sim(Int_t nEvents = 100)
 		stsGeom    = "sts/sts_v12b.geo.root";
 		richGeom   = "rich/rich_v08a.geo";
 		trdGeom    = "trd/trd_v13g.geo.root";
-		tofGeom    = "";//"tof/tof_v13b.root";
+		tofGeom    = "";//"tof/tof_v13b.geo.root";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";
 		magnetGeom = "magnet/magnet_v12a.geo";

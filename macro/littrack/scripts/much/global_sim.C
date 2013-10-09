@@ -31,7 +31,7 @@ void global_sim(Int_t nEvents = 100, Int_t seed = 555)
 	TString stsGeom = "sts/sts_v12b.geo.root";
 	TString muchGeom = "much/much_v12c.geo";
 	TString trdGeom = "";//"trd_muon_setup_new.geo";
-	TString tofGeom = "tof/tof_v13b.root";
+	TString tofGeom = "tof/tof_v13b.geo.root";
 	TString fieldMap = "field_v12a";
 	TString magnetGeom = "magnet/magnet_v12a.geo";
 

@@ -169,11 +169,30 @@ void run_sim_single_elec(Int_t nEvents = 1)
   FairBoxGenerator *eminus = new FairBoxGenerator();
   eminus->SetPDGType(11);
   eminus->SetMultiplicity(1);
-  eminus->SetBoxXYZ(-400.,-400.,400.,400.,405.);  // z=405 for SIS100 setup
+  //  eminus->SetBoxXYZ(-400.,-400.,400.,400.,405.);  // z=405 for SIS100 setup
+  eminus->SetBoxXYZ(32.,-32.,32.,-32.,405.);  // shoot at corner of diagonal modules
   eminus->SetPRange(2.,2.);
   eminus->SetPhiRange(0.,360.);
   eminus->SetThetaRange(0.,0.);
   primGen->AddGenerator(eminus);
+
+//  FairBoxGenerator *e2 = new FairBoxGenerator();
+//  e2->SetPDGType(11);
+//  e2->SetMultiplicity(1);
+//  e2->SetBoxXYZ(-32.,32.,-32.,32.,405.);  // shoot at corner of diagonal modules
+//  e2->SetPRange(2.,2.);
+//  e2->SetPhiRange(0.,360.);
+//  e2->SetThetaRange(0.,0.);
+//  primGen->AddGenerator(e2);
+
+  FairBoxGenerator *e3 = new FairBoxGenerator();
+  e3->SetPDGType(11);
+  e3->SetMultiplicity(1);
+  e3->SetBoxXYZ(-82.,82.,-82.,82.,405.);  // shoot at corner of diagonal module
+  e3->SetPRange(2.,2.);
+  e3->SetPhiRange(0.,360.);
+  e3->SetThetaRange(0.,0.);
+  primGen->AddGenerator(e3);
 
 //  // Use the CbmUrqmdGenrator which calculates a reaction plane and
 //  // rotate all particles accordingly

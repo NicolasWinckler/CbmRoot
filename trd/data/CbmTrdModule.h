@@ -91,6 +91,11 @@ private:
          Double_t& posX,
          Double_t& posY) const;
 
+   void TransformToLocalPad(
+         const Double_t* local_point,
+         Double_t& posX,
+         Double_t& posY) const;
+
    Int_t GetSector(
          const Double_t* local_point) const;
 

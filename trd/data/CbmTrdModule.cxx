@@ -325,6 +325,7 @@ void CbmTrdModule::GetPadInfo(
 	           << " y: " << std::setprecision(5) << fSectorBeginY.GetAt(0) << FairLogger::endl
 	     << FairLogger::endl;
    */
+
    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(trdPoint->GetDetectorID());
    GetModuleInformation(moduleAddress, local_point, sectorId, columnId, rowId);
 }
@@ -336,9 +337,9 @@ void CbmTrdModule::TransformToLocalCorner(
       Double_t& posX,
       Double_t& posY) const
 {
-   // Transformation from local coordinate system with origin
-   // in the middle of the module into a system
-   // with the origin in the lower left corner (looking upstream).
+   // Transformation from local coordinate system 
+   // with origin in the middle of the module 
+   // into a system with the origin in the lower left corner (looking upstream).
    // Since for both coordinate systems the orientation is the same 
    // this is only a shift by the half size of the module in x- and y-direction
    posX = local_point[0] + fSizeX;
@@ -352,15 +353,55 @@ void CbmTrdModule::TransformToLocalSector(
       Double_t& posX,
       Double_t& posY) const
 {
-   // Transformation of the module coordinate system with origin
-   // in the middle of the chamber into a system
-   // with the origin in the lower left corner (looking upstream)
+   // Transformation of the module coordinate system 
+   // with origin in the middle of the module 
+   // into a system with the origin in the lower left corner (looking upstream)
    // of the sector the point is in. 
    // First, transform in a system with origin in the lower left corner.
    TransformToLocalCorner(local_point, posX, posY);
    Int_t sector = GetSector(local_point);
    posX -= fSectorBeginX.GetAt(sector);
    posY -= fSectorBeginY.GetAt(sector);
+}
+
+
+void CbmTrdModule::TransformToLocalPad(
+      const Double_t* local_point,
+      Double_t& posX,
+      Double_t& posY) const
+{
+   // Transformation of the local module coordinate system 
+   // with origin in the middle of the module  
+   // into a system with the origin in the local pad center
+   // of the pad below the point.
+   // First, transform in a system with origin in the lower left sector.
+
+   Double_t sector_point[2];
+   TransformToLocalSector(local_point, sector_point[0], sector_point[1]);
+
+   //   TransformToLocalCorner(local_point, posX, posY);
+   Int_t sectorId = GetSector(local_point);
+
+   Double_t padx = (Int_t(sector_point[0] / fPadSizeX.At(sectorId)) + 0.5) * fPadSizeX.At(sectorId);  // x position of pad center 
+   Double_t pady = (Int_t(sector_point[1] / fPadSizeY.At(sectorId)) + 0.5) * fPadSizeY.At(sectorId);  // y position of pad center 
+
+   posX = sector_point[0] - padx;
+   posY = sector_point[1] - pady;
+
+   /*
+   // print debug info
+   LOG(INFO) << "sector x: " << std::setprecision(5) << sector_point[0] 
+                   << " y: " << std::setprecision(5) << sector_point[1] << FairLogger::endl;
+
+   LOG(INFO) << "pad    x: " << std::setprecision(5) << padx 
+                   << " y: " << std::setprecision(5) << pady << FairLogger::endl;
+
+   LOG(INFO) << "diff   x: " << std::setprecision(5) << posX 
+	     << " y: " << std::setprecision(5) << posY << FairLogger::endl;
+
+   LOG(INFO) << "npad   x: " << std::setprecision(5) << padx / fPadSizeX.At(sectorId)
+                   << " y: " << std::setprecision(5) << pady / fPadSizeY.At(sectorId) << FairLogger::endl << FairLogger::endl;
+   */
 }
 
 
@@ -440,7 +481,7 @@ void CbmTrdModule::GetPosition(
    if ( (local_point[1]< 0) || (local_point[1] > 2 * fSizeY) )
      LOG(FATAL) << "CbmTrdModule::GetPosition local_point[1]=" << local_point[1] << " in moduleID " << moduleAddress << " is out of bounds!" << FairLogger::endl;
 
-   // calculte position in the module coordinate system
+   // calculate position in the module coordinate system
    // with origin in the middle of the module
    local_point[0] -= fSizeX;
    local_point[1] -= fSizeY;

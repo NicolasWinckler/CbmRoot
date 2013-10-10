@@ -58,6 +58,12 @@ public:
 
   Int_t GetNofSectors() const { return fNofSectors; }
 
+ void GetPadInfo(
+        const Double_t* local_point,
+        Int_t& sectorId,
+        Int_t& columnId,
+        Int_t& rowId) const;
+
   void GetPadInfo(
         const CbmTrdPoint* trdPoint,
         Int_t& sectorId,

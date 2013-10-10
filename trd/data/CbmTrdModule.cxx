@@ -225,8 +225,13 @@ Int_t CbmTrdModule::GetNofRowsInSector(Int_t i) const
 {
    return (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);  // need to round for correct result
 }
-
-
+void CbmTrdModule::GetPadInfo(
+      const Double_t *local_point,
+      Int_t& sectorId,
+      Int_t& columnId,
+      Int_t& rowId) const
+{
+}
 void CbmTrdModule::GetPadInfo(
       const CbmTrdPoint* trdPoint,
       Int_t& sectorId,

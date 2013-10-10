@@ -13,6 +13,7 @@
 #include "TGeoNode.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
+#include "TVirtualMC.h"
 
 #include <string>
 #include <cstdlib>
@@ -53,19 +54,31 @@ void CbmTrdGeoHandler::Init(Bool_t isSimulation)
 
 Int_t CbmTrdGeoHandler::GetModuleAddress()
 {
-   // We take the mother node (module) of the current node we are in (gas).
-   TGeoNode* node = gGeoManager->GetMother();
-   // Get the module copy number to get the information about layerId and moduleId.
-   Int_t copyNr = node->GetNumber();
-   // In TGeoManager numbering starts with 1, so we have to subtract 1.
-   Int_t layerId = ((copyNr / 100) % 100) - 1;
-   Int_t moduleId = (copyNr % 100) - 1;
-   // Form the module address.
-   return CbmTrdAddress::GetAddress(layerId, moduleId, 0, 0, 0);
+
+  // In the simulation we can not rely on the TGeoManager information
+  // In the simulation we get the correct information only from gMC 
+  Int_t copyNr;
+  if(fIsSimulation) { 
+    LOG(DEBUG4) << gMC->CurrentVolPath() << FairLogger::endl;
+    // get the copy number of the mother volume (1 volume up in hierarchy) 
+    gMC->CurrentVolOffID(1, copyNr); 
+  } else {
+    LOG(DEBUG4) << gGeoManager->GetPath() << FairLogger::endl;
+    // We take the mother node (module) of the current node we are in (gas).
+    TGeoNode* node = gGeoManager->GetMother();
+    // Get the module copy number to get the information about layerId and moduleId.
+    copyNr = node->GetNumber();
+  }
+  LOG(DEBUG4) << "CopyNr: " << copyNr << FairLogger::endl;
+  
+  // In TGeoManager numbering starts with 1, so we have to subtract 1.
+  Int_t layerId = ((copyNr / 100) % 100) - 1;
+  Int_t moduleId = (copyNr % 100) - 1;
+  // Form the module address.
+  return CbmTrdAddress::GetAddress(layerId, moduleId, 0, 0, 0);
 }
 
-Int_t CbmTrdGeoHandler::GetModuleAddress(
-      const TString& path)
+Int_t CbmTrdGeoHandler::GetModuleAddress(const TString& path)
 {
   if (fGeoPathHash != path.Hash()) {
     NavigateTo(path);

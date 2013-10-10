@@ -221,9 +221,9 @@ Int_t CbmTrdModule::GetSector(
 
           rowId = npady - nofRows;
 
-	  LOG(INFO) << "npady   : " << npady << " <= " << nofRows + secRows 
-                    << "rowId   : " << rowId << " <= " << nofRows 
-                    << " - sec " << i << FairLogger::endl;
+	  LOG(DEBUG2) << "npady   : " << npady << " <= " << nofRows + secRows 
+                    << "  rowId " << rowId << "  nRows(sec-1) " << nofRows 
+                    << "  sec " << i << FairLogger::endl;
    
           return i;
         }

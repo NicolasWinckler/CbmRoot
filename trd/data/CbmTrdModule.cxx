@@ -138,25 +138,38 @@ CbmTrdModule::~CbmTrdModule()
 void CbmTrdModule::ProjectPositionToNextAnodeWire(
       Double_t* local_point) const
 {
+
    // Move the local point along y to the next anode wire position.
    if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {  // wires must be defined defined
+
+      // check, if the input is within the allowed range
+      if ( fabs(local_point[1]) > fSizeY )
+        LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point must be within gas volume y=" << std::setprecision(5) << local_point[1] << FairLogger::endl;
 
       Double_t ypos = local_point[1];
 
       LOG(DEBUG2) << "local y before: " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
 
-      // make sure, local_point[1] is not negative - module center coordinate
-      // therefore transform to local corner and then back at the end of operation
-      local_point[1] = Int_t(((local_point[1] + fSizeY - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing + fAnodeWireOffset - fSizeY;  
+      // make sure, local_point[1] is not negative (due to module center coordinate)
+      // therefore transform to local corner first and then back at the end of operation
+      local_point[1] += fSizeY;   // transform to module corner coordinates
+
+      local_point[1] = Int_t(((local_point[1] - fAnodeWireOffset) / fAnodeWireSpacing) + 0.5) * fAnodeWireSpacing + fAnodeWireOffset;   // find closest anode wire
+
+      if ( local_point[1] > 2 * fSizeY - fAnodeWireOffset )
+	local_point[1] = 2 * fSizeY - fAnodeWireOffset;   // move inwards to the last anode wire
+
+      local_point[1] -= fSizeY;   // transform back to module center coordinates
 
       LOG(DEBUG2) << "local y after : " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
 
-      // check, if we have left the volume
-      if ( fabs(local_point[1]) > fSizeY )
-        LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point projected out of plane, from " 
+      // check, if we have left the anode wire grid
+      if ( fabs(local_point[1]) > fSizeY - fAnodeWireOffset )
+        LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point projected outside anode wire plane, from " 
                    << std::setprecision(5) << ypos << " to "
-                   << std::setprecision(5) << local_point[1] << " - fSizeY "
-                   << std::setprecision(5) << fSizeY << FairLogger::endl;
+                   << std::setprecision(5) << local_point[1] << " - last anode wire at "
+                   << std::setprecision(5) << fSizeY - fAnodeWireOffset << FairLogger::endl;
+
    } else {
       LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire: fAnodeWireOffset and fAnodeWireSpacing not set. ProjectPositionToNextAnodeWire can not be used." << FairLogger::endl;
    }

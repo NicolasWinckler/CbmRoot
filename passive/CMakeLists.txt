@@ -22,11 +22,13 @@ CbmGeoCave.cxx
 CbmGeoMagnet.cxx       
 CbmGeoPassivePar.cxx   
 CbmGeoPipe.cxx         
+CbmGeoPlatform.cxx
 CbmGeoStart.cxx        
 CbmGeoTarget.cxx       
 CbmMagnet.cxx          
 CbmPassiveContFact.cxx 
-CbmPipe.cxx   
+CbmPipe.cxx
+CbmPlatform.cxx
 CbmShield.cxx
 CbmShieldGeo.cxx         
 CbmTarget.cxx 

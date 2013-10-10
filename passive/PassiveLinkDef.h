@@ -9,12 +9,14 @@
 #pragma link C++ class  CbmMagnet+;
 #pragma link C++ class  CbmTarget+;
 #pragma link C++ class  CbmPipe+;
+#pragma link C++ class  CbmPlatform+;
 #pragma link C++ class  CbmShield+;
 #pragma link C++ class  CbmCave+;
 
 #pragma link C++ class CbmGeoStart;
 #pragma link C++ class CbmGeoCave;
 #pragma link C++ class CbmGeoPipe;
+#pragma link C++ class CbmGeoPlatform;
 #pragma link C++ class CbmShieldGeo+;
 #pragma link C++ class CbmGeoTarget;
 #pragma link C++ class CbmGeoMagnet;

@@ -276,8 +276,10 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
      fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
 
 
-    //SplitTrackPath(point, ELoss);
+    SplitTrackPath(point, ELoss);
 
+     /*
+     // To be deleted after debuging--------------------------------- start
 
     Double_t local_point_out[3];
     Double_t local_point_in[3]; // entrace point coordinates in local module cs
@@ -398,8 +400,9 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
       //printf("Summed charge: %f  hit:(%i, %i) max:(%i, %i)\n",sum,columnId,rowId,nCol-1,nRow-1);
     }
   }
-
-
+  // To be deleted after debuging---------------------------------stop
+  */
+  }
   // Fill data from internally used stl map into output TClonesArray
   Int_t iDigi = 0;
   map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it;
@@ -440,9 +443,10 @@ Double_t CbmTrdDigitizerPRF::CalcPRF(Double_t x, Double_t W, Double_t h)
 // --------------------------------------------------------------------
 void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clusterELoss)
 {
+  // TODO: scan full surface but sum up if pad is outside module untill reenter the active pad-plane-> charge conservation
   Int_t sectorId(-1), columnId(-1), rowId(-1), preSecRows(0);
-  //fModuleInfo->GetPadInfo( local_point, sectorId, columnId, rowId);// TODO: David add this function to TrdModule;
-  if (sectorId < 0 || columnId < 0 || rowId < 0) {
+  fModuleInfo->GetPadInfo( local_point, sectorId, columnId, rowId);// TODO: David add this function to TrdModule;
+  if (sectorId < 0 && columnId < 0 && rowId < 0) {
     return;
   } else {
     Double_t displacement_x(0), displacement_y(0);
@@ -517,24 +521,23 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 // --------------------------------------------------------------------
 void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss)
 {
-  const Int_t nClusterPerCm = 1;//TODO: as function of track length in active volume
-  Double_t point_in[3];
-  Double_t point_out[3];
-
-  point_in[0] = point->GetXIn();
-  point_in[1] = point->GetYIn();
-  point_in[2] = point->GetZIn();
-
-  point_out[0] = point->GetXOut();
-  point_out[1] = point->GetYOut();
-  point_out[2] = point->GetZOut();
-
+  const Double_t nClusterPerCm = 1.0;//TODO: as function of track length in active volume
+  Double_t point_in[3] = {
+    point->GetXIn(),
+    point->GetYIn(),
+    point->GetZIn()
+};
+  Double_t point_out[3] = {
+    point->GetXOut(),
+    point->GetYOut(),
+    point->GetZOut()
+  };
   Double_t local_point_out[3];// exit point coordinates in local module cs
   Double_t local_point_in[3]; // entrace point coordinates in local module cs
   gGeoManager->MasterToLocal(point_in,  local_point_in);
   gGeoManager->MasterToLocal(point_out, local_point_out);
 
-  Double_t cluster_pos[3]; // cluster position in local module coordinate system
+  Double_t cluster_pos[3];   // cluster position in local module coordinate system
   Double_t cluster_delta[3]; // vector pointing in MC-track direction with length of one path slice within chamber volume to creat n cluster
 
   Double_t trackLength = 0;
@@ -543,9 +546,13 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
     cluster_delta[i] = (local_point_out[i] - local_point_in[i]);
     trackLength += cluster_delta[i] * cluster_delta[i];
   }
-  const Int_t nCluster = TMath::Sqrt(trackLength) / nClusterPerCm + 1;// +1 ????
-  if (nCluster < 1)
-    printf("nCluster: %i   track length: %fcm  nCluster/cm: %i\n",nCluster, TMath::Sqrt(trackLength), nClusterPerCm);
+  //trackLength = TMath::Sqrt(trackLength);
+  const Int_t nCluster = TMath::Sqrt(trackLength) / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
+  if (nCluster < 1){
+    //LOG(DEBUG2) << "Summed charge: " << std::setprecision(5) << sum << "  hit:(" << columnId << ", " << rowId <<")   max:(" << fnCol-1 << ", " << fnRow-1 << ")" << FairLogger::endl;
+    printf("nCluster: %i   track length: %fcm  nCluster/cm: %3.1f  ELoss: %EGeV\n",nCluster, TMath::Sqrt(trackLength), nClusterPerCm, ELoss);
+    return;
+  }
   Double_t clusterELoss = ELoss / nCluster;
   for (Int_t iCluster = 1; iCluster <= nCluster; iCluster++){
     for (Int_t i = 0; i < 3; i++){

@@ -225,13 +225,25 @@ Int_t CbmTrdModule::GetNofRowsInSector(Int_t i) const
 {
    return (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);  // need to round for correct result
 }
+
+
 void CbmTrdModule::GetPadInfo(
       const Double_t *local_point,
       Int_t& sectorId,
       Int_t& columnId,
       Int_t& rowId) const
 {
+   Double_t posX, posY;
+   TransformToLocalSector(local_point, posX, posY);
+
+   // calculate in which sector the point is
+   sectorId = GetSector(local_point);
+
+   columnId = (Int_t)(posX / fPadSizeX.At(sectorId));
+   rowId    = (Int_t)(posY / fPadSizeY.At(sectorId));
 }
+
+
 void CbmTrdModule::GetPadInfo(
       const CbmTrdPoint* trdPoint,
       Int_t& sectorId,

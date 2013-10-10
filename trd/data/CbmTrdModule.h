@@ -108,6 +108,9 @@ private:
   Int_t GetSector(
         const Double_t* local_point) const;
 
+  Int_t GetSector(
+        Int_t npady) const;
+
   Int_t fModuleAddress; // unique detector ID
   Int_t fOrientation; // angle between long pad axis and y-axis in steps of 90 deg [0..3]
   Double_t fX; // center of module in global c.s. [cm]

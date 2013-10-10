@@ -200,6 +200,29 @@ Int_t CbmTrdModule::GetSector(
 }
 
 
+Int_t CbmTrdModule::GetSector(
+      Int_t npady) const
+{
+   // Calculate the sector for pad coordinates in the module
+   // e.g. in which sector is pad (20/28)
+
+   Int_t nofRows = 0;
+   if (fSectorSizeY.At(0) < fSizeY)  // if there are sectors in y direction
+     for (Int_t i = 0; i < fNofSectors; i++) {  // for each sector
+        nofRows += (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);     // need to round for correct result
+        if ( npady <= nofRows ) {
+  
+	  LOG(INFO) << "npady   : " << npady << " <= " <<  nofRows << FairLogger::endl;
+   
+          return i;
+        }
+     }
+
+   LOG(ERROR) << "CbmTrdModule::GetSector: Could not find pad in any of the sectors" << FairLogger::endl;
+   return -1; // This should be never reached
+}
+
+
 Int_t CbmTrdModule::GetNofColumns() const  // get total number of pad columns in module
 {
    Int_t nofColumns = 0;

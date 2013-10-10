@@ -15,6 +15,7 @@ static TString muchGeom;
 static TString trdGeom;
 static TString tofGeom;
 static TString ecalGeom;
+static TString platformGeom;
 
 static TString  fieldMap;
 static Double_t fieldZ;
@@ -40,6 +41,7 @@ void sis100_hadron_setup()
   stsGeom    = "sts/sts_v13c.geo.root";
   richGeom   = "";
   muchGeom   = "";
+//  platformGeom = "passive/platform_v13a.geo";
   trdGeom    = "trd/trd_v13h.geo.root";
   tofGeom    = "tof/tof_v13-4a.geo.root";
   ecalGeom   = "";

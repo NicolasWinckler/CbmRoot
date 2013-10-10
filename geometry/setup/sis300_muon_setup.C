@@ -15,6 +15,7 @@ static TString muchGeom;
 static TString trdGeom;
 static TString tofGeom;
 static TString ecalGeom;
+static TString platformGeom;
 
 static TString  fieldMap;
 static Double_t fieldZ;
@@ -40,6 +41,7 @@ void sis300_muon_setup()
   stsGeom    = "sts/sts_v13c.geo.root";
   richGeom   = "";
   muchGeom   = "much/much_v13c.geo";
+//  platformGeom = "passive/platform_v13b.geo";
   trdGeom    = "trd/trd_v13m.geo.root";
   tofGeom    = "tof/tof_v13-4e.geo.root";
   ecalGeom   = "";

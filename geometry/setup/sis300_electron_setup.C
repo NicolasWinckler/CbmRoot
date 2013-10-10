@@ -16,6 +16,7 @@ static TString muchGeom;
 static TString trdGeom;
 static TString tofGeom;
 static TString ecalGeom;
+static TString platformGeom;
 
 static TString  fieldMap;
 static Double_t fieldZ;
@@ -41,6 +42,7 @@ void sis300_electron_setup()
   stsGeom    = "sts/sts_v13c.geo.root";
   richGeom   = "rich/rich_v13a.gdml";
   muchGeom   = "";
+//  platformGeom = "passive/platform_v13b.geo";
   trdGeom    = "trd/trd_v13g.geo.root";
   tofGeom    = "tof/tof_v13-4d.geo.root";
   ecalGeom   = "";

@@ -144,7 +144,7 @@ void CbmTrdModule::ProjectPositionToNextAnodeWire(
 
       // check, if the input is within the allowed range
       if ( fabs(local_point[1]) > fSizeY )
-        LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point must be within gas volume y=" << std::setprecision(5) << local_point[1] << FairLogger::endl;
+        LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point must be within gas volume, y=" << std::setprecision(5) << local_point[1] << FairLogger::endl;
 
       Double_t ypos = local_point[1];
 
@@ -246,6 +246,12 @@ void CbmTrdModule::GetPadInfo(
       Int_t& columnId,
       Int_t& rowId) const
 {
+   // check, if the input is within the allowed range
+  if ( fabs(local_point[0]) > fSizeX )
+     LOG(ERROR) << "CbmTrdModule::GetPadInfo - local point x must be within gas volume, x=" << std::setprecision(5) << local_point[0] << FairLogger::endl;
+  if ( fabs(local_point[1]) > fSizeY )
+     LOG(ERROR) << "CbmTrdModule::GetPadInfo - local point y must be within gas volume, y=" << std::setprecision(5) << local_point[1] << FairLogger::endl;
+
    Double_t posX, posY;
    TransformToLocalSector(local_point, posX, posY);
 
@@ -299,6 +305,8 @@ void CbmTrdModule::GetPadInfo(
    gGeoManager->MasterToLocal(global_point, local_point);
 
    /* 
+   if ( gLogger->isLogNeeded(DEBUG2) )
+   {
    // 20131009 - DE - debuging output to check module orientation 0,1,2,3 with box generator
 
    // print module orientation
@@ -368,6 +376,7 @@ void CbmTrdModule::GetPadInfo(
    LOG(INFO) << "sec0   x: " << std::setprecision(5) << fSectorBeginX.GetAt(0)
 	           << " y: " << std::setprecision(5) << fSectorBeginY.GetAt(0) << FairLogger::endl
 	     << FairLogger::endl;
+   }
    */
 
    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(trdPoint->GetDetectorID());

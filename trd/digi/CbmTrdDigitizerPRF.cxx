@@ -259,8 +259,10 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 			  (point_out[2] + point_in[2]) / 2
 			  );
 
- 
- 
+    if (!TString(gGeoManager->GetPath()).Contains("gas")){
+      LOG(ERROR) << "CbmTrdDigitizerPRF::Exec: MC-track not in TRD! Node:" << TString(gGeoManager->GetPath()).Data() << " gGeoManager->MasterToLocal() failed!" << FairLogger::endl;
+      continue;
+    }
     const Int_t nCluster = 1;//TODO: as function of track length in active volume
    
     const Double_t *global_point = gGeoManager->GetCurrentPoint();
@@ -270,138 +272,15 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 
     fModuleID = point->GetDetectorID();
     fModuleInfo = fDigiPar->GetModule(fModuleID);
+    fnCol = fModuleInfo->GetNofColumns();
+    fnRow = fModuleInfo->GetNofRows();
     // Form address which contains layerId, moduleId, sectorId, columnId and rowId.
     // Address in the MC point contains only information about layerId and moduleId.
-     fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
-     fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
-
+    fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
+    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
 
     SplitTrackPath(point, ELoss);
 
-     /*
-     // To be deleted after debuging--------------------------------- start
-
-    Double_t local_point_out[3];
-    Double_t local_point_in[3]; // entrace point coordinates in local module cs
-    Double_t cluster_pos[3]; // cluster position in local module coordinate system
-    Double_t cluster_delta[3]; // vector pointing in MC-track direction with length of one path slice within chamber volume to creat n cluster
-    gGeoManager->MasterToLocal(point_in,  local_point_in);
-    gGeoManager->MasterToLocal(point_out, local_point_out);
-    for (Int_t i = 0; i < 3; i++){
-      cluster_delta[i] = (local_point_out[i] - local_point_in[i]) / (nCluster + 1);
-      cluster_pos[i] = local_point_in[i] + cluster_delta[i] * nCluster;    
-      //printf("(%i):  point_in %f  point_out %f  global_point %f  local_point %f   local_point_in %f  \n",i,point_in[i],point_out[i],global_point[i],local_point[i],local_point_in[i]);
-      //printf("   (%i):  %4.f = %4.f + %4.f * %i\n",i,cluster_pos[i],local_point_in[i],cluster_delta[i], nCluster);
-    }
-    if (Debug)
-      if ( fabs(cluster_pos[1]) > fModuleInfo->GetSizeY() )
-	{
-	  printf("ori %d\n", fModuleInfo->GetOrientation() );
-	  printf("%f %f\n", cluster_pos[1], fModuleInfo->GetSizeY() );
-	  printf("%f %f\n", local_point_in[1], cluster_delta[1]  );
-	  printf("%f %f\n", point_out[1], point_in[1]  );
-	}
-    fModuleInfo->ProjectPositionToNextAnodeWire(cluster_pos);
-
-    // Form address which contains layerId, moduleId, sectorId, columnId and rowId.
-    // Address in the MC point contains only information about layerId and moduleId.
-    //Int_t fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
-    //Int_t fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
-   
-
-    const Int_t nCol = fModuleInfo->GetNofColumns();
-    const Int_t nRow = fModuleInfo->GetNofRows();
-
-    fnRow = fModuleInfo->GetNofRows();
-    fnCol = fModuleInfo->GetNofColumns();
-    fnSec = fModuleInfo->GetNofSectors();
-    Int_t sectorId(0), columnId(0), rowId(0); // globale row and column ids
-    Int_t preSecRows (0);
-    fModuleInfo->GetPadInfo(point, sectorId, columnId, rowId);
-    if (sectorId < 0) {
-      continue;
-    }
-    if (sectorId > 0){
-      for (Int_t iSec = 0; iSec < sectorId; iSec++){
-	rowId += fModuleInfo->GetNofRowsInSector(iSec); // sector row id -> global row
-	preSecRows += fModuleInfo->GetNofRowsInSector(iSec); // all full sector rows up to the one we are inside
-      }
-    } 
-    Double_t displacement_x(0), displacement_y(0);
-    Double_t h = fModuleInfo->GetAnodeWireToPadPlaneDistance();
-    Double_t W(fModuleInfo->GetPadSizeX(sectorId)), H(fModuleInfo->GetPadSizeY(sectorId));
-    fModuleInfo->TransformToLocalPad(cluster_pos, displacement_x, displacement_y);
-    //Define pad-plane area of interest: maximum 7 columns and 3 rows
-    const Int_t maxCol(7), maxRow(3);
-    Int_t startCol(columnId-maxCol/2), stopCol(columnId+maxCol/2+1), startRow(rowId-maxRow/2), stopRow(rowId+maxRow/2+1), startSec(0);
-    if (startCol < 0 )  
-      startCol = 0;
-    if (stopCol  > nCol) 
-      stopCol  = nCol;
-    if (startRow < 0)   
-      startRow = 0;
-    if (stopRow  > nRow) 
-      stopRow  = nRow;
-
-    if (startRow > fModuleInfo->GetNofRowsInSector(0))
-      startSec = 1;
-    if (startRow > fModuleInfo->GetNofRowsInSector(0) + fModuleInfo->GetNofRowsInSector(1))
-      startSec = 2;
-    Int_t iSec = startSec;
-    // Scan pad-plane area to determine charge distribution
-    Double_t sum = 0;
-    for (Int_t iRow = startRow; iRow < stopRow; iRow++){
-      Int_t globalRow = iRow - preSecRows;
-      if (globalRow < 0){
-	globalRow = iRow;
-      }
-      if (Debug) printf("[%2i]: ",iRow);
-      for (Int_t iCol = startCol; iCol < stopCol; iCol++){
-	Int_t address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, sectorId, globalRow, iCol); 
-	//printf("[%f, %f, %f]\n",cluster_pos[0],cluster_pos[1],cluster_pos[2]);
-	//fModuleInfo->TransformToLocalPad(cluster_pos, displacement_x, displacement_y);
-	Double_t chargeFraction = 0;
-	if (rowId == iRow && columnId == iCol)
-	  chargeFraction = CalcPRF(displacement_x, W, h) * 
-	    CalcPRF(displacement_y, H, h);
-	else
-	  chargeFraction = CalcPRF((iCol - columnId) * W - displacement_x, W, h) * 
-	    CalcPRF((iRow - rowId) * H - displacement_y, H, h);
-	sum += chargeFraction;
-	map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it = fDigiMap.find(address);
-	if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-	  fDigiMap[address] = make_pair(new CbmTrdDigi(address, chargeFraction*ELoss, fTime), new CbmTrdDigiMatch(pointId));
-	} else { // Pixel already in map -> Add charge
-	  CbmTrdDigi* digi = it->second.first;
-	  digi->AddCharge(ELoss);
-	  digi->SetTime(max(fTime, digi->GetTime()));
-	  CbmTrdDigiMatch* digiMatch = it->second.second;
-	  digiMatch->AddPoint(pointId);
-	}
-	if (Debug) {
-	  if (rowId == iRow && columnId == iCol)
-	    printf("(%3i) ",iCol);
-	  else
-	    printf(" %3i  ",iCol);
-	  if (iCol == nCol-1)
-	    cout << "|";
-	}
-      }
-      if (Debug) {
-	if (iRow == nRow-1)
-	  cout << endl << "-------------------------------------" << endl;
-	else
-	  cout << endl;
-      }
-    }
-    if (Debug) cout << endl;
-    if (sum < 0.95){
-      LOG(DEBUG2) << "Summed charge: " << std::setprecision(5) << sum << "  hit:(" << columnId << ", " << rowId <<")   max:(" << nCol-1 << ", " << nRow-1 << ")" << FairLogger::endl;
-      //printf("Summed charge: %f  hit:(%i, %i) max:(%i, %i)\n",sum,columnId,rowId,nCol-1,nRow-1);
-    }
-  }
-  // To be deleted after debuging---------------------------------stop
-  */
   }
   // Fill data from internally used stl map into output TClonesArray
   Int_t iDigi = 0;
@@ -444,89 +323,82 @@ Double_t CbmTrdDigitizerPRF::CalcPRF(Double_t x, Double_t W, Double_t h)
 void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clusterELoss)
 {
   // TODO: scan full surface but sum up if pad is outside module untill reenter the active pad-plane-> charge conservation
-  Int_t sectorId(-1), columnId(-1), rowId(-1), preSecRows(0);
-  fModuleInfo->GetPadInfo( local_point, sectorId, columnId, rowId);// TODO: David add this function to TrdModule;
+  Int_t sectorId(-1), columnId(-1), rowId(-1);//, preSecRows(0);
+  fModuleInfo->GetPadInfo( local_point, sectorId, columnId, rowId);
   if (sectorId < 0 && columnId < 0 && rowId < 0) {
+    printf("    x:%7.3f  y:%7.3f z:%7.3f\n",local_point[0],local_point[1],local_point[2]);
     return;
   } else {
-    Double_t displacement_x(0), displacement_y(0);
+    Double_t displacement_x(0), displacement_y(0);//mm
     Double_t h = fModuleInfo->GetAnodeWireToPadPlaneDistance();
     Double_t W(fModuleInfo->GetPadSizeX(sectorId)), H(fModuleInfo->GetPadSizeY(sectorId));
     fModuleInfo->TransformToLocalPad(local_point, displacement_x, displacement_y);
-    displacement_x *= 10.; //cm->mm
-    displacement_y *= 10.; //cm->mm
     const Int_t maxCol(7), maxRow(3);
     //Estimate starting column and row and limits due to chamber dimensions
-    Int_t startCol(columnId-maxCol/2), stopCol(columnId+maxCol/2+1), startRow(rowId-maxRow/2), stopRow(rowId+maxRow/2+1), startSec(0);
-    if (startCol < 0 )  
-      startCol = 0;
-    if (stopCol  > fnCol) 
-      stopCol  = fnCol;
-    if (startRow < 0)   
-      startRow = 0;
-    if (stopRow  > fnRow) 
-      stopRow  = fnRow;
-
-    if (startRow > fModuleInfo->GetNofRowsInSector(0))
-      startSec = 1;
-    if (startRow > fModuleInfo->GetNofRowsInSector(0) + fModuleInfo->GetNofRowsInSector(1))
-      startSec = 2;
-    Int_t iSec = startSec; // is different from sectorId (id of the maximum pad in the center of the scanned region) if lowest pad row is in a different sector compared to pad max
-    // Scan pad-plane area to determine charge distribution
+    Int_t startCol(columnId-maxCol/2), stopCol(columnId+maxCol/2), startRow(rowId-maxRow/2), stopRow(rowId+maxRow/2), startSec(0);
     Double_t sum = 0;
-    for (Int_t iRow = startRow; iRow < stopRow; iRow++){
-      Int_t globalRow = iRow - preSecRows;
-      if (globalRow < 0){
-	globalRow = iRow;
-      }
-      //if (Debug) printf("[%2i]: ",iRow);
-      for (Int_t iCol = startCol; iCol < stopCol; iCol++){
-	Int_t address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, sectorId, globalRow, iCol); 
-	//printf("[%f, %f, %f]\n",cluster_pos[0],cluster_pos[1],cluster_pos[2]);
-	//fModuleInfo->TransformToLocalPad(cluster_pos, displacement_x, displacement_y);
+    Int_t secRow(-1), targCol(-1), targRow(-1), targSec(-1), address(-1);
+    for (Int_t iRow = startRow; iRow <= rowId+maxRow/2; iRow++){
+      for (Int_t iCol = startCol; iCol <= columnId+maxCol/2; iCol++){
+	if (((iCol >= 0) && (iCol <= fnCol-1)) && ((iRow >= 0) && (iRow <= fnRow-1))){// real adress	 
+	  targSec = fModuleInfo->GetSector(iRow, secRow);
+	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, iCol); 
+	} else {
+          targRow = iRow;
+          targCol = iCol;
+          if (iCol < 0)
+	    targCol = 0;
+	  else if (iCol > fnCol-1)
+	    targCol = fnCol-1;
+	  if (iRow < 0)
+	    targRow = 0;
+	  else if (iRow > fnRow-1)	    
+	    targRow = fnRow-1;
+
+	  targSec = fModuleInfo->GetSector(targRow, secRow);
+	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, targCol);
+	}
 	Double_t chargeFraction = 0;
-	if (rowId == iRow && columnId == iCol)
-	  chargeFraction = CalcPRF(displacement_x, W, h) * 
-	    CalcPRF(displacement_y, H, h);
+	if (rowId == iRow && columnId == iCol) // if pad in center of 7x3 arrayxs
+	  chargeFraction = CalcPRF(displacement_x, W, h) * CalcPRF(displacement_y, H, h);
 	else
-	  chargeFraction = CalcPRF((iCol - columnId) * W - displacement_x, W, h) * 
-	    CalcPRF((iRow - rowId) * H - displacement_y, H, h);
+	  chargeFraction = CalcPRF((iCol - columnId) * W - displacement_x, W, h) * CalcPRF((iRow - rowId) * H - displacement_y, H, h);
+
 	sum += chargeFraction;
+	//if (iCol >= stopCol)
+
 	AddDigi(fMCindex, address, Double_t(chargeFraction * clusterELoss), fTime);
-	/*if (Debug) {
+	/*
 	  if (rowId == iRow && columnId == iCol)
-	    printf("(%3i) ",iCol);
+	  printf("(%3i:%f4.3) ",iCol,chargeFraction);
 	  else
-	    printf(" %3i  ",iCol);
+	  printf(" %3i:%f4.3  ",iCol,chargeFraction);
 	  if (iCol == fnCol-1)
-	    cout << "|";
-	    }*/
+	  cout << "|";
+	*/
       }
       /*
-      if (Debug) {
 	if (iRow == fnRow-1)
-	  cout << endl << "-------------------------------------" << endl;
+	cout << endl << "-------------------------------------" << endl;
 	else
-	  cout << endl;
-      }
+	cout << endl;
       */
     }
-    //if (Debug) cout << endl;
-    if (sum < 0.95){
-      LOG(DEBUG2) << "Summed charge: " << std::setprecision(5) << sum << "  hit:(" << columnId << ", " << rowId <<")   max:(" << fnCol-1 << ", " << fnRow-1 << ")" << FairLogger::endl;
-      //printf("Summed charge: %f  hit:(%i, %i) max:(%i, %i)\n",sum,columnId,rowId,nCol-1,nRow-1);
+    //cout << endl;
+    if (sum < 0.99 || sum > 1.01){
+      LOG(WARNING) << "CbmTrdDigitizerPRF::ScanPadPlane: Summed charge: " << std::setprecision(5) << sum << "  hit:(" << columnId << ", " << rowId <<")   max:(" << fnCol-1 << ", " << fnRow-1 << ")" << FairLogger::endl;
     }
   }  
 }
 // --------------------------------------------------------------------
 void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss)
 {
-  const Double_t nClusterPerCm = 1.0;//TODO: as function of track length in active volume
+  const Double_t nClusterPerCm = 1.0;
   Double_t point_in[3] = {
     point->GetXIn(),
     point->GetYIn(),
     point->GetZIn()
-};
+  };
   Double_t point_out[3] = {
     point->GetXOut(),
     point->GetYOut(),
@@ -537,6 +409,8 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
   gGeoManager->MasterToLocal(point_in,  local_point_in);
   gGeoManager->MasterToLocal(point_out, local_point_out);
 
+
+
   Double_t cluster_pos[3];   // cluster position in local module coordinate system
   Double_t cluster_delta[3]; // vector pointing in MC-track direction with length of one path slice within chamber volume to creat n cluster
 
@@ -546,17 +420,53 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
     cluster_delta[i] = (local_point_out[i] - local_point_in[i]);
     trackLength += cluster_delta[i] * cluster_delta[i];
   }
-  //trackLength = TMath::Sqrt(trackLength);
-  const Int_t nCluster = TMath::Sqrt(trackLength) / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
+  trackLength = TMath::Sqrt(trackLength);
+  const Int_t nCluster = trackLength / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
   if (nCluster < 1){
-    //LOG(DEBUG2) << "Summed charge: " << std::setprecision(5) << sum << "  hit:(" << columnId << ", " << rowId <<")   max:(" << fnCol-1 << ", " << fnRow-1 << ")" << FairLogger::endl;
-    printf("nCluster: %i   track length: %fcm  nCluster/cm: %3.1f  ELoss: %EGeV\n",nCluster, TMath::Sqrt(trackLength), nClusterPerCm, ELoss);
+    LOG(WARNING) << "CbmTrdDigitizerPRF::SplitTrackPath: nCluster: "<<nCluster<<"   track length: "<<std::setprecision(5)<<trackLength<<"cm  nCluster/cm: "<<std::setprecision(2)<<nClusterPerCm<<"  ELoss: "<<std::setprecision(5)<<ELoss*1e-6<<"keV " << FairLogger::endl;
+    //printf("nCluster: %i   track length: %fcm  nCluster/cm: %3.1f  ELoss: %EGeV\n",nCluster, TMath::Sqrt(trackLength), nClusterPerCm, ELoss);
     return;
   }
-  Double_t clusterELoss = ELoss / nCluster;
-  for (Int_t iCluster = 1; iCluster <= nCluster; iCluster++){
+  //printf("%i\n",nCluster);
+  for (Int_t i = 0; i < 3; i++){
+    cluster_delta[i] /= Double_t(nCluster);
+  }
+  Double_t clusterELoss = ELoss / Double_t(nCluster);
+  /*
+  for (Int_t i = 0; i < 3; i++){ 
+    cluster_pos[i] = local_point_in[i] + 0.5 * cluster_delta[i];// move start position 0.5 step widths into track direction
+  }
+  Double_t clusterELoss = ELoss / Double_t(nCluster);
+  
+  if ( fModuleInfo->GetSizeX() < fabs(cluster_pos[0]) || fModuleInfo->GetSizeY() < fabs(cluster_pos[1])){
+    printf("->    nC 0/%i x: %7.3f y: %7.3f \n",nCluster-1,cluster_pos[0],cluster_pos[1]);
     for (Int_t i = 0; i < 3; i++){
-      cluster_pos[i] = local_point_in[i] + cluster_delta[i] * iCluster;  
+      printf("  (%i) | in: %7.3f + delta: %7.3f * cluster: 0/%i = cluster_pos: %7.3f out: %7.3f g_in:%f g_out:%f\n",
+	     i,local_point_in[i],cluster_delta[i],(Int_t)nCluster,cluster_pos[i],local_point_out[i],point_in[i],point_out[i]);
+    }
+  }
+  fModuleInfo->ProjectPositionToNextAnodeWire(cluster_pos);
+
+  ScanPadPlane(cluster_pos, clusterELoss);
+
+  */
+  for (Int_t iCluster = 0; iCluster < nCluster; iCluster++){
+    for (Int_t i = 0; i < 3; i++){
+      cluster_pos[i] = local_point_in[i] + (0.5 + iCluster) * cluster_delta[i];// move start position 0.5 step widths into track direction
+      //cluster_pos[i] += cluster_delta[i]; 
+
+      //printf(" (%i) out: %7.3f | in: %7.3f + delta: %7.3f * cluster: %i/%i  = cluster_pos: %7.3f | length: %7.3fcm nCluster/cm: %3.1f\n",i,local_point_out[i],local_point_in[i],cluster_delta[i],iCluster,nCluster,cluster_pos[i],TMath::Sqrt(trackLength),nClusterPerCm); 
+      //if (fabs(local_point_out[i]-local_point_in[i]) < fabs(cluster_pos[i]-local_point_in[i]) ){
+      //LOG(WARNING) << "  ("<<i<<") | in: "<<local_point_in[i]<<" + delta: "<<cluster_delta[i]<<" * cluster: "<<iCluster<<"/"<<(Int_t)nCluster<<" = cluster_pos: "<<cluster_pos[i]<<" out: "<<local_point_out[i]<< FairLogger::endl;
+      //printf("  (%i) | in: %7.3f + delta: %7.3f * cluster: %i/%i = cluster_pos: %7.3f out: %7.3f\n",i,local_point_in[i],cluster_delta[i],iCluster,(Int_t)nCluster,cluster_pos[i],local_point_out[i]);
+      //}
+    }
+
+    if ( fModuleInfo->GetSizeX() < fabs(cluster_pos[0]) || fModuleInfo->GetSizeY() < fabs(cluster_pos[1])){
+      printf("->    nC %i/%i x: %7.3f y: %7.3f \n",iCluster,nCluster-1,cluster_pos[0],cluster_pos[1]);
+      for (Int_t i = 0; i < 3; i++)
+	printf("  (%i) | in: %7.3f + delta: %7.3f * cluster: %i/%i = cluster_pos: %7.3f out: %7.3f g_in:%f g_out:%f\n",
+	       i,local_point_in[i],cluster_delta[i],iCluster,(Int_t)nCluster,cluster_pos[i],local_point_out[i],point_in[i],point_out[i]);
     }
 
     fModuleInfo->ProjectPositionToNextAnodeWire(cluster_pos);

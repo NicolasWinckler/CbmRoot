@@ -275,6 +275,43 @@ Int_t CbmTrdModule::GetNofRowsInSector(Int_t i) const
 }
 
 
+void CbmTrdModule::GetPadPosition(
+      const Int_t padAddress,
+      Double_t& posX,
+      Double_t& posY,
+      Double_t& posZ) const
+{
+  // get address of a pad, return position relative to module center
+
+   Int_t sectorId = CbmTrdAddress::GetSectorId(padAddress);
+   Int_t rowId    = CbmTrdAddress::GetRowId(padAddress);
+   Int_t columnId = CbmTrdAddress::GetColumnId(padAddress);
+
+   // calculate position in sector coordinate system 
+   // with the origin in the lower left corner (looking upstream)
+   posX = (((Double_t)columnId + 0.5) * fPadSizeX.At(sectorId));
+   posY = (((Double_t)rowId    + 0.5) * fPadSizeY.At(sectorId));
+
+   // calculate position in module coordinate system
+   // with the origin in the lower left corner (looking upstream)
+   posX += fSectorBeginX.GetAt(sectorId);
+   posY += fSectorBeginY.GetAt(sectorId);
+
+   // calculate position in the module coordinate system
+   // with origin in the middle of the module
+   posX -= fSizeX;
+   posY -= fSizeY;
+   posZ  = fSizeZ;
+
+   // check limits
+   if ( fabs(posX) > fSizeX )
+     LOG(FATAL) << "CbmTrdModule::GetPadPosition posX=" << posX << " is out of bounds!" << FairLogger::endl;
+   // check limits
+   if ( fabs(posY) > fSizeY )
+     LOG(FATAL) << "CbmTrdModule::GetPadPosition posY=" << posY << " is out of bounds!" << FairLogger::endl;
+}
+
+
 void CbmTrdModule::GetPadInfo(
       const Double_t *local_point,
       Int_t& sectorId,
@@ -569,8 +606,6 @@ void CbmTrdModule::GetPosition(
    local_point[0] += fSectorBeginX.GetAt(sectorId);
    local_point[1] += fSectorBeginY.GetAt(sectorId);
    // local_point[i] must be >= 0 at this point 
-
-   //   std::cout << "lp " << local_point[0] << " " <<  local_point[1] << std::endl;
 
    // check limits
    if ( (local_point[0]< 0) || (local_point[0] > 2 * fSizeX) )

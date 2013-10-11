@@ -558,7 +558,7 @@ void CbmTrdModule::GetPadPosition(
    // with origin in the middle of the module
    posX -= fSizeX;
    posY -= fSizeY;
-   posZ  = fSizeZ;
+   posZ  = 0; // fSizeZ;
 
    // check limits
    if ( fabs(posX) > fSizeX )

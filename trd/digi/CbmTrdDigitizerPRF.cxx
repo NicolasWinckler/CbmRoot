@@ -269,12 +269,12 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     //const Int_t nCluster = 1;//TODO: as function of track length in active volume
     //cout << TString(gGeoManager->GetPath()).Data() << endl;
     //cout << "GetModuleAddress " << fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())) << endl;
-//    fLayerId = CbmTrdAddress::GetLayerId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
-//    cout << "GetLayerId   " << fLayerId << endl;
-//    fModuleId = CbmTrdAddress::GetModuleId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
-//    cout << "GetModuleId  " << fModuleId << endl;
-//    fModuleId = point->GetDetectorID();
-//    cout << "ModuleAddress " << fModuleId << endl;
+    //    fLayerId = CbmTrdAddress::GetLayerId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
+    //    cout << "GetLayerId   " << fLayerId << endl;
+    //    fModuleId = CbmTrdAddress::GetModuleId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
+    //    cout << "GetModuleId  " << fModuleId << endl;
+    //    fModuleId = point->GetDetectorID();
+    //    cout << "ModuleAddress " << fModuleId << endl;
 
     fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
     //cout << "GetLayerId   " << fLayerId << endl;
@@ -287,8 +287,8 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     gGeoManager->MasterToLocal(global_point, local_point);
 
 
-//    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
-//    fLayerId  = CbmTrdAddress::GetLayerId(point->GetDetectorID());
+    //    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
+    //    fLayerId  = CbmTrdAddress::GetLayerId(point->GetDetectorID());
 
     fModuleInfo = fDigiPar->GetModule(point->GetDetectorID());
     fnCol = fModuleInfo->GetNofColumns();

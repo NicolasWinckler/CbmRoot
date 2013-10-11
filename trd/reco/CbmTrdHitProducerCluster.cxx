@@ -139,14 +139,7 @@ InitStatus CbmTrdHitProducerCluster::Init()
 {
   cout << " * CbmTrdHitProducerCluster * :: Init()" << endl;
   FairRootManager *ioman = FairRootManager::Instance();
-  /*
-  fTrdPoints=(TClonesArray *)ioman->GetObject("TrdPoint"); 
-  if ( ! fTrdPoints ) {
-    cout << "-W CbmTrdHitProducerCluster::Init: No TrdPoints array!" << endl;
-    cout << "                             Task will be inactive" << endl;
-    return kERROR;
-  }
-  */
+
   fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
   if ( ! fDigis ) {
     cout << "-W CbmTrdHitProducerCluster::Init: No TrdDigi array!" << endl;
@@ -192,7 +185,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     cout << " DEBUG: fCluster is NULL" << endl;
     return;
   }
-
+  fHitCounter = 0;
   Int_t nCluster = fClusters->GetEntries(); // Number of clusters found by CbmTrdClusterFinderFast
   cout << " Found " << nCluster << " Cluster in Collection" << endl;
 
@@ -229,10 +222,11 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
   for (Int_t iDigi = 0; iDigi < nDigisInCluster; iDigi++){  
     digi = (CbmTrdDigi*)fDigis->At(cluster->GetDigi(iDigi));
    
-    if (iDigi == 0){
+    //if (iDigi == 0){
       moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());
-      fModuleInfo = fDigiPar->GetModule(moduleAddress);     
-    }
+      fModuleInfo = fDigiPar->GetModule(moduleAddress);  
+      gGeoManager->FindNode(fModuleInfo->GetX(), fModuleInfo->GetY(), fModuleInfo->GetZ()); 
+      //}
     if (!fModuleInfo){
       printf("No CbmTrdModule found!  digiAddress:%i  ModuleAddress:%i\n",digi->GetAddress(),CbmTrdAddress::GetModuleAddress(digi->GetAddress()));
       return;
@@ -272,8 +266,7 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
   // ---- Register ------------------------------------------------------
   void CbmTrdHitProducerCluster::Register()
   {
-    cout << " * CbmTrdHitProducerCluster * :: Register()" << endl;
-    //FairRootManager::Instance()->Register("TrdHit","Trd Hit", fHits, kTRUE);
+    FairRootManager::Instance()->Register("TrdHit","Trd Hit", fHits, kTRUE);
   }
   // --------------------------------------------------------------------
 
@@ -281,13 +274,13 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
   // ---- Finish --------------------------------------------------------
   void CbmTrdHitProducerCluster::Finish()
   {
-    //cout << " * CbmTrdHitProducerCluster * :: Finish()" << endl;
   }
 
 // -----   Public method EndOfEvent   --------------------------------------
 void CbmTrdHitProducerCluster::FinishEvent() {
-  //  cout<<"In CbmTrdHitProducerCluster::FinishEvent()"<<endl;
   if (fHits) fHits->Clear();
+  if (fDigis) fDigis->Clear();
+  if (fClusters) fClusters->Clear();
 }
 // -------------------------------------------------------------------------
 

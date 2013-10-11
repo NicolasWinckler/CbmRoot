@@ -36,7 +36,7 @@ void sis300_electron_setup()
   // -----  Geometries  -----------------------------------------------------
   caveGeom   = "cave.geo";
   targetGeom = "target/target_au_250mu.geo";
-  pipeGeom   = "pipe/pipe_v13d.geo";
+  pipeGeom   = "pipe/pipe_v13b.geo";
   magnetGeom = "magnet/magnet_v12b.geo.root";
   mvdGeom    = "mvd/mvd_v07a.geo";
   stsGeom    = "sts/sts_v13c.geo.root";

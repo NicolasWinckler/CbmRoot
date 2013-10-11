@@ -1,106 +1,65 @@
-// pipe for SIS100 hadron setup
+// pipe for SIS100/SIS300 muon setup
 // by DE, 20131007
 //
-//  pipe_v13c.geo 
-//  -----------------
-//  this is a copy of pipe_standard.geo, 
-//  with changes as follows:
-//               - reduce diameter of segment 3, now starting at 4500 mm 
-//                 to 33 cm to avoid overlap with tof
-//               - fill empty section at RICH position for SIS100 hadron setup
+//  Beam pipe geometry for the muon setup.
+//  This version has a continuous pipe from z = -50 cm
+//  to z = 1039.9 cm, thus filling the gap from z = 160 cm
+//  to z = 350 cm, where the RICH is in pipe_v13a.geo.
 //
-//  description of shape PCON:
-//  - material
-//  - number of points
-//  - azimuthal angle from xxx to yyy   [deg]
-//  - point 1: z  inner-radius  outer-radius [mm]
-//  - ...
-//  - point n 
-//  
+//  Copy from former pipe_much.geo, but here beam pipe ends
+//  at z = 1039.9 cm to avoid overlap with the TOF.
+
+//  History of cvs commits:
+//  $Log: pipe_newvac.geo,v $
+//  Revision 1.2  2006/02/03 14:16:13  hoehne
+//  update because of slightly modified rich.geo
+//
+//  Revision 1.1  2005/09/20 09:27:49  friese
+//  Modified beam pipe in sts
+//
+//  - Revision   Johann M. Heuser, 21.7.2005
+//  - new geometry for the vacuum section: barrel-like shape
+//  - diameter at z=1700: reduced from
+//
+// Revision for Much: continuous pipe
 //----------------------------------------------------------
-
-
 pipe1
 cave
 PCON 
 carbon
-9
+11
 0. 360.
- -50.   25.  25.5 
-  25.   25.  25.5 
-  35.  130. 130.5
- 239.5 130. 130.5
- 240.  128. 130.5
- 269.5  10.  12.5
- 270.   10.  10.5 
-1600.   32.  32.5
-3500.  200. 200.5
-
-0. 0. 0. 
+  -50.   25.  25.5
+   25.   25.  25.5
+   35.  130. 130.5
+  260.  130. 130.5
+  270.   10.  10.5
+ 1500.   30.  30.5
+ 1700.   85.  85.5
+ 5500.  250. 250.5
+ 6500.  250. 250.5
+ 6500.  149. 149.5
+11400.  149. 149.5
+0. 0. 0.
 1.  0.  0.  0.  1.  0.  0.  0.  1
 //
-
 pipevac1
 cave
 PCON
 vacuum
-9
+11
 0. 360.  
- -50.  0.  25.   
-  25.  0.  25.  
-  35.  0. 130.
- 239.5 0. 130.
- 240.  0. 128.
- 269.5 0.  10.
- 270.  0.  10.
-1600.  0.  32.
-3500.  0. 200.
-
-0. 0. 0. 
-1.  0.  0.  0. 1.  0.  0. 0. 1
-//
-
-pipe2
-cave
-PCON 
-carbon
-2
-0. 360.
-3500. 200. 200.5
-4500. 200. 200.5
+  -50.  0.  25.   
+   25.  0.  25.  
+   35.  0. 130.
+  260.  0. 130.   
+  270.  0.  10.
+ 1500.  0.  30.  
+ 1700   0.  85.
+ 5500.  0. 250.
+ 6500.  0. 250.
+ 6500.  0. 149.
+11400.  0. 149.
 0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1
-
-pipevac2
-pipe2
-PCON
-vacuum
-2
-0. 360.
-3500. 0. 200.
-4500. 0. 200.
-0. 0. 0. 
 1.  0.  0.  0. 1.  0.  0. 0. 1
 //
-
-pipe3
-cave
-PCON 
-carbon
-2
-0. 360.
-4500. 149. 149.5
-10000. 149. 149.5
-0. 0. 0. 
-1.  0.  0.  0.  1.  0.  0.  0.  1
-
-pipevac3
-pipe3
-PCON
-vacuum
-2
-0. 360.
-4500. 0. 149.
-10000. 0. 149.
-0. 0. 0. 
-1.  0.  0.  0. 1.  0.  0. 0. 1

@@ -1,8 +1,13 @@
-//  pipe_v13a.geo 
+// pipe for SIS100 hadron setup
+// by DE, 20131007
+//
+//  pipe_v13c.geo 
 //  -----------------
 //  this is a copy of pipe_standard.geo, 
 //  with changes as follows:
-//               length of segment 2 reduced to avoid overlap with tof
+//               - reduce diameter of segment 3, now starting at 4500 mm 
+//                 to 33 cm to avoid overlap with tof
+//               - fill empty section at RICH position for SIS100 hadron setup
 //
 //  description of shape PCON:
 //  - material
@@ -19,7 +24,7 @@ pipe1
 cave
 PCON 
 carbon
-8
+9
 0. 360.
  -50.   25.  25.5 
   25.   25.  25.5 
@@ -29,6 +34,7 @@ carbon
  269.5  10.  12.5
  270.   10.  10.5 
 1600.   32.  32.5
+3500.  200. 200.5
 
 0. 0. 0. 
 1.  0.  0.  0.  1.  0.  0.  0.  1
@@ -38,7 +44,7 @@ pipevac1
 cave
 PCON
 vacuum
-8
+9
 0. 360.  
  -50.  0.  25.   
   25.  0.  25.  
@@ -48,6 +54,7 @@ vacuum
  269.5 0.  10.
  270.  0.  10.
 1600.  0.  32.
+3500.  0. 200.
 
 0. 0. 0. 
 1.  0.  0.  0. 1.  0.  0. 0. 1
@@ -59,8 +66,8 @@ PCON
 carbon
 2
 0. 360.
-3500. 0. 200.5
-10399. 0. 200.5
+3500. 200. 200.5
+4500. 200. 200.5
 0. 0. 0.
 1.  0.  0.  0.  1.  0.  0.  0.  1
 
@@ -71,7 +78,7 @@ vacuum
 2
 0. 360.
 3500. 0. 200.
-10399. 0. 200.
+4500. 0. 200.
 0. 0. 0. 
 1.  0.  0.  0. 1.  0.  0. 0. 1
 //
@@ -82,8 +89,8 @@ PCON
 carbon
 2
 0. 360.
-11001. 0. 300.5 
-11400. 0. 300.5
+4500. 149. 149.5
+10000. 149. 149.5
 0. 0. 0. 
 1.  0.  0.  0.  1.  0.  0.  0.  1
 
@@ -93,7 +100,7 @@ PCON
 vacuum
 2
 0. 360.
-11001. 0. 300.
-11400. 0. 300.
+4500. 0. 149.
+10000. 0. 149.
 0. 0. 0. 
 1.  0.  0.  0. 1.  0.  0. 0. 1

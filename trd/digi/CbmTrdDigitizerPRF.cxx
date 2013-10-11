@@ -212,7 +212,8 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   Int_t nCount = 0;
   Int_t nEntries = fTrdPoints->GetEntries();
   Int_t pointId;
-  if (fDebug) nEntries = 1;
+  if (fDebug) 
+    nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Buffer of TRD" << endl;
   for (Int_t j = 0; j < nEntries ; j++ ){
     pointId = j;
@@ -346,6 +347,9 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
     printf("    x:%7.3f  y:%7.3f z:%7.3f\n",local_point[0],local_point[1],local_point[2]);
     return;
   } else {
+    for (Int_t i = 0; i < sectorId; i++)
+      rowId += fModuleInfo->GetNofRowsInSector(i); // local -> global row
+
     Double_t displacement_x(0), displacement_y(0);//mm
     Double_t h = fModuleInfo->GetAnodeWireToPadPlaneDistance();
     Double_t W(fModuleInfo->GetPadSizeX(sectorId)), H(fModuleInfo->GetPadSizeY(sectorId));
@@ -363,6 +367,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
       for (Int_t iCol = startCol; iCol <= columnId+maxCol/2; iCol++){
 	if (((iCol >= 0) && (iCol <= fnCol-1)) && ((iRow >= 0) && (iRow <= fnRow-1))){// real adress	 
 	  targSec = fModuleInfo->GetSector(iRow, secRow);
+	  //printf("secId digi1 %i\n",targSec);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, iCol); 
 	  //printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,iCol);
 	} else {
@@ -378,6 +383,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	    targRow = fnRow-1;
 
 	  targSec = fModuleInfo->GetSector(targRow, secRow);
+	  //printf("secId digi2 %i\n",targSec);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, targCol);
 	  //printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,targCol);
 	}

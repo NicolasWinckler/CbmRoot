@@ -240,7 +240,7 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
       hit_posV[iDim] += local_pad_posV[iDim] * iCharge;
     }
   }
-
+  //printf("secId %i\n",CbmTrdAddress::GetSectorId(digi->GetAddress()));
   Double_t hit_pos[3];
   for (Int_t iDim = 0; iDim < 3; iDim++){
     hit_posV[iDim] /= totalCharge;

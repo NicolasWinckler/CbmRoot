@@ -24,7 +24,6 @@ CbmGeoPassivePar.cxx
 CbmGeoPipe.cxx         
 CbmGeoPlatform.cxx
 CbmGeoStart.cxx        
-CbmGeoTarget.cxx       
 CbmMagnet.cxx          
 CbmPassiveContFact.cxx 
 CbmPipe.cxx

@@ -21,6 +21,7 @@ void run_sim(Int_t nEvents = 2)
   TString parFile = outDir + "/params.root";
   
   TString macro = inDir + "/geometry/standard_electron_setup.C";
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
   gROOT->LoadMacro(macro);
   gInterpreter->ProcessLine("standard_electron_setup()");
 
@@ -68,11 +69,7 @@ void run_sim(Int_t nEvents = 2)
     fRun->AddModule(pipe);
   }
   
-  if ( targetGeom != "" ) {
-    FairModule* target = new CbmTarget("Target");
-    target->SetGeometryFileName(targetGeom);
-    fRun->AddModule(target);
-  }
+  if ( target ) fRun->AddModule(target);
 
   if ( magnetGeom != "" ) {
     FairModule* magnet = new CbmMagnet("MAGNET");

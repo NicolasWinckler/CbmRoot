@@ -18,7 +18,6 @@
 #pragma link C++ class CbmGeoPipe;
 #pragma link C++ class CbmGeoPlatform;
 #pragma link C++ class CbmShieldGeo+;
-#pragma link C++ class CbmGeoTarget;
 #pragma link C++ class CbmGeoMagnet;
 #pragma link C++ class CbmGeoPassivePar;
 #pragma link C++ class CbmPassiveContFact;

@@ -68,6 +68,8 @@ public:
     Double_t GetPyIn()  const { return fPy; }
     Double_t GetPzIn()  const { return fPz; }
 
+    Int_t GetModuleAddress() const { return GetDetectorID(); }
+    
     void PositionOut(TVector3& pos) const {pos.SetXYZ(fX_out, fY_out, fZ_out);}
     void MomentumOut(TVector3& mom) const {mom.SetXYZ(fPx_out, fPy_out, fPz_out);}
  

@@ -211,14 +211,14 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
       /*
-      if (fMultiHit)
+	if (fMultiHit)
 	fMinimumChargeTH = 1.0e-08;
-      else
+	else
 	fMinimumChargeTH = mChargeTH[iChargeTH];
       */
       //fMinimumChargeTH = 0.0;
       /*
-       * Digis are sorted according to the moduleId. A combiId is calculted based 
+       * Digis are sorted according to the moduleAddress. A combiId is calculted based 
        * on the rowId and the colId to have a neighbouring criterion for digis within 
        * the same pad row. The digis of each module are sorted according to this combiId.
        * All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
@@ -233,11 +233,12 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       Int_t nentries = fDigis->GetEntries();
       Int_t digiCounter = 0;
       cout << " Found " << nentries << " Digis in Collection" << endl;
-      std::map<Int_t, MyDigiList*> modules; //map of <moduleId, List of struct 'MyDigi' pointer>
-      std::map<Int_t, MyDigiList*> ModuleNeighbourDigiMap; //map of <moduleId, List of struct 'MyDigi' pointer>
+      std::map<Int_t, MyDigiList*> modules; //map of <moduleAddress, List of struct 'MyDigi' pointer>
+      std::map<Int_t, MyDigiList*> ModuleNeighbourDigiMap; //map of <moduleAddress, List of struct 'MyDigi' pointer>
 
       for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
 	CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
+	
 	/*
 	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 	Int_t size = digi->GetMCIndex().size();
@@ -256,28 +257,50 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	/*
 	 *unrotate rotated modules in x- and y-direction (row <-> col)
 	 */
-	Int_t moduleId = digi->GetDetId();
-	Int_t Station  = fGeoHandler->GetStation(moduleId);
-	Int_t Layer    = fGeoHandler->GetLayer(moduleId);
+	Int_t digiAddress  = digi->GetAddress();
+	Int_t layerId    = CbmTrdAddress::GetLayerId(digiAddress);
+	Int_t moduleId = CbmTrdAddress::GetModuleId(digiAddress);
+	Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
 
+	//Int_t Station  = fGeoHandler->GetStation(moduleId);
+	//Int_t Layer    = fGeoHandler->GetLayer(moduleId);
+	//printf("digiAddress:%i  modId:%i  layer:%i\n",digiAddress,moduleId,layerId);
 	MyDigi *d = new MyDigi;
 	//d = new MyDigi;
 	    
-	fModuleInfo = fDigiPar->GetModule(moduleId);
+	fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(digiAddress));
+	if (fModuleInfo){
+	  printf("digiAddress %i found\n",digiAddress);
+	} else {
+	  printf("digi %3i digiAddress %i layer %i and modId %i  Sec%i Row:%i Col%i not found\n",
+		 iDigi,digiAddress,layerId,moduleId,CbmTrdAddress::GetSectorId(digi->GetAddress()),
+		 CbmTrdAddress::GetRowId(digi->GetAddress()),CbmTrdAddress::GetColumnId(digi->GetAddress())); 
+	  continue;
+	}
 	d->digiId = iDigi;
 	/*
 	 *'rotated' modules are backrotated to get consistent notation of Row and Col
-	 */
-	if (Layer%2 == 0) {
-	  d->colId = digi->GetRow();
-	  d->rowId = digi->GetCol();
-	  d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
-	}
-	else {
-	  d->rowId = digi->GetRow();
-	  d->colId = digi->GetCol();
-	  d->combiId = d->rowId * (fModuleInfo->GetNofColumns() + 1) + d->colId;
-	}
+	 *//* // not longer needed since all modules ar in a local not rotated cs
+	      if (layerId%2 == 0) {
+	      d->colId = digi->GetRow();
+	      d->rowId = digi->GetCol();
+	      d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
+	      }
+	      else {
+	      d->rowId = digi->GetRow();
+	      d->colId = digi->GetCol();
+	      d->combiId = d->rowId * (fModuleInfo->GetNofColumns() + 1) + d->colId;
+	      }
+	   */
+	Int_t iSector = CbmTrdAddress::GetSectorId(digi->GetAddress());
+	Int_t globalRow = CbmTrdAddress::GetRowId(digi->GetAddress());
+	for (Int_t iS = 0; iS < iSector; iS++)
+	  globalRow += fModuleInfo->GetNofRowsInSector(iS);
+
+	d->colId = CbmTrdAddress::GetColumnId(digi->GetAddress());
+	d->rowId = globalRow;
+	d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
+
 	d->charge = digi->GetCharge();
 
 	if (optimization && fMinimumChargeTH == 0)
@@ -285,19 +308,19 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	    DigiChargeSpectrum->Fill(digi->GetCharge());
 	  }
  
-	if (ModuleNeighbourDigiMap.find(moduleId) == ModuleNeighbourDigiMap.end()) {
+	if (ModuleNeighbourDigiMap.find(moduleAddress) == ModuleNeighbourDigiMap.end()) {
 	     
-	  ModuleNeighbourDigiMap[moduleId] = new MyDigiList;
+	  ModuleNeighbourDigiMap[moduleAddress] = new MyDigiList;
 	} 
-	ModuleNeighbourDigiMap[moduleId]->push_back(d);
+	ModuleNeighbourDigiMap[moduleAddress]->push_back(d);
 	if (digi->GetCharge() > fMinimumChargeTH)
 	  {
 	    digiCounter++;
-	    if (modules.find(moduleId) == modules.end()) {
+	    if (modules.find(moduleAddress) == modules.end()) {
 	     
-	      modules[moduleId] = new MyDigiList;
+	      modules[moduleAddress] = new MyDigiList;
 	    } 
-	    modules[moduleId]->push_back(d);
+	    modules[moduleAddress]->push_back(d);
 	  }
 	// Since the pointer is stored in a stl container which is used later out of the scope of this loop
 	// the pointer is set to NULL here to make clear that the objects must deleted elswhere. If the objects 
@@ -308,7 +331,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	//	delete d;
       }
       cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << fMinimumChargeTH << ")" << endl;
-      std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
+      std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleAddress, pointer of Vector of List of struct 'MyDigi' >
       for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
 	if (dynamic) {
 	  fModuleInfo = fDigiPar->GetModule(it->first);
@@ -332,6 +355,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	fModClusterMap[it->first] = clusterModule(it->second, ModuleNeighbourDigiMap[it->first]);
 	//drawCluster(it->first, fModClusterMap[it->first]);
       }
+      cout << "addCluster(fModClusterMap)" << endl;
       addCluster(fModClusterMap);
       /*
        * clean up
@@ -581,14 +605,14 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   }
 
   //----------------------------------------------------------------------
-  void CbmTrdClusterFinderFast::drawCluster(Int_t moduleId, ClusterList *clusterList)
+  void CbmTrdClusterFinderFast::drawCluster(Int_t moduleAddress, ClusterList *clusterList)
   {
     Char_t name[50];
     Char_t title[50];
-    sprintf(name,"C%d",moduleId);
+    sprintf(name,"C%d",moduleAddress);
     sprintf(title,"%s",name);
     Char_t Canfile[100];
-    sprintf(Canfile,"Pics/ModuleID%s.png",name);
+    sprintf(Canfile,"Pics/ModuleAddress%s.png",name);
     TH2F* Test = new TH2F(title,name,200,0,200,30,0,30);
     Test->SetContour(99);
  
@@ -686,8 +710,8 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 
 		    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
 		    cluster->SetDigis(digiIndices);
-		    cluster->SetCharge(Charge);
-		    cluster->SetMaxCharge(qMax);
+		    //cluster->SetCharge(Charge);
+		    //cluster->SetMaxCharge(qMax);
 		    digiIndices.clear();
 		    //digiIndices.Reset();
 		    //digiIndices.Set(3);
@@ -717,8 +741,8 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 
 	    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster(); // andrey
 	    cluster->SetDigis(digiIndices); // andrey
-	    cluster->SetCharge(Charge); // andrey
-	    cluster->SetMaxCharge(qMax); // andrey
+	    //cluster->SetCharge(Charge); // andrey
+	    //cluster->SetMaxCharge(qMax); // andrey
 	  }	  
 	}       
     } 

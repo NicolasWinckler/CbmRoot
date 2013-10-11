@@ -48,7 +48,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
     fTime(-1.),
     fModuleType(-1),
     fModuleCopy(-1),
-    fModuleID(-1),
+    //fModuleID(-1),
     fMCindex(-1),
     fnRow(-1),
     fnCol(-1),
@@ -76,7 +76,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
    fDebug(false),
    fModuleType(-1),
    fModuleCopy(-1),
-   fModuleID(-1),
+   //fModuleID(-1),
    fMCindex(-1),
     fnRow(-1),
     fnCol(-1),
@@ -213,7 +213,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   Int_t nEntries = fTrdPoints->GetEntries();
   Int_t pointId;
   cout << " Found " << nEntries << " MC-Points in Buffer of TRD" << endl;
-  for (Int_t j = 0; j < nEntries ; j++ ){
+  for (Int_t j = 0; j < /*nEntries*/1 ; j++ ){
     pointId = j;
     ELoss = 0.0;
     ELossTR = 0.0;
@@ -266,20 +266,35 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
       continue;
     }
     //const Int_t nCluster = 1;//TODO: as function of track length in active volume
-   
+    cout << TString(gGeoManager->GetPath()).Data() << endl;
+    cout << "GetModuleAddress " << fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())) << endl;
+//    fLayerId = CbmTrdAddress::GetLayerId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
+//    cout << "GetLayerId   " << fLayerId << endl;
+//    fModuleId = CbmTrdAddress::GetModuleId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
+//    cout << "GetModuleId  " << fModuleId << endl;
+//    fModuleId = point->GetDetectorID();
+//    cout << "ModuleAddress " << fModuleId << endl;
+
+    fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
+    cout << "GetLayerId   " << fLayerId << endl;
+    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
+    cout << "GetModuleId2 " << fModuleId << endl;
+
     const Double_t *global_point = gGeoManager->GetCurrentPoint();
     Double_t local_point[3];
 
     gGeoManager->MasterToLocal(global_point, local_point);
 
-    fModuleID = point->GetDetectorID();
-    fModuleInfo = fDigiPar->GetModule(fModuleID);
+
+//    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
+//    fLayerId  = CbmTrdAddress::GetLayerId(point->GetDetectorID());
+
+    fModuleInfo = fDigiPar->GetModule(point->GetDetectorID());
     fnCol = fModuleInfo->GetNofColumns();
     fnRow = fModuleInfo->GetNofRows();
     // Form address which contains layerId, moduleId, sectorId, columnId and rowId.
     // Address in the MC point contains only information about layerId and moduleId.
-    fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
-    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
+    //fLayerId = CbmTrdAddress::GetLayerId(gGeoManager->GetModuleAddress(TString(gGeoManager->GetPath())));//gGeoManager->GetLayer(fModuleId);//CbmTrdAddress::GetLayerId(fModuleInfo->GetModuleAddress());   
 
     SplitTrackPath(point, ELoss);
 
@@ -348,6 +363,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	if (((iCol >= 0) && (iCol <= fnCol-1)) && ((iRow >= 0) && (iRow <= fnRow-1))){// real adress	 
 	  targSec = fModuleInfo->GetSector(iRow, secRow);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, iCol); 
+	  printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,iCol);
 	} else {
           targRow = iRow;
           targCol = iCol;
@@ -362,6 +378,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 
 	  targSec = fModuleInfo->GetSector(targRow, secRow);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, targCol);
+	  printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,targCol);
 	}
 	Double_t chargeFraction = 0;
 	if (rowId == iRow && columnId == iCol) // if pad in center of 7x3 arrayxs

@@ -58,7 +58,7 @@ reco/CbmTrdHitProducerIdeal.cxx
 reco/CbmTrdHitProducerSmearing.cxx
 reco/CbmTrdHitProducerDigi.cxx
 #reco/CbmTrdClusterFinder.cxx
-#reco/CbmTrdClusterFinderFast.cxx
+reco/CbmTrdClusterFinderFast.cxx
 #reco/CbmTrdHitProducerCluster.cxx
 #reco/CbmTrdSimpleHitProducerCluster.cxx
 

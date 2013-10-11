@@ -90,7 +90,7 @@ class CbmTrdDigitizerPRF : public FairTask {
 
   Int_t   fModuleType;
   Int_t   fModuleCopy;
-  Int_t   fModuleID;//Unique number for detector module
+  //Int_t   fModuleID;//Unique number for detector module
   Int_t   fMCindex;// index to MCPoint
   //Double_t fELossTR;
 

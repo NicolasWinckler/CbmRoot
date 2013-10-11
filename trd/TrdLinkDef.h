@@ -44,7 +44,7 @@
 //#pragma link C++ class  CbmTrdDetectorId+;
 #pragma link C++ class CbmTrdElectronsTrainAnn+;
 //#pragma link C++ class CbmTrdClusterFinder+;
-//#pragma link C++ class CbmTrdClusterFinderFast+;
+#pragma link C++ class CbmTrdClusterFinderFast+;
 //#pragma link C++ class CbmTrdSimpleHitProducerCluster+;
 //#pragma link C++ class CbmTrdHitProducerCluster+;
 #pragma link C++ class CbmTrdGeoHandler+;

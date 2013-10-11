@@ -108,6 +108,9 @@ void create_pipegeo_v13(const char* geoTag)
   gGeoMan->SetName("PIPEgeom");
   TGeoVolume* top = new TGeoVolumeAssembly("TOP");
   gGeoMan->SetTopVolume(top);
+  TString pipeName = "PIPE_";
+  pipeName += geoTag;
+  TGeoVolume* pipe = new TGeoVolumeAssembly(pipeName.Data());
   // --------------------------------------------------------------------------
 
 
@@ -137,8 +140,8 @@ void create_pipegeo_v13(const char* geoTag)
   infoFile << setw(2) << "i" << setw(10) << "z" << setw(10) << "rmin" << endl;
   TGeoVolume* pipe1    = MakePipe  (1, nSects1, z1, r1, carbon, &infoFile);
   TGeoVolume* pipevac1 = MakeVacuum(1, nSects1, z1, r1, vacuum, &infoFile);
-  top->AddNode(pipe1, 0);
-  top->AddNode(pipevac1, 0);
+  pipe->AddNode(pipe1, 0);
+  pipe->AddNode(pipevac1, 0);
   // -----   End of part 1   --------------------------------------------------
 
 
@@ -151,8 +154,8 @@ void create_pipegeo_v13(const char* geoTag)
 
   /** For v13b (electron setup)
   Int_t nSects2 = 4;
-  Double_t z2[] = { 350.00, 5999.95, 6000.00, 10000.00 };
-  Double_t r2[] = {  20.00,   20.00,  14.90,     14.90 };
+  Double_t z2[] = { 350.00, 599.95, 600.00,  1000.00 };
+  Double_t r2[] = {  25.00,  25.00,  14.90,    14.90 };
   **/
 
   if ( nSects2 ) {
@@ -161,8 +164,8 @@ void create_pipegeo_v13(const char* geoTag)
 
     TGeoVolume* pipe2    = MakePipe  (2, nSects2, z2, r2, carbon, &infoFile);
     TGeoVolume* pipevac2 = MakeVacuum(2, nSects2, z2, r2, vacuum, &infoFile);
-    top->AddNode(pipe2, 0);
-    top->AddNode(pipevac2, 0);
+    pipe->AddNode(pipe2, 0);
+    pipe->AddNode(pipevac2, 0);
   }
   // -----   End of part 2   --------------------------------------------------
 
@@ -171,6 +174,7 @@ void create_pipegeo_v13(const char* geoTag)
 
 
   // ---------------   Finish   -----------------------------------------------
+  top->AddNode(pipe, 1);
   cout << endl << endl;
   gGeoMan->CloseGeometry();
   gGeoMan->CheckOverlaps(0.001);

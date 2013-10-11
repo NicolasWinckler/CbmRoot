@@ -10,6 +10,8 @@ class CbmPipe : public FairModule {
 
     virtual ~CbmPipe();
     virtual void ConstructGeometry();
+
+    virtual void ConstructAsciiGeometry();
    
   ClassDef(CbmPipe,1) //CBMPIPE
 

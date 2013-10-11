@@ -212,8 +212,9 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   Int_t nCount = 0;
   Int_t nEntries = fTrdPoints->GetEntries();
   Int_t pointId;
+  if (fDebug) nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Buffer of TRD" << endl;
-  for (Int_t j = 0; j < /*nEntries*/1 ; j++ ){
+  for (Int_t j = 0; j < nEntries ; j++ ){
     pointId = j;
     ELoss = 0.0;
     ELossTR = 0.0;
@@ -266,8 +267,8 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
       continue;
     }
     //const Int_t nCluster = 1;//TODO: as function of track length in active volume
-    cout << TString(gGeoManager->GetPath()).Data() << endl;
-    cout << "GetModuleAddress " << fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())) << endl;
+    //cout << TString(gGeoManager->GetPath()).Data() << endl;
+    //cout << "GetModuleAddress " << fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())) << endl;
 //    fLayerId = CbmTrdAddress::GetLayerId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
 //    cout << "GetLayerId   " << fLayerId << endl;
 //    fModuleId = CbmTrdAddress::GetModuleId(fGeoHandler->GetModuleAddress(TString(gGeoManager->GetPath())));
@@ -276,9 +277,9 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 //    cout << "ModuleAddress " << fModuleId << endl;
 
     fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
-    cout << "GetLayerId   " << fLayerId << endl;
+    //cout << "GetLayerId   " << fLayerId << endl;
     fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
-    cout << "GetModuleId2 " << fModuleId << endl;
+    //cout << "GetModuleId2 " << fModuleId << endl;
 
     const Double_t *global_point = gGeoManager->GetCurrentPoint();
     Double_t local_point[3];
@@ -363,7 +364,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	if (((iCol >= 0) && (iCol <= fnCol-1)) && ((iRow >= 0) && (iRow <= fnRow-1))){// real adress	 
 	  targSec = fModuleInfo->GetSector(iRow, secRow);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, iCol); 
-	  printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,iCol);
+	  //printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,iCol);
 	} else {
           targRow = iRow;
           targCol = iCol;
@@ -378,7 +379,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 
 	  targSec = fModuleInfo->GetSector(targRow, secRow);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, targCol);
-	  printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,targCol);
+	  //printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,targCol);
 	}
 	Double_t chargeFraction = 0;
 	if (rowId == iRow && columnId == iCol) // if pad in center of 7x3 arrayxs

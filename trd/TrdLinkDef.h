@@ -46,7 +46,7 @@
 //#pragma link C++ class CbmTrdClusterFinder+;
 #pragma link C++ class CbmTrdClusterFinderFast+;
 //#pragma link C++ class CbmTrdSimpleHitProducerCluster+;
-//#pragma link C++ class CbmTrdHitProducerCluster+;
+#pragma link C++ class CbmTrdHitProducerCluster+;
 #pragma link C++ class CbmTrdGeoHandler+;
 //#pragma link C++ class CbmTrdDigiWriteoutBuffer+;
 //#pragma link C++ class CbmTrdDigiRingSorter+;

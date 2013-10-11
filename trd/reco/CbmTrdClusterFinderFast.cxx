@@ -270,7 +270,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	    
 	fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(digiAddress));
 	if (fModuleInfo){
-	  printf("digiAddress %i found\n",digiAddress);
+	  //printf("digiAddress %i found\n",digiAddress);
 	} else {
 	  printf("digi %3i digiAddress %i layer %i and modId %i  Sec%i Row:%i Col%i not found\n",
 		 iDigi,digiAddress,layerId,moduleId,CbmTrdAddress::GetSectorId(digi->GetAddress()),

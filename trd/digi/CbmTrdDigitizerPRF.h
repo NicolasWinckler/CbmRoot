@@ -57,11 +57,12 @@ class CbmTrdDigitizerPRF : public FairTask {
   /** Finish task (called after all event) **/
   virtual void FinishTask(){;}
 
-  /*
-    void AddHit(TVector3 &posHit, TVector3 &posHitErr,
-    Int_t TrackID, Int_t PlaneID, Int_t ref, Double_t ELoss,
-    Double_t ELossTR, Double_t ELossdEdX);
-  */
+  void Register();
+
+ private:
+
+  CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
+  CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
 
   Double_t CalcPRF(Double_t x, Double_t W, Double_t h);
 
@@ -70,13 +71,6 @@ class CbmTrdDigitizerPRF : public FairTask {
   void SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss);
 
   void AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time);
-
-  void Register();
-
- private:
-
-  CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
-  CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
 
   Bool_t fDebug;
 

@@ -37,7 +37,7 @@ void run_sim_single_elec(Int_t nEvents = 1)
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target/target_au_250mu.geo";
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
   TString pipeGeom   = "pipe/pipe_standard.geo";
   TString magnetGeom = "magnet/magnet_v12b.geo.root";
   TString mvdGeom    = "mvd/mvd_v07a.geo";
@@ -98,11 +98,7 @@ void run_sim_single_elec(Int_t nEvents = 1)
     fRun->AddModule(pipe);
   }
   
-  if ( targetGeom != "" ) {
-    FairModule* target = new CbmTarget("Target");
-    target->SetGeometryFileName(targetGeom);
-    fRun->AddModule(target);
-  }
+  if ( target ) fRun->AddModule(target);
 
   if ( magnetGeom != "" ) {
     FairModule* magnet = new CbmMagnet("MAGNET");

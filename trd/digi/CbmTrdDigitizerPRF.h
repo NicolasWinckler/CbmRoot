@@ -78,6 +78,8 @@ class CbmTrdDigitizerPRF : public FairTask {
   CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
   CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
 
+  Bool_t fDebug;
+
   Double_t fTime;
   Int_t fnRow;
   Int_t fnCol;

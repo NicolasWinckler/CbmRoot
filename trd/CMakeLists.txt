@@ -40,7 +40,7 @@ param/CbmTrdDigiPar.cxx
 param/CbmTrdCreateDigiPar.cxx
 
 #digi/CbmTrdDigitizerMathieson.cxx 
-#digi/CbmTrdDigitizerPRF.cxx
+digi/CbmTrdDigitizerPRF.cxx
 digi/CbmTrdDigitizer.cxx
 #digi/CbmTrdDigiWriteoutBuffer.cxx
 

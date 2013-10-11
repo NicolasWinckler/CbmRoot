@@ -44,6 +44,7 @@ using std::fabs;
 // ---- Default constructor -------------------------------------------
 CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
   : FairTask("TrdCluster"),
+    fDebug(false),
     fTime(-1.),
     fModuleType(-1),
     fModuleCopy(-1),
@@ -72,6 +73,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
 					     CbmTrdRadiator *radiator)
   :FairTask(name),
    fTime(-1.),
+   fDebug(false),
    fModuleType(-1),
    fModuleCopy(-1),
    fModuleID(-1),
@@ -194,7 +196,7 @@ InitStatus CbmTrdDigitizerPRF::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
 {
-  Bool_t Debug = false;
+  fDebug = false;
   TStopwatch timer;
   timer.Start();
   cout << "================CbmTrdDigitizerPRF=====================" << endl;
@@ -263,7 +265,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
       LOG(ERROR) << "CbmTrdDigitizerPRF::Exec: MC-track not in TRD! Node:" << TString(gGeoManager->GetPath()).Data() << " gGeoManager->MasterToLocal() failed!" << FairLogger::endl;
       continue;
     }
-    const Int_t nCluster = 1;//TODO: as function of track length in active volume
+    //const Int_t nCluster = 1;//TODO: as function of track length in active volume
    
     const Double_t *global_point = gGeoManager->GetCurrentPoint();
     Double_t local_point[3];
@@ -295,7 +297,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     iDigi++;
   }
   fDigiMap.clear();
-  printf("\n   Created %i TrdDigis\n",iDigi);
+  printf("\n   Created %i TrdDigis  %7.3f Digis/MC-Point\n",iDigi, Double_t(iDigi/nEntries));
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -322,7 +324,6 @@ Double_t CbmTrdDigitizerPRF::CalcPRF(Double_t x, Double_t W, Double_t h)
 // --------------------------------------------------------------------
 void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clusterELoss)
 {
-  // TODO: scan full surface but sum up if pad is outside module untill reenter the active pad-plane-> charge conservation
   Int_t sectorId(-1), columnId(-1), rowId(-1);//, preSecRows(0);
   fModuleInfo->GetPadInfo( local_point, sectorId, columnId, rowId);
   if (sectorId < 0 && columnId < 0 && rowId < 0) {
@@ -333,12 +334,16 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
     Double_t h = fModuleInfo->GetAnodeWireToPadPlaneDistance();
     Double_t W(fModuleInfo->GetPadSizeX(sectorId)), H(fModuleInfo->GetPadSizeY(sectorId));
     fModuleInfo->TransformToLocalPad(local_point, displacement_x, displacement_y);
+
     const Int_t maxCol(7), maxRow(3);
+
     //Estimate starting column and row and limits due to chamber dimensions
     Int_t startCol(columnId-maxCol/2), stopCol(columnId+maxCol/2), startRow(rowId-maxRow/2), stopRow(rowId+maxRow/2), startSec(0);
     Double_t sum = 0;
     Int_t secRow(-1), targCol(-1), targRow(-1), targSec(-1), address(-1);
+    if (fDebug) printf("\nhit: (%7.3f,%7.3f)\n",displacement_x,displacement_y);
     for (Int_t iRow = startRow; iRow <= rowId+maxRow/2; iRow++){
+      if (fDebug) printf("(%i): ",iRow);
       for (Int_t iCol = startCol; iCol <= columnId+maxCol/2; iCol++){
 	if (((iCol >= 0) && (iCol <= fnCol-1)) && ((iRow >= 0) && (iRow <= fnRow-1))){// real adress	 
 	  targSec = fModuleInfo->GetSector(iRow, secRow);
@@ -368,23 +373,26 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	//if (iCol >= stopCol)
 
 	AddDigi(fMCindex, address, Double_t(chargeFraction * clusterELoss), fTime);
-	/*
+	
+	if (fDebug) {
 	  if (rowId == iRow && columnId == iCol)
-	  printf("(%3i:%f4.3) ",iCol,chargeFraction);
+	    printf("(%3i:%5.3E) ",iCol,chargeFraction);
 	  else
-	  printf(" %3i:%f4.3  ",iCol,chargeFraction);
+	    printf(" %3i:%5.3E  ",iCol,chargeFraction);
 	  if (iCol == fnCol-1)
-	  cout << "|";
-	*/
-      }
-      /*
+	    cout << "|";
+	}
+	
+      } // for iCol
+      
+      if (fDebug) {
 	if (iRow == fnRow-1)
-	cout << endl << "-------------------------------------" << endl;
+	  cout << endl << "-------------------------------------" << endl;
 	else
-	cout << endl;
-      */
-    }
-    //cout << endl;
+	  cout << endl;
+      }
+      
+    } // for iRow
     if (sum < 0.99 || sum > 1.01){
       LOG(WARNING) << "CbmTrdDigitizerPRF::ScanPadPlane: Summed charge: " << std::setprecision(5) << sum << "  hit:(" << columnId << ", " << rowId <<")   max:(" << fnCol-1 << ", " << fnRow-1 << ")" << FairLogger::endl;
     }
@@ -409,8 +417,6 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
   gGeoManager->MasterToLocal(point_in,  local_point_in);
   gGeoManager->MasterToLocal(point_out, local_point_out);
 
-
-
   Double_t cluster_pos[3];   // cluster position in local module coordinate system
   Double_t cluster_delta[3]; // vector pointing in MC-track direction with length of one path slice within chamber volume to creat n cluster
 
@@ -424,42 +430,16 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
   const Int_t nCluster = trackLength / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
   if (nCluster < 1){
     LOG(WARNING) << "CbmTrdDigitizerPRF::SplitTrackPath: nCluster: "<<nCluster<<"   track length: "<<std::setprecision(5)<<trackLength<<"cm  nCluster/cm: "<<std::setprecision(2)<<nClusterPerCm<<"  ELoss: "<<std::setprecision(5)<<ELoss*1e-6<<"keV " << FairLogger::endl;
-    //printf("nCluster: %i   track length: %fcm  nCluster/cm: %3.1f  ELoss: %EGeV\n",nCluster, TMath::Sqrt(trackLength), nClusterPerCm, ELoss);
     return;
   }
-  //printf("%i\n",nCluster);
   for (Int_t i = 0; i < 3; i++){
     cluster_delta[i] /= Double_t(nCluster);
   }
   Double_t clusterELoss = ELoss / Double_t(nCluster);
-  /*
-  for (Int_t i = 0; i < 3; i++){ 
-    cluster_pos[i] = local_point_in[i] + 0.5 * cluster_delta[i];// move start position 0.5 step widths into track direction
-  }
-  Double_t clusterELoss = ELoss / Double_t(nCluster);
-  
-  if ( fModuleInfo->GetSizeX() < fabs(cluster_pos[0]) || fModuleInfo->GetSizeY() < fabs(cluster_pos[1])){
-    printf("->    nC 0/%i x: %7.3f y: %7.3f \n",nCluster-1,cluster_pos[0],cluster_pos[1]);
-    for (Int_t i = 0; i < 3; i++){
-      printf("  (%i) | in: %7.3f + delta: %7.3f * cluster: 0/%i = cluster_pos: %7.3f out: %7.3f g_in:%f g_out:%f\n",
-	     i,local_point_in[i],cluster_delta[i],(Int_t)nCluster,cluster_pos[i],local_point_out[i],point_in[i],point_out[i]);
-    }
-  }
-  fModuleInfo->ProjectPositionToNextAnodeWire(cluster_pos);
-
-  ScanPadPlane(cluster_pos, clusterELoss);
-
-  */
+ 
   for (Int_t iCluster = 0; iCluster < nCluster; iCluster++){
     for (Int_t i = 0; i < 3; i++){
-      cluster_pos[i] = local_point_in[i] + (0.5 + iCluster) * cluster_delta[i];// move start position 0.5 step widths into track direction
-      //cluster_pos[i] += cluster_delta[i]; 
-
-      //printf(" (%i) out: %7.3f | in: %7.3f + delta: %7.3f * cluster: %i/%i  = cluster_pos: %7.3f | length: %7.3fcm nCluster/cm: %3.1f\n",i,local_point_out[i],local_point_in[i],cluster_delta[i],iCluster,nCluster,cluster_pos[i],TMath::Sqrt(trackLength),nClusterPerCm); 
-      //if (fabs(local_point_out[i]-local_point_in[i]) < fabs(cluster_pos[i]-local_point_in[i]) ){
-      //LOG(WARNING) << "  ("<<i<<") | in: "<<local_point_in[i]<<" + delta: "<<cluster_delta[i]<<" * cluster: "<<iCluster<<"/"<<(Int_t)nCluster<<" = cluster_pos: "<<cluster_pos[i]<<" out: "<<local_point_out[i]<< FairLogger::endl;
-      //printf("  (%i) | in: %7.3f + delta: %7.3f * cluster: %i/%i = cluster_pos: %7.3f out: %7.3f\n",i,local_point_in[i],cluster_delta[i],iCluster,(Int_t)nCluster,cluster_pos[i],local_point_out[i]);
-      //}
+      cluster_pos[i] = local_point_in[i] + (0.5 + iCluster) * cluster_delta[i];// move start position 0.5 step widths into track direction    
     }
 
     if ( fModuleInfo->GetSizeX() < fabs(cluster_pos[0]) || fModuleInfo->GetSizeY() < fabs(cluster_pos[1])){

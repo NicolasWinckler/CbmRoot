@@ -58,12 +58,6 @@ public:
 
   Int_t GetNofSectors() const { return fNofSectors; }
 
-  void GetPadPosition(
-        const Int_t digiAddress,
-        Double_t& posX,
-        Double_t& posY,
-        Double_t& posZ) const;
-
   void GetPadInfo(
         const Double_t* local_point,
         Int_t& sectorId,
@@ -75,6 +69,11 @@ public:
         Int_t& sectorId,
         Int_t& columnId,
         Int_t& rowId) const;
+
+  void GetPadPosition(
+        const Int_t digiAddress,
+	TVector3& padPos,
+	TVector3& padPosErr) const;
 
   void GetPosition(
         Int_t moduleAddress,

@@ -216,7 +216,7 @@ void CbmTarget::Print(Option_t* opt) {
 
 
 // -----   Set a geometry file (overloaded from base class)   ---------------
-Bool_t CbmTarget::SetGeometryFileName(TString name, TString version) {
+void CbmTarget::SetGeometryFileName(TString name, TString version) {
   fBuildFromFile = kTRUE;
   LOG(INFO) << "Using target file name " << name << FairLogger::endl;
   return FairModule::SetGeometryFileName(name, version);

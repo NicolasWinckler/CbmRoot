@@ -90,7 +90,7 @@ class CbmTarget : public FairModule {
      ** If a geometry file is set by this method, the target geometry
      ** will be built from this file; the parameters will have no effect.
      **/
-    virtual Bool_t SetGeometryFileName(TString name, TString geoVer = "0");
+    virtual void SetGeometryFileName(TString name, TString geoVer = "0");
 
 
     /** Set the position of the target w.r.t. the global coordinate system.

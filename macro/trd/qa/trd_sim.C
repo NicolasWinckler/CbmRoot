@@ -7,7 +7,7 @@
 //
 // --------------------------------------------------------------------------
 
-void QAsim_root_trd(Int_t nEvents = 1)
+void trd_sim(Int_t nEvents = 1)
 {
 
   // ========================================================================
@@ -16,29 +16,44 @@ void QAsim_root_trd(Int_t nEvents = 1)
   // ----- Paths and file names  --------------------------------------------
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
-  //TString inFile  = inDir + "/input/urqmd.auau.25gev.centr.0000.ftn14";
   TString outDir  = "data";
   TString outFile = outDir + "/test.mc.root";
   TString parFile = outDir + "/params.root";
   
-  // -----  Geometries  -----------------------------------------------------
-  TString caveGeom   = "cave.geo";
-  TString targetGeom = "target/target_au_250mu.geo";
-  TString pipeGeom   = "pipe/pipe_standard.geo";
-  TString magnetGeom = "magnet/magnet_v12b.geo.root";
-  TString mvdGeom    = "mvd/mvd_v07a.geo";
-  TString stsGeom    = "sts/sts_v12b.geo.root";
-  TString richGeom   = "rich/rich_v08a.geo";
-  TString trdGeom    = "trd/trd_v13g.geo.root";
-  //  TString tofGeom    = "tof/tof_v13b.root";
-  TString tofGeom    = "";
-  TString ecalGeom   = "";
-//  TString ecalGeom   = "ecal/ecal_v08a.geo";
-  
-  // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "field_v12b";    // name of field map
-  Double_t fieldZ     = 50.;             // field centre z position
-  Double_t fieldScale =  1.;             // field scaling factor
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
+
+//  TString macro = inDir + "/geometry/standard_electron_setup.C";
+//  gROOT->LoadMacro(macro);
+//  gInterpreter->ProcessLine("standard_electron_setup()");
+
+  //// SIS 100 hadron
+  //  TString macro = inDir + "/geometry/setup/sis100_hadron_setup.C";
+  //  gROOT->LoadMacro(macro);
+  //  gInterpreter->ProcessLine("sis100_hadron_setup()");
+
+//// SIS 100 electron
+//  TString macro = inDir + "/geometry/setup/sis100_electron_setup.C";
+//  gROOT->LoadMacro(macro);
+//  gInterpreter->ProcessLine("sis100_electron_setup()");
+
+  //// SIS 100 muon
+  //  TString macro = inDir + "/geometry/setup/sis100_muon_setup.C";
+  //  gROOT->LoadMacro(macro);
+  //  gInterpreter->ProcessLine("sis100_muon_setup()");
+
+// SIS 300 electron
+  TString macro = inDir + "/macro/trd/geometry/setup/sis300_electron_setup.C";
+
+//  TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
+  gROOT->LoadMacro(macro);
+  gInterpreter->ProcessLine("sis300_electron_setup()");
+
+  platformGeom = "passive/platform_v13b.geo";
+
+  //// SIS 300 muon
+  //  TString macro = inDir + "/geometry/setup/sis300_muon_setup.C";
+  //  gROOT->LoadMacro(macro);
+  //  gInterpreter->ProcessLine("sis300_muon_setup()");
   
   // In general, the following parts need not be touched
   // ========================================================================
@@ -83,11 +98,7 @@ void QAsim_root_trd(Int_t nEvents = 1)
     fRun->AddModule(pipe);
   }
   
-  if ( targetGeom != "" ) {
-    FairModule* target = new CbmTarget("Target");
-    target->SetGeometryFileName(targetGeom);
-    fRun->AddModule(target);
-  }
+  if ( target ) fRun->AddModule(target);
 
   if ( magnetGeom != "" ) {
     FairModule* magnet = new CbmMagnet("MAGNET");
@@ -95,6 +106,12 @@ void QAsim_root_trd(Int_t nEvents = 1)
     fRun->AddModule(magnet);
   }
   
+  if ( platformGeom != "" ) {
+    FairModule* platform = new CbmPlatform("PLATFORM");
+    platform->SetGeometryFileName(platformGeom);
+    fRun->AddModule(platform);
+  }
+
   if ( mvdGeom != "" ) {
     FairDetector* mvd = new CbmMvd("MVD", kTRUE);
     mvd->SetGeometryFileName(mvdGeom);
@@ -133,10 +150,12 @@ void QAsim_root_trd(Int_t nEvents = 1)
   
   // ------------------------------------------------------------------------
 
-
-
   // -----   Create magnetic field   ----------------------------------------
-  CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
+  if ( 2 == fieldSymType ) {
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  }  else if ( 3 == fieldSymType ) {
+    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
+  } 
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

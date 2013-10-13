@@ -26,7 +26,7 @@ void trd_digi1(Int_t nEvents = 1)
   cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
-  if (digipar.Length() == 0) digipar = "trd_standard";
+  if (digipar.Length() == 0) digipar = "trd_v13g";
 
   FairLogger *logger = FairLogger::GetLogger();
   logger->SetLogFileName("MyLog.log");

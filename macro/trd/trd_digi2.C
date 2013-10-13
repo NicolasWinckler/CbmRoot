@@ -37,7 +37,7 @@ void trd_digi2(Int_t nEvents = 1)
   cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
-  if (digipar.Length() == 0) digipar = "trd_standard";
+  if (digipar.Length() == 0) digipar = "trd_v13g";
 
   // ========================================================================
   //          Adjust this part according to your requirements

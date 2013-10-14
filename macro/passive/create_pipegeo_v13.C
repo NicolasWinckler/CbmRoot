@@ -44,6 +44,41 @@ TGeoManager*   gGeoMan     = NULL;  // will be set later
 
 void create_pipegeo_v13(const char* geoTag)
 {
+    
+  // -----   Define pipe parts   ----------------------------------------------
+  
+  /** For v13a (hadron setup): only one part
+   **/
+  Int_t nSects1 = 12;
+  Double_t z1[] = { -5.0, 2.5,  3.5, 23.95, 24.0, 26.95, 27.0, 160.0, 350.0, 449.95, 450.0, 1000.0 };
+  Double_t r1[] = {  2.5, 2.5, 13.0, 13.0,  12.8,  1.0,   1.0,   3.2,  25.0,  25.0,   13.9,   13.9 };
+  Int_t nSects2 = 0;
+  Double_t z2[]; 
+  Double_t r2[];
+    
+    
+  /** For v13b (electron setup): two parts, excluding RICH region
+  Int_t nSects1 = 8;
+  Double_t z1[] = { -5.0, 2.5,  3.5, 23.95, 24.0, 26.95, 27.0, 160.0};
+  Double_t r1[] = {  2.5, 2.5, 13.0, 13.0,  12.8,  1.0,   1.0,   3.2};
+  Int_t nSects2 = 4;
+  Double_t z2[] = { 350.00, 599.95, 600.00,  1000.00 };
+  Double_t r2[] = {  25.00,  25.00,  13.90,    13.90 };
+   **/
+
+    
+  /** For v13c (muon setup). only one part
+  Int_t nSects1 = 11;
+  Double_t z1[] = { -5.0, 2.5,  3.5, 26.0, 27.0, 150.0, 170.0, 550.0, 649.5, 650.0, 1140.0};
+  Double_t r1[] = {  2.5, 2.5, 13.0, 13.0,  1.0,   3.0,   8.5,  25.0,  25.0,  13.9,   13.9};
+  Int_t nSects2 = 0;
+  Double_t z2[];
+  Double_t r2[];
+   **/
+
+  // --------------------------------------------------------------------------
+
+    
 
   // -------------  Load the necessary FairRoot libraries   -------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -115,27 +150,7 @@ void create_pipegeo_v13(const char* geoTag)
 
 
 
-  // -----   Part 1   ---------------------------------------------------------
-
-  /** For v13a (hadron setup)
-  Int_t nSects1 = 12;
-  Double_t z1[] = { -5.0, 2.5,  3.5, 23.95, 24.0, 26.95, 27.0, 160.0, 350.0, 449.95, 450.0, 1000.0 };
-  Double_t r1[] = {  2.5, 2.5, 13.0, 13.0,  12.8,  1.0,   1.0,   3.2,  20.0,  20.0,   14.9,   14.9 };
-  **/
-
-  /** For v13b (electron setup)
-  Int_t nSects1 = 8;
-  Double_t z1[] = { -5.0, 2.5,  3.5, 23.95, 24.0, 26.95, 27.0, 160.0};
-  Double_t r1[] = {  2.5, 2.5, 13.0, 13.0,  12.8,  1.0,   1.0,   3.2};
-  **/
-
-  /** For v13c (muon setup)
-  **/
-  Int_t nSects1 = 11;
-  Double_t z1[] = { -5.0, 2.5,  3.5, 26.0, 27.0, 150.0, 170.0, 550.0, 649.5, 650.0, 1140.0};
-  Double_t r1[] = {  2.5, 2.5, 13.0, 13.0,  1.0,   3.0,   8.5,  25.0,  25.0,  14.9,   14.9};
-
-
+  // -----   Create Part 1   --------------------------------------------------
   infoFile << "Part 1: " << nSects1 << " sections" << endl;
   infoFile << setw(2) << "i" << setw(10) << "z" << setw(10) << "rmin" << endl;
   TGeoVolume* pipe1    = MakePipe  (1, nSects1, z1, r1, carbon, &infoFile);
@@ -145,19 +160,7 @@ void create_pipegeo_v13(const char* geoTag)
   // -----   End of part 1   --------------------------------------------------
 
 
-  // -----   Part 2   ---------------------------------------------------------
-
-  /** For v13a and v13c (hadron and muon)
-  **/
-  Int_t nSects2 = 0;
-  Double_t* z2, Double_t* r2;
-
-  /** For v13b (electron setup)
-  Int_t nSects2 = 4;
-  Double_t z2[] = { 350.00, 599.95, 600.00,  1000.00 };
-  Double_t r2[] = {  25.00,  25.00,  14.90,    14.90 };
-  **/
-
+  // -----   Create Part 2 (if required)   ------------------------------------
   if ( nSects2 ) {
     infoFile << "Part 2: " << nSects2 << " sections" << endl;
     infoFile << setw(2) << "i" << setw(10) << "z" << setw(10) << "rmin" << endl;
@@ -168,8 +171,6 @@ void create_pipegeo_v13(const char* geoTag)
     pipe->AddNode(pipevac2, 0);
   }
   // -----   End of part 2   --------------------------------------------------
-
-
 
 
 
@@ -197,6 +198,7 @@ void create_pipegeo_v13(const char* geoTag)
 
 
 
+// =====  Make the beam pipe volume   =========================================
 TGeoVolume* MakePipe(Int_t iPart, Int_t nSects, Double_t* z, Double_t* r,
                      TGeoMedium* medium, fstream* infoFile) {
 
@@ -216,8 +218,11 @@ TGeoVolume* MakePipe(Int_t iPart, Int_t nSects, Double_t* z, Double_t* r,
   return pipe;
 
 }
+// ============================================================================
 
 
+
+// =====   Make the volume for the vacuum inside the beam pipe   ==============
 TGeoVolume* MakeVacuum(Int_t iPart, Int_t nSects, Double_t* z, Double_t* r,
                       TGeoMedium* medium, fstream* infoFile) {
 
@@ -234,6 +239,7 @@ TGeoVolume* MakeVacuum(Int_t iPart, Int_t nSects, Double_t* z, Double_t* r,
   return vacuum;
 
 }
+// ============================================================================
 
 
 

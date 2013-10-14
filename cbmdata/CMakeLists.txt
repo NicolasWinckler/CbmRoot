@@ -76,6 +76,9 @@ tof/CbmTofPoint.cxx
 tof/CbmTofDetectorId.cxx
 tof/CbmTofDetectorId_v07a.cxx
 tof/CbmTofDetectorId_v12b.cxx
+tof/CbmTofAddress.cxx
+tof/CbmTofDigi.cxx
+tof/CbmTofDigiExp.cxx
 
 ecal/CbmEcalHit.cxx 
 ecal/CbmEcalPoint.cxx

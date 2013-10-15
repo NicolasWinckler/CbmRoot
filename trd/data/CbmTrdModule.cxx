@@ -143,7 +143,7 @@ void CbmTrdModule::ProjectPositionToNextAnodeWire(
    if (fAnodeWireOffset > 0.0 && fAnodeWireSpacing > 0.0) {  // wires must be defined defined
 
       // check, if the input is within the allowed range
-      if ( fabs(local_point[1]) >= fSizeY )
+      if ( fabs(local_point[1]) > fSizeY )
         LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point must be within gas volume, y=" << std::setprecision(5) << local_point[1] << FairLogger::endl;
 
       Double_t ypos = local_point[1];
@@ -164,7 +164,7 @@ void CbmTrdModule::ProjectPositionToNextAnodeWire(
       LOG(DEBUG2) << "local y after projection: " << std::setprecision(5) << local_point[1] << " mm" << FairLogger::endl;
 
       // check, if we have left the anode wire grid
-      if ( fabs(local_point[1]) >= fSizeY - fAnodeWireOffset )
+      if ( fabs(local_point[1]) > fSizeY - fAnodeWireOffset )
         LOG(ERROR) << "CbmTrdModule::ProjectPositionToNextAnodeWire - local point projected outside anode wire plane, from " 
                    << std::setprecision(5) << ypos << " to "
                    << std::setprecision(5) << local_point[1] << " - last anode wire at "
@@ -317,11 +317,11 @@ void CbmTrdModule::GetPadInfo(
       Int_t& rowId) const
 {
    // check, if the input is within the allowed range
-  if ( fabs(local_point[0]) >= fSizeX )
+  if ( fabs(local_point[0]) > fSizeX )
      LOG(ERROR) << "CbmTrdModule::GetPadInfo - local point x must be within gas volume, x=" 
                 << std::setprecision(5) << local_point[0] << " fSizeX "
                 << std::setprecision(5) << fSizeX << FairLogger::endl;
-  if ( fabs(local_point[1]) >= fSizeY )
+  if ( fabs(local_point[1]) > fSizeY )
      LOG(ERROR) << "CbmTrdModule::GetPadInfo - local point y must be within gas volume, y=" 
                 << std::setprecision(5) << local_point[1] << " fSizeY "
                 << std::setprecision(5) << fSizeY << FairLogger::endl;
@@ -618,10 +618,10 @@ void CbmTrdModule::GetPadPosition(
    posZ  = 0; // fSizeZ;
 
    // check limits
-   if ( fabs(posX) >= fSizeX )
+   if ( fabs(posX) > fSizeX )
      LOG(FATAL) << "CbmTrdModule::GetPadPosition posX=" << posX << " is out of bounds!" << FairLogger::endl;
    // check limits
-   if ( fabs(posY) >= fSizeY )
+   if ( fabs(posY) > fSizeY )
      LOG(FATAL) << "CbmTrdModule::GetPadPosition posY=" << posY << " is out of bounds!" << FairLogger::endl;
 
    padPos.SetXYZ(posX, posY, posZ);

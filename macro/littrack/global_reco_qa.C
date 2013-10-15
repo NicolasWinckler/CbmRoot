@@ -12,7 +12,7 @@ using std::endl;
 using std::vector;
 using std::string;
 
-void global_reco_qa(Int_t nEvents = 100,
+void global_reco_qa(Int_t nEvents = 10,
       TString opt = "reco")
 // opt == "reco" in case of one input file with all reconstructed data
 // opt == "ht" (hitas and tracks) in case of two input files with reconstructed hits and tracks
@@ -140,11 +140,11 @@ void global_reco_qa(Int_t nEvents = 100,
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
-  // run->AddTask(clusteringQa);
+   run->AddTask(clusteringQa);
 
    CbmLitTofQa* tofQa = new CbmLitTofQa();
    tofQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(tofQa);
+   //run->AddTask(tofQa);
    // -----------------------------------------------------------------------
 
    // -----  Parameter database   --------------------------------------------

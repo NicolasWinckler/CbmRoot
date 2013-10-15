@@ -40,12 +40,13 @@ void global_sim(Int_t nEvents = 100)
 	TString plutoFile = "/Users/andrey/Development/cbm/d/pluto/omega.25gev.1M.root";
 
 	// Geometries
-	TString caveGeom = "", targetGeom = "", pipeGeom = "", shieldGeom = "",
+	TString caveGeom = "", //targetGeom = "",
+			pipeGeom = "", shieldGeom = "",
 			mvdGeom = "", stsGeom = "", muchGeom = "", richGeom = "", trdGeom = "",
 			tofGeom = "", ecalGeom = "", fieldMap = "", magnetGeom = "";
 	if (setup == "muon") {
 		caveGeom   = "cave.geo";
-		targetGeom = "target/target_au_250mu.geo";
+		//targetGeom = "target/target_au_250mu.geo";
 		pipeGeom   = "pipe/pipe_much.geo";
 		shieldGeom = "shield_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
@@ -57,13 +58,13 @@ void global_sim(Int_t nEvents = 100)
 		magnetGeom = "magnet/magnet_v12a.geo";
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
-		targetGeom = "target/target_au_250mu.geo";
-		pipeGeom   = "pipe/pipe_standard.geo";
+		//targetGeom = "target/target_au_250mu.geo";
+		pipeGeom   = "pipe/pipe_v13a.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
 		richGeom   = "rich/rich_v08a.geo";
 		trdGeom    = "trd/trd_v13g.geo.root";
-		tofGeom    = "";//"tof/tof_v13b.geo.root";
+		tofGeom    = "tof/tof_v13b.geo.root";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_v12a";
 		magnetGeom = "magnet/magnet_v12a.geo";
@@ -90,7 +91,7 @@ void global_sim(Int_t nEvents = 100)
         pluto = TString(gSystem->Getenv("LIT_PLUTO"));
 
 		caveGeom = TString(gSystem->Getenv("LIT_CAVE_GEOM"));
-		targetGeom = TString(gSystem->Getenv("LIT_TARGET_GEOM"));
+		//targetGeom = TString(gSystem->Getenv("LIT_TARGET_GEOM"));
 		pipeGeom = TString(gSystem->Getenv("LIT_PIPE_GEOM"));
 		shieldGeom = TString(gSystem->Getenv("LIT_SHIELD_GEOM"));
 		mvdGeom = TString(gSystem->Getenv("LIT_MVD_GEOM"));
@@ -139,11 +140,12 @@ void global_sim(Int_t nEvents = 100)
 		run->AddModule(shield);
 	}
 
-	if ( targetGeom != "" ) {
-		FairModule* target = new CbmTarget("Target");
-		target->SetGeometryFileName(targetGeom);
+	//if ( targetGeom != "" ) {
+	//	FairModule* target = new CbmTarget("Target");
+	//	target->SetGeometryFileName(targetGeom);
+		CbmTarget* target = new CbmTarget("Gold", 0.025);
 		run->AddModule(target);
-	}
+	//}
 
 	if ( magnetGeom != "" ) {
 		FairModule* magnet = new CbmMagnet("MAGNET");

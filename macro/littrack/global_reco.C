@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 100, // number of events
+void global_reco(Int_t nEvents = 10, // number of events
 		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -44,7 +44,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    // Reconstruction parameters
    TString globalTrackingType = "nn"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
-   TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
+   TString trdHitProducerType = "digi"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
 
 //   // Normalization for efficiency

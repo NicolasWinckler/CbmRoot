@@ -12,7 +12,7 @@ collision_energy=$5
 
 create_output_dir events_${test_name}/
 
-nevents=500
+nevents=300
 
 #     NMU+ NMU- NE- NE+ NPI+ NPI- NJPSIMU NJPSIE AU URQMD UNIGEN
 pars=(0    0    0   0   0    0    0       10     0  yes   no)
@@ -43,9 +43,9 @@ function run_reco() {
    ${ROOTSYS}/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco_qa.C(${nevents}, \"reco\")"
 }
 
-#run_reco smearing nn
+run_reco smearing nn
 run_reco smearing branch
-#run_reco clustering nn
-#run_reco clustering branch
+run_reco digi nn
+run_reco digi branch
 
 export LIT_SCRIPT=no

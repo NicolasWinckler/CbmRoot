@@ -235,6 +235,7 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
     totalCharge += iCharge;
     //Double_t local_pad_pos[3];
     fModuleInfo->GetPadPosition(digi->GetAddress(), local_pad_posV, local_pad_dposV);//local_pad_pos[0], local_pad_pos[1], local_pad_pos[2]);
+    fModuleInfo->TransformHitError(local_pad_dposV);
     //printf("digi:%i charge:%E  (%7.3f, %7.3f, %7.3f)\n", iDigi, iCharge, local_pad_pos[0], local_pad_pos[1], local_pad_pos[2]);
     for (Int_t iDim = 0; iDim < 3; iDim++){
       hit_posV[iDim] += local_pad_posV[iDim] * iCharge;

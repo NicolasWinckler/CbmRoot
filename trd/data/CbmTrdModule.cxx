@@ -503,6 +503,28 @@ void CbmTrdModule::TransformToLocalPad(
 }
 
 
+void CbmTrdModule::TransformHitError(
+      TVector3& hitErr) const
+{
+  Double_t x,y; // ,z; 
+  x = hitErr.X();
+  y = hitErr.Y();
+  //  z = hitErr.Z();
+
+  //  LOG(INFO) << "ori : " << fOrientation << FairLogger::endl;
+
+  if ((fOrientation == 1) || (fOrientation == 3))  // for orientations 1 or 3
+  {
+    hitErr.SetX(y);  // swap errors
+    hitErr.SetY(x);  // swap errors
+
+    //    LOG(INFO) << " swapped x and y error" << FairLogger::endl;
+    //    LOG(INFO) << "ori : " << fOrientation << " swapped x and y error" << FairLogger::endl;
+  }
+
+}
+
+
 void CbmTrdModule::GetModuleInformation(
       Int_t moduleAddress,
       const Double_t* local_point,

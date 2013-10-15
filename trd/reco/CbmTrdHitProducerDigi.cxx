@@ -71,19 +71,23 @@ void CbmTrdHitProducerDigi::Exec(
       Int_t columnId = CbmTrdAddress::GetColumnId(address);
       Int_t rowId = CbmTrdAddress::GetRowId(address);
 
-      TVector3 hitPos, padSize;
+      TVector3 hitPos, padSize, hitError;
       fModuleInfo = fDigiPar->GetModule(moduleAddress);
       fModuleInfo->GetPosition(moduleAddress, sectorId, columnId, rowId, hitPos, padSize);
         
       // Calculate the hit error from the pad sizes
-      padSize *= 1. / TMath::Sqrt(12.);
+      hitError = padSize;
+      hitError *= 1. / TMath::Sqrt(12.);
+
+      // Take into account module orientation for errors
+      fModuleInfo->TransformHitError(hitError);
 
       // For each digi create one hit and one cluster.
       CbmTrdCluster* cluster = new ((*fTrdClusters)[iDigi]) CbmTrdCluster();
       cluster->SetAddress(address);
       cluster->AddDigi(iDigi);
 
-      new ((*fTrdHits)[iDigi]) CbmTrdHit(address, hitPos, padSize, 0., iDigi, 0., 0., charge);
+      new ((*fTrdHits)[iDigi]) CbmTrdHit(address, hitPos, hitError, 0., iDigi, 0., 0., charge);
    }
 
    static Int_t eventNo = 0;

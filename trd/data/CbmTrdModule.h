@@ -83,6 +83,9 @@ public:
         TVector3& padPos,
         TVector3& padSize) const;
 
+  void TransformHitError(
+	TVector3& hitErr) const;
+
   void TransformToLocalPad(
         const Double_t* local_point,
         Double_t& posX,

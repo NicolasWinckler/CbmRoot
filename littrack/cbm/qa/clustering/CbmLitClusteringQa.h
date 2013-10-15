@@ -61,6 +61,12 @@ private:
      */
     void ReadDataBranches();
 
+    void ProcessPoints();
+
+    void ProcessDigis();
+
+    void ProcessClusters();
+
     /**
      * \brief Calculate statistics for hits.
      */
@@ -91,6 +97,15 @@ private:
           const string& detName,
           const string& parameter,
           const string& xTitle);
+
+    void CreateClusterParametersHistograms(
+          DetectorId detId,
+          const string& detName);
+
+
+    void FillTrdResidualAndPullHistograms();
+
+    void MatchHitsToPoints();
 
     void SetMuchClustersArray();
 
@@ -157,17 +172,19 @@ private:
     TClonesArray* fTrdDigis; // CbmTrdDigi array
     TClonesArray* fTrdClusters; // CbmTrdCluster array
     TClonesArray* fTrdHits; // CbmTrdHit array
+    TClonesArray* fTrdDigiMatches; // CbmTrdDigiMatch array
 
     TClonesArray* fTofPoints; // CbmTofPoint array
     TClonesArray* fTofHits; // CbmTofHit array
 
+    map<Int_t, Int_t> fTrdHitMatchPoint; // TrdHit -> TrdPoint
 
 
     CbmMuchGeoScheme* fMuchGeoScheme;
     TString fMuchDigiFile;
 
-    std::map<Int_t, Int_t> fBestPoints;
-    std::map<Int_t, Int_t> fBestPointsForHits;
+    map<Int_t, Int_t> fBestPoints;
+    map<Int_t, Int_t> fBestPointsForHits;
 
     CbmLitClusteringQa(const CbmLitClusteringQa&);
     CbmLitClusteringQa& operator=(const CbmLitClusteringQa&);

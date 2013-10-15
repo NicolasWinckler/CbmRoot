@@ -132,6 +132,8 @@ void CbmLitFitQaReport::DrawResidualAndPullHistograms(
    string parameterNames[] = { "X", "Y", "Tx", "Ty", "Qp" };
    string catNames[] = { "Res", "Pull", "WrongCov" };
 
+   if (!HM()->Exists("htf_" + detName + "_FirstParam_Res_X")) return;
+
    // [0] - for the first track parameter, [1] - for the last track parameter
    for (Int_t i = 0; i < 2; i++) {
 	   string trackParamName = (i == 0) ? "FirstParam" : "LastParam";
@@ -166,6 +168,7 @@ void CbmLitFitQaReport::DrawResidualAndPullHistograms(
 void CbmLitFitQaReport::DrawTrackParams(
       const string& detName)
 {
+   if (!HM()->Exists("htp_" + detName + "_FirstParam_X")) return;
    for (Int_t i = 0; i < 2; i++) {
       string trackParamName = (i == 0) ? "FirstParam" : "LastParam";
       string canvasName = string("fit_qa_track_params_" + detName + trackParamName);

@@ -382,11 +382,12 @@ void CbmLitFitQa::ProcessTrackParamsAtVertex()
 void CbmLitFitQa::CreateHistograms()
 {
    CreateResidualAndPullHistograms(kSTS, "Sts");
-   CreateResidualAndPullHistograms(kTRD, "Trd");
-   CreateResidualAndPullHistograms(kMUCH, "Much");
-
    CreateTrackParamHistograms(kSTS, "Sts");
+
+   CreateResidualAndPullHistograms(kTRD, "Trd");
    CreateTrackParamHistograms(kTRD, "Trd");
+
+   CreateResidualAndPullHistograms(kMUCH, "Much");
    CreateTrackParamHistograms(kMUCH, "Much");
 
    // Momentum resolution vs momwntum

@@ -30,6 +30,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/much/geo
 
 ${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/sts/setup
 
 ${CBMROOT_SOURCE_DIR}/rich
 

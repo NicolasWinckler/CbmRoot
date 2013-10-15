@@ -49,6 +49,13 @@ private:
 
    string PrintMuchAcuracy() const;
 
+   void DrawNofObjectsHistograms(
+      const string& detName,
+      const string& parameter);
+
+   void DrawResidualsAndPulls(
+      const string& detName);
+
    void DrawLogYHistogramsByPattern(
             const string& histNamePattern);
 
@@ -63,7 +70,7 @@ private:
 
    void DrawResidualHistogrms();
 
-   void ScaleHistogramsByNofEvents();
+   void ScaleAndShrinkHistograms();
 
    ClassDef(CbmLitClusteringQaReport, 1)
 };

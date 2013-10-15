@@ -29,6 +29,9 @@
 #include "CbmMuchPadRadial.h"
 #include "CbmTrackMatch.h"
 #include "CbmMCTrack.h"
+#include "CbmTrdAddress.h"
+#include "CbmCluster.h"
+#include "CbmTrdDigiMatch.h"
 
 #include "TSystem.h"
 #include "TClonesArray.h"
@@ -51,6 +54,7 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fHM(NULL),
    fOutputDir(""),
    fDet(),
+   fMCTracks(NULL),
    fMvdPoints(NULL),
    fMvdDigis(NULL),
    fMvdClusters(NULL),
@@ -66,10 +70,12 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fMuchClusters(NULL),
    fMuchPixelHits(NULL),
    fMuchStrawHits(NULL),
+   fMuchDigiMatches(NULL),
    fTrdPoints(NULL),
    fTrdDigis(NULL),
    fTrdClusters(NULL),
    fTrdHits(NULL),
+   fTrdDigiMatches(NULL),
    fTofPoints(NULL),
    fTofHits(NULL),
    fMuchGeoScheme(CbmMuchGeoScheme::Instance())
@@ -89,6 +95,7 @@ InitStatus CbmLitClusteringQa::Init()
 
    fDet.DetermineSetup();
    ReadDataBranches();
+
    if(fDet.GetDet(kMUCH)){
       if(fMuchDigiFile != NULL){
          MuchGeoSchemeInit(fMuchDigiFile);
@@ -105,12 +112,19 @@ InitStatus CbmLitClusteringQa::Init()
 void CbmLitClusteringQa::Exec(
     Option_t* opt)
 {
+   MatchHitsToPoints();
+
    // Increase event counter
+   ProcessPoints();
+   ProcessDigis();
+   ProcessClusters();
    ProcessHits();
    IncreaseCounters();
 
+   FillTrdResidualAndPullHistograms();
+
    fHM->H1("hen_EventNo_ClusteringQa")->Fill(0.5);
-   std::cout << "CbmLitClusteringQaCalculator::Exec: event=" << fHM->H1("hen_EventNo_ClusteringQa")->GetEntries() << std::endl;
+   std::cout << "CbmLitClusteringQa::Exec: event=" << fHM->H1("hen_EventNo_ClusteringQa")->GetEntries() << std::endl;
 
    fBestPoints.clear();
    fBestPointsForHits.clear();
@@ -178,9 +192,47 @@ void CbmLitClusteringQa::ReadDataBranches()
    fTrdDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
    fTrdClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
    fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
+   fTrdDigiMatches = (TClonesArray*) ioman->GetObject("TrdDigiMatch");
 
    fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
    fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
+}
+
+void CbmLitClusteringQa::ProcessPoints()
+{
+   if (NULL != fTrdPoints && fHM->Exists("hno_NofObjects_TrdPoints_Station")) {
+      for (Int_t i = 0; i < fTrdPoints->GetEntriesFast(); i++) {
+         const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(i));
+         fHM->H1("hno_NofObjects_TrdPoints_Station")->Fill(CbmTrdAddress::GetLayerId(point->GetDetectorID()));
+      }
+   }
+}
+
+void CbmLitClusteringQa::ProcessDigis()
+{
+   if (NULL != fTrdDigis && fHM->Exists("hno_NofObjects_TrdDigis_Station")) {
+      for (Int_t i = 0; i < fTrdDigis->GetEntriesFast(); i++) {
+         const CbmDigi* digi = static_cast<const CbmDigi*>(fTrdDigis->At(i));
+         const CbmTrdDigiMatch* digiMatch = static_cast<const CbmTrdDigiMatch*>(fTrdDigiMatches->At(i));
+         Int_t layerId = CbmTrdAddress::GetLayerId(digi->GetAddress());
+         fHM->H1("hno_NofObjects_TrdDigis_Station")->Fill(layerId);
+         fHM->H1("hpa_TrdDigi_NofPointsInDigi_H1")->Fill(digiMatch->GetNofRefs());
+         fHM->H1("hpa_TrdDigi_NofPointsInDigi_H2")->Fill(layerId, digiMatch->GetNofRefs());
+      }
+   }
+}
+
+void CbmLitClusteringQa::ProcessClusters()
+{
+   if (NULL != fTrdClusters && fHM->Exists("hno_NofObjects_TrdClusters_Station")) {
+      for (Int_t i = 0; i < fTrdClusters->GetEntriesFast(); i++) {
+         const CbmCluster* cluster = static_cast<const CbmCluster*>(fTrdClusters->At(i));
+         Int_t layerId = CbmTrdAddress::GetLayerId(cluster->GetAddress());
+         fHM->H1("hno_NofObjects_TrdClusters_Station")->Fill(layerId);
+         fHM->H1("hpa_TrdCluster_NofDigisInCluster_H1")->Fill(cluster->GetNofDigis());
+         fHM->H1("hpa_TrdCluster_NofDigisInCluster_H2")->Fill(layerId, cluster->GetNofDigis());
+      }
+   }
 }
 
 void CbmLitClusteringQa::ProcessHits()
@@ -199,8 +251,13 @@ void CbmLitClusteringQa::ProcessHits()
    }
    if (NULL != fTrdHits && fHM->Exists("hno_NofObjects_TrdHits_Station")) {
       for (Int_t i = 0; i < fTrdHits->GetEntriesFast(); i++) {
-         const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fTrdHits->At(i));
-         fHM->H1("hno_NofObjects_TrdHits_Station")->Fill(hit->GetPlaneId());
+         const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(fTrdHits->At(i));
+         Int_t layerId = CbmTrdAddress::GetLayerId(hit->GetAddress());
+         fHM->H1("hno_NofObjects_TrdHits_Station")->Fill(layerId);
+         fHM->H1("hpa_TrdHit_SigmaX_H1")->Fill(hit->GetDx());
+         fHM->H1("hpa_TrdHit_SigmaX_H2")->Fill(layerId, hit->GetDx());
+         fHM->H1("hpa_TrdHit_SigmaY_H1")->Fill(hit->GetDy());
+         fHM->H1("hpa_TrdHit_SigmaY_H2")->Fill(layerId, hit->GetDy());
       }
    }
    if (NULL != fMuchPixelHits && fHM->Exists("hno_NofObjects_MuchHits_Station")) {
@@ -213,12 +270,6 @@ void CbmLitClusteringQa::ProcessHits()
       for (Int_t i = 0; i < fMuchStrawHits->GetEntriesFast(); i++) {
          const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fMuchStrawHits->At(i));
          fHM->H1("hno_NofObjects_MuchHits_Station")->Fill(hit->GetPlaneId());
-      }
-   }
-   if (NULL != fTofHits && fHM->Exists("hno_NofObjects_TofHits_Station")) {
-      for (Int_t i = 0; i < fTofHits->GetEntriesFast(); i++) {
-         const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(fTofHits->At(i));
-         fHM->H1("hno_NofObjects_TofHits_Station")->Fill(hit->GetPlaneId());
       }
    }
 }
@@ -253,13 +304,64 @@ void CbmLitClusteringQa::IncreaseCounters()
    if (NULL != fTofHits && fHM->Exists("hno_NofObjects_TofHits_Event")) fHM->H1("hno_NofObjects_TofHits_Event")->Fill(fTofHits->GetEntriesFast());
 }
 
+void CbmLitClusteringQa::FillTrdResidualAndPullHistograms()
+{
+   if (NULL == fTrdHits && NULL == fTrdPoints && !fHM->Exists("hrp_Trd_ResidualX_H2")
+         && !fHM->Exists("hrp_Trd_ResidualY_H2") && !fHM->Exists("hrp_Trd_PullX_H2")
+         && !fHM->Exists("hrp_Trd_PullY_H2")) return;
+
+   Int_t nofHits = fTrdHits->GetEntriesFast();
+	for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+      CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(iHit);
+      if (isnan(hit->GetX()) || (isnan(hit->GetY()))) continue;
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(fTrdHitMatchPoint[iHit]));
+      if (point == NULL) continue;
+      //Float_t xPoint = (muchPoint->GetXIn() + muchPoint->GetXOut()) / 2;
+      //Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
+      Float_t residualX =  point->GetX() - hit->GetX();
+      Float_t residualY =  point->GetY() - hit->GetY();
+      Int_t layerId = CbmTrdAddress::GetLayerId(hit->GetAddress());
+      fHM->H2("hrp_Trd_ResidualX_H2")->Fill(layerId, residualX);
+      fHM->H2("hrp_Trd_ResidualY_H2")->Fill(layerId, residualY);
+      fHM->H2("hrp_Trd_PullX_H2")->Fill(layerId, residualX / hit->GetDx());
+      fHM->H2("hrp_Trd_PullY_H2")->Fill(layerId, residualY / hit->GetDy());
+   }
+}
+
+void CbmLitClusteringQa::MatchHitsToPoints()
+{
+   if (fTrdPoints && fTrdDigis && fTrdClusters && fTrdHits) {
+      fTrdHitMatchPoint.clear();
+      Int_t nofHits = fTrdHits->GetEntriesFast();
+      for(Int_t iHit = 0; iHit < nofHits; iHit++) {
+         Double_t maxCharge = std::numeric_limits<Double_t>::min();
+         Int_t matchedPointIndex = -1;
+         const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(fTrdHits->At(iHit));
+         const CbmCluster* cluster = static_cast<const CbmCluster*>(fTrdClusters->At(hit->GetRefId()));
+         Int_t nofDigis = cluster->GetNofDigis();
+         for (Int_t iDigi = 0; iDigi < nofDigis; iDigi++) {
+            const CbmTrdDigiMatch* digiMatch = static_cast<const CbmTrdDigiMatch*>(fTrdDigiMatches->At(cluster->GetDigi(iDigi)));
+            Int_t nofPoints = digiMatch->GetNofRefs();
+            for (Int_t iPoint = 0; iPoint < nofPoints; iPoint++) {
+               Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
+               const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(pointIndex));
+               if (point->GetEnergyLoss() > maxCharge) {
+                  maxCharge = point->GetEnergyLoss();
+                  matchedPointIndex = pointIndex;
+               }
+            }
+         }
+         fTrdHitMatchPoint[iHit] = matchedPointIndex;
+      }
+   }
+}
+
 void CbmLitClusteringQa::CreateHistograms()
 {
    CreateNofObjectsHistograms(kMVD, "Mvd", "Station", "Station number");
    CreateNofObjectsHistograms(kSTS, "Sts", "Station", "Station number");
    CreateNofObjectsHistograms(kTRD, "Trd", "Station", "Station number");
    CreateNofObjectsHistograms(kMUCH, "Much", "Station", "Station number");
-   CreateNofObjectsHistograms(kTOF, "Tof", "Station", "Station number");
 
    CreateNofObjectsHistograms(kMVD, "Mvd");
    CreateNofObjectsHistograms(kSTS, "Sts");
@@ -267,6 +369,12 @@ void CbmLitClusteringQa::CreateHistograms()
    CreateNofObjectsHistograms(kMUCH, "Much");
    CreateNofObjectsHistograms(kTOF, "Tof");
    CreateNofObjectsHistograms(kRICH, "Rich");
+
+   //CreateClusterParametersHistograms(kMVD, "Mvd");
+   //CreateClusterParametersHistograms(kSTS, "Sts");
+   CreateClusterParametersHistograms(kTRD, "Trd");
+   //CreateClusterParametersHistograms(kMUCH, "Much");
+   //CreateClusterParametersHistograms(kTOF, "Tof");
 
    // Histogram stores number of events
    fHM->Create1<TH1F>("hen_EventNo_ClusteringQa", "hen_EventNo_ClusteringQa", 1, 0, 1.);
@@ -310,6 +418,56 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
       fHM->Create1<TH1F>(name + "Digis_" + parameter, name + "Digis_" + parameter + ";" + xTitle + ";Digis per event", nofBins, minX, maxX);
       fHM->Create1<TH1F>(name + "Clusters_" + parameter, name + "Clusters_" + parameter + ";" + xTitle + ";Clusters per event", nofBins, minX, maxX);
       fHM->Create1<TH1F>(name + "Hits_" + parameter, name + "Hits_" + parameter + ";" + xTitle + ";Hits per event", nofBins, minX, maxX);
+   }
+}
+
+void CbmLitClusteringQa::CreateClusterParametersHistograms(
+      DetectorId detId,
+      const string& detName)
+{
+   assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
+   Int_t nofBinsStation = 100;
+   Double_t minStation = -0.5;
+   Double_t maxStation = 99.5;
+   Int_t nofBins = 100;
+   Double_t min = -0.5;
+   Double_t max = 99.5;
+   Int_t nofBinsSigma = 100;
+   Double_t minSigma = -0.5;
+   Double_t maxSigma = 9.5;
+   Int_t nofBinsResidual = 200;
+   Double_t minResidual = -10.0;
+   Double_t maxResidual = 10.0;
+   Int_t nofBinsPull = 100;
+   Double_t minPull = -5.0;
+   Double_t maxPull = 5.0;
+   if (fDet.GetDet(detId)) {
+      string nameH1 = "hpa_" + detName + "Cluster_NofDigisInCluster_H1";
+      fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of digis;Yield", nofBins, min, max);
+      string nameH2 = "hpa_" + detName + "Cluster_NofDigisInCluster_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of digis;Yield", nofBinsStation, minStation, max, nofBins, min, max);
+      nameH1 = "hpa_" + detName + "Digi_NofPointsInDigi_H1";
+      fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
+      nameH2 = "hpa_" + detName + "Digi_NofPointsInDigi_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, maxStation, nofBins, min, max);
+      nameH1 = "hpa_" + detName + "Hit_SigmaX_H1";
+      fHM->Create1<TH1F>(nameH1, nameH1 + ";#sigma_{X} [cm];Yield", nofBinsSigma, minSigma, maxSigma);
+      nameH2 = "hpa_" + detName + "Hit_SigmaX_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;#sigma_{X} [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsSigma, minSigma, maxSigma);
+      nameH1 = "hpa_" + detName + "Hit_SigmaY_H1";
+      fHM->Create1<TH1F>(nameH1, nameH1 + ";#sigma_{Y} [cm];Yield", nofBinsSigma, minSigma, maxSigma);
+      nameH2 = "hpa_" + detName + "Hit_SigmaY_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;#sigma_{Y} [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsSigma, minSigma, maxSigma);
+
+      // Residual and pull histograms
+      nameH2 = "hrp_" + detName + "_ResidualX_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Residual X [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsResidual, minResidual, maxResidual);
+      nameH2 = "hrp_" + detName + "_ResidualY_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Residual Y [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsResidual, minResidual, maxResidual);
+      nameH2 = "hrp_" + detName + "_PullX_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Pull X;Yield", nofBinsStation, minStation, maxStation, nofBinsPull, minPull, maxPull);
+      nameH2 = "hrp_" + detName + "_PullY_H2";
+      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Pull Y;Yield", nofBinsStation, minStation, maxStation, nofBinsPull, minPull, maxPull);
    }
 }
 

@@ -17,6 +17,7 @@
 #include <vector>
 using std::vector;
 using std::endl;
+using std::stringstream;
 using boost::assign::list_of;
 using lit::NumberToString;
 using lit::Split;
@@ -128,7 +129,31 @@ string CbmLitClusteringQaReport::PrintMuchAcuracy() const
 
 void CbmLitClusteringQaReport::Draw()
 {
-   ScaleHistogramsByNofEvents();
+   ScaleAndShrinkHistograms();
+
+   DrawNofObjectsHistograms("Mvd", "Event");
+   DrawNofObjectsHistograms("Sts", "Event");
+   DrawNofObjectsHistograms("Rich", "Event");
+   DrawNofObjectsHistograms("Trd", "Event");
+   DrawNofObjectsHistograms("Much", "Event");
+   DrawNofObjectsHistograms("Tof", "Event");
+
+   DrawNofObjectsHistograms("Mvd", "Station");
+   DrawNofObjectsHistograms("Sts", "Station");
+   DrawNofObjectsHistograms("Trd", "Station");
+   DrawNofObjectsHistograms("Much", "Station");
+
+   DrawH1ByPattern("hpa_.*Cluster_NofDigisInCluster_H1");
+   DrawH2ByPattern("hpa_.*Cluster_NofDigisInCluster_H2", kLinear, kLinear, kLinear, "colz");
+
+   DrawH1ByPattern("hpa_.*Digi_NofPointsInDigi_H1");
+   DrawH2ByPattern("hpa_.*Digi_NofPointsInDigi_H2", kLinear, kLinear, kLinear, "colz");
+
+   DrawH1ByPattern("hpa_.*Hit_Sigma.*_H1");
+   DrawH2ByPattern("hpa_.*Hit_Sigma.*_H2", kLinear, kLinear, kLinear, "colz");
+
+   DrawResidualsAndPulls("Trd");
+
 
    if(HM()->Exists("hno_NofObjects_MuchHits_Station")){
       DrawH1ByPattern("hss_Much_ClusterToPointRatio");
@@ -157,6 +182,55 @@ void CbmLitClusteringQaReport::Draw()
       DrawH1ByPattern("h_Much_.*Mean.*");
       DrawH1ByPattern("h_Much_.*Sigma.*");
    }
+}
+
+
+void CbmLitClusteringQaReport::DrawNofObjectsHistograms(
+	  const string& detName,
+      const string& parameter)
+{
+	if (!HM()->Exists("hno_NofObjects_" + detName + "Points_" + parameter)) return;
+	string canvasName = GetReportName() + "_NofObjects_" + detName + "_" + parameter;
+	TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
+	canvas->SetGrid();
+	canvas->cd();
+	vector<string> labels = list_of("Points")("Digis")("Clusters")("Hits");
+	vector<TH1*> histos = list_of(HM()->H1("hno_NofObjects_" + detName + "Points_" + parameter))
+		(HM()->H1("hno_NofObjects_" + detName + "Digis_" + parameter))
+		(HM()->H1("hno_NofObjects_" + detName + "Clusters_" + parameter))
+		(HM()->H1("hno_NofObjects_" + detName + "Hits_" + parameter));
+	DrawH1(histos, labels, kLinear, kLinear, true, 0.65, 0.75, 0.95, 0.99);
+}
+
+void CbmLitClusteringQaReport::DrawResidualsAndPulls(
+      const string& detName)
+{
+   vector<string> par = list_of("ResidualX")("ResidualY")("PullX")("PullY");
+   Int_t nofCanvases = par.size();
+   for (Int_t iCanvas = 0; iCanvas < nofCanvases; iCanvas++) {
+      string histName = "hrp_" + detName + "_" + par[iCanvas] + "_H2";
+      TH2* hist = HM()->H2(histName);
+      string canvasName = GetReportName() + "_" + histName + "_station";
+      TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 1600, 900);
+      Int_t nofBins = 10;//hist->GetXaxis()->GetNbins();
+      Int_t nofColumns = 5;
+      Int_t nofRows = (nofBins / nofColumns) + ((nofBins % 5 == 0) ? 0 : 1);
+      canvas->Divide(nofColumns, nofRows);
+
+      std::cout << nofBins << " " << nofColumns << " " << nofRows << std::endl;
+      for (Int_t iBin = 1; iBin <= nofBins; iBin++){
+         stringstream ss;
+         ss << histName << "_" << iBin << "_py";
+         TH1* projY = hist->ProjectionY(ss.str().c_str(), iBin, iBin);
+         projY->SetNameTitle(ss.str().c_str(), ss.str().c_str());
+         projY->SetXTitle(par[iCanvas].c_str());
+         projY->SetYTitle("Yield");
+         canvas->cd(iBin);
+         DrawH1(projY, kLinear, kLinear);
+         projY->Fit("gaus");
+      }
+   }
+   DrawH2ByPattern("hrp_" + detName + "_.*_H2", kLinear, kLinear, kLinear, "colz");
 }
 
 void CbmLitClusteringQaReport::DrawLogYHistogramsByPattern(
@@ -192,6 +266,7 @@ void CbmLitClusteringQaReport::DrawHistogramsByLayer(const string& histNamePatte
 	}
 }
 
+
 void CbmLitClusteringQaReport::DrawNofObjectsHistigrams(
       const string& histNamePatternPixelHits,
       const string& histNamePatternPoints,
@@ -199,7 +274,7 @@ void CbmLitClusteringQaReport::DrawNofObjectsHistigrams(
       const string& histNamePatternDigis,
       const string& histName)
 {
-   string canvasName = GetReportName() + histName;
+   string canvasName = GetReportName() + "_" + histName;
    TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 800, 500);
    canvas->SetGrid();
    canvas->cd();
@@ -283,14 +358,29 @@ void CbmLitClusteringQaReport::DrawResidualHistogrms()
    }
 }
 
-void CbmLitClusteringQaReport::ScaleHistogramsByNofEvents()
+void CbmLitClusteringQaReport::ScaleAndShrinkHistograms()
 {
    Int_t nofEvents = HM()->H1("hen_EventNo_ClusteringQa")->GetEntries();
 
    HM()->ScaleByPattern("hno_NofObjects_.*_Station", 1. / nofEvents);
    HM()->ShrinkEmptyBinsH1ByPattern("hno_NofObjects_.*_Station");
 
-   if(HM()->Exists("hno_NofObjects_MuchHits_Station")){
+   HM()->NormalizeToIntegralByPattern("hpa_.*Cluster_NofDigisInCluster_.*");
+   HM()->ShrinkEmptyBinsH1ByPattern("hpa_.*Cluster_NofDigisInCluster_H1");
+   HM()->ShrinkEmptyBinsH2ByPattern("hpa_.*Cluster_NofDigisInCluster_H2");
+   HM()->NormalizeToIntegralByPattern("hpa_.*Digi_NofPointsInDigi_.*");
+   HM()->ShrinkEmptyBinsH1ByPattern("hpa_.*Digi_NofPointsInDigi_H1");
+   HM()->ShrinkEmptyBinsH2ByPattern("hpa_.*Digi_NofPointsInDigi_H2");
+
+   HM()->NormalizeToIntegralByPattern("hrp_.*_.*_H2");
+   HM()->ShrinkEmptyBinsH2ByPattern("hrp_.*_.*_H2");
+
+   HM()->NormalizeToIntegralByPattern("hpa_.*Hit_Sigma.*_.*");
+   HM()->ShrinkEmptyBinsH1ByPattern("hpa_.*Hit_Sigma.*_H1");
+   HM()->ShrinkEmptyBinsH2ByPattern("hpa_.*Hit_Sigma.*_H2");
+
+
+   if(HM()->Exists("hno_NofObjects_MuchHits_Station")) {
       HM()->ScaleByPattern("(hss_Much_|hsc_Much_).+", 1. / nofEvents);
       HM()->ShrinkEmptyBinsH1ByPattern("(hss_Much_|hsh_Much_).+");
    }

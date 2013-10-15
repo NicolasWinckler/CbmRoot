@@ -283,12 +283,12 @@ Int_t CbmTrdModule::GetModuleRow(
    // check limits
    if ( (sectorId < 0) || (sectorId > GetNofSectors()-1) )
      LOG(FATAL) << "CbmTrdModule::GetModuleRow sectorId " << sectorId << " of " << GetNofSectors()-1
-                << " in moduleID " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
+                << " in moduleAddress " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
 
    // check limits
    if ( (rowId < 0) || (rowId > GetNofRowsInSector(sectorId)-1) )
      LOG(FATAL) << "CbmTrdModule::GetModuleRow rowId "   << rowId     << " of " << GetNofRowsInSector(sectorId)-1
-		<< " in moduleID " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
+		<< " in moduleAddress " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
 
    Int_t moduleRowId = rowId;
 
@@ -656,15 +656,15 @@ void CbmTrdModule::GetPosition(
 
    // check limits
    if ( (sectorId < 0) || (sectorId > GetNofSectors()-1) )
-     LOG(FATAL) << "CbmTrdModule::GetPosition sectorId " << sectorId << " of " << GetNofSectors()-1                 << " in moduleID " << moduleAddress << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::GetPosition sectorId " << sectorId << " of " << GetNofSectors()-1                 << " in moduleAddress " << moduleAddress << " is out of bounds!" << FairLogger::endl;
 
    // check limits
    if ( (columnId < 0) || (columnId > GetNofColumnsInSector(sectorId)-1) )
-     LOG(FATAL) << "CbmTrdModule::GetPosition columnId " << columnId << " of " << GetNofColumnsInSector(sectorId)-1 << " in moduleID " << moduleAddress << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::GetPosition columnId " << columnId << " of " << GetNofColumnsInSector(sectorId)-1 << " in moduleAddress " << moduleAddress << " is out of bounds!" << FairLogger::endl;
 
    // check limits
    if ( (rowId < 0) || (rowId > GetNofRowsInSector(sectorId)-1) )
-     LOG(FATAL) << "CbmTrdModule::GetPosition rowId "   << rowId     << " of " << GetNofRowsInSector(sectorId)-1    << " in moduleID " << moduleAddress << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::GetPosition rowId "   << rowId     << " of " << GetNofRowsInSector(sectorId)-1    << " in moduleAddress " << moduleAddress << " is out of bounds!" << FairLogger::endl;
 
    Double_t local_point[3];
    Double_t padsizex = fPadSizeX.At(sectorId);
@@ -683,10 +683,10 @@ void CbmTrdModule::GetPosition(
 
    // check limits
    if ( (local_point[0]< 0) || (local_point[0] > 2 * fSizeX) )
-     LOG(FATAL) << "CbmTrdModule::GetPosition local_point[0]=" << local_point[0] << " in moduleID " << moduleAddress << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::GetPosition local_point[0]=" << local_point[0] << " in moduleAddress " << moduleAddress << " is out of bounds!" << FairLogger::endl;
    // check limits
    if ( (local_point[1]< 0) || (local_point[1] > 2 * fSizeY) )
-     LOG(FATAL) << "CbmTrdModule::GetPosition local_point[1]=" << local_point[1] << " in moduleID " << moduleAddress << " is out of bounds!" << FairLogger::endl;
+     LOG(FATAL) << "CbmTrdModule::GetPosition local_point[1]=" << local_point[1] << " in moduleAddress " << moduleAddress << " is out of bounds!" << FairLogger::endl;
 
    // calculate position in the module coordinate system
    // with origin in the middle of the module

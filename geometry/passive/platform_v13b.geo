@@ -5,7 +5,7 @@
 // -- size Y 2340 (no rails)
 // -- size Z 4550
 //-------------------------------
-platform_v13a
+platform_v13b
 cave
 BOX
 aluminium

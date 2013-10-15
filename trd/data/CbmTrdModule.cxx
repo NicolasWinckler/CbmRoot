@@ -204,7 +204,8 @@ Int_t CbmTrdModule::GetSector(
       Int_t npady,
       Int_t& rowId) const
 {
-   // Calculate the sector for pad coordinates in the module
+   // Calculate the pad coordinates in this sector
+   // from pad coordinates in the module
    // e.g. in which sector is pad (20/28)
 
    if ( (npady < 0) || (npady > GetNofRows()-1) ) {
@@ -214,18 +215,23 @@ Int_t CbmTrdModule::GetSector(
 
    Int_t secRows = 0;   // number of rows in sector
    Int_t nofRows = 0;   // number of rows in total
-   if (fSectorSizeY.At(0) < fSizeY)  // if there are sectors in y direction
-     for (Int_t i = 0; i < fNofSectors; i++) {  // for each sector
-        secRows = (Int_t)(fSectorSizeY.At(i) / fPadSizeY.At(i) + 0.5);     // need to round for correct result
-        if ( npady <= nofRows + secRows ) {
 
+   if (fSectorSizeY.At(0) < fSizeY)  // if there are sectors in y direction
+     for (Int_t iSector = 0; iSector < fNofSectors; iSector++) {  // for each sector
+        secRows = (Int_t)(fSectorSizeY.At(iSector) / fPadSizeY.At(iSector) + 0.5);     // need to round for correct result
+        if ( npady < nofRows + secRows ) {  // if we are in the sector containing the pad
+                                            // note nypad = 12 is not in sector 0, with rowIds 0..11
           rowId = npady - nofRows;
 
 	  LOG(DEBUG2) << "npady   : " << npady << " <= " << nofRows + secRows 
                     << "  rowId " << rowId << "  nRows(sec-1) " << nofRows 
-                    << "  sec " << i << FairLogger::endl;
+                    << "  sec " << iSector << FairLogger::endl;
    
-          return i;
+          if ( (rowId < 0) || (rowId > GetNofRowsInSector(iSector)-1) )
+            LOG(FATAL) << "CbmTrdModule::GetModuleRow rowId "   << rowId     << " of " << GetNofRowsInSector(iSector)-1
+                       << " in moduleAddress " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
+
+          return iSector;  // return sector
         }
 	nofRows += secRows;  // sum up new total number of rows
      }

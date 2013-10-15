@@ -236,6 +236,23 @@ void CbmHistManager::ScaleByPattern(
 	}
 }
 
+void CbmHistManager::NormalizeToIntegral(
+      const string& histName)
+{
+   TH1* hist = H1(histName);
+   hist->Scale(1. / hist->Integral());
+}
+
+void CbmHistManager::NormalizeToIntegralByPattern(
+      const string& pattern)
+{
+   vector<TH1*> effHistos = H1Vector(pattern);
+   Int_t nofEffHistos = effHistos.size();
+   for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+      NormalizeToIntegral(effHistos[iHist]->GetName());
+   }
+}
+
 void CbmHistManager::Rebin(
       const string& histName,
       Int_t ngroup)

@@ -312,6 +312,20 @@ public:
          Double_t scale);
 
    /**
+    * \brief Normalize histogram to integral.
+    * \param[in] histName Name of histogram.
+    */
+   void NormalizeToIntegral(
+         const string& histName);
+
+   /**
+    * \brief Normalize histograms to integral which name matches specified pattern.
+    * \param[in] histPatternName Regular expression for histogram name.
+    */
+   void NormalizeToIntegralByPattern(
+         const string& pattern);
+
+   /**
     * \brief Rebin histogram.
     * \param[in] histName Name of histogram.
     * \param[in] ngroup Rebining factor.

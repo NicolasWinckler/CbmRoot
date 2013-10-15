@@ -1,11 +1,11 @@
 //
 //   comments
 //
+// 2013-10-11 - DE - add empty string defining the platform                                                                        
 // 2013-10-07 - DE - pipe_v13e.geo fixes overlap with TOF, also avoids TRD
 //
 
 static TString caveGeom;
-static TString targetGeom; 
 static TString pipeGeom;
 static TString magnetGeom;
 static TString mvdGeom;
@@ -33,17 +33,15 @@ void sis100_muon_setup()
   fieldSymType =  3;
 
   // -----  Geometries  -----------------------------------------------------
-  caveGeom   = "cave.geo";
-  targetGeom = "target/target_au_250mu.geo";
-  pipeGeom   = "pipe/pipe_v13c.geo";
-  magnetGeom = "magnet/magnet_v12b_much.geo.root";
-  mvdGeom    = "mvd/mvd_v07a.geo";
-  stsGeom    = "sts/sts_v13c.geo.root";
-  richGeom   = "";
-  muchGeom   = "much/much_v13d.geo";
-//  platformGeom = "passive/platform_v13a.geo";
-  trdGeom    = "trd/trd_v13l.geo.root";
-  tofGeom    = "tof/tof_v13-4c.geo.root";
-  ecalGeom   = "";
+  caveGeom     = "cave.geo";
+  pipeGeom     = "pipe/pipe_v13c.geo.root";
+  magnetGeom   = "magnet/magnet_v12b_much.geo.root";
+  stsGeom      = "sts/sts_v13c.geo.root";
+  richGeom     = "";
+  muchGeom     = "much/much_v13d.geo";
+  platformGeom = ""; // "passive/platform_v13a.geo";
+  trdGeom      = "trd/trd_v13l.geo.root";
+  tofGeom      = "tof/tof_v13-4c.geo.root";
+  ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

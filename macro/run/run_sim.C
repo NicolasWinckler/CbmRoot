@@ -20,12 +20,11 @@ void run_sim(Int_t nEvents = 2)
   TString outFile = outDir + "/test.mc.root";
   TString parFile = outDir + "/params.root";
   
-  TString macro = inDir + "/geometry/standard_electron_setup.C";
+  TString macro = inDir + "/geometry/setup/sis100_hadron_setup.C";
   CbmTarget* target = new CbmTarget("Gold", 0.025);
   gROOT->LoadMacro(macro);
-  gInterpreter->ProcessLine("standard_electron_setup()");
+  gInterpreter->ProcessLine("sis100_hadron_setup()");
 
-  
   // In general, the following parts need not be touched
   // ========================================================================
 

@@ -62,7 +62,7 @@ public:
         Int_t& sectorId,
         Int_t& rowId) const;
 
-  void GetPadInfo(
+  Bool_t GetPadInfo(
         const Double_t* local_point,
         Int_t& sectorId,
         Int_t& columnId,

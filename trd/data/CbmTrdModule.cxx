@@ -310,7 +310,7 @@ Int_t CbmTrdModule::GetModuleRow(
 }
 
 
-void CbmTrdModule::GetPadInfo(
+Bool_t CbmTrdModule::GetPadInfo(
       const Double_t *local_point,
       Int_t& sectorId,
       Int_t& columnId,
@@ -318,13 +318,19 @@ void CbmTrdModule::GetPadInfo(
 {
    // check, if the input is within the allowed range
   if ( fabs(local_point[0]) > fSizeX )
+  {
      LOG(ERROR) << "CbmTrdModule::GetPadInfo - local point x must be within gas volume, x=" 
-                << std::setprecision(5) << local_point[0] << " fSizeX "
-                << std::setprecision(5) << fSizeX << FairLogger::endl;
+                << std::setprecision(8) << local_point[0] << " fSizeX="
+                << std::setprecision(8) << fSizeX << FairLogger::endl;
+     return kFALSE;
+  }
   if ( fabs(local_point[1]) > fSizeY )
+  {
      LOG(ERROR) << "CbmTrdModule::GetPadInfo - local point y must be within gas volume, y=" 
-                << std::setprecision(5) << local_point[1] << " fSizeY "
-                << std::setprecision(5) << fSizeY << FairLogger::endl;
+                << std::setprecision(8) << local_point[1] << " fSizeY="
+                << std::setprecision(8) << fSizeY << FairLogger::endl;
+     return kFALSE;
+  }
 
    Double_t posX, posY;
    TransformToLocalSector(local_point, posX, posY);
@@ -334,6 +340,8 @@ void CbmTrdModule::GetPadInfo(
 
    columnId = (Int_t)(posX / fPadSizeX.At(sectorId));
    rowId    = (Int_t)(posY / fPadSizeY.At(sectorId));
+
+   return kTRUE;
 }
 
 

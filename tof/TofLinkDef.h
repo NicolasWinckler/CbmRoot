@@ -18,5 +18,12 @@
 #pragma link C++ class CbmTofCell;
 #pragma link C++ class CbmTofCreateDigiPar+;
 
+#pragma link C++ class CbmTofDigiBdfPar+;
+#pragma link C++ class CbmTofDigitizerBDF+;
+
+#pragma link C++ class CbmTofSimpClusterizer+;
+
+#pragma link C++ class CbmTofTests+;
+
 #endif
 

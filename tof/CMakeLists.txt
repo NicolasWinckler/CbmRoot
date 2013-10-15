@@ -12,6 +12,8 @@ ${CBMROOT_SOURCE_DIR}/tof/TofParam
 ${CBMROOT_SOURCE_DIR}/tof/TofReco
 ${CBMROOT_SOURCE_DIR}/tof/TofTools
 ${CBMROOT_SOURCE_DIR}/tof/TofData
+${CBMROOT_SOURCE_DIR}/tof/TofDigi
+${CBMROOT_SOURCE_DIR}/tof/TofTests
 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 
@@ -34,6 +36,7 @@ TofMC/CbmTof.cxx
 TofParam/CbmGeoTofPar.cxx 
 TofParam/CbmTofContFact.cxx 
 TofParam/CbmTofDigiPar.cxx 
+TofParam/CbmTofDigiBdfPar.cxx 
 TofParam/CbmTofCreateDigiPar.cxx
 
 TofReco/CbmTofHitProducer.cxx 
@@ -43,6 +46,12 @@ TofReco/CbmTofHitProducerNew.cxx
 TofTools/CbmTofGeoHandler.cxx
 
 TofData/CbmTofCell.cxx
+
+TofDigi/CbmTofDigitizerBDF.cxx
+
+TofReco/CbmTofSimpClusterizer.cxx 
+
+TofTests/CbmTofTests.cxx 
 )
 
 set(LINKDEF TofLinkDef.h)

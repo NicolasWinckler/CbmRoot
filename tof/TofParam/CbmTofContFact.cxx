@@ -13,6 +13,7 @@
 
 #include "CbmGeoTofPar.h"
 #include "CbmTofDigiPar.h"
+#include "CbmTofDigiBdfPar.h"
 
 #include "FairRuntimeDb.h"
 
@@ -50,6 +51,13 @@ void CbmTofContFact::setAllContainers() {
     p1->addContext("TestNonDefaultContext");
 
     containers->Add(p1);
+
+    FairContainer* p2= new FairContainer("CbmTofDigiBdfPar",
+                                          "TOF BDF Digitization parameters",
+                                          "TestDefaultContext");
+    p2->addContext("TestNonDefaultContext");
+
+    containers->Add(p2);
 }
 
 FairParSet* CbmTofContFact::createContainer(FairContainer* c) {
@@ -64,6 +72,9 @@ FairParSet* CbmTofContFact::createContainer(FairContainer* c) {
   }
   if (strcmp(name,"CbmTofDigiPar")==0) {
     p=new CbmTofDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+  }
+  if (strcmp(name,"CbmTofDigiBdfPar")==0) {
+    p=new CbmTofDigiBdfPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
   return p;
 }

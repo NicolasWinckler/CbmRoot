@@ -58,6 +58,10 @@ public:
 
   Int_t GetNofSectors() const { return fNofSectors; }
 
+  Int_t GetModuleRow(
+        Int_t& sectorId,
+        Int_t& rowId) const;
+
   void GetPadInfo(
         const Double_t* local_point,
         Int_t& sectorId,

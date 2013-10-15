@@ -275,6 +275,41 @@ Int_t CbmTrdModule::GetNofRowsInSector(Int_t i) const
 }
 
 
+Int_t CbmTrdModule::GetModuleRow(
+		   Int_t& sectorId,
+		   Int_t& rowId) const
+{
+
+   // check limits
+   if ( (sectorId < 0) || (sectorId > GetNofSectors()-1) )
+     LOG(FATAL) << "CbmTrdModule::GetModuleRow sectorId " << sectorId << " of " << GetNofSectors()-1
+                << " in moduleID " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
+
+   // check limits
+   if ( (rowId < 0) || (rowId > GetNofRowsInSector(sectorId)-1) )
+     LOG(FATAL) << "CbmTrdModule::GetModuleRow rowId "   << rowId     << " of " << GetNofRowsInSector(sectorId)-1
+		<< " in moduleID " << fModuleAddress << " is out of bounds!" << FairLogger::endl;
+
+   Int_t moduleRowId = rowId;
+
+   // calculate row number within module
+   for (Int_t iSector = 0; iSector < sectorId; iSector++)
+   {
+     moduleRowId += (Int_t)(fSectorSizeY.At(iSector) / fPadSizeY.At(iSector) + 0.5);
+     //     LOG(INFO) << "adding sector "   << iSector << " of " << sectorId << FairLogger::endl;
+   }
+
+//   if (sectorId == 0)
+//     // do nothing
+//   if (sectorId >= 1)
+//     moduleRowId += (Int_t)(fSectorSizeY.At(0) / fPadSizeY.At(0) + 0.5);
+//   if (sectorId >= 2)
+//     moduleRowId += (Int_t)(fSectorSizeY.At(1) / fPadSizeY.At(1) + 0.5);
+
+   return moduleRowId;
+}
+
+
 void CbmTrdModule::GetPadInfo(
       const Double_t *local_point,
       Int_t& sectorId,

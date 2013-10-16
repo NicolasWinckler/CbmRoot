@@ -564,11 +564,12 @@ void CbmTofDigiBdfPar::printParams()
    TString sRpcNb = "  Nb Rpc for each SM type:    |-> ";
    sIndex =         "  Rpc index                   |--  ";
    Int_t iMaxRpcNb = 0;
-   TString sGapsNb[fiNbSmTypes];
-   TString sGapsSz[fiNbSmTypes];
-   TString sChNb[fiNbSmTypes];
-   TString sChType[fiNbSmTypes];
-   TString sChOrient[fiNbSmTypes];
+
+   TString* sGapsNb = new TString[fiNbSmTypes];
+   TString* sGapsSz = new TString[fiNbSmTypes];
+   TString* sChNb = new TString[fiNbSmTypes];
+   TString* sChType = new TString[fiNbSmTypes];
+   TString* sChOrient = new TString[fiNbSmTypes];
 
    for( Int_t iSmType = 0; iSmType < fiNbSmTypes; iSmType ++)
    {
@@ -708,4 +709,12 @@ void CbmTofDigiBdfPar::printParams()
          LOG(INFO)<<"  Maximal time dist. to last chan.:   Use 5*Nom. Syst. Res. = "<<fdMaxTimeDistClust<<" [ns]"<<FairLogger::endl;
       } // else of if( -1 <  fdMaxTimeDistClust)
    LOG(INFO)<<"  Maximal dist. along ch to last one: "<<fdMaxSpaceDistClust<<" [cm]"<<FairLogger::endl;
+
+
+   delete [] sGapsNb;
+   delete [] sGapsSz;
+   delete [] sChNb;
+   delete [] sChType;
+   delete [] sChOrient;
+
 }

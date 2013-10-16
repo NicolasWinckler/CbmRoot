@@ -146,6 +146,7 @@ private:
    std::map<Int_t, Int_t> fNofHitsInRingMap;
 
 	TH1* fh_vertex_z;
+	TH2* fh_vertex_xy;
 	TH1* fh_nof_rings_1hit;
 	TH1* fh_nof_rings_7hits;
    TH1* fh_nof_rings_prim_1hit;

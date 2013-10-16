@@ -44,6 +44,7 @@ CbmRichUrqmdTest::CbmRichUrqmdTest()
     fMinNofHits(7),
     fNofHitsInRingMap(),
     fh_vertex_z(NULL),
+    fh_vertex_xy(NULL),
     fh_nof_rings_1hit(NULL),		      
     fh_nof_rings_7hits(NULL),		    
     fh_nof_rings_prim_1hit(NULL),		    
@@ -95,7 +96,7 @@ InitStatus CbmRichUrqmdTest::Init()
    if ( NULL == fRichRingMatches) { Fatal("CbmRichUrqmdTest::Init","No RichRingMatch array!"); }
 
    fRichProjections = (TClonesArray*) ioman->GetObject("RichProjection");
-   if ( NULL == fRichProjections) { Fatal("CbmRichUrqmdTest::Init","No fRichProjections array!"); }
+   //if ( NULL == fRichProjections) { Fatal("CbmRichUrqmdTest::Init","No fRichProjections array!"); }
 
    InitHistograms();
 
@@ -120,7 +121,8 @@ void CbmRichUrqmdTest::Exec(
 
 void CbmRichUrqmdTest::InitHistograms()
 {
-   fh_vertex_z = new TH1D("fh_vertex_z", "fh_vertex_z;z [cm];Number of vertices per event", 200, -1., 200);
+   fh_vertex_z = new TH1D("fh_vertex_z", "fh_vertex_z;z [cm];Number of vertices per event", 350, -1., 350);
+   fh_vertex_xy = new TH2D("fh_vertex_xy", "fh_vertex_xy;x [cm];y [cm];Number of vertices per event", 300, -150., 150., 300, -150., 150.);
    fh_nof_rings_1hit = new TH1D("fh_nof_rings_1hit", "fh_nof_rings_1hit;Number of detected particles/event;Yield", 100, -.5, 99.5);
    fh_nof_rings_7hits = new TH1D("fh_nof_rings_7hits", "fh_nof_rings_7hits;Number of detected particles/event;Yield", 100, -.5, 99.5 );
    fh_nof_rings_prim_1hit = new TH1D("fh_nof_rings_prim_1hit", "fh_nof_rings_prim_1hit;Number of detected particles/event;Yield", 50, -.5, 49.5);
@@ -295,6 +297,7 @@ void CbmRichUrqmdTest::NofHits()
 
 void CbmRichUrqmdTest::NofProjections()
 {
+   if (fRichProjections == NULL) return;
    int nofProj = fRichProjections->GetEntriesFast();
    int nofGoodProj = 0;
    for (int i = 0; i < nofProj; i++){
@@ -324,6 +327,7 @@ void CbmRichUrqmdTest::Vertex()
       TVector3 v;
       mctrack->GetStartVertex(v);
       fh_vertex_z->Fill(v.Z());
+      fh_vertex_xy->Fill(v.X(), v.Y());
    } // nMcTracks
 }
 
@@ -335,6 +339,11 @@ void CbmRichUrqmdTest::DrawHist()
    fh_vertex_z->Scale(1./fEventNum);
    TCanvas* cVertex = CreateCanvas("rich_urqmd_vertex_z", "rich_urqmd_vertex_z", 800, 800);
    DrawH1(fh_vertex_z);
+   gPad->SetLogy(true);
+
+   fh_vertex_xy->Scale(1./fEventNum);
+   TCanvas* cVertexXY = CreateCanvas("rich_urqmd_vertex_xy", "rich_urqmd_vertex_xy", 800, 800);
+   DrawH2(fh_vertex_xy);
    gPad->SetLogy(true);
 
    TCanvas* c2 = CreateCanvas("rich_urqmd_nof_rings", "rich_urqmd_nof_rings", 800, 800);

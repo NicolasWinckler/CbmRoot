@@ -1,19 +1,19 @@
-void run_sim_geotest(Int_t nEvents = 10)
+void run_sim_geotest(Int_t nEvents = 5)
 {
    TTree::SetMaxTreeSize(90000000000);
 
    TString script = TString(gSystem->Getenv("SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richgeotest/";
-   TString parFile =  outDir + "test.mc.0000.root";
-   TString outFile = outDir + "test.param.0000.root";
+   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/geotest/";
+   TString parFile =  outDir + "test.param.0000.root";
+   TString outFile = outDir + "test.mc.0000.root";
    TString caveGeom = "cave.geo";
-   TString targetGeom = "target_au_250mu.geo";
-   TString pipeGeom   = "pipe_standard.geo";
-   TString magnetGeom = "passive/magnet_v12a.geo";
+   TString targetGeom = "target/target_au_250mu.geo";
+   TString pipeGeom   = "pipe/pipe_standard.geo";
+   TString magnetGeom = "magnet/magnet_v12a.geo";
    TString stsGeom = "sts/sts_v12b.geo.root";
-   TString richGeom= "rich/rich_v08a.geo";
+   TString richGeom= /*"rich/rich_v08a.geo"*/"rich/rich_v13a.gdml";
    TString fieldMap = "field_v12a";
    TString richDetectorType = "standard"; // "standard" or "prototype"
    Double_t fieldZ = 50.; // field center z position

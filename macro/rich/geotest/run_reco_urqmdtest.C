@@ -7,11 +7,11 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
    gRandom->SetSeed(10);
 
-   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/richurqmdtest/";
-   TString inFile = outDir + "35gev.mbias.mc.0000.root";
-   TString parFile = outDir + "35gev.mbias.param.0000.root";
-   TString outFile = outDir + "35gev.mbias.reco.0000.root";
-   std::string resultDir = "results_urqmd_35gev_mbias/";
+   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/urqmdtest/";
+   TString inFile = outDir + "25gev.centr.mc.0000.root";
+   TString parFile = outDir + "25gev.centr.param.0000.root";
+   TString outFile = outDir + "25gev.centr.reco.0000.root";
+   std::string resultDir = "results_urqmd_25gev_centr/";
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
@@ -89,6 +89,7 @@ void run_reco_urqmdtest(Int_t nEvents = 1000)
    richReco->SetRunProjection(true);
    richReco->SetRunTrackAssign(false);
    richReco->SetFinderName("ideal");
+  // richReco->SetExtrapolationName("ideal");
    run->AddTask(richReco);
 
    CbmRichMatchRings* matchRings = new CbmRichMatchRings();

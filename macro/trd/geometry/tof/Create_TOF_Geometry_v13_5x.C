@@ -5,11 +5,17 @@
 
 // Changelog
 //
+// 2013-10-16 - DE - prepare tof_v13_5a geometry - SIS 100 hadron  : TOF_Z_Front =  450 cm
+// 2013-10-16 - DE - prepare tof_v13_5b geometry - SIS 100 electron: TOF_Z_Front =  600 cm
+// 2013-10-16 - DE - prepare tof_v13_5c geometry - SIS 100 muon    : TOF_Z_Front =  650 cm
+// 2013-10-16 - DE - prepare tof_v13_5d geometry - SIS 300 electron: TOF_Z_Front =  880 cm
+// 2013-10-16 - DE - prepare tof_v13_5e geometry - SIS 300 muon    : TOF_Z_Front = 1020 cm
+// 2013-10-16 - DE - patch pole_alu bug - skip 0 thickness air volume in pole
 // 2013-09-04 - DE - prepare tof_v13_4a geometry - SIS 100 hadron  : TOF_Z_Front =  450 cm
 // 2013-09-04 - DE - prepare tof_v13_4b geometry - SIS 100 electron: TOF_Z_Front =  600 cm
-// 2013-09-04 - DE - prepare tof_v13_4c geometry - SIS 100 muon	   : TOF_Z_Front =  650 cm
+// 2013-09-04 - DE - prepare tof_v13_4c geometry - SIS 100 muon    : TOF_Z_Front =  650 cm
 // 2013-09-04 - DE - prepare tof_v13_4d geometry - SIS 300 electron: TOF_Z_Front =  880 cm
-// 2013-09-04 - DE - prepare tof_v13_4e geometry - SIS 300 muon	   : TOF_Z_Front = 1020 cm
+// 2013-09-04 - DE - prepare tof_v13_4e geometry - SIS 300 muon    : TOF_Z_Front = 1020 cm
 // 2013-09-04 - DE - dump z-positions to .geo.info file
 // 2013-09-04 - DE - define front z-position of TOF wall (TOF_Z_Front)
 // 2013-09-04 - DE - fix arrangement of glass plates in RPC cells 
@@ -32,20 +38,20 @@
 #include <iostream>
 
 // Name of geometry version and output file
-//const TString geoVersion = "tof_v13-4a";
-//const TString geoVersion = "tof_v13-4b";
-//const TString geoVersion = "tof_v13-4c";
-const TString geoVersion = "tof_v13-4d";
-//const TString geoVersion = "tof_v13-4e";
+const TString geoVersion = "tof_v13-5a";
+//const TString geoVersion = "tof_v13-5b";
+//const TString geoVersion = "tof_v13-5c";
+//const TString geoVersion = "tof_v13-5d";
+//const TString geoVersion = "tof_v13-5e";
 const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
 
 // TOF_Z_Front corresponds to front cover of outer super module towers
-//const Float_t TOF_Z_Front =  450;  // SIS 100 hadron
+const Float_t TOF_Z_Front =  450;  // SIS 100 hadron
 //const Float_t TOF_Z_Front =  600;  // SIS 100 electron
 //const Float_t TOF_Z_Front =  650;  // SIS 100 muon
-const Float_t TOF_Z_Front =  880;  // SIS 300 electron
+//const Float_t TOF_Z_Front =  880;  // SIS 300 electron
 //const Float_t TOF_Z_Front = 1020;  // SIS 300 muon
 //
 //const Float_t TOF_Z_Front = 951.5;   // Wall_Z_Position = 1050 cm
@@ -196,7 +202,7 @@ void position_outer_tof_modules(Int_t);
 void dump_info_file();
 
 
-void Create_TOF_Geometry_v13_4x() {
+void Create_TOF_Geometry_v13_5x() {
   // Load the necessary FairRoot libraries 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();

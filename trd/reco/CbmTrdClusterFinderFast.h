@@ -109,6 +109,8 @@ class CbmTrdClusterFinderFast : public FairTask
 		   MyDigiList *cluster);
   void drawCluster(Int_t moduleId, ClusterList *clusterList);
 
+  void addNeighbourDigis(Int_t nRow, ClusterList *clusters, MyDigiList *neighbours);
+
   void addCluster(std::map<Int_t, ClusterList*> fModClusterMap);
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/

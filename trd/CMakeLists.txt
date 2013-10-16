@@ -53,6 +53,7 @@ qa/CbmTrdHitRateQa.cxx
 qa/CbmTrdDigitizerPRFQa.cxx
 qa/CbmTrdClusterizerFastQa.cxx
 qa/CbmTrdHitProducerClusterQa.cxx
+qa/CbmTrdRecoQa.cxx
 
 reco/CbmTrdHitProducerIdeal.cxx    
 reco/CbmTrdHitProducerSmearing.cxx

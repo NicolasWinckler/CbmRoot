@@ -35,9 +35,9 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
    ClusterSum(-1),
-   fMinimumChargeTH(1.0e-08),
-   fMultiHit(true),
-   fRowClusterMerger(false),
+   fMinimumChargeTH(1.0e-06),//1.0e-08),
+   fMultiHit(false),//true),
+   fRowClusterMerger(true),//false),
    fNeighbourReadout(true)
 {
 }
@@ -133,8 +133,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   cout << "================CbmTrdClusterFinderFast===============" << endl;
   Int_t counterI = 0;
   Int_t counterJ = 0;
-  Float_t mRMax = 7500;
-  Bool_t dynamic = true;
+  Float_t mRMax = 0;//7500;
+  Bool_t dynamic = false;//true;
   Bool_t optimization = false;//true;//false;//
   if (optimization) {
     dynamic = false;
@@ -208,204 +208,202 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
     }
   //  MyDigi *d;
 
-  for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
-    {
-      /*
-	if (fMultiHit)
-	fMinimumChargeTH = 1.0e-08;
-	else
-	fMinimumChargeTH = mChargeTH[iChargeTH];
-      */
-      //fMinimumChargeTH = 0.0;
-      /*
-       * Digis are sorted according to the moduleAddress. A combiId is calculted based 
-       * on the rowId and the colId to have a neighbouring criterion for digis within 
-       * the same pad row. The digis of each module are sorted according to this combiId.
-       * All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
-       * the rowClusters are compared to the rowClusters of the last row. If an overlap 
-       * is found they are marked to be parents(last row) and childrens(activ row) 
-       * (mergeRowCluster()). After this, the finale clusters are created. Therefor 
-       * walkCluster() walks along the list of marked parents and markes every visited 
-       * rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
-       * get a visual output.
-       */
+  for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++){
+    /*
+      if (fMultiHit)
+      fMinimumChargeTH = 1.0e-08;
+      else
+      fMinimumChargeTH = mChargeTH[iChargeTH];
+    */
+    //fMinimumChargeTH = 0.0;
+    /*
+     * Digis are sorted according to the moduleAddress. A combiId is calculted based 
+     * on the rowId and the colId to have a neighbouring criterion for digis within 
+     * the same pad row. The digis of each module are sorted according to this combiId.
+     * All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
+     * the rowClusters are compared to the rowClusters of the last row. If an overlap 
+     * is found they are marked to be parents(last row) and childrens(activ row) 
+     * (mergeRowCluster()). After this, the finale clusters are created. Therefor 
+     * walkCluster() walks along the list of marked parents and markes every visited 
+     * rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
+     * get a visual output.
+     */
       
-      Int_t nentries = fDigis->GetEntries();
-      Int_t digiCounter = 0;
-      cout << " Found " << nentries << " Digis in Collection" << endl;
-      std::map<Int_t, MyDigiList*> modules; //map of <moduleAddress, List of struct 'MyDigi' pointer>
-      std::map<Int_t, MyDigiList*> ModuleNeighbourDigiMap; //map of <moduleAddress, List of struct 'MyDigi' pointer>
+    Int_t nentries = fDigis->GetEntries();
+    Int_t digiCounter = 0;
+    cout << " Found " << nentries << " Digis in Collection" << endl;
+    std::map<Int_t, MyDigiList*> modules; //map of <moduleAddress, List of struct 'MyDigi' pointer>
+    std::map<Int_t, MyDigiList*> ModuleNeighbourDigiMap; //map of <moduleAddress, List of struct 'MyDigi' pointer>
 
-      for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
-	CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
+    for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
+      CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
 	
-	/*
-	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-	Int_t size = digi->GetMCIndex().size();
-	std::vector<int> MCIndex = digi->GetMCIndex();
-	cout << size << ": ";
-	for (Int_t i = 0; i < size; i++) {
-	cout << " ," << MCIndex[i];
-	}
-	cout << endl;
-	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-	*/
-	/*
-	  if (digi->GetCharge() > fMinimumChargeTH)
-	  {
-	*/
-	/*
-	 *unrotate rotated modules in x- and y-direction (row <-> col)
-	 */
-	Int_t digiAddress  = digi->GetAddress();
-	Int_t layerId    = CbmTrdAddress::GetLayerId(digiAddress);
-	Int_t moduleId = CbmTrdAddress::GetModuleId(digiAddress);
-	Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
-
-	//Int_t Station  = fGeoHandler->GetStation(moduleId);
-	//Int_t Layer    = fGeoHandler->GetLayer(moduleId);
-	//printf("digiAddress:%i  modId:%i  layer:%i\n",digiAddress,moduleId,layerId);
-	MyDigi *d = new MyDigi;
-	//d = new MyDigi;
-	    
-	fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(digiAddress));
-	if (fModuleInfo){
-	  //printf("digiAddress %i found\n",digiAddress);
-	} else {
-	  printf("digi %3i digiAddress %i layer %i and modId %i  Sec%i Row:%i Col%i not found\n",
-		 iDigi,digiAddress,layerId,moduleId,CbmTrdAddress::GetSectorId(digi->GetAddress()),
-		 CbmTrdAddress::GetRowId(digi->GetAddress()),CbmTrdAddress::GetColumnId(digi->GetAddress())); 
-	  continue;
-	}
-	d->digiId = iDigi;
-	/*
-	 *'rotated' modules are backrotated to get consistent notation of Row and Col
-	 *//* // not longer needed since all modules ar in a local not rotated cs
-	      if (layerId%2 == 0) {
-	      d->colId = digi->GetRow();
-	      d->rowId = digi->GetCol();
-	      d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
-	      }
-	      else {
-	      d->rowId = digi->GetRow();
-	      d->colId = digi->GetCol();
-	      d->combiId = d->rowId * (fModuleInfo->GetNofColumns() + 1) + d->colId;
-	      }
-	   */
-	Int_t iSector = CbmTrdAddress::GetSectorId(digi->GetAddress());
-	Int_t globalRow = CbmTrdAddress::GetRowId(digi->GetAddress());
-	for (Int_t iS = 0; iS < iSector; iS++)
-	  globalRow += fModuleInfo->GetNofRowsInSector(iS);
-
-	d->colId = CbmTrdAddress::GetColumnId(digi->GetAddress());
-	d->rowId = globalRow;
-	d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
-
-	d->charge = digi->GetCharge();
-
-	if (optimization && fMinimumChargeTH == 0)
-	  {
-	    DigiChargeSpectrum->Fill(digi->GetCharge());
-	  }
- 
-	if (ModuleNeighbourDigiMap.find(moduleAddress) == ModuleNeighbourDigiMap.end()) {
-	     
-	  ModuleNeighbourDigiMap[moduleAddress] = new MyDigiList;
-	} 
-	ModuleNeighbourDigiMap[moduleAddress]->push_back(d);
-	if (digi->GetCharge() > fMinimumChargeTH)
-	  {
-	    digiCounter++;
-	    if (modules.find(moduleAddress) == modules.end()) {
-	     
-	      modules[moduleAddress] = new MyDigiList;
-	    } 
-	    modules[moduleAddress]->push_back(d);
-	  }
-	// Since the pointer is stored in a stl container which is used later out of the scope of this loop
-	// the pointer is set to NULL here to make clear that the objects must deleted elswhere. If the objects 
-	// are not deleted later this is a perfect memory leak. 
-	// The problem here is that the pointers are stored in several stl containers, so one has to use the stl
-	// container holding all pointers to delete the objects. 
-	d = NULL;
-	//	delete d;
-      }
-      cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << fMinimumChargeTH << ")" << endl;
-      std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleAddress, pointer of Vector of List of struct 'MyDigi' >
-      for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
-	if (dynamic) {
-	  fModuleInfo = fDigiPar->GetModule(it->first);
-	  
-	  Float_t mSizeX   = (fModuleInfo->GetSizeX()) * 2 * 10;
-	  Float_t mSizeY   = (fModuleInfo->GetSizeY()) * 2 * 10;
-	  Float_t mPosXC   = fModuleInfo->GetX() * 10;
-	  Float_t mPosYC   = fModuleInfo->GetY() * 10;
-	  Float_t mR = sqrt(pow(mPosXC,2) + pow(mPosYC,2));
-	  counterJ++;
-	  if (mR > mRMax) {
-	    fRowClusterMerger = true;
-	    counterI++;
-	    //cout << it->first << "   "<< mR << endl;
-	  }
-	  else {
-	    fRowClusterMerger = false;
-	    //cout << "  " << it->first << "   " << mR <<endl;
-	  }
-	}
-	fModClusterMap[it->first] = clusterModule(it->second, ModuleNeighbourDigiMap[it->first]);
-	//drawCluster(it->first, fModClusterMap[it->first]);
-      }
-      cout << "addCluster(fModClusterMap)" << endl;
-      addCluster(fModClusterMap);
       /*
-       * clean up
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      Int_t size = digi->GetMCIndex().size();
+      std::vector<int> MCIndex = digi->GetMCIndex();
+      cout << size << ": ";
+      for (Int_t i = 0; i < size; i++) {
+      cout << " ," << MCIndex[i];
+      }
+      cout << endl;
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      */
+      /*
+	if (digi->GetCharge() > fMinimumChargeTH)
+	{
+      */
+      /*
+       *unrotate rotated modules in x- and y-direction (row <-> col)
        */
-      // Here is now the point to delete all objects which are stored in stl containers. 
-      // ModuleNeighbourDigiMap hols all pointers to objects of type MyDigi, so this is
-      // the correct container to delete all of them. For the other stl containers one
-      // has only to delete the lists and not the MyDigi stored in the lists.
-      for (std::map<Int_t, MyDigiList*>::iterator it =  ModuleNeighbourDigiMap.begin(); 
-	   it !=  ModuleNeighbourDigiMap.end(); ++it) {
-	for (MyDigiList::iterator digisIt = it->second->begin(); 
-	     digisIt != it->second->end(); ++digisIt) {
-	  delete *digisIt;
-	}
-	delete it->second;
-      }
-      ModuleNeighbourDigiMap.clear();
+      Int_t digiAddress  = digi->GetAddress();
+      Int_t layerId    = CbmTrdAddress::GetLayerId(digiAddress);
+      Int_t moduleId = CbmTrdAddress::GetModuleId(digiAddress);
+      Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
 
-      for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
-	   it != fModClusterMap.end(); ++it) {
-	for (ClusterList::iterator clusterIt = it->second->begin(); 
-	     clusterIt != it->second->end(); ++clusterIt) {
-	  /*
-	    for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
-	    digisIt != (*clusterIt)->end(); ++digisIt) {
-	    delete *digisIt;
-	    }
-	  */
-	  delete *clusterIt;
-	}
-	delete it->second;
+      //Int_t Station  = fGeoHandler->GetStation(moduleId);
+      //Int_t Layer    = fGeoHandler->GetLayer(moduleId);
+      //printf("digiAddress:%i  modId:%i  layer:%i\n",digiAddress,moduleId,layerId);
+      MyDigi *d = new MyDigi;
+      //d = new MyDigi;
+	    
+      fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(digiAddress));
+      if (fModuleInfo){
+	//printf("digiAddress %i found\n",digiAddress);
+      } else {
+	printf("digi %3i digiAddress %i layer %i and modId %i  Sec%i Row:%i Col%i not found\n",
+	       iDigi,digiAddress,layerId,moduleId,CbmTrdAddress::GetSectorId(digi->GetAddress()),
+	       CbmTrdAddress::GetRowId(digi->GetAddress()),CbmTrdAddress::GetColumnId(digi->GetAddress())); 
+	continue;
       }
-      fModClusterMap.clear();
-      
-      for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin();
-	   it != modules.end(); ++it) {
+      d->digiId = iDigi;
+      /*
+       *'rotated' modules are backrotated to get consistent notation of Row and Col
+       *//* // not longer needed since all modules ar in a local not rotated cs
+	    if (layerId%2 == 0) {
+	    d->colId = digi->GetRow();
+	    d->rowId = digi->GetCol();
+	    d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
+	    }
+	    else {
+	    d->rowId = digi->GetRow();
+	    d->colId = digi->GetCol();
+	    d->combiId = d->rowId * (fModuleInfo->GetNofColumns() + 1) + d->colId;
+	    }
+	 */
+      Int_t secRow = CbmTrdAddress::GetRowId(digi->GetAddress());
+      Int_t iSector = CbmTrdAddress::GetSectorId(digi->GetAddress());
+      Int_t globalRow = 0;
+      for (Int_t iS = 0; iS < iSector; iS++)
+	globalRow += fModuleInfo->GetNofRowsInSector(iS);
+      globalRow = fModuleInfo->GetModuleRow(iSector,secRow);
+
+      d->colId = CbmTrdAddress::GetColumnId(digi->GetAddress());
+      d->rowId = globalRow;
+      d->combiId = d->rowId * (fModuleInfo->GetNofRows() + 1) + d->colId;
+
+      d->charge = digi->GetCharge();
+
+      if (optimization && fMinimumChargeTH == 0){
+	  DigiChargeSpectrum->Fill(digi->GetCharge());
+	}
+      //cout << "Searching neighbour digis below threshold" << endl;
+      if (ModuleNeighbourDigiMap.find(moduleAddress) == ModuleNeighbourDigiMap.end()) {	     
+	ModuleNeighbourDigiMap[moduleAddress] = new MyDigiList;
+      } 
+      ModuleNeighbourDigiMap[moduleAddress]->push_back(d);
+      if (digi->GetCharge() > fMinimumChargeTH)	{
+	  digiCounter++;
+	  if (modules.find(moduleAddress) == modules.end()) {	     
+	    modules[moduleAddress] = new MyDigiList;
+	  } 
+	  modules[moduleAddress]->push_back(d);
+	}
+      // Since the pointer is stored in a stl container which is used later out of the scope of this loop
+      // the pointer is set to NULL here to make clear that the objects must deleted elswhere. If the objects 
+      // are not deleted later this is a perfect memory leak. 
+      // The problem here is that the pointers are stored in several stl containers, so one has to use the stl
+      // container holding all pointers to delete the objects. 
+      d = NULL;
+      //	delete d;
+    }
+    cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << fMinimumChargeTH << ")" << endl;
+    std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleAddress, pointer of Vector of List of struct 'MyDigi' >
+    for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
+      if (dynamic) {
+	fModuleInfo = fDigiPar->GetModule(it->first);
+	  
+	Float_t mSizeX   = (fModuleInfo->GetSizeX()) * 2 * 10;
+	Float_t mSizeY   = (fModuleInfo->GetSizeY()) * 2 * 10;
+	Float_t mPosXC   = fModuleInfo->GetX() * 10;
+	Float_t mPosYC   = fModuleInfo->GetY() * 10;
+	Float_t mR = sqrt(pow(mPosXC,2) + pow(mPosYC,2));
+	counterJ++;
+	if (mR > mRMax) {
+	  fRowClusterMerger = true;
+	  counterI++;
+	  //cout << it->first << "   "<< mR << endl;
+	}
+	else {
+	  fRowClusterMerger = false;
+	  //cout << "  " << it->first << "   " << mR <<endl;
+	}
+      }
+      fModClusterMap[it->first] = clusterModule(it->second, ModuleNeighbourDigiMap[it->first]);
+      //drawCluster(it->first, fModClusterMap[it->first]);
+      addNeighbourDigis(fDigiPar->GetModule(it->first)->GetNofRows(), fModClusterMap[it->first], ModuleNeighbourDigiMap[it->first]);
+    }
+    //cout << "addCluster(fModClusterMap)" << endl;
+    addCluster(fModClusterMap);
+    /*
+     * clean up
+     */
+    // Here is now the point to delete all objects which are stored in stl containers. 
+    // ModuleNeighbourDigiMap holds all pointers to objects of type MyDigi, so this is
+    // the correct container to delete all of them. For the other stl containers one
+    // has only to delete the lists and not the MyDigi stored in the lists.
+    for (std::map<Int_t, MyDigiList*>::iterator it =  ModuleNeighbourDigiMap.begin(); 
+	 it !=  ModuleNeighbourDigiMap.end(); ++it) {
+      for (MyDigiList::iterator digisIt = it->second->begin(); 
+	   digisIt != it->second->end(); ++digisIt) {
+	delete *digisIt;
+      }
+      delete it->second;
+    }
+    ModuleNeighbourDigiMap.clear();
+
+    for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
+	 it != fModClusterMap.end(); ++it) {
+      for (ClusterList::iterator clusterIt = it->second->begin(); 
+	   clusterIt != it->second->end(); ++clusterIt) {
 	/*
-	  for (MyDigiList::iterator digisIt = it->second->begin(); 
-	  digisIt != it->second->end(); ++digisIt) {
+	  for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
+	  digisIt != (*clusterIt)->end(); ++digisIt) {
 	  delete *digisIt;
 	  }
 	*/
-	delete it->second;
+	delete *clusterIt;
       }
-      modules.clear();
-      if (optimization)
-	{
-	  OptimalTH->Fill(mChargeTH[iChargeTH],ClusterSum);
+      delete it->second;
+    }
+    fModClusterMap.clear();
+      
+    for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin();
+	 it != modules.end(); ++it) {
+      /*
+	for (MyDigiList::iterator digisIt = it->second->begin(); 
+	digisIt != it->second->end(); ++digisIt) {
+	delete *digisIt;
 	}
-    } //for (iChargeTH)
+      */
+      delete it->second;
+    }
+    modules.clear();
+    if (optimization)
+      {
+	OptimalTH->Fill(mChargeTH[iChargeTH],ClusterSum);
+      }
+  } //for (iChargeTH)
   //     delete d;
   if (optimization)
     {
@@ -432,18 +430,93 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 }
 
   //----------------------------------------------------------------------
-  bool digiSorter(MyDigi *a, MyDigi *b)
-  { return (a->combiId < b->combiId); }
+bool digiSorter(MyDigi *a, MyDigi *b)
+{ return (a->combiId < b->combiId); }
+  //----------------------------------------------------------------------
+void CbmTrdClusterFinderFast::addNeighbourDigis(Int_t nRow, ClusterList *clusters, MyDigiList *neighbours)
+{
+  Int_t activeCombiId(0), testCombiId(0);
+  Int_t activeRow(0), firstRow(0);
+  Int_t activeCol(0), firstCol(0);
+  
+  for (ClusterList::iterator it = clusters->begin(); it != clusters->end(); ++it) {
+    //cout << "new cluster" << endl;
+    MyDigiList *tobeIncluded = new MyDigiList;
+    for (MyDigiList::iterator i = (*it)->begin(); i != (*it)->end(); i++){//Int_t iDigi = 0; iDigi < (*it)->size(); iDigi++){
+      //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
+      activeCombiId = (*i)->combiId;
+      //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
+      activeRow = (*i)->rowId;
+      //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
+      activeCol = (*i)->colId;
+      //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
+      //nRow = (activeCombiId - activeCol) / activeRow - 1;
+      //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
+      if (activeCol > 0)
+	firstCol = activeCol-1;
+      else 
+	firstCol = 0;
+      if (activeRow > 0)
+	firstRow = activeRow-1;
+      else
+	firstRow = 0;
 
+      //cout << " " << activeCombiId << endl;
+      /*
+       * walk around the active digi and test if neigbours are already included in second list. second list is used to avoid neighbours of neighbours to be included
+       */
+      for (Int_t iRow = firstRow; iRow <= activeRow+1; iRow++){
+	for (Int_t iCol = firstCol; iCol <= activeCol+1; iCol++){
+	  Bool_t alreadyInList = false;
+	  testCombiId = iRow * (nRow+1) + iCol;
+	  //cout << testCombiId;
+	  if (testCombiId != activeCombiId){
+	    for (MyDigiList::iterator n = neighbours->begin(); n != neighbours->end(); n++){
+	      if (testCombiId == (*n)->combiId){ //cout << " within neighbour list";
+		for (MyDigiList::iterator t = tobeIncluded->begin(); t != tobeIncluded->end(); t++){ // list of neighbours to be included in cluster
+		  if ((*t)->combiId == testCombiId) {
+		    alreadyInList = true;
+		    //cout << ", but already in tobe list" << endl;
+		  }
+		}
+		if (!alreadyInList)	      
+		  for (MyDigiList::iterator d = (*it)->begin(); d != (*it)->end(); d++){ // digis which are already inside cluster
+		    if ((*d)->combiId == testCombiId){
+		      alreadyInList = true;
+		      //cout << ", but already in cluster list" << endl;
+		    }
+		  }
+		if (!alreadyInList){
+		  tobeIncluded->push_back(*n);
+		  //cout << ". Yeah baby, new neighbour" << endl;
+		}
+	      }
+	    } 
+	  } //else cout << " test == active" << endl;
+	}
+      }
+      //cout << endl;
+    }
+    tobeIncluded->sort(digiSorter);
+    //cout << " new neighbours" << endl;
+    for (MyDigiList::iterator t = tobeIncluded->begin(); t != tobeIncluded->end(); t++){
+      //cout << "       " << (*t)->combiId;
+      (*it)->push_back(*t);
+    }
+    delete tobeIncluded;
+    //cout << endl;
+  }
+}
   //----------------------------------------------------------------------
   ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis, MyDigiList *neighbours)
   {
+    //cout << "----------ClusterModule----------" << endl;
     /*
      *  3 new Lists are initialized: 
      *  currentList for the activ row, 
      *  openList for the previous row and 
      *  closedList for finished rows.
-     *  Digis in the TCloneArray digis are sorted according to their combiId (rowId * (nCol+1) + colId).
+     *  Digis in the TCloneArray digis are sorted according to their combiId (rowId * (nRow+1) + colId).
      */
     std::list<RowCluster*> closedList;
     std::list<RowCluster*> openList;
@@ -522,6 +595,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
 						std::list<RowCluster*> *openList)
   {
+    //cout << "----------mergeRowcluster----------" << endl;
     /*
      *  finish up the current rowCluster
      *  Limitations of the currentCluster are compared to the limitations of the RowClusters of the openList.
@@ -536,9 +610,9 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
      */
     for (std::list<RowCluster*>::iterator openIt = openList->begin(); 
 	 openIt != openList->end(); ++openIt) {
-      if (currentCluster->maxCol < (*openIt)->minCol - 1)
+      if (currentCluster->maxCol < (*openIt)->minCol)// - 1) //avoid diagonal row merging
 	break;
-      else if (currentCluster->minCol > (*openIt)->maxCol + 1)
+      else if (currentCluster->minCol > (*openIt)->maxCol)// + 1) //avoid diagonal row merging
 	continue;
       else {
 	currentCluster->parents.push_back(*openIt);
@@ -550,6 +624,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   //----------------------------------------------------------------------
   ClusterList *CbmTrdClusterFinderFast::findCluster(std::list<RowCluster*> *rowClusterList)
   {
+    //cout << "----------findCluster----------" << endl;
     /*
      *  all found RowClusters are merged to clusters and copyed to the finale clusterList
      *  since the rowClusterList is empty
@@ -570,8 +645,9 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 					    RowCluster *currentRowCluster,
 					    MyDigiList *cluster)
   {
+    //cout << "----------walkCluster----------" << endl;
     /*
-     * the rowClusters are sorted in the neighbour list if conected by a cild oder parent pointer.
+     * the rowClusters are sorted in the neighbour list if conected by a child oder parent pointer.
      * This pointer is removed and the rowCluster is marked as 'hasBeenVisited'. 
      * Therefor it can not be merged to any cluster.
      */
@@ -607,6 +683,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   //----------------------------------------------------------------------
   void CbmTrdClusterFinderFast::drawCluster(Int_t moduleAddress, ClusterList *clusterList)
   {
+    //cout << "----------drawCluster----------" << endl;
     Char_t name[50];
     Char_t title[50];
     sprintf(name,"C%d",moduleAddress);
@@ -641,113 +718,125 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   }
 
   //--------------------------------------------------------------------
-void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
-{
-  ClusterSum = 0;
-  Float_t Charge;
-  Float_t qMax;
-  Float_t deltaCharge;
-  Float_t preDelta;
-  for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 
-    {
-      for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
-	{
-	  ClusterSum++;
-	  std::vector<Int_t> digiIndices( 3/*(*iCluster)->size()*/ ); // andrey
-	  Int_t idigi = 0;
-	  Int_t i = 1;
-	  Charge = 0;
-	  qMax = 0;
-	  deltaCharge = 0;
-	  preDelta = 0;
-	  MyDigiList::iterator lastDigi = (*iCluster)->begin();
-	  MyDigiList::iterator nextDigi = (*iCluster)->begin();
-	  for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) 
-	    {
-	      if (fMultiHit){
-		if (idigi < (*iCluster)->size()-1) {
-		  nextDigi++;
+  void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
+  {
+    //cout << "----------addCluster----------" << endl;
+    ClusterSum = 0;
+    Float_t Charge;
+    Float_t qMax;
+    Float_t deltaCharge;
+    Float_t preDelta;
+    Int_t modCounter = 0;
+    for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) {
+      modCounter++;
+      Int_t cluCounter = 0;
+      //cout << " module:" << iMod->first << "  " << modCounter << "/" << fModClusterMap.size() << endl;
+      for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) {
+	cluCounter++;
+	//cout << "   cluster:" << cluCounter << "/" << (*iCluster)->size() << endl;
+	ClusterSum++;
+	//std::vector<Int_t> digiIndices( 3/*(*iCluster)->size()*/ ); // andrey
+	std::vector<Int_t> digiIndices( (*iCluster)->size() );
+	Int_t idigi = 0;
+	Int_t i = 1;
+	Charge = 0;
+	qMax = 0;
+	deltaCharge = 0;
+	preDelta = 0;
+	MyDigiList::iterator lastDigi = (*iCluster)->begin();
+	MyDigiList::iterator nextDigi = (*iCluster)->begin();
+	for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) {
+	  if (fMultiHit){
+	    if (idigi < (*iCluster)->size()-1) {
+	      nextDigi++;
+	    }
+	    if (nextDigi != (*iCluster)->end()) {
+	      //cout << (*iDigi)->charge << " " << (*nextDigi)->charge << "    ";
+	      deltaCharge = (*nextDigi)->charge - (*iDigi)->charge;
+	      if (preDelta >= 0 && deltaCharge <= 0) { // local maximum in charge distribution
+		//cout << "pre" << preDelta << " delta" << deltaCharge << endl;
+		//cout << (*lastDigi)->charge << " " << (*iDigi)->charge << " " << (*nextDigi)->charge << endl;
+		i = 1;
+		if ((*lastDigi) != (*iDigi))
+		  i++;
+		if ((*nextDigi) != (*iDigi))
+		  i++;
+
+		digiIndices.resize(i, 0.); // andrey
+		//		    digiIndices.Reset();
+		//		    digiIndices.Set(i);
+
+		i = 0;
+		if ((*lastDigi) != (*iDigi)){
+		  digiIndices[i] = (*lastDigi)->digiId; // andrey
+		  //		      digiIndices.SetAt((*lastDigi)->digiId,i);
+		  Charge += (*lastDigi)->charge;
+		  i++;
 		}
-		if (nextDigi != (*iCluster)->end()) {
-		  //cout << (*iDigi)->charge << " " << (*nextDigi)->charge << "    ";
-		  deltaCharge = (*nextDigi)->charge - (*iDigi)->charge;
-		  if (preDelta >= 0 && deltaCharge <= 0) { // local maximum in charge distribution
-		    //cout << "pre" << preDelta << " delta" << deltaCharge << endl;
-		    //cout << (*lastDigi)->charge << " " << (*iDigi)->charge << " " << (*nextDigi)->charge << endl;
-		    i = 1;
-		    if ((*lastDigi) != (*iDigi))
-		      i++;
-		    if ((*nextDigi) != (*iDigi))
-		      i++;
 
-		    digiIndices.resize(i, 0.); // andrey
-//		    digiIndices.Reset();
-//		    digiIndices.Set(i);
-
-		    i = 0;
-		    if ((*lastDigi) != (*iDigi)){
-		      digiIndices[i] = (*lastDigi)->digiId; // andrey
-//		      digiIndices.SetAt((*lastDigi)->digiId,i);
-		      Charge += (*lastDigi)->charge;
-		      i++;
-		    }
-
-		    digiIndices[i] = (*iDigi)->digiId; // andrey
-//		    digiIndices.SetAt((*iDigi)->digiId,i);
-		    Charge += (*iDigi)->charge;
-		    i++;
- 
-		    if ((*nextDigi) != (*iDigi)) {
-		      digiIndices[i] = (*nextDigi)->digiId; // andrey
-//		      digiIndices.SetAt((*nextDigi)->digiId,i);
-		      Charge += (*nextDigi)->charge;
-		    }
-
-		    qMax = (*iDigi)->charge;
-
-		    TClonesArray& clref = *fClusters;
-		    Int_t size = clref.GetEntriesFast();
-
-		    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
-		    cluster->SetDigis(digiIndices);
-		    //cluster->SetCharge(Charge);
-		    //cluster->SetMaxCharge(qMax);
-		    digiIndices.clear();
-		    //digiIndices.Reset();
-		    //digiIndices.Set(3);
-		    Charge = 0;
-		   
-		  }
-		  preDelta = deltaCharge;	     
-		  lastDigi = iDigi;
-		}
-		//cout << endl;
-	      }
-	      else {
-	    	  digiIndices[idigi] = (*iDigi)->digiId; // andrey
-//		digiIndices.SetAt((*iDigi)->digiId,idigi);
+		digiIndices[i] = (*iDigi)->digiId; // andrey
+		//		    digiIndices.SetAt((*iDigi)->digiId,i);
 		Charge += (*iDigi)->charge;
-	
-		if (qMax < (*iDigi)->charge)
-		  {
-		    qMax = (*iDigi)->charge;
-		  }
-	      }
-	      idigi++;
-	    }	 	  
-	  if (!fMultiHit){
-	    TClonesArray& clref = *fClusters;
-	    Int_t size = clref.GetEntriesFast();
+		i++;
+ 
+		if ((*nextDigi) != (*iDigi)) {
+		  digiIndices[i] = (*nextDigi)->digiId; // andrey
+		  //		      digiIndices.SetAt((*nextDigi)->digiId,i);
+		  Charge += (*nextDigi)->charge;
+		}
 
-	    CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster(); // andrey
-	    cluster->SetDigis(digiIndices); // andrey
-	    //cluster->SetCharge(Charge); // andrey
-	    //cluster->SetMaxCharge(qMax); // andrey
-	  }	  
-	}       
-    } 
-  cout << " Found " << ClusterSum << " Cluster" << endl;
-}
+		qMax = (*iDigi)->charge;
+
+		TClonesArray& clref = *fClusters;
+		Int_t size = clref.GetEntriesFast();
+
+		CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
+		cluster->SetDigis(digiIndices);
+		//cluster->SetCharge(Charge);
+		//cluster->SetMaxCharge(qMax);
+		digiIndices.clear();
+		//digiIndices.Reset();
+		//digiIndices.Set(3);
+		Charge = 0;
+		   
+	      }
+	      preDelta = deltaCharge;	     
+	      lastDigi = iDigi;
+	    }
+	    //cout << endl;
+	  } else {
+	    digiIndices[idigi] = (*iDigi)->digiId; // andrey
+
+	    //cout << "    fill digiIndices:" << idigi << "  "  << (*iDigi)->digiId << " size:" << digiIndices.size() <<  endl;
+	    //digiIndices.SetAt((*iDigi)->digiId,idigi);
+	    Charge += (*iDigi)->charge;
+	
+	    if (qMax < (*iDigi)->charge)
+	      {
+		qMax = (*iDigi)->charge;
+		//cout << "    new qMax:" <<  qMax << endl;
+	      }
+	  }
+	  idigi++;
+	}	 	  
+	if (!fMultiHit){
+	  //	cout << "2" << endl;
+	  TClonesArray& clref = *fClusters;
+	  Int_t size = clref.GetEntriesFast();
+	  //cout << "    size:" << size << endl;
+	  CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster(); // andrey
+	  //cout << "    vector:" << digiIndices.size() << endl;
+	  cluster->SetDigis(digiIndices); // andrey
+	  //cout << "test" << endl;
+	  //cluster->SetCharge(Charge); // andrey
+	  //cluster->SetMaxCharge(qMax); // andrey
+	}	  
+	//cout << "end of cluster" << endl;
+      } // for iCluster     
+      //cout << " end of module" << endl;
+    } // for iModule
+    cout << " Found " << ClusterSum << " Cluster" << endl;
+  }
 
   // ---- Register ------------------------------------------------------
   void CbmTrdClusterFinderFast::Register()

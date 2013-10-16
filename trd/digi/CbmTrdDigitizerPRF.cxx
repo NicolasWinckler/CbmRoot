@@ -48,7 +48,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
     fTime(-1.),
     fModuleType(-1),
     fModuleCopy(-1),
-    //fModuleID(-1),
+    fModuleAddress(-1),
     fMCindex(-1),
     fnRow(-1),
     fnCol(-1),
@@ -76,7 +76,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
    fDebug(false),
    fModuleType(-1),
    fModuleCopy(-1),
-   //fModuleID(-1),
+   fModuleAddress(-1),
    fMCindex(-1),
     fnRow(-1),
     fnCol(-1),
@@ -280,6 +280,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
     //cout << "GetLayerId   " << fLayerId << endl;
     fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
+    fModuleAddress = CbmTrdAddress::GetModuleAddress(point->GetDetectorID());
     //cout << "GetModuleId2 " << fModuleId << endl;
 
     const Double_t *global_point = gGeoManager->GetCurrentPoint();
@@ -369,7 +370,8 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	  targSec = fModuleInfo->GetSector(iRow, secRow);
 	  //printf("secId digi1 %i\n",targSec);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, iCol); 
-	  //printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,iCol);
+	  if (secRow > 11 && fModuleId == 5)
+	    printf("address %i layer %i and modId %i modAddress %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,fModuleAddress,targSec,secRow,iCol);
 	} else {
           targRow = iRow;
           targCol = iCol;
@@ -385,7 +387,8 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	  targSec = fModuleInfo->GetSector(targRow, secRow);
 	  //printf("secId digi2 %i\n",targSec);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, targCol);
-	  //printf("address %i layer %i and modId %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,targSec,secRow,targCol);
+	  if (secRow > 11 && fModuleId == 5)
+	    printf("address %i layer %i and modId %i modAddress %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,fModuleAddress,targSec,secRow,targCol);
 	}
 	Double_t chargeFraction = 0;
 	if (rowId == iRow && columnId == iCol) // if pad in center of 7x3 arrayxs

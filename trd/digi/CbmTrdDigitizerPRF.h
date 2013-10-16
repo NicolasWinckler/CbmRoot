@@ -80,6 +80,7 @@ class CbmTrdDigitizerPRF : public FairTask {
   Int_t fnSec;
   Int_t fLayerId;
   Int_t fModuleId;
+  Int_t fModuleAddress;
   //Int_t fnSecRow[3];
 
   Int_t   fModuleType;

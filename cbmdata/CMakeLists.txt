@@ -102,6 +102,7 @@ stt/CbmSttTrackMatch.cxx
 
 global/CbmGlobalTrack.cxx
 global/CbmVertex.cxx
+global/CbmTofTrack.cxx
 )
 
 set(LINKDEF  DataLinkDef.h)

@@ -85,6 +85,7 @@
 #pragma link C++ class CbmSttTrackMatch+;
 
 #pragma link C++ class CbmGlobalTrack+;
+#pragma link C++ class CbmTofTrack;
 #pragma link C++ class CbmVertex+;
 
 #endif

@@ -22,6 +22,8 @@
 #include "TClonesArray.h"
 #include "TVector3.h"
 #include "TMath.h"
+#include "TPad.h"
+#include "TFrame.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TMultiGraph.h"
@@ -50,6 +52,7 @@ CbmTrdRecoQa::CbmTrdRecoQa()
     fModuleMapDigi(),
     fModuleMapCluster(),
     fModuleMapHit(),
+    fModuleMapTrack(),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler())
@@ -71,6 +74,7 @@ CbmTrdRecoQa::CbmTrdRecoQa(const char* name,
     fModuleMapDigi(),
     fModuleMapCluster(),
     fModuleMapHit(),
+    fModuleMapTrack(),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler())
@@ -220,16 +224,16 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     fModuleInfo = fDigiPar->GetModule(moduleAddress);////point->GetDetectorID());
     //printf("Address:%i ID:%i\n",moduleAddress,moduleId);
     if (fModuleInfo) {
-      std::map<Int_t, TGraph* >::iterator it = fModuleMapPoint.find(moduleAddress);
+      std::map<Int_t, TGraphErrors* >::iterator it = fModuleMapPoint.find(moduleAddress);
       if (it == fModuleMapPoint.end()) {  
 	name.Form("ModuleAddress%i",moduleAddress);   
-	fModuleMap[moduleAddress] = new TCanvas(name,name,2000,1000);
-	fModuleMap[moduleAddress]->Divide(4,2);
+	fModuleMap[moduleAddress] = new TCanvas(name,name,1500,1000);
+	fModuleMap[moduleAddress]->Divide(3,2);
 	//name.Form("ModuleAddress%iPoints",moduleAddress);  
 	fModuleMapPoint[moduleAddress] = new TGraphErrors();
 	fModuleMapPoint[moduleAddress]->SetMarkerStyle(20);
-	fModuleMapPoint[moduleAddress]->SetMarkerSize(0.75);
-	fModuleMapPoint[moduleAddress]->SetMarkerColor(2);
+	fModuleMapPoint[moduleAddress]->SetMarkerSize(0.5);
+	fModuleMapPoint[moduleAddress]->SetMarkerColor(15);
 	//fModuleMapPoint[moduleAddress] = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	TH2I* dummy = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	name.Form("ModuleAddress%iDigis",moduleAddress);   
@@ -239,6 +243,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	name.Form("ModuleAddress%iHits",moduleAddress);   
 	fModuleMapHit[moduleAddress] = new TGraphErrors();//name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	fModuleMapHit[moduleAddress]->SetMarkerStyle(24);
+	fModuleMapTrack[moduleAddress] = new std::vector<TLine*>;
 	fModuleMap[moduleAddress]->cd(1);
 	dummy->Draw();/*
 			fModuleMapPoint[moduleAddress]->Draw("AP");
@@ -299,16 +304,17 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 			   col_out + x_out / W_out, 
 			   row_out + y_out / H_out);
       l->SetLineWidth(2);
-      l->SetLineColor(2);
+      l->SetLineColor(15);
+      fModuleMapTrack[moduleAddress]->push_back(l);
       fModuleMap[moduleAddress]->cd(1);
       l->Draw("same");
       /*
-      fModuleMap[moduleAddress]->cd(2);
-      l->Draw("same");
-      fModuleMap[moduleAddress]->cd(3);
-      l->Draw("same");
-      fModuleMap[moduleAddress]->cd(4);
-      l->Draw("same");
+	fModuleMap[moduleAddress]->cd(2);
+	l->Draw("same");
+	fModuleMap[moduleAddress]->cd(3);
+	l->Draw("same");
+	fModuleMap[moduleAddress]->cd(4);
+	l->Draw("same");
       */
     } else {
       printf("Address:%i ID:%i\n",moduleAddress,moduleId);
@@ -351,8 +357,8 @@ void CbmTrdRecoQa::Exec(Option_t* option)
       fModuleInfo = fDigiPar->GetModule(moduleAddress);
       Int_t sec(CbmTrdAddress::GetSectorId(digiAddress)), row(CbmTrdAddress::GetRowId(digiAddress));
       row = fModuleInfo->GetModuleRow(sec, row);
-      //fModuleMapCluster[moduleAddress]->Fill(CbmTrdAddress::GetColumnId(digiAddress), row, iCluster+1);
-      fModuleMapCluster[moduleAddress]->SetBinContent(CbmTrdAddress::GetColumnId(digiAddress)+1, row+1, iCounter+1);
+      fModuleMapCluster[moduleAddress]->Fill(CbmTrdAddress::GetColumnId(digiAddress), row, iCounter+1);
+      //fModuleMapCluster[moduleAddress]->SetBinContent(CbmTrdAddress::GetColumnId(digiAddress)+1, row+1, iCounter+1);
       charge = digi->GetCharge();
       if (charge > chargeMax)
 	chargeMax = charge;
@@ -390,28 +396,36 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     it->second->cd(1);
     name.Form("%i Points",fModuleMapPoint[it->first]->GetN());
     fModuleMapPoint[it->first]->SetNameTitle(name,name);
+    fModuleMapPoint[it->first]->SetFillStyle(0);
     TPaveText *ptext = new TPaveText(10,3.5,11,4.0);
     ptext->SetTextSize(0.035);
-    ptext->SetTextColor(2);
+    ptext->SetTextColor(15);
     ptext->SetFillStyle(0);
     ptext->SetLineColor(0);
     ptext->AddText(name);
     //fModuleMapPoint[it->first]->Draw("P");
-    fModuleMapPoint[it->first]->SetMaximum(fModuleMapDigi[it->first]->GetYaxis()->GetXmax());
-    fModuleMapPoint[it->first]->SetMinimum(fModuleMapDigi[it->first]->GetYaxis()->GetXmin());
-    fModuleMapPoint[it->first]->GetXaxis()->SetLimits(fModuleMapDigi[it->first]->GetXaxis()->GetXmin(), 
-						      fModuleMapDigi[it->first]->GetXaxis()->GetXmax());
+ 
 
     //fModuleMapPoint[it->first]->Draw("P,same");
     ptext->Draw("same");
     it->second->cd(1)->Update();
     it->second->cd(2);
     fModuleMapDigi[it->first]->DrawCopy("colz");
+    for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
+      fModuleMapTrack[it->first]->at(t)->Draw("same");
+  
     it->second->cd(3)->SetLogz(1);
-    fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(1.0e-6,fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin()));
+    fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(9.9e-7,fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin()));
     fModuleMapDigi[it->first]->DrawCopy("colz");
+    for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
+      fModuleMapTrack[it->first]->at(t)->Draw("same");
+
     it->second->cd(4);
     fModuleMapCluster[it->first]->DrawCopy("colz");
+    for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
+      fModuleMapTrack[it->first]->at(t)->Draw("same");
+
+    it->second->cd(4)->Update();
     it->second->cd(5);
     //fModuleMapPoint[it->first]->Draw();
     //fModuleMapHit[it->first]->Draw("P,same");

@@ -38,7 +38,7 @@ class TH2I;
 class TGraph;
 class TGraphErrors;
 class TCanvas;
-
+class TLine;
 
 class CbmTrdRecoQa : public FairTask
 {
@@ -90,10 +90,11 @@ class CbmTrdRecoQa : public FairTask
   CbmTrdRecoQa& operator=(const CbmTrdRecoQa&);
 
   std::map<Int_t, TCanvas*> fModuleMap;
-  std::map<Int_t, TGraph*> fModuleMapPoint;
+  std::map<Int_t, TGraphErrors*> fModuleMapPoint;
   std::map<Int_t, TH2D*> fModuleMapDigi;
   std::map<Int_t, TH2I*> fModuleMapCluster;
   std::map<Int_t, TGraphErrors*> fModuleMapHit;
+  std::map<Int_t, std::vector<TLine*>* > fModuleMapTrack;
   // map<moduleAdress, <v[0]=Mc; v[1]=digi; v[3]=cluster; v[4]=hit> >
   ClassDef(CbmTrdRecoQa, 1)
     };

@@ -100,7 +100,7 @@ class CbmTrdClusterFinderFast : public FairTask
  private:
   //static const Bool_t fMultiHit = true;
 
-  ClusterList *clusterModule(MyDigiList *digis, MyDigiList *neighbours);  
+  ClusterList *clusterModule(MyDigiList *digis/*, MyDigiList *neighbours*/);  
   void mergeRowCluster(RowCluster *currentCluster,
 		       std::list<RowCluster*> *openList);
   ClusterList *findCluster(std::list<RowCluster*> *rowClusterList);

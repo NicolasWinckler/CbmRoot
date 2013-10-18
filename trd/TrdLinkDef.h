@@ -22,7 +22,7 @@
 #pragma link C++ class  CbmTrdDigitizerPRF;
 #pragma link C++ class  CbmTrdHitRateQa;
 //#pragma link C++ class  CbmTrdHitDensityQa;
-//#pragma link C++ class  CbmTrdOccupancyQa;
+#pragma link C++ class  CbmTrdOccupancyQa;
 #pragma link C++ class  CbmTrdDigitizerPRFQa;
 #pragma link C++ class  CbmTrdClusterizerFastQa;
 #pragma link C++ class  CbmTrdHitProducerClusterQa;

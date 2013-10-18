@@ -626,7 +626,7 @@ void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
     //printf("r:%4i minc: %4i maxc: %4i ",(*openIt)->row,(*openIt)->minCol,(*openIt)->maxCol);
     if (currentCluster->maxCol < (*openIt)->minCol){// - 1) //avoid diagonal row merging
       //printf("too much left\n");
-      continue;//break;
+      break;
     } else if (currentCluster->minCol > (*openIt)->maxCol){// + 1) //avoid diagonal row merging
       //printf("too much right\n");
       continue;

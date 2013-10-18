@@ -226,33 +226,33 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
   for (Int_t iDigi=0; iDigi < nEntries; iDigi++ ) {
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
     
-    Int_t moduleId = digi->GetDetId();
-    Int_t Station  = fGeoHandler->GetStation(moduleId);
-    Int_t Layer    = fGeoHandler->GetLayer(moduleId);
+    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());//digi->GetDetId();
+    Int_t Station  = 0;//fGeoHandler->GetStation(moduleId);
+    Int_t Layer    = CbmTrdAddress::GetLayerId(moduleAddress);;//fGeoHandler->GetLayer(moduleId);
     Int_t combiId = 10 * Station + Layer;
-    fModuleInfo = fDigiPar->GetModule(moduleId);
+    fModuleInfo = fDigiPar->GetModule(moduleAddress);
     Int_t nRows = fModuleInfo->GetNofRows();
     Int_t nCols = fModuleInfo->GetNofColumns();
     fDigiChargeSpectrum->Fill(digi->GetCharge());
     if (digi->GetCharge() > fTriggerThreshold) {
       digiTriggerCounter++;
       digiCounter++;
-      if (fModuleOccupancyMap.find(moduleId) == fModuleOccupancyMap.end()){
-	title.Form("Module_%i",moduleId);
-	//fModuleOccupancyMap[moduleId] = (TH2F*)outFile->Get(title);
-	//if (!fModuleOccupancyMap[moduleId])
-	fModuleOccupancyMap[moduleId] = new TH2F(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
-	//fModuleOccupancyMap[moduleId]->Reset();
-	title.Form("M_%i",moduleId);
-	fModuleOccupancyMemoryMap[moduleId] = new TH1F(title,title,10000,0,100);
-	fModuleMap[moduleId] = new OccupancyModule();
-	fModuleMap[moduleId]->Station = Station;
-	fModuleMap[moduleId]->Layer = Layer;
-	fModuleMap[moduleId]->ModuleSizeX = fModuleInfo->GetSizeX();
-	fModuleMap[moduleId]->ModuleSizeY = fModuleInfo->GetSizeY();
-	fModuleMap[moduleId]->ModulePositionX = fModuleInfo->GetX();
-	fModuleMap[moduleId]->ModulePositionY = fModuleInfo->GetY();
-	fModuleMap[moduleId]->moduleId = moduleId;
+      if (fModuleOccupancyMap.find(moduleAddress) == fModuleOccupancyMap.end()){
+	title.Form("Module_%i",moduleAddress);
+	//fModuleOccupancyMap[moduleAddress] = (TH2F*)outFile->Get(title);
+	//if (!fModuleOccupancyMap[moduleAddress])
+	fModuleOccupancyMap[moduleAddress] = new TH2F(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	//fModuleOccupancyMap[moduleAddress]->Reset();
+	title.Form("M_%i",moduleAddress);
+	fModuleOccupancyMemoryMap[moduleAddress] = new TH1F(title,title,10000,0,100);
+	fModuleMap[moduleAddress] = new OccupancyModule();
+	fModuleMap[moduleAddress]->Station = Station;
+	fModuleMap[moduleAddress]->Layer = Layer;
+	fModuleMap[moduleAddress]->ModuleSizeX = fModuleInfo->GetSizeX();
+	fModuleMap[moduleAddress]->ModuleSizeY = fModuleInfo->GetSizeY();
+	fModuleMap[moduleAddress]->ModulePositionX = fModuleInfo->GetX();
+	fModuleMap[moduleAddress]->ModulePositionY = fModuleInfo->GetY();
+	fModuleMap[moduleAddress]->moduleAddress = moduleAddress;
       }
       if (fLayerOccupancyMap.find(combiId) == fLayerOccupancyMap.end()){
 	title.Form("S%i_L%i",Station,Layer);
@@ -265,32 +265,35 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
 	fLayerAverageOccupancyMap[combiId]->SetYTitle("Average layer occupancy [%]");
 	fLayerAverageOccupancyMap[combiId]->SetXTitle("Trigger threshold");
       }
-      Int_t iCol(digi->GetCol()), iRow(digi->GetRow()), ixBin(iCol+1), iyBin(iRow+1);
-      if (fModuleOccupancyMap[moduleId]->GetBinContent(ixBin,iyBin) == 0)
-	fModuleOccupancyMap[moduleId]->Fill(iCol,iRow);
+
+      Int_t digiAddress(digi->GetAddress()), iCol(CbmTrdAddress::GetColumnId(digiAddress)), iRow(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
+      iRow = fModuleInfo->GetModuleRow(iSec, iRow);
+      Int_t ixBin(iCol+1), iyBin(iRow+1);
+      if (fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin,iyBin) == 0)
+	fModuleOccupancyMap[moduleAddress]->Fill(iCol,iRow);
       if(fNeigbourReadout) {
 	if (nCols > nRows) { // Neigbour readout only along the short pad size direction
-	  if (ixBin > 1 && fModuleOccupancyMap[moduleId]->GetBinContent(ixBin-1,iyBin) == 0){//left
-	    fModuleOccupancyMap[moduleId]->Fill(iCol-1,iRow);
+	  if (ixBin > 1 && fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin-1,iyBin) == 0){//left
+	    fModuleOccupancyMap[moduleAddress]->Fill(iCol-1,iRow);
 	    digiCounter++;
 	  }
-	  if (ixBin < nCols && fModuleOccupancyMap[moduleId]->GetBinContent(ixBin+1,iyBin) == 0){//right
-	    fModuleOccupancyMap[moduleId]->Fill(iCol+1,iRow);
+	  if (ixBin < nCols && fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin+1,iyBin) == 0){//right
+	    fModuleOccupancyMap[moduleAddress]->Fill(iCol+1,iRow);
 	    digiCounter++;
 	  }
 	}
 	else {
-	  if (iyBin < nRows && fModuleOccupancyMap[moduleId]->GetBinContent(ixBin,iyBin+1) == 0){//upper
-	    fModuleOccupancyMap[moduleId]->Fill(iCol,iRow+1);
+	  if (iyBin < nRows && fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin,iyBin+1) == 0){//upper
+	    fModuleOccupancyMap[moduleAddress]->Fill(iCol,iRow+1);
 	    digiCounter++;
 	  }
-	  if (iyBin > 1 && fModuleOccupancyMap[moduleId]->GetBinContent(ixBin,iyBin-1) == 0){//lower
-	    fModuleOccupancyMap[moduleId]->Fill(iCol,iRow-1);
+	  if (iyBin > 1 && fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin,iyBin-1) == 0){//lower
+	    fModuleOccupancyMap[moduleAddress]->Fill(iCol,iRow-1);
 	    digiCounter++;
 	  }
 	}
       }
-      //fModuleOccupancyMap[moduleId]->SetBinContent(digi->GetCol()+1, digi->GetRow()+1, 1);
+      //fModuleOccupancyMap[moduleAddress]->SetBinContent(digi->GetCol()+1, digi->GetRow()+1, 1);
     }
   }
   printf("%6i primary triggered digis\n%6i including neigbouring triggered digis\n", digiTriggerCounter, digiCounter);

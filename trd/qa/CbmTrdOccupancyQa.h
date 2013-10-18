@@ -38,7 +38,7 @@ typedef struct OccupancyModule
 {
   Int_t Station;
   Int_t Layer;
-  Int_t moduleId;
+  Int_t moduleAddress;
   Int_t nPad;
   Int_t nxPad;
   Int_t nyPad;
@@ -59,7 +59,7 @@ typedef struct OccupancyModule
   Float_t ModulePositionY;
   Float_t ModulePositionZ;
 
-  OccupancyModule () : Station(-1), Layer(-1), moduleId(-1), //PadPlane(), 
+  OccupancyModule () : Station(-1), Layer(-1), moduleAddress(-1), //PadPlane(), 
     nPad(0),
     nxPad(0), nyPad(0),
 		       /* NoSectors(0), SectorSizeX(), SectorSizeY(), PadSizeX(), 

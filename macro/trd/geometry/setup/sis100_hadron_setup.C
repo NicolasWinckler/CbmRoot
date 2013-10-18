@@ -34,15 +34,15 @@ void sis100_hadron_setup()
 
   // -----  Geometries  -----------------------------------------------------
   caveGeom     = "cave.geo";
-  pipeGeom     = "pipe/pipe_v13a.geo"; // "pipe/pipe_v13a.geo.root";
+  pipeGeom     = "pipe/pipe_v13a.geo.root";
   magnetGeom   = "magnet/magnet_v12b.geo.root";
-  mvdGeom      = "mvd/mvd_v07a.geo";
+  mvdGeom      = "";
   stsGeom      = "sts/sts_v13c.geo.root";
   richGeom     = "";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13a.geo";
   trdGeom      = "trd/trd_v13h.geo.root";
-  tofGeom      = "tof/tof_v13-4a.geo.root";
+  tofGeom      = "tof/tof_v13-5a.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

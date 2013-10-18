@@ -34,15 +34,15 @@ void sis300_muon_setup()
 
   // -----  Geometries  -----------------------------------------------------
   caveGeom     = "cave.geo";
-  pipeGeom     = "pipe/pipe_v13c.geo"; // "pipe/pipe_v13c.geo.root";
+  pipeGeom     = "pipe/pipe_v13c.geo.root"; // "pipe/pipe_v13c.geo.root";
   magnetGeom   = "magnet/magnet_v12b_much.geo.root";
-  mvdGeom      = "mvd/mvd_v07a.geo";
+  mvdGeom      = "";
   stsGeom      = "sts/sts_v13c.geo.root";
   richGeom     = "";
   muchGeom     = "much/much_v13c.geo";
   platformGeom = ""; // "passive/platform_v13b.geo";
   trdGeom      = "trd/trd_v13m.geo.root";
-  tofGeom      = "tof/tof_v13-4e.geo.root";
+  tofGeom      = "tof/tof_v13-5e.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

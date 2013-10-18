@@ -35,15 +35,14 @@ void sis100_electron_setup()
 
   // -----  Geometries  -----------------------------------------------------
   caveGeom     = "cave.geo";
-  pipeGeom     = "pipe/pipe_v13b.geo"; // "pipe/pipe_v13b.geo.root";
+  pipeGeom     = "pipe/pipe_v13b.geo.root"; 
   magnetGeom   = "magnet/magnet_v12b.geo.root";
-  mvdGeom      = "mvd/mvd_v07a.geo";
   stsGeom      = "sts/sts_v13c.geo.root";
-  richGeom     = "rich/rich_v13a.gdml";
+  richGeom     = "rich/rich_v08a.geo";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13a.geo";
   trdGeom      = "trd/trd_v13k.geo.root";
-  tofGeom      = "tof/tof_v13-4b.geo.root";
+  tofGeom      = "tof/tof_v13-5b.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

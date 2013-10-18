@@ -46,7 +46,7 @@ digi/CbmTrdDigitizer.cxx
 
 qa/CbmTrdHitProducerQa.cxx  
 qa/CbmTrdTracksPidQa.cxx
-#qa/CbmTrdQa.cxx
+qa/CbmTrdQa.cxx
 #qa/CbmTrdHitDensityQa.cxx
 qa/CbmTrdHitRateQa.cxx
 qa/CbmTrdOccupancyQa.cxx

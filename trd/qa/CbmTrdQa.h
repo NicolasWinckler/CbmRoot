@@ -33,7 +33,7 @@ class CbmTrdQa : public FairTask {
   void SaveHistos();
   void NormalizeHistos();
   void CreateLayerView();
-  void GetPadInfos(Int_t moduleId, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY);
+  void GetPadInfos(Int_t moduleAddress, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY);
   virtual void FinishEvent();
   virtual void FinishTask();
   void Register();

@@ -228,7 +228,7 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
     
     Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());//digi->GetDetId();
     Int_t Station  = 0;//fGeoHandler->GetStation(moduleId);
-    Int_t Layer    = CbmTrdAddress::GetLayerId(moduleAddress);;//fGeoHandler->GetLayer(moduleId);
+    Int_t Layer    = CbmTrdAddress::GetLayerId(moduleAddress);//fGeoHandler->GetLayer(moduleId);
     Int_t combiId = 10 * Station + Layer;
     fModuleInfo = fDigiPar->GetModule(moduleAddress);
     Int_t nRows = fModuleInfo->GetNofRows();

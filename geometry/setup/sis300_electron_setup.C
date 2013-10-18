@@ -39,7 +39,7 @@ void sis300_electron_setup()
   magnetGeom   = "magnet/magnet_v12b.geo.root";
   mvdGeom      = "";  // Waiting for Godot
   stsGeom      = "sts/sts_v13c.geo.root";
-  richGeom     = "rich/rich_v13a.gdml";
+  richGeom     = "rich/rich_v08a.geo";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13b.geo";
   trdGeom      = "trd/trd_v13g.geo.root";

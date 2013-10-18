@@ -11,6 +11,8 @@
 #include "CbmStsTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmGeoStsPar.h"
+#include "CbmStsDigiPar.h"
+#include "CbmStsDigiScheme.h"
 
 // Includes from base
 #include "FairGeoNode.h"
@@ -25,6 +27,7 @@
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TFile.h"
+#include "TGeoManager.h"
 #include "TH1F.h"
 #include "TList.h"
 #include "TVector3.h"
@@ -53,6 +56,7 @@ CbmStsFindTracksQa::CbmStsFindTracksQa(Int_t iVerbose)
   fMatches(NULL),
   fPassGeo(NULL),
   fStsGeo(NULL),
+  fDigiScheme(new CbmStsDigiScheme()),
   fTargetPos(0.,0.,0.),
   fNStations(0),
   fMinHits(4),
@@ -115,6 +119,7 @@ CbmStsFindTracksQa::CbmStsFindTracksQa(Int_t minHits, Double_t quota,
   fMatches(NULL),
   fPassGeo(NULL),
   fStsGeo(NULL),
+  fDigiScheme(new CbmStsDigiScheme()),
   fTargetPos(0.,0.,0.),
   fNStations(0),
   fMinHits(minHits),
@@ -178,6 +183,8 @@ CbmStsFindTracksQa::~CbmStsFindTracksQa() {
 // -----   Public method SetParContainers   --------------------------------
 void CbmStsFindTracksQa::SetParContainers() {
 
+  cout << GetName() << ": SetParContainers" << endl;
+
   // Get Run
   FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) {
@@ -201,14 +208,14 @@ void CbmStsFindTracksQa::SetParContainers() {
 	 << "No passive geometry parameters!" << endl;
     return;
   }
+  cout << "Passive :" << fPassGeo << endl;
 
   // Get STS geometry parameters
   fStsGeo = (CbmGeoStsPar*) runDb->getContainer("CbmGeoStsPar");
-  if ( ! fStsGeo ) {
-    cout << "-E- " << GetName() << "::SetParContainers: "
-	 << "No STS geometry parameters!" << endl;
-    return;
-  }
+  cout << "StsGeo :" << fStsGeo << endl;
+
+  // Get STS digitisation parameter container
+  fDigiPar = (CbmStsDigiPar*) runDb->getContainer("CbmStsDigiPar");
 
 }
 // -------------------------------------------------------------------------
@@ -265,6 +272,11 @@ InitStatus CbmStsFindTracksQa::Init() {
 	 << endl;
     return kERROR;
   }
+
+  // Build digitisation scheme
+  Bool_t success = fDigiScheme->Init(fStsGeo, fDigiPar);
+  if ( ! success ) return kERROR;
+
 
   // Get the geometry of target and STS
   InitStatus geoStatus = GetGeometry();
@@ -579,53 +591,67 @@ void CbmStsFindTracksQa::Finish() {
 InitStatus CbmStsFindTracksQa::GetGeometry() {
 
   // Get target geometry
-  if ( ! fPassGeo ) {
-    cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
-	 <<endl;
-    fTargetPos.SetXYZ(0., 0., 0.);
-    return kERROR;
-  }
-  TObjArray* passNodes = fPassGeo->GetGeoPassiveNodes();
-  if ( ! passNodes ) {
-    cout << "-W- " << GetName() << "::GetGeometry: No passive node array"
-	 << endl;
-    fTargetPos.SetXYZ(0., 0., 0.);
-    return kERROR;
-  }
-  FairGeoNode* target = (FairGeoNode*) passNodes->FindObject("targ");
-  if ( ! target ) {
-    cout << "-E- " << GetName() << "::GetGeometry: No target node"
-	 << endl;
-    fTargetPos.SetXYZ(0., 0., 0.);
-    return kERROR;
-  }
-  FairGeoVector targetPos = target->getLabTransform()->getTranslation();
-  FairGeoVector centerPos = target->getCenterPosition().getTranslation();
-  Double_t targetX = targetPos.X() + centerPos.X();
-  Double_t targetY = targetPos.Y() + centerPos.Y();
-  Double_t targetZ = targetPos.Z() + centerPos.Z();
-  fTargetPos.SetXYZ(targetX, targetY, targetZ);
+  GetTargetPosition();
 
-  // Get STS geometry
-  if ( ! fStsGeo ) {
-    cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
-	 <<endl;
-    fNStations = 0;
-    return kERROR;
-  }
-  TObjArray* stsNodes = fStsGeo->GetGeoSensitiveNodes();
-  if ( ! stsNodes ) {
-    cout << "-E- " << GetName() << "::GetGeometry: No STS node array"
-	 << endl;
-    fNStations = 0;
-    return kERROR;
-  }
-  fNStations = stsNodes->GetEntries();
+  fNStations = fDigiScheme->GetNStations();
+
 
   return kSUCCESS;
 
 }
 // -------------------------------------------------------------------------
+
+
+// -----   Get target node   -----------------------------------------------
+void CbmStsFindTracksQa::GetTargetPosition() {
+
+  TGeoNode* target;
+
+  gGeoManager->CdTop();
+  TGeoNode* cave = gGeoManager->GetCurrentNode();
+  for (Int_t iNode1 = 0; iNode1 < cave->GetNdaughters(); iNode1++) {
+	  TString name = cave->GetDaughter(iNode1)->GetName();
+	  if ( name.Contains("pipe", TString::kIgnoreCase) ) {
+		  LOG(DEBUG) << "Found pipe node " << name << FairLogger::endl;
+		  gGeoManager->CdDown(iNode1);
+		  break;
+	  }
+  }
+  for (Int_t iNode2 = 0; iNode2 < gGeoManager->GetCurrentNode()->GetNdaughters(); iNode2++) {
+	  TString name = gGeoManager->GetCurrentNode()->GetDaughter(iNode2)->GetName();
+	  if ( name.Contains("pipevac1", TString::kIgnoreCase) ) {
+		  LOG(DEBUG) << "Found vacuum node " << name << FairLogger::endl;
+		  gGeoManager->CdDown(iNode2);
+		  break;
+	  }
+  }
+  for (Int_t iNode3 = 0; iNode3 < gGeoManager->GetCurrentNode()->GetNdaughters(); iNode3++) {
+	  TString name = gGeoManager->GetCurrentNode()->GetDaughter(iNode3)->GetName();
+	  if ( name.Contains("target", TString::kIgnoreCase) ) {
+		  LOG(DEBUG) << "Found target node " << name << FairLogger::endl;
+		  gGeoManager->CdDown(iNode3);
+		  target = gGeoManager->GetCurrentNode();
+		  break;
+	  }
+  }
+  if ( ! target ) {
+	  fTargetPos[0] = 0.;
+	  fTargetPos[1] = 0.;
+	  fTargetPos[2] = 0.;
+	  return;
+  }
+  TGeoHMatrix* glbMatrix = gGeoManager->GetCurrentMatrix();
+  Double_t* pos = glbMatrix->GetTranslation();
+  fTargetPos[0] = pos[0];
+  fTargetPos[1] = pos[1];
+  fTargetPos[2] = pos[2];
+
+}
+// -------------------------------------------------------------------------
+
+
+
+
 
 
 

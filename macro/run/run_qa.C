@@ -33,7 +33,7 @@ run_qa()
   
   
   // STS digitisation file
-  TString stsDigiFile = "sts_standard.digi.par";
+  TString stsDigiFile = "sts_v13c_std.digi.par";
 
   // In general, the following parts need not be touched
   // ========================================================================

@@ -46,7 +46,7 @@ void run_reco(Int_t nEvents = 2) {
   TString workDir = gSystem->Getenv("VMCWORKDIR");
   TString paramDir = workDir + "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v13c_std.digi.par";
   parFileList->Add(&stsDigiFile);
 
   TObjString trdDigiFile =  paramDir + "/trd/trd_v13g.digi.par";
@@ -279,6 +279,7 @@ void run_reco(Int_t nEvents = 2) {
   // =========================================================================
   // ===                        RICH reconstruction                        ===
   // =========================================================================
+
 
   // ---------------------RICH Hit Producer ----------------------------------
   CbmRichHitProducer* richHitProd  = new CbmRichHitProducer();

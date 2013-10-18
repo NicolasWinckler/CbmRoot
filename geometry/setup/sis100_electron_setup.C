@@ -38,7 +38,7 @@ void sis100_electron_setup()
   pipeGeom     = "pipe/pipe_v13b.geo.root"; 
   magnetGeom   = "magnet/magnet_v12b.geo.root";
   stsGeom      = "sts/sts_v13c.geo.root";
-  richGeom     = "rich/rich_v13a.gdml";
+  richGeom     = "rich/rich_v08a.geo";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13a.geo";
   trdGeom      = "trd/trd_v13k.geo.root";

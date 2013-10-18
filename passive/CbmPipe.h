@@ -12,6 +12,8 @@ class CbmPipe : public FairModule {
     virtual void ConstructGeometry();
 
     virtual void ConstructAsciiGeometry();
+
+    virtual Bool_t CheckIfSensitive(std::string name) { return kFALSE; }
    
   ClassDef(CbmPipe,1) //CBMPIPE
 

@@ -11,6 +11,13 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "TH1.h"
+#include "CbmTrdPoint.h"
+#include "TGeoManager.h"
+#include "CbmTrdGeoHandler.h"
+
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 #include <iomanip>
@@ -648,6 +655,81 @@ void CbmTrdRadiator::Init(){
 }
 //----------------------------------------------------------------------------
 
+//---- Lattice Hit------------------------------------------------------------
+Bool_t CbmTrdRadiator::LatticeHit(const CbmTrdPoint* point){
+  //printf("---------------------------------------------------\n");
+  Double_t point_in[3];
+  Double_t point_out[3];
+  if (NULL != point){
+    point_in[0] = point->GetXIn();
+    point_in[1] = point->GetYIn();
+    point_in[2] = point->GetZIn();
+
+    point_out[0] = point->GetXOut();
+    point_out[1] = point->GetYOut();
+    point_out[2] = point->GetZOut();
+    Double_t back_direction[3] = {(point_in[0] - point_out[0]),
+				  (point_in[1] - point_out[1]),
+				  (point_in[2] - point_out[2])
+    };
+    if (back_direction[2] > 0){
+      LOG(DEBUG2) << "CbmTrdRadiator::LatticeHit: MC-track points towards target!" << FairLogger::endl;
+      //for(Int_t i = 0; i < 3; i++)
+      //printf("%i:  in:%8.2f  out:%8.2f direction:%8.2f\n",i,point_in[i],point_out[i],back_direction[i]);
+      return false;
+    }
+    Double_t trackLength = TMath::Sqrt(back_direction[0] * back_direction[0] + 
+				       back_direction[1] * back_direction[1] + 
+				       back_direction[2] * back_direction[2] 
+				       );
+
+    trackLength *= 10.; // cm -> mm to get a step width of 1mm
+    //printf("track length:%7.2fmm\n",trackLength);
+    gGeoManager->FindNode((point_out[0] + point_in[0]) / 2, 
+			  (point_out[1] + point_in[1]) / 2, 
+			  (point_out[2] + point_in[2]) / 2
+			  );
+
+    Double_t pos[3] = {point_in[0], point_in[1], point_in[2]}; // start at entrance point
+
+    for(Int_t i = 0; i < 3; i++){
+      back_direction[i] /= trackLength;
+      //printf("%i:  in:%8.2f  out:%8.2f  start:%8.2f direction:%8.2f\n",i,point_in[i],point_out[i],pos[i],back_direction[i]);
+    }
+    if (TString(gGeoManager->GetPath()).Contains("gas")){
+      Int_t stepCount = 0;
+      while (/*(!TString(gGeoManager->GetPath()).Contains("lattice") || !TString(gGeoManager->GetPath()).Contains("radiator")) &&*/ pos[2] >= point_in[2] - 5 && stepCount < 50) {
+	stepCount++;
+	//printf("step%i\n",stepCount);
+	for(Int_t i = 0; i < 3; i++){
+	  pos[i] += back_direction[i];
+	  //printf("%8.2f   ",pos[i]);
+	}
+	//printf("   %s\n",TString(gGeoManager->GetPath()).Data());
+	gGeoManager->FindNode(pos[0], pos[1], pos[2]);
+	if (TString(gGeoManager->GetPath()).Contains("radiator")) {
+	  //printf ("%s false\n",TString(gGeoManager->GetPath()).Data());
+	  return false;
+	} else if (TString(gGeoManager->GetPath()).Contains("lattice")) {
+	  //printf ("%s true <----------------------------------------\n",TString(gGeoManager->GetPath()).Data());
+	  return true;
+	} else if (TString(gGeoManager->GetPath()).Contains("frame")) {
+	  //printf ("%s true <----------------------------------------\n",TString(gGeoManager->GetPath()).Data());
+	  return true;
+	} else {
+	  //printf ("%s\n",TString(gGeoManager->GetPath()).Data());
+	}
+      }
+    } else {
+      LOG(ERROR) << "CbmTrdRadiator::LatticeHit: MC-track not in TRD! Node:" << TString(gGeoManager->GetPath()).Data() << " gGeoManager->MasterToLocal() failed!" << FairLogger::endl;
+      return false;
+    }
+  } else {
+    LOG(ERROR) << "CbmTrdRadiator::LatticeHit: CbmTrdPoint == NULL!" << FairLogger::endl;
+    return false;
+  }
+}
+//----------------------------------------------------------------------------
 // ---- Spectra Production ---------------------------------------------------
 void CbmTrdRadiator::ProduceSpectra(){
 

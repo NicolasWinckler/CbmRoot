@@ -16,6 +16,7 @@
 #include "TVector3.h"
 
 class TH1D;
+class CbmTrdPoint;
 
 class CbmTrdRadiator 
 {
@@ -124,6 +125,8 @@ class CbmTrdRadiator
   void          SetFoilThick(Float_t t) { fFoilThick = t; }
   void          SetGapThick(Float_t t)  { fGapThick  = t; }
   void          SetSigma(Int_t SigmaT);
+
+  Bool_t LatticeHit(const CbmTrdPoint* point);
  
  private:
 

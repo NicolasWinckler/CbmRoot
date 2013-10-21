@@ -212,6 +212,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   Int_t nCount = 0;
   Int_t nEntries = fTrdPoints->GetEntries();
   Int_t pointId;
+  Int_t iLatticeHits(0), iElectrons(0), iBackwardTrack(0);
   if (fDebug) 
     nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Buffer of TRD" << endl;
@@ -236,15 +237,6 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 
     if(NULL == track) continue;
 
-    // Add TR energy loss for electrons ans positrons
-    Int_t pdgCode = track->GetPdgCode();
-    if(TMath::Abs(pdgCode) == 11){ 
-      ELossTR = fRadiators->GetTR(mom);
-    }
-    ELossdEdX = point->GetEnergyLoss();
-    ELoss = ELossTR + ELossdEdX;
-
-    fTime = point->GetTime();
 
     Double_t point_in[3];
     Double_t point_out[3];
@@ -256,6 +248,41 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     point_out[0] = point->GetXOut();
     point_out[1] = point->GetYOut();
     point_out[2] = point->GetZOut();
+
+
+    Double_t direction[3] = {point_out[0] - point_in[0],
+			     point_out[1] - point_in[1],
+			     point_out[2] - point_in[2]};
+
+    if (direction[2] < 0){
+      LOG(DEBUG2) << "CbmTrdDigitizerPRF::Exec: MC-track points towards target!" << FairLogger::endl;
+      iBackwardTrack++;
+      //TString ori[3] = {"x","y","z"};
+      //for(Int_t i = 0; i < 3; i++)
+      //printf("            %s:  in:%8.2f  out:%8.2f direction:%8.2f\n",ori[i].Data(),point_in[i],point_out[i],direction[i]);      
+    }
+
+
+    // Add TR energy loss for electrons ans positrons
+    Int_t pdgCode = track->GetPdgCode();
+  
+    if(TMath::Abs(pdgCode) == 11){ 
+      iElectrons++;
+      if (fRadiators->LatticeHit(point)){  // electron has passed lattice grid (or frame material) befor reaching the gas volume -> TR-photons have been absorbed by the lattice grid
+	iLatticeHits++;
+	ELossTR = 0.0;
+      } else if (direction[2] < 0){ //electron has not passed the radiator
+	ELossTR = 0.0;
+      } else {
+	ELossTR = fRadiators->GetTR(mom);
+      }
+    }
+    ELossdEdX = point->GetEnergyLoss();
+    ELoss = ELossTR + ELossdEdX;
+
+    fTime = point->GetTime();
+
+
 
     // Find node corresponding to the point in the center between entrance and exit MC-point coordinates
     gGeoManager->FindNode((point_out[0] + point_in[0]) / 2, 
@@ -315,6 +342,8 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     iDigi++;
   }
   fDigiMap.clear();
+  printf("\n   %i tracks pointing towards target (%5.1f%%)\n",iBackwardTrack,100.*iBackwardTrack/nEntries);
+  printf("\n   %i electron tracks through lattice material of %i electrons (%5.1f%%)\n",iLatticeHits,iElectrons,100*iLatticeHits/Double_t(iElectrons));
   printf("\n   Created %i TrdDigis  %7.3f Digis/MC-Point\n",iDigi, Double_t(iDigi/nEntries));
   timer.Stop();
   Double_t rtime = timer.RealTime();

@@ -48,9 +48,11 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
   TString firstModule = "";
   Int_t blockCounter(0), startCounter(0); // , stopCounter(0);
   Double_t msX(0), msY(0), mpX(0), mpY(0), mpZ(0), psX(0), psY(0);
+  Double_t ps1X(0), ps1Y(0), ps2X(0), ps2Y(0), ps3X(0), ps3Y(0);
   std::map<float, TCanvas*> layerView;// map key is z-position of modules
   std::map<float, TCanvas*>::iterator it;
   ifstream digipar;
+
   digipar.open(digiPar.Data(), ifstream::in);
   while (digipar.good()) {
     digipar >> buffer;
@@ -77,6 +79,29 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 	psX = buffer.Atof();
       if (startCounter == 18+1)   // position of pad size in y
 	psY = buffer.Atof();
+
+      if (startCounter == 13)   // position of pad size in x - do not take the backslash
+	ps1X = buffer.Atof();
+      if (startCounter == 15)   // position of pad size in y
+	ps1Y = buffer.Atof();
+
+      if (startCounter == 18)   // position of pad size in x
+	ps2X = buffer.Atof();
+      if (startCounter == 19)   // position of pad size in y
+	ps2Y = buffer.Atof();
+
+      if (startCounter == 22)   // position of pad size in x
+	ps3X = buffer.Atof();
+      if (startCounter == 23)   // position of pad size in y
+	ps3Y = buffer.Atof();
+
+      if (startCounter == 23)   // last element
+      {
+        printf("pad size sector 1: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps1X, ps1Y, ps1X*ps1Y);
+        printf("pad size sector 2: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps2X, ps2Y, ps2X*ps2Y);
+        printf("pad size sector 3: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps3X, ps3Y, ps3X*ps3Y);
+        printf("\n");
+      }
       //printf("module position: (%.1f, %.1f, %.1f) module size: (%.1f, %.1f) pad size: (%.2f, %.2f) pad area: %.2f\n",mpX,mpY,mpZ,2*msX,2*msY,psX,psY,psX*psY);
       if (startCounter == 22+1) {
 	startCounter = 0; // reset

@@ -54,7 +54,7 @@ void much_sim(TString inputSignal = "",
 
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target/target_au_250mu.geo";
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
   TString magnetGeom = "magnet/magnet_v12a.geo";
   TString stsGeom    = "sts/sts_v12b.geo.root";
 
@@ -125,18 +125,13 @@ void much_sim(TString inputSignal = "",
     fRun->AddModule(pipe);
   }
 
-   if ( shieldGeom != "" ) {
+  if ( target ) fRun->AddModule(target);
+
+  if ( shieldGeom != "" ) {
     FairModule* shield = new CbmShield("SHIELD");
     shield->SetGeometryFileName(shieldGeom);
     cout << "    --- " << shieldGeom << endl;
     fRun->AddModule(shield);
-  }
-
-  if ( targetGeom != "" ) {
-    FairModule* target = new CbmTarget("Target");
-    target->SetGeometryFileName(targetGeom);
-    cout << "    --- " << targetGeom << endl;
-    fRun->AddModule(target);
   }
 
   if ( magnetGeom != "" ) {

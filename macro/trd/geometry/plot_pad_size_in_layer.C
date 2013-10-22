@@ -20,7 +20,7 @@
 #include <cmath>
 #include <map>
 
-void plot_pad_size_in_layer(TString digiPar="trd.v12/trd_v12f.digi.par") {
+void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");
@@ -63,22 +63,22 @@ void plot_pad_size_in_layer(TString digiPar="trd.v12/trd_v12f.digi.par") {
     }
     if (read) {
       startCounter++;
-      if (startCounter == 4)
+      if (startCounter == 4+1)   // position of module position in x
 	mpX = buffer.Atof();
-      if (startCounter == 5)
+      if (startCounter == 5+1)   // position of module position in y
 	mpY = buffer.Atof();
-      if (startCounter == 6)
+      if (startCounter == 6+1)   // position of module position in z
 	mpZ = buffer.Atof();
-      if (startCounter == 7)
+      if (startCounter == 7+1)   // position of module size in x
 	msX = buffer.Atof();
-      if (startCounter == 8)
+      if (startCounter == 8+1)   // position of module size in y
 	msY = buffer.Atof();
-      if (startCounter == 17)
+      if (startCounter == 17+1)   // position of pad size in x
 	psX = buffer.Atof();
-      if (startCounter == 18)
+      if (startCounter == 18+1)   // position of pad size in y
 	psY = buffer.Atof();
       //printf("module position: (%.1f, %.1f, %.1f) module size: (%.1f, %.1f) pad size: (%.2f, %.2f) pad area: %.2f\n",mpX,mpY,mpZ,2*msX,2*msY,psX,psY,psX*psY);
-      if (startCounter == 22) {
+      if (startCounter == 22+1) {
 	startCounter = 0; // reset
 	it = layerView.find(mpZ);
 	if (it == layerView.end()){	

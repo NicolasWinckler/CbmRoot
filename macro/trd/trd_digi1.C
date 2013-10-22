@@ -27,6 +27,7 @@ void trd_digi1(Int_t nEvents = 1)
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
   if (digipar.Length() == 0) digipar = "trd_v13g";
+  cout << "finally using     : >> " << digipar << " << " << endl;
 
   FairLogger *logger = FairLogger::GetLogger();
   logger->SetLogFileName("MyLog.log");

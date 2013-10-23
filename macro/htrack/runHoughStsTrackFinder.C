@@ -11,7 +11,7 @@
 //
 // --------------------------------------------------------------------------
 
-Int_t runHoughStsTrackFinder()
+Int_t runHoughStsTrackFinder(Int_t nEvents=2)
 {
 
   // ========================================================================
@@ -48,31 +48,12 @@ Int_t runHoughStsTrackFinder()
   TString digiFile     = "sts_v11a.digi.par";
   //TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
 
-  // Number of events to process
-  Int_t nEvents        = 2;
-
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose       = 1;
 
 
   // In general, the following parts need not be touched
   // ========================================================================
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libPassive");
-  gSystem->Load("libSts");
-  gSystem->Load("libTrkBase");
-  gSystem->Load("libGeane");
-  gSystem->Load("libHTrack");
-  // ------------------------------------------------------------------------
 
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;

@@ -7,7 +7,7 @@
 //
 // --------------------------------------------------------------------------
 
-Int_t runProduceFile()
+Int_t runProduceFile(Int_t nEvents=2)
 {
 
   // ========================================================================
@@ -24,8 +24,6 @@ Int_t runProduceFile()
 
   // Trigger (centrality)
   TString trigger     = "centr";
-  // Number of events
-  Int_t   nEvents     = 2;
 
   // Output file name
   TString outFile     = folder + "/" + system + "." + beam + "." + trigger + ".mc.root";
@@ -36,8 +34,7 @@ Int_t runProduceFile()
   // Cave geometry
   TString caveGeom    = "cave.geo";
 
-  // Target geometry
-  TString targetGeom  = "target/target_au_250mu.geo";
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
 
   // Beam pipe geometry
   TString pipeGeom    = "pipe/pipe_standard.geo";
@@ -75,29 +72,12 @@ Int_t runProduceFile()
   timer.Start();
   // ------------------------------------------------------------------------
 
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libSts");
-  // ------------------------------------------------------------------------
-
   // -----   Create detectors and passive volumes   -------------------------
   FairModule* cave   = new CbmCave("CAVE");
   cave->SetGeometryFileName(caveGeom);
 
   FairModule* pipe   = new CbmPipe("PIPE");
   pipe->SetGeometryFileName(pipeGeom);
-
-  FairModule* target = new CbmTarget("Target");
-  target->SetGeometryFileName(targetGeom);
 
   FairModule* magnet = new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
@@ -140,7 +120,7 @@ Int_t runProduceFile()
   fRun->SetMaterials("media.geo");       // Materials
   fRun->AddModule(cave);
   fRun->AddModule(pipe);
-  fRun->AddModule(target);
+  if ( target ) fRun->AddModule(target);
   fRun->AddModule(magnet);
   fRun->AddModule(sts);
   fRun->SetField(magField);

@@ -11,7 +11,7 @@ void run()
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target/target_au_250mu.geo";
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
   TString pipeGeom   = "pipe/pipe_standard.geo";
   TString magnetGeom = "magnet/magnet_v09e.geo";
   TString stsGeom    = "sts/sts_v11a.geo";
@@ -54,9 +54,7 @@ void run()
   Pipe->SetGeometryFileName(pipeGeom);
   fRun->AddModule(Pipe);
   
-  FairModule *Target= new CbmTarget("Target");
-  Target->SetGeometryFileName(targetGeom);
-  fRun->AddModule(Target);		
+  fRun->AddModule(target);		
 
   FairModule *Magnet= new CbmMagnet("MAGNET");
   Magnet->SetGeometryFileName(magnetGeom);

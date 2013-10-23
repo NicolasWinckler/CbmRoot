@@ -32,7 +32,7 @@ Int_t mvd_qa1_transUrqmd()
   TString caveGeom = "cave.geo";
 
   // Target geometry
-  TString targetGeom = "target/target_au_250mu.geo";
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
 
   // Beam pipe geometry
   TString pipeGeom = "pipe/pipe_standard.geo";
@@ -49,9 +49,6 @@ Int_t mvd_qa1_transUrqmd()
   // In general, the following parts need not be touched
   // ========================================================================
 
-
-
-
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
@@ -63,23 +60,6 @@ Int_t mvd_qa1_transUrqmd()
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  // ------------------------------------------------------------------------
-
- 
- 
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -102,8 +82,6 @@ Int_t mvd_qa1_transUrqmd()
   pipe->SetGeometryFileName(pipeGeom);
   fRun->AddModule(pipe);
   
-  FairModule* target= new CbmTarget("Target");
-  target->SetGeometryFileName(targetGeom);
   fRun->AddModule(target);		
 
   FairModule* magnet= new CbmMagnet("MAGNET");

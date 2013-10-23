@@ -51,14 +51,6 @@ class CbmTrdDigitizerPRF : public FairTask {
   /** Executed task **/
   virtual void Exec(Option_t * option);
 
-  /** Finish (called after each event) **/
-  virtual void FinishEvent();
- 
-  /** Finish task (called after all event) **/
-  virtual void FinishTask(){;}
-
-  void Register();
-
  private:
 
   CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
@@ -86,7 +78,7 @@ class CbmTrdDigitizerPRF : public FairTask {
   Int_t   fModuleType;
   Int_t   fModuleCopy;
   //Int_t   fModuleID;//Unique number for detector module
-  Int_t   fMCindex;// index to MCPoint
+  Int_t   fMCPointId;// index to MCPoint
   //Double_t fELossTR;
 
   TClonesArray *fTrdPoints; //! Trd MC points

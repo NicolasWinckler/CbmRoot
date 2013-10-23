@@ -49,7 +49,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
     fModuleType(-1),
     fModuleCopy(-1),
     fModuleAddress(-1),
-    fMCindex(-1),
+    fMCPointId(-1),
     fnRow(-1),
     fnCol(-1),
     fnSec(-1),
@@ -77,7 +77,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
    fModuleType(-1),
    fModuleCopy(-1),
    fModuleAddress(-1),
-   fMCindex(-1),
+   fMCPointId(-1),
     fnRow(-1),
     fnCol(-1),
     fnSec(-1),
@@ -196,6 +196,9 @@ InitStatus CbmTrdDigitizerPRF::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
 {
+  fDigis->Clear();
+  fDigiMatchs->Clear();
+
   fDebug = false;
   TStopwatch timer;
   timer.Start();
@@ -211,13 +214,12 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   Double_t time;
   Int_t nCount = 0;
   Int_t nEntries = fTrdPoints->GetEntries();
-  Int_t pointId;
   Int_t iLatticeHits(0), iElectrons(0), iBackwardTrack(0);
   if (fDebug) 
     nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Buffer of TRD" << endl;
   for (Int_t j = 0; j < nEntries ; j++ ){
-    pointId = j;
+    fMCPointId = j;
     ELoss = 0.0;
     ELossTR = 0.0;
     ELossdEdX = 0.0;
@@ -229,8 +231,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
     if(NULL == point) continue;
 
     point->Momentum(mom);
-    fMCindex=point->GetTrackID();
-    track = (CbmMCTrack*) fMCStacks->At(fMCindex);
+    track = (CbmMCTrack*) fMCStacks->At(point->GetTrackID());
     if(NULL == track) {
       cout << " no point found " << endl;
     }
@@ -428,7 +429,7 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	sum += chargeFraction;
 	//if (iCol >= stopCol)
 
-	AddDigi(fMCindex, address, Double_t(chargeFraction * clusterELoss), fTime);
+	AddDigi(fMCPointId, address, Double_t(chargeFraction * clusterELoss), fTime);
 	
 	if (fDebug) {
 	  if (rowId == iRow && columnId == iCol)
@@ -524,20 +525,5 @@ void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, 
     digiMatch->AddPoint(pointId);
   }
 }
-// ---- FinishTask-----------------------------------------------------
-void CbmTrdDigitizerPRF::FinishEvent()
-{  
-  fDigis->Delete();
-  fDigiMatchs->Delete();
-  fTrdPoints->Clear();
-  fMCStacks->Clear();
-}
-// ---- Register ------------------------------------------------------
-void CbmTrdDigitizerPRF::Register()
-{
-  FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigis, kTRUE);
-  FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchs, kTRUE);
-}
-// --------------------------------------------------------------------
 
 ClassImp(CbmTrdDigitizerPRF)

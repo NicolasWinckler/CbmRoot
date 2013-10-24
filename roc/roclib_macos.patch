@@ -203,3 +203,14 @@
  
  $(MBSFAPI_DS): $(MBSFAPI_H)  $(MBSFAPI_LINKDEF)
  	echo "Generating root dictionary $(MBSFAPI_DS) ..."
+--- roclib/Makefile~	2013-10-24 14:16:13.000000000 +0200
++++ roclib/Makefile	2013-10-24 14:21:11.000000000 +0200
+@@ -41,7 +41,7 @@
+ 
+ $(ROCDICT_LIB): $(ROCDICT_OBJ)
+ 	@echo 'Building: $@'
+-	@$(LD) -o $@ -shared -O $(ROCDICT_OBJ)
++	@$(LD) -o $@ -shared -flat_namespace -single_module -undefined dynamic_lookup -O $(ROCDICT_OBJ)
+ 
+ dict: $(ROCDICT_LIB) $(ROCDICT_MAP)
+ 

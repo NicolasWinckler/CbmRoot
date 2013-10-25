@@ -1,61 +1,50 @@
-/** CbmMuchHitProducer class
- *
- * @author  A.Kiseleva
- * @version 0.0
- * @since   13.04.06
- *
- *  Hit producer for MUon CHambers detector
- *
+/**
+ * \file CbmMuchHitProducerIdeal.h
+ * \author  A.Kiseleva
+ * \date 13.04.06
+ * \brief Ideal hit producer for MUon CHambers detector.
  */
 
-#ifndef CBMMUCHHITPRODUCERIDEAL_H
-#define CBMMUCHHITPRODUCERIDEAL_H
+#ifndef CBMMUCHHITPRODUCERIDEAL_H_
+#define CBMMUCHHITPRODUCERIDEAL_H_
 
 #include "FairTask.h"
+#include "TString.h"
 
 class TClonesArray;
-class TString;
+class CbmMuchGeoScheme;
 
-class CbmMuchHitProducerIdeal : public FairTask {
+class CbmMuchHitProducerIdeal : public FairTask
+{
+public:
 
-  public:
+   CbmMuchHitProducerIdeal(const char* digiFileName);
 
-    CbmMuchHitProducerIdeal(const char *name="MuchHitProducer", Int_t verbose = 1,
-        Double_t SigmaXY = 0.0100, Double_t SigmaZ = 0. );
+   virtual ~CbmMuchHitProducerIdeal();
 
-    virtual ~CbmMuchHitProducerIdeal();
+   InitStatus Init();
+   void Exec(Option_t * option);
+   void Finish();
 
-    virtual InitStatus Init();// *MENU*
-    virtual void Exec(Option_t * option);
-    virtual void FinishTask();// *MENU*
+   void SetSigmaX(Double_t sigma) { fSigmaX = sigma; }
+   void SetSigmaY(Double_t sigma) { fSigmaY = sigma; }
+   void SetSigmaZ(Double_t sigma) { fSigmaZ = sigma; }
 
-    void Register();
+private:
+   TClonesArray* fMuchPoints; // Much MC points
+   TClonesArray* fMuchPixelHits; // Much hits
 
-    void AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr, Int_t ref );
+   Double_t fSigmaX;
+   Double_t fSigmaY;
+   Double_t fSigmaZ;
 
-    void SetSigmaXY(Double_t sigma);
-    void SetSigmaZ(Double_t sigma);
+   TString fDigiFile; // Digitization file
+   CbmMuchGeoScheme* fGeoScheme; // Geometry scheme
 
-    Double_t GetSigmaXY();
-    Double_t GetSigmaZ();
+   CbmMuchHitProducerIdeal(const CbmMuchHitProducerIdeal&);
+   CbmMuchHitProducerIdeal& operator=(const CbmMuchHitProducerIdeal&);
 
-  private:
-
-    Int_t fVerbose;
-
-    TClonesArray *fMuchPoints; //! Much MC points
-    TClonesArray *fHitCollection; //! Much hits
-
-    Double_t fSigmaXY;//!
-    Double_t fSigmaZ; //!
-
-    TString fVersion; //!
-    Int_t  fNHits;    //!!
-
-    CbmMuchHitProducerIdeal(const CbmMuchHitProducerIdeal&);
-    CbmMuchHitProducerIdeal& operator=(const CbmMuchHitProducerIdeal&);
-
-    ClassDef(CbmMuchHitProducerIdeal,1)
+   ClassDef(CbmMuchHitProducerIdeal, 1);
 };
 
 #endif

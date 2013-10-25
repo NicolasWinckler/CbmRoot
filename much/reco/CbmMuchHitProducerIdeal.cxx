@@ -1,182 +1,93 @@
-/** CbmMuchHitProducer class
- *
- * @author  A.Kiseleva
- * @version 0.0
- * @since   13.04.06
- *
- *  Hit producer for MUon CHambers detector
- *
+/**
+ * \file CbmMuchHitProducerIdeal.cxx
+ * \author  A.Kiseleva
+ * \date 13.04.06
  */
 
-#include <iostream>
-
-#include "TRandom.h"
-#include "TVector3.h"
-#include "TMath.h"
-#include "TStyle.h"
-#include "TCanvas.h"
-#include "TClonesArray.h"
-
 #include "CbmMuchHitProducerIdeal.h"
-#include "FairMCApplication.h"
-#include "FairDetector.h"
 #include "FairRootManager.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchPixelHit.h"
+#include "CbmMuchGeoScheme.h"
 
-using std::cout;
-using std::endl;
+#include "TClonesArray.h"
+#include "TRandom.h"
+#include "TVector3.h"
+#include "TFile.h"
 
-ClassImp(CbmMuchHitProducerIdeal)
+#include <cmath>
 
+using std::fabs;
 
-// ---- Constructor ----------------------------------------------------
-CbmMuchHitProducerIdeal::CbmMuchHitProducerIdeal(const char *name, Int_t verbose,
-				       Double_t SigmaXY, Double_t SigmaZ )
-: FairTask(name,verbose),
-  fVerbose(verbose),
+CbmMuchHitProducerIdeal::CbmMuchHitProducerIdeal(const char* digiFileName)
+: FairTask("CbmMuchHitProducerIdeal"),
+  fDigiFile(digiFileName),
+  fGeoScheme(NULL),
   fMuchPoints(NULL),
-  fHitCollection(new TClonesArray("CbmMuchHit", 100)),
-  fSigmaXY(SigmaXY),
-  fSigmaZ(SigmaZ),
-  fVersion(""),
-  fNHits(0)
+  fMuchPixelHits(NULL),
+  fSigmaX(0.01),
+  fSigmaY(0.01),
+  fSigmaZ(0.)
 {
 }
-// --------------------------------------------------------------------
 
-
-
-// ---- Destructor ----------------------------------------------------
 CbmMuchHitProducerIdeal::~CbmMuchHitProducerIdeal()
 {
 }
-// --------------------------------------------------------------------
 
-
-
-// ---- Init ----------------------------------------------------------
 InitStatus CbmMuchHitProducerIdeal::Init()
 {
-  fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");
-  Register();
-  return kSUCCESS;
+   FairRootManager* ioman = FairRootManager::Instance();
+   fMuchPoints = static_cast<TClonesArray*>(ioman->GetObject("MuchPoint"));
+   fMuchPixelHits = new TClonesArray("CbmMuchPixelHit", 100);
+   ioman->Register("MuchPixelHit", "MUCH", fMuchPixelHits, kTRUE);
+
+   // Initialize GeoScheme
+   fGeoScheme = CbmMuchGeoScheme::Instance();
+   TFile* oldfile = gFile;
+   TFile* file = new TFile(fDigiFile);
+   TObjArray* stations = (TObjArray*) file->Get("stations");
+   file->Close();
+   file->Delete();
+   gFile = oldfile;
+   fGeoScheme->Init(stations);
+   return kSUCCESS;
 }
-// --------------------------------------------------------------------
 
-
-// ---- Exec ----------------------------------------------------------
 void CbmMuchHitProducerIdeal::Exec(Option_t * option)
 {
-  fHitCollection->Clear();
-  fNHits = 0;
-  Int_t nMuchPoint = fMuchPoints->GetEntries();
-
-  if(fVerbose > 0)cout <<  "-I- CbmMuchHitProducer : " << nMuchPoint
-		       << " Much points in this event" << endl;
-
-
-  CbmMuchPoint *pt1 = NULL;
-  TVector3 pos1, pos2;
-  Double_t delta_x, delta_y, delta_z;
-  Double_t xHit, yHit, zHit;
-  Double_t xHitErr, yHitErr, zHitErr;
-
-  for (int j=0; j < nMuchPoint; j++ )
-    {
-
-      pt1 = (CbmMuchPoint*) fMuchPoints->At(j);
-      if(NULL == pt1)continue;
-
-      // Get point position
-      pt1->Position(pos1);
+   static Int_t eventNo = 0;
+   fMuchPixelHits->Clear();
+   Int_t iHit = 0;
+   Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
+   for (Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++) {
+      const CbmMuchPoint* point = static_cast<const CbmMuchPoint*>(fMuchPoints->At(iPoint));
 
       // Smear position
-      delta_x = gRandom->Gaus(0, fSigmaXY);
-      delta_y = gRandom->Gaus(0, fSigmaXY);
-      delta_z = gRandom->Gaus(0, fSigmaZ);
-      if(TMath::Abs(delta_x) > 3*fSigmaXY)delta_x = 3*fSigmaXY*delta_x/TMath::Abs(delta_x);
-      if(TMath::Abs(delta_y) > 3*fSigmaXY)delta_y = 3*fSigmaXY*delta_y/TMath::Abs(delta_y);
-      if(TMath::Abs(delta_z) > 3*fSigmaZ)delta_z = 3*fSigmaZ*delta_z/TMath::Abs(delta_z);
+      Double_t dX = gRandom->Gaus(0, fSigmaX);
+      Double_t dY = gRandom->Gaus(0, fSigmaY);
+      Double_t dZ = gRandom->Gaus(0, fSigmaZ);
 
-      xHit = pos1.X() + delta_x;
-      yHit = pos1.Y() + delta_y;
-      zHit = pos1.Z() + delta_z;
+      dX = (fabs(dX) < 3 * fSigmaX) ? dX : (dX > 0) ? 3 * fSigmaX : -3 * fSigmaX;
+      dY = (fabs(dY) < 3 * fSigmaY) ? dY : (dY > 0) ? 3 * fSigmaY : -3 * fSigmaY;
+      dZ = (fabs(dZ) < 3 * fSigmaZ) ? dZ : (dZ > 0) ? 3 * fSigmaZ : -3 * fSigmaZ;
 
-      xHitErr = fSigmaXY;
-      yHitErr = fSigmaXY;
-      zHitErr = fSigmaZ;
+      TVector3 hitPos(point->GetXIn() + dX, point->GetYIn() + dY, point->GetZIn() + dZ);
+      TVector3 hitPosErr(fSigmaX, fSigmaY, fSigmaZ);
 
-      TVector3 hitPos(xHit, yHit, zHit);
-      TVector3 hitPosErr(xHitErr, yHitErr, zHitErr);
-      TVector3	mom;
-      pt1->Momentum(mom);
-      AddHit(pt1->GetDetectorID(), hitPos, hitPosErr,j );
-    }
-  if(fVerbose > 0) cout << "-I- CbmMuchHitProducer : " << fNHits
-			<< " Much hits created in this event" << endl;
+      Int_t address = point->GetDetectorID();
+      Int_t planeId = fGeoScheme->GetLayerSideNr(address);
+
+      new ((*fMuchPixelHits)[iHit++]) CbmMuchPixelHit(address, hitPos, hitPosErr, 0, iPoint, planeId);
+   }
+   eventNo++;
+   LOG(INFO) << "CbmMuchHitProducerIdeal::Exec: eventNo=" << eventNo << " nofPoints="
+         << fMuchPoints->GetEntries() << " nofHits=" << fMuchPixelHits->GetEntries()
+         << FairLogger::endl;
 }
-// --------------------------------------------------------------------
 
-
-
-// ---- Add Hit to HitCollection --------------------------------------
-void CbmMuchHitProducerIdeal::AddHit(Int_t detID, TVector3 &posHit,
-				TVector3 &posHitErr, Int_t ref )
-{
-  new((*fHitCollection)[fNHits]) CbmMuchPixelHit(detID, posHit, posHitErr, 0, ref, -1);
-  if(fVerbose > 1) {
-    CbmMuchPixelHit* MuchHit = (CbmMuchPixelHit*) fHitCollection->At(fNHits);
-    //MuchHit->Print();
-    cout << endl;
-  }
-  fNHits++;
-}
-// --------------------------------------------------------------------
-
-
-
-// ---- Finish --------------------------------------------------------
-void CbmMuchHitProducerIdeal::FinishTask()
+void CbmMuchHitProducerIdeal::Finish()
 {
 }
-// --------------------------------------------------------------------
 
-
-
-// ---- Register ------------------------------------------------------
-void CbmMuchHitProducerIdeal::Register()
-{
-  FairRootManager::Instance()->Register("MuchHit", "Much",
-				       fHitCollection, kTRUE);
-}
-
-// ---- SetSigmaXY -----------------------------------------------------
-void CbmMuchHitProducerIdeal::SetSigmaXY(Double_t sigma)
-{
-  fSigmaXY = sigma;
-}
-// --------------------------------------------------------------------
-
-// ---- SetSigmaZ -----------------------------------------------------
-void CbmMuchHitProducerIdeal::SetSigmaZ(Double_t sigma)
-{
-  fSigmaZ = sigma;
-}
-// --------------------------------------------------------------------
-// ---- GetSigmaXY -----------------------------------------------------
-Double_t CbmMuchHitProducerIdeal::GetSigmaXY()
-{
-  return  fSigmaXY;
-}
-// --------------------------------------------------------------------
-
-// ---- GetSigmaZ -----------------------------------------------------
-Double_t CbmMuchHitProducerIdeal::GetSigmaZ()
-{
-  return  fSigmaZ;
-}
-// --------------------------------------------------------------------
-
-
-
+ClassImp(CbmMuchHitProducerIdeal)

@@ -22,7 +22,7 @@
 #include <cmath>
 #include <map>
 
-void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
+void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t nlines=1, Int_t onlyfirstlayer=0) {
 
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");
@@ -46,11 +46,13 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
   fLayerDummy->GetZaxis()->SetTitleOffset(-2);
 
   TString title;
+  TString title1, title2, title3;
   TString buffer;
   TString firstModule = "";
   Int_t blockCounter(0), startCounter(0); // , stopCounter(0);
   Double_t msX(0), msY(0), mpX(0), mpY(0), mpZ(0), psX(0), psY(0);
   Double_t ps1X(0), ps1Y(0), ps2X(0), ps2Y(0), ps3X(0), ps3Y(0);
+  Int_t modId(0), layerId(0);
   std::map<float, TCanvas*> layerView;// map key is z-position of modules
   std::map<float, TCanvas*>::iterator it;
   ifstream digipar;
@@ -67,6 +69,12 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
     }
     if (read) {
       startCounter++;
+      if (startCounter == 1)   // position of module position in x
+      {
+	modId = buffer.Atoi();
+        layerId = (modId & (15 << 4)) >> 4;  // from CbmTrdAddress.h
+      }
+
       if (startCounter == 5)   // position of module position in x
 	mpX = buffer.Atof();
       if (startCounter == 6)   // position of module position in y
@@ -77,10 +85,6 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 	msX = buffer.Atof();
       if (startCounter == 9)   // position of module size in y
 	msY = buffer.Atof();
-      if (startCounter == 18)   // position of pad size in x
-	psX = buffer.Atof();
-      if (startCounter == 19)   // position of pad size in y
-	psY = buffer.Atof();
 
       if (startCounter == 13)   // position of pad size in x - do not take the backslash (@14)
 	ps1X = buffer.Atof();
@@ -88,9 +92,15 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 	ps1Y = buffer.Atof();
 
       if (startCounter == 18)   // position of pad size in x
+      {
 	ps2X = buffer.Atof();
+        psX = ps2X;   // for backwards compatibility - sector 2 is default sector
+      }
       if (startCounter == 19)   // position of pad size in y
+      {
 	ps2Y = buffer.Atof();
+        psY = ps2Y;   // for backwards compatibility - sector 2 is default sector
+      }
 
       if (startCounter == 22)   // position of pad size in x
 	ps3X = buffer.Atof();
@@ -99,18 +109,26 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 
 //      if (startCounter == 23)   // last element
 //      {
+//        printf("moduleId         : %d, %d\n", modId, layerId);
 //        printf("pad size sector 1: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps1X, ps1Y, ps1X*ps1Y);
 //        printf("pad size sector 2: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps2X, ps2Y, ps2X*ps2Y);
 //        printf("pad size sector 3: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps3X, ps3Y, ps3X*ps3Y);
 //        printf("\n");
 //      }
+
       //printf("module position: (%.1f, %.1f, %.1f) module size: (%.1f, %.1f) pad size: (%.2f, %.2f) pad area: %.2f\n",mpX,mpY,mpZ,2*msX,2*msY,psX,psY,psX*psY);
 
       if (startCounter == 23) { // if last element is reached
 	startCounter = 0; // reset
+
+        if ( onlyfirstlayer == 1 )   
+          if ( !((layerId == 0) || (layerId == 4) || (layerId == 8)) )   // plot only 1 layer per station
+            continue;
+
 	it = layerView.find(mpZ);
 	if (it == layerView.end()){	
-	  title.Form("pad_size_layer_at_z_%.2fm",mpZ);  
+	  //	  title.Form("pad_size_layer_at_z_%.2fm",mpZ);  
+	  title.Form("%02d_pad_size_layer%02d", layerId, layerId);  
 	  layerView[mpZ] = new TCanvas(title,title,1200,1000);
 	  fLayerDummy->DrawCopy("");
 
@@ -133,7 +151,6 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 	layerView[mpZ]->cd();
 	//	title.Form("%2.0fcm^{2}",psX*psY);  // print pad size
 	//	title.Form("%.0f",psX*psY);  // print pad size - 1 digit
-	title.Form("%3.1f",psX*psY);  // print pad size - 2 digits
 	TPaveText *text = new TPaveText(mpX - msX,
 					mpY - msY,
 					mpX + msX,
@@ -173,7 +190,20 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par") {
 //        printf("%2.1f: %s\n", psX*psY, "green");
         } 
 
-	text->AddText(title);
+   	title1.Form("%3.1f",ps1X*ps1Y);  // print pad size - 2 digits - sector 1
+	title2.Form("%3.1f",ps2X*ps2Y);  // print pad size - 2 digits - sector 2
+	title3.Form("%3.1f",ps3X*ps3Y);  // print pad size - 2 digits - sector 3
+
+        if (nlines==1)   // plot pad size for central sector only
+	{
+	  text->AddText(title2);
+        }
+        else   // plot pad size for all 3 sectors
+	{
+	  text->AddText(title1);
+	  text->AddText(title2);
+	  text->AddText(title3);
+        }
 	text->Draw("same");
 	//layerView[mpZ]->Update();
       }

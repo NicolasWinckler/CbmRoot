@@ -53,6 +53,8 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
   Double_t msX(0), msY(0), mpX(0), mpY(0), mpZ(0), psX(0), psY(0);
   Double_t ps1X(0), ps1Y(0), ps2X(0), ps2Y(0), ps3X(0), ps3Y(0);
   Int_t modId(0), layerId(0);
+  Double_t sec1(0), sec2(0), sec3(0);
+  Double_t row1(0), row2(0), row3(0);
   std::map<float, TCanvas*> layerView;// map key is z-position of modules
   std::map<float, TCanvas*>::iterator it;
   ifstream digipar;
@@ -86,11 +88,15 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
       if (startCounter == 9)   // position of module size in y
 	msY = buffer.Atof();
 
+      if (startCounter == 12)   // sector 1 size in y
+	sec1 = buffer.Atof();
       if (startCounter == 13)   // position of pad size in x - do not take the backslash (@14)
 	ps1X = buffer.Atof();
       if (startCounter == 15)   // position of pad size in y
 	ps1Y = buffer.Atof();
 
+      if (startCounter == 17)   // sector 2 size in y
+	sec2 = buffer.Atof();
       if (startCounter == 18)   // position of pad size in x
       {
 	ps2X = buffer.Atof();
@@ -102,6 +108,8 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
         psY = ps2Y;   // for backwards compatibility - sector 2 is default sector
       }
 
+      if (startCounter == 21)   // sector 3 size in y
+	sec3 = buffer.Atof();
       if (startCounter == 22)   // position of pad size in x
 	ps3X = buffer.Atof();
       if (startCounter == 23)   // position of pad size in y
@@ -113,6 +121,7 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
 //        printf("pad size sector 1: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps1X, ps1Y, ps1X*ps1Y);
 //        printf("pad size sector 2: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps2X, ps2Y, ps2X*ps2Y);
 //        printf("pad size sector 3: (%.2f cm, %.2f cm) pad area: %.2f cm2\n", ps3X, ps3Y, ps3X*ps3Y);
+//        printf("rows per sector  : %.1f %.1f %.1f\n", sec1/ps1Y, sec2/ps2Y, sec3/ps3Y);
 //        printf("\n");
 //      }
 
@@ -124,6 +133,10 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
         if ( onlyfirstlayer == 1 )   
           if ( !((layerId == 0) || (layerId == 4) || (layerId == 8)) )   // plot only 1 layer per station
             continue;
+
+        row1 = sec1 / ps1Y;
+        row2 = sec2 / ps2Y;
+        row3 = sec3 / ps3Y;
 
 	it = layerView.find(mpZ);
 	if (it == layerView.end()){	
@@ -190,9 +203,13 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
 //        printf("%2.1f: %s\n", psX*psY, "green");
         } 
 
-   	title1.Form("%3.1f",ps1X*ps1Y);  // print pad size - 2 digits - sector 1
-	title2.Form("%3.1f",ps2X*ps2Y);  // print pad size - 2 digits - sector 2
-	title3.Form("%3.1f",ps3X*ps3Y);  // print pad size - 2 digits - sector 3
+//   	title1.Form("%3.1f",ps1X*ps1Y);  // print pad size - 2 digits - sector 1
+//	title2.Form("%3.1f",ps2X*ps2Y);  // print pad size - 2 digits - sector 2
+//	title3.Form("%3.1f",ps3X*ps3Y);  // print pad size - 2 digits - sector 3
+
+   	title1.Form("%3.1f - %.0f", ps1X*ps1Y, row1);  // print pad size - 2 digits - sector 1
+	title2.Form("%3.1f - %.0f", ps2X*ps2Y, row2);  // print pad size - 2 digits - sector 2
+	title3.Form("%3.1f - %.0f", ps3X*ps3Y, row3);  // print pad size - 2 digits - sector 3
 
         if (nlines==1)   // plot pad size for central sector only
 	{

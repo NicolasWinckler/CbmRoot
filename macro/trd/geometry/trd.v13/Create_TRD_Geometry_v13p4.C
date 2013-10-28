@@ -268,7 +268,7 @@ const Double_t DetectorSizeY[2] = { 57., 95.};   // quadratic modules
 
 // Parameters tor the lattice grid reinforcing the entrance window
 const Double_t lattice_o_width[2] = { 1.5, 2.0 };   // Width of outer lattice frame in cm
-const Double_t lattice_i_width[2] = { 0.4, 0.4 };   // Width of inner lattice frame in cm
+const Double_t lattice_i_width[2] = { 0.2, 0.2 };   // { 0.4, 0.4 };   // Width of inner lattice frame in cm
 // Thickness (in z) of lattice frames in cm - see below
 
 // statistics

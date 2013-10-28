@@ -531,11 +531,11 @@ void dump_info_file()
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
       if (PlaneId[iLayer] < 5)
-        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -2.5 * DetectorSizeX[1], 2.5 * DetectorSizeX[1], PlaneId[iLayer]);
+        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -2.5 * DetectorSizeY[1], 2.5 * DetectorSizeY[1], PlaneId[iLayer]);
       else if (PlaneId[iLayer] < 9)
-        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -3.5 * DetectorSizeX[1], 3.5 * DetectorSizeX[1], PlaneId[iLayer]);
+        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -3.5 * DetectorSizeY[1], 3.5 * DetectorSizeY[1], PlaneId[iLayer]);
       else
-        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -4.5 * DetectorSizeX[1], 4.5 * DetectorSizeX[1], PlaneId[iLayer]);
+        fprintf(ifile,"%5d cm to %5d cm y-dimension of layer %2d\n", -4.5 * DetectorSizeY[1], 4.5 * DetectorSizeY[1], PlaneId[iLayer]);
   fprintf(ifile,"\n");
 
   // Show layer positions

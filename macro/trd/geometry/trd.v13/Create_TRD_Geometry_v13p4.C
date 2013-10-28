@@ -3,6 +3,9 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// TODO:
+// integrate lattice grid without Composite shape from v13x and v13y
+// adapt support structure to MUCH platform
 
 // 2013-10-28 - DE - introduce new geometry naming scheme: v13x1 - SIS 100 hadron
 // 2013-10-28 - DE - introduce new geometry naming scheme: v13x2 - SIS 100 electron
@@ -2149,9 +2152,9 @@ add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
 
 void create_box_supports()
 // todo
-// - restore original colors
-// - derive aperture size from module size L (95 cm)
-// - reduce aperture size
+// DONE - restore original colors
+// DONE - derive aperture size from module size L (95 cm)
+// - reduce aperture size for platform
 {
   const TString trd_01 = "support_trd1";
   TGeoVolume* trd_1 = new TGeoVolumeAssembly(trd_01);
@@ -2172,15 +2175,15 @@ void create_box_supports()
   TGeoMedium* keepVolMed        = gGeoMan->GetMedium(KeepingVolumeMedium);
   TGeoMedium* aluminiumVolMed   = gGeoMan->GetMedium(AluminiumVolumeMedium);  // define Volume Medium
 
-  const Int_t I_height = 40; // cm
-  const Int_t I_width  = 30; // cm
-  const Int_t I_thick  =  2; // cm
+  const Int_t I_height = 40; // cm // I profile properties
+  const Int_t I_width  = 30; // cm // I profile properties
+  const Int_t I_thick  =  2; // cm // I profile properties
 
-  Double_t AperX[3] = { 4.5*100., 5.5*100., 6*100.};  // inner aperture in X of support structure for stations 1,2,3
-  Double_t AperX[3] = { 3.5*100., 4.5*100., 5*100.};  // inner aperture in X of support structure for stations 1,2,3
+  Double_t AperX[3] = { 4.5*DetectorSizeX[1], 5.5*DetectorSizeX[1], 6*DetectorSizeX[1] };  // inner aperture in X of support structure for stations 1,2,3
+  Double_t AperY[3] = { 3.5*DetectorSizeY[1], 4.5*DetectorSizeY[1], 5*DetectorSizeY[1] };  // inner aperture in Y of support structure for stations 1,2,3
+//  Double_t AperX[3] = { 450., 550., 600.};  // 100 cm modules  // inner aperture in X of support structure for stations 1,2,3
+//  Double_t AperY[3] = { 350., 450., 500.};  // 100 cm modules  // inner aperture in Y of support structure for stations 1,2,3
 
-  Double_t AperX[3] = { 450., 550., 600.};  // inner aperture in X of support structure for stations 1,2,3
-  Double_t AperY[3] = { 350., 450., 500.};  // inner aperture in Y of support structure for stations 1,2,3
   Double_t PilPosX;
   Double_t BarPosY;
 
@@ -2245,8 +2248,8 @@ void create_box_supports()
       TGeoBBox* trd_I_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
       TGeoVolume* trd_I_vert2     = new TGeoVolume("trd_I_y12", trd_I_vert2_keep, aluminiumVolMed);
 
-      trd_I_vert1->SetLineColor(kBlue);   // Orange);  // Yellow);  // kBlue);  
-      trd_I_vert2->SetLineColor(kBlue);   // Yellow);  // kOrange);
+      trd_I_vert1->SetLineColor(kGreen);  // kBlue);  // Yellow);  // kOrange);
+      trd_I_vert2->SetLineColor(kGreen);  // kBlue);  // Yellow);  // kOrange);
     
       TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[0]+I_height) ) /2.);
       TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[0]+I_height) ) /2.);
@@ -2280,8 +2283,8 @@ void create_box_supports()
       TGeoBBox* trd_I_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (BeamHeight + (AperY[1]+I_height) ) /2.);
       TGeoVolume* trd_I_vert2     = new TGeoVolume("trd_I_y22", trd_I_vert2_keep, aluminiumVolMed);
 
-      trd_I_vert1->SetLineColor(kBlue);   // Orange);  // Yellow);  // kBlue);  
-      trd_I_vert2->SetLineColor(kBlue);   // Yellow);  // kOrange);
+      trd_I_vert1->SetLineColor(kGreen);
+      trd_I_vert2->SetLineColor(kGreen);
     
       TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[1]+I_height) ) /2.);
       TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[1]+I_height) ) /2.);
@@ -2315,8 +2318,8 @@ void create_box_supports()
       TGeoBBox* trd_I_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (BeamHeight + (AperY[2]+I_height) ) /2.);
       TGeoVolume* trd_I_vert2     = new TGeoVolume("trd_I_y32", trd_I_vert2_keep, aluminiumVolMed);
 
-      trd_I_vert1->SetLineColor(kBlue);   // Orange);  // Yellow);  // kBlue);  
-      trd_I_vert2->SetLineColor(kBlue);   // Yellow);  // kOrange);
+      trd_I_vert1->SetLineColor(kGreen);
+      trd_I_vert2->SetLineColor(kGreen);
     
       TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[2]+I_height) ) /2.);
       TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[2]+I_height) ) /2.);
@@ -2355,8 +2358,8 @@ void create_box_supports()
       TGeoBBox* trd_I_hori2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., AperX[0]);
       TGeoVolume* trd_I_hori2     = new TGeoVolume("trd_I_x12", trd_I_hori2_keep, aluminiumVolMed);
 
-      trd_I_hori1->SetLineColor(kOrange);  // Yellow);
-      trd_I_hori2->SetLineColor(kOrange);  // Yellow);
+      trd_I_hori1->SetLineColor(kRed);  // Yellow);
+      trd_I_hori2->SetLineColor(kRed);  // Yellow);
     
       TGeoTranslation *tx01 = new TGeoTranslation("tx01", 0.,                      0., 0.);
       TGeoTranslation *tx02 = new TGeoTranslation("tx02", 0.,  (I_height-I_thick) /2., 0.);
@@ -2390,8 +2393,8 @@ void create_box_supports()
       TGeoBBox* trd_I_hori2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., AperX[1]);
       TGeoVolume* trd_I_hori2     = new TGeoVolume("trd_I_x22", trd_I_hori2_keep, aluminiumVolMed);
 
-      trd_I_hori1->SetLineColor(kOrange);  // Yellow);
-      trd_I_hori2->SetLineColor(kOrange);  // Yellow);
+      trd_I_hori1->SetLineColor(kRed);
+      trd_I_hori2->SetLineColor(kRed);
     
       TGeoTranslation *tx01 = new TGeoTranslation("tx01", 0.,                      0., 0.);
       TGeoTranslation *tx02 = new TGeoTranslation("tx02", 0.,  (I_height-I_thick) /2., 0.);
@@ -2425,8 +2428,8 @@ void create_box_supports()
       TGeoBBox* trd_I_hori2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., AperX[2]);
       TGeoVolume* trd_I_hori2     = new TGeoVolume("trd_I_x32", trd_I_hori2_keep, aluminiumVolMed);
 
-      trd_I_hori1->SetLineColor(kOrange);  // Yellow);
-      trd_I_hori2->SetLineColor(kOrange);  // Yellow);
+      trd_I_hori1->SetLineColor(kRed);
+      trd_I_hori2->SetLineColor(kRed);
     
       TGeoTranslation *tx01 = new TGeoTranslation("tx01", 0.,                      0., 0.);
       TGeoTranslation *tx02 = new TGeoTranslation("tx02", 0.,  (I_height-I_thick) /2., 0.);
@@ -2465,8 +2468,8 @@ void create_box_supports()
       TGeoBBox* trd_I_slope2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (PilPosZ[1]-PilPosZ[0]-I_width)/2.);
       TGeoVolume* trd_I_slope2     = new TGeoVolume("trd_I_z12", trd_I_slope2_keep, aluminiumVolMed);
 
-      trd_I_slope1->SetLineColor(kRed);  // Yellow);
-      trd_I_slope2->SetLineColor(kRed);  // Yellow);
+      trd_I_slope1->SetLineColor(kYellow);
+      trd_I_slope2->SetLineColor(kYellow);
     
       TGeoTranslation *tz01 = new TGeoTranslation("tz01", 0.,                      0., 0.);
       TGeoTranslation *tz02 = new TGeoTranslation("tz02", 0.,  (I_height-I_thick) /2., 0.);
@@ -2501,8 +2504,8 @@ void create_box_supports()
       TGeoBBox* trd_I_slope2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (PilPosZ[3]-PilPosZ[2]-I_width)/2.);
       TGeoVolume* trd_I_slope2     = new TGeoVolume("trd_I_z22", trd_I_slope2_keep, aluminiumVolMed);
 
-      trd_I_slope1->SetLineColor(kRed);  // Yellow);
-      trd_I_slope2->SetLineColor(kRed);  // Yellow);
+      trd_I_slope1->SetLineColor(kYellow);
+      trd_I_slope2->SetLineColor(kYellow);
     
       TGeoTranslation *tz01 = new TGeoTranslation("tz01", 0.,                      0., 0.);
       TGeoTranslation *tz02 = new TGeoTranslation("tz02", 0.,  (I_height-I_thick) /2., 0.);
@@ -2537,8 +2540,8 @@ void create_box_supports()
       TGeoBBox* trd_I_slope2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (PilPosZ[5]-PilPosZ[4]-I_width)/2.);
       TGeoVolume* trd_I_slope2     = new TGeoVolume("trd_I_z32", trd_I_slope2_keep, aluminiumVolMed);
 
-      trd_I_slope1->SetLineColor(kRed);  // Yellow);
-      trd_I_slope2->SetLineColor(kRed);  // Yellow);
+      trd_I_slope1->SetLineColor(kYellow);
+      trd_I_slope2->SetLineColor(kYellow);
     
       TGeoTranslation *tz01 = new TGeoTranslation("tz01", 0.,                      0., 0.);
       TGeoTranslation *tz02 = new TGeoTranslation("tz02", 0.,  (I_height-I_thick) /2., 0.);

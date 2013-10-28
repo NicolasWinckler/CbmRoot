@@ -4,6 +4,13 @@
 ///                                             
 
 
+// 2013-10-28 - DE - introduce new geometry naming scheme: v13x1 - SIS 100 hadron
+// 2013-10-28 - DE - introduce new geometry naming scheme: v13x2 - SIS 100 electron
+// 2013-10-28 - DE - introduce new geometry naming scheme: v13x3 - SIS 100 muon
+// 2013-10-28 - DE - introduce new geometry naming scheme: v13x4 - SIS 300 electron
+// 2013-10-28 - DE - introduce new geometry naming scheme: v13x5 - SIS 300 muon
+// 2013-10-28 - DE - add option to draw the magnetic field vector in the magnet
+//
 // 2013-06-25 - DE - v13g trd300_rich             (10 layers, z = 4100 ) - TRD right behind SIS300 RICH
 // 2013-06-25 - DE - v13h trd100_sts              ( 4 layers, z = 2600 ) - TRD completely on RICH/MUCH platform to allow TOF to move upstream
 // 2013-06-25 - DE - v13i trd100_rich             ( 2 layers, z = 4100 ) - TRD right behind RICH			      
@@ -12,7 +19,7 @@
 // 2013-06-25 - DE - ---  trd100_much_2_absorbers ( 4 layers, z = 4300 ) - same as version at z = 4600			      
 // 2013-06-25 - DE - v13l trd100_much_3_absorbers ( 4 layers, z = 4600 ) - TRD right behind SIS100 MUCH
 // 2013-06-25 - DE - v13m trd300_much_6_absorbers (10 layers, z = 5500 ) - TRD right behind SIS300 MUCH
-// 2013-06-25 - DE - v13n trd300_rich_streched    (10 layers, z = 4600 ) - TRD streched behind SIS300 RICH
+// 2013-06-25 - DE - v13n trd300_rich_stretched   (10 layers, z = 4600 ) - TRD stretched behind SIS300 RICH
 //
 // 2013-06-19 - DE - add TRD (I, II, III) labels on support structure
 // 2013-05-29 - DE - allow for flexible TRD z-positions defined by position of layer01
@@ -38,7 +45,7 @@
 // TODO: 
 // - use Silicon as ASIC material
 
-// in root all sizes are diven in cm
+// in root all sizes are given in cm
 
 #include "TSystem.h"
 #include "TGeoManager.h"
@@ -58,19 +65,20 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion   = "trd_v13w";
+const TString geoVersion   = "trd_v13p4";
 const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
 
 // display switches
-const Bool_t IncludeRadiator = true;  // false;  // true, if radiator is included in geometry
-const Bool_t IncludeLattice  = true;  // false;  // true, if lattice grid is included in geometry
-const Bool_t IncludeGasHoles = false; // false;  // true, if gas holes to be pllotted in the lattice grid
-const Bool_t IncludeFebs     = true;  // false;  // true, if FEBs are included in geometry
-const Bool_t IncludeAsics    = true;  // false;  // true, if ASICs are included in geometry
-const Bool_t IncludeSupports = true;  // false;  // true, if support structure is included in geometry
-const Bool_t IncludeLabels   = true;  // false;  // true, if TRD (I, II, III) labels are plottoed in (VisLevel 5)
+const Bool_t IncludeRadiator    = true;  // false;  // true, if radiator is included in geometry
+const Bool_t IncludeLattice     = true;  // false;  // true, if lattice grid is included in geometry
+const Bool_t IncludeGasHoles    = false; // false;  // true, if gas holes to be plotted in the lattice grid
+const Bool_t IncludeFebs        = true;  // false;  // true, if FEBs are included in geometry
+const Bool_t IncludeAsics       = true;  // false;  // true, if ASICs are included in geometry
+const Bool_t IncludeSupports    = true;  // false;  // true, if support structure is included in geometry
+const Bool_t IncludeLabels      = true;  // false;  // true, if TRD (I, II, III) labels are plotted in (VisLevel 5)
+const Bool_t IncludeFieldVector = false; // false;  // true, if magnetic field vector to be shown (in the magnet)
 
 const Double_t feb_rotation_angle = 45; //0.1; // 65.; // 70.; // 0.;   // rotation around x-axis, should be < 90 degrees  
 
@@ -113,43 +121,34 @@ const Int_t   MaxLayers = 10;   // max layers
 //
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-3l  // 1: plot, 0: hide
+//
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 };  // SIS300-mu  // 1: plot, 0: hide
-//
 const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
-Int_t    PlaneId[MaxLayers]; // automatiaclly filled with layer ID
+Int_t    PlaneId[MaxLayers]; // automatically filled with layer ID
 
 const Int_t   LayerType[MaxLayers]        = { 10, 11, 10, 11, 20, 21, 20, 21, 30, 31 };  // ab: a [1-3] - layer type, b [0,1] - vertical/horizontal pads
 const Int_t   LayerNrInStation[MaxLayers] = { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2 };
 
 // 5x z-positions from 260 till 550 cm
-Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13g trd300_rich             (10 layers, z = 4100 )
-//Double_t LayerPosition[MaxLayers] = { 260. }; // start position - 2013-06-25 - DE - v13h trd100_sts              ( 4 layers, z = 2600 )
+Double_t LayerPosition[MaxLayers] = { 260. }; // start position - 2013-10-28 - DE - v13x1 - SIS 100 hadron         ( 4 layers, z = 2600 )
+Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-10-28 - DE - v13x2 - SIS 100 electron       ( 4 layers, z = 4100 )
+Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-10-28 - DE - v13x3 - SIS 100 muon     3_abs ( 4 layers, z = 4600 )
+Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-10-28 - DE - v13x4 - SIS 300 electron       (10 layers, z = 4100 )
+Double_t LayerPosition[MaxLayers] = { 550. }; // start position - 2013-10-28 - DE - v13x5 - SIS 300 muon     6_abs (10 layers, z = 5500 )
+// obsolete variants
 //Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13i trd100_rich             ( 2 layers, z = 4100 )
 //Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13j trd100_rich             ( 3 layers, z = 4100 )
-//Double_t LayerPosition[MaxLayers] = { 410. }; // start position - 2013-06-25 - DE - v13k trd100_rich             ( 4 layers, z = 4100 )
 //Double_t LayerPosition[MaxLayers] = { 430. }; // start position - 2013-06-25 - DE - ---  trd100_much_2_absorbers ( 4 layers, z = 4300 )
-//Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13l trd100_much_3_absorbers ( 4 layers, z = 4600 )
-//Double_t LayerPosition[MaxLayers] = { 550. }; // start position - 2013-06-25 - DE - v13m trd300_much_6_absorbers (10 layers, z = 5500 )
-//Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13n trd300_rich_streched    (10 layers, z = 4600 )
+//Double_t LayerPosition[MaxLayers] = { 460. }; // start position - 2013-06-25 - DE - v13n trd300_rich_stretched   (10 layers, z = 4600 )
 
 
 const Double_t LayerThickness = 45.0; // Thickness of one TRD layer in cm
 
-//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0. };  // SIS100 - z offest in addition to LayerThickness 
-const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   5.,   0.,   0.,   0.,   5.,   0. };  // v13g, v13m - z offest in addition to LayerThickness 
-//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,  95.,   0.,   0.,   0.,   5.,   0. };  // v13n       - z offest in addition to LayerThickness 
-
-//const Double_t LayerThickness = 49.5; // Thickness of one TRD layer in cm
- //// just behind RICH v13a at z=400
-//const Double_t LayerPosition[MaxLayers] = { 400., 450., 500., 550., 600., 650., 700., 750., 800., 850. };  // z position in cm of Layer front
-// 3 stations, no gap between TRD stations
-//const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 650., 700., 750., 800., 850., 900. };  // v13c // z position in cm of Layer front
-// 3 stations, 25 cm gap
-//const Double_t LayerPosition[MaxLayers] = { 450., 500., 550., 600., 675., 725., 775., 825., 900., 950. };  // z position in cm of Layer front
-// equal spacing
-//const Double_t LayerPosition[MaxLayers] = { 500., 550., 600., 650., 700., 750., 800., 850., 900., 950. };  // z position in cm of Layer front
+const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   5.,   0.,   0.,   0.,   5.,   0. };  // v13x[4,5] - z offset in addition to LayerThickness 
+//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0.,   0. };  // SIS100 - z offset in addition to LayerThickness 
+//const Double_t LayerOffset[MaxLayers] = {   0.,   0.,   0.,   0.,  95.,   0.,   0.,   0.,   5.,   0. };  // v13n       - z offset in addition to LayerThickness 
 
 const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },    // for layer[1-3][i,o] below
                                       { 5, 5, 9, 11 },
@@ -177,7 +176,7 @@ const Int_t layer1o[9][11]= { {  0,    0,    0,    0,    0,    0,    0,    0,   
 // Layer1 =  24 + 26;   // v12x
 
 // ### Layer Type 11 is Layer Type 1 with detector modules rotated by 90°
-// In the subroutine creating the layers this is recognized automatically 
+// in the subroutine creating the layers, this is recognized automatically 
 
 
 // ### Layer Type 2
@@ -214,8 +213,7 @@ const Int_t layer3i[5][5] = { {  0,  0,  0,  0,  0 },     // abc: a module type 
                               {  0,  0,  0,  0,  0 },
                               {  0,  0,  0,  0,  0 } };
 // number of modules 25x0 
-// Only for convinience in the function needed
-
+// needed only for convenience in the function
 
 // v12x - module types in the outer sector of layer3 - looking upstream
 const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821,  821,  821,  821 },
@@ -303,7 +301,7 @@ const Double_t padplane_thickness     =   0.0360; // 360 micron thickness of pad
 const Double_t padplane_position      =  padcopper_position + padcopper_thickness/2. + padplane_thickness/2.;
 
 // backpanel components
-const Double_t carbon_thickness       =   0.0190 * 2; // use 2 layers!!   // 190 micron thickness for 1 layer of carbon fibres
+const Double_t carbon_thickness       =   0.0190 * 2; // use 2 layers!!   // 190 micron thickness for 1 layer of carbon fibers
 const Double_t honeycomb_thickness    =   2.3 - kapton_thickness - padcopper_thickness - padplane_thickness - carbon_thickness;    //  ~ 2.3 mm thickness of honeycomb
 const Double_t honeycomb_position     =  padplane_position + padplane_thickness/2. + honeycomb_thickness/2.;
 const Double_t carbon_position        =  honeycomb_position + honeycomb_thickness/2. + carbon_thickness/2.;
@@ -346,11 +344,11 @@ void create_trd_module_type(Int_t moduleType);
 void create_detector_layers(Int_t layer);
 void create_supports();
 void add_trd_labels();
-void create_field_vector();
+void create_mag_field_vector();
 void dump_info_file();
 
 
-void Create_TRD_Geometry_v13w() {
+void Create_TRD_Geometry_v13p4() {
   // Load the necessary FairRoot libraries 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -404,6 +402,9 @@ void Create_TRD_Geometry_v13w() {
 
   if (IncludeSupports)
     create_supports();
+
+  if (IncludeFieldVector)
+    create_mag_field_vector();
   
   gGeoMan->CloseGeometry();
 //  gGeoMan->CheckOverlaps(0.001);
@@ -1898,7 +1899,6 @@ void create_supports()
   if (ShowLayer[8])  // if geometry contains layer 9 (1st layer of station 3)
     gGeoMan->GetVolume(geoVersion)->AddNode(trd_3, 3);
 
-  create_field_vector();
 }
 
 
@@ -2104,9 +2104,9 @@ add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
 }   
    
 
-void create_field_vector()
+void create_mag_field_vector()
 {
-  const TString cbmfield_01 = "cbmfield1";
+  const TString cbmfield_01 = "cbm_field";
   TGeoVolume* cbmfield_1 = new TGeoVolumeAssembly(cbmfield_01);
 
   TGeoMedium* copperVolMed   = gGeoMan->GetMedium(PadCopperVolumeMedium);  // define Volume Medium
@@ -2114,28 +2114,29 @@ void create_field_vector()
   TGeoRotation  *rotx090 = new TGeoRotation("rotx090"); rotx090->RotateX(  90.); // rotate  90 deg around x-axis                     
   TGeoRotation  *rotx270 = new TGeoRotation("rotx270"); rotx270->RotateX( 270.); // rotate 270 deg around x-axis                     
 
-   // Field tube
-   TGeoTube* trd_field = new TGeoTube("", 0., 100/2., 400/2.);
-   TGeoVolume* trdmod1_fieldvol = new TGeoVolume("field", trd_field, copperVolMed);
-   trdmod1_fieldvol->SetLineColor(kRed);
-   trdmod1_fieldvol->SetTransparency(30);   // transparency for the TRD
-   TGeoTranslation* trd_field_trans = new TGeoTranslation("", 0., 0., 0.);// field_position);
-   cbmfield_1->AddNode(trdmod1_fieldvol, 1, trd_field_trans);
-   //   gGeoMan->GetVolume(geoVersion)->AddNode(trdmod1_fieldvol, 1, trd_field_trans);
+  Int_t tube_length = 500;
+  Int_t cone_length = 120;
+  Int_t cone_width  = 280;
 
-   // Field cone
-   TGeoCone* trd_cone = new TGeoCone("", 100/2., 0., 200/2., 0., 0.);
-   TGeoVolume* trdmod1_conevol = new TGeoVolume("cone", trd_cone, copperVolMed);
-   trdmod1_conevol->SetLineColor(kRed);
-   trdmod1_conevol->SetTransparency(30);   // transparency for the TRD
-   TGeoTranslation* trd_cone_trans = new TGeoTranslation("", 0., 0., (400+100)/2.);// cone_position);
-   cbmfield_1->AddNode(trdmod1_conevol, 1, trd_cone_trans);
-   //   gGeoMan->GetVolume(geoVersion)->AddNode(trdmod1_conevol, 1, trd_cone_trans);
+  // field tube
+  TGeoTube* trd_field = new TGeoTube("", 0., 100/2., tube_length/2.);
+  TGeoVolume* trdmod1_fieldvol = new TGeoVolume("tube", trd_field, copperVolMed);
+  trdmod1_fieldvol->SetLineColor(kRed);
+  trdmod1_fieldvol->SetTransparency(30);   // transparency for the TRD
+  TGeoTranslation* trd_field_trans = new TGeoTranslation("", 0., 0., 0.);   // tube position
+  cbmfield_1->AddNode(trdmod1_fieldvol, 1, trd_field_trans);
 
-   TGeoCombiTrans* field_combi01 = new TGeoCombiTrans(-200., 0., 0., rotx270);
-   TGeoCombiTrans* field_combi02 = new TGeoCombiTrans( 200., 0., 0., rotx090);
+  // field cone
+  TGeoCone* trd_cone = new TGeoCone("", cone_length/2., 0., cone_width/2., 0., 0.);
+  TGeoVolume* trdmod1_conevol = new TGeoVolume("cone", trd_cone, copperVolMed);
+  trdmod1_conevol->SetLineColor(kRed);
+  trdmod1_conevol->SetTransparency(30);   // transparency for the TRD
+  TGeoTranslation* trd_cone_trans = new TGeoTranslation("", 0., 0., (tube_length+cone_length)/2.);   // cone position
+  cbmfield_1->AddNode(trdmod1_conevol, 1, trd_cone_trans);
 
-   //   gGeoMan->GetVolume(geoVersion)->AddNode(cbmfield_1, 0);
-   gGeoMan->GetVolume(geoVersion)->AddNode(cbmfield_1, 1, field_combi01);
-   gGeoMan->GetVolume(geoVersion)->AddNode(cbmfield_1, 2, field_combi02);
+  TGeoCombiTrans* field_combi01 = new TGeoCombiTrans(0., 0., 40., rotx270);   // point in +y direction
+  gGeoMan->GetVolume(geoVersion)->AddNode(cbmfield_1, 1, field_combi01);
+
+  //   TGeoCombiTrans* field_combi02 = new TGeoCombiTrans( 200., 0., 0., rotx090);   // point in -y direction
+  //   gGeoMan->GetVolume(geoVersion)->AddNode(cbmfield_1, 2, field_combi02);
 }

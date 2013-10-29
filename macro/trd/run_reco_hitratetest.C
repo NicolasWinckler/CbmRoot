@@ -28,7 +28,8 @@ void run_reco_hitratetest()
   whichTrdGeo.open("whichTrdGeo",ios::in);
   TString selectGeo;
   if (whichTrdGeo) whichTrdGeo >> selectGeo;
-  TString digipar = selectGeo(0,8);
+  TString digipar = selectGeo(0,9);
+  digipar.ReplaceAll(".","");
   cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();

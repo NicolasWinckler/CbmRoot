@@ -2220,9 +2220,9 @@ void create_box_supports()
       trd_I_vert1->SetLineColor(kGreen);  // kBlue);  // Yellow);  // kOrange);
       trd_I_vert2->SetLineColor(kGreen);  // kBlue);  // Yellow);  // kOrange);
     
-      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[0]+I_height) ) /2.);
-      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[0]+I_height) ) /2.);
-      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., (BeamHeight - (AperY[0]+I_height) ) /2.);
+      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., 0.);
+      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., 0.);
+      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., 0.);
     
       TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
       TGeoVolume* trd_I_vert_vol1    = new TGeoVolume("trd_I_y10", trd_I_vert_vol1_keep, keepVolMed);
@@ -2234,13 +2234,13 @@ void create_box_supports()
 
       PilPosX = AperX[0];
     
-      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), 0., PilPosZ[0], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[0], rotzx01);
       trd_1->AddNode(trd_I_vert_vol1, 11, trd_I_vert_combi01);
-      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), 0., PilPosZ[0], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[0], rotzx01);
       trd_1->AddNode(trd_I_vert_vol1, 12, trd_I_vert_combi02);
-      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), 0., PilPosZ[1], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[1], rotzx01);
       trd_1->AddNode(trd_I_vert_vol1, 13, trd_I_vert_combi03);
-      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), 0., PilPosZ[1], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[1], rotzx01);
       trd_1->AddNode(trd_I_vert_vol1, 14, trd_I_vert_combi04);
     }
 
@@ -2255,10 +2255,10 @@ void create_box_supports()
       trd_I_vert1->SetLineColor(kGreen);
       trd_I_vert2->SetLineColor(kGreen);
     
-      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[1]+I_height) ) /2.);
-      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[1]+I_height) ) /2.);
-      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., (BeamHeight - (AperY[1]+I_height) ) /2.);
-    
+      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., 0.);
+      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., 0.);
+      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., 0.);
+
       TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[1]+I_height) ) /2.);
       TGeoVolume* trd_I_vert_vol1    = new TGeoVolume("trd_I_y20", trd_I_vert_vol1_keep, keepVolMed);
 
@@ -2269,13 +2269,13 @@ void create_box_supports()
 
       PilPosX = AperX[1];
     
-      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), 0., PilPosZ[2], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[1]+I_height))/2., PilPosZ[2], rotzx01);
       trd_2->AddNode(trd_I_vert_vol1, 21, trd_I_vert_combi01);
-      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), 0., PilPosZ[2], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[1]+I_height))/2., PilPosZ[2], rotzx01);
       trd_2->AddNode(trd_I_vert_vol1, 22, trd_I_vert_combi02);
-      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), 0., PilPosZ[3], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[1]+I_height))/2., PilPosZ[3], rotzx01);
       trd_2->AddNode(trd_I_vert_vol1, 23, trd_I_vert_combi03);
-      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), 0., PilPosZ[3], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[1]+I_height))/2., PilPosZ[3], rotzx01);
       trd_2->AddNode(trd_I_vert_vol1, 24, trd_I_vert_combi04);
     }
 
@@ -2290,9 +2290,9 @@ void create_box_supports()
       trd_I_vert1->SetLineColor(kGreen);
       trd_I_vert2->SetLineColor(kGreen);
     
-      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., (BeamHeight - (AperY[2]+I_height) ) /2.);
-      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., (BeamHeight - (AperY[2]+I_height) ) /2.);
-      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., (BeamHeight - (AperY[2]+I_height) ) /2.);
+      TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., 0.);
+      TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., 0.);
+      TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., 0.);
     
       TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[2]+I_height) ) /2.);
       TGeoVolume* trd_I_vert_vol1    = new TGeoVolume("trd_I_y30", trd_I_vert_vol1_keep, keepVolMed);
@@ -2304,13 +2304,13 @@ void create_box_supports()
 
       PilPosX = AperX[2];
       
-      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), 0., PilPosZ[4], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[2]+I_height))/2., PilPosZ[4], rotzx01);
       trd_3->AddNode(trd_I_vert_vol1, 31, trd_I_vert_combi01);
-      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), 0., PilPosZ[4], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[2]+I_height))/2., PilPosZ[4], rotzx01);
       trd_3->AddNode(trd_I_vert_vol1, 32, trd_I_vert_combi02);
-      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), 0., PilPosZ[5], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[2]+I_height))/2., PilPosZ[5], rotzx01);
       trd_3->AddNode(trd_I_vert_vol1, 33, trd_I_vert_combi03);
-      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), 0., PilPosZ[5], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[2]+I_height))/2., PilPosZ[5], rotzx01);
       trd_3->AddNode(trd_I_vert_vol1, 34, trd_I_vert_combi04);
     }
 

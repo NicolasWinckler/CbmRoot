@@ -893,17 +893,17 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
      {
        //     printf("lattice type %d\n", type);
        // drift window - lattice grid - sprossenfenster
-       TGeoBBox* trd_lattice_mod0_ho = new TGeoBBox("", sizeX/2.,                       lattice_o_width[type]/2.,       lattice_thickness/2.);  // horizontal
-       TGeoBBox* trd_lattice_mod0_vo = new TGeoBBox("", lattice_o_width[type]/2.,       sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
-       TGeoBBox* trd_lattice_mod0_hi = new TGeoBBox("", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2.,       lattice_thickness/2.);  // horizontal
-       TGeoBBox* trd_lattice_mod0_vi = new TGeoBBox("", lattice_i_width[type]/2.,       0.20*activeAreaY/2.-lattice_i_width[type]/2., lattice_thickness/2.);  // vertical
-       TGeoBBox* trd_lattice_mod0_vb = new TGeoBBox("", lattice_i_width[type]/2.,       0.20*activeAreaY/2.-lattice_i_width[type]/4., lattice_thickness/2.);  // vertical border
+       TGeoBBox* trd_lattice_mod0_ho = new TGeoBBox("", sizeX/2.,                       lattice_o_width[type]/2.,       lattice_thickness/2.);                // horizontal outer
+       TGeoBBox* trd_lattice_mod0_hi = new TGeoBBox("", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2.,       lattice_thickness/2.);                // horizontal inner
+       TGeoBBox* trd_lattice_mod0_vo = new TGeoBBox("", lattice_o_width[type]/2.,       sizeX/2.-lattice_o_width[type], lattice_thickness/2.);                // vertical outer
+       TGeoBBox* trd_lattice_mod0_vi = new TGeoBBox("", lattice_i_width[type]/2.,       0.20*activeAreaY/2.-lattice_i_width[type]/2., lattice_thickness/2.);  // vertical inner
+       TGeoBBox* trd_lattice_mod0_vb = new TGeoBBox("", lattice_i_width[type]/2.,       0.20*activeAreaY/2.-lattice_i_width[type]/4., lattice_thickness/2.);  // vertical border 
 
-       TGeoVolume* trd_lattice_mod0_vol_ho = new TGeoVolume("S0ho", trd_lattice_mod0_ho, latticeVolMed);
-       TGeoVolume* trd_lattice_mod0_vol_vo = new TGeoVolume("S0vo", trd_lattice_mod0_vo, latticeVolMed);
-       TGeoVolume* trd_lattice_mod0_vol_hi = new TGeoVolume("S0hi", trd_lattice_mod0_hi, latticeVolMed);
-       TGeoVolume* trd_lattice_mod0_vol_vi = new TGeoVolume("S0vi", trd_lattice_mod0_vi, latticeVolMed);
-       TGeoVolume* trd_lattice_mod0_vol_vb = new TGeoVolume("S0vb", trd_lattice_mod0_vb, latticeVolMed);
+       TGeoVolume* trd_lattice_mod0_vol_ho = new TGeoVolume("lattice0ho", trd_lattice_mod0_ho, latticeVolMed);
+       TGeoVolume* trd_lattice_mod0_vol_hi = new TGeoVolume("lattice0hi", trd_lattice_mod0_hi, latticeVolMed);
+       TGeoVolume* trd_lattice_mod0_vol_vo = new TGeoVolume("lattice0vo", trd_lattice_mod0_vo, latticeVolMed);
+       TGeoVolume* trd_lattice_mod0_vol_vi = new TGeoVolume("lattice0vi", trd_lattice_mod0_vi, latticeVolMed);
+       TGeoVolume* trd_lattice_mod0_vol_vb = new TGeoVolume("lattice0vb", trd_lattice_mod0_vb, latticeVolMed);
 
        trd_lattice_mod0_vol_ho->SetLineColor(kYellow);  // kBlue);  
        trd_lattice_mod0_vol_vo->SetLineColor(kYellow);	// kOrange);
@@ -936,7 +936,7 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 //       TGeoVolumeAssembly* trdmod0_lattice = new TGeoVolumeAssembly("mod0lattice"); // volume for lattice grid
 
        TGeoBBox* trd_lattice_mod0  = new TGeoBBox("", sizeX /2., sizeY /2., lattice_thickness /2.);
-       TGeoVolume* trdmod0_lattice = new TGeoVolume("mod0lattice", trd_lattice_mod0, keepVolMed);
+       TGeoVolume* trdmod0_lattice = new TGeoVolume("lat_grid_mod0", trd_lattice_mod0, keepVolMed);
 
        // outer frame
        trdmod0_lattice->AddNode(trd_lattice_mod0_vol_ho, 1, tv010);
@@ -977,17 +977,17 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
      {
        //     printf("lattice type %d\n", type);
        // drift window - lattice grid - sprossenfenster
-       TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("", sizeX/2.,                       lattice_o_width[type]/2.,       lattice_thickness/2.);  // horizontal
-       TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("", lattice_o_width[type]/2.,       sizeX/2.-lattice_o_width[type], lattice_thickness/2.);  // vertical
-       TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2.,       lattice_thickness/2.);  // horizontal
-       TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("", lattice_i_width[type]/2.,       0.125*activeAreaY/2.-lattice_i_width[type]/2., lattice_thickness/2.);  // vertical
-       TGeoBBox *trd_lattice_mod1_vb = new TGeoBBox("", lattice_i_width[type]/2.,       0.125*activeAreaY/2.-lattice_i_width[type]/4., lattice_thickness/2.);  // vertical border
+       TGeoBBox *trd_lattice_mod1_ho = new TGeoBBox("", sizeX/2.,                       lattice_o_width[type]/2.,       lattice_thickness/2.);                 // horizontal outer
+       TGeoBBox *trd_lattice_mod1_hi = new TGeoBBox("", sizeX/2.-lattice_o_width[type], lattice_i_width[type]/2.,       lattice_thickness/2.);                 // horizontal inner
+       TGeoBBox *trd_lattice_mod1_vo = new TGeoBBox("", lattice_o_width[type]/2.,       sizeX/2.-lattice_o_width[type], lattice_thickness/2.);                 // vertical outer  
+       TGeoBBox *trd_lattice_mod1_vi = new TGeoBBox("", lattice_i_width[type]/2.,       0.125*activeAreaY/2.-lattice_i_width[type]/2., lattice_thickness/2.);  // vertical inner  
+       TGeoBBox *trd_lattice_mod1_vb = new TGeoBBox("", lattice_i_width[type]/2.,       0.125*activeAreaY/2.-lattice_i_width[type]/4., lattice_thickness/2.);  // vertical border 
 
-       TGeoVolume* trd_lattice_mod1_vol_ho = new TGeoVolume("S1ho", trd_lattice_mod1_ho, latticeVolMed);
-       TGeoVolume* trd_lattice_mod1_vol_vo = new TGeoVolume("S1vo", trd_lattice_mod1_vo, latticeVolMed);
-       TGeoVolume* trd_lattice_mod1_vol_hi = new TGeoVolume("S1hi", trd_lattice_mod1_hi, latticeVolMed);
-       TGeoVolume* trd_lattice_mod1_vol_vi = new TGeoVolume("S1vi", trd_lattice_mod1_vi, latticeVolMed);
-       TGeoVolume* trd_lattice_mod1_vol_vb = new TGeoVolume("S1vb", trd_lattice_mod1_vb, latticeVolMed);
+       TGeoVolume* trd_lattice_mod1_vol_ho = new TGeoVolume("lattice1ho", trd_lattice_mod1_ho, latticeVolMed);
+       TGeoVolume* trd_lattice_mod1_vol_hi = new TGeoVolume("lattice1hi", trd_lattice_mod1_hi, latticeVolMed);
+       TGeoVolume* trd_lattice_mod1_vol_vo = new TGeoVolume("lattice1vo", trd_lattice_mod1_vo, latticeVolMed);
+       TGeoVolume* trd_lattice_mod1_vol_vi = new TGeoVolume("lattice1vi", trd_lattice_mod1_vi, latticeVolMed);
+       TGeoVolume* trd_lattice_mod1_vol_vb = new TGeoVolume("lattice1vb", trd_lattice_mod1_vb, latticeVolMed);
 
        trd_lattice_mod1_vol_ho->SetLineColor(kYellow);  // kBlue);  
        trd_lattice_mod1_vol_vo->SetLineColor(kYellow);	// kOrange);
@@ -1029,7 +1029,7 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 //       TGeoVolumeAssembly* trdmod1_lattice = new TGeoVolumeAssembly("mod1lattice"); // volume for lattice grid
 
        TGeoBBox* trd_lattice_mod1  = new TGeoBBox("", sizeX /2., sizeY /2., lattice_thickness /2.);
-       TGeoVolume* trdmod1_lattice = new TGeoVolume("mod1lattice", trd_lattice_mod1, keepVolMed);
+       TGeoVolume* trdmod1_lattice = new TGeoVolume("lat_grid_mod1", trd_lattice_mod1, keepVolMed);
 
        // outer frame
        trdmod1_lattice->AddNode(trd_lattice_mod1_vol_ho, 1, tv110);
@@ -2191,7 +2191,7 @@ void create_box_supports()
       TGeoTranslation *ty01 = new TGeoTranslation("ty01", 0.,                      0., 0.);
       TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., 0.);
       TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., 0.);
-    
+
       TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
       TGeoVolume* trd_I_vert_vol1    = new TGeoVolume("trd_I_y10", trd_I_vert_vol1_keep, keepVolMed);
 
@@ -2199,6 +2199,15 @@ void create_box_supports()
       trd_I_vert_vol1->AddNode(trd_I_vert1, 1, ty01);
       trd_I_vert_vol1->AddNode(trd_I_vert2, 2, ty02);
       trd_I_vert_vol1->AddNode(trd_I_vert2, 3, ty03);
+
+//      // close gap to horizontal z-bars
+//      TGeoBBox* trd_I_vert3_keep  = new TGeoBBox("", (I_width-I_thick)/2. /2., I_height /2. - I_thick, I_thick /2.);
+//      TGeoVolume* trd_I_vert3     = new TGeoVolume("trd_I_y13", trd_I_vert3_keep, aluminiumVolMed);
+//      trd_I_vert3->SetLineColor(kGreen);
+//      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[0]+I_height) - I_width) /2.);
+//      TGeoTranslation *ty05 = new TGeoTranslation("ty05", -(I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[0]+I_height) - I_width) /2.);
+//      trd_I_vert_vol1->AddNode(trd_I_vert3, 4, ty04);
+//      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
 
       PilPosX = AperX[0];
     

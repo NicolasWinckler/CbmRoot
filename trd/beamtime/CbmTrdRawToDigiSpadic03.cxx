@@ -30,6 +30,17 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "/mount/scr1/c_berg09/cbm/roc_2012/onlinemonitor/rocmonitor/TRocEvent.h"
+#include "/mount/scr1/c_berg09/cbm/roc_2012/include/roc/Message.h"
+#include "/mount/scr1/c_berg09/cbm/roc_2012/onlinemonitor/spadicmonitor/TSpadicEvent.h"
+//#include "TEpicsEvent.h"
+//#include "TFiberHodEvent.h"
+#include "/mount/scr1/c_berg09/cbm/roc_2012/beamtime/cern-oct12/go4/TMbsCrateEvent.h"
+#include "/mount/scr1/c_berg09/cbm/roc_2012/beamtime/cern-oct12/go4/TBeamMonitorEvent.h"
+#include "/mount/scr1/c_berg09/cbm/roc_2012/beamtime/cern-oct12/go4/TCernOct12UnpackEvent.h"
+//#include "TCernOct12DetectorEvent.h"
+
+#include "/mount/scr1/c_berg09/cbm/go4_trunk/Go4Event/TGo4EventElement.h"
 //#define NUM_SPADIC_CHA             8
 //#define SPADIC_TRACE_SIZE         45
 //#define SPADIC_ADC_MAX           255
@@ -48,17 +59,18 @@ CbmTrdRawToDigiSpadic03::CbmTrdRawToDigiSpadic03()
     fDigiPar(NULL),
     fModuleInfo(NULL),
 
-    baselineDistribution(NULL),
-    covaMatixValue(NULL),
-    covaMatixValueMaxAmplitude(NULL),
-    covaMatixValueHitTime(NULL),
-    maxAmplitudeHitTime(NULL),
-    noiseDistribution(NULL),
-    clusterSize(NULL),
-    signalChDistance(NULL),
-    averageNoise_2D(NULL),
-    averageSignal_2D(NULL),
-    covaMatixValueClusterSize(NULL)
+    baselineDistribution(),
+    covaMatixValue(),
+    covaMatixValueMaxAmplitude(),
+    covaMatixValueHitTime(),
+    maxAmplitudeHitTime(),
+    maxAmplitudeValue(),
+    noiseDistribution(),
+    clusterSize(),
+    signalChDistance(),
+    averageNoise_2D(),
+    averageSignal_2D(),
+    covaMatixValueClusterSize()
 {
 }
 
@@ -76,17 +88,18 @@ CbmTrdRawToDigiSpadic03::CbmTrdRawToDigiSpadic03(const char *name, const char *t
     fDigiPar(NULL),
     fModuleInfo(NULL),
 
-    baselineDistribution(NULL),
-    covaMatixValue(NULL),
-    covaMatixValueMaxAmplitude(NULL),
-    covaMatixValueHitTime(NULL),
-    maxAmplitudeHitTime(NULL),
-    noiseDistribution(NULL),
-    clusterSize(NULL),
-    signalChDistance(NULL),
-    averageNoise_2D(NULL),
-    averageSignal_2D(NULL),
-    covaMatixValueClusterSize(NULL)
+    baselineDistribution(),
+    covaMatixValue(),
+    covaMatixValueMaxAmplitude(),
+    covaMatixValueHitTime(),
+    maxAmplitudeHitTime(),  
+    maxAmplitudeValue(),
+    noiseDistribution(),
+    clusterSize(),
+    signalChDistance(),
+    averageNoise_2D(),
+    averageSignal_2D(),
+    covaMatixValueClusterSize()
 {
 }
 
@@ -145,7 +158,7 @@ InitStatus CbmTrdRawToDigiSpadic03::Init()
   fDigis = new TClonesArray("CbmTrdDigi", 100);
   ioman->Register("TrdDigi","TRD Digis",fDigis,kTRUE);
 
-  fGeoHandler->Init();
+  //fGeoHandler->Init();
 
   return kSUCCESS;
 
@@ -178,6 +191,21 @@ void CbmTrdRawToDigiSpadic03::Exec(Option_t * option)
     fSusIds.push_back(10);
     fSusIds.push_back(18);
   }
+  for (std::vector<Int_t>::iterator it=fSusIds.begin(); it!=fSusIds.end(); it++){
+    name.Form("_Sus%02i",(*it));
+    clusterSize[(*it)] = new TH1I("UC_clusterSize"+name,"clusterSize"+name,NUM_SPADIC_CHA+1,-0.5,NUM_SPADIC_CHA+0.5);
+    maxAmplitudeValue[(*it)] = new TH1I("UC_maxAmplitudeValue"+name,"maxAmplitudeValue"+name,256*2,0,256);
+    maxAmplitudeHitTime[(*it)] = new TH2I("UC_maxAmplitudeHitTime"+name,"maxAmplitudeHitTime"+name,256,0,256,45,0,45);
+    covaMatixValue[(*it)] = new TH1I("UC_covaMatixValue"+name,"covaMatixValue"+name,1000,-0.13,0.13);
+    covaMatixValueMaxAmplitude[(*it)] = new TH2I("UC_covaMatixValueMaxAmplitude"+name,"covaMatixValueMaxAmplitude"+name,1000,-0.13,0.13,256,0,256);
+    covaMatixValueHitTime[(*it)] = new TH2I("UC_covaMatixValueHitTime"+name,"covaMatixValueHitTime"+name,1000,-0.13,0.13,45,0,45);
+    signalChDistance[(*it)] = new TH1I("UC_signalChDistance"+name,"signalChDistance"+name,2*NUM_SPADIC_CHA+1,-NUM_SPADIC_CHA-0.5,NUM_SPADIC_CHA+0.5);
+    averageSignal_2D[(*it)] = new TH2I("UC_averageSignal_2D"+name,"averageSignal_2D"+name,SPADIC_TRACE_SIZE,0,SPADIC_TRACE_SIZE,356,-100,256);
+    averageNoise_2D[(*it)] = new TH2I("UC_averageNoise_2D"+name,"averageNoise_2D"+name,SPADIC_TRACE_SIZE,0,SPADIC_TRACE_SIZE,356,-100,256);
+    noiseDistribution[(*it)] = new TH1I("UC_noiseDistribution"+name,"noiseDistribution"+name,2*SPADIC_ADC_MAX,-SPADIC_ADC_MAX,SPADIC_ADC_MAX);
+    baselineDistribution[(*it)] = new TH2I("UC_baselineDistribution"+name,"baselineDistribution"+name,NUM_SPADIC_CHA,-0.5,NUM_SPADIC_CHA-0.5,SPADIC_ADC_MAX,0,SPADIC_ADC_MAX);
+    covaMatixValueClusterSize[(*it)] = new TH2I("covaMatixValueClusterSize"+name,"covaMatixValueClusterSize"+name,100,0,1,NUM_SPADIC_CHA,-0.5,NUM_SPADIC_CHA-0.5);
+  }
   if (fFile->IsOpen()){
     TTree* theTree=NULL;
     TKey* kee=NULL;
@@ -188,33 +216,35 @@ void CbmTrdRawToDigiSpadic03::Exec(Option_t * option)
 	break; // we take first Tree in file, disregarding its name...
     }
     if(theTree==NULL) {
-      cout <<"Error: no Tree in file " << endl;
+      cout <<"[Error      ]  CbmTrdRawToDigiSpadic03::Exec: no Tree in file " << endl;
       return;
     }
-    //TCernOct12UnpackEvent* evnt = new TCernOct12UnpackEvent;
-    //TGo4EventElement* theBase=evnt;
-    //evnt->synchronizeWithTree(theTree, &theBase);
+    TCernOct12UnpackEvent* evnt = new TCernOct12UnpackEvent;
+    TGo4EventElement* theBase=evnt;
+    evnt->synchronizeWithTree(theTree, &theBase);
     Int_t entries = theTree->GetEntries();
-    //TMbsCrateEvent* fCrateInputEvent=NULL;
-    //TSpadicEvent* SpadicInputEvent=NULL;
-    //TSpadicData* theSpadic=NULL;
+    printf("Found %i events in TTree\n",entries);
+    TMbsCrateEvent* fCrateInputEvent=NULL;
+    TSpadicEvent* SpadicInputEvent=NULL;
+    TSpadicData* theSpadic=NULL;
     Int_t iDigi = 0;
     for(Int_t i=0;i<entries;++i) {
+      //cout << i << endl;
       theTree->GetEntry(i);
-      //SpadicInputEvent=dynamic_cast<TSpadicEvent*>(evnt->GetSubEvent("SPADIC"));
-      //isPulser = fCrateInputEvent->fIsPulser;
+      SpadicInputEvent=dynamic_cast<TSpadicEvent*>(evnt->GetSubEvent("SPADIC"));
+      isPulser = fCrateInputEvent->fIsPulser;
       if (isPulser) continue;
       for (std::vector<Int_t>::iterator it=fSusIds.begin(); it!=fSusIds.end(); it++){
 	fSusid = (*it);
-	//theSpadic=NULL;
-	//theSpadic=dynamic_cast<TSpadicData*>(SpadicInputEvent->getEventElement(fSusid));
-	//if (!theSpadic) {cout << "no data found for Susibo " << fSusid << endl; continue;}
+	theSpadic=NULL;
+	theSpadic=dynamic_cast<TSpadicData*>(SpadicInputEvent->getEventElement(fSusid));
+	if (!theSpadic) {cout << "no data found for Susibo " << fSusid << endl; continue;}
 	for (Int_t ch = 0; ch < NUM_SPADIC_CHA; ch++) {
 	  rawPulse[ch]->Reset();
 	  baselinePulse[ch]->Reset();
 	  baselineNoisePulse[ch]->Reset();
 	  for (Int_t bin = 0; bin < SPADIC_TRACE_SIZE; bin++) {	
-	    //rawPulse[ch]->Fill(bin, (Double_t)theSpadic->fSpadicPulse[ch][bin]);
+	    rawPulse[ch]->Fill(bin, (Double_t)theSpadic->fSpadicPulse[ch][bin]);
 	  } 
 	}
 	BaselineCompensation(rawPulse, baselinePulse);
@@ -222,7 +252,7 @@ void CbmTrdRawToDigiSpadic03::Exec(Option_t * option)
 	 
 	  
 	for (Int_t ch = 0; ch < NUM_SPADIC_CHA; ch++){
-	  Int_t digiAddress = 0;// To be calculated by a CbmTrdDigiAddress class based on the channel id and susibo id
+	  Int_t digiAddress = 5;// CbmTrdAddressTestBeam::GetAddress(fSusid, ch); To be calculated by a CbmTrdDigiAddress class based on the channel id and susibo id
 	  Double_t timeStamp = 0;
 	  Double_t signal = 0;
 	  for (Int_t bin = 1; bin <= baselineNoisePulse[ch]->GetNbinsX(); bin++){
@@ -291,8 +321,8 @@ Int_t CbmTrdRawToDigiSpadic03::GetPadMax(TH1D* inPulse[NUM_SPADIC_CHA]) {
       }
       baseline[ch] /= (Double_t)fNBaselineTB;
       if (baseline[ch] > 1)
-	if(baselineDistribution)
-	  baselineDistribution->Fill(ch,baseline[ch]);
+	if(baselineDistribution.find(fSusid) != baselineDistribution.end())
+	  baselineDistribution[fSusid]->Fill(ch,baseline[ch]);
     }
    
     for (Int_t ch = 0; ch < NUM_SPADIC_CHA; ch++){
@@ -331,13 +361,13 @@ Int_t CbmTrdRawToDigiSpadic03::CancelNoise_Cova(TH1D* inPulse[NUM_SPADIC_CHA], T
 						){
   Bool_t rawStatistic(false), debug(false);
   if(fLowercorthreshold.empty()){
-    cout << "CbmTrdRawToDigiSpadic03::CancelNoise_Cova: Thresholds not set!" << endl;
+    cout << "CbmTrdRawToDigiSpadic03::CancelNoise_Cova: fLowercorthreshold Thresholds not set!" << endl;
     fLowercorthreshold[11] = 0.120;//{0.121, 0.112, 0.111};
     fLowercorthreshold[10] = 0.112;
     fLowercorthreshold[18] = 0.111;
   }
   if(fLowercorthreshold.empty()){
-    cout << "CbmTrdRawToDigiSpadic03::CancelNoise_Cova: Thresholds not set!" << endl;
+    cout << "CbmTrdRawToDigiSpadic03::CancelNoise_Cova: fMinimumAmplitudeThreshold Thresholds not set!" << endl;
     fMinimumAmplitudeThreshold[11] = 30;
     fMinimumAmplitudeThreshold[10] = 16;
     fMinimumAmplitudeThreshold[18] = 20;
@@ -378,7 +408,7 @@ Int_t CbmTrdRawToDigiSpadic03::CancelNoise_Cova(TH1D* inPulse[NUM_SPADIC_CHA], T
   std::list<Double_t>::iterator it;
   for(int ch=0;ch<NUM_SPADIC_CHA;ch++){
     cortest[ch] = TMatrixDRow (*cova,minCh)(ch);
-    if(covaMatixValueClusterSize){
+    if(covaMatixValueClusterSize.find(fSusid) != covaMatixValueClusterSize.end()){
       covaList.push_back(cortest[ch]);
     }
     if((cortest[ch] > fLowercorthreshold[fSusid]) 
@@ -395,19 +425,19 @@ Int_t CbmTrdRawToDigiSpadic03::CancelNoise_Cova(TH1D* inPulse[NUM_SPADIC_CHA], T
     }
     else { //debug
       if (lastSigCh != -1){
-	if(signalChDistance){
-	  signalChDistance->Fill(ch - lastSigCh/*maxCh-ch*/); //debug
+	if(signalChDistance.find(fSusid) != signalChDistance.end()){
+	  signalChDistance[fSusid]->Fill(ch - lastSigCh/*maxCh-ch*/); //debug
 	}
       }
       lastSigCh = ch;
     } //debug
   }
-  if(covaMatixValueClusterSize) {
+  if(covaMatixValueClusterSize.find(fSusid) != covaMatixValueClusterSize.end()) {
     covaList.sort();
     Int_t counter = 0;//NUM_SPADIC_CHA-1;
     for (it = covaList.begin(); it != covaList.end(); it++){
       if(debug) cout << *it << " (" << counter << ") | ";
-      covaMatixValueClusterSize->Fill(*it,counter);
+      covaMatixValueClusterSize[fSusid]->Fill(*it,counter);
       counter++;
     }
     if(debug) cout << endl;
@@ -418,8 +448,8 @@ Int_t CbmTrdRawToDigiSpadic03::CancelNoise_Cova(TH1D* inPulse[NUM_SPADIC_CHA], T
   for(Int_t bin = 0; bin < SPADIC_TRACE_SIZE; bin++){
     thisisnoise[bin] /= (double)noise_ch_counter;
     if (noise_ch_counter < NUM_SPADIC_CHA && noise_ch_counter > 0){
-      if(noiseDistribution){
-	noiseDistribution->Fill(thisisnoise[bin]);
+      if(noiseDistribution.find(fSusid) != noiseDistribution.end()){
+	noiseDistribution[fSusid]->Fill(thisisnoise[bin]);
       }
     }    
   } /*//else {cout << "very bad thing happened!!" << endl;}
@@ -435,53 +465,53 @@ Int_t CbmTrdRawToDigiSpadic03::CancelNoise_Cova(TH1D* inPulse[NUM_SPADIC_CHA], T
     for (int k=0; k<SPADIC_TRACE_SIZE; k++){  
       outPulse[ch]->Fill(k, inPulse[ch]->GetBinContent(inPulse[ch]->FindBin(k)) - thisisnoise[k]);
       if ( TString(inPulse[0]->GetTitle()).BeginsWith("baselinePulse")){
-	if(averageSignal_2D && averageNoise_2D){
+	if(averageSignal_2D.find(fSusid) != averageSignal_2D.end() && averageNoise_2D.find(fSusid) != averageNoise_2D.end()){
 	  if (rawStatistic){
-	    averageSignal_2D->Fill(k,inPulse[ch]->GetBinContent(inPulse[ch]->FindBin(k)));
+	    averageSignal_2D[fSusid]->Fill(k,inPulse[ch]->GetBinContent(inPulse[ch]->FindBin(k)));
 	  } else {
-	    averageSignal_2D->Fill(k,outPulse[ch]->GetBinContent(outPulse[ch]->FindBin(k)));
+	    averageSignal_2D[fSusid]->Fill(k,outPulse[ch]->GetBinContent(outPulse[ch]->FindBin(k)));
 	  }
-	  averageNoise_2D->Fill(k,thisisnoise[k]);
+	  averageNoise_2D[fSusid]->Fill(k,thisisnoise[k]);
 	}
       }
     }
     if ( TString(inPulse[ch]->GetTitle()).BeginsWith("baselinePulse")){
       if (rawStatistic){
 	if (ch != minCh)
-	  if (covaMatixValue)
-	    covaMatixValue->Fill(cortest[ch]);
+	  if (covaMatixValue.find(fSusid) != covaMatixValue.end())
+	    covaMatixValue[fSusid]->Fill(cortest[ch]);
 	if (ch != minCh)
-	  if(covaMatixValueMaxAmplitude)
-	    covaMatixValueMaxAmplitude->Fill(cortest[ch], inPulse[ch]->GetBinContent(inPulse[ch]->GetMaximumBin()));
+	  if(covaMatixValueMaxAmplitude.find(fSusid) != covaMatixValueMaxAmplitude.end())
+	    covaMatixValueMaxAmplitude[fSusid]->Fill(cortest[ch], inPulse[ch]->GetBinContent(inPulse[ch]->GetMaximumBin()));
 	if (ch != minCh)
-	  if(covaMatixValueHitTime)
-	    covaMatixValueHitTime->Fill(cortest[ch], inPulse[ch]->GetMaximumBin());
-	if(maxAmplitudeHitTime)
+	  if(covaMatixValueHitTime.find(fSusid) != covaMatixValueHitTime.end())
+	    covaMatixValueHitTime[fSusid]->Fill(cortest[ch], inPulse[ch]->GetMaximumBin());
+	if(maxAmplitudeHitTime.find(fSusid) != maxAmplitudeHitTime.end())
 	  if (inPulse[ch]->GetBinContent(inPulse[ch]->GetMaximumBin()) > 0.0){
-	    maxAmplitudeHitTime->Fill(inPulse[ch]->GetBinContent(inPulse[ch]->GetMaximumBin()), inPulse[ch]->GetMaximumBin());
+	    maxAmplitudeHitTime[fSusid]->Fill(inPulse[ch]->GetBinContent(inPulse[ch]->GetMaximumBin()), inPulse[ch]->GetMaximumBin());
 	  }
       } else {
 	if (ch != minCh){
-	  if (covaMatixValue){
-	    covaMatixValue->Fill(cortest[ch]);
+	  if (covaMatixValue.find(fSusid) != covaMatixValue.end()){
+	    covaMatixValue[fSusid]->Fill(cortest[ch]);
 	  }	
-	  if(covaMatixValueMaxAmplitude){
-	    covaMatixValueMaxAmplitude->Fill(cortest[ch], outPulse[ch]->GetBinContent(outPulse[ch]->GetMaximumBin()));
+	  if(covaMatixValueMaxAmplitude.find(fSusid) != covaMatixValueMaxAmplitude.end()){
+	    covaMatixValueMaxAmplitude[fSusid]->Fill(cortest[ch], outPulse[ch]->GetBinContent(outPulse[ch]->GetMaximumBin()));
 	  }	
-	  if(covaMatixValueHitTime){
-	    covaMatixValueHitTime->Fill(cortest[ch], outPulse[ch]->GetMaximumBin());
+	  if(covaMatixValueHitTime.find(fSusid) != covaMatixValueHitTime.end()){
+	    covaMatixValueHitTime[fSusid]->Fill(cortest[ch], outPulse[ch]->GetMaximumBin());
 	  }
 	}
-	if(maxAmplitudeHitTime){
+	if(maxAmplitudeHitTime.find(fSusid) != maxAmplitudeHitTime.end()){
 	  if (outPulse[ch]->GetBinContent(outPulse[ch]->GetMaximumBin()) > 0.0){
-	    maxAmplitudeHitTime->Fill(outPulse[ch]->GetBinContent(outPulse[ch]->GetMaximumBin()), outPulse[ch]->GetMaximumBin());
+	    maxAmplitudeHitTime[fSusid]->Fill(outPulse[ch]->GetBinContent(outPulse[ch]->GetMaximumBin()), outPulse[ch]->GetMaximumBin());
 	  }
 	}	
       }
     }
   }
   if ( TString(inPulse[0]->GetTitle()).BeginsWith("baselinePulse")){
-    if (clusterSize){      
+    if (clusterSize.find(fSusid) != clusterSize.end()){      
       if (rawStatistic){
 	maxCh = GetPadMax(inPulse);
 	for (Int_t iCh = maxCh; iCh < NUM_SPADIC_CHA; iCh++){
@@ -527,12 +557,41 @@ Int_t CbmTrdRawToDigiSpadic03::CancelNoise_Cova(TH1D* inPulse[NUM_SPADIC_CHA], T
 	  signal_ch_counter++;
 	} 
       }      
-      //clusterSize->Fill(NUM_SPADIC_CHA-noise_ch_counter); //debug
-      clusterSize->Fill(signal_ch_counter); //debug
+      clusterSize[fSusid]->Fill(signal_ch_counter); //debug
     }
   }
   fPrincipal->Clear();
   return signal_ch_counter;
+}
+
+void CbmTrdRawToDigiSpadic03::FinishTask() { 
+  cout << "CbmTrdRawToDigiSpadic03::FinishTask" << endl;
+  TString name;
+  gDirectory->pwd();
+  if (!gDirectory->Cd("CbmTrdRawToDigiSpadic03_QA")) 
+    gDirectory->mkdir("CbmTrdRawToDigiSpadic03_QA");
+  gDirectory->Cd("CbmTrdRawToDigiSpadic03_QA");
+  for (std::vector<Int_t>::iterator it=fSusIds.begin(); it!=fSusIds.end(); it++){
+    name.Form("Sus%02i",(*it));
+    if (!gDirectory->Cd(name)) 
+      gDirectory->mkdir(name);
+    gDirectory->Cd(name);
+    gDirectory->pwd();
+    baselineDistribution[(*it)]->Write("", TObject::kOverwrite);
+    covaMatixValue[(*it)]->Write("", TObject::kOverwrite);
+    covaMatixValueMaxAmplitude[(*it)]->Write("", TObject::kOverwrite);
+    covaMatixValueHitTime[(*it)]->Write("", TObject::kOverwrite);
+    maxAmplitudeHitTime[(*it)]->Write("", TObject::kOverwrite);
+    maxAmplitudeValue[(*it)]->Write("", TObject::kOverwrite);
+    noiseDistribution[(*it)]->Write("", TObject::kOverwrite);
+    clusterSize[(*it)]->Write("", TObject::kOverwrite);
+    signalChDistance[(*it)]->Write("", TObject::kOverwrite);
+    averageNoise_2D[(*it)]->Write("", TObject::kOverwrite);
+    averageSignal_2D[(*it)]->Write("", TObject::kOverwrite);
+    covaMatixValueClusterSize[(*it)]->Write("", TObject::kOverwrite);
+    gDirectory->Cd("..");
+  }
+  gDirectory->Cd("..");
 }
 
 ClassImp(CbmTrdRawToDigiSpadic03)

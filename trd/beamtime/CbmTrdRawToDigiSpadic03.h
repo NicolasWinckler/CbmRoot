@@ -41,10 +41,10 @@ class CbmTrdRawToDigiSpadic03
   virtual void Exec(Option_t * option);
 
   /** Finish (called after each event) **/
-  virtual void FinishEvent();
+  //virtual void FinishEvent();
  
   /** Finish task (called after all event) **/
-  virtual void FinishTask(){;}
+  virtual void FinishTask();
 
   void Register();
 
@@ -81,17 +81,18 @@ class CbmTrdRawToDigiSpadic03
   CbmTrdRawToDigiSpadic03(const CbmTrdRawToDigiSpadic03&);
 
 
-  TH2I*baselineDistribution;
-  TH1I*covaMatixValue;
-  TH2I*covaMatixValueMaxAmplitude;
-  TH2I*covaMatixValueHitTime;
-  TH2I*maxAmplitudeHitTime;
-  TH1I*noiseDistribution;
-  TH1I*clusterSize;
-  TH1I*signalChDistance;
-  TH2I*averageNoise_2D;
-  TH2I*averageSignal_2D;
-  TH2I*covaMatixValueClusterSize;
+  std::map<Int_t, TH2I*> baselineDistribution;
+  std::map<Int_t, TH1I*> covaMatixValue;
+  std::map<Int_t, TH2I*> covaMatixValueMaxAmplitude;
+  std::map<Int_t, TH2I*> covaMatixValueHitTime;
+  std::map<Int_t, TH2I*> maxAmplitudeHitTime;
+  std::map<Int_t, TH1I*> maxAmplitudeValue;
+  std::map<Int_t, TH1I*> noiseDistribution;
+  std::map<Int_t, TH1I*> clusterSize;
+  std::map<Int_t, TH1I*> signalChDistance;
+  std::map<Int_t, TH2I*> averageNoise_2D;
+  std::map<Int_t, TH2I*> averageSignal_2D;
+  std::map<Int_t, TH2I*> covaMatixValueClusterSize;
 
   ClassDef(CbmTrdRawToDigiSpadic03,1)
 

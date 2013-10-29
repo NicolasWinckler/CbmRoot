@@ -44,7 +44,7 @@ CbmMvdPoint::CbmMvdPoint(Int_t trackID, Int_t pdgCode, Int_t stationNr,
     fPdgCode(pdgCode),
     fPointId(-1)
 {
-  SetLink(FairLink(kMCTrack, trackID));
+  SetLink(FairLink(Cbm::kMCTrack, trackID));
   fDetectorID = DetectorId(stationNr);
 }
 

@@ -79,8 +79,8 @@ class CbmStsHit : public CbmHit
   void SetStatLayer(Int_t it)              { fStatLayer = it; }
   Int_t GetStatLayer()                const { return fStatLayer; }
   void AddIndex(int index){
-			AddLink(FairLink(kStsCluster, index));
-		}
+			AddLink(FairLink(Cbm::kStsCluster, index));
+ 		}
 
   /** Screen output **/
   virtual void Print(Option_t* opt) const;

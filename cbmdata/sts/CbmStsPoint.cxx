@@ -42,7 +42,7 @@ CbmStsPoint::CbmStsPoint(Int_t trackID, Int_t detID, TVector3 posIn,
     fPy_out(momOut.Py()),
     fPz_out(momOut.Pz())
 {
-  SetLink(FairLink(kMCTrack, trackID));
+  SetLink(FairLink(Cbm::kMCTrack, trackID));
 }
 // -------------------------------------------------------------------------
 

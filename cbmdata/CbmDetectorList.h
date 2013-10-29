@@ -26,13 +26,16 @@ enum DetectorId {kREF,      // Reference plane
 
 
 /**   Data type enumerator  **/
+
+namespace Cbm
+{
 enum DataType {kUnknown, 
 	       kMCTrack,
 	       kStsPoint, 
 	       kStsDigi, 
 	       kStsCluster, 
 	       kStsHit};
-
+}
 
 
 #include "TObject.h"

@@ -42,11 +42,13 @@ void trd_sim(Int_t nEvents = 1)
   //  gInterpreter->ProcessLine("sis100_muon_setup()");
 
 // SIS 300 electron
-  TString macro = inDir + "/macro/trd/geometry/setup/sis300_electron_setup.C";
-
 //  TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
+//  gROOT->LoadMacro(macro);
+//  gInterpreter->ProcessLine("sis300_electron_setup()");
+
+  TString macro = inDir + "/macro/trd/geometry/setup/trd_sim_sis300_electron_setup.C";
   gROOT->LoadMacro(macro);
-  gInterpreter->ProcessLine("sis300_electron_setup()");
+  gInterpreter->ProcessLine("trd_sim_sis300_electron_setup()");
 
   platformGeom = "passive/platform_v13b.geo";
 

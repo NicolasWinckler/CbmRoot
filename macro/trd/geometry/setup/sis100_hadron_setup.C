@@ -41,7 +41,7 @@ void sis100_hadron_setup()
   richGeom     = "";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13a.geo";
-  trdGeom      = "trd/trd_v13h.geo.root";
+  trdGeom      = "trd/trd_v13p1.geo.root";  // "trd/trd_v13h.geo.root";
   tofGeom      = "tof/tof_v13-5a.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;

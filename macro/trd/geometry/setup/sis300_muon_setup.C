@@ -41,7 +41,7 @@ void sis300_muon_setup()
   richGeom     = "";
   muchGeom     = "much/much_v13c.geo";
   platformGeom = ""; // "passive/platform_v13b.geo";
-  trdGeom      = "trd/trd_v13m.geo.root";
+  trdGeom      = "trd/trd_v13p5.geo.root";  // "trd/trd_v13m.geo.root";
   tofGeom      = "tof/tof_v13-5e.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;

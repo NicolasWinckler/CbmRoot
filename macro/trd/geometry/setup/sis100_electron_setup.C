@@ -41,7 +41,7 @@ void sis100_electron_setup()
   richGeom     = "rich/rich_v08a.geo";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13a.geo";
-  trdGeom      = "trd/trd_v13k.geo.root";
+  trdGeom      = "trd/trd_v13p2.geo.root";  // "trd/trd_v13k.geo.root";
   tofGeom      = "tof/tof_v13-5b.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;

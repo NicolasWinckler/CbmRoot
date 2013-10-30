@@ -5,9 +5,15 @@
 //
 // V. Friese   22/02/2007
 //
+// 2013-10-30 - DE - introduce new geometry setup naming scheme:
+// 2013-10-30 - DE - CbmSetup = 1 - SIS 100 hadron                                                         
+// 2013-10-30 - DE - CbmSetup = 2 - SIS 100 electron                                                       
+// 2013-10-30 - DE - CbmSetup = 3 - SIS 100 muon                                                           
+// 2013-10-30 - DE - CbmSetup = 4 - SIS 300 electron                                                       
+// 2013-10-30 - DE - CbmSetup = 5 - SIS 300 muon         
 // --------------------------------------------------------------------------
 
-void run_sim(Int_t nEvents = 2)
+void run_sim(Int_t nEvents = 2, Int_t CbmSetup = 4)
 {
 
   // ========================================================================
@@ -20,10 +26,38 @@ void run_sim(Int_t nEvents = 2)
   TString outFile = outDir + "/test.mc.root";
   TString parFile = outDir + "/params.root";
   
-  TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
   CbmTarget* target = new CbmTarget("Gold", 0.025);
-  gROOT->LoadMacro(macro);
-  gInterpreter->ProcessLine("sis300_electron_setup()");
+
+  if (CbmSetup == 1)
+  {
+    TString macro = inDir + "/geometry/setup/sis100_hadron_setup.C";
+    gROOT->LoadMacro(macro);
+    gInterpreter->ProcessLine("sis100_hadron_setup()");
+  }
+  if (CbmSetup == 2)
+  {
+    TString macro = inDir + "/geometry/setup/sis100_electron_setup.C";
+    gROOT->LoadMacro(macro);
+    gInterpreter->ProcessLine("sis100_electron_setup()");
+  }
+  if (CbmSetup == 3)
+  {
+    TString macro = inDir + "/geometry/setup/sis100_muon_setup.C";
+    gROOT->LoadMacro(macro);
+    gInterpreter->ProcessLine("sis100_muon_setup()");
+  }
+  if (CbmSetup == 4)  // default setup
+  {
+    TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
+    gROOT->LoadMacro(macro);
+    gInterpreter->ProcessLine("sis300_electron_setup()");
+  }
+  if (CbmSetup == 5)
+  {
+    TString macro = inDir + "/geometry/setup/sis300_muon_setup.C";
+    gROOT->LoadMacro(macro);
+    gInterpreter->ProcessLine("sis300_muon_setup()");
+  }
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -100,6 +134,11 @@ void run_sim(Int_t nEvents = 2)
     fRun->AddModule(rich);
   }
   
+  if ( muchGeom != "" ) {
+    FairDetector* much = new CbmMuch("MUCH", kTRUE);
+    much->SetGeometryFileName(muchGeom);
+    fRun->AddModule(much);
+  }
 
   if ( trdGeom != "" ) {
     FairDetector* trd = new CbmTrd("TRD",kTRUE );

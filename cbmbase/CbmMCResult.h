@@ -16,7 +16,7 @@
 class CbmMCResult: public CbmMCObject {
 public:
 	CbmMCResult();
-	CbmMCResult(DataType start, DataType stop);
+	CbmMCResult(Cbm::DataType start, Cbm::DataType stop);
 	CbmMCResult(const CbmMCResult& result):
 		CbmMCObject(result.GetStartType(), result.GetEntryVector()),
 		fStartType(result.GetStartType()),
@@ -25,11 +25,11 @@ public:
 
 	virtual ~CbmMCResult();
 
-	void SetStartType(DataType start){fStartType = start;}
-	void SetStopType(DataType stop){fStopType = stop;}
+	void SetStartType(Cbm::DataType start){fStartType = start;}
+	void SetStopType(Cbm::DataType stop){fStopType = stop;}
 
-	DataType GetStartType(void) const {return fStartType;}
-	DataType GetStopType(void) const {return fStopType;}
+	Cbm::DataType GetStartType(void) const {return fStartType;}
+	Cbm::DataType GetStopType(void) const {return fStopType;}
 
 	CbmMCResult& operator=(const CbmMCResult& result){
 	  CbmMCObject::operator=(result);
@@ -49,8 +49,8 @@ public:
 
 
 private:
-	DataType fStartType;
-	DataType fStopType;
+	Cbm::DataType fStartType;
+	Cbm::DataType fStopType;
 
 	ClassDef(CbmMCResult, 2);
 };

@@ -40,10 +40,10 @@ InitStatus CbmMCMatchLoaderTask::Init()
 	fMCMatch = new CbmMCMatch("CbmMCMatch", "CbmMCMatch");
 
 //  fMCMatch->InitStage(kMCTrack, "", "MCTrack");
-  fMCMatch->InitStage(kStsPoint, "", "StsPoint");
-  fMCMatch->InitStage(kStsDigi, "", "StsDigi");
-  fMCMatch->InitStage(kStsCluster, "", "StsCluster");
-  fMCMatch->InitStage(kStsHit, "", "StsHit");
+  fMCMatch->InitStage(Cbm::kStsPoint, "", "StsPoint");
+  fMCMatch->InitStage(Cbm::kStsDigi, "", "StsDigi");
+  fMCMatch->InitStage(Cbm::kStsCluster, "", "StsCluster");
+  fMCMatch->InitStage(Cbm::kStsHit, "", "StsHit");
 
 
   FairRootManager* ioman = FairRootManager::Instance();
@@ -85,7 +85,7 @@ void CbmMCMatchLoaderTask::Exec(Option_t* opt)
 	fMCMatch->ClearMCList();
 
 	fMCMatch->LoadInMCLists(fMCLink);
-	fMCMatch->CreateArtificialStage(kMCTrack, "", "");
+	fMCMatch->CreateArtificialStage(Cbm::kMCTrack, "", "");
 
 	fMCMatch->Print();
 	cout << endl;

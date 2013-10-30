@@ -14,7 +14,7 @@ ClassImp(CbmMCMatch);
 
 CbmMCMatch::CbmMCMatch()
   : TNamed(),
-    fUltimateStage(kMCTrack),
+    fUltimateStage(Cbm::kMCTrack),
     fList(),
     fFinalStageML()
 {
@@ -29,23 +29,23 @@ CbmMCMatch::~CbmMCMatch() {
 	fList.clear();
 }
 
-void CbmMCMatch::AddElement(DataType sourceType, int index, DataType targetType, int link)
+void CbmMCMatch::AddElement(Cbm::DataType sourceType, int index, Cbm::DataType targetType, int link)
 {
 	FairLink myPair(targetType, link);
 	AddElement(sourceType, index, myPair);
 }
 
-void CbmMCMatch::AddElement(DataType type, int index, FairLink link){
+void CbmMCMatch::AddElement(Cbm::DataType type, int index, FairLink link){
 	fList[type]->AddLink(link, index);
 }
 
 
 
-void CbmMCMatch::SetElements(DataType sourceType, int index, FairMultiLinkedData* links){
+void CbmMCMatch::SetElements(Cbm::DataType sourceType, int index, FairMultiLinkedData* links){
 	fList[sourceType]->SetEntry(links, index);
 }
 
-void CbmMCMatch::InitStage(DataType type, std::string fileName, std::string branchName)
+void CbmMCMatch::InitStage(Cbm::DataType type, std::string fileName, std::string branchName)
 {
 	if (fList[type] == 0){
 		CbmMCStage* newStage = new CbmMCStage(type, fileName, branchName);
@@ -56,7 +56,7 @@ void CbmMCMatch::InitStage(DataType type, std::string fileName, std::string bran
 	}
 }
 
-void CbmMCMatch::RemoveStage(DataType type){
+void CbmMCMatch::RemoveStage(Cbm::DataType type){
 	fList.erase(type);
 }
 
@@ -68,7 +68,7 @@ void CbmMCMatch::SetCommonWeightStages(Float_t weight)
 	}
 }
 
-CbmMCResult CbmMCMatch::GetMCInfo(DataType start, DataType stop){
+CbmMCResult CbmMCMatch::GetMCInfo(Cbm::DataType start, Cbm::DataType stop){
 
 	CbmMCResult result(start, stop);
 	if(!IsTypeInList(start))
@@ -79,12 +79,12 @@ CbmMCResult CbmMCMatch::GetMCInfo(DataType start, DataType stop){
 		return GetMCInfoBackward(start, stop);
 }
 
-CbmMCEntry CbmMCMatch::GetMCInfoSingle(FairLink aLink, DataType stop)
+CbmMCEntry CbmMCMatch::GetMCInfoSingle(FairLink aLink, Cbm::DataType stop)
 {
 	CbmMCEntry result;
-	if(!IsTypeInList((DataType)aLink.GetType()))
+	if(!IsTypeInList((Cbm::DataType)aLink.GetType()))
 		return result;
-	if(!(fList[(DataType)aLink.GetType()]->GetNEntries() > aLink.GetIndex()))
+	if(!(fList[(Cbm::DataType)aLink.GetType()]->GetNEntries() > aLink.GetIndex()))
 		return result;
 
 	if (aLink.GetType() < stop)
@@ -93,7 +93,7 @@ CbmMCEntry CbmMCMatch::GetMCInfoSingle(FairLink aLink, DataType stop)
 		return GetMCInfoBackwardSingle(aLink, stop);
 }
 
-CbmMCResult CbmMCMatch::GetMCInfoForward(DataType start, DataType stop)
+CbmMCResult CbmMCMatch::GetMCInfoForward(Cbm::DataType start, Cbm::DataType stop)
 {
 	CbmMCResult result(start, stop);
 	CbmMCStage startVec = *(fList[start]);
@@ -118,7 +118,7 @@ CbmMCResult CbmMCMatch::GetMCInfoForward(DataType start, DataType stop)
 
 }
 
-CbmMCEntry CbmMCMatch::GetMCInfoForwardSingle(FairLink link, DataType stop)
+CbmMCEntry CbmMCMatch::GetMCInfoForwardSingle(FairLink link, Cbm::DataType stop)
 {
 	CbmMCEntry result;
 	ClearFinalStage();
@@ -131,7 +131,7 @@ CbmMCEntry CbmMCMatch::GetMCInfoForwardSingle(FairLink link, DataType stop)
 
 }
 
-CbmMCResult CbmMCMatch::GetMCInfoBackward(DataType start, DataType stop)
+CbmMCResult CbmMCMatch::GetMCInfoBackward(Cbm::DataType start, Cbm::DataType stop)
 {
 	CbmMCResult result(start, stop);
 	CbmMCStage startVec = *(fList[start]);
@@ -150,10 +150,10 @@ CbmMCResult CbmMCMatch::GetMCInfoBackward(DataType start, DataType stop)
 	return result;
 }
 
-CbmMCEntry CbmMCMatch::GetMCInfoBackwardSingle(FairLink aLink, DataType stop, Double_t weight)
+CbmMCEntry CbmMCMatch::GetMCInfoBackwardSingle(FairLink aLink, Cbm::DataType stop, Double_t weight)
 {
 	CbmMCEntry result;
-	FairMultiLinkedData multiLink = fList[(DataType)aLink.GetType()]->GetEntry(aLink.GetIndex());
+	FairMultiLinkedData multiLink = fList[(Cbm::DataType)aLink.GetType()]->GetEntry(aLink.GetIndex());
 
 	ClearFinalStage();
 	multiLink.MultiplyAllWeights(weight);
@@ -165,7 +165,7 @@ CbmMCEntry CbmMCMatch::GetMCInfoBackwardSingle(FairLink aLink, DataType stop, Do
 }
 
 
-void CbmMCMatch::FindStagesPointingToLinks(FairMultiLinkedData links, DataType stop)
+void CbmMCMatch::FindStagesPointingToLinks(FairMultiLinkedData links, Cbm::DataType stop)
 {
 	FairMultiLinkedData tempLinks;
 	for (int i = 0; i < links.GetNLinks(); i++){
@@ -192,7 +192,7 @@ void CbmMCMatch::FindStagesPointingToLinks(FairMultiLinkedData links, DataType s
 FairMultiLinkedData CbmMCMatch::FindStagesPointingToLink(FairLink link)
 {
 	FairMultiLinkedData result;
-	TListIteratorConst iter = fList.find((DataType)link.GetType());
+	TListIteratorConst iter = fList.find((Cbm::DataType)link.GetType());
 	for(;iter!= fList.end(); iter++){
 		if (iter->second->PosInList(link).GetNLinks() > 0){
 			result.AddLinks(iter->second->PosInList(link), true);
@@ -202,7 +202,7 @@ FairMultiLinkedData CbmMCMatch::FindStagesPointingToLink(FairLink link)
 }
 
 
-FairMultiLinkedData CbmMCMatch::FindLinksToStage(DataType stage)
+FairMultiLinkedData CbmMCMatch::FindLinksToStage(Cbm::DataType stage)
 {
 	FairMultiLinkedData result;
 	for (int i = 0; i < GetNMCStages(); i++){
@@ -212,13 +212,13 @@ FairMultiLinkedData CbmMCMatch::FindLinksToStage(DataType stage)
 }
 
 
-void CbmMCMatch::CreateArtificialStage(DataType stage, std::string fileName, std::string branchName)
+void CbmMCMatch::CreateArtificialStage(Cbm::DataType stage, std::string fileName, std::string branchName)
 {
 	FairMultiLinkedData stageLinks = FindLinksToStage(stage);
 	if (stageLinks.GetNLinks() > 0){
 		InitStage(stage, fileName, branchName);
 		FairMultiLinkedData artData;
-		artData.SetLink(FairLink((Int_t)kUnknown, -1));
+		artData.SetLink(FairLink((Int_t)Cbm::kUnknown, -1));
 		for (int i = 0; i < stageLinks.GetNLinks(); i++){
 			fList[stage]->SetEntry(&artData, stageLinks.GetLink(i).GetIndex());
 		}
@@ -227,7 +227,7 @@ void CbmMCMatch::CreateArtificialStage(DataType stage, std::string fileName, std
 
 
 
-void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, DataType stopStage){
+void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, Cbm::DataType stopStage){
 
 	CbmMCEntry tempStage;
 
@@ -250,7 +250,7 @@ void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, DataType stopStag
 				AddToFinalStage(startStage.GetLink(i),1);
 			}
 			else{
-				double tempStageWeight = GetMCStageType(static_cast<DataType>(tempStage.GetSource()))->GetWeight();
+				double tempStageWeight = GetMCStageType(static_cast<Cbm::DataType>(tempStage.GetSource()))->GetWeight();
 				double startLinkWeight = startStage.GetLink(i).GetWeight()/startStage.GetNLinks();
 				//std::cout << " StageWeight: " << tempStageWeight << " startLinkWeight: " << startLinkWeight;
 				tempStage.MultiplyAllWeights(tempStageWeight);
@@ -271,7 +271,7 @@ void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, DataType stopStag
 	}
 }
 
-CbmMCEntry CbmMCMatch::GetEntry(DataType type, int index){
+CbmMCEntry CbmMCMatch::GetEntry(Cbm::DataType type, int index){
 
 	CbmMCEntry empty;
 	if (index < 0) return empty;
@@ -283,7 +283,7 @@ CbmMCEntry CbmMCMatch::GetEntry(DataType type, int index){
 }
 
 CbmMCEntry CbmMCMatch::GetEntry(FairLink link){
-	return GetEntry(static_cast<DataType>(link.GetType()), link.GetIndex());
+	return GetEntry(static_cast<Cbm::DataType>(link.GetType()), link.GetIndex());
 }
 
 void CbmMCMatch::AddToFinalStage(FairLink hitPair, Float_t mult){
@@ -304,7 +304,7 @@ void CbmMCMatch::ClearMCList()
 	//fList.clear();
 }
 
-bool CbmMCMatch::IsTypeInList(DataType type){
+bool CbmMCMatch::IsTypeInList(Cbm::DataType type){
 	for(TListIterator iter = fList.begin(); iter != fList.end(); iter++){
 		if (iter->first == type)
 			return true;
@@ -316,10 +316,10 @@ void CbmMCMatch::LoadInMCLists(TClonesArray* myLinkArray){
 	for (int i = 0; i < myLinkArray->GetEntriesFast(); i++){
 		CbmMCEntry* myLink = (CbmMCEntry*)myLinkArray->At(i);
 		//std::cout << "myLink.size(): " << myLink->GetNLinks() << ":";
-		if (IsTypeInList((DataType)myLink->GetSource())){
-			//fList[(DataType)myLink->GetSource()]->ClearEntries();
-			fList[(DataType)myLink->GetSource()]->SetEntry(*myLink);
-			fList[(DataType)myLink->GetSource()]->SetLoaded(kTRUE);
+		if (IsTypeInList((Cbm::DataType)myLink->GetSource())){
+			//fList[(Cbm::DataType)myLink->GetSource()]->ClearEntries();
+			fList[(Cbm::DataType)myLink->GetSource()]->SetEntry(*myLink);
+			fList[(Cbm::DataType)myLink->GetSource()]->SetLoaded(kTRUE);
 		}
 	}
 }

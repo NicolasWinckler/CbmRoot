@@ -18,15 +18,15 @@ using std::endl;
 CbmMCMatchSelectorTask::CbmMCMatchSelectorTask()
   : FairTask("Creates CbmMCMatch"), 
     fMCMatch(NULL),
-    fStart(kUnknown), 
-    fStop(kUnknown),
+    fStart(Cbm::kUnknown), 
+    fStop(Cbm::kUnknown),
     fStageWeights(),
     fCommonWeight(0.)
 {
 }
 // -------------------------------------------------------------------------
 
-CbmMCMatchSelectorTask::CbmMCMatchSelectorTask(DataType start, DataType stop)
+CbmMCMatchSelectorTask::CbmMCMatchSelectorTask(Cbm::DataType start, Cbm::DataType stop)
   : FairTask("Creates CbmMCMatch"), 
     fMCMatch(NULL),
     fStart(start), 

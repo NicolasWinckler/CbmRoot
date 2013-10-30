@@ -22,7 +22,7 @@ CbmMCStage::CbmMCStage()
 CbmMCStage::~CbmMCStage() {
 }
 
-CbmMCStage::CbmMCStage(DataType id, std::string fileName, std::string branchName, Double_t weight)
+CbmMCStage::CbmMCStage(Cbm::DataType id, std::string fileName, std::string branchName, Double_t weight)
   : CbmMCObject(id), 
     fBranchName(branchName), 
     fFileName(fileName), 

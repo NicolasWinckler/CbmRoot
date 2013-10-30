@@ -87,7 +87,7 @@ void CbmMCTestHitCompare::Exec(Option_t* opt)
 {
 	//fMCMatch->CreateArtificialStage(kMCTrack, "", "");
 
-	CbmMCResult myResult = fMCMatch->GetMCInfo(kStsHit, kStsPoint);
+  CbmMCResult myResult = fMCMatch->GetMCInfo(Cbm::kStsHit, Cbm::kStsPoint);
 	cout << myResult;
 	for (int i = 0; i < myResult.GetNEntries(); i++){
 		CbmMCEntry myLinks = myResult.GetMCLink(i);
@@ -96,7 +96,7 @@ void CbmMCTestHitCompare::Exec(Option_t* opt)
 		cout << "Hit Match for hit " << i << " at (" << myHit->GetX() << "," << myHit->GetY() << "," << myHit->GetZ() << ")" << endl;
 		if (myLinks.GetNLinks()<2){
 		  for (int j = 0; j < myLinks.GetNLinks(); j++){
-		    if (myLinks.GetLink(j).GetType() == kStsPoint){
+		    if (myLinks.GetLink(j).GetType() == Cbm::kStsPoint){
 				
 		      CbmStsPoint* myMCPoint = (CbmStsPoint*)fMCPoint->At(myLinks.GetLink(j).GetIndex());
 		      //myMCTrack->Print(myLinks.GetFairLink(j).GetIndex());
@@ -111,7 +111,7 @@ void CbmMCTestHitCompare::Exec(Option_t* opt)
 		}
 		else {
 		  for (int j = 0; j < myLinks.GetNLinks(); j++){
-		    if (myLinks.GetLink(j).GetType() == kStsPoint){
+		    if (myLinks.GetLink(j).GetType() == Cbm::kStsPoint){
 				
 		      CbmStsPoint* myMCPoint = (CbmStsPoint*)fMCPoint->At(myLinks.GetLink(j).GetIndex());
 		      //myMCTrack->Print(myLinks.GetFairLink(j).GetIndex());

@@ -13,7 +13,7 @@ CbmMCList::CbmMCList()
   : TObject(),
     fList(),
     fEntry(-1),
-    fType(kUnknown) 
+    fType(Cbm::kUnknown) 
 {
 	// TODO Auto-generated constructor stub
 

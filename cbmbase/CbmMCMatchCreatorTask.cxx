@@ -46,10 +46,10 @@ InitStatus CbmMCMatchCreatorTask::Init()
 
 	fMCMatch = new CbmMCMatch("CbmMCMatch", "CbmMCMatch");
 
-  fMCMatch->InitStage(kStsPoint, "", "StsPoint");
-  fMCMatch->InitStage(kStsDigi, "", "StsDigi");
-  fMCMatch->InitStage(kStsCluster, "", "StsCluster");
-  fMCMatch->InitStage(kStsHit, "", "StsHit");
+  fMCMatch->InitStage(Cbm::kStsPoint, "", "StsPoint");
+  fMCMatch->InitStage(Cbm::kStsDigi, "", "StsDigi");
+  fMCMatch->InitStage(Cbm::kStsCluster, "", "StsCluster");
+  fMCMatch->InitStage(Cbm::kStsHit, "", "StsHit");
 
   InitStatus status = InitBranches();
 

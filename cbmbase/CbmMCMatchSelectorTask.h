@@ -34,7 +34,7 @@ class CbmMCMatchSelectorTask : public FairTask
   /** Default constructor **/
 	CbmMCMatchSelectorTask();
 
-	CbmMCMatchSelectorTask(DataType start, DataType stop);
+	CbmMCMatchSelectorTask(Cbm::DataType start, Cbm::DataType stop);
 
   /** Destructor **/
   virtual ~CbmMCMatchSelectorTask();
@@ -50,12 +50,12 @@ class CbmMCMatchSelectorTask : public FairTask
 
   virtual void Finish();
 
-  virtual void SetStart(DataType type){fStart = type;}
-  virtual void SetStop(DataType type){fStop = type;}
+  virtual void SetStart(Cbm::DataType type){fStart = type;}
+  virtual void SetStop(Cbm::DataType type){fStop = type;}
 
   virtual void SetAllWeights(Float_t weight) {fCommonWeight = weight;}
   virtual void SetWeightStage(Int_t type, Float_t weight){
-	  fStageWeights.push_back(std::pair<DataType, Float_t>(static_cast<DataType>(type), weight));
+	  fStageWeights.push_back(std::pair<Cbm::DataType, Float_t>(static_cast<Cbm::DataType>(type), weight));
   }
 
   virtual void SetWeights();
@@ -64,10 +64,10 @@ class CbmMCMatchSelectorTask : public FairTask
 
  private:
   CbmMCMatch* fMCMatch;
-  DataType fStart;
-  DataType fStop;
+  Cbm::DataType fStart;
+  Cbm::DataType fStop;
 
-  std::vector<std::pair<DataType, Float_t> > fStageWeights;
+  std::vector<std::pair<Cbm::DataType, Float_t> > fStageWeights;
   Float_t fCommonWeight;
 
   void Register();

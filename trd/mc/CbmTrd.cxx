@@ -32,6 +32,8 @@
 using std::cout;
 using std::endl;
 
+
+// -----   Default constructor   ----------------------------------------------
 CbmTrd::CbmTrd() 
   : FairDetector("TRD", kTRUE, kTRD),
     fPosIn(),
@@ -47,7 +49,10 @@ CbmTrd::CbmTrd()
 {
   fVerboseLevel = 1;
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Standard constructor   ---------------------------------------------
 CbmTrd::CbmTrd(const char* name, Bool_t active)
   : FairDetector(name, active, kTRD),
     fPosIn(),
@@ -63,7 +68,10 @@ CbmTrd::CbmTrd(const char* name, Bool_t active)
 {
   fVerboseLevel = 1;
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Destructor   -------------------------------------------------------
 CbmTrd::~CbmTrd() {
    if (fTrdPoints) {
       fTrdPoints->Delete();
@@ -73,7 +81,10 @@ CbmTrd::~CbmTrd() {
       delete fGeoHandler;
    }
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Initialize   -------------------------------------------------------
 void CbmTrd::Initialize()
 {
    FairDetector::Initialize();
@@ -83,7 +94,10 @@ void CbmTrd::Initialize()
    Bool_t isSimulation=kTRUE;
    fGeoHandler->Init(isSimulation);
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   SetSpecialPhysicsCuts   --------------------------------------------
 void CbmTrd::SetSpecialPhysicsCuts()
 {
    FairRun* fRun = FairRun::Instance();
@@ -156,7 +170,10 @@ void CbmTrd::SetSpecialPhysicsCuts()
       gMC->Gstpar(matIdVMC,"PPCUTM",-1.);
    }
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method ProcessHits   ----------------------------------------
 Bool_t  CbmTrd::ProcessHits(
       FairVolume* vol)
 {
@@ -198,25 +215,40 @@ Bool_t  CbmTrd::ProcessHits(
 
    return kTRUE;
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method EndOfEvent   -----------------------------------------
 void CbmTrd::EndOfEvent()
 {
    if (fVerboseLevel) Print();
    fTrdPoints->Delete();
    fPosIndex = 0;
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method Register   -------------------------------------------
 void CbmTrd::Register()
 {
    FairRootManager::Instance()->Register("TrdPoint", "Trd", fTrdPoints, kTRUE);
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method GetCollection   --------------------------------------
 TClonesArray* CbmTrd::GetCollection(
       Int_t iColl) const
 {
-   if (iColl == 0) return fTrdPoints; else return NULL;
+   if (iColl == 0) 
+     return fTrdPoints; 
+   else 
+     return NULL;
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method Print   ----------------------------------------------
 void CbmTrd::Print() const
 {
    Int_t nofPoints = fTrdPoints->GetEntriesFast();
@@ -224,19 +256,26 @@ void CbmTrd::Print() const
    if (fVerboseLevel > 1)
       for (Int_t i = 0; i < nofPoints; i++) (*fTrdPoints)[i]->Print();
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method Reset   ----------------------------------------------
 void CbmTrd::Reset()
 {
    fTrdPoints->Delete();
    ResetParameters();
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   Public method CopyClones   -----------------------------------------
 void CbmTrd::CopyClones(
       TClonesArray* cl1,
       TClonesArray* cl2,
       Int_t offset)
 {
    Int_t nEntries = cl1->GetEntriesFast();
+   LOG(INFO) << "CbmTrd: " << nEntries << " entries to add." << FairLogger::endl;
    TClonesArray& clref = *cl2;
    for (Int_t i = 0; i < nEntries; i++) {
       CbmTrdPoint* oldpoint = (CbmTrdPoint*) cl1->At(i);
@@ -245,21 +284,34 @@ void CbmTrd::CopyClones(
       new (clref[fPosIndex]) CbmTrdPoint(*oldpoint);
       fPosIndex++;
    }
+   LOG(INFO) << "CbmTrd: " << cl2->GetEntriesFast() << " merged entries." << FairLogger::endl;
 }
+// ----------------------------------------------------------------------------
 
+
+// -----  ConstructGeometry  --------------------------------------------------
 void CbmTrd::ConstructGeometry()
 {
-   TString fileName = GetGeometryFileName();
-   if (fileName.EndsWith(".geo")) {
-      ConstructASCIIGeometry();
-   } else if (fileName.EndsWith(".root")) {
-      ConstructRootGeometry();
-   } else {
-      LOG(ERROR) << "CbmTrd::ConstructGeometry: Geometry format not supported." << FairLogger::endl;
-   }
+  TString fileName = GetGeometryFileName();
+  if ( fileName.EndsWith(".root") ) {
+    LOG(INFO) << "Constructing TRD geometry from ROOT file "
+              << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  }
+  else if ( fileName.EndsWith(".geo") ) {
+    LOG(INFO) <<  "Constructing TRD geometry from ASCII file "
+              << fileName.Data() << FairLogger::endl;
+    ConstructAsciiGeometry();
+  }
+  else
+    LOG(FATAL) <<  "Geometry format of TRD file " << fileName.Data()
+               << " not supported." << FairLogger::endl;
 }
+// ----------------------------------------------------------------------------
 
-void CbmTrd::ConstructASCIIGeometry()
+
+// -----   ConstructAsciiGeometry   -------------------------------------------
+void CbmTrd::ConstructAsciiGeometry()
 {
    FairGeoLoader* geoLoad = FairGeoLoader::Instance();
    FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -294,7 +346,10 @@ void CbmTrd::ConstructASCIIGeometry()
 
    ProcessNodes(volList);
 }
+// ----------------------------------------------------------------------------
 
+
+// -----   CheckIfSensitive   -------------------------------------------------
 Bool_t CbmTrd::CheckIfSensitive(
       string name)
 {
@@ -305,5 +360,7 @@ Bool_t CbmTrd::CheckIfSensitive(
    }
    return kFALSE;
 }
+// ----------------------------------------------------------------------------
+
 
 ClassImp(CbmTrd)

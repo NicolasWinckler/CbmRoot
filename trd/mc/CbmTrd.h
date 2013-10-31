@@ -88,14 +88,14 @@ public:
    virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
    /**
-     * \breif Constructs the TRD geometry.
+    * \brief Constructs the TRD geometry.
     **/
    virtual void ConstructGeometry();
 
    /**
-     * \breif Constructs the TRD geometry from ASCII file.
+    * \brief Constructs the TRD geometry from ASCII file.
     **/
-   virtual void ConstructASCIIGeometry();
+   virtual void ConstructAsciiGeometry();
 
    Bool_t CheckIfSensitive(string name);
 

@@ -294,12 +294,12 @@ void CbmTrd::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if ( fileName.EndsWith(".root") ) {
-    LOG(INFO) << "Constructing TRD geometry from ROOT file "
+    LOG(INFO) << "Constructing TRD  geometry from ROOT  file "
               << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   }
   else if ( fileName.EndsWith(".geo") ) {
-    LOG(INFO) <<  "Constructing TRD geometry from ASCII file "
+    LOG(INFO) <<  "Constructing TRD  geometry from ASCII file "
               << fileName.Data() << FairLogger::endl;
     ConstructAsciiGeometry();
   }

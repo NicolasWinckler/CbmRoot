@@ -2116,30 +2116,33 @@ void create_box_supports()
   const Int_t I_width  = 30; // cm // I profile properties
   const Int_t I_thick  =  2; // cm // I profile properties
 
-  Double_t AperX[3] = { 4.5*DetectorSizeX[1], 5.5*DetectorSizeX[1], 6*DetectorSizeX[1] };  // inner aperture in X of support structure for stations 1,2,3
-  Double_t AperY[3] = { 3.5*DetectorSizeY[1], 4.5*DetectorSizeY[1], 5*DetectorSizeY[1] };  // inner aperture in Y of support structure for stations 1,2,3
+  const Double_t BeamHeight     = 570;   // beamline is at 5.7m above the floor
+  const Double_t PlatformHeight = 234;   // platform is   2.34m above the floor
+  const Double_t PlatformOffset =   1;   // distance to platform
+
 //  Double_t AperX[3] = { 450., 550., 600.};  // 100 cm modules  // inner aperture in X of support structure for stations 1,2,3
 //  Double_t AperY[3] = { 350., 450., 500.};  // 100 cm modules  // inner aperture in Y of support structure for stations 1,2,3
 
+  const Double_t AperX[3] = { 4.5*DetectorSizeX[1], 5.5*DetectorSizeX[1], 6*DetectorSizeX[1] };  // inner aperture in X of support structure for stations 1,2,3
+  const Double_t AperY[3] = { 3.5*DetectorSizeY[1], 4.5*DetectorSizeY[1], 5*DetectorSizeY[1] };  // inner aperture in Y of support structure for stations 1,2,3
+  // platform
+  const Double_t AperYbot[3] = { BeamHeight-(PlatformHeight+PlatformOffset+I_height), 4.5*DetectorSizeY[1], 5*DetectorSizeY[1] };  // inner aperture for station1
+
+  const Double_t xBarPosYtop[3] = { AperY[0]   +I_height/2., AperY[1]+I_height/2., AperY[2]+I_height/2. };
+  const Double_t xBarPosYbot[3] = { AperYbot[0]+I_height/2., xBarPosYtop[1]      , xBarPosYtop[2]       };
+
+  const Double_t zBarPosYtop[3] = { AperY[0]   +I_height-I_width/2., AperY[1]+I_height-I_width/2., AperY[2]+I_height-I_width/2. };
+  const Double_t zBarPosYbot[3] = { AperYbot[0]+I_height-I_width/2., zBarPosYtop[1]              , zBarPosYtop[2]               };
+
   Double_t PilPosX;
-  Double_t BarPosY;
-
-  const Double_t BeamHeight = 570;  // beamline is at 5.7m above floor
-
   Double_t PilPosZ[6];  // PilPosZ
-//  PilPosZ[0] = LayerPosition[0] + LayerThickness/2.;
-//  PilPosZ[1] = LayerPosition[3] + LayerThickness/2.;
-//  PilPosZ[2] = LayerPosition[4] + LayerThickness/2.;
-//  PilPosZ[3] = LayerPosition[7] + LayerThickness/2.;
-//  PilPosZ[4] = LayerPosition[8] + LayerThickness/2.;
-//  PilPosZ[5] = LayerPosition[9] + LayerThickness/2.;
 
-  PilPosZ[0] = LayerPosition[0] + 15;
-  PilPosZ[1] = LayerPosition[3] - 15 + LayerThickness;
-  PilPosZ[2] = LayerPosition[4] + 15;		      
-  PilPosZ[3] = LayerPosition[7] - 15 + LayerThickness;
-  PilPosZ[4] = LayerPosition[8] + 15;		      
-  PilPosZ[5] = LayerPosition[9] - 15 + LayerThickness;
+  PilPosZ[0] = LayerPosition[0] + I_width/2.;
+  PilPosZ[1] = LayerPosition[3] - I_width/2. + LayerThickness;
+  PilPosZ[2] = LayerPosition[4] + I_width/2.;		      
+  PilPosZ[3] = LayerPosition[7] - I_width/2. + LayerThickness;
+  PilPosZ[4] = LayerPosition[8] + I_width/2.;		      
+  PilPosZ[5] = LayerPosition[9] - I_width/2. + LayerThickness;
 
 //  cout << "PilPosZ[0]: " << PilPosZ[0] << endl;
 //  cout << "PilPosZ[1]: " << PilPosZ[1] << endl;
@@ -2180,9 +2183,11 @@ void create_box_supports()
   // station 1
   if (ShowLayer[0])  // if geometry contains layer 1 (1st layer of station 1)
     {
-      TGeoBBox* trd_I_vert1_keep  = new TGeoBBox("", I_thick /2., I_height /2. - I_thick, (BeamHeight + (AperY[0]+I_height) ) /2.);
+//      TGeoBBox* trd_I_vert1_keep  = new TGeoBBox("", I_thick /2., I_height /2. - I_thick, (BeamHeight + (AperY[0]+I_height) ) /2.);
+      TGeoBBox* trd_I_vert1_keep  = new TGeoBBox("", I_thick /2., I_height /2. - I_thick, ( (AperYbot[0]+I_height) + (AperY[0]+I_height) ) /2.);
       TGeoVolume* trd_I_vert1     = new TGeoVolume("trd_I_y11", trd_I_vert1_keep, aluminiumVolMed);
-      TGeoBBox* trd_I_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
+      //      TGeoBBox* trd_I_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
+      TGeoBBox* trd_I_vert2_keep  = new TGeoBBox("", I_width /2.,            I_thick /2., ( (AperYbot[0]+I_height) + (AperY[0]+I_height) ) /2.);
       TGeoVolume* trd_I_vert2     = new TGeoVolume("trd_I_y12", trd_I_vert2_keep, aluminiumVolMed);
 
       trd_I_vert1->SetLineColor(kGreen);  // kBlue);  // Yellow);  // kOrange);
@@ -2192,7 +2197,8 @@ void create_box_supports()
       TGeoTranslation *ty02 = new TGeoTranslation("ty02", 0.,  (I_height-I_thick) /2., 0.);
       TGeoTranslation *ty03 = new TGeoTranslation("ty03", 0., -(I_height-I_thick) /2., 0.);
 
-      TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
+      //      TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., (BeamHeight + (AperY[0]+I_height) ) /2.);
+      TGeoBBox* trd_I_vert_vol1_keep = new TGeoBBox("", I_width /2., I_height /2., ( (AperYbot[0]+I_height) + (AperY[0]+I_height) ) /2.);
       TGeoVolume* trd_I_vert_vol1    = new TGeoVolume("trd_I_y10", trd_I_vert_vol1_keep, keepVolMed);
 
       // build I-bar trd_I_vert_vol1
@@ -2204,20 +2210,22 @@ void create_box_supports()
       TGeoBBox* trd_I_vert3_keep  = new TGeoBBox("", (I_width-I_thick)/2. /2., I_height /2. - I_thick, I_thick /2.);
       TGeoVolume* trd_I_vert3     = new TGeoVolume("trd_I_y13", trd_I_vert3_keep, aluminiumVolMed);
       trd_I_vert3->SetLineColor(kGreen);
-      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[0]+I_height) - I_width) /2.);
-      //      TGeoTranslation *ty05 = new TGeoTranslation("ty05", -(I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[0]+I_height) - I_width) /2.);
+//      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -( (AperYbot[0]+I_height) + (AperY[0]+I_height) - I_width) /2.);  // top
+//      TGeoTranslation *ty05 = new TGeoTranslation("ty05",  (I_thick/2. + (I_width-I_thick)/2./2.), 0.,  ( (AperYbot[0]+I_height) + (AperY[0]+I_height) - I_width) /2.);  // bottom
+      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -( zBarPosYbot[0] + zBarPosYtop[0] )/2. );  // top	  
+      TGeoTranslation *ty05 = new TGeoTranslation("ty05",  (I_thick/2. + (I_width-I_thick)/2./2.), 0.,  ( zBarPosYbot[0] + zBarPosYtop[0] )/2. );  // bottom
       trd_I_vert_vol1->AddNode(trd_I_vert3, 4, ty04);
-      //      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
+      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
 
       PilPosX = AperX[0];
     
-      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[0], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), -( (AperYbot[0]+I_height) - (AperY[0]+I_height))/2., PilPosZ[0], rotzx01);
       trd_1->AddNode(trd_I_vert_vol1, 11, trd_I_vert_combi01);
-      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[0], rotzx01);
+      TGeoCombiTrans* trd_I_vert_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -( (AperYbot[0]+I_height) - (AperY[0]+I_height))/2., PilPosZ[0], rotzx01);
       trd_1->AddNode(trd_I_vert_vol1, 12, trd_I_vert_combi02);
-      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[1], rotzx02);
+      TGeoCombiTrans* trd_I_vert_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.), -( (AperYbot[0]+I_height) - (AperY[0]+I_height))/2., PilPosZ[1], rotzx02);
       trd_1->AddNode(trd_I_vert_vol1, 13, trd_I_vert_combi03);
-      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -(BeamHeight - (AperY[0]+I_height))/2., PilPosZ[1], rotzx02);
+      TGeoCombiTrans* trd_I_vert_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.), -( (AperYbot[0]+I_height) - (AperY[0]+I_height))/2., PilPosZ[1], rotzx02);
       trd_1->AddNode(trd_I_vert_vol1, 14, trd_I_vert_combi04);
     }
 
@@ -2248,10 +2256,10 @@ void create_box_supports()
       TGeoBBox* trd_I_vert3_keep  = new TGeoBBox("", (I_width-I_thick)/2. /2., I_height /2. - I_thick, I_thick /2.);
       TGeoVolume* trd_I_vert3     = new TGeoVolume("trd_I_y23", trd_I_vert3_keep, aluminiumVolMed);
       trd_I_vert3->SetLineColor(kGreen);
-      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[1]+I_height) - I_width) /2.);
-      //      TGeoTranslation *ty05 = new TGeoTranslation("ty05", -(I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[1]+I_height) - I_width) /2.);
+      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[1]+I_height) - I_width) /2.);          // top
+      TGeoTranslation *ty05 = new TGeoTranslation("ty05",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight - (AperY[1]+I_height) )/2. + zBarPosYbot[1] );  // bottom
       trd_I_vert_vol1->AddNode(trd_I_vert3, 4, ty04);
-      //      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
+      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
 
       PilPosX = AperX[1];
     
@@ -2292,10 +2300,10 @@ void create_box_supports()
       TGeoBBox* trd_I_vert3_keep  = new TGeoBBox("", (I_width-I_thick)/2. /2., I_height /2. - I_thick, I_thick /2.);
       TGeoVolume* trd_I_vert3     = new TGeoVolume("trd_I_y33", trd_I_vert3_keep, aluminiumVolMed);
       trd_I_vert3->SetLineColor(kGreen);
-      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[2]+I_height) - I_width) /2.);
-      //      TGeoTranslation *ty05 = new TGeoTranslation("ty05", -(I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[2]+I_height) - I_width) /2.);
+      TGeoTranslation *ty04 = new TGeoTranslation("ty04",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight + (AperY[2]+I_height) - I_width) /2.);          // top
+      TGeoTranslation *ty05 = new TGeoTranslation("ty05",  (I_thick/2. + (I_width-I_thick)/2./2.), 0., -(BeamHeight - (AperY[2]+I_height) )/2. + zBarPosYbot[2] );  // bottom
       trd_I_vert_vol1->AddNode(trd_I_vert3, 4, ty04);
-      //      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
+      trd_I_vert_vol1->AddNode(trd_I_vert3, 5, ty05);
 
       PilPosX = AperX[2];
       
@@ -2337,15 +2345,13 @@ void create_box_supports()
       trd_I_hori_vol1->AddNode(trd_I_hori2, 2, tx02);
       trd_I_hori_vol1->AddNode(trd_I_hori2, 3, tx03);
 
-      BarPosY = AperY[0];
-    
-      TGeoCombiTrans* trd_I_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+I_height/2.), PilPosZ[0], roty090);
+      TGeoCombiTrans* trd_I_hori_combi01 = new TGeoCombiTrans(0., xBarPosYtop[0], PilPosZ[0], roty090);
       trd_1->AddNode(trd_I_hori_vol1, 11, trd_I_hori_combi01);
-      TGeoCombiTrans* trd_I_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+I_height/2.), PilPosZ[0], roty090);
+      TGeoCombiTrans* trd_I_hori_combi02 = new TGeoCombiTrans(0.,-xBarPosYbot[0], PilPosZ[0], roty090);
       trd_1->AddNode(trd_I_hori_vol1, 12, trd_I_hori_combi02);
-      TGeoCombiTrans* trd_I_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+I_height/2.), PilPosZ[1], roty090);
+      TGeoCombiTrans* trd_I_hori_combi03 = new TGeoCombiTrans(0., xBarPosYtop[0], PilPosZ[1], roty090);
       trd_1->AddNode(trd_I_hori_vol1, 13, trd_I_hori_combi03);
-      TGeoCombiTrans* trd_I_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+I_height/2.), PilPosZ[1], roty090);
+      TGeoCombiTrans* trd_I_hori_combi04 = new TGeoCombiTrans(0.,-xBarPosYbot[0], PilPosZ[1], roty090);
       trd_1->AddNode(trd_I_hori_vol1, 14, trd_I_hori_combi04);
     }
 
@@ -2371,16 +2377,14 @@ void create_box_supports()
       trd_I_hori_vol1->AddNode(trd_I_hori1, 1, tx01);
       trd_I_hori_vol1->AddNode(trd_I_hori2, 2, tx02);
       trd_I_hori_vol1->AddNode(trd_I_hori2, 3, tx03);
-
-      BarPosY = AperY[1];
     
-      TGeoCombiTrans* trd_I_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+I_height/2.), PilPosZ[2], roty090);
+      TGeoCombiTrans* trd_I_hori_combi01 = new TGeoCombiTrans(0., xBarPosYtop[1], PilPosZ[2], roty090);
       trd_2->AddNode(trd_I_hori_vol1, 21, trd_I_hori_combi01);
-      TGeoCombiTrans* trd_I_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+I_height/2.), PilPosZ[2], roty090);
+      TGeoCombiTrans* trd_I_hori_combi02 = new TGeoCombiTrans(0.,-xBarPosYbot[1], PilPosZ[2], roty090);
       trd_2->AddNode(trd_I_hori_vol1, 22, trd_I_hori_combi02);
-      TGeoCombiTrans* trd_I_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+I_height/2.), PilPosZ[3], roty090);
+      TGeoCombiTrans* trd_I_hori_combi03 = new TGeoCombiTrans(0., xBarPosYtop[1], PilPosZ[3], roty090);
       trd_2->AddNode(trd_I_hori_vol1, 23, trd_I_hori_combi03);
-      TGeoCombiTrans* trd_I_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+I_height/2.), PilPosZ[3], roty090);
+      TGeoCombiTrans* trd_I_hori_combi04 = new TGeoCombiTrans(0.,-xBarPosYbot[1], PilPosZ[3], roty090);
       trd_2->AddNode(trd_I_hori_vol1, 24, trd_I_hori_combi04);
     }
 
@@ -2407,15 +2411,13 @@ void create_box_supports()
       trd_I_hori_vol1->AddNode(trd_I_hori2, 2, tx02);
       trd_I_hori_vol1->AddNode(trd_I_hori2, 3, tx03);
 
-      BarPosY = AperY[2];
-    
-      TGeoCombiTrans* trd_I_hori_combi01 = new TGeoCombiTrans(0., (BarPosY+I_height/2.), PilPosZ[4], roty090);
-      trd_3->AddNode(trd_I_hori_vol1, 31, trd_I_hori_combi01);
-      TGeoCombiTrans* trd_I_hori_combi02 = new TGeoCombiTrans(0.,-(BarPosY+I_height/2.), PilPosZ[4], roty090);
-      trd_3->AddNode(trd_I_hori_vol1, 32, trd_I_hori_combi02);
-      TGeoCombiTrans* trd_I_hori_combi03 = new TGeoCombiTrans(0., (BarPosY+I_height/2.), PilPosZ[5], roty090);
-      trd_3->AddNode(trd_I_hori_vol1, 33, trd_I_hori_combi03);
-      TGeoCombiTrans* trd_I_hori_combi04 = new TGeoCombiTrans(0.,-(BarPosY+I_height/2.), PilPosZ[5], roty090);
+      TGeoCombiTrans* trd_I_hori_combi01 = new TGeoCombiTrans(0., xBarPosYtop[2], PilPosZ[4], roty090);
+      trd_3->AddNode(trd_I_hori_vol1, 31, trd_I_hori_combi01);	            
+      TGeoCombiTrans* trd_I_hori_combi02 = new TGeoCombiTrans(0.,-xBarPosYbot[2], PilPosZ[4], roty090);
+      trd_3->AddNode(trd_I_hori_vol1, 32, trd_I_hori_combi02);	            
+      TGeoCombiTrans* trd_I_hori_combi03 = new TGeoCombiTrans(0., xBarPosYtop[2], PilPosZ[5], roty090);
+      trd_3->AddNode(trd_I_hori_vol1, 33, trd_I_hori_combi03);	            
+      TGeoCombiTrans* trd_I_hori_combi04 = new TGeoCombiTrans(0.,-xBarPosYbot[2], PilPosZ[5], roty090);
       trd_3->AddNode(trd_I_hori_vol1, 34, trd_I_hori_combi04);
     }
 
@@ -2448,15 +2450,14 @@ void create_box_supports()
       trd_I_slope_vol1->AddNode(trd_I_slope2, 3, tz03);
 
       PilPosX = AperX[0];
-      BarPosY = AperY[0];
         
-      TGeoCombiTrans* trd_I_slope_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), (BarPosY+I_height-I_width/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), zBarPosYtop[0], (PilPosZ[0]+PilPosZ[1])/2., rotz090);
       trd_1->AddNode(trd_I_slope_vol1, 11, trd_I_slope_combi01);
-      TGeoCombiTrans* trd_I_slope_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), (BarPosY+I_height-I_width/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), zBarPosYtop[0], (PilPosZ[0]+PilPosZ[1])/2., rotz090);
       trd_1->AddNode(trd_I_slope_vol1, 12, trd_I_slope_combi02);
-      TGeoCombiTrans* trd_I_slope_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.),-(BarPosY+I_height-I_width/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.),-zBarPosYbot[0], (PilPosZ[0]+PilPosZ[1])/2., rotz090);
       trd_1->AddNode(trd_I_slope_vol1, 13, trd_I_slope_combi03);
-      TGeoCombiTrans* trd_I_slope_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.),-(BarPosY+I_height-I_width/2.), (PilPosZ[0]+PilPosZ[1])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.),-zBarPosYbot[0], (PilPosZ[0]+PilPosZ[1])/2., rotz090);
       trd_1->AddNode(trd_I_slope_vol1, 14, trd_I_slope_combi04);
     }
 
@@ -2484,15 +2485,14 @@ void create_box_supports()
       trd_I_slope_vol1->AddNode(trd_I_slope2, 3, tz03);
 
       PilPosX = AperX[1];
-      BarPosY = AperY[1];
         
-      TGeoCombiTrans* trd_I_slope_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), (BarPosY+I_height-I_width/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), zBarPosYtop[1], (PilPosZ[2]+PilPosZ[3])/2., rotz090);
       trd_2->AddNode(trd_I_slope_vol1, 21, trd_I_slope_combi01);
-      TGeoCombiTrans* trd_I_slope_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), (BarPosY+I_height-I_width/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), zBarPosYtop[1], (PilPosZ[2]+PilPosZ[3])/2., rotz090);
       trd_2->AddNode(trd_I_slope_vol1, 22, trd_I_slope_combi02);
-      TGeoCombiTrans* trd_I_slope_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.),-(BarPosY+I_height-I_width/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.),-zBarPosYbot[1], (PilPosZ[2]+PilPosZ[3])/2., rotz090);
       trd_2->AddNode(trd_I_slope_vol1, 23, trd_I_slope_combi03);
-      TGeoCombiTrans* trd_I_slope_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.),-(BarPosY+I_height-I_width/2.), (PilPosZ[2]+PilPosZ[3])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.),-zBarPosYbot[1], (PilPosZ[2]+PilPosZ[3])/2., rotz090);
       trd_2->AddNode(trd_I_slope_vol1, 24, trd_I_slope_combi04);
     }
 
@@ -2520,15 +2520,14 @@ void create_box_supports()
       trd_I_slope_vol1->AddNode(trd_I_slope2, 3, tz03);
 
       PilPosX = AperX[2];
-      BarPosY = AperY[2];
         
-      TGeoCombiTrans* trd_I_slope_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), (BarPosY+I_height-I_width/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi01 = new TGeoCombiTrans( (PilPosX+I_height/2.), zBarPosYtop[2], (PilPosZ[4]+PilPosZ[5])/2., rotz090);
       trd_3->AddNode(trd_I_slope_vol1, 31, trd_I_slope_combi01);
-      TGeoCombiTrans* trd_I_slope_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), (BarPosY+I_height-I_width/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi02 = new TGeoCombiTrans(-(PilPosX+I_height/2.), zBarPosYtop[2], (PilPosZ[4]+PilPosZ[5])/2., rotz090);
       trd_3->AddNode(trd_I_slope_vol1, 32, trd_I_slope_combi02);
-      TGeoCombiTrans* trd_I_slope_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.),-(BarPosY+I_height-I_width/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi03 = new TGeoCombiTrans( (PilPosX+I_height/2.),-zBarPosYbot[2], (PilPosZ[4]+PilPosZ[5])/2., rotz090);
       trd_3->AddNode(trd_I_slope_vol1, 33, trd_I_slope_combi03);
-      TGeoCombiTrans* trd_I_slope_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.),-(BarPosY+I_height-I_width/2.), (PilPosZ[4]+PilPosZ[5])/2., rotz090);
+      TGeoCombiTrans* trd_I_slope_combi04 = new TGeoCombiTrans(-(PilPosX+I_height/2.),-zBarPosYbot[2], (PilPosZ[4]+PilPosZ[5])/2., rotz090);
       trd_3->AddNode(trd_I_slope_vol1, 34, trd_I_slope_combi04);
     }
 
@@ -2538,9 +2537,9 @@ void create_box_supports()
     Int_t text_height    = 40;
     Int_t text_thickness =  8;
   
-    TGeoTranslation *tr200 = new TGeoTranslation(0., (AperY[0]+I_height+ text_height/2.), PilPosZ[0]-15+ text_thickness/2.);
-    TGeoTranslation *tr201 = new TGeoTranslation(0., (AperY[1]+I_height+ text_height/2.), PilPosZ[2]-15+ text_thickness/2.);
-    TGeoTranslation *tr202 = new TGeoTranslation(0., (AperY[2]+I_height+ text_height/2.), PilPosZ[4]-15+ text_thickness/2.);
+    TGeoTranslation *tr200 = new TGeoTranslation(0., (AperY[0]+I_height+ text_height/2.), PilPosZ[0]-I_width/2.+ text_thickness/2.);
+    TGeoTranslation *tr201 = new TGeoTranslation(0., (AperY[1]+I_height+ text_height/2.), PilPosZ[2]-I_width/2.+ text_thickness/2.);
+    TGeoTranslation *tr202 = new TGeoTranslation(0., (AperY[2]+I_height+ text_height/2.), PilPosZ[4]-I_width/2.+ text_thickness/2.);
   
     TGeoCombiTrans  *tr203 = new TGeoCombiTrans(-(AperX[0]+I_height+ text_thickness/2.), (AperY[0]+I_height-I_width-text_height/2.), (PilPosZ[0]+PilPosZ[1])/2., roty090);
     TGeoCombiTrans  *tr204 = new TGeoCombiTrans(-(AperX[1]+I_height+ text_thickness/2.), (AperY[1]+I_height-I_width-text_height/2.), (PilPosZ[2]+PilPosZ[3])/2., roty090);

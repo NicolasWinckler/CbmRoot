@@ -96,14 +96,14 @@ void run_sim(Int_t nEvents = 2, Int_t CbmSetup = 4)
     fRun->AddModule(cave);
   }
 
+  if ( target ) fRun->AddModule(target);
+
   if ( pipeGeom != "" ) {
     FairModule* pipe = new CbmPipe("PIPE");
     pipe->SetGeometryFileName(pipeGeom);
     fRun->AddModule(pipe);
   }
   
-  if ( target ) fRun->AddModule(target);
-
   if ( magnetGeom != "" ) {
     FairModule* magnet = new CbmMagnet("MAGNET");
     magnet->SetGeometryFileName(magnetGeom);

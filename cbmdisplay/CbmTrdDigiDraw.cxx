@@ -15,6 +15,7 @@
 #include "FairRootManager.h"            // for FairRootManager
 #include "FairRunAna.h"                 // for FairRunAna
 #include "FairRuntimeDb.h"              // for FairRuntimeDb
+#include "FairLogger.h"
 
 #include "Riosfwd.h"                    // for ostream
 #include "TClonesArray.h"               // for TClonesArray

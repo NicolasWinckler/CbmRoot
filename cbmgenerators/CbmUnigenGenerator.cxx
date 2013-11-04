@@ -8,6 +8,7 @@
 #include "CbmMCEventHeader.h"
 
 #include "FairPrimaryGenerator.h"
+#include "FairLogger.h"
 
 #include "URun.h"
 #include "UEvent.h"

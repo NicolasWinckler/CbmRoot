@@ -39,11 +39,11 @@ public:
 	  //		SetStage(result.GetEntryVector());
 	}
 
-	virtual void Print(std::ostream& out = std::cout){ out << *this;}
+	virtual void print(std::ostream& out = std::cout){ out << *this;}
 
 	friend std::ostream& operator<< (std::ostream& out, const CbmMCResult& result){
 		out << "MC Link from: " << result.GetStartType() << " to "  << result.GetStopType() << ":" << std::endl;
-		((CbmMCObject)result).Print(out);
+		((CbmMCObject)result).print(out);
 		return out;
 	}
 

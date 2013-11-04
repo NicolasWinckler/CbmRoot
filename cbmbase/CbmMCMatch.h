@@ -69,12 +69,12 @@ public:
 
 	bool IsTypeInList(Cbm::DataType type);
 
-	void Print(std::ostream& out = std::cout){out << *this;}
+	void print(std::ostream& out = std::cout){out << *this;}
 
 	friend std::ostream& operator<< (std::ostream& out, const CbmMCMatch& match){
 		for (int i = 0; i < match.GetNMCStages(); i++){
 			if (match.GetMCStage(i)->GetLoaded() == kTRUE){
-				match.GetMCStage(i)->Print(out);
+				match.GetMCStage(i)->print(out);
 				out << std::endl;
 			}
 		}

@@ -70,6 +70,25 @@ report/CbmHtmlReportElement.cxx
 report/CbmLatexReportElement.cxx  
 )
 
+# Better way to check for presence of print or Print
+# Does not work with trunk version of fairbase
+#Include(CheckIncludeFiles)
+#Set(CMAKE_REQUIRED_INCLUDES ${INCLUDE_DIRECTORIES})
+#Check_Include_Files(CbmMCEntry.h HAVE_LOWERCASE_PRINT)
+
+EXECUTE_PROCESS(COMMAND grep -c print ${CMAKE_SOURCE_DIR}/base/event/FairMultiLinkedData.h 
+                OUTPUT_VARIABLE NR_OF_print )
+If(NR_OF_print GREATER 0)
+  Set(HAVE_LOWERCASE_PRINT TRUE)
+EndIf(NR_OF_print GREATER 0)
+
+If(${HAVE_LOWERCASE_PRINT})
+  Message(STATUS "FairMultiLinkedData has lowercase print function")
+  Add_Definitions(-DHAVE_LOWERCASE_PRINT)
+Else(${HAVE_LOWERCASE_PRINT})
+  Message(STATUS "FairMultiLinkedData has upercase print function")
+EndIf(${HAVE_LOWERCASE_PRINT})
+
 
 EXEC_PROGRAM( ${ROOT_CONFIG_EXECUTABLE} 
     ARGS "--has-gdml"

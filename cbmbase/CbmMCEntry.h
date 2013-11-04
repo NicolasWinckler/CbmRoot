@@ -38,13 +38,19 @@ public:
 
 	virtual ~CbmMCEntry();
 
-	virtual void Print(std::ostream& out){
+	virtual void print(std::ostream& out){
 		out << *this;
 	}
 
 	friend std::ostream& operator<< (std::ostream& out, const CbmMCEntry& link){
 		//out << "Source: " << link.GetSource() << " Position: " << link.GetPos() << std::endl;
+
+#ifdef HAVE_LOWERCASE_PRINT
+		((FairMultiLinkedData)link).print(out);
+#else
 		((FairMultiLinkedData)link).Print(out);
+#endif
+
 		return out;
 	}
 

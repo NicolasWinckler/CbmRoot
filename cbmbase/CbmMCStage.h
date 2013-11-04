@@ -57,11 +57,11 @@ public:
 		fLoaded = kFALSE;
 	}
 
-	virtual void Print(std::ostream& out){out << *this;}
+	virtual void print(std::ostream& out){out << *this;}
 
 	friend std::ostream& operator<< (std::ostream& out, const CbmMCStage& stage){
 		out << stage.GetStageId() << ": " << stage.GetBranchName() << " // " <<  stage.GetFileName() << std::endl; //" with weight: " << stage.GetWeight() << std::endl;
-		((CbmMCObject)stage).Print(out);
+		((CbmMCObject)stage).print(out);
 		return out;
 	}
 

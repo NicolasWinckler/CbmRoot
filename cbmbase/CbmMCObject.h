@@ -69,7 +69,7 @@ class CbmMCObject: public TObject {
 
 	virtual void ClearEntries(){fStage.clear();}
 
-	virtual void Print(std::ostream& out = std::cout){out << *this;}
+	virtual void print(std::ostream& out = std::cout){out << *this;}
 
 	CbmMCObject& operator=(const CbmMCObject& obj){
 	  TObject::operator=(obj);
@@ -82,7 +82,7 @@ class CbmMCObject: public TObject {
 		std::vector<CbmMCEntry> stages = obj.GetEntryVector();
 		for (int i = 0; i < stages.size(); i++){
 			out << i << ": ";
-			stages[i].Print(out);
+			stages[i].print(out);
 		}
 		return out;
 	}

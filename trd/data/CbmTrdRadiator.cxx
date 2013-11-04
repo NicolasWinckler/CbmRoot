@@ -6,18 +6,19 @@
 #include "CbmTrdRadiator.h"
 
 #include "CbmTrdGas.h"
+#include "CbmTrdPoint.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "TRandom.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "TH1.h"
-#include "CbmTrdPoint.h"
 #include "TGeoManager.h"
-#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include <iostream>
 #include <iomanip>

@@ -13,6 +13,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TRandom.h"
 #include "TMath.h"
@@ -33,6 +34,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 using std::cout;
 using std::endl;
 using std::pair;

@@ -22,7 +22,8 @@
 #include <cmath>
 #include <map>
 
-void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t nlines=1, Int_t onlyfirstlayer=0) {
+void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t nlines=1, Int_t nrows_in_sec=0, Int_t alllayers=1) 
+{
 
   gStyle->SetPalette(1,0);
   gROOT->SetStyle("Plain");
@@ -130,7 +131,7 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
       if (startCounter == 23) { // if last element is reached
 	startCounter = 0; // reset
 
-        if ( onlyfirstlayer == 1 )   
+        if ( alllayers == 0 )   
           if ( !((layerId == 0) || (layerId == 4) || (layerId == 8)) )   // plot only 1 layer per station
             continue;
 
@@ -183,9 +184,13 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
         {
           text->SetFillColor(kOrange + 10);
         }
-        else if (psX*psY <= 2)
+        else if (psX*psY <= 2.1)
         {
-          text->SetFillColor(kOrange +  6);
+          text->SetFillColor(kOrange -  3);
+        }
+        else if (psX*psY <= 3.1)
+        {
+          text->SetFillColor(kOrange -  4);
         }
         else if (psX*psY <= 5)
         {
@@ -203,13 +208,18 @@ void plot_pad_size_in_layer(TString digiPar="trd.v13/trd_v13g.digi.par", Int_t n
 //        printf("%2.1f: %s\n", psX*psY, "green");
         } 
 
-//   	title1.Form("%3.1f",ps1X*ps1Y);  // print pad size - 2 digits - sector 1
-//	title2.Form("%3.1f",ps2X*ps2Y);  // print pad size - 2 digits - sector 2
-//	title3.Form("%3.1f",ps3X*ps3Y);  // print pad size - 2 digits - sector 3
-
-   	title1.Form("%3.1f - %.0f", ps1X*ps1Y, row1);  // print pad size - 2 digits - sector 1
-	title2.Form("%3.1f - %.0f", ps2X*ps2Y, row2);  // print pad size - 2 digits - sector 2
-	title3.Form("%3.1f - %.0f", ps3X*ps3Y, row3);  // print pad size - 2 digits - sector 3
+        if (nrows_in_sec == 1)   // print number of rows in sector
+	{
+   	  title1.Form("%3.1f - %2.0f", ps1X*ps1Y, row1);  // print pad size and nrows - 2 digits - sector 1
+	  title2.Form("%3.1f - %2.0f", ps2X*ps2Y, row2);  // print pad size and nrows - 2 digits - sector 2
+	  title3.Form("%3.1f - %2.0f", ps3X*ps3Y, row3);  // print pad size and nrows - 2 digits - sector 3
+	}
+        else
+	{
+   	  title1.Form("%3.1f",ps1X*ps1Y);  // print pad size - 2 digits - sector 1
+	  title2.Form("%3.1f",ps2X*ps2Y);  // print pad size - 2 digits - sector 2
+	  title3.Form("%3.1f",ps3X*ps3Y);  // print pad size - 2 digits - sector 3
+	}
 
         if (nlines==1)   // plot pad size for central sector only
 	{

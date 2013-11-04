@@ -34,11 +34,13 @@ public:
     * \brief Main function to be implemented for concrete hit-to-track merging algorithm.
     * \param hits Vector of hits that have to be merged with tracks.
     * \param tracks Vector of tracks that have to be merged with hits.
+    * \param tracks Output vector of TOF tracks.
     * \return Status code.
     */
    virtual LitStatus DoMerge(
       HitPtrVector& hits,
-      TrackPtrVector& tracks) = 0;
+      TrackPtrVector& tracks,
+      TofTrackPtrVector& tofTracks) = 0;
 };
 
 #endif /* CBMLITHITTOTRACKMERGER_H_ */

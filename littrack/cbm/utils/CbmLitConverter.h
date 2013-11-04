@@ -8,7 +8,9 @@ class CbmLitPixelHit;
 class CbmLitStripHit;
 class CbmLitTrack;
 class CbmLitTrackParam;
+class CbmLitTofTrack;
 class CbmTrack;
+class CbmTofTrack;
 class CbmBaseHit;
 class CbmPixelHit;
 class CbmStripHit;
@@ -21,8 +23,6 @@ class TClonesArray;
 class CbmLitConverter
 {
 public:
-   CbmLitConverter();
-   virtual ~CbmLitConverter();
 
    static void FairTrackParamToCbmLitTrackParam(
       const FairTrackParam* par,
@@ -64,27 +64,17 @@ public:
 
    static void CbmLitTrackToCbmTrack(
       const CbmLitTrack* litTrack,
-      CbmTrack* track);
-
-	static void GlobalTrackArrayToLitTrackVector(
-	   const TClonesArray* globalTracks,
-	   const TClonesArray* stsTracks,
-	   const TClonesArray* trdTracks,
-	   const TClonesArray* muchTracks,
-	   const TClonesArray* mvdHits,
-	   const TClonesArray* stsHits,
-	   const TClonesArray* trdHits,
-	   const TClonesArray* muchStrawHits,
-	   const TClonesArray* muchPixelHits,
-	   const TClonesArray* tofHits,
-	   TrackPtrVector& litTracks);
+      CbmTrack* track,
+      LitSystemId systemId);
 
    static void LitTrackVectorToGlobalTrackArray(
       const TrackPtrVector& litTracks,
+      const TofTrackPtrVector& littofTracks,
       TClonesArray* globalTracks,
       TClonesArray* stsTracks,
       TClonesArray* trdTracks,
-      TClonesArray* muchTracks);
+      TClonesArray* muchTracks,
+      TClonesArray* tofTracks);
 
    static void HitArrayToHitVector(
       const TClonesArray* hits,
@@ -97,14 +87,6 @@ public:
    static void StsTrackArrayToTrackVector(
       const TClonesArray* tracks,
       TrackPtrVector& litTracks);
-
-   static void TrackVectorToMuchTrackArray(
-      TrackPtrVector& tracks,
-      TClonesArray* muchTracks);
-
-   static void TrackVectorToTrdTrackArray(
-      TrackPtrVector& tracks,
-      TClonesArray* trdTracks);
 };
 
 #endif /*CBMLITCONVERTER_H_*/

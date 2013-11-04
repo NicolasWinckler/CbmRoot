@@ -14,6 +14,7 @@ using std::vector;
 using std::pair;
 class CbmLitHit;
 class CbmLitTrack;
+class CbmLitTofTrack;
 
 typedef vector<CbmLitHit*> HitPtrVector;
 typedef vector<CbmLitHit*>::iterator HitPtrIterator;
@@ -26,6 +27,9 @@ typedef vector<CbmLitHit*>::const_iterator HitPtrConstIterator;
 
 typedef vector<CbmLitTrack*>::iterator TrackPtrIterator;
 typedef vector<CbmLitTrack*> TrackPtrVector;
+
+typedef vector<CbmLitTofTrack*>::iterator TofTrackPtrIterator;
+typedef vector<CbmLitTofTrack*> TofTrackPtrVector;
 
 typedef vector<CbmLitFitNode> FitNodeVector;
 typedef vector<CbmLitFitNode>::iterator FitNodeIterator;

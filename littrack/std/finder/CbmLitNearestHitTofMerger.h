@@ -31,7 +31,8 @@ public:
     * \brief Inherited from CbmLitHitToTrackMerger */
    virtual LitStatus DoMerge(
       HitPtrVector& hits, //TODO: add const here
-      TrackPtrVector& tracks);
+      TrackPtrVector& tracks,
+      TofTrackPtrVector& tofTracks);
 
    /** Setters **/
    void SetFieldPropagator(TrackPropagatorPtr propagator) { fFieldPropagator = propagator; }

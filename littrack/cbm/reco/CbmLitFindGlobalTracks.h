@@ -123,15 +123,18 @@ private:
    CbmLitDetectorSetup fDet;
 
    // Pointers to data arrays
+   // Input
    TClonesArray* fMvdHits; // CbmMvdHit array
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fStsHits; // CbmStsHit
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
    TClonesArray* fMuchStrawHits; // CbmMuchStrawHit array
-   TClonesArray* fMuchTracks; // output CbmMuchTrack array
    TClonesArray* fTrdHits; // CbmTrdHit array
-   TClonesArray* fTrdTracks; // output CbmTrdTrack array
    TClonesArray* fTofHits; // CbmTofHit array
+   // Output
+   TClonesArray* fMuchTracks; // output CbmMuchTrack array
+   TClonesArray* fTrdTracks; // output CbmTrdTrack array
+   TClonesArray* fTofTracks; // output CbmTofTrack array
    TClonesArray* fGlobalTracks; //output CbmGlobalTrack array
 
    // LIT data arrays
@@ -139,6 +142,7 @@ private:
    HitPtrVector fLitHits; // MUCH+TRD hits
    HitPtrVector fLitTofHits; // TOF hits
    TrackPtrVector fLitOutputTracks; // output Lit tracks
+   TofTrackPtrVector fLitOutputTofTracks; // output Lit TOF tracks
 
    // Tools
    TrackFinderPtr fFinder; // track finder

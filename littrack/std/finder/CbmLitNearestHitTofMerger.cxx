@@ -9,6 +9,7 @@
 #include "data/CbmLitHit.h"
 #include "data/CbmLitTrack.h"
 #include "data/CbmLitTrackParam.h"
+#include "data/CbmLitTofTrack.h"
 #include "interface/CbmLitTrackPropagator.h"
 #include "interface/CbmLitTrackUpdate.h"
 #include "utils/CbmLitMath.h"
@@ -33,7 +34,8 @@ CbmLitNearestHitTofMerger::~CbmLitNearestHitTofMerger()
 
 LitStatus CbmLitNearestHitTofMerger::DoMerge(
    HitPtrVector& hits,
-   TrackPtrVector& tracks)
+   TrackPtrVector& tracks,
+   TofTrackPtrVector& tofTracks)
 {
    // First find hit with minimum Z position and build map from Z hit position
    // to track parameter to improve the calculation speed.
@@ -85,10 +87,17 @@ LitStatus CbmLitNearestHitTofMerger::DoMerge(
          }
 
          if (minHit != NULL) { // Check if hit was added
-            track->AddHit(minHit);
-            track->SetParamLast(&minPar);
-            track->SetChi2(track->GetChi2() + minChiSq);
-            track->SetNDF(lit::NDF(track));
+            //track->AddHit(minHit);
+            //track->SetParamLast(&minPar);
+            //track->SetChi2(track->GetChi2() + minChiSq);
+            //track->SetNDF(lit::NDF(track));
+            //Create new TOF track
+            CbmLitTofTrack* tofTrack = new CbmLitTofTrack();
+            tofTrack->SetTrack(track);
+            tofTrack->SetHit(minHit);
+            tofTrack->SetTrackParam(&minPar);
+            tofTrack->SetDistance(minChiSq);
+            tofTracks.push_back(tofTrack);
          }
    }
    return kLITSUCCESS;

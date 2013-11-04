@@ -74,11 +74,24 @@ class CbmTofTrack : public TObject {
 	/**  Track y position at TOF  **/
     Double_t GetTrackY() const { return fTrackPar.GetY(); }
 
+    /** Set track index **/
+    void SetTrackIndex(Int_t trackIndex) { fGlbTrack = trackIndex; }
 
+    /** Set TOF hit index **/
+    void SetTofHitIndex(Int_t tofHitIndex) { fTofHit = tofHitIndex; }
+
+    /** Set track parameter **/
+    void SetTrackParameter(const FairTrackParam* par) { fTrackPar = *par; }
+
+    /** Set track length **/
+    void SetTrackLength(Double32_t trackLength) { fTrackLength = trackLength; }
+
+    /** Set PID hypothesis for track extrapolation to TOF **/
+    void SetPidHypo(Int_t pid) { fPidHypo = pid; }
 
   private:
 
-    Int_t          fGlbTrack;     ///< Index of global track
+   Int_t          fGlbTrack;     ///< Index of global track
 	Int_t          fTofHit;       ///< Index of TofHit
 	Double32_t     fTrackLength;  ///< Track length from primary vertex to TOF [cm]
 	FairTrackParam fTrackPar;     ///< Track parameters at z of TofHit

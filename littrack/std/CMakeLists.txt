@@ -8,6 +8,7 @@ ${STD_DIR}base/CbmLitHitData.cxx
 ${STD_DIR}finder/CbmLitTrackFinderBranch.cxx
 ${STD_DIR}finder/CbmLitTrackFinderNN.cxx
 ${STD_DIR}finder/CbmLitNearestHitTofMerger.cxx
+${STD_DIR}finder/CbmLitAllHitsTofMerger.cxx
 
 ${STD_DIR}fitter/CbmLitTrackFitterImp.cxx 
 ${STD_DIR}fitter/CbmLitKalmanFilter.cxx

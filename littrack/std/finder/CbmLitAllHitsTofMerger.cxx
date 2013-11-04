@@ -1,10 +1,10 @@
 /**
- * \file CbmLitNearestHitTofMerger.h
+ * \file CbmLitAllHitsTofMerger.h
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2013
  **/
 
-#include "finder/CbmLitNearestHitTofMerger.h"
+#include "finder/CbmLitAllHitsTofMerger.h"
 
 #include "data/CbmLitHit.h"
 #include "data/CbmLitTrack.h"
@@ -19,7 +19,7 @@
 
 using std::map;
 
-CbmLitNearestHitTofMerger::CbmLitNearestHitTofMerger():
+CbmLitAllHitsTofMerger::CbmLitAllHitsTofMerger():
       fFieldPropagator(),
       fLinePropagator(),
       fFilter(),
@@ -28,11 +28,11 @@ CbmLitNearestHitTofMerger::CbmLitNearestHitTofMerger():
 {
 }
 
-CbmLitNearestHitTofMerger::~CbmLitNearestHitTofMerger()
+CbmLitAllHitsTofMerger::~CbmLitAllHitsTofMerger()
 {
 }
 
-LitStatus CbmLitNearestHitTofMerger::DoMerge(
+LitStatus CbmLitAllHitsTofMerger::DoMerge(
    HitPtrVector& hits,
    TrackPtrVector& tracks,
    TofTrackPtrVector& tofTracks)
@@ -68,32 +68,23 @@ LitStatus CbmLitNearestHitTofMerger::DoMerge(
          }
 
          // Loop over hits
-         litfloat minChiSq = std::numeric_limits<litfloat>::max(); // minimum chi-square of hit
-         const CbmLitHit* minHit = NULL; // Pointer to hit with minimum chi-square
-         CbmLitTrackParam minPar; // Track parameters for closest hit
          for (HitPtrIterator it = hits.begin(); it != hits.end(); it++) {
             const CbmLitHit* hit = *it;
             if (zParamMap.find(hit->GetZ()) == zParamMap.end()) { // This should never happen
-               std::cout << "-E- CbmLitNearestHitTofMerger::DoMerge: Z position " << hit->GetZ() << " not found in map. Something is wrong.\n";
+               std::cout << "-E- CbmLitAllHitsTofMerger::DoMerge: Z position " << hit->GetZ() << " not found in map. Something is wrong.\n";
             }
             CbmLitTrackParam tpar(zParamMap[hit->GetZ()]);
             litfloat chi = 0.;
             fFilter->Update(&tpar, hit, chi);
-            if (chi < fChiSqCut && chi < minChiSq) { // Check if hit is inside validation gate and closer to the track.
-               minChiSq = chi;
-               minHit = hit;
-               minPar = tpar;
+            if (chi < fChiSqCut) { // Check if hit is inside validation gate and closer to the track.
+               //Create new TOF track
+              CbmLitTofTrack* tofTrack = new CbmLitTofTrack();
+              tofTrack->SetTrack(track);
+              tofTrack->SetHit(hit);
+              tofTrack->SetTrackParam(&tpar);
+              tofTrack->SetDistance(chi);
+              tofTracks.push_back(tofTrack);
             }
-         }
-
-         if (minHit != NULL) { // Check if hit was added
-            //Create new TOF track
-            CbmLitTofTrack* tofTrack = new CbmLitTofTrack();
-            tofTrack->SetTrack(track);
-            tofTrack->SetHit(minHit);
-            tofTrack->SetTrackParam(&minPar);
-            tofTrack->SetDistance(minChiSq);
-            tofTracks.push_back(tofTrack);
          }
    }
    return kLITSUCCESS;

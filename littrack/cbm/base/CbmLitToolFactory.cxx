@@ -11,6 +11,7 @@
 #include "finder/CbmLitTrackFinderNN.h"
 #include "finder/CbmLitTrackFinderBranch.h"
 #include "finder/CbmLitNearestHitTofMerger.h"
+#include "finder/CbmLitAllHitsTofMerger.h"
 #include "fitter/CbmLitKalmanFilter.h"
 #include "fitter/CbmLitKalmanSmoother.h"
 #include "fitter/CbmLitTrackFitterImp.h"
@@ -209,9 +210,17 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
    const std::string& name)
 {
-   assert(name == "tof_nearest_hit");
+   assert(name == "tof_nearest_hit" || name == "tof_all_hits");
    if (name == "tof_nearest_hit") {
       CbmLitNearestHitTofMerger* nhMerger = new CbmLitNearestHitTofMerger();
+      nhMerger->SetFieldPropagator(CreateTrackPropagator("lit"));
+      nhMerger->SetLinePropagator(CreateTrackPropagator("line"));
+      nhMerger->SetFilter(CreateTrackUpdate("kalman"));
+      nhMerger->SetPDG(211);
+      nhMerger->SetChiSqCut(50.);//13.86);
+      return HitToTrackMergerPtr(nhMerger);
+   } else if (name == "tof_all_hits") {
+      CbmLitAllHitsTofMerger* nhMerger = new CbmLitAllHitsTofMerger();
       nhMerger->SetFieldPropagator(CreateTrackPropagator("lit"));
       nhMerger->SetLinePropagator(CreateTrackPropagator("line"));
       nhMerger->SetFilter(CreateTrackUpdate("kalman"));

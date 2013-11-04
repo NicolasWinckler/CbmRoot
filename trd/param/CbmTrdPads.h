@@ -4,6 +4,7 @@
 // -------------------------------------------------------------------------
 //
 // 
+// v3.0 - 20131104 DE - v13p4 - use 4 (instead of 3) S-sized module types in the inner zone due to occupancy
 // v2.7 - 20130327 DE - v13g - shrinked TRD (540 and 910 mm) - variable pad size 
 // v2.6 - 20130327 DE - v13g - shrinked TRD (540 and 910 mm) - 1 cm2 fixed pad size for trd1mod[1-8]
 // v2.5 - 20120606 DE - v12f - 1 cm2 fixed pad size for trd1mod[1-8]
@@ -64,25 +65,25 @@ Float_t fst1_pad_type[8][3][4] =   // array of pad geometries in the TRD (trd1mo
       // either  5 FEBs a 4 rows  5 * 4 = 20 rows
       // or     10 FEBs a 2 rows 10 * 2 = 20 rows
 
-//    { { 54.,  4.5, 54./80,  4.50 },  
-//      { 54., 45.0, 54./80,  4.50 },  
-//      { 54.,  4.5, 54./80,  4.50 } },
-//      // mod3 - ultimate - alternative
-//      //  3.0375 cm2
-//      // 6.75 mm wide pads (540mm / 80pads)
-//      // 12 x  45 mm                            ,   80 * 12 =  960 pads
-//      // either  2 FEBs a 6 rows  2 * 6 = 12 rows
-//      // or      3 FEBs a 4 rows  3 * 4 = 12 rows
-//      // or      6 FEBs a 2 rows  6 * 2 = 12 rows
-    { { 54., 13.5, 54./80,  6.75 },  
-      { 54., 27.0, 54./80,  6.75 },  
-      { 54., 13.5, 54./80,  6.75 } },
-      // mod3
-      //  4.5563 cm2
+    { { 54.,  4.5, 54./80,  4.50 },  
+      { 54., 45.0, 54./80,  4.50 },  
+      { 54.,  4.5, 54./80,  4.50 } },
+      // mod3 - ultimate - alternative
+      //  3.0375 cm2
       // 6.75 mm wide pads (540mm / 80pads)
-      //  8 x  67.5 mm                          ,   80 *  8 =  640 pads
-      // either  2 FEBs a 4 rows  2 * 4 =  8 rows
-      // or      4 FEBs a 2 rows  4 * 2 =  8 rows
+      // 12 x  45 mm                            ,   80 * 12 =  960 pads
+      // either  2 FEBs a 6 rows  2 * 6 = 12 rows
+      // or      3 FEBs a 4 rows  3 * 4 = 12 rows
+      // or      6 FEBs a 2 rows  6 * 2 = 12 rows
+//    { { 54., 13.5, 54./80,  6.75 },  
+//      { 54., 27.0, 54./80,  6.75 },  
+//      { 54., 13.5, 54./80,  6.75 } },
+//      // mod3
+//      //  4.5563 cm2
+//      // 6.75 mm wide pads (540mm / 80pads)
+//      //  8 x  67.5 mm                          ,   80 *  8 =  640 pads
+//      // either  2 FEBs a 4 rows  2 * 4 =  8 rows
+//      // or      4 FEBs a 2 rows  4 * 2 =  8 rows
 
     { { 54., 13.5, 54./80,  6.75 },  
       { 54., 27.0, 54./80,  6.75 },  

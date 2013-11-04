@@ -293,17 +293,17 @@ void CbmRich::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if ( fileName.EndsWith(".root") ) {
-     LOG(INFO) << "Constructing RICH geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+     LOG(INFO) << "Constructing RICH geometry from ROOT  file " << fileName.Data() << FairLogger::endl;
      ConstructRootGeometry();
   } else if ( fileName.EndsWith(".geo") ) {
      LOG(INFO) << "Constructing RICH geometry from ASCII file " << fileName.Data() << FairLogger::endl;
      ConstructAsciiGeometry();
   } else if (fileName.EndsWith(".gdml") ) {
-     LOG(INFO) << "Constructing RICH geometry from GDML file " << fileName.Data() << FairLogger::endl;
+     LOG(INFO) << "Constructing RICH geometry from GDML  file " << fileName.Data() << FairLogger::endl;
      ConstructGdmlGeometry(fPositionRotation);
   } else {
-    LOG(FATAL) <<  "Geometry format of RICH file " << fileName.Data()
-		  << " not supported." << FairLogger::endl;
+    LOG(FATAL) << "Geometry format of RICH file " << fileName.Data()
+               << " not supported." << FairLogger::endl;
   }
 }
 

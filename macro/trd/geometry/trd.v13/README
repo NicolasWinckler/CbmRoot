@@ -2,7 +2,25 @@
 ##   Information about trd.v13 geometries
 #
 
-# updated 2013-06-24 - by DE
+# updated 2013-11-05 - by DE
+
+# introduced new geometry naming scheme in Nov 2013,
+  names are now easier to associate to setups:
+
+- trd_v13p_1e.geo.root
+- trd_v13p_1h.geo.root
+- trd_v13p_1m.geo.root
+- trd_v13p_3e.geo.root
+- trd_v13p_3m.geo.root
+
+The default macro is Create_TRD_Geometry_v13p_3e.C
+all 4 other setups are generated in shell scripts by patching:
+
+create_TRD_Geometry_v13p_1e.sh
+create_TRD_Geometry_v13p_1h.sh
+create_TRD_Geometry_v13p_1m.sh
+create_TRD_Geometry_v13p_3m.sh
+
 
 # introduced new geometry naming scheme in May/June 2013, 
   new geometries according to official z positions by Walter (v1.00):

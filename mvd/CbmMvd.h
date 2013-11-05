@@ -117,7 +117,7 @@ class CbmMvd : public FairDetector
    **/
   virtual void ConstructGeometry();
 
-  virtual void ConstructASCIIGeometry();
+  virtual void ConstructAsciiGeometry();
 
   virtual Bool_t CheckIfSensitive(std::string name);
 

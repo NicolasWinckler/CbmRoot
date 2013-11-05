@@ -32,25 +32,25 @@ void CbmPipe::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if ( fileName.EndsWith(".root") ) {
-    LOG(INFO) << "Constructing PIPE geometry from ROOT file "
+    LOG(INFO) << "Constructing PIPE geometry from ROOT  file "
               << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   }
   else if ( fileName.EndsWith(".geo") ) {
-    LOG(INFO) <<  "Constructing PIPE geometry from ASCII file "
+    LOG(INFO) << "Constructing PIPE geometry from ASCII file "
               << fileName.Data() << FairLogger::endl;
     ConstructAsciiGeometry();
   }
   else
-    LOG(FATAL) <<  "Geometry format of PIPE file " << fileName.Data()
+    LOG(FATAL) << "Geometry format of PIPE file " << fileName.Data()
                << " not supported." << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
 
-void CbmPipe::ConstructAsciiGeometry(){
-
-    FairGeoLoader *loader=FairGeoLoader::Instance();
+void CbmPipe::ConstructAsciiGeometry()
+{
+        FairGeoLoader *loader=FairGeoLoader::Instance();
 	FairGeoInterface *GeoInterface =loader->getGeoInterface();
 	CbmGeoPipe *MGeo=new CbmGeoPipe();
 	MGeo->setGeomFile(GetGeometryFileName());

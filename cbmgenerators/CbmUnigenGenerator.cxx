@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                     CbmUnigenGenerator                        -----
 // -----              Created 2006/Jul/04  by D. Kresan                -----
+// -----              Switch to FairLogger 2013/Oct/31 by DE           -----
 // -------------------------------------------------------------------------
 
 #include "CbmUnigenGenerator.h"
@@ -8,7 +9,6 @@
 #include "CbmMCEventHeader.h"
 
 #include "FairPrimaryGenerator.h"
-#include "FairLogger.h"
 
 #include "URun.h"
 #include "UEvent.h"
@@ -56,40 +56,41 @@ CbmUnigenGenerator::CbmUnigenGenerator(TString fileName)
     fPhiMax(0.),
     fEventPlaneSet(kFALSE) 
 {
-    cout << "-I- CbmUnigenGenerator: Opening input file " << fileName << endl;
+    LOG(INFO) << "CbmUnigenGenerator: Opening input file "
+              << fFileName.Data() << FairLogger::endl;
     fInputFile = new TFile(fFileName);
     if (NULL == fInputFile) {
-	Fatal("CbmUnigenGenerator","Cannot open input file.");
+        LOG(FATAL) << "CbmUnigenGenerator: Cannot open input file." << FairLogger::endl;
     }
 
     // Get run description
     URun *run = (URun*) fInputFile->Get("run");
     if(NULL==run) {
-	Fatal("CbmUnigenGenerator","No run description in input file.");
+        LOG(FATAL) << "CbmUnigenGenerator: No run description in input file." << FairLogger::endl;
     }
     fCM = kFALSE;
     if(TMath::Abs(run->GetPTarg()) > 0) fCM = kTRUE;
     fBetaCM = 0.;
     fGammaCM = 1.;
     if(fCM) {
-        cout << "-I- CbmUnigenGenerator: we are in CM frame" << endl;
+        LOG(INFO) << "CbmUnigenGenerator: we are in CM frame" << FairLogger::endl;
 	Double_t elab = (TMath::Power(run->GetSqrtS()/run->GetAProj(),2)-
 			 2*TMath::Power(0.938271998,2))/(2*0.938271998);
 	Double_t plab = TMath::Sqrt(elab*elab - TMath::Power(0.938271998,2));
-        cout << "-I- CbmUnigenGenerator: Plab = " << plab << " AGeV" << endl;
+        LOG(INFO) << "CbmUnigenGenerator: Plab = " << plab << " AGeV" << FairLogger::endl;
         fBetaCM = plab / (elab + 0.938271998);
 	fGammaCM = 1./TMath::Sqrt(1. - fBetaCM*fBetaCM);
-	cout << "-I- CbmUnigenGenerator: boost parameters:" << endl
-	    << "                             betaCM = " << fBetaCM
-	    << ",  gammaCM = " << fGammaCM << endl;
+        LOG(INFO) << "CbmUnigenGenerator: boost parameters: " 
+                  << "betaCM = "    << fBetaCM
+	          << ", gammaCM = " << fGammaCM << FairLogger::endl;
     } else {
-        cout << "-I- CbmUnigenGenerator: we are in LAB frame" << endl;
+        LOG(INFO) << "CbmUnigenGenerator: we are in LAB frame" << FairLogger::endl;
     }
 
     delete run;
     fInTree = (TTree*) fInputFile->Get("events");
     if(NULL == fInTree) {
-	Fatal("CbmUnigenGenerator","No event tree in input file.");
+        LOG(FATAL) << "CbmUnigenGenerator: No event tree in input file." << FairLogger::endl;
     }
     fEvent = new UEvent();
     fInTree->SetBranchAddress("event", &fEvent);
@@ -110,13 +111,13 @@ Bool_t CbmUnigenGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
     // Check for input file
     if(NULL==fInputFile || NULL==fInTree) {
-	cout << "-E- CbmUnigenGenerator: Input file is not opened!" << endl;
+        LOG(ERROR) << "CbmUnigenGenerator: Input file is not opened!" << FairLogger::endl;
 	return kFALSE;
     }
 
     // If end of input file is reached : close it and abort run
     if(fEvents >= fInTree->GetEntries()) {
-	cout << "-I- CbmUnigenGenerator: End of input file reached" << endl;
+        LOG(INFO) << "CbmUnigenGenerator: End of input file reached" << FairLogger::endl;
 	CloseInput();
 	return kFALSE;
     }
@@ -124,8 +125,8 @@ Bool_t CbmUnigenGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     // Read entry
     fInTree->GetEntry(fEvents);
 
-    cout << "-I- CbmUnigenGenerator: Event " << fEvent->GetEventNr()
-	<< ", multiplicity " << fEvent->GetNpa() << endl;
+    LOG(INFO) << "CbmUnigenGenerator: Event " << fEvent->GetEventNr()
+              << ", multiplicity " << fEvent->GetNpa() << FairLogger::endl;
 
     UParticle *particle;
     Double_t pz;
@@ -195,8 +196,8 @@ void CbmUnigenGenerator::SetEventPlane(Double_t phiMin, Double_t phiMax) {
 void CbmUnigenGenerator::CloseInput()
 {
     if(NULL != fInputFile) {
-	cout << "-I- CbmUnigenGenerator: Closing input file "
-	    << fFileName << endl;
+        LOG(INFO) << "CbmUnigenGenerator: Closing input file "
+                  << fFileName.Data() << FairLogger::endl;
 	fInputFile->Close();
 	fInputFile = NULL;
     }

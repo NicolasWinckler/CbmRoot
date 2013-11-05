@@ -286,24 +286,25 @@ void CbmRich::CopyClones(
 
 void CbmRich::ConstructOpGeometry() 
 {
-	cout<< "CbmRich::ConstructOpGeometry() " <<endl;
+	LOG(INFO) << "CbmRich::ConstructOpGeometry()" << FairLogger::endl;
 }
 
 void CbmRich::ConstructGeometry()
 {
-   TString fileName = GetGeometryFileName();
-     if ( fileName.EndsWith(".root") ) {
-        cout << "Constructing RICH geometry from ROOT file: " << fileName.Data() << endl;
-        ConstructRootGeometry();
-     } else if ( fileName.EndsWith(".geo") ) {
-        cout << "-I- Constructing RICH geometry from ASCII file: " << fileName.Data() << endl;
-        ConstructAsciiGeometry();
-     } else if (fileName.EndsWith(".gdml") ) {
-        cout << "-I- Constructing RICH geometry from GDML file: " << fileName.Data() << endl;
-        ConstructGdmlGeometry(fPositionRotation);
-     } else {
-        Fatal("CbmRich::ConstructGeometry", "Geometry format of RICH geometry file is not supported");
-     }
+  TString fileName = GetGeometryFileName();
+  if ( fileName.EndsWith(".root") ) {
+     LOG(INFO) << "Constructing RICH geometry from ROOT  file " << fileName.Data() << FairLogger::endl;
+     ConstructRootGeometry();
+  } else if ( fileName.EndsWith(".geo") ) {
+     LOG(INFO) << "Constructing RICH geometry from ASCII file " << fileName.Data() << FairLogger::endl;
+     ConstructAsciiGeometry();
+  } else if (fileName.EndsWith(".gdml") ) {
+     LOG(INFO) << "Constructing RICH geometry from GDML  file " << fileName.Data() << FairLogger::endl;
+     ConstructGdmlGeometry(fPositionRotation);
+  } else {
+    LOG(FATAL) << "Geometry format of RICH file " << fileName.Data()
+               << " not supported." << FairLogger::endl;
+  }
 }
 
 void CbmRich::ConstructAsciiGeometry()

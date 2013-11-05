@@ -548,12 +548,12 @@ void CbmFieldMap::ReadAsciiFile(const char* fileName) {
   Double_t bx=0., by=0., bz=0.;
 
   // Open file
-  cout << "-I- CbmFieldMap: Reading field map from ASCII file " 
-       << fileName << endl;
+  LOG(INFO) << "CbmFieldMap: Reading field map from ASCII file " 
+	    << fileName << FairLogger::endl;
   ifstream mapFile(fileName);
   if ( ! mapFile.is_open() ) {
-    cerr << "-E- CbmFieldMap:ReadAsciiFile: Could not open file! " << endl;
-    Fatal("ReadAsciiFile","Could not open file");
+    LOG(ERROR) << "CbmFieldMap:ReadAsciiFile: Could not open file!" << FairLogger::endl;
+    LOG(FATAL) << "CbmFieldMap:ReadAsciiFile: Could not open file!" << FairLogger::endl;
   }
 
   // Read map type
@@ -636,13 +636,12 @@ void CbmFieldMap::ReadRootFile(const char* fileName,
   TFile* oldFile = gFile;
 
   // Open root file
-  cout << "-I- CbmFieldMap: Reading field map from ROOT file " 
-       << fileName << endl; 
+  LOG(INFO) << "CbmFieldMap: Reading field map from ROOT file " 
+	    << fileName << FairLogger::endl;
   TFile* file = new TFile(fileName, "READ");		
   if (!(file->IsOpen())) {
-    cerr << "-E- CbmFieldMap::ReadRootfile: Cannot read from file! " 
-	 << endl;
-    Fatal("ReadRootFile","Cannot read from file");
+    LOG(ERROR) << "CbmFieldMap:ReadRootFile: Could not open file!" << FairLogger::endl;
+    LOG(FATAL) << "CbmFieldMap:ReadRootFile: Could not open file!" << FairLogger::endl;
   }
 
   // Get the field data object

@@ -39,7 +39,7 @@ FairParSet* CbmFieldContFact::createContainer(FairContainer* container) {
 
 
   const char* name = container->GetName();
-  cout << "create CbmFieldPar container " << name << endl;
+  LOG(INFO) << "create CbmFieldPar container " << name << FairLogger::endl;
   FairParSet* set = NULL;
   if ( strcmp(name, "CbmFieldPar") == 0 ) 
     set = new CbmFieldPar( container->getConcatName().Data(),

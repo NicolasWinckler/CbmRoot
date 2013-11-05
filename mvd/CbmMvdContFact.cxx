@@ -55,7 +55,7 @@ FairParSet* CbmMvdContFact::createContainer(FairContainer* c) {
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
-  cout << " -I container name " << name << endl;
+  LOG(DEBUG) << "container name " << name << FairLogger::endl;
   FairParSet* p=0;
   if (strcmp(name,"CbmMvdGeoPar")==0) {
     p=new CbmMvdGeoPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());

@@ -27,9 +27,27 @@ CbmPlatform::~CbmPlatform()
 {
 }
 
-void CbmPlatform::ConstructGeometry(){
+void CbmPlatform::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if ( fileName.EndsWith(".root") ) {
+    LOG(INFO) << "Constructing PLATFORM      from ROOT file "
+              << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  }
+  else if ( fileName.EndsWith(".geo") ) {
+    LOG(INFO) << "Constructing PLATFORM      from ASCII file "
+              << fileName.Data() << FairLogger::endl;
+    ConstructAsciiGeometry();
+  }
+  else
+    LOG(FATAL) << "Geometry format of PLATFORM file " << fileName.Data()
+               << " not supported." << FairLogger::endl;
+}
 
-    FairGeoLoader *loader=FairGeoLoader::Instance();
+void CbmPlatform::ConstructAsciiGeometry()
+{
+        FairGeoLoader *loader=FairGeoLoader::Instance();
 	FairGeoInterface *GeoInterface =loader->getGeoInterface();
 	CbmGeoPlatform *MGeo=new CbmGeoPlatform();
 	MGeo->setGeomFile(GetGeometryFileName());

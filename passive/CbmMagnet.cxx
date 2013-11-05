@@ -38,14 +38,18 @@ CbmMagnet::~CbmMagnet()
 void CbmMagnet::ConstructGeometry()
 {
 	TString fileName=GetGeometryFileName();
-	if (fileName.EndsWith(".geo"))
-	{	ConstructASCIIGeometry();}
-	else if (fileName.EndsWith(".root"))
-	{	ConstructRootGeometry();}
-	else if (fileName.EndsWith(".gdml"))
-	{	ConstructGDMLGeometry(fposrot);}
-	else
-	{	std::cout << "Geometry format not supported." << std::endl;
+	if (fileName.EndsWith(".root"))	{
+	  LOG(INFO) << "Constructing MAGNET        from ROOT  file " << fileName.Data() << FairLogger::endl;
+	  ConstructRootGeometry();
+        } else if (fileName.EndsWith(".geo")) {
+          LOG(INFO) << "Constructing MAGNET        from ASCII file " << fileName.Data() << FairLogger::endl;
+          ConstructASCIIGeometry();
+        } else if (fileName.EndsWith(".gdml")) {
+	  LOG(INFO) << "Constructing MAGNET        from GDML  file " << fileName.Data() << FairLogger::endl;
+	  ConstructGDMLGeometry(fposrot);
+        } else {
+	  LOG(FATAL) << "Geometry format of MAGNET file " << fileName.Data()
+		     << " not supported." << FairLogger::endl;
 	}
 }
 

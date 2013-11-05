@@ -222,20 +222,25 @@ void CbmMvd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 // -------------------------------------------------------------------------
 
 void CbmMvd::ConstructGeometry(){
-
-  TString fileName=GetGeometryFileName();
-  if(fileName.EndsWith(".geo")){
-    ConstructASCIIGeometry();
-  }else if(fileName.EndsWith(".root")){
+  TString fileName = GetGeometryFileName();
+  if ( fileName.EndsWith(".root") ) {
+    LOG(INFO) << "Constructing MVD  geometry from ROOT  file "
+		<< fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
-  }else{
-    std::cout<< "Geometry format not supported " <<std::endl;
   }
-}  
+  else if ( fileName.EndsWith(".geo") ) {
+    LOG(INFO) <<  "Constructing MVD  geometry from ASCII file "
+		<< fileName.Data() << FairLogger::endl;
+    ConstructAsciiGeometry();
+  }
+  else
+    LOG(FATAL) <<  "Geometry format of MVD file " << fileName.Data()
+		 << " not supported." << FairLogger::endl;
+}
 
 
 // -----   Virtual public method ConstructGeometry   -----------------------
-void CbmMvd::ConstructASCIIGeometry() {
+void CbmMvd::ConstructAsciiGeometry() {
   
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -260,8 +265,8 @@ void CbmMvd::ConstructASCIIGeometry() {
   while( (node = (FairGeoNode*)iter.Next()) ) {
     vol = dynamic_cast<FairGeoVolume*> ( node );
     if ( node->isSensitive()  ) {
-      	cout<<"Add: "<<vol->GetName()<<endl;
-      fSensNodes->AddLast( vol );
+	   LOG(DEBUG) << "Add: "<< vol->GetName() << FairLogger::endl;
+           fSensNodes->AddLast( vol );
        }else{
            fPassNodes->AddLast( vol );
        }
@@ -278,9 +283,9 @@ void CbmMvd::ConstructASCIIGeometry() {
     volId = gGeoManager->GetUID(volName);
     if (volId > -1 ) {
       fStationMap[volId] = iStation;
-      cout << "-I- " << GetName() << "::ConstructGeometry: "
+      LOG(INFO) << GetName() << "::ConstructAsciiGeometry: "
            << "Station No. " << iStation << ", volume ID " << volId 
-	   << ", volume name " << volName << endl;
+	   << ", volume name " << volName << FairLogger::endl;
       iStation++;
     }
   } while ( volId > -1 );

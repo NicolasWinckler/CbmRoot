@@ -45,9 +45,11 @@ CbmUrqmdGenerator::CbmUrqmdGenerator(const char* fileName)
     fPhiMax(0.),
     fEventPlaneSet(kFALSE) 
 {
-  cout << "-I CbmUrqmdGenerator: Opening input file " << fileName << endl;
+  LOG(INFO) << "CbmUrqmdGenerator: Opening input file " 
+	    << fileName << FairLogger::endl;
   fInputFile = fopen(fFileName, "r");
-  if ( ! fInputFile ) Fatal("CbmUrqmdgenerator","Cannot open input file.");
+  if ( ! fInputFile ) 
+    LOG(FATAL) << "Cannot open input file." << FairLogger::endl;
   ReadConversionTable();
 }
 // ------------------------------------------------------------------------
@@ -80,14 +82,13 @@ Bool_t CbmUrqmdGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
   // ---> Check for input file  
   if ( ! fInputFile ) {
-    cout << "-E CbmUrqmdGenerator: Input file not open! " << endl; 
+    LOG(ERROR) << "CbmUrqmdGenerator: Input file not open!" << FairLogger::endl;
     return kFALSE;
   }
 
   // ---> Check for primary generator
   if ( ! primGen ) {
-    cout << "-E- CbmUrqmdGenerator::ReadEvent: "
-	 << "No PrimaryGenerator!" << endl;
+    LOG(ERROR) << "CbmUrqmdGenerator::ReadEvent: No PrimaryGenerator!" << FairLogger::endl;
     return kFALSE;
   }
 
@@ -102,13 +103,13 @@ Bool_t CbmUrqmdGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
   char read[200];
   fgets(read, 200, fInputFile);
   if ( feof(fInputFile) ) {
-    cout << "-I CbmUrqmdGenerator : End of input file reached." << endl;
+    LOG(INFO) << "CbmUrqmdGenerator : End of input file reached." << FairLogger::endl;
     fclose(fInputFile);
     fInputFile = NULL;
     return kFALSE;
   }
   if ( read[0] != 'U' ) {
-    cout << "-E CbmUrqmdGenerator: Wrong event header" << endl;
+    LOG(ERROR) << "CbmUrqmdGenerator: Wrong event header" << FairLogger::endl;
     return kFALSE;
   }
  
@@ -153,12 +154,11 @@ Bool_t CbmUrqmdGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
   // ---> Generate rotation angle  D
   if ( fEventPlaneSet ) phi = gRandom->Uniform(fPhiMin, fPhiMax);
-  
 
-  cout << "-I CbmUrqmdGenerator: Event " << evnr << ",  b = " << b 
+  LOG(INFO) << "CbmUrqmdGenerator: Event " << evnr << ",  b = " << b 
        << " fm,  multiplicity " << ntracks  << ", ekin: " << ekin 
        << " GeV, plab: " << plab << " GeV, beta: " << beta 
-       << ", phi: " << phi << endl;
+       << ", phi: " << phi << FairLogger::endl;
 
   // Set event id and impact parameter in MCEvent if not yet done
   CbmMCEventHeader* event = dynamic_cast<CbmMCEventHeader*>(primGen->GetEvent());
@@ -191,8 +191,8 @@ Bool_t CbmUrqmdGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
      
     // Convert Unique PID into PDG particle code 
     if (fParticleTable.find(pid) == fParticleTable.end()) {
-      cout << "-W CbmUrqmdGenerator: PID " << ityp << " charge "
-	   << ichg << " not found in table (" << pid << ")" << endl;
+      LOG(WARNING) << "CbmUrqmdGenerator: PID " << ityp << " charge "
+	   << ichg << " not found in table (" << pid << ")" << FairLogger::endl;
       continue;
     }
     Int_t pdgID = fParticleTable[pid];
@@ -241,7 +241,7 @@ Bool_t CbmUrqmdGenerator::SkipEvents(Int_t count) {
   {
     // ---> Check for input file  
     if ( ! fInputFile ) {
-      cout << "-E CbmUrqmdGenerator: Input file not open! " << endl; 
+      LOG(ERROR) << "CbmUrqmdGenerator: Input file not open! " << FairLogger::endl;
       return kFALSE;
     }
 
@@ -253,13 +253,13 @@ Bool_t CbmUrqmdGenerator::SkipEvents(Int_t count) {
     char read[200];
     fgets(read, 200, fInputFile);
     if ( feof(fInputFile) ) {
-      cout << "-I CbmUrqmdGenerator : End of input file reached." << endl;
+      LOG(INFO) << "CbmUrqmdGenerator : End of input file reached." << FairLogger::endl;
       fclose(fInputFile);
       fInputFile = NULL;
       return kFALSE;
     }
     if ( read[0] != 'U' ) {
-      cout << "-E CbmUrqmdGenerator: Wrong event header" << endl;
+      LOG(ERROR) << "CbmUrqmdGenerator: Wrong event header" << FairLogger::endl;
       return kFALSE;
     }
  
@@ -286,7 +286,7 @@ Bool_t CbmUrqmdGenerator::SkipEvents(Int_t count) {
     fgets(read, 200, fInputFile);
     fgets(read, 200, fInputFile);
   
-    cout << "-I CbmUrqmdGenerator: Event " << evnr << " skipped!" << endl;
+    LOG(INFO) << "CbmUrqmdGenerator: Event " << evnr << " skipped!" << FairLogger::endl;
 
     // ---> Loop over tracks in the current event
     for(int itrack=0; itrack<ntracks; itrack++) {
@@ -321,9 +321,7 @@ void CbmUrqmdGenerator::ReadConversionTable() {
   pdgconv->close();
   delete pdgconv; 
 
-  cout << "-I CbmUrqmdGenerator: Particle table for conversion from "
-       << "UrQMD loaded" <<  endl;
-
+  LOG(INFO) << "CbmUrqmdGenerator: Particle table for conversion from UrQMD loaded" << FairLogger::endl;
 }
 // ------------------------------------------------------------------------
 

@@ -9,7 +9,8 @@ class CbmPlatform : public FairModule {
     CbmPlatform(const char * name, const char *Title="CBM Platform");
     virtual ~CbmPlatform();
     virtual void ConstructGeometry();
-   
+    virtual void ConstructAsciiGeometry();
+
     ClassDef(CbmPlatform,1) //CBMPLATFORM
 
 };

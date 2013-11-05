@@ -3,9 +3,9 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
-// TODO:
-// adapt support structure to MUCH platform
-
+// 2013-11-04 - DE - v13p4 - adapt the number of front-end boards to the pad layout of the 540 mm modules
+// 2013-11-04 - DE - v13p4 - use 8 module types (4x S + 4x L) to better match the occupancy
+// 2013-10-31 - DE - v13p4 - modify the support structure of station 1 to match with the MUCH/RICH platform
 // 2013-10-29 - DE - v13p4 - build lattice grid as TGeoBBox instead of VolumeAssembly - in run_sim.C save  9% of time compared to v13p7
 // 2013-10-29 - DE - v13p4 - build lattice grid as TGeoBBox instead of CompositeShape - in run_sim.C save 18% of time compared to v13p6
 //
@@ -161,11 +161,11 @@ const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },    // for layer[1-3][i,o]
                                       { 5, 5, 9, 11 } };
 // ### Layer Type 1
 // v12x - module types in the inner sector of layer1 - looking upstream
-const Int_t layer1i[5][5] = { { 423,  323,  221,  321,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers
+const Int_t layer1i[5][5] = { { 423,  423,  321,  421,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers
                               { 323,  123,  121,  121,  321 },  
                               { 203,  103,    0,  101,  201 },  
                               { 303,  103,  101,  101,  301 },  
-                              { 403,  303,  201,  301,  401 } };
+                              { 403,  403,  301,  401,  401 } };
 // number of modules 1x0, 8x1, 4x2, 8x3, 4x4
 
 // v12x - module types in the outer sector of layer1 - looking upstream
@@ -173,7 +173,7 @@ const Int_t layer1o[9][11]= { {  0,    0,    0,    0,    0,    0,    0,    0,   
                               {  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
                               {  0,    0,  823,  823,  723,  721,  721,  821,  821,    0,    0 },
                               {  0,    0,  823,  723,    0,    0,    0,  721,  821,    0,    0 },
-                              {  0,    0,  803,  703,    0,    0,    0,  701,  801,    0,    0 },
+                              {  0,    0,  803,  603,    0,    0,    0,  601,  801,    0,    0 },
                               {  0,    0,  803,  703,    0,    0,    0,  701,  801,    0,    0 },
                               {  0,    0,  803,  803,  703,  701,  701,  801,  801,    0,    0 },
                               {  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
@@ -187,11 +187,11 @@ const Int_t layer1o[9][11]= { {  0,    0,    0,    0,    0,    0,    0,    0,   
 
 // ### Layer Type 2
 // v12x - module types in the inner sector of layer2 - looking upstream
-const Int_t layer2i[5][5] = { { 423,  323,  321,  321,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+const Int_t layer2i[5][5] = { { 423,  423,  321,  421,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
                               { 323,  223,  121,  221,  321 },
-                              { 303,  103,    0,  101,  301 },
+                              { 203,  103,    0,  101,  201 },
                               { 303,  203,  101,  201,  301 },
-                              { 403,  303,  301,  301,  401 } };
+                              { 403,  403,  301,  401,  401 } };
 // number of modules 1x0, 4x1, 4x2, 12x3, 4x4
 
 // v12x - module types in the outer sector of layer2 - looking upstream
@@ -242,19 +242,32 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 
-// ultimate density
+// ultimate density - 540 mm
+//const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  6,  3,  4,  3 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+//
+//// super density - 540 mm
+const Int_t FebsPerModule[NofModuleTypes] = {  9,  5,  6,  4, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+//
+//// normal density - 540 mm
+//const Int_t FebsPerModule[NofModuleTypes] = { 18, 10,  6,  4, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+
+// ultimate density - 570 mm
 //const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  5,  3,  2,  1 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,216,216 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
-////
+//
 //const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  3, 10,  5,  3,  3 }; // min (6) module types // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
-//// super density
-const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
-//// normal density
+//// super density - 570 mm
+//const Int_t FebsPerModule[NofModuleTypes] = { 10,  5,  5,  5, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+//
+//// normal density - 570 mm
 //const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
-//
+
 const Double_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 const Double_t asic_offset  = 0.2;  // 2 mm - offset of ASICs to FEBs to avoid overlaps
 
@@ -767,6 +780,7 @@ void dump_info_file()
       }
       fprintf(ifile,"v: %5.2f deg, h: %5.2f deg - vertical/horizontal - layer %2d\n", yangle, xangle, PlaneId[iLayer]);
     }  
+  fprintf(ifile,"\n");
 
   // aperture
   fprintf(ifile,"# inner aperture\n");
@@ -794,6 +808,7 @@ void dump_info_file()
       }
       fprintf(ifile,"v: %5.2f deg, h: %5.2f deg - vertical/horizontal - layer %2d\n", yangle, xangle, PlaneId[iLayer]);
     }  
+  fprintf(ifile,"\n");
 
   fclose(ifile);
 }
@@ -2088,10 +2103,6 @@ add_trd_labels(TGeoVolume* trdbox1, TGeoVolume* trdbox2, TGeoVolume* trdbox3)
    
 
 void create_box_supports()
-// todo
-// DONE - restore original colors
-// DONE - derive aperture size from module size L (95 cm)
-// - reduce aperture size for platform
 {
   const TString trd_01 = "support_trd1";
   TGeoVolume* trd_1 = new TGeoVolumeAssembly(trd_01);

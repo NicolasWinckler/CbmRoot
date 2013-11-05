@@ -1,6 +1,7 @@
 //
 //   comments
 //
+// 2013-11-05 - DE - switch to trd_v13p geometry
 // 2013-10-11 - DE - add empty string defining the platform                                                                        
 // 2013-10-07 - DE - pipe_v13e.geo fixes overlap with TOF, also avoids TRD
 //
@@ -36,11 +37,12 @@ void sis100_muon_setup()
   caveGeom     = "cave.geo";
   pipeGeom     = "pipe/pipe_v13c.geo.root";
   magnetGeom   = "magnet/magnet_v12b_much.geo.root";
+  mvdGeom      = "";
   stsGeom      = "sts/sts_v13c.geo.root";
   richGeom     = "";
   muchGeom     = "much/much_v13d.geo";
   platformGeom = ""; // "passive/platform_v13a.geo";
-  trdGeom      = "trd/trd_v13p3.geo.root";  // "trd/trd_v13l.geo.root";
+  trdGeom      = "trd/trd_v13p_1m.geo.root";
   tofGeom      = "tof/tof_v13-5c.geo.root";
   ecalGeom     = "";
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;

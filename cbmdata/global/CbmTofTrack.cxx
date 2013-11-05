@@ -7,7 +7,15 @@
 
 #include "CbmTofTrack.h"
 
-CbmTofTrack::CbmTofTrack() {
+CbmTofTrack::CbmTofTrack() :
+   TObject(),
+   fGlbTrack(-1),
+   fTofHit(-1),
+   fTrackLength(0.),
+   fTrackPar(),
+   fPidHypo(-1),
+   fDistance(0.)
+{
 }
 
 CbmTofTrack::~CbmTofTrack() {

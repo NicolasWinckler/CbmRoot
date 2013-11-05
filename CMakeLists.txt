@@ -31,9 +31,11 @@ include(CheckCompiler)
 #Check the compiler and set the compile and link flags
 Check_Compiler()
 
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
-set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
+Set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+Set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+Set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
+
+Set(VMCWORKDIR ${CBMROOT_SOURCE_DIR})
 
 Option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used."OFF)
 If(USE_PATH_INFO)
@@ -219,13 +221,11 @@ Else(${EveIsBuild} STREQUAL yes)
   Message("The eventdisplay is not build, there is no OpenGL support.")
 EndIf(${EveIsBuild} STREQUAL yes)
 
-set(BUILD_ROCLIB FALSE CACHE BOOL "Build DABC and RocLib which are needed
-    to read testbeam data.")
-If(BUILD_ROCLIB)
-  configure_file(${PROJECT_SOURCE_DIR}/cmake/scripts/CMakeLists.txt_roc
-                 ${PROJECT_SOURCE_DIR}/roc/CMakeLists.txt COPYONLY)
+set(BUILD_BEAMTIME FALSE CACHE BOOL "Build everything needed (DABC, RocLib ...) to read testbeam data.")
+If(BUILD_BEAMTIME)
   add_subdirectory (roc)
-EndIf(BUILD_ROCLIB)
+  add_subdirectory (beamtime)
+EndIf(BUILD_BEAMTIME)
 
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)

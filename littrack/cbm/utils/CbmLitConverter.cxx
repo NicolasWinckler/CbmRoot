@@ -296,6 +296,7 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
         Int_t tofHitId = litTofTrack->GetHit()->GetRefId();
         track->SetTofHitIndex(tofHitId);
         track->SetTrackIndex(globalTrackId);
+        track->SetDistance(litTofTrack->GetDistance());
         FairTrackParam par;
         CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTofTrack->GetTrackParam(), &par);
         track->SetTrackParameter(&par);

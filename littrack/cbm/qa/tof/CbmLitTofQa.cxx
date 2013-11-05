@@ -10,6 +10,7 @@
 #include "CbmTrackMatch.h"
 #include "CbmStsTrack.h"
 #include "CbmTofHit.h"
+#include "CbmTofTrack.h"
 #include "CbmTofPoint.h"
 #include "CbmMCTrack.h"
 #include "CbmKFVertex.h"
@@ -175,6 +176,7 @@ CbmLitTofQa::CbmLitTofQa():
    fStsTrackMatches(NULL),
    fTofHits(NULL),
    fTofPoints(NULL),
+   fTofTracks(NULL),
    fMCTracks(NULL),
    fPrimVertex(NULL),
    fKFFitter(),
@@ -208,6 +210,7 @@ void CbmLitTofQa::Exec(
    ProcessMC();
    ProcessGlobalTracks();
    ProcessTofHits();
+   ProcessTofTracks();
 }
 
 void CbmLitTofQa::Finish()
@@ -229,6 +232,7 @@ void CbmLitTofQa::ReadDataBranches()
    fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
    fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
    fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
+   fTofTracks = (TClonesArray*) ioman->GetObject("TofTrack");
    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
    fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
 }
@@ -266,6 +270,15 @@ void CbmLitTofQa::CreateHistograms()
       fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 400, -0.2, 1.8));
       name = "hmp_Tof_RecoMCIDAccTof_" + fTrackCategories[iCat] + "_m2p";
       fHM->Add(name, new TH2F(name.c_str(), string(name + ";P [GeV/c];M^{2} [(GeV/c)^{2}]").c_str(), fPRangeBins, fPRangeMin, fPRangeMax, 400, -0.2, 1.8));
+
+      name = "hmp_TofTrack_" + fTrackCategories[iCat] + "_Distance";
+      fHM->Add(name, new TH1F(name.c_str(), string(name + ";Distance [cm]").c_str(), 200, 0., 50.));
+      name = "hmp_TofTrack_" + fTrackCategories[iCat] + "_NormDistance";
+      fHM->Add(name, new TH1F(name.c_str(), string(name + ";Normalized distance").c_str(), 200, 0., 50.));
+      name = "hmp_TofTrack_" + fTrackCategories[iCat] + "_Length";
+      fHM->Add(name, new TH1F(name.c_str(), string(name + ";Length [cm]").c_str(), 1200, 0., 1200.));
+      name = "hmp_TofTrack_" + fTrackCategories[iCat] + "_NofHitsPerGlobalTrack";
+      fHM->Add(name, new TH1F(name.c_str(), string(name + ";number of hits per global track").c_str(), 1200, 0., 1200.));
    }
    string name = "hmp_Tof_dTime";
    fHM->Add(name, new TH1F(name.c_str(), string(name + ";dt [ps];Counter").c_str(), 1000, -500., 500.));
@@ -392,6 +405,40 @@ void CbmLitTofQa::ProcessTofHits()
       Int_t tofMCTrackId = tofPoint->GetTrackID();
 
       fHM->H1("hmp_Tof_dTime")->Fill(1000*(tofPoint->GetTime() - tofHit->GetTime()));
+   }
+}
+
+void CbmLitTofQa::ProcessTofTracks()
+{
+   map<Int_t, Int_t> nofTofHitsPerGlobalTrack;
+   Int_t nofTofTracks = fTofTracks->GetEntriesFast();
+   for (Int_t iTrack = 0; iTrack < nofTofTracks; iTrack++) {
+      const CbmTofTrack* tofTrack = static_cast<const CbmTofTrack*>(fTofTracks->At(iTrack));
+      nofTofHitsPerGlobalTrack[tofTrack->GetTrackIndex()]++;
+   }
+
+   for (Int_t iTrack = 0; iTrack < nofTofTracks; iTrack++) {
+      const CbmTofTrack* tofTrack = static_cast<const CbmTofTrack*>(fTofTracks->At(iTrack));
+      const CbmTofHit* tofHit = static_cast<const CbmTofHit*>(fTofHits->At(tofTrack->GetTofHitIndex()));
+      Int_t tofMCPointId = tofHit->GetRefId();
+
+      const FairTrackParam* par = tofTrack->GetTrackParameter();
+      Double_t dx = par->GetX() - tofHit->GetX();
+      Double_t dy = par->GetY() - tofHit->GetY();
+      Double_t distance = sqrt(dx * dx + dy * dy);
+
+      Int_t nofTrackCategories = fTrackCategories.size();
+      for (Int_t iCat = 0; iCat < nofTrackCategories; iCat++) {
+        string category = fTrackCategories[iCat];
+        LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(category)->second;
+        Bool_t categoryOk = function(fMCTracks, tofMCPointId);
+        if (categoryOk) {
+           fHM->H1("hmp_TofTrack_" + category + "_Distance")->Fill(distance);
+           fHM->H1("hmp_TofTrack_" + category + "_NormDistance")->Fill(tofTrack->GetDistance());
+           fHM->H1("hmp_TofTrack_" + category + "_Length")->Fill(tofTrack->GetTrackLength());
+           fHM->H1("hmp_TofTrack_" + category + "_NofHitsPerGlobalTrack")->Fill(nofTofHitsPerGlobalTrack[tofTrack->GetTrackIndex()]);
+        }
+      }
    }
 }
 

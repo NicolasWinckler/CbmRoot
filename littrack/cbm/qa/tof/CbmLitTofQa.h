@@ -94,6 +94,8 @@ private:
 
    void ProcessTofHits();
 
+   void ProcessTofTracks();
+
    void FitHistograms();
 
    CbmLitTofQa(const CbmLitTofQa&);
@@ -115,6 +117,7 @@ private:
    TClonesArray* fStsTrackMatches; // CbmTrackMatch array
    TClonesArray* fTofHits; // CbmTofHit array
    TClonesArray* fTofPoints; // CbmTofPoint array
+   TClonesArray* fTofTracks; // CbmTofTrack array
    TClonesArray* fMCTracks; // CbmMCTrack array
 
    CbmVertex* fPrimVertex; // Pointer to the primary vertex

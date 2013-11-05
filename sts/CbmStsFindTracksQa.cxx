@@ -31,6 +31,7 @@
 #include "TH1F.h"
 #include "TList.h"
 #include "TVector3.h"
+#include "TGeoMatrix.h"
 
 // Includes from C++
 #include <iostream>

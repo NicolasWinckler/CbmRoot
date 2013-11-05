@@ -10,8 +10,8 @@ eventDisplay()
   whichTrdGeo.open("whichTrdGeo",ios::in);
   TString selectGeo;
   if (whichTrdGeo) whichTrdGeo >> selectGeo;
-  TString digipar = selectGeo(0,9);
-  digipar.ReplaceAll(".","");
+  TString digipar = selectGeo(0,11);
+  digipar.ReplaceAll(".ge","");
   cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();

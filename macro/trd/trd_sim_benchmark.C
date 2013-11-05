@@ -29,7 +29,8 @@ void trd_sim_benchmark(Int_t nEvents = 50)
   TString stsGeom    = "sts/sts_v12b.geo.root";
   TString richGeom   = "rich/rich_v08a.geo";
   //  TString trdGeom    = "trd/trd_v13p4.geo.root";
-  TString trdGeom    = "../macro/trd/geometry/trd.v13/trd_v13p4.geo.root";
+  //  TString trdGeom    = "../macro/trd/geometry/trd.v13/trd_v13p4.geo.root";
+  TString trdGeom    = "../macro/trd/geometry/trd.v13/trd_v13p_3e.geo.root";
   TString tofGeom    = "tof/tof_v13-5d.geo.root";
   
   // -----   Magnetic field   -----------------------------------------------

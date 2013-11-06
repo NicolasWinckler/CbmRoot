@@ -256,6 +256,8 @@ void CbmLitFindGlobalTracks::ConvertOutputData()
 
 void CbmLitFindGlobalTracks::CalculateLength()
 {
+   if (fTofTracks == NULL || fGlobalTracks == NULL) return;
+
    /* Calculate the length of the global track
     * starting with (0, 0, 0) and adding all
     * distances between hits

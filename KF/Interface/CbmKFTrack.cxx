@@ -56,5 +56,5 @@ void CbmKFTrack::SetPID( Int_t pidHypo )
 { 
   TParticlePDG* particlePDG = TDatabasePDG::Instance()->GetParticle(pidHypo);
   fMass = (particlePDG) ? particlePDG->Mass() :0.13957;
-  fIsElectron = (abs(pidHypo)==11); 
+  fIsElectron = (TMath::Abs(pidHypo)==11); 
 }

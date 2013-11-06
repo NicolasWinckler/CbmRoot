@@ -989,7 +989,9 @@ bitfield& bitfield::operator ~ () {
 }
 std::bitset<numberOfBits>::reference& operator ~ (std::bitset<numberOfBits>::reference& operand) {
 
-	return operand.flip();
+//	return operand.flip();
+	operand.flip();
+	return operand;
 
 }
 

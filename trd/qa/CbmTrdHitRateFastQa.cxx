@@ -1079,8 +1079,8 @@ Double_t CbmTrdHitRateFastQa::CalcHitRatePad(const Double_t x_min, const Double_
   for (Int_t yStep = 0; yStep < ySteps; yStep++) {
     x = x_min + 0.5;
     for (Int_t xStep = 0; xStep < xSteps; xStep++) {
-      r = sqrt( pow(x, 2) + pow(y,2));
-      alpha = atan(r/z)*1000.;
+      r = sqrt( pow(x/1.5, 2) + pow(y,2));
+      alpha = atan(r/z)*1000.; //[mrad]
       HitRate += // fit including errors
 	exp(4.536355e00 + -8.393716e-03 * alpha) + 
 	exp(2.400547e01 + -1.208306e-02 * alpha) /
@@ -1089,7 +1089,7 @@ Double_t CbmTrdHitRateFastQa::CalcHitRatePad(const Double_t x_min, const Double_
     }
     y += yStepWidth;
   }
-  return (HitRate);
+  return (HitRate);// [Hz/mm^2]
 }
 
 Double_t CbmTrdHitRateFastQa::CalcHitRate(HitRateGeoPara2 *GeoPara, Double_t StartX, Double_t StopX, Int_t xSteps, Double_t StartY, Double_t StopY, Int_t ySteps, Double_t* Mpos, TH2F* Topview[3], TCanvas* c0)
@@ -1117,7 +1117,7 @@ Double_t CbmTrdHitRateFastQa::CalcHitRate(HitRateGeoPara2 *GeoPara, Double_t Sta
 //    x = StartX + 0.5 * fabs(GeoPara->cosX);
     for (Int_t xStep = 0; xStep < xSteps; xStep++) {
       z = (GeoPara->lambda - (x * GeoPara->vN[0] + y * GeoPara->vN[1])) / GeoPara->vN[2];
-      r = sqrt( pow(x, 2) + pow(y,2));
+      r = sqrt( pow(x/1.5, 2) + pow(y,2));
       alpha = atan(r/z)*1000.;
       /* //Fit without errors
       HitRate += 

@@ -149,9 +149,9 @@ void mvd_reco(Int_t nEvents = 100)
 	fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 
-   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-   clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);
+//   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+//   clusteringQa->SetOutputDir(std::string(resultDir));
+//   run->AddTask(clusteringQa);
    // ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

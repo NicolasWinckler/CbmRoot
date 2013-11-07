@@ -283,7 +283,7 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   Bool_t Fast = true; // false; // true; // false;  // will not fill the root file (in Histo)!!
   Bool_t firstLayer = false;
   fDraw = true; // false;
-  Double_t ZRangeL = 0;
+  Double_t ZRangeL = 1;
   Double_t ZRangeU = 1e05;
   Double_t mm2bin = 2.5; // 20.0; // 10.0; // 5.0; // 2.5;
  
@@ -649,7 +649,7 @@ void CbmTrdHitRateFastQa::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
   Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
-
+  Layer->Fill(0.,0.,0.);
 
   sprintf(name,"c1_S%d_L%d",fStation,fLayer);
   sprintf(title,"c1 Station %d, Layer %d",fStation,fLayer);

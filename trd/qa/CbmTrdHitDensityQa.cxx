@@ -142,9 +142,10 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	}
 	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
 	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
-	fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
-      
-	//TODO : Find neighbours!!
+	if (fUsedDigiMap.find(digiAddress) == fUsedDigiMap.end()){
+	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
+	  fUsedDigiMap[digiAddress] = iDigi;
+	} 
 	Int_t neighbourAddress = 0;
 	if (iRow > 0){
 	  if (local_Row > 0)
@@ -195,7 +196,7 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
   // ---- Finish --------------------------------------------------------
 void CbmTrdHitDensityQa::Finish()
 {
-  Double_t min(0), max(10./(Double_t)fEventCounter->GetEntries()/*1e5*/);
+  Double_t min(1), max(/*(Double_t)fEventCounter->GetEntries()/10.*/fEventRate);
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
@@ -223,6 +224,8 @@ void CbmTrdHitDensityQa::Finish()
       name.Form("hd_S%d_L%d",fStation,fLayer);
       title.Form("hd Station %d, Layer %d",fStation,fLayer);
       LayerMap[LayerId] = new TCanvas(name,title,1000,900);
+      name.Form("hdH_S%d_L%d",fStation,fLayer);
+      title.Form("hdH Station %d, Layer %d",fStation,fLayer);
       TH2F *Layer = new TH2F(name,title,600,-6000,6000,600,-6000,6000);
       Layer->SetContour(99);
       Layer->SetXTitle("x-Coordinate [mm]");
@@ -238,8 +241,10 @@ void CbmTrdHitDensityQa::Finish()
       Layer->GetYaxis()->SetTitleOffset(2);
       Layer->GetZaxis()->SetTitleSize(0.02);
       Layer->GetZaxis()->SetTitleOffset(-2);
-      LayerMap[LayerId]->cd();
-      Layer->Draw();
+      Layer->GetZaxis()->SetRangeUser(min,max);
+      LayerMap[LayerId]->cd()->SetLogz(1);
+      Layer->Fill(0.,0.,0.);
+      Layer->Draw("colz");
     }
  
     fModuleInfo = fDigiPar->GetModule(fModuleHitMapIt->first);
@@ -247,6 +252,7 @@ void CbmTrdHitDensityQa::Finish()
     Int_t global_Row = 0;
     TVector3 padPos;
     TVector3 padSize;
+    printf("Module: %6i   Maximum Rate: %EHz/Pad\n",fModuleHitMapIt->first,fModuleHitMapIt->second->GetBinContent(fModuleHitMapIt->second->GetMaximumBin()) / Double_t(fEventCounter->GetEntries()) * fEventRate);
     for (Int_t s = 0; s < nSec; s++){
       const Int_t nRow = fModuleInfo->GetNofRowsInSector(s);
       const Int_t nCol = fModuleInfo->GetNofColumnsInSector(s);
@@ -267,7 +273,7 @@ void CbmTrdHitDensityQa::Finish()
 	    local_min[i] *= 10.;
 	    local_max[i] *= 10.;
 	  }
-	  Double_t rate = fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1) / Double_t(fEventCounter->GetEntries());// * fEventRate;
+	  Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;
 	  TBox *pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
 	  //printf("    %i %i %i  (%f, %f)   (%f, %f)   %f\n",s,r,c,local_min[0],local_min[1],global_min[0],global_min[1],rate);
 	  pad->SetLineColor(0);

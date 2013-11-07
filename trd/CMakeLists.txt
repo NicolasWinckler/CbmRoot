@@ -20,12 +20,32 @@ ${CBMROOT_SOURCE_DIR}/trd/param
 ${CBMROOT_SOURCE_DIR}/trd/reco
 ${CBMROOT_SOURCE_DIR}/trd/tools
 ${CBMROOT_SOURCE_DIR}/trd/data
+${CBMROOT_SOURCE_DIR}/trd/beamtime
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
+#${ROCSYS}/lib
+#${GO4SYS}/include
+#${GO4SYS}/Go4Event
+#${GO4SYS}/Go4StatusBase
+#${ROCSYS}/include
+#${ROCSYS}/include/spadic
+#${ROCSYS}/include/sp605
+#${ROCSYS}/include/roc
+#${ROCSYS}/onlinemonitor/framework
+#${ROCSYS}/onlinemonitor/epicsmonitor
+#${ROCSYS}/onlinemonitor/rocmonitor
+#${ROCSYS}/onlinemonitor/spadicmonitor
+#${ROCSYS}/onlinemonitor/spadicV10monitor
+#${ROCSYS}/onlinemonitor/trbmonitor
+#${ROCSYS}/beamtime/cern-oct12/go4
+#${ROCSYS}/beamtime/cern-oct11/go4/RICH
+#${ROCSYS}/beamtime/cern-oct11/go4/MSFFM
+#${ROCSYS}/beamtime/cern-oct11/go4/BUCHAREST
+#${ROCSYS}/beamtime/cern-oct11/go4/
 ) 
 
 link_directories( ${LINK_DIRECTORIES})
@@ -47,8 +67,9 @@ digi/CbmTrdDigitizer.cxx
 qa/CbmTrdHitProducerQa.cxx  
 qa/CbmTrdTracksPidQa.cxx
 qa/CbmTrdQa.cxx
-#qa/CbmTrdHitDensityQa.cxx
+qa/CbmTrdHitDensityQa.cxx
 qa/CbmTrdHitRateQa.cxx
+qa/CbmTrdHitRateFastQa.cxx
 qa/CbmTrdOccupancyQa.cxx
 qa/CbmTrdDigitizerPRFQa.cxx
 qa/CbmTrdClusterizerFastQa.cxx
@@ -69,6 +90,19 @@ tools/CbmTrdGeoHandler.cxx
 data/CbmTrdRadiator.cxx  
 data/CbmTrdGas.cxx
 data/CbmTrdModule.cxx
+
+#beamtime/CbmTrdRawToDigiSpadic03.cxx
+
+
+#${ROCSYS}/include/spadic/Message.h
+#${ROCSYS}/include/roc/Message.h
+#${ROCSYS}/onlinemonitor/rocmonitor/TRocEvent.cxx
+#${ROCSYS}/onlinemonitor/spadicmonitor/TSpadicEvent.cxx
+#${ROCSYS}/onlinemonitor/framework/TTriglogEvent.cxx
+#${ROCSYS}/beamtime/cern-oct12/go4/TMbsCrateEvent.cxx
+#${ROCSYS}/beamtime/cern-oct12/go4/TCernOct12UnpackEvent.cxx
+#${ROCSYS}/beamtime/cern-oct12/go4/TCernOct12DetectorEvent.cxx
+#${ROCSYS}/beamtime/cern-oct12/go4/TBeamMonitorEvent.cxx
 
 CbmTrdFindTracks.cxx  
 CbmTrdTrackFinderIdeal.cxx  

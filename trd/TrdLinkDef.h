@@ -21,7 +21,8 @@
 //#pragma link C++ class  CbmTrdDigitizerMathieson;
 #pragma link C++ class  CbmTrdDigitizerPRF;
 #pragma link C++ class  CbmTrdHitRateQa;
-//#pragma link C++ class  CbmTrdHitDensityQa;
+#pragma link C++ class  CbmTrdHitRateFastQa;
+#pragma link C++ class  CbmTrdHitDensityQa;
 #pragma link C++ class  CbmTrdOccupancyQa;
 #pragma link C++ class  CbmTrdDigitizerPRFQa;
 #pragma link C++ class  CbmTrdClusterizerFastQa;
@@ -54,4 +55,11 @@
 #pragma link C++ class CbmTrdQa+;
 #pragma link C++ class CbmTrdRecoQa+;
 
+//#pragma link C++ class CbmTrdRawToDigiSpadic03+;
+//#pragma link C++ class TRocEvent+;
+//#pragma link C++ class TSpadicEvent+;
+//#pragma link C++ class TMbsCrateEvent+;
+//#pragma link C++ class TBeamMonitorEvent+;
+//#pragma link C++ class TCernOct12UnpackEvent+;
+//#pragma link C++ class TTriglogEvent+;
 #endif

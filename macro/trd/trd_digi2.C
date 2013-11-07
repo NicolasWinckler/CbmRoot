@@ -33,13 +33,22 @@ void trd_digi2(Int_t nEvents = 1)
   whichTrdGeo.open("whichTrdGeo",ios::in);
   TString selectGeo;
   if (whichTrdGeo) whichTrdGeo >> selectGeo;
-  TString digipar = selectGeo(0,9);
-  digipar.ReplaceAll(".","");
+  TString digipar = selectGeo(0,11);
+  digipar.ReplaceAll(".ge","");
   cout << "selected geometry : >> " << selectGeo << " << (to select a different geometry, edit macro/trd/whichTrdGeo file)" << endl;
   cout << "selected digipar  : >> " << digipar << " << " << endl;
   whichTrdGeo.close();
-  if (digipar.Length() == 0) digipar = "trd_v13g";
+  if (digipar.Length() == 0) digipar = "trd_v13p_3e";
   cout << "finally using     : >> " << digipar << " << " << endl;
+
+  FairLogger *logger = FairLogger::GetLogger();
+  logger->SetLogFileName("MyLog.log");
+  logger->SetLogToScreen(kTRUE);
+  //  //  logger->SetLogToFile(kFALSE);
+  //  //  logger->SetLogVerbosityLevel("HIGH");
+  //  //  logger->SetLogFileLevel("DEBUG4");
+  //  logger->SetLogScreenLevel("DEBUG2");
+  logger->SetLogScreenLevel("INFO");
 
   // ========================================================================
   //          Adjust this part according to your requirements

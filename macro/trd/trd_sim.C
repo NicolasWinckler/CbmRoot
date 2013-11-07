@@ -7,7 +7,7 @@
 //
 // --------------------------------------------------------------------------
 
-void trd_sim(Int_t nEvents = 1)
+void trd_sim(Int_t nEvents = 1, Int_t CbmSetup = 4)
 {
 
   // ========================================================================
@@ -22,40 +22,41 @@ void trd_sim(Int_t nEvents = 1)
   
   CbmTarget* target = new CbmTarget("Gold", 0.025);
 
-//  TString macro = inDir + "/geometry/standard_electron_setup.C";
-//  gROOT->LoadMacro(macro);
-//  gInterpreter->ProcessLine("standard_electron_setup()");
+  if (CbmSetup == 1)
+    {
+      TString macro = inDir + "/geometry/setup/sis100_hadron_setup.C";
+      gROOT->LoadMacro(macro);
+      gInterpreter->ProcessLine("sis100_hadron_setup()");
+    }
+  if (CbmSetup == 2)
+    {
+      TString macro = inDir + "/geometry/setup/sis100_electron_setup.C";
+      gROOT->LoadMacro(macro);
+      gInterpreter->ProcessLine("sis100_electron_setup()");
+    }
+  if (CbmSetup == 3)
+    {
+      TString macro = inDir + "/geometry/setup/sis100_muon_setup.C";
+      gROOT->LoadMacro(macro);
+      gInterpreter->ProcessLine("sis100_muon_setup()");
+    }
+  if (CbmSetup == 4)  // default setup
+    {
+      TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
+      gROOT->LoadMacro(macro);
+      gInterpreter->ProcessLine("sis300_electron_setup()");
+    }
+  if (CbmSetup == 5)
+    {
+      TString macro = inDir + "/geometry/setup/sis300_muon_setup.C";
+      gROOT->LoadMacro(macro);
+      gInterpreter->ProcessLine("sis300_muon_setup()");
+    }
 
-  //// SIS 100 hadron
-  //  TString macro = inDir + "/geometry/setup/sis100_hadron_setup.C";
-  //  gROOT->LoadMacro(macro);
-  //  gInterpreter->ProcessLine("sis100_hadron_setup()");
-
-//// SIS 100 electron
-//  TString macro = inDir + "/geometry/setup/sis100_electron_setup.C";
-//  gROOT->LoadMacro(macro);
-//  gInterpreter->ProcessLine("sis100_electron_setup()");
-
-  //// SIS 100 muon
-  //  TString macro = inDir + "/geometry/setup/sis100_muon_setup.C";
-  //  gROOT->LoadMacro(macro);
-  //  gInterpreter->ProcessLine("sis100_muon_setup()");
-
-// SIS 300 electron
-//  TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
-//  gROOT->LoadMacro(macro);
-//  gInterpreter->ProcessLine("sis300_electron_setup()");
-
-  TString macro = inDir + "/macro/trd/geometry/setup/trd_sim_sis300_electron_setup.C";
-  gROOT->LoadMacro(macro);
-  gInterpreter->ProcessLine("trd_sim_sis300_electron_setup()");
-
-  platformGeom = "passive/platform_v13b.geo";
-
-  //// SIS 300 muon
-  //  TString macro = inDir + "/geometry/setup/sis300_muon_setup.C";
-  //  gROOT->LoadMacro(macro);
-  //  gInterpreter->ProcessLine("sis300_muon_setup()");
+  if (CbmSetup <= 3)
+    platformGeom = "passive/platform_v13a.geo";
+  else
+    platformGeom = "passive/platform_v13b.geo";
   
   // In general, the following parts need not be touched
   // ========================================================================

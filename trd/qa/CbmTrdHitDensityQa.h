@@ -16,7 +16,8 @@
 class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdGeoHandler;
-
+class TH2I;
+class TH1I;
 class TClonesArray;
 
 typedef std::list<MyPoint*> MyPointList;
@@ -50,10 +51,7 @@ class CbmTrdHitDensityQa : public FairTask
 
  private:
 
-  TClonesArray*     fTrdPoints;   /** Input array of Trd MC points **/
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
-  TClonesArray*     fClusters;    /** Input array of CbmTrdCluster **/
-  TClonesArray*     fClusterHits; /** Output array of CbmTrdHit **/
 
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!  
@@ -63,10 +61,13 @@ class CbmTrdHitDensityQa : public FairTask
   Int_t fLayer;
   Int_t fModuleID;
 
-  Int_t fMCindex;
+  TH1I *fEventCounter;
 
-  std::map<Int_t, MyPointList*> ModulePointMap;
-
+  Double_t fTriggerThreshold;
+  Double_t fEventRate;
+  std::map<Int_t, Int_t> fUsedDigiMap;
+  std::map<Int_t, TH2I*> fModuleHitMap;
+  std::map<Int_t, TH2I*>::iterator fModuleHitMapIt;
   CbmTrdHitDensityQa(const CbmTrdHitDensityQa&);
   CbmTrdHitDensityQa& operator=(const CbmTrdHitDensityQa&);
 

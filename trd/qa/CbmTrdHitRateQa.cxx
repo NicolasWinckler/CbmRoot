@@ -11,6 +11,7 @@
 #include "FairRuntimeDb.h"
 
 #include "TColor.h"
+#include "TStyle.h"
 #include "TBox.h"
 #include "TH2.h"
 #include "TCanvas.h"
@@ -98,7 +99,7 @@ CbmTrdHitRateQa::CbmTrdHitRateQa()
     fMCStacks(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
-    fRadiators(NULL),
+    //fRadiators(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt()
@@ -107,8 +108,7 @@ CbmTrdHitRateQa::CbmTrdHitRateQa()
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
-CbmTrdHitRateQa::CbmTrdHitRateQa(const char *name, const char *title,
-                 CbmTrdRadiator *radiator)
+CbmTrdHitRateQa::CbmTrdHitRateQa(const char *name, const char *title)
   : FairTask(name),
     Digicounter(-1),
     tFile(NULL),
@@ -169,7 +169,7 @@ CbmTrdHitRateQa::CbmTrdHitRateQa(const char *name, const char *title,
     fMCStacks(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
-    fRadiators(radiator),
+    //fRadiators(radiator),
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt()
@@ -182,10 +182,10 @@ CbmTrdHitRateQa::~CbmTrdHitRateQa()
 {
   //    FairRootManager *ioman =FairRootManager::Instance();
   //ioman->Write();
-  fDigiCollection->Clear("C");
-  delete fDigiCollection;
-  fDigiMatchCollection->Clear("C");
-  delete fDigiMatchCollection;
+  //fDigiCollection->Clear("C");
+  //delete fDigiCollection;
+  //fDigiMatchCollection->Clear("C");
+  //delete fDigiMatchCollection;
 
 }
 // --------------------------------------------------------------------
@@ -244,16 +244,16 @@ InitStatus CbmTrdHitRateQa::Init()
       cout << "                            Task will be inactive" << endl;
       return kERROR;
     }
-
+  /*
     fDigiCollection = new TClonesArray("CbmTrdDigi", 100);
     ioman->Register("TrdDigi","TRD Digis",fDigiCollection,kTRUE);
 
     fDigiMatchCollection = new TClonesArray("CbmTrdDigiMatch", 100);
     ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchCollection,kTRUE);
-
+  */
     fGeoHandler->Init();
 
-    fRadiators->Init();
+    //fRadiators->Init();
 
     return kSUCCESS;
 
@@ -264,6 +264,9 @@ InitStatus CbmTrdHitRateQa::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitRateQa::Exec(Option_t * option)
 {
+  //TStyle::SetNumberContours(99); 
+  gStyle->SetNumberContours(99); 
+  //TH2::SetContour(99); 
   /*
   const Int_t Number = 11;
   Double_t r[Number] =      {1.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 1.00, 0.50, 1.00};
@@ -327,8 +330,10 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
       h2Topview[i]->Draw("colz");
     }
   }
+  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++)
+    printf("%2i %3i\n",i,TColor::GetColorPalette(i));
   //h2Topview->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
-
+  // return;
 
   vector<int> Plane01;
   vector<int> Plane02;
@@ -343,9 +348,9 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
 
   Int_t ModuleID;
   Int_t Sector = 0;
-  //  const Int_t NofModules = fDigiPar->GetNrOfModules();
+  const Int_t NofModules = fDigiPar->GetNrOfModules();
 
-  const Int_t NofModules = 80; // DE
+  //const Int_t NofModules = 80; // DE
   //TH2F *Module[NofModules];
 
   for (Int_t i = 0; i < NofModules; i++) {  
@@ -384,22 +389,22 @@ void CbmTrdHitRateQa::Exec(Option_t * option)
   }
 
   vector< vector<int> > LiSi;
+  //LiSi.push_back(Plane01);
+  //LiSi.push_back(Plane02);
+  //LiSi.push_back(Plane05);
+  //LiSi.push_back(Plane06);
+  //LiSi.push_back(Plane09);
+  //LiSi.push_back(Plane10);
   LiSi.push_back(Plane01);
   LiSi.push_back(Plane02);
+  LiSi.push_back(Plane03);
+  LiSi.push_back(Plane04);
   LiSi.push_back(Plane05);
   LiSi.push_back(Plane06);
+  LiSi.push_back(Plane07);
+  LiSi.push_back(Plane08);
   LiSi.push_back(Plane09);
   LiSi.push_back(Plane10);
-//  LiSi.push_back(Plane01);
-//  LiSi.push_back(Plane02);
-//  LiSi.push_back(Plane03);
-//  LiSi.push_back(Plane04);
-//  LiSi.push_back(Plane05);
-//  LiSi.push_back(Plane06);
-//  LiSi.push_back(Plane07);
-//  LiSi.push_back(Plane08);
-//  LiSi.push_back(Plane09);
-//  LiSi.push_back(Plane10);
 
   Char_t OutFile1[200];
   Char_t OutFile2[200];
@@ -1388,8 +1393,8 @@ void CbmTrdHitRateQa::DrawDigi()
 // ---- Register ------------------------------------------------------
 void CbmTrdHitRateQa::Register()
 {
-  FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
-  FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
+  //FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
+  //FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
 }
 // --------------------------------------------------------------------
 

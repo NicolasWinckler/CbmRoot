@@ -309,21 +309,18 @@ void CbmSts::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if ( fileName.EndsWith(".root") ) {
-    gLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing STS geometry from ROOT file %s", 
-		  fileName.Data());
+    LOG(INFO) << "Constructing STS  geometry from ROOT  file "
+              << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   }
   else if ( fileName.EndsWith(".geo") ) {
-    gLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing STS geometry from ASCII file %s", 
-		  fileName.Data());
+    LOG(INFO) << "Constructing STS  geometry from ASCII file "
+              << fileName.Data() << FairLogger::endl;
     ConstructAsciiGeometry();
   }
   else
-    gLogger->Fatal(MESSAGE_ORIGIN,
-		   "Geometry format of STS file %S not supported.", 
-		   fileName.Data());
+    LOG(FATAL) <<  "Geometry format of STS file " << fileName.Data()
+               << " not supported." << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 

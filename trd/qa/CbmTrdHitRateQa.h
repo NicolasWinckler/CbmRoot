@@ -58,8 +58,7 @@ class CbmTrdHitRateQa : public FairTask {
   CbmTrdHitRateQa();
 
   /** Standard constructor **/
-  CbmTrdHitRateQa(const char *name, const char *title="CBM Task",
-		    CbmTrdRadiator *radiator=NULL);
+  CbmTrdHitRateQa(const char *name, const char *title="CBM Task");
 
   /** Destructor **/
   virtual ~CbmTrdHitRateQa();
@@ -180,7 +179,7 @@ class CbmTrdHitRateQa : public FairTask {
 
   CbmTrdDigiPar  *fDigiPar;
   CbmTrdModule   *fModuleInfo;
-  CbmTrdRadiator *fRadiators; 
+  //CbmTrdRadiator *fRadiators; 
 
   CbmTrdGeoHandler* fGeoHandler; //!
     

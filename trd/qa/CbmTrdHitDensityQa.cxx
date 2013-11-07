@@ -17,6 +17,11 @@
 #include "TArray.h"
 #include "TF1.h"
 #include "TH2F.h"
+#include "TH2I.h"
+#include "TH2D.h"
+#include "TColor.h"
+#include "TMath.h"
+
 #include "TProfile.h"
 #include "TLine.h"
 #include "TCanvas.h"
@@ -34,36 +39,27 @@ using std::endl;
 // ---- Default constructor -------------------------------------------
 CbmTrdHitDensityQa::CbmTrdHitDensityQa()
   :FairTask("CbmTrdHitDensityQa",1),
-   fTrdPoints(NULL),
    fDigis(NULL),
-   fClusters(NULL),
-   fClusterHits(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
+   fTriggerThreshold(1e-6),
+   fEventRate(1e7),
+   fEventCounter(NULL),
    fStation(-1),
    fLayer(-1), 
    fModuleID(-1),
-   fMCindex(-1),
-   ModulePointMap()
+   fModuleHitMap(),
+   fUsedDigiMap()
 {
 }
 
 // ---- Destructor ----------------------------------------------------
 CbmTrdHitDensityQa::~CbmTrdHitDensityQa()
 {
-  if(fClusters){
-    fClusters->Clear("C");
-    fClusters->Delete();
-    delete fClusters;
-  }
   if(fDigis){
     fDigis->Delete();
     delete fDigis;
-  }    
-    if(fClusterHits){
-    fClusterHits->Delete();
-    delete fClusterHits;
   }    
     if(fDigiPar){
     delete fDigiPar;
@@ -98,28 +94,12 @@ InitStatus CbmTrdHitDensityQa::Init()
 {
   cout << " * CbmTrdHitDensityQa * :: Init()" << endl;
   FairRootManager *ioman = FairRootManager::Instance();
-  fTrdPoints=(TClonesArray *)ioman->GetObject("TrdPoint"); 
-  if ( ! fTrdPoints ) {
-    cout << "-W CbmTrdHitDensityQa::Init: No TrdPoints array!" << endl;
-    cout << "                             Task will be inactive" << endl;
-    return kERROR;
-  }
-  /*
   fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
   if ( ! fDigis ) {
     cout << "-W CbmTrdHitDensityQa::Init: No TrdDigi array!" << endl;
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
-  fClusters =(TClonesArray *)  ioman->GetObject("TrdCluster");
-  if ( ! fClusters ) {
-    cout << "-W CbmTrdHitDensityQa::Init: No TrdCluster array!" << endl;
-    cout << "                             Task will be inactive" << endl;
-    return kERROR;
-  }    
-  fClusterHits = new TClonesArray("CbmTrdHit", 100);
-  ioman->Register("TrdHit","TRD Hit",fClusterHits,kTRUE);
-  */
   // Extract information about the number of TRD stations and
   // the number of layers per TRD station from the geomanager.
   // Store the information about the number of layers at the entrance
@@ -131,207 +111,210 @@ InitStatus CbmTrdHitDensityQa::Init()
 
   fGeoHandler->Init();
 
+  fEventCounter = new TH1I("fEventCounter","fEventCounter",1,-0.5,0.5);
   return kSUCCESS;
   
 }
 void CbmTrdHitDensityQa::Exec(Option_t * option)
 {
-  Int_t nStation = 3;
-  Int_t  nLayer = 4;
-  TFile *tFile;
-  TH1F *hPointDistance;
-  TProfile *hPointDistanceRadius;
-  TH2F *hPointDistanceRadius2;
-  TH1F *hPointDistanceM[nStation][nLayer];
-  TProfile *hPointDistanceRadiusM[nStation][nLayer];
-  TH2F *hPointDistanceRadius2M[nStation][nLayer];
-  TH2F *hHitRatePosition[nStation][nLayer];
-  
-  if(!gSystem->AccessPathName("CbmTrdHitDensityQa.root")){
-    cout << "  << found existing root file" << endl;
-    tFile = new TFile("CbmTrdHitDensityQa.root","UPDATE");
-    hPointDistance = (TH1F*)tFile->Get("PointDistance");
-    hPointDistanceRadius = (TProfile*)tFile->Get("PointDistanceRadius");
-    hPointDistanceRadius2 = (TH2F*)tFile->Get("PointDistanceRadius2");
-    TString name;
-    for (Int_t s = 0; s < nStation; s++) 
-      for(Int_t l = 0; l < nLayer; l++) {
-	name.Form("PointDistanceS%dL%d",s+1,l+1);
-	hPointDistanceM[s][l] = (TH1F*)tFile->Get(name);
-	name.Form("PointDistanceRadiusS%dL%d",s+1,l+1);
-	hPointDistanceRadiusM[s][l] = (TProfile*)tFile->Get(name);
-	name.Form("PointDistanceRadius2S%dL%d",s+1,l+1);
-	hPointDistanceRadius2M[s][l] = (TH2F*)tFile->Get(name);
-	name.Form("HitRate2S%dL%d",s+1,l+1);
-	hHitRatePosition[s][l] = (TH2F*)tFile->Get(name);
-      }
-  }
-  else {    
-    tFile = new TFile("CbmTrdHitDensityQa.root",/*"CREATE"*/"RECREATE"," ROOT file with histograms");
-    cout << "  << file new created" << endl;
-    hPointDistance = new TH1F("PointDistance","PointDistance", 10000, 0, 1500);
-    hPointDistance->SetXTitle("point to point distance within same module (each pair once) [mm]");
-    hPointDistance->SetYTitle("counts");
-    hPointDistanceRadius = new TProfile("PointDistanceRadius","PointDistanceRadius", 1000, 0, 10000, 0, 1500);
-    hPointDistanceRadius->SetXTitle("radial position of first point [mm]");
-    hPointDistanceRadius->SetYTitle("point to point distance within same module (each pair once) [mm]");
-    hPointDistanceRadius2 = new TH2F("PointDistanceRadius2","PointDistanceRadius2", 1000, 0, 10000, 10000, 0, 1500);
-    hPointDistanceRadius2->SetXTitle("radial position of first point [mm]");
-    hPointDistanceRadius2->SetYTitle("point to point distance within same module (each pair once) [mm]");
-    TString name;
-    for (Int_t s = 0; s < nStation; s++) 
-      for(Int_t l = 0; l < nLayer; l++) {
-	name.Form("PointDistanceS%dL%d",s+1,l+1);
-	hPointDistanceM[s][l] = new TH1F(name, name, 10000, 0, 1500);
-	hPointDistanceM[s][l]->SetXTitle("point to point distance within same module (each pair once) [mm]");
-	hPointDistanceM[s][l]->SetYTitle("counts");
-	name.Form("PointDistanceRadiusS%dL%d",s+1,l+1);
-	hPointDistanceRadiusM[s][l] = new TProfile(name, name, 1000, 0, 10000, 0, 1500);
-	hPointDistanceRadiusM[s][l]->SetXTitle("radial position of first point [mm]");
-	hPointDistanceRadiusM[s][l]->SetYTitle("point to point distance within same module (each pair once) [mm]");
-	name.Form("PointDistanceRadius2S%dL%d",s+1,l+1);
-	hPointDistanceRadius2M[s][l] =  new TH2F(name, name, 1000, 0, 10000, 10000, 0, 1500);
-	hPointDistanceRadius2M[s][l]->SetXTitle("radial position of first point [mm]");
-	hPointDistanceRadius2M[s][l]->SetYTitle("point to point distance within same module (each pair once) [mm]");
-	name.Form("HitRate2S%dL%d",s+1,l+1);
-	hHitRatePosition[s][l] =  new TH2F(name, name, 2000, -10000, 10000, 2000, -10000, 10000);
-	hHitRatePosition[s][l]->SetXTitle("x-coordinate [mm]");
-	hHitRatePosition[s][l]->SetYTitle("y-coordinate [mm]");
-	hHitRatePosition[s][l]->SetZTitle("hits / cm^{2}");
-      }
-  }
-  CbmTrdPoint *pt = NULL;
-  //MyPoint* point = new MyPoint;
-  Int_t nEntries = fTrdPoints->GetEntries();
-  for (int j = 0; j < nEntries ; j++ ) {
-
-    MyPoint* point = new MyPoint;
-
-    pt = (CbmTrdPoint*) fTrdPoints->At(j);
-    if(NULL == pt) {
-      cout << " no point found " << endl;
-    }
-    if(NULL == pt) continue;
-    fMCindex=pt->GetTrackID();
-    // --------------->[mm]<---------------
-    Double_t x_in   = pt->GetXIn();
-    Double_t x_out  = pt->GetXOut();
-    Double_t y_in   = pt->GetYIn();
-    Double_t y_out  = pt->GetYOut();
-    Double_t z_in   = pt->GetZIn();
-    Double_t z_out  = pt->GetZOut();
-    Double_t x_mean = (x_in + x_out)/2.;
-    Double_t y_mean = (y_in + y_out)/2.;
-    Double_t z_mean = (z_in + z_out)/2.;
-    gGeoManager->FindNode(x_mean, y_mean, z_mean);
-    const Double_t *global_point = gGeoManager->GetCurrentPoint();
-    Double_t local_point[3];
-    gGeoManager->MasterToLocal(global_point, local_point);
- 
-    point->global_inC[0]  = x_mean * 10.;
-    point->global_inC[1]  = y_mean * 10.;
-    point->global_inC[2]  = z_mean * 10.;
-
-    
-
-    fModuleID = pt->GetDetectorID();
-
-    std::map<Int_t, MyPointList* >::iterator it = ModulePointMap.find(fModuleID);
-    if (it == ModulePointMap.end())
+  printf("=================CbmTrdHitDensityQa====================\n");
+  TString title;
+  TStopwatch timer;
+  timer.Start();
+  fEventCounter->Fill(0);
+  printf("\n  Event: %i\n\n",(Int_t)fEventCounter->GetEntries());
+  Int_t nEntries = fDigis->GetEntries();
+  for (Int_t iDigi=0; iDigi < nEntries; iDigi++ ) {
+    CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
+    Int_t digiAddress = digi->GetAddress();
+    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
+    Int_t moduleId = CbmTrdAddress::GetModuleId(moduleAddress);// TODO
+    fLayer    = CbmTrdAddress::GetLayerId(moduleAddress);
+    fModuleInfo = fDigiPar->GetModule(moduleAddress);
+    if (digi->GetCharge() > fTriggerThreshold) 
       {
-	ModulePointMap[fModuleID] = new MyPointList;
-      }
-    ModulePointMap[fModuleID]->push_back(point);
-  }
-  std::map<Int_t, MyPointList* >::iterator it;
-  for ( it = ModulePointMap.begin(); it != ModulePointMap.end(); it++) {
-    fModuleInfo     = fDigiPar->GetModule((*it).first);
-    fStation = fGeoHandler->GetStation((*it).first);
-    fLayer = fGeoHandler->GetLayer((*it).first);
-    Float_t xPos1(0), yPos1(0), r1(0), xPos2(0), yPos2(0), r2(0), dr(0);
-    MyPointList::iterator listIt1;
-    MyPointList::iterator listIt2;
-    for ( listIt1 = (*it).second->begin(); listIt1 != (*it).second->end(); listIt1++) {
-      xPos1 = (*listIt1)->global_inC[0];
-      yPos1 = (*listIt1)->global_inC[1];
-
-      hHitRatePosition[fStation-1][fLayer-1]->Fill(xPos1,yPos1);
-
-      r1 = sqrt(xPos1 * xPos1 + yPos1 * yPos1);
-
-      for ( listIt2 = listIt1; listIt2 != (*it).second->end(); listIt2++) {
-	if (listIt2 != listIt1) {
-	  xPos2 = (*listIt2)->global_inC[0];
-	  yPos2 = (*listIt2)->global_inC[1];	  
-	  r2 = sqrt(xPos2 * xPos2 + yPos2 * yPos2);
-
-	  dr = fabs(r1 - r2);
-
-	  hPointDistance->Fill(dr);
-	  hPointDistanceRadius->Fill(r1,dr);
-	  hPointDistanceRadius2->Fill(r1,dr);
-
-	  hPointDistanceM[fStation-1][fLayer-1]->Fill(dr);
-	  hPointDistanceRadiusM[fStation-1][fLayer-1]->Fill(r1,dr);
-	  hPointDistanceRadius2M[fStation-1][fLayer-1]->Fill(r1,dr);
+	fUsedDigiMap[digiAddress] = iDigi;
+	if (fModuleHitMap.find(moduleAddress) == fModuleHitMap.end()){
+	  title.Form("hd_Module_%i",moduleAddress);
+	  Int_t nRows = fModuleInfo->GetNofRows();
+	  Int_t nCols = fModuleInfo->GetNofColumns();
+	  fModuleHitMap[moduleAddress] = new TH2I(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	}
+	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
+	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
+	fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
+      
+	//TODO : Find neighbours!!
+	Int_t neighbourAddress = 0;
+	if (iRow > 0){
+	  if (local_Row > 0)
+	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row-1, iCol);
+	  else if (iSec > 0)
+	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec-1, fModuleInfo->GetNofRowsInSector(iSec-1)-1, iCol);
+	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
+	    fModuleHitMap[moduleAddress]->Fill(iCol, iRow-1);
+	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  }
+	}
+	if (iRow < fModuleInfo->GetNofRows()-1){
+	  if (local_Row+1 > fModuleInfo->GetNofRowsInSector(iSec)-1)
+	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec+1, 0, iCol);
+	  else
+	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row+1, iCol);
+	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
+	    fModuleHitMap[moduleAddress]->Fill(iCol, iRow+1);
+	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  }
+	}
+	if (iCol > 0){
+	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row, iCol-1);
+	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
+	    fModuleHitMap[moduleAddress]->Fill(iCol-1, iRow);
+	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  }
+	}
+	if (iCol < fModuleInfo->GetNofColumns()-1){
+	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row, iCol+1);
+	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
+	    fModuleHitMap[moduleAddress]->Fill(iCol+1, iRow);
+	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  }
 	}
       }
-    }
   }
+}
+  // ---- Register ------------------------------------------------------
+  void CbmTrdHitDensityQa::Register()
+  {
+    cout << " * CbmTrdHitDensityQa * :: Register()" << endl;
 
-  hPointDistance->Write("", TObject::kOverwrite);
-  hPointDistanceRadius->Write("", TObject::kOverwrite);
-  hPointDistanceRadius2->Write("", TObject::kOverwrite);
-  for (Int_t s = 0; s < nStation; s++) 
-    for(Int_t l = 0; l < nLayer; l++) {
-      hPointDistanceM[s][l]->Write("", TObject::kOverwrite);
-      hPointDistanceRadiusM[s][l]->Write("", TObject::kOverwrite);
-      hPointDistanceRadius2M[s][l]->Write("", TObject::kOverwrite);
-      hHitRatePosition[s][l]->Write("", TObject::kOverwrite);
-    }
-  for (std::map<Int_t, MyPointList*>::iterator it1 = ModulePointMap.begin(); it1 != ModulePointMap.end(); ++it1) {
-    for (MyPointList::iterator pointIt = it1->second->begin(); pointIt != it1->second->end(); ++pointIt) {
-      delete *pointIt;
-    }
-    delete it1->second;
   }
-  ModulePointMap.clear();
-  tFile->Close();
-  //delete tFile;
-  /*
-  delete hPointDistance;
-  delete hPointDistanceRadius;
-  delete hPointDistanceRadius2;
-  for (Int_t s = 0; s < nStation; s++) 
-    for(Int_t l = 0; l < nLayer; l++) {
-      delete hPointDistanceM[s][l];
-      delete hPointDistanceRadiusM[s][l];
-      delete hPointDistanceRadius2M[s][l];
-    }
-  */
-  //delete point;
-  //delete pt;
-}
-    // ---- Register ------------------------------------------------------
-void CbmTrdHitDensityQa::Register()
-{
-  cout << " * CbmTrdHitDensityQa * :: Register()" << endl;
-  //FairRootManager::Instance()->Register("TrdHit","Trd Hit", fClusterHits, kTRUE);
-}
-    // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
 
 
-    // ---- Finish --------------------------------------------------------
+  // ---- Finish --------------------------------------------------------
 void CbmTrdHitDensityQa::Finish()
 {
-  //cout << " * CbmTrdHitDensityQa * :: Finish()" << endl;
+  Double_t min(0), max(10./(Double_t)fEventCounter->GetEntries()/*1e5*/);
+  std::vector<Int_t> fColors;
+  std::vector<Double_t> fZLevel;
+  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+    fColors.push_back(TColor::GetColorPalette(i));
+    fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));
+  }
+  TString title, name;
+  std::map< Int_t, TCanvas*> LayerMap;
+  std::map< Int_t, TCanvas*>::iterator LayerMapIt;
+  gDirectory->pwd();
+  fEventCounter->Write("", TObject::kOverwrite);
+  if (!gDirectory->Cd("TrdHitDensityQa")) 
+    gDirectory->mkdir("TrdHitDensityQa");
+  gDirectory->Cd("TrdHitDensityQa");
+  if (!gDirectory->Cd("Module")) 
+    gDirectory->mkdir("Module");
+  gDirectory->Cd("Module");
+  for (fModuleHitMapIt = fModuleHitMap.begin();
+       fModuleHitMapIt != fModuleHitMap.end(); ++fModuleHitMapIt) {
+    fModuleHitMapIt->second->Write("", TObject::kOverwrite);
+    Int_t LayerId = CbmTrdAddress::GetLayerId(fModuleHitMapIt->first);
+    if (LayerMap.find(LayerId) == LayerMap.end()){
+      fStation =  LayerId / 4 + 1;  // OK for SIS100 and SIS300
+      fLayer   =  LayerId % 4 + 1;  // 
+      name.Form("hd_S%d_L%d",fStation,fLayer);
+      title.Form("hd Station %d, Layer %d",fStation,fLayer);
+      LayerMap[LayerId] = new TCanvas(name,title,1000,900);
+      TH2F *Layer = new TH2F(name,title,600,-6000,6000,600,-6000,6000);
+      Layer->SetContour(99);
+      Layer->SetXTitle("x-Coordinate [mm]");
+      Layer->SetYTitle("y-Coordinate [mm]");
+      Layer->SetZTitle("Hits/Pad [Hz]");
+      Layer->SetStats(kFALSE);
+      Layer->GetXaxis()->SetLabelSize(0.02);
+      Layer->GetYaxis()->SetLabelSize(0.02);
+      Layer->GetZaxis()->SetLabelSize(0.02);
+      Layer->GetXaxis()->SetTitleSize(0.02);
+      Layer->GetXaxis()->SetTitleOffset(1.5);
+      Layer->GetYaxis()->SetTitleSize(0.02);
+      Layer->GetYaxis()->SetTitleOffset(2);
+      Layer->GetZaxis()->SetTitleSize(0.02);
+      Layer->GetZaxis()->SetTitleOffset(-2);
+      LayerMap[LayerId]->cd();
+      Layer->Draw();
+    }
+ 
+    fModuleInfo = fDigiPar->GetModule(fModuleHitMapIt->first);
+    const Int_t nSec = fModuleInfo->GetNofSectors();
+    Int_t global_Row = 0;
+    TVector3 padPos;
+    TVector3 padSize;
+    for (Int_t s = 0; s < nSec; s++){
+      const Int_t nRow = fModuleInfo->GetNofRowsInSector(s);
+      const Int_t nCol = fModuleInfo->GetNofColumnsInSector(s);
+      for (Int_t r = 0; r < nRow; r++){
+	for (Int_t c = 0; c < nCol; c++){
+	  fModuleInfo->GetPosition(fModuleHitMapIt->first, s, c, r, padPos, padSize);// padPos local or global???
+	  Double_t local_min[3] = {padPos[0]-0.5*padSize[0], padPos[1]-0.5*padSize[1], padPos[2]};
+	  Double_t local_max[3] = {padPos[0]+0.5*padSize[0], padPos[1]+0.5*padSize[1], padPos[2]};
+	  if (fModuleInfo->GetOrientation() == 1 || fModuleInfo->GetOrientation() == 3){ // Pad size is in local coordinate system where position is in global coordinate system
+	    local_min[0] = padPos[0]-0.5*padSize[1];
+	    local_min[1] = padPos[1]-0.5*padSize[0];
+	    local_max[0] = padPos[0]+0.5*padSize[1];
+	    local_max[1] = padPos[1]+0.5*padSize[0];
+	  }
+	  for (Int_t i = 0; i < 3; i++) {
+	    //global_min[i] *= 10.;
+	    //global_max[i] *= 10.;
+	    local_min[i] *= 10.;
+	    local_max[i] *= 10.;
+	  }
+	  Double_t rate = fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1) / Double_t(fEventCounter->GetEntries());// * fEventRate;
+	  TBox *pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
+	  //printf("    %i %i %i  (%f, %f)   (%f, %f)   %f\n",s,r,c,local_min[0],local_min[1],global_min[0],global_min[1],rate);
+	  pad->SetLineColor(0);
+	  pad->SetLineWidth(0);	
+	  Int_t color(0), j(0);
+	  while ((rate > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	    //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	    j++;
+	  }
+	  //printf ("%i<%i %i    %E <= %E\n\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	  pad->SetFillColor(fColors[j]);
+	  if (j >= fZLevel.size() || rate > max)
+	    pad->SetFillColor(12);
+	  LayerMap[LayerId]->cd();
+	  pad->Draw("same");
+	}
+	global_Row++;
+      }
+    }
+    TBox *module = new TBox(fModuleInfo->GetX()*10-fModuleInfo->GetSizeX()*10,
+			    fModuleInfo->GetY()*10-fModuleInfo->GetSizeY()*10,
+			    fModuleInfo->GetX()*10+fModuleInfo->GetSizeX()*10,
+			    fModuleInfo->GetY()*10+fModuleInfo->GetSizeY()*10);
+    module->SetFillStyle(0);
+    LayerMap[LayerId]->cd();
+    module->Draw("same");
+  }
+  gDirectory->Cd("..");
+  for (LayerMapIt = LayerMap.begin();
+       LayerMapIt != LayerMap.end(); ++LayerMapIt) {
+    LayerMapIt->second->Write("", TObject::kOverwrite);
+    fStation =  LayerMapIt->first / 4 + 1;  // OK for SIS100 and SIS300
+    fLayer   =  LayerMapIt->first % 4 + 1;  // 
+    name.Form("pics/CbmTrdHitDensityQa_S%i_L%i.png",fStation,fLayer);
+    LayerMapIt->second->SaveAs(name);
+    name.ReplaceAll("png","pdf");
+    LayerMapIt->second->SaveAs(name);
+  }
+  gDirectory->Cd("..");
 }
 
-    // -----   Public method EndOfEvent   --------------------------------------
+  // -----   Public method EndOfEvent   --------------------------------------
 void CbmTrdHitDensityQa::FinishEvent() {
-  //  cout<<"In CbmTrdHitDensityQa::FinishEvent()"<<endl;
-  if (fClusterHits) fClusterHits->Clear();
+  if (fDigis)
+    fDigis->Delete();
+  fUsedDigiMap.clear();
 }
-    // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
 
-ClassImp(CbmTrdHitDensityQa)
+  ClassImp(CbmTrdHitDensityQa)

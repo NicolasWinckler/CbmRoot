@@ -23,7 +23,7 @@ void checkFieldMap ()
 //    TString  fieldName = "FieldProtvino";
 //    TString  fieldName = "FieldV04Pavel";
 // //   TString  fieldName = "FieldActive_PDS";
-  TString fieldName = "FieldMuonMagnet";
+  TString fieldName = "field_v12b";
   //  TString fieldName = "FieldHermes";
    TString psFile = "check." + fieldName + ".ps";
   Double_t fzref1 =   0.;        // Origin plane
@@ -57,30 +57,8 @@ void checkFieldMap ()
 
 
   // -------  Get magnetic field  -----------------------------------------
-  CbmFieldMap* field = NULL;
-  if ( fieldName == "FieldActive" || fieldName == "FieldIron"|| fieldName == "FieldMuonMagnet" ) 
-    field = new CbmFieldMapSym3(fieldName.Data());
-  else 
-    {
-      if (fieldName == "FieldSC_16x13" || fieldName == "FieldSCmuon_16x13" || fieldName == "FieldSC" 
-	  //	  ||  fieldName == "FieldAlligator" || fieldName == "FieldDipole" || 
-	  //	  fieldName == "FieldHera" || fieldName == "FieldHeraP" || fieldName == "FieldHeraS" || fieldName == "FieldHermes"
-	  )
-	field = new CbmFieldMapSym2(fieldName.Data());
-      else 
-	{  
-	  if ( fieldName == "FieldV04Pavel" ) 
-	    field = new CbmFieldMap(fieldName.Data());
-	  else 
-	    {
-	      //	if (fieldName == "FieldActive_PDS")
-	      //	  field = new CbmFieldMapSym3PosDepScaled("FieldActive");
-	      //	else
-	      cout << "=====> ERROR: Field map " << fieldName << " unknown!" << endl;
-	      exit;
-	    }
-	}
-    }
+  CbmFieldMap* field = new CbmFieldMapSym3(fieldName.Data());
+  
   field->Init();
   field->Print();
 

@@ -38,8 +38,8 @@ Double_t gkStripPitchFront = 0.0058;
 Double_t gkStripPitchBack  = 0.0058;
 
 // ---> Strip stereo angle on front and back side
-Double_t gkStereoFront =  -8.;
-Double_t gkStereoBack  =   8.;
+Double_t gkStereoFront =  0.;
+Double_t gkStereoBack  =  7.5;
 
 // ---> Geometry and digitisation tags
 TString gkGeoTag = "v12b";
@@ -59,8 +59,8 @@ TGeoManager*   geoMan           = NULL;  // will be set later
 // ============================================================================
 // ======                         Main function                           =====
 // ============================================================================
-void create_stsdigipar_v12(const char* geoTag = gkGeoTag,
-						   const char* digiTag = gkDigiTag)
+void create_stsdigipar_v12(const char* geoTag  = gkGeoTag,
+                           const char* digiTag = gkDigiTag)
 {
 
   // ---> Open parameter file

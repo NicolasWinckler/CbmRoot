@@ -496,8 +496,10 @@ void CbmTrdQa::Exec(Option_t * option)
       point = (CbmTrdPoint*) fPoints->At(iPoint);
       fdEdxPoint->Fill(point->GetEnergyLoss());
       moduleAddress = point->GetDetectorID();
-      Station  = 0;//fGeoHandler->GetStation(moduleId);
-      Layer    = CbmTrdAddress::GetLayerId(moduleAddress);//fGeoHandler->GetLayer(moduleId);
+      Station  = CbmTrdAddress::GetLayerId(moduleAddress) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Layer    = CbmTrdAddress::GetLayerId(moduleAddress) % 4 + 1;//fGeoHandler->GetLayer(moduleId);
+      //Station  = 0;//fGeoHandler->GetStation(moduleId);
+      //Layer    = CbmTrdAddress::GetLayerId(moduleAddress);//fGeoHandler->GetLayer(moduleId);
       //printf ("P det: %i S%i L%i  \n",moduleId,Station,Layer);//GetDetId()); 
       combiId = 10 * Station + Layer;
       iTrack = point->GetTrackID();

@@ -227,9 +227,10 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
     
     Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());//digi->GetDetId();
-    Int_t Station  = 0;//fGeoHandler->GetStation(moduleId);
-    Int_t Layer    = CbmTrdAddress::GetLayerId(moduleAddress);//fGeoHandler->GetLayer(moduleId);
+    Int_t Station  = CbmTrdAddress::GetLayerId(moduleAddress) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+    Int_t Layer    = CbmTrdAddress::GetLayerId(moduleAddress) % 4 + 1;//fGeoHandler->GetLayer(moduleId);
     Int_t combiId = 10 * Station + Layer;
+    //printf("Station %i Layer %i combiId %i\n", Station, Layer, combiId);
     fModuleInfo = fDigiPar->GetModule(moduleAddress);
     Int_t nRows = fModuleInfo->GetNofRows();
     Int_t nCols = fModuleInfo->GetNofColumns();
@@ -256,11 +257,13 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
       }
       if (fLayerOccupancyMap.find(combiId) == fLayerOccupancyMap.end()){
 	title.Form("S%i_L%i",Station,Layer);
+	printf("   new %s\n",title.Data());
 	//fLayerOccupancyMap[combiId] = new TH2F(title,title,1200,-600,600,1000,-500,500);
 	fLayerOccupancyMap[combiId] = new TCanvas(title,title,1200,1000);
 	fLayerOccupancyMap[combiId]->cd();
 	fLayerDummy->DrawCopy("");
 	title.Form("Station%i_Layer%i",Station,Layer);
+	printf("       new %s\n",title.Data());
 	fLayerAverageOccupancyMap[combiId] = new TProfile(title,title,1e6,0,1.0e-3);
 	fLayerAverageOccupancyMap[combiId]->SetYTitle("Average layer occupancy [%]");
 	fLayerAverageOccupancyMap[combiId]->SetXTitle("Trigger threshold");
@@ -272,7 +275,7 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
       if (fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin,iyBin) == 0)
 	fModuleOccupancyMap[moduleAddress]->Fill(iCol,iRow);
       if(fNeigbourReadout) {
-	if (nCols > nRows) { // Neigbour readout only along the short pad size direction
+	if (nCols > nRows) { // Neigbour readout does not depend on a signal on the neighbouring channel
 	  if (ixBin > 1 && fModuleOccupancyMap[moduleAddress]->GetBinContent(ixBin-1,iyBin) == 0){//left
 	    fModuleOccupancyMap[moduleAddress]->Fill(iCol-1,iRow);
 	    digiCounter++;
@@ -377,6 +380,36 @@ void CbmTrdOccupancyQa::CreateLayerView()
     text->SetFillStyle(1001);
     text->SetLineColor(1);
     Int_t maxCol = 4;
+   if (occupancy > 0 && occupancy <= 2.5)
+      text->SetFillColor(kViolet
+			 //+Int_t((occupancy-0)/6.*maxCol)
+			 );
+    if (occupancy > 2.5 && occupancy <= 5){
+      text->SetFillColor(kAzure
+			 //+Int_t((occupancy-6)/6.*maxCol)
+			 );
+      text->SetTextColor(kWhite);
+    }
+    if (occupancy > 5 && occupancy <= 7.5)
+      text->SetFillColor(kTeal
+			 //+Int_t((occupancy-12)/6.*maxCol)
+			 );
+    if (occupancy > 7.5 && occupancy <= 10)
+      text->SetFillColor(kSpring
+			 //+Int_t((occupancy-18)/6.*maxCol)
+			 );
+    if (occupancy > 10 && occupancy <= 12.5)
+      text->SetFillColor(kYellow
+			 //+Int_t((occupancy-24)/6.*maxCol)
+			 );
+    if (occupancy > 12.5 && occupancy <= 15)
+      text->SetFillColor(kOrange
+			 //+Int_t((occupancy-24)/6.*maxCol)
+			 );
+    if (occupancy > 15)
+      text->SetFillColor(kRed);
+
+    /*
     if (occupancy > 0 && occupancy <= 5)
       text->SetFillColor(kViolet
 			 //+Int_t((occupancy-0)/6.*maxCol)
@@ -405,6 +438,7 @@ void CbmTrdOccupancyQa::CreateLayerView()
 			 );
     if (occupancy > 30)
       text->SetFillColor(kRed);
+    */
     fLayerOccupancyMap[fModuleMap[fModuleOccupancyMemoryMapIt->first]->Station*10+fModuleMap[fModuleOccupancyMemoryMapIt->first]->Layer]->cd();
     //b->Draw("same");
     //text->SetFillStyle(0);

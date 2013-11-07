@@ -269,13 +269,13 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   gStyle->SetNumberContours(99); 
   //TH2::SetContour(99); 
   /*
-  const Int_t Number = 11;
-  Double_t r[Number] =      {1.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 1.00, 0.50, 1.00};
-  Double_t g[Number] =      {0.00, 0.00, 0.00, 0.50, 1.00, 1.00, 1.00, 1.00, 1.00, 0.50, 1.00};
-  Double_t b[Number] =      {1.00, 1.00, 1.00, 1.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.50, 1.00};
-  Double_t length[Number] = {0.00, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00};
-  Int_t nb = 99;
-  Int_t a = TColor::CreateGradientColorTable(Number,length,r,g,b,nb);
+    const Int_t Number = 11;
+    Double_t r[Number] =      {1.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 1.00, 0.50, 1.00};
+    Double_t g[Number] =      {0.00, 0.00, 0.00, 0.50, 1.00, 1.00, 1.00, 1.00, 1.00, 0.50, 1.00};
+    Double_t b[Number] =      {1.00, 1.00, 1.00, 1.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.50, 1.00};
+    Double_t length[Number] = {0.00, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00};
+    Int_t nb = 99;
+    Int_t a = TColor::CreateGradientColorTable(Number,length,r,g,b,nb);
   */
   printf("Introduction:\n");
   HitRateGeoPara2 *GeoPara = new HitRateGeoPara2;
@@ -332,13 +332,13 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
     }
   }
   /*
-  for (Int_t i = 0; i < 8; i++){
+    for (Int_t i = 0; i < 8; i++){
     fColors.push_back(19-i);
     fZLevel.push_back(ZRangeL + (i+1) * ((ZRangeU - ZRangeL) / 9));
     printf("%2i %3i %f\n",i,fColors[i],fZLevel[i]);
-  }
- fColors.push_back(1);
- fZLevel.push_back(ZRangeL + (9) * ((ZRangeU - ZRangeL) / 9));
+    }
+    fColors.push_back(1);
+    fZLevel.push_back(ZRangeL + (9) * ((ZRangeU - ZRangeL) / 9));
   */ 
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
     fColors.push_back(TColor::GetColorPalette(i));
@@ -420,8 +420,8 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   LiSi.push_back(Plane09);
   LiSi.push_back(Plane10);
 
-  Char_t OutFile1[200];
-  Char_t OutFile2[200];
+  TString OutFile1;
+  TString OutFile2;
 
   TImage *Outimage1;
   TImage *Outimage2;
@@ -453,8 +453,8 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
       h2Topview[1]->Reset();
       h2Topview[2]->Reset();
 
-      sprintf(OutFile1,"pics/HitRateLayerPadView_S%d_L%d.png", fStation,fLayer);
-      sprintf(OutFile2,"pics/HitRateLayerSpectrum_S%d_L%d.png",fStation,fLayer);
+      OutFile1.Form("pics/HitRateLayerPadView_S%d_L%d.png", fStation,fLayer);
+      OutFile2.Form("pics/HitRateLayerSpectrum_S%d_L%d.png",fStation,fLayer);
 
       HistoInit(c1, c2, h2Layer, h1HitPad, ZRangeL, ZRangeU, mm2bin);
 
@@ -469,23 +469,25 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
       /*
         GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
 
-      if(fDraw)
-      {
+	if(fDraw)
+	{
 	c1->cd(1)->SetLogz(1);
 	h2Layer->Draw("colz");  // draw layer view
-      }
+	}
 
-      Lines = true;
-      for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
+	Lines = true;
+	for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
 	ScanPlane();
-      GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
+	GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
       */
       if(fDraw)  // dump png file for this layer
-      {
-	Outimage1 = TImage::Create();
-	Outimage1->FromPad(c1);
-	Outimage1->WriteImage(OutFile1);
-      }
+	{
+	  Outimage1 = TImage::Create();
+	  Outimage1->FromPad(c1);
+	  Outimage1->WriteImage(OutFile1);
+	  OutFile1.ReplaceAll("png","pdf");
+	  c1->SaveAs(OutFile1);
+	}
 
       if(fDraw){
 	delete c1;
@@ -494,6 +496,8 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 	Outimage2 = TImage::Create();
 	Outimage2->FromPad(c2);
 	Outimage2->WriteImage(OutFile2);
+	OutFile1.ReplaceAll("png","pdf");
+	c2->SaveAs(OutFile2);
       }
 
       /*
@@ -520,9 +524,9 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   if(fDraw)
     c0->Update();
 
-//  // write modules histos to file
-//  for (Int_t i = 0; i < NofModules; i++)
-//    Module[i]->Write("", TObject::kOverwrite);
+  //  // write modules histos to file
+  //  for (Int_t i = 0; i < NofModules; i++)
+  //    Module[i]->Write("", TObject::kOverwrite);
 
   //  tFile->Close();  // this causes a segfalut
 }
@@ -1079,7 +1083,7 @@ Double_t CbmTrdHitRateFastQa::CalcHitRatePad(const Double_t x_min, const Double_
   for (Int_t yStep = 0; yStep < ySteps; yStep++) {
     x = x_min + 0.5;
     for (Int_t xStep = 0; xStep < xSteps; xStep++) {
-      r = sqrt( pow(x/1.5, 2) + pow(y,2));
+      r = sqrt( pow(x, 2) + pow(y,2));
       alpha = atan(r/z)*1000.; //[mrad]
       HitRate += // fit including errors
 	exp(4.536355e00 + -8.393716e-03 * alpha) + 

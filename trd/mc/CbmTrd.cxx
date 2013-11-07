@@ -251,10 +251,12 @@ TClonesArray* CbmTrd::GetCollection(
 // -----   Public method Print   ----------------------------------------------
 void CbmTrd::Print() const
 {
-   Int_t nofPoints = fTrdPoints->GetEntriesFast();
-   LOG(INFO) << "CbmTrd: " << nofPoints << " points registered in this event." << endl;
-   if (fVerboseLevel > 1)
-      for (Int_t i = 0; i < nofPoints; i++) (*fTrdPoints)[i]->Print();
+  Int_t nHits = fTrdPoints->GetEntriesFast();
+  LOG(INFO) << "CbmTrd : " << nHits << " points registered in this event." << FairLogger::endl;
+
+  if (fVerboseLevel > 1)
+    for (Int_t i=0; i<nHits; i++)
+      (*fTrdPoints)[i]->Print();
 }
 // ----------------------------------------------------------------------------
 

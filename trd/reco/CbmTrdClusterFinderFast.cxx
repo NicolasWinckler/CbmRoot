@@ -38,6 +38,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fMinimumChargeTH(1.0e-06),//1.0e-08),
    fMultiHit(false),//true),
    fRowClusterMerger(true),//false),
+   fNeighbourRowTrigger(true),
    fNeighbourReadout(true)
 {
 }
@@ -52,6 +53,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t Neighbo
    fMinimumChargeTH(MinimumChargeTH),
    fMultiHit(MultiHit),
    fRowClusterMerger(RowClusterMerger),
+   fNeighbourRowTrigger(true),
    fNeighbourReadout(NeighbourReadout)
 {
 }
@@ -124,7 +126,21 @@ InitStatus CbmTrdClusterFinderFast::Init()
   
 } 
 // --------------------------------------------------------------------
-
+void CbmTrdClusterFinderFast::SetTriggerThreshold(Double_t minCharge){
+  fMinimumChargeTH = minCharge;//  To be used for test beam data processing
+}
+// --------------------------------------------------------------------
+void CbmTrdClusterFinderFast::SetNeighbourTrigger(Bool_t trigger){
+  fNeighbourReadout = trigger;//  
+}
+// --------------------------------------------------------------------
+void CbmTrdClusterFinderFast::SetNeighbourRowTrigger(Bool_t trigger){
+  fNeighbourRowTrigger = trigger;//
+}
+// --------------------------------------------------------------------
+void CbmTrdClusterFinderFast::SetPrimaryClusterRowMerger(Bool_t rowMerger){
+  fRowClusterMerger = rowMerger;
+}
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
@@ -134,11 +150,11 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   Int_t counterI = 0;
   Int_t counterJ = 0;
   Float_t mRMax = 0;//7500;
-  Bool_t dynamic = false;//true;
+  Bool_t dynamic = false;//true;  
   Bool_t optimization = false;//true;//false;//
   if (optimization) {
     dynamic = false;
-    fRowClusterMerger = true;
+    //fRowClusterMerger = true;
     cout << "  minimum charge threshold optimization run" << endl <<"  fRowClusterMerger: on" << endl;
   }
   else {
@@ -344,19 +360,20 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	Float_t mR = sqrt(pow(mPosXC,2) + pow(mPosYC,2));
 	counterJ++;
 	if (mR > mRMax) {
-	  fRowClusterMerger = true;
+	  //fRowClusterMerger = true;
 	  counterI++;
 	  //cout << it->first << "   "<< mR << endl;
 	}
 	else {
-	  fRowClusterMerger = false;
+	  //fRowClusterMerger = false;
 	  //cout << "  " << it->first << "   " << mR <<endl;
 	}
       }
       //if (it->first==5)
       fModClusterMap[it->first] = clusterModule(it->second/*, ModuleNeighbourDigiMap[it->first]*/);
       //drawCluster(it->first, fModClusterMap[it->first]);
-      addNeighbourDigis(fDigiPar->GetModule(it->first)->GetNofColumns(), fModClusterMap[it->first], ModuleNeighbourDigiMap[it->first]);
+      if (fNeighbourReadout)
+	addNeighbourDigis(fDigiPar->GetModule(it->first)->GetNofColumns(), fModClusterMap[it->first], ModuleNeighbourDigiMap[it->first]);
     }
     //cout << "addCluster(fModClusterMap)" << endl;
     addCluster(fModClusterMap);
@@ -441,8 +458,8 @@ bool digiSorter(MyDigi *a, MyDigi *b)
 void CbmTrdClusterFinderFast::addNeighbourDigis(Int_t nCol, ClusterList *clusters, MyDigiList *neighbours)
 {
   Int_t activeCombiId(0), testCombiId(0);
-  Int_t activeRow(0), firstRow(0);
-  Int_t activeCol(0), firstCol(0);
+  Int_t activeRow(0), firstRow(0), lastRow(0);
+  Int_t activeCol(0), firstCol(0), lastCol(0);
 
   neighbours->sort(digiSorter);
 
@@ -459,21 +476,31 @@ void CbmTrdClusterFinderFast::addNeighbourDigis(Int_t nCol, ClusterList *cluster
       //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
       //nRow = (activeCombiId - activeCol) / activeRow - 1;
       //printf("%i %i %i %i\n",activeCombiId,activeRow,activeCol,nRow);
-      if (activeCol > 0)
-	firstCol = activeCol-1;
-      else 
-	firstCol = 0;
-      if (activeRow > 0)
-	firstRow = activeRow-1;
-      else
-	firstRow = 0;
-
+      lastCol = activeCol+1;
+      if(fNeighbourRowTrigger){
+	lastRow = activeRow+1;
+	if (activeCol > 0)
+	  firstCol = activeCol-1;
+	else 
+	  firstCol = 0;
+	if (activeRow > 0)
+	  firstRow = activeRow-1;
+	else
+	  firstRow = 0;
+      } else {
+	firstRow = activeRow;
+	lastRow = activeRow;
+	if (activeCol > 0)
+	  firstCol = activeCol-1;
+	else 
+	  firstCol = 0;
+      }
       //cout << " " << activeCombiId << endl;
       /*
        * walk around the active digi and test if neigbours are already included in second list. second list is used to avoid neighbours of neighbours to be included
        */
-      for (Int_t iRow = firstRow; iRow <= activeRow+1; iRow++){
-	for (Int_t iCol = firstCol; iCol <= activeCol+1; iCol++){
+      for (Int_t iRow = firstRow; iRow <= lastRow; iRow++){
+	for (Int_t iCol = firstCol; iCol <= lastCol; iCol++){
 	  Bool_t alreadyInList = false;
 	  testCombiId = iRow * (nCol+1) + iCol;
 	  //cout << testCombiId;
@@ -553,9 +580,9 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis/*, MyDigiL
        * (and merged to the clusters of the previous row) 
        * if a break between the activ digi and the currentCluster is found.
        */
-      //if (fRowClusterMerger) {
-      mergeRowCluster(currentCluster, &openList);
-      //}
+      if (fRowClusterMerger) {
+	mergeRowCluster(currentCluster, &openList);
+      }
       currentList.push_back(currentCluster);
  
       if ((*it)->rowId > currentCluster->row) {

@@ -189,15 +189,18 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   Int_t nCluster = fClusters->GetEntries(); // Number of clusters found by CbmTrdClusterFinderFast
   cout << " Found " << nCluster << " Cluster in Collection" << endl;
 
-  for (Int_t iCluster = 0; iCluster < nCluster; iCluster++) {
-    //cout << iCluster << endl;
-    CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
-    fClusterId = iCluster;
-    CenterOfCharge(cluster);
+  if (nCluster > 0)
+    for (Int_t iCluster = 0; iCluster < nCluster; iCluster++) {
+      //cout << iCluster << endl;
+      CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
+      fClusterId = iCluster;
+      CenterOfCharge(cluster);
 
-  }  
-
-  printf("\n   Created %i TrdHits  %7.3f Hits/Cluster\n",fHitCounter, Double_t(fHitCounter/nCluster));
+    }  
+  if (nCluster > 0)
+    printf("\n   Created %i TrdHits  %7.3f Hits/Cluster\n",fHitCounter, Double_t(fHitCounter/nCluster));
+  else
+    printf("\n   Created %i TrdHits \n",fHitCounter);
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -241,6 +244,7 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
       hit_posV[iDim] += local_pad_posV[iDim] * iCharge;
     }
   }
+  //delete digi;
   //printf("secId %i\n",CbmTrdAddress::GetSectorId(digi->GetAddress()));
   Double_t hit_pos[3];
   for (Int_t iDim = 0; iDim < 3; iDim++){

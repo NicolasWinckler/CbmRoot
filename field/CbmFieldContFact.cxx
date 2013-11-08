@@ -8,6 +8,7 @@
 
 #include "FairParSet.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include <iostream>
 

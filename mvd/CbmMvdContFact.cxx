@@ -18,6 +18,7 @@
 #include "FairParAsciiFileIo.h"
 #include "FairParIo.h"
 #include "FairParGenericSet.h"
+#include "FairLogger.h"
 
 #include "TClass.h"
 

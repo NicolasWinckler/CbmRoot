@@ -5,8 +5,10 @@
 
 #include "CbmUrqmdGenerator.h"
 
-#include "FairPrimaryGenerator.h"
 #include "CbmMCEventHeader.h"
+
+#include "FairPrimaryGenerator.h"
+#include "FairLogger.h"
 
 #include "TLorentzVector.h"
 #include "TMath.h"

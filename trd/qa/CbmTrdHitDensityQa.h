@@ -48,8 +48,12 @@ class CbmTrdHitDensityQa : public FairTask
   /** Finish task **/
   virtual void Finish();
   void Register();
+  void SetTriggerThreshold(Double_t triggerthreshold);
+  void SetNeighbourTrigger(Bool_t trigger);
 
  private:
+
+  Bool_t fNeighbourTrigger;
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters; 

@@ -87,11 +87,12 @@ class CbmTrdOccupancyQa : public FairTask {
   void CopyEvent2MemoryMap();
   void SetNeighbourReadout(Bool_t neighbourReadout);
   void SetTriggerThreshold(Double_t triggerthreshold);
-
+  void SetNeighbourTrigger(Bool_t trigger);
  private:
   CbmTrdOccupancyQa& operator=(const CbmTrdOccupancyQa&);
   CbmTrdOccupancyQa(const CbmTrdOccupancyQa&);
   TClonesArray *fDigis; //! TRD digis
+  TClonesArray*     fClusters; 
   CbmTrdDigiPar  *fDigiPar;    //!
   CbmTrdModule   *fModuleInfo; //!
   CbmTrdGeoHandler* fGeoHandler; //!

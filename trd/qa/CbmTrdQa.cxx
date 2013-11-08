@@ -23,6 +23,7 @@
 #include "TStopwatch.h"
 #include "TBox.h"
 #include "TPaveText.h"
+#include "TColor.h"
 #include <iostream>
 #include <cmath>
 using std::cout;
@@ -352,6 +353,9 @@ InitStatus CbmTrdQa::Init()
   fLayerDummy->GetYaxis()->SetTitleOffset(2);
   fLayerDummy->GetZaxis()->SetTitleSize(0.02);
   fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+  fLayerDummy->SetStats(kFALSE);
+  fLayerDummy->SetContour(99);
+  fLayerDummy->Fill(0.,0.,0.);
   fDistanceMcToHit = new TH1I("DistanceMcToHit", "DistanceMcToHit", 1500, 0, 150);
   fDistanceMcToHit->SetXTitle("#Delta r (MC-Hit) pairs [cm]");
   fDistanceMcToHit->SetYTitle("#");
@@ -524,7 +528,7 @@ void CbmTrdQa::Exec(Option_t * option)
       if (fLayerMap.find(combiId) == fLayerMap.end()){
 	title.Form("Station%i_Layer%i",Station,Layer);
 	fLayerMap[combiId] =  new TCanvas(title,title,1200,1000);
-	fLayerDummy->DrawCopy();
+	fLayerDummy->Draw("colz");
       }
     }
   }
@@ -537,8 +541,8 @@ void CbmTrdQa::Exec(Option_t * option)
       //fPointsPerDigi->Fill((Int_t)digi->GetMCIndex().size());
       fdEdxDigi->Fill(digi->GetCharge());
       moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());//digi->GetDetId();
-      Station  = 0;//fGeoHandler->GetStation(moduleAddress);
-      Layer    = CbmTrdAddress::GetLayerId(moduleAddress);//fGeoHandler->GetLayer(moduleAddress);
+      Station  = CbmTrdAddress::GetLayerId(moduleAddress) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Layer    = CbmTrdAddress::GetLayerId(moduleAddress) % 4 + 1;//fGeoHandler->GetLayer(moduleId);
       //printf ("D det: %i S%i L%i  \n",moduleAddress,Station,Layer);//GetDetId()); 
       combiId = 10 * Station + Layer;
       fModuleInfo = fDigiPar->GetModule(moduleAddress);
@@ -548,7 +552,7 @@ void CbmTrdQa::Exec(Option_t * option)
       if (fLayerMap.find(combiId) == fLayerMap.end()){
 	title.Form("Station%i_Layer%i",Station,Layer);
 	fLayerMap[combiId] =  new TCanvas(title,title,1200,1000);
-	fLayerDummy->DrawCopy();
+	fLayerDummy->Draw("colz");
       }
     }
   }
@@ -596,9 +600,8 @@ void CbmTrdQa::Exec(Option_t * option)
       hit = (CbmTrdHit*) fHits->At(iHit);
       fdEdxHit->Fill(hit->GetELoss());
       moduleAddress = hit->GetAddress();//hit->GetDetId();
-      Station  = 0;//fGeoHandler->GetStation(moduleAddress);
-      Layer    = CbmTrdAddress::GetModuleId(moduleAddress);//fGeoHandler->GetLayer(moduleAddress);
-      //printf ("H det: %i S%i L%i  \n",moduleAddress,Station,Layer);//GetDetId()); 
+      Station  = CbmTrdAddress::GetLayerId(moduleAddress) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Layer    = CbmTrdAddress::GetLayerId(moduleAddress) % 4 + 1;//fGeoHandler->GetLayer(moduleId);
       combiId = 10 * Station + Layer;
       fModuleInfo = fDigiPar->GetModule(moduleAddress);
       if (fModuleHitMap.find(moduleAddress) == fModuleHitMap.end()){
@@ -608,7 +611,7 @@ void CbmTrdQa::Exec(Option_t * option)
 	title.Form("Station%i_Layer%i",Station,Layer);
 	fLayerMap[combiId] = new TCanvas(title,title,1200,1000);
 	fLayerMap[combiId]->cd();
-	fLayerDummy->DrawCopy();
+	fLayerDummy->Draw("colz");
       }
     }
   }
@@ -824,7 +827,11 @@ void CbmTrdQa::SaveHistos()
   fLostPointVsAlpha->Write("", TObject::kOverwrite);
   fHitToPointEfficiencyVsAlpha->Write("", TObject::kOverwrite);
   fPositionResolutionShort->Write("", TObject::kOverwrite);
+  fPositionResolutionShort->DrawCopy();
+  c->SaveAs("pics/TrdQaPositionResolutionShort.pdf");
   fPositionResolutionLong->Write("", TObject::kOverwrite);
+  fPositionResolutionLong->DrawCopy();
+  c->SaveAs("pics/TrdQaPositionResolutionLong.pdf");
   fClusterSize->Write("", TObject::kOverwrite);
   fPointsPerDigi->Write("", TObject::kOverwrite);
   fDigiPerCluster->Write("", TObject::kOverwrite);
@@ -832,7 +839,7 @@ void CbmTrdQa::SaveHistos()
   fPRF_1D->Write("", TObject::kOverwrite);
   fPRF_2D->Write("", TObject::kOverwrite);
   delete l;
-gDirectory->Cd("..");
+  gDirectory->Cd("..");
 }
 void CbmTrdQa::FinishEvent()
 { 
@@ -911,6 +918,7 @@ void CbmTrdQa::GetPadInfos(Int_t moduleAddress, Double_t x, Double_t y, Int_t &i
 }
 void CbmTrdQa::CreateLayerView()
 {
+  TString title;
   /*
     for (fLayerPointMapIt = fLayerPointMap.begin();
     fLayerPointMapIt != fLayerPointMap.end(); ++fLayerPointMapIt) {
@@ -921,178 +929,265 @@ void CbmTrdQa::CreateLayerView()
     fLayerHitMapIt->second;
     } 
   */
-  gDirectory->pwd();
-  if (!gDirectory->Cd("TrdQa")) 
-    gDirectory->mkdir("TrdQa");
-  gDirectory->Cd("TrdQa");
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(20), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
 
-  TString title;
-  printf("fModuleGhostMap: %i\n",(Int_t)fModuleGhostMap.size());
-  for (fModuleGhostMapIt = fModuleGhostMap.begin();
-       fModuleGhostMapIt != fModuleGhostMap.end(); ++fModuleGhostMapIt) {
-    Double_t value = fModuleGhostMapIt->second->GetMean(1);
-    Double_t valueE = fModuleGhostMapIt->second->GetRMS(1);
-    fModuleInfo = fDigiPar->GetModule(fModuleGhostMapIt->first);
-    Int_t Station = 0;//fGeoHandler->GetStation(fModuleGhostMapIt->first);
-    Int_t Layer   = CbmTrdAddress::GetLayerId(fModuleGhostMapIt->first);//fGeoHandler->GetLayer(fModuleGhostMapIt->first);
-    Int_t combiId = 10 * Station + Layer;
-    fLayerMap[combiId]->cd();
-    if (fModuleGhostMapIt == fModuleGhostMap.begin()){
-      fLayerDummy->SetZTitle("left over hits / all points [%]");
-      fLayerDummy->DrawCopy();
-    }
-    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
-				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
-				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
-				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
-    text->SetFillStyle(1001);
-    text->SetLineColor(1);
-    if (value >= 0 && value <= 5)
-      text->SetFillColor(kViolet);
-    if (value > 5 && value <= 10){
-      text->SetFillColor(kAzure);
-      text->SetTextColor(kWhite);
-    }
-    if (value > 10 && value <= 15)
-      text->SetFillColor(kTeal);
-    if (value > 15 && value <= 20)
-      text->SetFillColor(kSpring);
-    if (value > 20 && value <= 25)
-      text->SetFillColor(kYellow);
-    if (value > 25 && value <= 30)
-      text->SetFillColor(kOrange);
-    if (value > 30)
-      text->SetFillColor(kRed);
-    title.Form("%.1f#pm%.1f",value,valueE);
-    text->AddText(title);
-    text->Draw("same");
-  }
-  gDirectory->pwd();
-  if (!gDirectory->Cd("Ghost")) 
-    gDirectory->mkdir("Ghost");
-  gDirectory->Cd("Ghost");
-  for (
-  fLayerMapIt = fLayerMap.begin();
-  fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
-  fLayerMapIt->second->Write("", TObject::kOverwrite);
-  title.Form("pics/Ghost_S%i_L%i_%s.pdf",0,CbmTrdAddress::GetLayerId(fLayerMapIt->first),fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
-  fLayerMapIt->second->SaveAs(title);
-  }
-  for (fModuleGhostMapIt = fModuleGhostMap.begin();
-       fModuleGhostMapIt != fModuleGhostMap.end(); ++fModuleGhostMapIt) {
-    fModuleGhostMapIt->second->Write("", TObject::kOverwrite);
-  }
-  gDirectory->Cd("..");
-  printf("fModuleLostMap: %i\n",(Int_t)fModuleLostMap.size());
-  for (fModuleLostMapIt = fModuleLostMap.begin();
-       fModuleLostMapIt != fModuleLostMap.end(); ++fModuleLostMapIt) {
-    Double_t value = fModuleLostMapIt->second->GetMean(1);
-    Double_t valueE = fModuleLostMapIt->second->GetRMS(1);
-    fModuleInfo = fDigiPar->GetModule(fModuleLostMapIt->first);
-    Int_t Station = 0;//fGeoHandler->GetStation(fModuleLostMapIt->first);
-    Int_t Layer   = CbmTrdAddress::GetLayerId(fModuleLostMapIt->first);//fGeoHandler->GetLayer(fModuleLostMapIt->first);
-    Int_t combiId = 10 * Station + Layer;
-    fLayerMap[combiId]->cd();
-    if (fModuleLostMapIt == fModuleLostMap.begin()){
-      fLayerDummy->SetZTitle("left over points / all points [%]");
-      fLayerDummy->DrawCopy();
-    }
-    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
-				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
-				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
-				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
-    text->SetFillStyle(1001);
-    text->SetLineColor(1);
-    if (value >= 0 && value <= 5)
-      text->SetFillColor(kViolet);
-    if (value > 5 && value <= 10){
-      text->SetFillColor(kAzure);
-      text->SetTextColor(kWhite);
-    }
-    if (value > 10 && value <= 15)
-      text->SetFillColor(kTeal);
-    if (value > 15 && value <= 20)
-      text->SetFillColor(kSpring);
-    if (value > 20 && value <= 25)
-      text->SetFillColor(kYellow);
-    if (value > 25 && value <= 30)
-      text->SetFillColor(kOrange);
-    if (value > 30)
-      text->SetFillColor(kRed);
-    title.Form("%.1f#pm%.1f",value,valueE);
-    text->AddText(title);
-    text->Draw("same");
-  }
-  gDirectory->pwd();
-  if (!gDirectory->Cd("Lost")) 
-    gDirectory->mkdir("Lost");
-  gDirectory->Cd("Lost");
+    gDirectory->pwd();
+    if (!gDirectory->Cd("TrdQa")) 
+      gDirectory->mkdir("TrdQa");
+    gDirectory->Cd("TrdQa");
 
-for (
-       fLayerMapIt = fLayerMap.begin();
-fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
-    fLayerMapIt->second->Write("", TObject::kOverwrite);
-    title.Form("pics/Lost_S%i_L%i_%s.pdf",0,CbmTrdAddress::GetLayerId(fLayerMapIt->first),fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
-    fLayerMapIt->second->SaveAs(title);
-     }
-  for (fModuleLostMapIt = fModuleLostMap.begin();
-       fModuleLostMapIt != fModuleLostMap.end(); ++fModuleLostMapIt) {
-    fModuleLostMapIt->second->Write("", TObject::kOverwrite);
-  }
-  gDirectory->Cd("..");
 
-  printf("fModuleEfficiencyMap: %i\n",(Int_t)fModuleEfficiencyMap.size());
-  for (fModuleEfficiencyMapIt = fModuleEfficiencyMap.begin();
-       fModuleEfficiencyMapIt != fModuleEfficiencyMap.end(); ++fModuleEfficiencyMapIt) {
-    Double_t value = fModuleEfficiencyMapIt->second->GetMean(1);
-    Double_t valueE = fModuleEfficiencyMapIt->second->GetRMS(1);
-    fModuleInfo = fDigiPar->GetModule(fModuleEfficiencyMapIt->first);
-    Int_t Station = 0;//fGeoHandler->GetStation(fModuleEfficiencyMapIt->first);
-    Int_t Layer   = CbmTrdAddress::GetLayerId(fModuleEfficiencyMapIt->first);//fGeoHandler->GetLayer(fModuleEfficiencyMapIt->first);
-    Int_t combiId = 10 * Station + Layer;
-    fLayerMap[combiId]->cd();
-    if (fModuleEfficiencyMapIt == fModuleEfficiencyMap.begin()){
-      fLayerDummy->SetZTitle("found point hit pairs / all points [%]");
-      fLayerDummy->DrawCopy();
+    printf("fModuleGhostMap: %i\n",(Int_t)fModuleGhostMap.size());
+    for (fModuleGhostMapIt = fModuleGhostMap.begin();
+	 fModuleGhostMapIt != fModuleGhostMap.end(); ++fModuleGhostMapIt) {
+      Double_t value = fModuleGhostMapIt->second->GetMean(1);
+      Double_t valueE = fModuleGhostMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleGhostMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleGhostMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleGhostMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleGhostMapIt == fModuleGhostMap.begin()){
+	fLayerDummy->SetZTitle("left over hits / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				      fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				      fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				      fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);
+
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      /*
+	if (value >= 0 && value <= 5)
+	text->SetFillColor(kViolet);
+	if (value > 5 && value <= 10){
+	text->SetFillColor(kAzure);
+	text->SetTextColor(kWhite);
+	}
+	if (value > 10 && value <= 15)
+	text->SetFillColor(kTeal);
+	if (value > 15 && value <= 20)
+	text->SetFillColor(kSpring);
+	if (value > 20 && value <= 25)
+	text->SetFillColor(kYellow);
+	if (value > 25 && value <= 30)
+	text->SetFillColor(kOrange);
+	if (value > 30)
+	text->SetFillColor(kRed);
+      */
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
     }
-    TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
-				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
-				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
-				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
-    text->SetFillStyle(1001);
-    text->SetLineColor(1);
-    if (value >= 0 && value <= 12.5)
-      text->SetFillColor(kViolet);
-    if (value > 12.5 && value <= 25){
-      text->SetFillColor(kAzure);
-      text->SetTextColor(kWhite);
-    }
-    if (value > 0 && value <= 50)
-      text->SetFillColor(kTeal);
-    if (value > 50 && value <= 70)
-      text->SetFillColor(kSpring);
-    if (value > 70 && value <= 80)
-      text->SetFillColor(kYellow);
-    if (value > 80 && value <= 90)
-      text->SetFillColor(kOrange);
-    if (value > 90)
-      text->SetFillColor(kRed);
-    title.Form("%.1f#pm%.1f",value,valueE);
-    text->AddText(title);
-    text->Draw("same");
   }
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(20), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+    gDirectory->pwd();
+    if (!gDirectory->Cd("Ghost")) 
+      gDirectory->mkdir("Ghost");
+    gDirectory->Cd("Ghost");
+    for (
+	 fLayerMapIt = fLayerMap.begin();
+	 fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+      fLayerMapIt->second->Write("", TObject::kOverwrite);
+      title.Form("pics/Ghost_S%i_L%i_%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+      fLayerMapIt->second->SaveAs(title);
+      title.ReplaceAll("pdf","png");
+      fLayerMapIt->second->SaveAs(title);
+    }
+    for (fModuleGhostMapIt = fModuleGhostMap.begin();
+	 fModuleGhostMapIt != fModuleGhostMap.end(); ++fModuleGhostMapIt) {
+      fModuleGhostMapIt->second->Write("", TObject::kOverwrite);
+    }
+    gDirectory->Cd("..");
+    printf("fModuleLostMap: %i\n",(Int_t)fModuleLostMap.size());
+    for (fModuleLostMapIt = fModuleLostMap.begin();
+	 fModuleLostMapIt != fModuleLostMap.end(); ++fModuleLostMapIt) {
+      Double_t value = fModuleLostMapIt->second->GetMean(1);
+      Double_t valueE = fModuleLostMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleLostMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleLostMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleLostMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);    
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleLostMapIt == fModuleLostMap.begin()){
+	fLayerDummy->SetZTitle("left over points / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				      fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				      fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				      fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+      /*
+
+	if (value >= 0 && value <= 5)
+	text->SetFillColor(kViolet);
+	if (value > 5 && value <= 10){
+	text->SetFillColor(kAzure);
+	text->SetTextColor(kWhite);
+	}
+	if (value > 10 && value <= 15)
+	text->SetFillColor(kTeal);
+	if (value > 15 && value <= 20)
+	text->SetFillColor(kSpring);
+	if (value > 20 && value <= 25)
+	text->SetFillColor(kYellow);
+	if (value > 25 && value <= 30)
+	text->SetFillColor(kOrange);
+	if (value > 30)
+	text->SetFillColor(kRed);
+      */
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+  
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(100), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+    gDirectory->pwd();
+    if (!gDirectory->Cd("Lost")) 
+      gDirectory->mkdir("Lost");
+    gDirectory->Cd("Lost");
+
+    for (
+	 fLayerMapIt = fLayerMap.begin();
+	 fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+      fLayerMapIt->second->Write("", TObject::kOverwrite);
+      title.Form("pics/Lost_S%i_L%i_%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+      fLayerMapIt->second->SaveAs(title);
+      title.ReplaceAll("pdf","png");
+      fLayerMapIt->second->SaveAs(title);
+    }
+    for (fModuleLostMapIt = fModuleLostMap.begin();
+	 fModuleLostMapIt != fModuleLostMap.end(); ++fModuleLostMapIt) {
+      fModuleLostMapIt->second->Write("", TObject::kOverwrite);
+    }
+    gDirectory->Cd("..");
+
+    printf("fModuleEfficiencyMap: %i\n",(Int_t)fModuleEfficiencyMap.size());
+    for (fModuleEfficiencyMapIt = fModuleEfficiencyMap.begin();
+	 fModuleEfficiencyMapIt != fModuleEfficiencyMap.end(); ++fModuleEfficiencyMapIt) {
+      Double_t value = fModuleEfficiencyMapIt->second->GetMean(1);
+      Double_t valueE = fModuleEfficiencyMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleEfficiencyMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleEfficiencyMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleEfficiencyMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleEfficiencyMapIt == fModuleEfficiencyMap.begin()){
+	fLayerDummy->SetZTitle("found point hit pairs / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				      fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				      fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				      fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+      /*
+	if (value >= 0 && value <= 12.5)
+	text->SetFillColor(kViolet);
+	if (value > 12.5 && value <= 25){
+	text->SetFillColor(kAzure);
+	text->SetTextColor(kWhite);
+	}
+	if (value > 0 && value <= 50)
+	text->SetFillColor(kTeal);
+	if (value > 50 && value <= 70)
+	text->SetFillColor(kSpring);
+	if (value > 70 && value <= 80)
+	text->SetFillColor(kYellow);
+	if (value > 80 && value <= 90)
+	text->SetFillColor(kOrange);
+	if (value > 90)
+	text->SetFillColor(kRed);
+      */
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+ 
   gDirectory->pwd();
   if (!gDirectory->Cd("Efficiency")) 
     gDirectory->mkdir("Efficiency");
   gDirectory->Cd("Efficiency");
 
-for (
+  for (
        fLayerMapIt = fLayerMap.begin();
-fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
     fLayerMapIt->second->Write("", TObject::kOverwrite);
-    title.Form("pics/Efficiency_S%i_L%i_%s.pdf",0,CbmTrdAddress::GetLayerId(fLayerMapIt->first),fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    title.Form("pics/Efficiency_S%i_L%i_%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
     fLayerMapIt->second->SaveAs(title);
-     }
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
   for (fModuleEfficiencyMapIt = fModuleEfficiencyMap.begin();
        fModuleEfficiencyMapIt != fModuleEfficiencyMap.end(); ++fModuleEfficiencyMapIt) {
     fModuleEfficiencyMapIt->second->Write("", TObject::kOverwrite);

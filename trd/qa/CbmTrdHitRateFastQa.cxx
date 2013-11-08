@@ -458,9 +458,10 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 
       HistoInit(c1, c2, h2Layer, h1HitPad, ZRangeL, ZRangeU, mm2bin);
 
-      if(fDraw)
+      if(fDraw){
+	c2->cd(1);
 	MaxHitRatePerPad->Draw("same");  // draw red line
-
+      }
       // generate HitPerPadSpectra
       // generate png files
       Lines = false;
@@ -657,8 +658,7 @@ void CbmTrdHitRateFastQa::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F
     c1 = new TCanvas(name,title,1000,900);	
     c1->Divide(1,1);
     c1->cd(1)->SetLogz(1);
-    Layer->DrawCopy("colz");
-    Layer->DrawCopy("z same");
+    Layer->Draw("colz");
   }
 }
 

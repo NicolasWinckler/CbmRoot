@@ -46,6 +46,7 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    fGeoHandler(new CbmTrdGeoHandler()),
    fTriggerThreshold(1e-6),
    fEventRate(1e7),
+   fNeighbourTrigger(true),
    fEventCounter(NULL),
    fStation(-1),
    fLayer(-1), 
@@ -122,10 +123,17 @@ InitStatus CbmTrdHitDensityQa::Init()
 
   fGeoHandler->Init();
 
+  printf("\nCbmTrdHitDensityQa::Init: NeighbourTrigger %i\n\n",fNeighbourTrigger);
+
   fEventCounter = new TH1I("fEventCounter","fEventCounter",1,-0.5,0.5);
   return kSUCCESS;
   
 }
+
+void CbmTrdHitDensityQa::SetNeighbourTrigger(Bool_t trigger){
+  fNeighbourTrigger = trigger;
+}
+
 void CbmTrdHitDensityQa::Exec(Option_t * option)
 {
   printf("=================CbmTrdHitDensityQa====================\n");
@@ -137,7 +145,7 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
  
   CbmTrdDigi *digi = NULL;
   CbmTrdCluster *cluster = NULL;
-  if (NULL != fClusters){
+  if (NULL != fClusters && fNeighbourTrigger == true){
     Int_t nCluster = fClusters->GetEntries();
     for (Int_t iCluster = 0; iCluster < nCluster; iCluster++) {
       //cout << iCluster << endl;
@@ -186,41 +194,43 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
 	  fUsedDigiMap[digiAddress] = iDigi;
 	} 
-	Int_t neighbourAddress = 0;
-	if (iRow > 0){
+	/*
+	  Int_t neighbourAddress = 0;
+	  if (iRow > 0){
 	  if (local_Row > 0)
-	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row-1, iCol);
+	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row-1, iCol);
 	  else if (iSec > 0)
-	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec-1, fModuleInfo->GetNofRowsInSector(iSec-1)-1, iCol);
+	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec-1, fModuleInfo->GetNofRowsInSector(iSec-1)-1, iCol);
 	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
-	    fModuleHitMap[moduleAddress]->Fill(iCol, iRow-1);
-	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow-1);
+	  fUsedDigiMap[neighbourAddress] = iDigi;
 	  }
-	}
-	if (iRow < fModuleInfo->GetNofRows()-1){ // Only cross like neighbour trigger 
+	  }
+	  if (iRow < fModuleInfo->GetNofRows()-1){ // Only cross like neighbour trigger 
 	  if (local_Row+1 > fModuleInfo->GetNofRowsInSector(iSec)-1)
-	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec+1, 0, iCol);
+	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec+1, 0, iCol);
 	  else
-	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row+1, iCol);
+	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row+1, iCol);
 	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
-	    fModuleHitMap[moduleAddress]->Fill(iCol, iRow+1);
-	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow+1);
+	  fUsedDigiMap[neighbourAddress] = iDigi;
 	  }
-	}
-	if (iCol > 0){
+	  }
+	  if (iCol > 0){
 	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row, iCol-1);
 	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
-	    fModuleHitMap[moduleAddress]->Fill(iCol-1, iRow);
-	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  fModuleHitMap[moduleAddress]->Fill(iCol-1, iRow);
+	  fUsedDigiMap[neighbourAddress] = iDigi;
 	  }
-	}
-	if (iCol < fModuleInfo->GetNofColumns()-1){
+	  }
+	  if (iCol < fModuleInfo->GetNofColumns()-1){
 	  neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec, local_Row, iCol+1);
 	  if (fUsedDigiMap.find(neighbourAddress) == fUsedDigiMap.end()){
-	    fModuleHitMap[moduleAddress]->Fill(iCol+1, iRow);
-	    fUsedDigiMap[neighbourAddress] = iDigi;
+	  fModuleHitMap[moduleAddress]->Fill(iCol+1, iRow);
+	  fUsedDigiMap[neighbourAddress] = iDigi;
 	  }
-	}
+	  }
+	*/
       }
     }
   }
@@ -293,7 +303,7 @@ void CbmTrdHitDensityQa::Finish()
     Int_t global_Row = 0;
     TVector3 padPos;
     TVector3 padSize;
-    printf("Module: %6i   Maximum Trigger Rate: %EHz/Channel\n",fModuleHitMapIt->first,fModuleHitMapIt->second->GetBinContent(fModuleHitMapIt->second->GetMaximumBin()) / Double_t(fEventCounter->GetEntries()) * fEventRate);
+    //printf("Module: %6i   Maximum Trigger Rate: %EHz/Channel\n",fModuleHitMapIt->first,fModuleHitMapIt->second->GetBinContent(fModuleHitMapIt->second->GetMaximumBin()) / Double_t(fEventCounter->GetEntries()) * fEventRate);
     for (Int_t s = 0; s < nSec; s++){
       const Int_t nRow = fModuleInfo->GetNofRowsInSector(s);
       const Int_t nCol = fModuleInfo->GetNofColumnsInSector(s);
@@ -372,4 +382,7 @@ void CbmTrdHitDensityQa::FinishEvent() {
 }
   // -------------------------------------------------------------------------
 
+void CbmTrdHitDensityQa::SetTriggerThreshold(Double_t triggerthreshold){
+fTriggerThreshold = triggerthreshold;
+}
   ClassImp(CbmTrdHitDensityQa)

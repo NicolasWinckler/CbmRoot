@@ -11,23 +11,16 @@
 #include "FairTask.h"
 #include "CbmClusteringGeometry.h"
 
-class CbmClusteringSL//: public FairTask
+class CbmClusteringSL
 {
 public:
-   /**
-    * \brief Constructor.
-    */
 	CbmClusteringSL();
-
 	CbmClusteringSL(CbmClusteringGeometry* moduleGeo);
-   /**
-    * \brief Destructor.
-    */
    virtual ~CbmClusteringSL();
 
-   void SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad);
-   void SLRec2(CbmClusteringGeometry* moduleGeo, Int_t activePad);
-   void MainClusteringSL(CbmClusteringGeometry* moduleGeo, Int_t algVersion);
+   void SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad);              //Recursive function for all neighbours
+   void SLRec2(CbmClusteringGeometry* moduleGeo, Int_t activePad);              //Recursive function for vertical and horizontal neighbours
+   void MainClusteringSL(CbmClusteringGeometry* moduleGeo, Int_t algVersion);   //Clustering function
 
    Int_t GetNofClusters()	const { return fNofClusters;}
    Int_t GetNofPads()		const { return fNofPads;}
@@ -42,15 +35,15 @@ public:
 
 private:
 
-   Int_t fNofPads;
-   Int_t fNofActivePads;
+   Int_t fNofPads;                  //Number of pads in module
+   Int_t fNofActivePads;            //Number of charged pads in module
 
-   UInt_t* fA1; //g_MAX_PADS
-   Bool_t* fS; //g_MAX_PADS
-   Int_t* fNumbersOfPads; //g_MAX_PADS
+   UInt_t* fA1;                     //Primary array of charges
+   Bool_t* fS;                      //Array of states
+   Int_t* fNumbersOfPads;           //Array of relations Pad/Cluster
 
-   Int_t fNofClusters;
-   struct Cluster{
+   Int_t fNofClusters;              //Number of found clusters in module
+   struct Cluster{                  //Description of clusters
 	   //Int_t fNofCluster;
 	   Float_t fX;
 	   Float_t fY;

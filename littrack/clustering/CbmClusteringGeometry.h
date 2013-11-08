@@ -11,40 +11,19 @@
 #include "FairTask.h"
 #include "CbmMuchGeoScheme.h"
 
-//class CbmMuchGeoScheme;
-//class CbmMuchCluster;
-//class CbmMuchPad;
-//class TClonesArray;
-
-class CbmClusteringGeometry//: public FairTask
+class CbmClusteringGeometry
 {
 public:
-   /**
-    * \brief Constructor.
-    */
 	CbmClusteringGeometry();
 	CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme, Int_t geoVersion);
-	/*CbmClusteringGeometry(CbmClusteringGeometry* geo, Float_t x, Float_t y, Float_t dx, Float_t dy, Double_t phi1, Double_t phi2, Float_t r1, Float_t r2,
-	   Int_t digiNum, UInt_t charge, Int_t nofNeighbors, Int_t nofGoodNeighbors, vector<Int_t> neighbors, Long64_t chID);*/
-	/*CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t nPad,
-			Int_t digiNum, Int_t nofGoodNeighbors, vector<Int_t> neighbors, Long64_t chID);*/
-	CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t nofPads);
 	void CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y, Float_t dx, Float_t dy, Double_t phi1, Double_t phi2, Float_t r1, Float_t r2,
-			   Int_t digiNum, UInt_t charge, /*Int_t nofNeighbors, Int_t nofGoodNeighbors, vector<Int_t> neighbors, */Long64_t chID);
-   /**
-    * \brief Destructor.
-    */
+			   Int_t digiNum, UInt_t charge, Long64_t chID);            //Addition of a single pad
    virtual ~CbmClusteringGeometry();
 
-   void SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
+   void SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);  //Old geometry version
    void SetMuchModuleGeometryRadial(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
 
-   //Int_t GetStation()		const { return fStation; }
-   //Int_t GetLayer()			const { return fLayer; }
-   //Bool_t GetLayerSide()	const { return fSide; }
-   //Int_t GetModule()		const { return fModule; }
    Int_t GetDetId()			const { return fDetId; }
-
    Int_t GetNPads()			const { return fNofPads; }
    Int_t GetAPadsNom()		const { return fNofActivePads;}
    void SetAPadsNom(Int_t nPads);
@@ -52,8 +31,6 @@ public:
 
    Float_t GetDx(Int_t iPad);
    Float_t GetDy(Int_t iPad);
-   //Float_t GetY1(Int_t iPad);
-   //Float_t GetY2(Int_t iPad);
    Float_t GetX0(Int_t iPad);
    Float_t GetY0(Int_t iPad);
 
@@ -64,12 +41,9 @@ public:
    Int_t GetNeighbor(Int_t iPad, Int_t iNeighbor);
    //Int_t GetGoodNeighbor(Int_t iPad, Int_t iNeighbor);
    Long64_t GetPadID(Int_t iPad);
-
    UInt_t GetPadCharge(Int_t iPad);
    void SetPadCharge(Int_t iPad, UInt_t iCharge);
-
    Int_t GetPadByChannelId(Long64_t chId);
-
    Double_t GetPhi1(Int_t iPad);
    Double_t GetPhi2(Int_t iPad);
    Float_t GetR1(Int_t iPad);
@@ -77,29 +51,20 @@ public:
    vector<Int_t> GetNeighbors(Int_t iPad);
    Long64_t GetChannelID(Int_t iPad);
 
-   void AddPadNeighbor(Int_t nPad, Int_t nNeighbor);
-
-
-
 private:
 
    template <typename T1>
    T1 GetMin(T1& a, T1& b);
    template <typename T2>
    T2 GetMax(T2& a, T2& b);
-
    Bool_t SubEqual(Double_t x1, Double_t x2, Double_t l);
 
-   Long64_t fNofPads;
-   //Int_t fStation;
-   //Int_t fLayer;
-   //Bool_t fSide;
-   //Int_t fModule;
-   Int_t fDetId;
-   Int_t fNofActivePads;
+   Long64_t fNofPads;                       //Number of pads in module
+   Int_t fDetId;                            //Detector Id of MuchModule
+   Int_t fNofActivePads;                    //Number of charged pads in module
 
    map <Long64_t, Int_t> fPadByChannelId;
-   struct PadInformation{
+   struct PadInformation{                   //Description of single pad
 	   Float_t fX, fY;
 	   Float_t fDx, fDy;
 	   Double_t fPhi1, fPhi2;
@@ -110,13 +75,12 @@ private:
 	   Int_t fNofGoodNeighbors;
 	   vector<Int_t> fNeighbors;
 	   Long64_t channelID;
+	   Int_t nSector;
    };
    PadInformation* fPadList;
 
    CbmClusteringGeometry(const CbmClusteringGeometry&);
    CbmClusteringGeometry& operator=(const CbmClusteringGeometry&);
-   
-   //ClassDef(CbmClusteringGeometry, 1);
 };
 
 #endif

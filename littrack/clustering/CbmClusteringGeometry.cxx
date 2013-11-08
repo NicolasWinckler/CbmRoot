@@ -24,6 +24,7 @@
 #include "CbmMuchSectorRectangular.h"
 #include "CbmMuchSectorRadial.h"
 #include "CbmMuchPadRectangular.h"
+#include "CbmMuchAddress.h"
 
 #include "FairRootManager.h"
 
@@ -40,10 +41,6 @@ CbmClusteringGeometry::CbmClusteringGeometry():
 		fPadList()
 {
 	fNofPads = 0;
-	//fStation = 0;
-	//fLayer = 0;
-	//fSide = 0;
-	//fModule = 0;
 	fNofActivePads = 0;
 }
 
@@ -52,54 +49,27 @@ CbmClusteringGeometry::CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_
 	switch(geoVersion){
 	case 1:
 	{
-		SetMuchModuleGeometry(nStation, nLayer, nSide, nModule, scheme);
+		SetMuchModuleGeometryRectangular(nStation, nLayer, nSide, nModule, scheme);     //For old rectangular geometry
 		break;
 	}
 	case 2:
 	{
-		SetMuchModuleGeometryRadial(nStation, nLayer, nSide, nModule, scheme);
+		SetMuchModuleGeometryRadial(nStation, nLayer, nSide, nModule, scheme);          //For new radial geometry
 		break;
 	}
 	default:
 	{
-		std::cout<<"Error. Wrong detector geometry.\n";
+		std::cout<<"CbmClusteringGeometry: Error! Wrong detector geometry.\n";
 		break;
 	}
 	}
-//	SetMuchModuleGeometry(nStation, nLayer, nSide, nModule, scheme);
-//	SetMuchModuleGeometryRadial(nStation, nLayer, nSide, nModule, scheme);
 }
 
-CbmClusteringGeometry::CbmClusteringGeometry(CbmClusteringGeometry* geo, Int_t nofPads)
-{
-	fNofPads = nofPads;
-	fNofActivePads = fNofPads;
-	fDetId = geo->GetDetId();
-	fPadList = new PadInformation[fNofPads];
-	for(Int_t iPad = 0; iPad < fNofPads; iPad++)
-	{
-		fPadList[iPad].fDigiNum = 0;
-		fPadList[iPad].fCharge = 0;
-		fPadList[iPad].fX = 0;
-		fPadList[iPad].fY = 0;
-		fPadList[iPad].fDx = 0;
-		fPadList[iPad].fDy = 0;
-		fPadList[iPad].fPhi1 = 0;
-		fPadList[iPad].fPhi2 = 0;
-		fPadList[iPad].fR1 = 0;
-		fPadList[iPad].fR2 = 0;
-		fPadList[iPad].fNofNeighbors = 0;
-		fPadList[iPad].fNofGoodNeighbors = 0;
-		fPadList[iPad].fNeighbors.clear();
-		fPadList[iPad].channelID = 0;
-	}
-}
-
+//Addition of a single pad
 void CbmClusteringGeometry::CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y, Float_t dx, Float_t dy, Double_t phi1, Double_t phi2, Float_t r1, Float_t r2,
-			   Int_t digiNum, UInt_t charge, /*Int_t nofNeighbors, Int_t nofGoodNeighbors, vector<Int_t> neighbors, */Long64_t chID)
+			   Int_t digiNum, UInt_t charge, Long64_t chID)
 {
 	fPadList[nPad].fDigiNum = digiNum;
-	std::cout<<"-----TakeDigi: "<<fPadList[nPad].fDigiNum<<"\n";
 	fPadList[nPad].fCharge = charge;
 	fPadList[nPad].fX = x;
 	fPadList[nPad].fY = y;
@@ -109,29 +79,10 @@ void CbmClusteringGeometry::CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y
 	fPadList[nPad].fPhi2 = phi2;
 	fPadList[nPad].fR1 = r1;
 	fPadList[nPad].fR2 = r2;
-	/*fPadList[nPad].fNofNeighbors = nofNeighbors;
-	fPadList[nPad].fNofGoodNeighbors = nofGoodNeighbors;
-	fPadList[nPad].fNeighbors.clear();
-	//fPadList[nPad].fNeighbors = neighbors;
-	//fPadList[nPad].fNeighbors.assign(neighbors.begin(), neighbors.end());
-	std::cout<<"vs: "<<neighbors.size()<<"\n";
-	for(Int_t i = 0; i < neighbors.size(); i++)
-	{
-		std::cout<<"->n"<<i<<": "<<neighbors[i]<<" --- ";
-		fPadList[nPad].fNeighbors.push_back(neighbors[i]);
-		std::cout<<"N"<<i<<": "<<fPadList[nPad].fNeighbors[i]<<"\n";
-	}*/
-	//fPadList[nPad].fNeighbors.insert(fPadList[nPad].fNeighbors.begin(), neighbors.begin(), neighbors.end());
 	fPadList[nPad].channelID = chID;
-}
-
-void CbmClusteringGeometry::AddPadNeighbor(Int_t nPad, Int_t nNeighbor)
-{
-	std::cout<<"--p: "<<nPad<<" - n0: "<<nNeighbor;
-	fPadList[nPad].fNeighbors.push_back(nNeighbor);
-	std::cout<<" - n1: "<<fPadList[nPad].fNeighbors[fPadList[nPad].fNofGoodNeighbors];
-	fPadList[nPad].fNofGoodNeighbors++;
-	std::cout<<" --- ngn: "<<fPadList[nPad].fNofGoodNeighbors<<"\n";
+	fPadList[nPad].fNeighbors.clear();
+	fPadList[nPad].fNofNeighbors = 0;
+	fPadList[nPad].fNofGoodNeighbors = 0;
 }
 
 CbmClusteringGeometry::~CbmClusteringGeometry()
@@ -139,18 +90,12 @@ CbmClusteringGeometry::~CbmClusteringGeometry()
 	delete [] fPadList;
 }
 
-
-void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
+//TODO Complete this function or delete it
+void CbmClusteringGeometry::SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
 {
-	//std::cout<<"\n\nCreating module geometry for clustering...";
-	//--CbmMuchGeoScheme* scheme = CbmMuchGeoScheme::Instance();
-	//sch init - name
-	//TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-	//--TString muchDigiFile = "/home/kozlov/cbm/cbmroot_new/cbmroot/parameters/much/much_v11a.digi.root";
-	//--scheme->Init(muchDigiFile);
 	CbmMuchModuleGem* module = (CbmMuchModuleGem*) scheme->GetModule(nStation, nLayer, nSide, nModule);
 	fNofPads = module->GetNPads();
-	fDetId = module->GetDetectorId();
+	fDetId = CbmMuchAddress::GetAddress(nStation, nLayer, nSide, nModule);
 	fPadList = new PadInformation[fNofPads];
 	fNofActivePads = 0;
 	Int_t nofSectors = module->GetNSectors();
@@ -159,16 +104,8 @@ void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, 
 	{
 		CbmMuchSectorRectangular* sector = (CbmMuchSectorRectangular*) module->GetSector(iSector); //???
 		Int_t nofPadsInSector = sector->GetNChannels();//(sector->GetNCols())*(sector->GetNRows());
-		//Double_t padsDx_2 = (sector->GetPadDx())/2;
-		//Double_t padsDy_2 = (sector->GetPadDy())/2;
-		//std::cout<<"DX: "<<padsDx_2<<"\n";
 		Int_t padNx = sector->GetPadNx();
 		Int_t padNy = sector->GetPadNy();
-		//for(Int_t iPad = 0; iPad < nofPadsInSector; iPad++)
-		/*for(Int_t i = 0; i < padNx; i++)
-		{
-			for(Int_t j = 0; j < padNy; j++)
-			{*/
 		for(Int_t iPad = 0; iPad < nofPadsInSector; iPad++)
 		{
 			CbmMuchPadRectangular* pad = (CbmMuchPadRectangular*) sector->GetPadByChannelIndex(iPad);	//!!!
@@ -179,19 +116,10 @@ void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, 
 			fPadList[padIterator].fDx = sector->GetPadDx();
 			fPadList[padIterator].fDy = sector->GetPadDy();
 			fPadList[padIterator].fNeighbors.clear();
-			//fPadList[padIterator].x1 = fPadList[padIterator].xc - padsDx_2;
-			//fPadList[padIterator].x2 = fPadList[padIterator].xc + padsDx_2;
-			//fPadList[padIterator].y1 = fPadList[padIterator].yc - padsDy_2;
-			//fPadList[padIterator].y2 = fPadList[padIterator].yc + padsDy_2;
 			fPadList[padIterator].channelID = pad->GetChannelId();
 			fPadByChannelId[pad->GetChannelId()] = padIterator;
-			/*std::cout<<"Pad: "<<padIterator<<"; ChannelID: "<<pad->GetChannelId()<<"\n";
-			std::cout<<"Xc = "<<fSingleLayerGeo[padIterator].xc;
-			std::cout<<"Yc = "<<fSingleLayerGeo[padIterator].yc<<"\n";*/
 			padIterator++;
 		}
-			/*}
-		}*/
 	}
 	padIterator = 0;
 	for(Int_t iPadMain = 0; iPadMain < fNofPads; iPadMain++)
@@ -254,17 +182,11 @@ void CbmClusteringGeometry::SetMuchModuleGeometry(Int_t nStation, Int_t nLayer, 
 			}
 		}}
 	}
-	//fStation = nStation;
-	//fLayer = nLayer;
-	//fSide = nSide;
-	//fModule = nModule;
-	//std::cout<<" Geometry created:\nStation "<<fStation<<"; Layer "<<fLayer<<"; Side "<<fSide<<"; Module "<<fModule;
-	//std::cout<<"\nPads in module: "<<fNofPads<<"\n";
 }
 
 void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
 {
-	CbmMuchModuleGem* module = (CbmMuchModuleGem*) scheme->GetModule(nStation, nLayer, nSide, nModule);
+	CbmMuchModuleGemRadial* module = (CbmMuchModuleGemRadial*) scheme->GetModule(nStation, nLayer, nSide, nModule);
 	fNofPads = module->GetNPads();
 	fDetId = module->GetDetectorId();
 	fPadList = new PadInformation[fNofPads];
@@ -273,16 +195,11 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nL
 	Int_t padIterator = 0;
 	for(Int_t iSector = 0; iSector < nofSectors; iSector++)
 	{
-		CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSector(iSector);
+		CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSectorByIndex(iSector);
 		Int_t nofPadsInSector = sector->GetNChannels();
-//		Int_t padNx = sector->GetPadNx();
-//		Int_t padNy = sector->GetPadNy();
 		for(Int_t iPad = 0; iPad < nofPadsInSector; iPad++)
 		{
 			CbmMuchPadRadial* pad = (CbmMuchPadRadial*) sector->GetPadByChannelIndex(iPad);
-			/*if(padIterator < 5000){
-			std::cout<<"RadialTest: "<<pad->GetChannelId()<<"\n";
-			std::cout<<"->Phi1 = "<<pad->GetPhi1()<<"; Phi2 = "<<pad->GetPhi2()<<"; R1 = "<<pad->GetR1()<<"; R2 = "<<pad->GetR2()<<"\n";}*/
 			fPadList[padIterator].fDigiNum = 0;
 			fPadList[padIterator].fCharge = 0;
 			fPadList[padIterator].fPhi1 = pad->GetPhi1();
@@ -293,75 +210,49 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nL
 			Double_t phi = (fPadList[padIterator].fPhi1 + fPadList[padIterator].fPhi2) / 2;
 			fPadList[padIterator].fX = r * cos(phi);
 			fPadList[padIterator].fY = r * sin(phi);
-//			fPadList[padIterator].fX = pad->GetX();
-//			fPadList[padIterator].fY = pad->GetY();
-//			fPadList[padIterator].fDx = sector->GetPadDx();
-//			fPadList[padIterator].fDy = sector->GetPadDy();
 			fPadList[padIterator].fNeighbors.clear();
 			fPadList[padIterator].channelID = pad->GetChannelId();
-			fPadByChannelId[pad->GetChannelId()] = padIterator;
-			/*if(padIterator < 100){
-				std::cout<<"RadialTest: "<<fPadList[padIterator].channelID<<"\n";
-				std::cout<<"->Phi1 = "<<fPadList[padIterator].fPhi1<<"; Phi2 = "<<fPadList[padIterator].fPhi2
-						<<"; R1 = "<<fPadList[padIterator].fR1<<"; R2 = "<<fPadList[padIterator].fR2<<"\n";
-				std::cout<<"X: "<<fPadList[padIterator].fX<<"; Y: "<<fPadList[padIterator].fY<<"\n";}*/
+			fPadByChannelId[pad->GetAddress()] = padIterator;
+			fPadList[padIterator].nSector = iSector;
 			padIterator++;
 		}
-			/*}
-		}*/
 	}
-	//std::cout<<"PadIterator: "<<padIterator<<"\n";
 	padIterator = 0;
 	for(Int_t iPadMain = 0; iPadMain < fNofPads; iPadMain++)
 	{
 		fPadList[iPadMain].fNofNeighbors = 0;
 		fPadList[iPadMain].fNofGoodNeighbors = 0;
-		/*Double_t Left_1 = fPadList[iPadMain].fPhi1;
-		Double_t Right_1 = fPadList[iPadMain].fPhi2;
-		Float_t Down_1 = fPadList[iPadMain].fR1;
-		Float_t Up_1 = fPadList[iPadMain].fR2;*/
 		Double_t Left_1 = GetMin(fPadList[iPadMain].fPhi1, fPadList[iPadMain].fPhi2);
 		Double_t Right_1 = GetMax(fPadList[iPadMain].fPhi1, fPadList[iPadMain].fPhi2);
 		Float_t Down_1 = GetMin(fPadList[iPadMain].fR1, fPadList[iPadMain].fR2);
 		Float_t Up_1 = GetMax(fPadList[iPadMain].fR1, fPadList[iPadMain].fR2);
 		Double_t dPhi = fabs(fPadList[iPadMain].fPhi1 - fPadList[iPadMain].fPhi2) * 0.1;
 		Float_t dR = fabs(fPadList[iPadMain].fR1 - fPadList[iPadMain].fR2) * 0.1;
-		Double_t lPhi = /*(fPadList[iPadMain].fPhi1 - fPadList[iPadMain].fPhi2)*/(Left_1 - Right_1) * 0.01;
-		Float_t lR = /*(fPadList[iPadMain].fR1 - fPadList[iPadMain].fR2)*/(Down_1 - Up_1) * 0.01;
-		/*if(iPadMain < 150)
-		{
-			std::cout<<"R1: "<<Down_1<<"; R2: "<<Up_1<<"\n";
-		}*/
+		Double_t lPhi = (Left_1 - Right_1) * 0.01;
+		Float_t lR = (Down_1 - Up_1) * 0.01;
 		for(Int_t iPadNeighbor = 0; iPadNeighbor < fNofPads; iPadNeighbor++)
 		{
 			if(iPadMain == iPadNeighbor)continue;
-			/*Double_t Left_2 = fPadList[iPadNeighbor].fPhi1;
-			Double_t Right_2 = fPadList[iPadNeighbor].fPhi2;
-			Float_t Down_2 = fPadList[iPadNeighbor].fR1;
-			Float_t Up_2 = fPadList[iPadNeighbor].fR2;*/
 			Double_t Left_2 = GetMin(fPadList[iPadNeighbor].fPhi1, fPadList[iPadNeighbor].fPhi2);
 			Double_t Right_2 = GetMax(fPadList[iPadNeighbor].fPhi1, fPadList[iPadNeighbor].fPhi2);
 			Float_t Down_2 = GetMin(fPadList[iPadNeighbor].fR1, fPadList[iPadNeighbor].fR2);
 			Float_t Up_2 = GetMax(fPadList[iPadNeighbor].fR1, fPadList[iPadNeighbor].fR2);
-			if(SubEqual(Left_1, Right_2, dPhi) || SubEqual(Right_1, Left_2, dPhi))
+			//if(SubEqual(Left_1, Right_2, dPhi) || SubEqual(Right_1, Left_2, dPhi))
+			if((Left_1 == Right_2) || (Right_1 == Left_2))
 			{
 				if(((Down_1 - lR) < Up_2) && ((Up_1 + lR) > Down_2))
+			   //if((Down_1 < Up_2) && (Up_1 > Down_2))
 				{
-					//std::cout<<"--->lR: "<<lR<<"; lPhi: "<<lPhi<<"\n";
-					//std::cout<<"--->P1: "<<iPadMain<<"; Left: "<<Left_1<<"; Right: "<<Right_1<<"; Down: "<<Down_1<<"; Up: "<<Up_1<<"\n";
-					//std::cout<<"--->P2: "<<iPadNeighbor<<"; Left: "<<Left_2<<"; Right: "<<Right_2<<"; Down: "<<Down_2<<"; Up: "<<Up_2<<"\n\n";
 					fPadList[iPadMain].fNeighbors.push_back(iPadNeighbor);
 					fPadList[iPadMain].fNofGoodNeighbors++;
 				}
 			}
-			if(SubEqual(Up_1, Down_2, dPhi) || SubEqual(Down_1, Up_2, dPhi))
+			//if(SubEqual(Up_1, Down_2, dPhi) || SubEqual(Down_1, Up_2, dPhi))
+			if((Up_1 == Down_2) || (Down_1 == Up_2))
 			{
-				//if(((Left_1 + lPhi) < (Right_2 - lPhi)) && ((Right_1 - lPhi) > (Left_2 + lPhi)))
 				if(((Left_1 - lPhi) < Right_2) && ((Right_1 + lPhi) > Left_2))
+			   //if((Left_1 < Right_2) && (Right_1 > Left_2))
 				{
-					//std::cout<<"lR: "<<lR<<"; lPhi: "<<lPhi<<"\n";
-					//std::cout<<"P1: "<<iPadMain<<"; Left: "<<Left_1<<"; Right: "<<Right_1<<"; Down: "<<Down_1<<"; Up: "<<Up_1<<"\n";
-					//std::cout<<"P2: "<<iPadNeighbor<<"; Left: "<<Left_2<<"; Right: "<<Right_2<<"; Down: "<<Down_2<<"; Up: "<<Up_2<<"\n\n";
 					fPadList[iPadMain].fNeighbors.push_back(iPadNeighbor);
 					fPadList[iPadMain].fNofGoodNeighbors++;
 				}
@@ -418,16 +309,6 @@ Float_t CbmClusteringGeometry::GetY0(Int_t iPad)
 	return fPadList[iPad].fY;
 }
 
-/*Float_t CbmMuchGeoCl::GetY1(Int_t iPad)
-{
-	return fSingleLayerGeo[iPad].y1;
-}
-
-Float_t CbmMuchGeoCl::GetY2(Int_t iPad)
-{
-	return fSingleLayerGeo[iPad].y2;
-}*/
-
 Int_t CbmClusteringGeometry::GetDigiNum(Int_t iPad)
 {
 	return fPadList[iPad].fDigiNum;
@@ -450,7 +331,6 @@ Int_t CbmClusteringGeometry::GetGoodNeighborsNum(Int_t iPad)
 
 Int_t CbmClusteringGeometry::GetNeighbor(Int_t iPad, Int_t iNeighbor)
 {
-	//return fSingleLayerGeo[iPad].allNeighbors[iNeighbor];
 	return fPadList[iPad].fNeighbors[iNeighbor];
 }
 

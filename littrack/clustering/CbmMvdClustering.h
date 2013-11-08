@@ -110,11 +110,14 @@ private:
    Int_t fNofDigis;
    Int_t fNofPoints;
 
-   Int_t fNofPointsBySt[2];
-   Int_t fNofDigisBySt[2];
-   Int_t fNofClustersBySt[2];
+   Int_t fNofPointsBySt[4];
+   Int_t fNofDigisBySt[4];
+   Int_t fNofClustersBySt[4];
 
-   static const Int_t nDigiByCl = 100;
+   Double_t globalCTime;
+   Double_t globalRTime;
+
+   static const Int_t nDigiByCl = 150;
    Int_t fNofClusters;
    struct Cluster{
 	   Int_t nofCluster;
@@ -122,7 +125,8 @@ private:
    	   Float_t yc;
    	   Float_t sumClCharge;
    	   Int_t nofDidis;
-   	   Int_t digisInCluster[nDigiByCl];
+   	   //Int_t digisInCluster[nDigiByCl];
+   	   vector<Int_t> digisInCluster;
    	   Int_t nDigiMax;
    	   Int_t nMCPoint;
    };
@@ -161,9 +165,9 @@ private:
    Float_t fErrHit_Point;
    Float_t fErrPoint_Pixel;
    Int_t fLooseCl;
-   Int_t fLooseClustersBySt[2];
+   Int_t fLooseClustersBySt[4];
    Int_t fFakeCl;
-   Int_t fFakeClustersBySt[2];
+   Int_t fFakeClustersBySt[4];
 
    Int_t GetMvdGeometry();
    void Register();

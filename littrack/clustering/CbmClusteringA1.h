@@ -10,29 +10,15 @@
 
 #include "FairTask.h"
 #include "CbmClusteringGeometry.h"
-//#include "TClonesArray.h"
-//#include "CbmMuchClFull.h"
 
-//class CbmMuchGeoScheme;
-//class CbmMuchCluster;
-//class CbmMuchPad;
-//class TClonesArray;
-
-class CbmClusteringA1//: public FairTask
+class CbmClusteringA1
 {
 public:
-   /**
-    * \brief Constructor.
-    */
 	CbmClusteringA1();
-
 	CbmClusteringA1(CbmClusteringGeometry* moduleGeo);
-   /**
-    * \brief Destructor.
-    */
    virtual ~CbmClusteringA1();
 
-   void MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t algVersion);
+   void MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t algVersion);                   //Clustering function
    void ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
@@ -51,37 +37,30 @@ public:
 
 private:
 
-   Int_t fNofPads;
-   Int_t fNofActivePads;
+   Int_t fNofPads;          //Number of pads in module
+   Int_t fNofActivePads;    //Number of charged pads in module
 
-   UInt_t* fA1; //g_MAX_PADS
-   UInt_t* fA2; //g_MAX_PADS
-   Bool_t* fS; //g_MAX_PADS
-   Int_t* fNumbersOfPads; //g_MAX_PADS
+   UInt_t* fA1;             //Primary array of charges
+   UInt_t* fA2;             //Secondary array of charges
+   Bool_t* fS;              //Array of states
+   Int_t* fNumbersOfPads;   //Array of relations Pad/Cluster
 
-   //Float_t* fXc; //g_MAX_CENTERS
-   //Float_t* fYc; //g_MAX_CENTERS
-   //UInt_t* fSumClCharges; //g_MAX_CENTERS
-   //Int_t* fNumbersOfClusters; //g_MAX_CENTERS - ???
-
-   Int_t fNofClusters;
-   struct Cluster{
+   Int_t fNofClusters;      //Number of found clusters in module
+   struct Cluster{          //Description of clusters
 	   Int_t fNCluster;
 	   Float_t fX;
 	   Float_t fY;
 	   UInt_t fCharge;
 	   Int_t fNofPads;
-	   //Int_t padsInCluster[30];
 	   vector<Int_t> fPadsInCluster;
 	   vector<Int_t> fNPadsInCluster;
 	   vector<Int_t> fPadsCharges;
    };
    Cluster* fClusters;
-   //TClonesArray* fClFull;
 
    CbmClusteringA1(const CbmClusteringA1&);
    CbmClusteringA1& operator=(const CbmClusteringA1&);
   
 };
 
-#endif /* CBMCLUSTERINGA1_H_ */
+#endif

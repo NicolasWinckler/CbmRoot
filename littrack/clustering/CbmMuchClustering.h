@@ -15,7 +15,6 @@
 #include "CbmClusteringWard.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchModuleGem.h"
-//#include "TClonesArray.h"
 
 #include "TH1F.h"
 
@@ -24,82 +23,54 @@ class TClonesArray;
 class CbmMuchClustering: public FairTask
 {
 public:
-   /**
-    * \brief Constructor.
-    */
-	CbmMuchClustering(const char* digiFileName);
-
-   /**
-    * \brief Destructor.
-    */
+   CbmMuchClustering(const char* digiFileName);
    virtual ~CbmMuchClustering();
-
-   /**
-    * \brief Derived from FairTask.
-    */
    virtual InitStatus Init();
-
-   /**
-    * \brief Derived from FairTask.
-    */
    virtual void Exec(Option_t* opt);
-
-   /**
-    * \brief Derived from FairTask.
-    */
    virtual void Finish();
 
    void SetAlgorithmVersion(Int_t AlgorithmVersion) { fAlgorithmVersion = AlgorithmVersion;}
    void SetGeometryVersion(Int_t GeometryVersion)	{ fGeoVersion = GeometryVersion;}
 
-   void DeletePadsCharge(CbmClusteringGeometry* moduleGeo);
-
    void CreateModulesGeometryArray();
-
    void SetDigiCharges();
    void ClearDigiCharges();
-
    void ClusteringMainFunction();
-
-   void TestPoints();
 
 private:
 
    void ReadDataBranches();
 
+   /* Clustering algorithms
+    * 1 - Developed algorithm, using all neighbors;
+    * 2 - Developed algorithm, do not using diagonal neighbors;
+    * 3 - Simple Single Linkage method, using all neighbors;
+    * 4 - Simple Single Linkage method, do not using diagonal neighbors;
+    * 5 - Ward's method (!) not tested
+    */
    Int_t fAlgorithmVersion;
-   Int_t fNofModules;
-   Int_t fNofClusters;
+   /* Detector geometry type
+    * 1 - Rectangular;
+    * 2 - Radial
+    */
    Int_t fGeoVersion;
+   Int_t fNofModules;                       // Number of modules in detector
+   Int_t fNofClusters;                      // Number of clusters for event
 
-   CbmClusteringA1* fClustersA1;
-   CbmClusteringSL* fClustersSL;
-   CbmClusteringWard* fClustersWard;
+   CbmMuchGeoScheme* fScheme;               // MuCh geometry scheme
+   TString           fDigiFile;             // Digitization file
 
-   CbmMuchGeoScheme* fScheme;
-   TString            fDigiFile;
-
-   CbmClusteringGeometry** fModulesGeometryArray;
+   vector<CbmClusteringGeometry*> fModulesGeometryArray;
    map <Int_t, Int_t> fModulesByDetId;
 
-   TClonesArray* fMuchDigi;
-   TClonesArray* fMuchPad;
-   TClonesArray* fMuchPoint;
+   TClonesArray* fMuchDigi;                 // Input array of CbmMuchDigi
+   TClonesArray* fCluster;                  // Output array of CbmMuchCluster
+   TClonesArray* fHit;                      // Output array of CbmMuchHit
+   Int_t fNofEvents;                        // Event counter
 
-   TClonesArray* fCluster;
-   TClonesArray* fHit;
-   //TClonesArray* fStrawHit;
-   TH1F* fhDigisInCluster;
-   Int_t fNofEvents;
-
-   TH1F* fhPoints;
-   TClonesArray* fDigiMatch;
-
-   void ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
-   void ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver/*, Int_t &nHit, Int_t &nCluster*/);
-   void ClusteringWard(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2/*, Int_t Ver, Int_t &nHit, Int_t &nCluster*/);
-
-   void SubclusteringA1(Int_t iCl, CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver, CbmClusteringA1* clA1, Int_t it1);
+   void ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver);
+   void ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2, Int_t Ver);
+   void ClusteringWard(CbmClusteringGeometry* m1, CbmMuchModuleGem* m2/*, Int_t Ver*/);
 
    CbmMuchClustering(const CbmMuchClustering&);
    CbmMuchClustering& operator=(const CbmMuchClustering&);

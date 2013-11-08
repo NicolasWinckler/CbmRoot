@@ -52,6 +52,7 @@ class CbmTrdHitDensityQa : public FairTask
  private:
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
+  TClonesArray*     fClusters; 
 
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!  

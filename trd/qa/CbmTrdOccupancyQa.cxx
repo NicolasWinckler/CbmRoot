@@ -18,6 +18,7 @@
 #include "TStopwatch.h"
 #include "TBox.h"
 #include "TPaveText.h"
+#include "TColor.h"
 #include <iostream>
 #include <cmath>
 using std::cout;
@@ -45,12 +46,15 @@ CbmTrdOccupancyQa::CbmTrdOccupancyQa()
     fLayerAverageOccupancyMap(),
     fLayerAverageOccupancyMapIt(),
     fTriggerThreshold(1e-6),
+    fmin(0),
+    fmax(13),
     fNeigbourReadout(true),
     fGeo("")
 {
 // fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
+  fLayerDummy->SetStats(kFALSE);
   fLayerDummy->GetXaxis()->SetLabelSize(0.02);
   fLayerDummy->GetYaxis()->SetLabelSize(0.02);
   fLayerDummy->GetZaxis()->SetLabelSize(0.02);
@@ -60,6 +64,9 @@ CbmTrdOccupancyQa::CbmTrdOccupancyQa()
   fLayerDummy->GetYaxis()->SetTitleOffset(2);
   fLayerDummy->GetZaxis()->SetTitleSize(0.02);
   fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+ fLayerDummy->SetContour(99);
+  fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+  fLayerDummy->Fill(0.,0.,0.);
 //  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
@@ -102,6 +109,8 @@ CbmTrdOccupancyQa::CbmTrdOccupancyQa(const char *name, const char *title, const 
     fModuleOccupancyMemoryMapIt(),
     fLayerOccupancyMap(),
     fLayerOccupancyMapIt(),
+    fmin(0),
+    fmax(13),
     fLayerAverageOccupancyMap(),
     fLayerAverageOccupancyMapIt(),
     fTriggerThreshold(triggerThreshold),
@@ -120,6 +129,8 @@ CbmTrdOccupancyQa::CbmTrdOccupancyQa(const char *name, const char *title, const 
   fLayerDummy->GetYaxis()->SetTitleOffset(2);
   fLayerDummy->GetZaxis()->SetTitleSize(0.02);
   fLayerDummy->GetZaxis()->SetTitleOffset(-2);
+  fLayerDummy->SetContour(99);
+  fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
 //  fDigiChargeSpectrum = new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3);
   for (fModuleOccupancyMapIt = fModuleOccupancyMap.begin();
        fModuleOccupancyMapIt != fModuleOccupancyMap.end(); ++fModuleOccupancyMapIt) {
@@ -261,7 +272,7 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
 	//fLayerOccupancyMap[combiId] = new TH2F(title,title,1200,-600,600,1000,-500,500);
 	fLayerOccupancyMap[combiId] = new TCanvas(title,title,1200,1000);
 	fLayerOccupancyMap[combiId]->cd();
-	fLayerDummy->DrawCopy("");
+	fLayerDummy->DrawCopy("colz");
 	title.Form("Station%i_Layer%i",Station,Layer);
 	printf("       new %s\n",title.Data());
 	fLayerAverageOccupancyMap[combiId] = new TProfile(title,title,1e6,0,1.0e-3);
@@ -379,64 +390,85 @@ void CbmTrdOccupancyQa::CreateLayerView()
 				    );
     text->SetFillStyle(1001);
     text->SetLineColor(1);
-    Int_t maxCol = 4;
-   if (occupancy > 0 && occupancy <= 2.5)
-      text->SetFillColor(kViolet
-			 //+Int_t((occupancy-0)/6.*maxCol)
-			 );
-    if (occupancy > 2.5 && occupancy <= 5){
-      text->SetFillColor(kAzure
-			 //+Int_t((occupancy-6)/6.*maxCol)
-			 );
-      text->SetTextColor(kWhite);
-    }
-    if (occupancy > 5 && occupancy <= 7.5)
-      text->SetFillColor(kTeal
-			 //+Int_t((occupancy-12)/6.*maxCol)
-			 );
-    if (occupancy > 7.5 && occupancy <= 10)
-      text->SetFillColor(kSpring
-			 //+Int_t((occupancy-18)/6.*maxCol)
-			 );
-    if (occupancy > 10 && occupancy <= 12.5)
-      text->SetFillColor(kYellow
-			 //+Int_t((occupancy-24)/6.*maxCol)
-			 );
-    if (occupancy > 12.5 && occupancy <= 15)
-      text->SetFillColor(kOrange
-			 //+Int_t((occupancy-24)/6.*maxCol)
-			 );
-    if (occupancy > 15)
-      text->SetFillColor(kRed);
 
-    /*
-    if (occupancy > 0 && occupancy <= 5)
-      text->SetFillColor(kViolet
-			 //+Int_t((occupancy-0)/6.*maxCol)
-			 );
-    if (occupancy > 5 && occupancy <= 10){
-      text->SetFillColor(kAzure
-			 //+Int_t((occupancy-6)/6.*maxCol)
-			 );
-      text->SetTextColor(kWhite);
+    //Double_t min(0), max(12);
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
     }
-    if (occupancy > 10 && occupancy <= 15)
+    Int_t color(0), j(0);
+    while ((occupancy > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+      //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+      j++;
+    }
+    text->SetFillColor(fColors[j]);
+    if (j >= (Int_t)fZLevel.size())
+      text->SetFillColor(2);
+
+    if (fColors[j]<65)
+      text->SetTextColor(kWhite);
+    /*
+      Int_t maxCol = 4;
+      if (occupancy > 0 && occupancy <= 2.5)
+      text->SetFillColor(kViolet
+      //+Int_t((occupancy-0)/6.*maxCol)
+      );
+      if (occupancy > 2.5 && occupancy <= 5){
+      text->SetFillColor(kAzure
+      //+Int_t((occupancy-6)/6.*maxCol)
+      );
+      text->SetTextColor(kWhite);
+      }
+      if (occupancy > 5 && occupancy <= 7.5)
       text->SetFillColor(kTeal
-			 //+Int_t((occupancy-12)/6.*maxCol)
-			 );
-    if (occupancy > 15 && occupancy <= 20)
+      //+Int_t((occupancy-12)/6.*maxCol)
+      );
+      if (occupancy > 7.5 && occupancy <= 10)
       text->SetFillColor(kSpring
-			 //+Int_t((occupancy-18)/6.*maxCol)
-			 );
-    if (occupancy > 20 && occupancy <= 25)
+      //+Int_t((occupancy-18)/6.*maxCol)
+      );
+      if (occupancy > 10 && occupancy <= 12.5)
       text->SetFillColor(kYellow
-			 //+Int_t((occupancy-24)/6.*maxCol)
-			 );
-    if (occupancy > 25 && occupancy <= 30)
+      //+Int_t((occupancy-24)/6.*maxCol)
+      );
+      if (occupancy > 12.5 && occupancy <= 15)
       text->SetFillColor(kOrange
-			 //+Int_t((occupancy-24)/6.*maxCol)
-			 );
-    if (occupancy > 30)
+      //+Int_t((occupancy-24)/6.*maxCol)
+      );
+      if (occupancy > 15)
+      text->SetFillColor(kRed);
+    */
+    /*
+      if (occupancy > 0 && occupancy <= 5)
+      text->SetFillColor(kViolet
+      //+Int_t((occupancy-0)/6.*maxCol)
+      );
+      if (occupancy > 5 && occupancy <= 10){
+      text->SetFillColor(kAzure
+      //+Int_t((occupancy-6)/6.*maxCol)
+      );
+      text->SetTextColor(kWhite);
+      }
+      if (occupancy > 10 && occupancy <= 15)
+      text->SetFillColor(kTeal
+      //+Int_t((occupancy-12)/6.*maxCol)
+      );
+      if (occupancy > 15 && occupancy <= 20)
+      text->SetFillColor(kSpring
+      //+Int_t((occupancy-18)/6.*maxCol)
+      );
+      if (occupancy > 20 && occupancy <= 25)
+      text->SetFillColor(kYellow
+      //+Int_t((occupancy-24)/6.*maxCol)
+      );
+      if (occupancy > 25 && occupancy <= 30)
+      text->SetFillColor(kOrange
+      //+Int_t((occupancy-24)/6.*maxCol)
+      );
+      if (occupancy > 30)
       text->SetFillColor(kRed);
     */
     fLayerOccupancyMap[fModuleMap[fModuleOccupancyMemoryMapIt->first]->Station*10+fModuleMap[fModuleOccupancyMemoryMapIt->first]->Layer]->cd();

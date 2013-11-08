@@ -97,7 +97,8 @@ class CbmTrdOccupancyQa : public FairTask {
   CbmTrdGeoHandler* fGeoHandler; //!
   TH1I *fDigiChargeSpectrum;
   TH2I *fLayerDummy;
-  
+  Double_t fmin;
+  Double_t fmax;
   std::map<Int_t, OccupancyModule*> fModuleMap; //!
   std::map<Int_t, OccupancyModule*>::iterator fModuleMapIt; //!  
   std::map<Int_t, TH2F*> fModuleOccupancyMap; //!

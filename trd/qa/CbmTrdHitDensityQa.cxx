@@ -40,6 +40,7 @@ using std::endl;
 CbmTrdHitDensityQa::CbmTrdHitDensityQa()
   :FairTask("CbmTrdHitDensityQa",1),
    fDigis(NULL),
+   fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
@@ -60,8 +61,12 @@ CbmTrdHitDensityQa::~CbmTrdHitDensityQa()
   if(fDigis){
     fDigis->Delete();
     delete fDigis;
-  }    
-    if(fDigiPar){
+  }     
+  if(fClusters){
+    fClusters->Delete();
+    delete fClusters;
+  }
+  if(fDigiPar){
     delete fDigiPar;
   }
   if(fModuleInfo){
@@ -100,6 +105,12 @@ InitStatus CbmTrdHitDensityQa::Init()
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
+  fClusters =(TClonesArray *)  ioman->GetObject("TrdCluster");
+  if ( ! fClusters ) {
+    cout << "-W CbmTrdHitDensityQa::Init: No TrdCluster array!" << endl;
+    cout << "                             Task will be inactive" << endl;
+    //return kERROR;
+  }   
   // Extract information about the number of TRD stations and
   // the number of layers per TRD station from the geomanager.
   // Store the information about the number of layers at the entrance
@@ -123,17 +134,46 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
   timer.Start();
   fEventCounter->Fill(0);
   printf("\n  Event: %i\n\n",(Int_t)fEventCounter->GetEntries());
-  Int_t nEntries = fDigis->GetEntries();
-  for (Int_t iDigi=0; iDigi < nEntries; iDigi++ ) {
-    CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
-    Int_t digiAddress = digi->GetAddress();
-    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
-    Int_t moduleId = CbmTrdAddress::GetModuleId(moduleAddress);// TODO
-    fLayer    = CbmTrdAddress::GetLayerId(moduleAddress);
-    fModuleInfo = fDigiPar->GetModule(moduleAddress);
-    if (digi->GetCharge() > fTriggerThreshold) 
-      {
-	fUsedDigiMap[digiAddress] = iDigi;
+ 
+  CbmTrdDigi *digi = NULL;
+  CbmTrdCluster *cluster = NULL;
+  if (NULL != fClusters){
+    Int_t nCluster = fClusters->GetEntries();
+    for (Int_t iCluster = 0; iCluster < nCluster; iCluster++) {
+      //cout << iCluster << endl;
+      cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster  
+      Int_t nDigisInCluster = cluster->GetNofDigis();
+      for (Int_t iDigi = 0; iDigi < nDigisInCluster; iDigi++){  
+	digi = (CbmTrdDigi*)fDigis->At(cluster->GetDigi(iDigi));
+	Int_t digiAddress = digi->GetAddress();
+	Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
+	Int_t moduleId = CbmTrdAddress::GetModuleId(moduleAddress);// TODO
+	fLayer    = CbmTrdAddress::GetLayerId(moduleAddress);
+	fModuleInfo = fDigiPar->GetModule(moduleAddress);
+	if (fModuleHitMap.find(moduleAddress) == fModuleHitMap.end()){
+	  title.Form("hd_Module_%i",moduleAddress);
+	  Int_t nRows = fModuleInfo->GetNofRows();
+	  Int_t nCols = fModuleInfo->GetNofColumns();
+	  fModuleHitMap[moduleAddress] = new TH2I(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	}
+	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
+	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
+	if (fUsedDigiMap.find(digiAddress) == fUsedDigiMap.end()){ // Cluster include already neighbour trigger read-out. Two clusters can share associated neighbour digis, therefore test if digi is already used
+	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
+	  fUsedDigiMap[digiAddress] = iDigi;
+	} 
+      }
+    }  
+  } else {
+    Int_t nDigis = fDigis->GetEntries();
+    for (Int_t iDigi=0; iDigi < nDigis; iDigi++ ) {
+      digi = (CbmTrdDigi*) fDigis->At(iDigi);
+      Int_t digiAddress = digi->GetAddress();
+      Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
+      Int_t moduleId = CbmTrdAddress::GetModuleId(moduleAddress);// TODO
+      fLayer    = CbmTrdAddress::GetLayerId(moduleAddress);
+      fModuleInfo = fDigiPar->GetModule(moduleAddress);
+      if (digi->GetCharge() > fTriggerThreshold) {
 	if (fModuleHitMap.find(moduleAddress) == fModuleHitMap.end()){
 	  title.Form("hd_Module_%i",moduleAddress);
 	  Int_t nRows = fModuleInfo->GetNofRows();
@@ -157,7 +197,7 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	    fUsedDigiMap[neighbourAddress] = iDigi;
 	  }
 	}
-	if (iRow < fModuleInfo->GetNofRows()-1){
+	if (iRow < fModuleInfo->GetNofRows()-1){ // Only cross like neighbour trigger 
 	  if (local_Row+1 > fModuleInfo->GetNofRowsInSector(iSec)-1)
 	    neighbourAddress = CbmTrdAddress::GetAddress(fLayer, CbmTrdAddress::GetModuleId(moduleAddress), iSec+1, 0, iCol);
 	  else
@@ -182,6 +222,7 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	  }
 	}
       }
+    }
   }
 }
   // ---- Register ------------------------------------------------------
@@ -230,7 +271,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->SetContour(99);
       Layer->SetXTitle("x-Coordinate [mm]");
       Layer->SetYTitle("y-Coordinate [mm]");
-      Layer->SetZTitle("Hits/Pad [Hz]");
+      Layer->SetZTitle("Trigger/Channel [Hz]");
       Layer->SetStats(kFALSE);
       Layer->GetXaxis()->SetLabelSize(0.02);
       Layer->GetYaxis()->SetLabelSize(0.02);
@@ -252,7 +293,7 @@ void CbmTrdHitDensityQa::Finish()
     Int_t global_Row = 0;
     TVector3 padPos;
     TVector3 padSize;
-    printf("Module: %6i   Maximum Rate: %EHz/Pad\n",fModuleHitMapIt->first,fModuleHitMapIt->second->GetBinContent(fModuleHitMapIt->second->GetMaximumBin()) / Double_t(fEventCounter->GetEntries()) * fEventRate);
+    printf("Module: %6i   Maximum Trigger Rate: %EHz/Channel\n",fModuleHitMapIt->first,fModuleHitMapIt->second->GetBinContent(fModuleHitMapIt->second->GetMaximumBin()) / Double_t(fEventCounter->GetEntries()) * fEventRate);
     for (Int_t s = 0; s < nSec; s++){
       const Int_t nRow = fModuleInfo->GetNofRowsInSector(s);
       const Int_t nCol = fModuleInfo->GetNofColumnsInSector(s);
@@ -300,7 +341,9 @@ void CbmTrdHitDensityQa::Finish()
     module->SetFillStyle(0);
     LayerMap[LayerId]->cd();
     module->Draw("same");
+    delete fModuleHitMapIt->second;
   }
+  fModuleHitMap.clear();
   gDirectory->Cd("..");
   for (LayerMapIt = LayerMap.begin();
        LayerMapIt != LayerMap.end(); ++LayerMapIt) {
@@ -317,8 +360,14 @@ void CbmTrdHitDensityQa::Finish()
 
   // -----   Public method EndOfEvent   --------------------------------------
 void CbmTrdHitDensityQa::FinishEvent() {
-  if (fDigis)
+  if (fDigis){
+    fDigis->Clear("C");
     fDigis->Delete();
+  }
+  if (fClusters){
+    fClusters->Clear("C");
+    fClusters->Delete();
+  }
   fUsedDigiMap.clear();
 }
   // -------------------------------------------------------------------------

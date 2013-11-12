@@ -278,7 +278,7 @@ void CbmLitTofQa::CreateHistograms()
       name = "hmp_TofTrack_" + fTrackCategories[iCat] + "_Length";
       fHM->Add(name, new TH1F(name.c_str(), string(name + ";Length [cm]").c_str(), 1200, 0., 1200.));
       name = "hmp_TofTrack_" + fTrackCategories[iCat] + "_NofHitsPerGlobalTrack";
-      fHM->Add(name, new TH1F(name.c_str(), string(name + ";number of hits per global track").c_str(), 1200, 0., 1200.));
+      fHM->Add(name, new TH1F(name.c_str(), string(name + ";number of hits per global track").c_str(), 11, -0.5, 10.5));
    }
    string name = "hmp_Tof_dTime";
    fHM->Add(name, new TH1F(name.c_str(), string(name + ";dt [ps];Counter").c_str(), 1000, -500., 500.));
@@ -420,7 +420,8 @@ void CbmLitTofQa::ProcessTofTracks()
    for (Int_t iTrack = 0; iTrack < nofTofTracks; iTrack++) {
       const CbmTofTrack* tofTrack = static_cast<const CbmTofTrack*>(fTofTracks->At(iTrack));
       const CbmTofHit* tofHit = static_cast<const CbmTofHit*>(fTofHits->At(tofTrack->GetTofHitIndex()));
-      Int_t tofMCPointId = tofHit->GetRefId();
+      const FairMCPoint* tofPoint = static_cast<const FairMCPoint*>(fTofPoints->At(tofHit->GetRefId()));
+      Int_t tofMCTrackId = tofPoint->GetTrackID();
 
       const FairTrackParam* par = tofTrack->GetTrackParameter();
       Double_t dx = par->GetX() - tofHit->GetX();
@@ -431,7 +432,7 @@ void CbmLitTofQa::ProcessTofTracks()
       for (Int_t iCat = 0; iCat < nofTrackCategories; iCat++) {
         string category = fTrackCategories[iCat];
         LitTrackAcceptanceFunction function = fTrackAcceptanceFunctions.find(category)->second;
-        Bool_t categoryOk = function(fMCTracks, tofMCPointId);
+        Bool_t categoryOk = function(fMCTracks, tofMCTrackId);
         if (categoryOk) {
            fHM->H1("hmp_TofTrack_" + category + "_Distance")->Fill(distance);
            fHM->H1("hmp_TofTrack_" + category + "_NormDistance")->Fill(tofTrack->GetDistance());

@@ -155,6 +155,11 @@ Generate_Version_Info()
 # cause another cmake executable to run.  The same process will walk through
 # the project's entire directory structure.
 
+set(BUILD_BEAMTIME FALSE CACHE BOOL "Build everything needed (DABC, RocLib ...) to read testbeam data.")
+If(BUILD_BEAMTIME)
+  Set(BUILD_MBS FALSE)
+EndIf(BUILD_BEAMTIME)
+
 add_subdirectory (fairtools)
 add_subdirectory (MbsAPI)
 add_subdirectory (base)
@@ -221,9 +226,9 @@ Else(${EveIsBuild} STREQUAL yes)
   Message("The eventdisplay is not build, there is no OpenGL support.")
 EndIf(${EveIsBuild} STREQUAL yes)
 
-set(BUILD_BEAMTIME FALSE CACHE BOOL "Build everything needed (DABC, RocLib ...) to read testbeam data.")
+#set(BUILD_BEAMTIME FALSE CACHE BOOL "Build everything needed (DABC, RocLib ...) to read testbeam data.")
 If(BUILD_BEAMTIME)
-  add_subdirectory (roc)
+  add_subdirectory (roc3)
   add_subdirectory (beamtime)
 EndIf(BUILD_BEAMTIME)
 

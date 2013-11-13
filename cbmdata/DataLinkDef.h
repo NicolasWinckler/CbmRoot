@@ -15,6 +15,8 @@
 #pragma link C++ class CbmTrackMatch+;
 #pragma link C++ class CbmCluster+;
 #pragma link C++ class CbmDetectorList+;
+#pragma link C++ class CbmMatch+;
+#pragma link C++ class CbmTrackMatchNew+;
 
 #pragma link C++ class CbmMCEpoch+;
 #pragma link C++ class CbmMCEventHeader+;
@@ -54,7 +56,6 @@
 #pragma link C++ class CbmTrdPoint+;
 #pragma link C++ class CbmTrdTrack+;
 #pragma link C++ class CbmTrdDigi+;
-#pragma link C++ class CbmTrdDigiMatch+;
 #pragma link C++ class CbmTrdAddress+;
 #pragma link C++ class CbmTrdCluster+;
 

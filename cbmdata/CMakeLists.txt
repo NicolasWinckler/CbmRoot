@@ -33,6 +33,9 @@ CbmMCEpoch.cxx
 CbmMCEventHeader.cxx
 CbmMCTrack.cxx
 
+CbmMatch.cxx
+CbmTrackMatchNew.cxx
+
 mvd/CbmMvdCluster.cxx 
 mvd/CbmMvdDetectorId.cxx
 mvd/CbmMvdDigi.cxx  
@@ -67,7 +70,6 @@ trd/CbmTrdHit.cxx
 trd/CbmTrdTrack.cxx		 
 trd/CbmTrdPoint.cxx	
 trd/CbmTrdDigi.cxx  
-trd/CbmTrdDigiMatch.cxx  
 trd/CbmTrdAddress.cxx
 trd/CbmTrdCluster.cxx
 

@@ -299,7 +299,8 @@ void CbmMuchClustering::ClusteringA1(CbmClusteringGeometry* m1, CbmMuchModuleGem
 		dxy = sqrt(sumdxy2/12)/sumq;
 		dt = sqrt(sumdt2)/sumq;
 		Int_t nCluster = fCluster->GetEntriesFast();
-		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
+		CbmMuchCluster* cluster = new ((*fCluster)[nCluster]) CbmMuchCluster();
+		cluster->AddDigis(digiIndices);
 		Int_t nHit = fHit->GetEntriesFast();
 		new ((*fHit)[nHit]) CbmMuchPixelHit(address, x, y, z, dx, dy, 0, dxy, nCluster, planeId, t, dt);
 	}
@@ -360,7 +361,8 @@ void CbmMuchClustering::ClusteringSL(CbmClusteringGeometry* m1, CbmMuchModuleGem
 		dxy = sqrt(sumdxy2/12)/sumq;
 		dt = sqrt(sumdt2)/sumq;
 		Int_t nCluster = fCluster->GetEntriesFast();
-		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
+      CbmMuchCluster* cluster = new ((*fCluster)[nCluster]) CbmMuchCluster();
+      cluster->AddDigis(digiIndices);
 		Int_t nHit = fHit->GetEntriesFast();
 		new ((*fHit)[nHit]) CbmMuchPixelHit(address, x, y, z, dx, dy, 0, dxy, nCluster, planeId, t, dt);
 	}
@@ -428,7 +430,8 @@ void CbmMuchClustering::ClusteringWard(CbmClusteringGeometry* m1, CbmMuchModuleG
 //		std::cout<<"-----Data calculated for Cl "<<iCl<<"\n";
 		Int_t nCluster = fCluster->GetEntriesFast();
 //		std::cout<<"-------Add cluster "<<nCluster<<"; nDigis: "<<digiIndices.size();
-		new ((*fCluster)[nCluster]) CbmMuchCluster(digiIndices);
+		CbmMuchCluster* cluster = new ((*fCluster)[nCluster]) CbmMuchCluster();
+		cluster->AddDigis(digiIndices);
 //		std::cout<<" - ok\n";
 		//---
 		Int_t planeId = fScheme->GetLayerSideNr(detId);

@@ -1006,10 +1006,10 @@ void CbmMuchHitFinderQa::StatisticsQa(){
   for (Int_t i=0;i<nClusters;i++){
     CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(i);
     map<Int_t,Int_t> map_points;
-    Int_t nDigis = cluster->GetNDigis();
+    Int_t nDigis = cluster->GetNofDigis();
     fhDigisInCluster->Fill(nDigis);
     for(Int_t digiId=0;digiId<nDigis;digiId++){
-      Int_t index = cluster->GetDigiIndex(digiId);
+      Int_t index = cluster->GetDigi(digiId);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(index);
       Int_t nPoints = match->GetNPoints();
       for (Int_t iRefPoint=0;iRefPoint<nPoints;iRefPoint++){
@@ -1071,8 +1071,8 @@ void CbmMuchHitFinderQa::PullsQa(){
     Double_t dymin = 0;
 
 //    if (cluster->GetNDigis()>1) {if (verbose) printf("\n"); continue;}
-    for(Int_t digiId=0;digiId<cluster->GetNDigis();digiId++){
-      Int_t index = cluster->GetDigiIndex(digiId);
+    for(Int_t digiId=0;digiId<cluster->GetNofDigis();digiId++){
+      Int_t index = cluster->GetDigi(digiId);
 //      printf("%i\n",index);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(index);
       // Not unique if the pad has several mcPoint references
@@ -1176,9 +1176,9 @@ void CbmMuchHitFinderQa::ClusterDeconvQa(){
   for(Int_t iCluster = 0; iCluster < nClusters; ++iCluster){
     CbmMuchCluster* cluster = (CbmMuchCluster*)fClusters->At(iCluster);
     if(!cluster) continue;
-    Int_t nDigis = cluster->GetNDigis();
+    Int_t nDigis = cluster->GetNofDigis();
     for(Int_t id=0; id < nDigis; ++id){
-      Int_t iDigi = cluster->GetDigiIndex(id);
+      Int_t iDigi = cluster->GetDigi(id);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
       if(!match) continue;
       for(Int_t ip=0; ip<match->GetNPoints();++ip){

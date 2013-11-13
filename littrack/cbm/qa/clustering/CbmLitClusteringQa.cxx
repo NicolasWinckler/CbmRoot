@@ -562,8 +562,8 @@ void CbmLitClusteringQa::SetMuchClustersArray()
    Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
    for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++) {
       CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
-      for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-         Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+      for(Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+         Int_t digiIndex = cluster->GetDigi(iDigi);
          if(isnan(digiIndex))continue;
          CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
          for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
@@ -639,8 +639,8 @@ Float_t CbmLitClusteringQa::CalculateMuchClusterToPointRatio(Int_t nCluster, Int
       }
    }
    CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
-   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+   for(Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+      Int_t digiIndex = cluster->GetDigi(iDigi);
       if(isnan(digiIndex))continue;
       CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
       for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
@@ -656,15 +656,15 @@ Float_t CbmLitClusteringQa::CalculateMuchDigisToClusterRatio(Int_t nCluster, Int
 {
    Int_t nofDigisInCluster = 0;
    CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
-   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+   for(Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+      Int_t digiIndex = cluster->GetDigi(iDigi);
       if(isnan(digiIndex))continue;
       CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
       for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
          if(digiMatch->GetRefIndex(iPoint) == nPoint)nofDigisInCluster++;
       }
    }
-   Float_t clusterToPointRatio = 100.0 * (Float_t)nofDigisInCluster / (Float_t)(cluster->GetNDigis());
+   Float_t clusterToPointRatio = 100.0 * (Float_t)nofDigisInCluster / (Float_t)(cluster->GetNofDigis());
    if(clusterToPointRatio > 100)clusterToPointRatio = 100;
    return clusterToPointRatio;
 }
@@ -674,9 +674,9 @@ Int_t CbmLitClusteringQa::GetNofPointsInCluster(Int_t nCluster)
    CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(nCluster);
    vector<Int_t> pointsInCluster;
    Int_t nofPoints = 0;
-   for(Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++)
+   for(Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++)
    {
-      Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+      Int_t digiIndex = cluster->GetDigi(iDigi);
       if(isnan(digiIndex))continue;
       CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
       for(Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++){
@@ -789,8 +789,8 @@ void CbmLitClusteringQa::FillMuchClustersHistogram()
       Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
       for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
          CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
-         if(cluster->GetNDigis() < 1)continue;
-         CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
+         if(cluster->GetNofDigis() < 1)continue;
+         CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigi(0));
          Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
          if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
          CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(digi->GetDetectorId());
@@ -978,7 +978,7 @@ void CbmLitClusteringQa::FillMuchClusterQualityHistogram()
 		Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
 		for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
 		   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
-		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
+		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigi(0));
 			Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
 			Int_t nLayer = fMuchGeoScheme->GetLayerIndex(digi->GetDetectorId());
 			Int_t iLayer = (nStation * nofLayers[nStation]) + nLayer;
@@ -1092,7 +1092,7 @@ void CbmLitClusteringQa::FillMuchMCPointsInClusterHistogrm()
 		Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
 		for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
 		   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
-		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigiIndex(0));
+		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigi(0));
 			Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
 			Int_t nLayer = fMuchGeoScheme->GetLayerIndex(digi->GetDetectorId());
 			Int_t iLayer = (nStation * nofLayers[nStation]) + nLayer;
@@ -1324,8 +1324,8 @@ void CbmLitClusteringQa::FillDigisInClusterDistributionHistogrm()
       Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
 	  for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
          CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
-         if(isnan(cluster->GetNDigis()))continue;
-         fHM->H1("hss_Much_NofDigisInCluster_Total")->Fill(cluster->GetNDigis(), 1);
+         if(isnan(cluster->GetNofDigis()))continue;
+         fHM->H1("hss_Much_NofDigisInCluster_Total")->Fill(cluster->GetNofDigis(), 1);
       }
    }
 }

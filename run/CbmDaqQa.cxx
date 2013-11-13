@@ -101,8 +101,8 @@ void CbmDaqQa::Exec(Option_t* opt) {
     CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(iCluster);
     Int_t mcRef=-1;
     Double_t mcTime = -1;
-    for (Int_t iDigi=0;iDigi<cluster->GetNDigis();iDigi++){
-      Int_t iDigiIndex = cluster->GetDigiIndex(iDigi);
+    for (Int_t iDigi=0;iDigi<cluster->GetNofDigis();iDigi++){
+      Int_t iDigiIndex = cluster->GetDigi(iDigi);
 //    for (Int_t iDigi=0;iDigi<fTimeSlice->GetDataSize(kMUCH);iDigi++){
       CbmMuchDigi* digi = (CbmMuchDigi*) fTimeSlice->GetData(kMUCH,iDigiIndex);
       Double_t t = digi->GetTime();

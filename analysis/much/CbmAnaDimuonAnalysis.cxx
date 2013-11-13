@@ -307,8 +307,8 @@ Int_t CbmAnaDimuonAnalysis::GetMCTrackId(Int_t iMuchTrack){
       CbmMuchPixelHit* phit = (CbmMuchPixelHit*) hit;
       Int_t clusterId = phit->GetRefId();
       CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
-      for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-              Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+      for (Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+              Int_t digiIndex = cluster->GetDigi(iDigi);
               DigiToTrackMatch(fPixelDigiMatches, digiIndex, matchMap);
       }
     } else{

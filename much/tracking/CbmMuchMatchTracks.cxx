@@ -158,8 +158,8 @@ void CbmMuchMatchTracks::ExecPixel(
    CbmMuchCluster* cluster = static_cast<CbmMuchCluster*>(fClusters->At(clusterId));
    if (cluster == NULL) return;
 
-   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-       Int_t digiId = cluster->GetDigiIndex(iDigi);
+   for (Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+       Int_t digiId = cluster->GetDigi(iDigi);
        CbmMuchDigiMatch* digiMatch = static_cast<CbmMuchDigiMatch*>(fPixelDigiMatches->At(digiId));
        if (digiMatch == NULL) continue;
        for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {

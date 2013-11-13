@@ -344,10 +344,10 @@ void CbmMuchClusteringQa0::LinkingClustersToMCPoints()
 	for(Int_t iCl = 0; iCl < fNofClusters; iCl++)
 	{
 		CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchCluster->At(iCl);
-		Int_t nDigis = cluster->GetNDigis();
+		Int_t nDigis = cluster->GetNofDigis();
 		for(Int_t iDigi = 0; iDigi < nDigis; iDigi++)
 		{
-			Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+			Int_t digiIndex = cluster->GetDigi(iDigi);
 			//std::cout<<"digiIndex: "<<digiIndex<<"\n";
 			CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatch->At(digiIndex);
 			Int_t nPoints = digiMatch->GetNPoints();
@@ -411,7 +411,7 @@ void CbmMuchClusteringQa0::LinkingClustersToMCPoints()
 			std::cout<<"-->P: "<<fRealPoints[fClusters[cls].mPointsInCluster[i]].nofDigis<<"\n";
 		}}
 		//---
-		CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigi->At(cluster->GetDigiIndex(0));
+		CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigi->At(cluster->GetDigi(0));
 		const CbmMuchLayerSide* layerSide = static_cast<CbmMuchLayerSide*>(fGeoScheme->GetLayerSideByDetId(digi->GetDetectorId()));
 		for(Int_t iStation = 0; iStation < 6; iStation++)
 		{
@@ -454,7 +454,7 @@ void CbmMuchClusteringQa0::CreationOfRelations()
 			if(fClusters[iCl].mClToPoint[0] > 100) fClusters[iCl].mClToPoint[0] = 100;
 			fClusters[iCl].bestPoint = 0;
 			fClusters[iCl].mDigiToCl[0] = 100.0 * (Float_t)(fClusters[iCl].mDigisByPoint[0]) /
-					(Float_t)(cluster->GetNDigis());
+					(Float_t)(cluster->GetNofDigis());
 			//		fRealPoints[fClusters[iCl].mPointsInCluster[0]].digisByCluster[0];
 			/*fClusters[iCl].mPointToCl[0] = 100 * fRealPoints[fClusters[iCl].mPointsInCluster[0]].digisByCluster[0] /
 					fClusters[iCl].mDigisByPoint[0];*/
@@ -480,7 +480,7 @@ void CbmMuchClusteringQa0::CreationOfRelations()
 						(Float_t)fRealPoints[fClusters[iCl].mPointsInCluster[iPoint]].nofDigis;
 				if(fClusters[iCl].mClToPoint[iPoint] > 100) fClusters[iCl].mClToPoint[iPoint] = 100;
 				fClusters[iCl].mDigiToCl[iPoint] = 100.0 * (Float_t)(fClusters[iCl].mDigisByPoint[iPoint]) /
-						(Float_t)(cluster->GetNDigis());
+						(Float_t)(cluster->GetNofDigis());
 				if(fClusters[iCl].mDigisByPoint[iPoint] > bp)
 				{
 					bp = fClusters[iCl].mDigisByPoint[iPoint];
@@ -756,7 +756,7 @@ void CbmMuchClusteringQa0::FillErrorsByRadiusHistograms()
 			if(fClusters[fAccuracyArray[iCl].nHit].leyer == 0)
 			{
 				const CbmMuchCluster* cluster = static_cast<const CbmMuchCluster*>(fMuchCluster->At(fAccuracyArray[iCl].nHit));
-				const CbmMuchDigi* digi = static_cast<const CbmMuchDigi*>(fMuchDigi->At(cluster->GetDigiIndex(0)));
+				const CbmMuchDigi* digi = static_cast<const CbmMuchDigi*>(fMuchDigi->At(cluster->GetDigi(0)));
 				Int_t detId = digi->GetDetectorId();
 				Long64_t chId = digi->GetChannelId();
 				CbmMuchModuleGem* module = static_cast<CbmMuchModuleGem*>(fGeoScheme->GetModuleByDetId(detId));

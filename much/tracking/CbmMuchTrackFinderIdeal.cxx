@@ -90,8 +90,8 @@ Int_t CbmMuchTrackFinderIdeal::DoFind(
 		if (!hit) continue;
 		Int_t clusterId = hit->GetRefId();
 		CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
-		for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-			ProcessDigiMatches(fPixelDigiMatches, cluster->GetDigiIndex(iDigi), iHit, kMUCHPIXELHIT);
+		for (Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
+			ProcessDigiMatches(fPixelDigiMatches, cluster->GetDigi(iDigi), iHit, kMUCHPIXELHIT);
 		} // loop over digis in cluster
 	} // loop over hits
 

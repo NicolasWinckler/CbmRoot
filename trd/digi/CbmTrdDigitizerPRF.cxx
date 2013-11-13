@@ -59,7 +59,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
     fModuleId(-1),
     fLayerId(-1),
     digi(NULL),
-    digiMatch(NULL),
+    //digiMatch(NULL),
     fTrdPoints(NULL),
     fDigis(new TClonesArray("CbmTrdDigi")),
     fDigiMatchs(NULL),
@@ -90,7 +90,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
    fModuleId(-1),
    fLayerId(-1),
     digi(NULL),
-    digiMatch(NULL),
+   //digiMatch(NULL),
    fTrdPoints(NULL),
    fDigis(NULL),
    fDigiMatchs(NULL),
@@ -342,7 +342,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   //map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it;
   for (fDigiMapIt = fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++) {
     new ((*fDigis)[iDigi])      CbmTrdDigi(*(fDigiMapIt->second.first));
-    //new ((*fDigiMatchs)[iDigi]) CbmTrdDigiMatch(*(fDigiMapIt->second.second)); // Memory LEAK !!!!!!!!!!!!!!!!!!!!!!!!!!
+    new ((*fDigiMatchs)[iDigi]) CbmMatch(*(fDigiMapIt->second.second)); // Memory LEAK !!!!!!!!!!!!!!!!!!!!!!!!!!
 
   
     delete fDigiMapIt->second.first;
@@ -532,21 +532,22 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
 void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
   fDigiMapIt = fDigiMap.find(address);
-  
+  const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(pointId));
   //map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it = fDigiMap.find(address);
   if (fDigiMapIt == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-     CbmMatch* digiMatch = new CbmMatch();
-     digiMatch->AddReference(pointId, charge);
-     fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
+    CbmMatch* digiMatch = new CbmMatch();
+    digiMatch->AddReference(pointId, charge);
+    fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
     /*
-    delete fDigiMap[address].first;
-    delete fDigiMap[address].second;
-    fDigiMap.erase(address);
+      delete fDigiMap[address].first;
+      delete fDigiMap[address].second;
+      fDigiMap.erase(address);
     */
   } else { // Pixel already in map -> Add charge
     fDigiMapIt->second.first->AddCharge(charge);
     fDigiMapIt->second.first->SetTime(max(time, fDigiMapIt->second.first->GetTime()));
-    fDigiMapIt->second.second->AddPoint(pointId);
+    //fDigiMapIt->second.second->AddPoint(pointId);
+    fDigiMapIt->second.second->AddReference(pointId, charge);
   }
   
 }

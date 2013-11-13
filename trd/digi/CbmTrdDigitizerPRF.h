@@ -88,7 +88,7 @@ class CbmTrdDigitizerPRF : public FairTask {
   TClonesArray *fMCStacks;  //! MC Track information
 
   CbmTrdDigi* digi;
-  CbmTrdDigiMatch* digiMatch;
+  //CbmTrdDigiMatch* digiMatch;
 
   CbmTrdDigiPar  *fDigiPar;    //!
   CbmTrdModule   *fModuleInfo; //!
@@ -98,8 +98,8 @@ class CbmTrdDigitizerPRF : public FairTask {
 
   // Temporary storage for digis.
   // map<address, pair<CbmTrdDigi*, CbmTrdDigiMatch*>
-  std::map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> > fDigiMap;
-  std::map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator fDigiMapIt;
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap;
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator fDigiMapIt;
   ClassDef(CbmTrdDigitizerPRF,2)
 
     };

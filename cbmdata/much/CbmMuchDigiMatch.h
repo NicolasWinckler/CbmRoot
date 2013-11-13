@@ -84,7 +84,7 @@ class CbmMuchDigiMatch : public TObject
    */
   UInt_t AddCharge(Int_t iPoint, UInt_t iCharge);
 
-  UInt_t AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime, TArrayD shape, Double_t mcTime);
+  void AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime, TArrayD shape, Double_t mcTime);
   
   Int_t GetNoPrimaryElectrons() { return fTimePerPrimaryElectron.GetSize(); }
   Int_t    GetRefIndexPerPrimaryElectron(Int_t i)  { return fRefIndexPerPrimaryElectron[i]; }
@@ -98,7 +98,7 @@ class CbmMuchDigiMatch : public TObject
   Double_t GetTimeStamp(Double_t threshold);
   Double_t GetTimeOverThreshold(Double_t threshold);
   Double_t GetDeadTime() const {return fDeadTime; }
-  Double_t SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; }
+  void SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; }
  private:
 
   TArrayI fRefIndex;                    // Array of MC point indices

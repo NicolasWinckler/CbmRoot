@@ -94,11 +94,11 @@ Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
 
 // -----   Public method AddCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
-  if ( iCharge < 0 ) {
-    cout << "-W- CbmMuchDigiMatch::AddCharge: Illegal charge value "
-	 << iCharge << endl;
-    return 0;
-  }
+//  if ( iCharge < 0 ) {
+//    cout << "-W- CbmMuchDigiMatch::AddCharge: Illegal charge value "
+//	 << iCharge << endl;
+//    return 0;
+//  }
   Int_t n = fCharge.GetSize();
   fCharge.Set(n+1);
   fCharge.AddAt(iCharge, n);
@@ -191,7 +191,7 @@ void CbmMuchDigiMatch::Reset() {
 
 
 // -------------------------------------------------------------------------
-UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t charge, Double_t t, TArrayD shape, Double_t mcTime) {
+void CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t charge, Double_t t, TArrayD shape, Double_t mcTime) {
   AddCharge(iPoint,charge);
   Int_t n = fRefIndexPerPrimaryElectron.GetSize();
   fRefIndexPerPrimaryElectron.Set(n+1);

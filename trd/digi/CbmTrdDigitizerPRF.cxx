@@ -3,12 +3,13 @@
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdDigi.h"
-#include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
 #include "CbmTrdGeoHandler.h"
 
 #include "CbmMCTrack.h"
+
+#include "CbmMatch.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -182,7 +183,7 @@ InitStatus CbmTrdDigitizerPRF::Init()
   fDigis = new TClonesArray("CbmTrdDigi", 100);
   ioman->Register("TrdDigi","TRD Digis",fDigis,kTRUE);
 
-  fDigiMatchs = new TClonesArray("CbmTrdDigiMatch", 100);
+  fDigiMatchs = new TClonesArray("CbmMatch", 100);
   ioman->Register("TrdDigiMatch","TRD Digis",fDigiMatchs,kTRUE);
 
   fGeoHandler->Init();
@@ -334,12 +335,12 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   }
   // Fill data from internally used stl map into output TClonesArray
   Int_t iDigi = 0;
-  map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it;
+  map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
   for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
     CbmTrdDigi* digi = it->second.first;
     new ((*fDigis)[iDigi]) CbmTrdDigi(*digi);
-    CbmTrdDigiMatch* digiMatch = it->second.second;
-    new ((*fDigiMatchs)[iDigi]) CbmTrdDigiMatch(*digiMatch);
+    CbmMatch* digiMatch = it->second.second;
+    new ((*fDigiMatchs)[iDigi]) CbmMatch(*digiMatch);
     delete digi;
     delete digiMatch;
     iDigi++;
@@ -516,15 +517,18 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
 // --------------------------------------------------------------------
 void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
-  map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it = fDigiMap.find(address);
+  const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(pointId));
+  map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
   if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-    fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), new CbmTrdDigiMatch(pointId));
+     CbmMatch* digiMatch = new CbmMatch();
+     digiMatch->AddReference(pointId, charge);
+     fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
   } else { // Pixel already in map -> Add charge
-    CbmTrdDigi* digi = it->second.first;
-    digi->AddCharge(charge);
-    digi->SetTime(max(time, digi->GetTime()));
-    CbmTrdDigiMatch* digiMatch = it->second.second;
-    digiMatch->AddPoint(pointId);
+     CbmTrdDigi* digi = it->second.first;
+     digi->AddCharge(charge);
+     digi->SetTime(max(time, digi->GetTime()));
+     CbmMatch* digiMatch = it->second.second;
+     digiMatch->AddReference(pointId, charge);
   }
 }
 

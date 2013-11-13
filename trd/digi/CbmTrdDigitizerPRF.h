@@ -1,7 +1,6 @@
 #ifndef CBMTRDDIGITIZERPRF_H
 #define CBMTRDDIGITIZERPRF_H
 
-#include "CbmTrdDigiMatch.h"
 #include "FairTask.h"
 
 #include <map>
@@ -18,12 +17,12 @@ class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdRadiator;
 class CbmTrdGeoHandler;
+class CbmMatch;
 
 class TClonesArray;
 class TH1F;
 class TH2F;
 class TProfile;
-class CbmTrdDigiMatch;
 
 class CbmTrdDigitizerPRF : public FairTask {
 
@@ -93,8 +92,7 @@ class CbmTrdDigitizerPRF : public FairTask {
   CbmTrdGeoHandler* fGeoHandler; //!
 
     // Temporary storage for digis.
-    // map<address, pair<CbmTrdDigi*, CbmTrdDigiMatch*>
-  std::map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> > fDigiMap;
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap;
  
   ClassDef(CbmTrdDigitizerPRF,2)
 

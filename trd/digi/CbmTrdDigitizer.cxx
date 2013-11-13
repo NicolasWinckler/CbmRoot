@@ -3,12 +3,12 @@
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdDigi.h"
-#include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
 #include "CbmTrdAddress.h"
 
 #include "CbmMCTrack.h"
+#include "CbmMatch.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -72,7 +72,7 @@ InitStatus CbmTrdDigitizer::Init()
    fTrdDigis = new TClonesArray("CbmTrdDigi", 100);
    ioman->Register("TrdDigi", "TRD Digis", fTrdDigis, kTRUE);
 
-   fTrdDigiMatches = new TClonesArray("CbmTrdDigiMatch", 100);
+   fTrdDigiMatches = new TClonesArray("CbmMatch", 100);
    ioman->Register("TrdDigiMatch", "TRD Digis", fTrdDigiMatches, kTRUE);
 
    fRadiator->Init();
@@ -93,12 +93,12 @@ void CbmTrdDigitizer::Exec(Option_t * option)
 
    // Fill data from internally used stl map into output TClonesArray
    Int_t iDigi = 0;
-   map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it;
+   map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
    for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
       CbmTrdDigi* digi = it->second.first;
       new ((*fTrdDigis)[iDigi]) CbmTrdDigi(*digi);
-      CbmTrdDigiMatch* digiMatch = it->second.second;
-      new ((*fTrdDigiMatches)[iDigi]) CbmTrdDigiMatch(*digiMatch);
+      CbmMatch* digiMatch = it->second.second;
+      new ((*fTrdDigiMatches)[iDigi]) CbmMatch(*digiMatch);
       delete digi;
       delete digiMatch;
       iDigi++;
@@ -151,15 +151,17 @@ void CbmTrdDigitizer::AddDigi(
    // In case it exists already the information about another MC point in this
    // digi is added. Also the additional energy loss is added to the digi.
 
-   map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it = fDigiMap.find(address);
+   map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
    if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-      fDigiMap[address] = make_pair(new CbmTrdDigi(address, energyLoss, time), new CbmTrdDigiMatch(pointId));
+      CbmMatch* digiMatch = new CbmMatch();
+      digiMatch->AddReference(pointId, energyLoss);
+      fDigiMap[address] = make_pair(new CbmTrdDigi(address, energyLoss, time), digiMatch);
    } else { // Pixel already in map -> Add charge
       CbmTrdDigi* digi = it->second.first;
       digi->AddCharge(energyLoss);
       digi->SetTime(max(time, digi->GetTime()));
-      CbmTrdDigiMatch* digiMatch = it->second.second;
-      digiMatch->AddPoint(pointId);
+      CbmMatch* digiMatch = it->second.second;
+      digiMatch->AddReference(pointId, energyLoss);
    }
 }
 

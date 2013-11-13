@@ -1,7 +1,6 @@
 #ifndef CBMTRDOCCUPANCYQA_H_
 #define CBMTRDOCCUPANCYQA_H_
 
-#include "CbmTrdDigiMatch.h"
 #include "FairTask.h"
 
 #include <map>
@@ -24,7 +23,6 @@ class TH2F;
 class TProfile;
 class TProfile2D;
 class TCanvas;
-class CbmTrdDigiMatch;
 
 typedef struct Pad
 {

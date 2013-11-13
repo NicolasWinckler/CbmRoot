@@ -7,9 +7,9 @@
 
 #include "CbmTrdHit.h"
 #include "CbmTrdDigi.h"
-#include "CbmTrdDigiMatch.h"
 #include "CbmTrdPoint.h"
 #include "CbmGeoTrdPar.h"
+#include "CbmMatch.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -241,7 +241,7 @@ void CbmTrdHitProducerQa::Exec(Option_t* option)
     // Declare variables
     CbmTrdHit* trdHit = NULL;
     CbmTrdDigi* trdDigi = NULL;
-    CbmTrdDigiMatch* trdDigiMatch = NULL;
+    CbmMatch* trdDigiMatch = NULL;
     CbmTrdPoint* trdPoint = NULL;
     //    CbmMCTrack* mctrack = NULL;
 
@@ -273,10 +273,10 @@ void CbmTrdHitProducerQa::Exec(Option_t* option)
 	// This will have to change in the future, when the creation of the poin
 	// will not be necessarily connected to existence of tyhe point
 
-	trdDigiMatch = (CbmTrdDigiMatch*) fTrdDigiMatchCollection->At(trdHit->GetRefId());
+	trdDigiMatch = (CbmMatch*) fTrdDigiMatchCollection->At(trdHit->GetRefId());
 	if(NULL == trdDigiMatch) continue;
 
-	trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdDigiMatch->GetRefIndex());
+	trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdDigiMatch->GetMatchedReferenceId());
 	if(NULL == trdPoint) continue;
 
         plane = trdHit->GetPlaneId();

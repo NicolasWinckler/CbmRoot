@@ -20,9 +20,9 @@ class TClonesArray;
 
 class CbmTrdDigiPar;
 class CbmTrdDigi;
-class CbmTrdDigiMatch;
 class CbmTrdModule;
 class CbmTrdRadiator;
+class CbmMatch;
 
 class CbmTrdDigitizer : public FairTask
 {
@@ -75,17 +75,16 @@ private:
     Float_t fEfficiency; // Digi production efficiency [0..1]
 
     TClonesArray* fTrdPoints; //! Trd MC points
-    TClonesArray* fTrdDigis; //! TRD digis
-    TClonesArray* fTrdDigiMatches; //! Corresponding MCPoints to TRD digis
     TClonesArray* fMCTracks;  //! MC Track information
+    TClonesArray* fTrdDigis; //! Output CbmTrdDigi array
+    TClonesArray* fTrdDigiMatches; //! Output CbmMatch array
 
     CbmTrdDigiPar* fDigiPar;
     CbmTrdModule* fModuleInfo;
     CbmTrdRadiator* fRadiator;
     
     // Temporary storage for digis.
-    // map<address, pair<CbmTrdDigi*, CbmTrdDigiMatch*>
-    map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> > fDigiMap;
+    map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap;
 
     ClassDef(CbmTrdDigitizer, 4);
 };

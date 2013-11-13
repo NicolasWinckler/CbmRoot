@@ -30,7 +30,7 @@
 //#pragma link C++ class  CbmTrdCluster;
 #pragma link C++ class  CbmTrdContFact;
 #pragma link C++ class  CbmTrdRadiator;
-#pragma link C++ class  CbmTrdMatchTracks+;
+//#pragma link C++ class  CbmTrdMatchTracks+;
 #pragma link C++ class  CbmTrdSetTracksPidWkn+;
 #pragma link C++ class  CbmTrdSetTracksPidLike+;
 #pragma link C++ class  CbmTrdSetTracksPidANN+;

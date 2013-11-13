@@ -108,7 +108,7 @@ CbmTrdFindTracks.cxx
 CbmTrdTrackFinderIdeal.cxx  
 CbmTrdFitTracks.cxx  
 CbmTrdTrackFitterIdeal.cxx  
-CbmTrdMatchTracks.cxx
+#CbmTrdMatchTracks.cxx
 CbmTrdSetTracksPidWkn.cxx       
 CbmTrdSetTracksPidLike.cxx     
 CbmTrdSetTracksPidANN.cxx       

@@ -116,8 +116,8 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRectangular(Int_t nStation, Int
 			fPadList[padIterator].fDx = sector->GetPadDx();
 			fPadList[padIterator].fDy = sector->GetPadDy();
 			fPadList[padIterator].fNeighbors.clear();
-			fPadList[padIterator].channelID = pad->GetChannelId();
-			fPadByChannelId[pad->GetChannelId()] = padIterator;
+			fPadList[padIterator].channelID = CbmMuchAddress::GetElementAddress(pad->GetAddress() ,kMuchChannel);
+			fPadByChannelId[CbmMuchAddress::GetElementAddress(pad->GetAddress() ,kMuchChannel)] = padIterator;
 			padIterator++;
 		}
 	}
@@ -211,7 +211,7 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nL
 			fPadList[padIterator].fX = r * cos(phi);
 			fPadList[padIterator].fY = r * sin(phi);
 			fPadList[padIterator].fNeighbors.clear();
-			fPadList[padIterator].channelID = pad->GetChannelId();
+			fPadList[padIterator].channelID = CbmMuchAddress::GetElementAddress(pad->GetAddress() ,kMuchChannel);
 			fPadByChannelId[pad->GetAddress()] = padIterator;
 			fPadList[padIterator].nSector = iSector;
 			padIterator++;

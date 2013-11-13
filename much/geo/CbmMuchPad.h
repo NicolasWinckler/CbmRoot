@@ -43,10 +43,6 @@ public:
 
   Int_t GetSectorIndex()  { return CbmMuchAddress::GetElementId(fAddress,kMuchSector);  }
   Int_t GetChannelIndex() { return CbmMuchAddress::GetElementId(fAddress,kMuchChannel); }
-  
-  // specially for littrack
-  // TODO remove after littrack fix
-  Int_t GetChannelId() {return CbmMuchAddress::GetElementAddress(fAddress,kMuchChannel); }
 protected:
   Int_t               fAddress;    // Detector ID (including module number)
   Double_t            fX;          // X-coordinate of the pad center

@@ -228,14 +228,14 @@ void global_reco(Int_t nEvents = 10, // number of events
 				run->AddTask(trdHitProd);
 			} else if (trdHitProducerType == "clustering") {
 				// ----- TRD clustering -----
-				CbmTrdDigitizerPRF* trdClustering = new CbmTrdDigitizerPRF("TRD Clusterizer", "TRD task", radiator, false, true);
-				run->AddTask(trdClustering);
+			   CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF("TrdDigiPrf","TRD digi prf",radiator);
+			   run->AddTask(trdDigiPrf);
 
-				CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast(true, true, false, 5.0e-7);
-				run->AddTask(trdClusterfindingfast);
+			   CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
+			   run->AddTask(trdCluster);
 
-				CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
-				run->AddTask(trdClusterHitProducer);
+			   CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
+			   run->AddTask(trdHit);
 				// ----- End TRD Clustering -----
 			}
 			// ------------------------------------------------------------------------
@@ -265,11 +265,6 @@ void global_reco(Int_t nEvents = 10, // number of events
 		finder->SetMergerType("nearest_hit");
 
 		run->AddTask(finder);
-
-		if (IsTrd(parFile)) {
-			CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
-			run->AddTask(trdMatchTracks);
-		}
 
 		if (IsMuch(parFile)) {
 			CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
@@ -311,35 +306,8 @@ void global_reco(Int_t nEvents = 10, // number of events
 		// -----------------------------------------------------------------------
 	}
 
-//	if (opt == "all" || opt == "tracking") {
-//		// ----- Reconstruction QA tasks -----------------------------------------
-//		CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
-//		trackingQa->SetMinNofPointsSts(normStsPoints);
-//		trackingQa->SetMinNofPointsTrd(normTrdPoints);
-//		trackingQa->SetMinNofPointsMuch(normMuchPoints);
-//		trackingQa->SetMinNofPointsTof(normTofPoints);
-//		trackingQa->SetQuota(0.7);
-//		trackingQa->SetMinNofHitsTrd(normTrdHits);
-//		trackingQa->SetMinNofHitsMuch(normMuchHits);
-//		trackingQa->SetMinNofHitsRich(7);
-//		trackingQa->SetQuotaRich(0.6);
-//		trackingQa->SetVerbose(normTofHits);
-//		trackingQa->SetOutputDir(std::string(resultDir));
-//		run->AddTask(trackingQa);
-//
-//		CbmLitFitQa* fitQa = new CbmLitFitQa();
-//		fitQa->SetMvdMinNofHits(0);
-//		fitQa->SetStsMinNofHits(normStsPoints);
-//		fitQa->SetMuchMinNofHits(normMuchPoints);
-//		fitQa->SetTrdMinNofHits(normTrdPoints);
-//		fitQa->SetOutputDir(std::string(resultDir));
-//		run->AddTask(fitQa);
-//
-//		CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-//		clusteringQa->SetOutputDir(std::string(resultDir));
-//		run->AddTask(clusteringQa);
-//		// -----------------------------------------------------------------------
-//	}
+   CbmMatchRecoToMC* matchTask = new CbmMatchRecoToMC();
+   run->AddTask(matchTask);
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

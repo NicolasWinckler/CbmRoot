@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 100)
+void global_sim(Int_t nEvents = 10)
 {
    TTree::SetMaxTreeSize(90000000000);
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));

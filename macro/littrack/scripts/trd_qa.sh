@@ -47,5 +47,7 @@ run_reco smearing nn
 run_reco smearing branch
 run_reco digi nn
 run_reco digi branch
+run_reco clustering nn
+run_reco clustering branch
 
 export LIT_SCRIPT=no

@@ -135,7 +135,7 @@ void global_reco_qa(Int_t nEvents = 10,
    fitQa->SetMuchMinNofHits(normMuchPoints);
    fitQa->SetTrdMinNofHits(normTrdPoints);
    fitQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(fitQa);
+  // run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFile(muchDigiFile.Data());

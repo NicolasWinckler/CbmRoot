@@ -1,7 +1,7 @@
 #!/bin/sh
 
-xterm -hold -e ". ./trd_qa.sh trd_v13g trd/trd_v13g.geo.root $VMCWORKDIR/parameters/trd/trd_v13g.digi.par 6 25gev"&
-xterm -hold -e ". ./trd_qa.sh trd_v13k trd/trd_v13k.geo.root $VMCWORKDIR/parameters/trd/trd_v13k.digi.par 6 8gev"&
+xterm -hold -e ". ./trd_qa.sh trd_v13p_1e trd/trd_v13p_1e.geo.root $VMCWORKDIR/parameters/trd/trd_v13p_1e.digi.par 3 8gev"&
+xterm -hold -e ". ./trd_qa.sh trd_v13p_3e trd/trd_v13p_3e.geo.root $VMCWORKDIR/parameters/trd/trd_v13p_3e.digi.par 6 25gev"&
 
 #xterm -hold -e ". ./trd_qa.sh trd_v13c trd/trd_v13c.root $VMCWORKDIR/parameters/trd/trd_v13c.digi.par 6 25gev"&
 #xterm -hold -e ". ./trd_qa.sh trd_v13d trd/trd_v13d.root $VMCWORKDIR/parameters/trd/trd_v13d.digi.par 1 8gev"&

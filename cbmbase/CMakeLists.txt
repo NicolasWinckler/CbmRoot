@@ -67,7 +67,9 @@ report/CbmStudyReport.cxx
 report/CbmSimulationReport.cxx
 report/CbmTextReportElement.cxx
 report/CbmHtmlReportElement.cxx       
-report/CbmLatexReportElement.cxx  
+report/CbmLatexReportElement.cxx
+
+CbmMatchRecoToMC.cxx
 )
 
 # Better way to check for presence of print or Print

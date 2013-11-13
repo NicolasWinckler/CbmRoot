@@ -60,6 +60,8 @@
 #pragma link C++ class CbmLatexReportElement+;
 #pragma link C++ class CbmHtmlReportElement+;
 
+#pragma link C++ class CbmMatchRecoToMC+;
+
 #pragma link C++ enum ESystemId;
 #pragma link C++ enum EPassiveId;
 

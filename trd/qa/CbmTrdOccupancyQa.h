@@ -100,8 +100,8 @@ class CbmTrdOccupancyQa : public FairTask {
   Double_t fmax;
   std::map<Int_t, OccupancyModule*> fModuleMap; //!
   std::map<Int_t, OccupancyModule*>::iterator fModuleMapIt; //!  
-  std::map<Int_t, TH2F*> fModuleOccupancyMap; //!
-  std::map<Int_t, TH2F*>::iterator fModuleOccupancyMapIt; //!
+  std::map<Int_t, TH2I*> fModuleOccupancyMap; //!
+  std::map<Int_t, TH2I*>::iterator fModuleOccupancyMapIt; //!
   std::map<Int_t, TH1F*> fModuleOccupancyMemoryMap; //!
   std::map<Int_t, TH1F*>::iterator fModuleOccupancyMemoryMapIt; //!
   std::map<Int_t, TCanvas*> fLayerOccupancyMap; //!

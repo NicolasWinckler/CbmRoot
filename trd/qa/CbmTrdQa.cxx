@@ -26,6 +26,13 @@
 #include "TColor.h"
 #include <iostream>
 #include <cmath>
+
+#include "CbmTrdDigitizer.h"
+#include "CbmTrdDigitizerPRF.h"
+#include "CbmTrdClusterFinderFast.h"
+#include "CbmTrdHitProducerCluster.h"
+
+
 using std::cout;
 using std::cin;
 using std::endl;
@@ -62,6 +69,16 @@ CbmTrdQa::CbmTrdQa()
     fModuleLostMapIt(),
     fModuleEfficiencyMap(),
     fModuleEfficiencyMapIt(),
+    fModuleMultiPointMap(),
+    fModuleMultiPointMapIt(),
+    fModuledEdxMap(),
+    fModuledEdxMapIt(), 
+    fModuleTracklengthMap(),
+    fModuleTracklengthMapIt(), 
+    fModuleDeltaEMapIt(), 
+    fModuleDeltaEMap(),
+    fModuleClusterSizeMap(),
+    fModuleClusterSizeMapIt(),
     fTriggerThreshold(1e-6),
     fGeo(""),
     fD(true),
@@ -132,6 +149,16 @@ CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_
     fModuleLostMapIt(),
     fModuleEfficiencyMap(),
     fModuleEfficiencyMapIt(),
+    fModuleMultiPointMap(),
+    fModuleMultiPointMapIt(),
+    fModuledEdxMap(),
+    fModuledEdxMapIt(), 
+    fModuleTracklengthMap(),
+    fModuleTracklengthMapIt(), 
+    fModuleDeltaEMapIt(), 
+    fModuleDeltaEMap(),
+    fModuleClusterSizeMap(),
+    fModuleClusterSizeMapIt(),
     fTriggerThreshold(triggerThreshold),
     fGeo(geo),
     fD(true),
@@ -254,6 +281,37 @@ CbmTrdQa::~CbmTrdQa()
   } 
   fModuleEfficiencyMap.clear();
 
+  for (fModuleMultiPointMapIt = fModuleMultiPointMap.begin();
+       fModuleMultiPointMapIt != fModuleMultiPointMap.end(); ++fModuleMultiPointMapIt) {
+    delete fModuleMultiPointMapIt->second;
+  } 
+  fModuleMultiPointMap.clear();
+
+
+  for (fModuleDeltaEMapIt = fModuleDeltaEMap.begin();
+       fModuleDeltaEMapIt != fModuleDeltaEMap.end(); ++fModuleDeltaEMapIt) {
+    delete fModuleDeltaEMapIt->second;
+  } 
+  fModuleDeltaEMap.clear();
+
+  for (fModuleTracklengthMapIt = fModuleTracklengthMap.begin();
+       fModuleTracklengthMapIt != fModuleTracklengthMap.end(); ++fModuleTracklengthMapIt) {
+    delete fModuleTracklengthMapIt->second;
+  } 
+  fModuleTracklengthMap.clear();
+
+  for (fModuledEdxMapIt = fModuledEdxMap.begin();
+       fModuledEdxMapIt != fModuledEdxMap.end(); ++fModuledEdxMapIt) {
+    delete fModuledEdxMapIt->second;
+  } 
+  fModuledEdxMap.clear();
+
+  for (fModuleClusterSizeMapIt = fModuleClusterSizeMap.begin();
+       fModuleClusterSizeMapIt != fModuleClusterSizeMap.end(); ++fModuleClusterSizeMapIt) {
+    delete fModuleClusterSizeMapIt->second;
+  } 
+  fModuleClusterSizeMap.clear();
+
   delete fDistanceMcToHit;
   delete fDistanceMcToHitAll;
   delete fdEdxPionMc;
@@ -341,7 +399,7 @@ InitStatus CbmTrdQa::Init()
   }
   fGeoHandler->Init();
 
-  fLayerDummy = new TH2I("LayerDummy","",1200,-600,600,1000,-500,500);
+  fLayerDummy = new TH2I("LayerDummy","",1,-600,600,1,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
   fLayerDummy->GetXaxis()->SetLabelSize(0.02);
@@ -472,30 +530,47 @@ InitStatus CbmTrdQa::Init()
   fClusterPerHit = new TH1I("fClusterPerHit","fClusterPerHit",101,-0.5,100.5);
   fClusterPerHit->SetXTitle("cluster per hit");
   fClusterPerHit->SetYTitle("#");
-  fPRF_1D = new TProfile("fPRF_1D","fPRF_1D",300,-1.5,1.5);
-  fPRF_2D = new TH2I("fPRF_2D","fPRF_2D",300,-1.5,1.5,100,0,1);
+  fPRF_1D = new TProfile("fPRF_1D","fPRF_1D",30,-1.5,1.5);
+  fPRF_2D = new TH2I("fPRF_2D","fPRF_2D",30,-1.5,1.5,10,0,1);
 
   return kSUCCESS;
 }
+Double_t CbmTrdQa::GetTrackLength(CbmTrdPoint* point){
+  return TMath::Sqrt(
+		     (point->GetXOut() - point->GetXIn()) * (point->GetXOut() - point->GetXIn()) + 
+		     (point->GetYOut() - point->GetYIn()) * (point->GetYOut() - point->GetYIn()) + 
+		     (point->GetZOut() - point->GetZIn()) * (point->GetZOut() - point->GetZIn())
+		     );
+}
+
+void CbmTrdQa::SetTriggerThreshold(Double_t triggerthreshold){
+  fTriggerThreshold = triggerthreshold;
+}
+
 void CbmTrdQa::Exec(Option_t * option)
 {
   Bool_t samePadMerge = false;//true;
+  //fTriggerThreshold = CbmTrdClusterFinderFast::GetTriggerThreshold();
   TStopwatch timer;
   timer.Start();
   cout << endl << "==================CbmTrdQa===================" << endl;
-  Int_t nEntries(0), iTrack(-1), moduleAddress(-1), Station(-1), Layer(-1), combiId(-1), dEdx(0), rPos(0), PDG(-1), ghostCount(0), lostCount(0);
+  Int_t nEntries(0), iTrack(-1), moduleAddress(-1), Station(-1), Layer(-1), combiId(-1), dEdx(0), rPos(0), PDG(-1), ghostCount(0), lostCount(0), nStsPoints(0);
   TString title;
   Bool_t debug = false;
   CbmMCTrack *track = NULL;
   CbmTrdPoint *point = NULL;
+  CbmTrdPoint *point2 = NULL;
   CbmTrdDigi *digi = NULL;
   CbmTrdCluster *cluster = NULL;
   CbmTrdHit *hit = NULL;
   CbmTrdPoint *point_temp = NULL;
+  std::map<Int_t, Int_t> deltaEMap;
+  std::map<Int_t, Int_t> TrackableMap;
   // MC-points
   if (fP && fT) {
     nEntries = fPoints->GetEntries();
     printf("%i Points\n",nEntries);
+   
     for (Int_t iPoint=0; iPoint < nEntries; iPoint++ ) {
       point = (CbmTrdPoint*) fPoints->At(iPoint);
       fdEdxPoint->Fill(point->GetEnergyLoss());
@@ -509,22 +584,90 @@ void CbmTrdQa::Exec(Option_t * option)
       iTrack = point->GetTrackID();
       track = (CbmMCTrack*) fMCTracks->At(iTrack);
       PDG = track->GetPdgCode();
+      nStsPoints = track->GetNPoints(kSTS);
       fModuleInfo = fDigiPar->GetModule(moduleAddress);
       if (fModuleGhostMap.find(moduleAddress) == fModuleGhostMap.end()){
 	title.Form("G%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
-	fModuleGhostMap[moduleAddress] = new TH1F(title,title,200,0,200);
+	fModuleGhostMap[moduleAddress] = new TH1I(title,title,200,0,200);
 	fModuleGhostMap[moduleAddress]->SetXTitle("left over points / all points [%]");
 	fModuleGhostMap[moduleAddress]->SetYTitle("#");
 	title.Form("L%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
-	fModuleLostMap[moduleAddress]  = new TH1F(title,title,200,0,200);
+	fModuleLostMap[moduleAddress]  = new TH1I(title,title,200,0,200);
 	fModuleLostMap[moduleAddress]->SetXTitle("left over hits / all points [%]");
 	fModuleLostMap[moduleAddress]->SetYTitle("#");
 	title.Form("E%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
-	fModuleEfficiencyMap[moduleAddress]  = new TH1F(title,title,200,0,200);
+	fModuleEfficiencyMap[moduleAddress]  = new TH1I(title,title,200,0,200);
 	fModuleEfficiencyMap[moduleAddress]->SetXTitle("found point hit pairs / all points [%]");
 	fModuleEfficiencyMap[moduleAddress]->SetYTitle("#");
+	title.Form("M%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleMultiPointMap[moduleAddress]  = new TH1I(title,title,200,0,200);
+	fModuleMultiPointMap[moduleAddress]->SetXTitle("multi point per channel / all points [%]");
+	fModuleMultiPointMap[moduleAddress]->SetYTitle("#");
+	title.Form("D%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleDeltaEMap[moduleAddress]  = new TH1I(title,title,200,0,200);
+	fModuleDeltaEMap[moduleAddress]->SetXTitle("#delta-electrons [%]");
+	fModuleDeltaEMap[moduleAddress]->SetYTitle("#");
+	title.Form("TL%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleTracklengthMap[moduleAddress]  = new TH1I(title,title,200,0,10);
+	fModuleTracklengthMap[moduleAddress]->SetXTitle("track length [cm]");
+	fModuleTracklengthMap[moduleAddress]->SetYTitle("#");
+	title.Form("dE%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuledEdxMap[moduleAddress]  = new TH1I(title,title,200,0,50);
+	fModuledEdxMap[moduleAddress]->SetXTitle("#LTdEdx#GT [keV]");
+	fModuledEdxMap[moduleAddress]->SetYTitle("#");
+	title.Form("CS%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleClusterSizeMap[moduleAddress]  = new TH1I(title,title,200,0,200);
+	fModuleClusterSizeMap[moduleAddress]->SetXTitle("cluster size [channel]");
+	fModuleClusterSizeMap[moduleAddress]->SetYTitle("#");
+	title.Form("TA%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleTrackableMap[moduleAddress]  = new TH1I(title,title,200,0,200);
+	fModuleTrackableMap[moduleAddress]->SetXTitle("min. 5 STS points [%]");
+	fModuleTrackableMap[moduleAddress]->SetYTitle("#");
+	title.Form("TA2%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleTrackableMap2[moduleAddress]  = new TH1I(title,title,200,0,200);
+	fModuleTrackableMap2[moduleAddress]->SetXTitle("min. 5 STS points [%]");
+	fModuleTrackableMap2[moduleAddress]->SetYTitle("#");
+	title.Form("AP%i_S%i_L%i_(%.2f, %.2f, %.2f)",moduleAddress,Station,Layer,fModuleInfo->GetX(),fModuleInfo->GetY(),fModuleInfo->GetZ());
+	fModuleAveragePointsMap[moduleAddress]  = new TH1I(title,title,500,0,500);
+	fModuleAveragePointsMap[moduleAddress]->SetXTitle("average points per event");
+	fModuleAveragePointsMap[moduleAddress]->SetYTitle("#");
+
+	deltaEMap[moduleAddress] = 0;
+	TrackableMap[moduleAddress] = 0;
       }
-      fModulePointMap[moduleAddress].push_back(iPoint);       
+  
+      Double_t p_global[3] = {0.5 * (point->GetXOut() + point->GetXIn()),
+			      0.5 * (point->GetYOut() + point->GetYIn()),
+			      0.5 * (point->GetZOut() + point->GetZIn())};
+	
+      gGeoManager->FindNode(p_global[0], p_global[1], p_global[2]);
+      if (!TString(gGeoManager->GetPath()).Contains("gas")){
+	cout << gGeoManager->GetPath() << endl;
+	continue;
+      }
+      Double_t trackLength = GetTrackLength(point);
+      /*
+	TMath::Sqrt(
+	(point->GetXOut() - point->GetXIn()) * (point->GetXOut() - point->GetXIn()) + 
+	(point->GetYOut() - point->GetYIn()) * (point->GetYOut() - point->GetYIn()) + 
+	(point->GetZOut() - point->GetZIn()) * (point->GetZOut() - point->GetZIn())
+	);
+      */
+      if (Int_t(trackLength / 1.0 + 0.9) < 1){// Track length threshold of minimum 0.1cm track length in gas volume
+	deltaEMap[moduleAddress] += 1;	
+	continue;
+      }
+    if (nStsPoints > 5)
+	TrackableMap[moduleAddress] += 1;
+
+      Double_t ELoss = point->GetEnergyLoss();
+      //if (ELoss < 1E-9){
+      //continue;
+      //}
+      fModulePointMap[moduleAddress].push_back(iPoint); 
+      fModuledEdxMap[moduleAddress]->Fill(ELoss*1E6);
+      fModuleTracklengthMap[moduleAddress]->Fill(trackLength);
+
       if (fLayerMap.find(combiId) == fLayerMap.end()){
 	title.Form("Station%i_Layer%i",Station,Layer);
 	fLayerMap[combiId] =  new TCanvas(title,title,1200,1000);
@@ -564,6 +707,7 @@ void CbmTrdQa::Exec(Option_t * option)
     for (Int_t iCluster=0; iCluster < nEntries; iCluster++ ) {
       cluster = (CbmTrdCluster*) fClusters->At(iCluster);
       Double_t charge = 0;
+      fModuleClusterSizeMap[CbmTrdAddress::GetModuleAddress(((CbmTrdDigi*)fDigis->At(cluster->GetDigi(0)))->GetAddress())]->Fill(Int_t(cluster->GetNofDigis()));
       for (Int_t iDigi = 0; iDigi < cluster->GetNofDigis(); iDigi++){
 	digi = (CbmTrdDigi*)fDigis->At(cluster->GetDigi(iDigi));
 	charge += digi->GetCharge();
@@ -620,19 +764,27 @@ void CbmTrdQa::Exec(Option_t * option)
        fModulePointMapIt != fModulePointMap.end(); ++fModulePointMapIt) {
     if (fModuleHitMap.find(fModulePointMapIt->first) == fModuleHitMap.end()) {
       printf("module %i not found in hit map\n",fModulePointMapIt->first);
-    } 
-    else {
-      //fModuleHitMapIt = fModuleHitMap[fModulePointMapIt->first];
+    } else {
+      std::map<Int_t, Int_t> hasBeenUsed;
+
       moduleAddress = fModulePointMapIt->first;
       fModuleInfo = fDigiPar->GetModule(moduleAddress);
       allPoints = Int_t(fModulePointMapIt->second.size());
+      fModuleAveragePointsMap[moduleAddress]->Fill(allPoints);
       allHits = Int_t(fModuleHitMap[moduleAddress].size());
+      fModuleDeltaEMap[moduleAddress]->Fill(1.0e2 * deltaEMap[moduleAddress] / allPoints);
+      fModuleTrackableMap[moduleAddress]->Fill(100. * TrackableMap[moduleAddress] / allPoints);
+      fModuleTrackableMap2[moduleAddress]->Fill(TrackableMap[moduleAddress]);
+      //fModuleHitMapIt = fModuleHitMap[fModulePointMapIt->first];
+      //cout << "Module: " << moduleAddress << "   Points: "<< fModulePointMapIt->second.size() << endl;
+     
       Double_t multiHitCounterModule = 0;
       Double_t r = sqrt(fModuleInfo->GetX() * fModuleInfo->GetX() + fModuleInfo->GetY() * fModuleInfo->GetY()); // radial position of the module center
       Double_t alpha = atan(r / fModuleInfo->GetZ()) * 1000.; //[mrad]
       //printf("%.2f %.2f %.2f %.2f %.2f\n",fModuleInfo->GetX(), fModuleInfo->GetY(), fModuleInfo->GetZ(), r, alpha);
       //for (Int_t iPoint = 0; iPoint < Int_t(fModulePointMapIt->second.size()); iPoint++) {
       for (Int_t iPoint = Int_t(fModulePointMapIt->second.size())-1; iPoint >= 0; iPoint--) { // its better to go backwards since found point and hit pairs are erased -> vector sice is dynamic
+	//hasBeenUsed[fModulePointMapIt->second[iPoint]] = 0;
 	point = (CbmTrdPoint*) fPoints->At(fModulePointMapIt->second[iPoint]);
 	iTrack = point->GetTrackID();
 	track = (CbmMCTrack*) fMCTracks->At(iTrack);
@@ -644,9 +796,9 @@ void CbmTrdQa::Exec(Option_t * option)
 	  0.5 * (point->GetZIn() + point->GetZOut())};
 	*/
 	
-	Double_t p_global[3] = {point->GetXOut(),
-				point->GetYOut(),
-				point->GetZOut()};
+	Double_t p_global[3] = {0.5 * (point->GetXOut() + point->GetXIn()),
+				0.5 * (point->GetYOut() + point->GetYIn()),
+				0.5 * (point->GetZOut() + point->GetZIn())};
 	
 	gGeoManager->FindNode(p_global[0], p_global[1], p_global[2]);
 	const Double_t *global_point = gGeoManager->GetCurrentPoint();
@@ -654,9 +806,40 @@ void CbmTrdQa::Exec(Option_t * option)
 	gGeoManager->MasterToLocal(p_global, p_local);
 	//p_local[0] = p_global[0] - fModuleInfo->GetX();
 	//p_local[1] = p_global[1] - fModuleInfo->GetY();
-	Int_t xPpad(0), yPpad(0); // correspoondig digi from point point of view
-	Double_t xPPadSize(0), yPPadSize(0); // correspoondig pad sizes from point point of view
-	GetPadInfos( moduleAddress, p_local[0], p_local[1], xPpad, yPpad, xPPadSize, yPPadSize);
+
+	Int_t xPpad(0), yPpad(0), pSectorId(-1); // correspoondig digi from point point of view
+
+	fModuleInfo->GetPadInfo(p_local, pSectorId, xPpad, yPpad);
+	yPpad = fModuleInfo->GetModuleRow(pSectorId, yPpad);
+
+	for (Int_t jPoint = 0; jPoint < iPoint; jPoint++) {
+	  point2 = (CbmTrdPoint*) fPoints->At(fModulePointMapIt->second[jPoint]);
+	
+	  Double_t p_global2[3] = {0.5 * (point2->GetXOut() + point2->GetXIn()),
+				   0.5 * (point2->GetYOut() + point2->GetYIn()),
+				   0.5 * (point2->GetZOut() + point2->GetZIn())};
+	
+	  gGeoManager->FindNode(p_global2[0], p_global2[1], p_global2[2]);
+	  const Double_t *global_point2 = gGeoManager->GetCurrentPoint();
+	  Double_t p_local2[3] = {0.0};
+	  gGeoManager->MasterToLocal(p_global2, p_local2);
+	  Int_t xPpad2(0), yPpad2(0), pSectorId2(-1); // correspoondig digi from point point of view
+
+	  fModuleInfo->GetPadInfo(p_local2, pSectorId2, xPpad2, yPpad2);
+	  yPpad2 = fModuleInfo->GetModuleRow(pSectorId2, yPpad2);
+	  if ((xPpad2 == xPpad) && (yPpad2 == yPpad)){
+	    if (hasBeenUsed.find(fModulePointMapIt->second[iPoint]) == hasBeenUsed.end()){
+	      hasBeenUsed[fModulePointMapIt->second[iPoint]] = 1;
+	      multiHitCounterModule++;
+	    }
+	    if (hasBeenUsed.find(fModulePointMapIt->second[jPoint]) == hasBeenUsed.end()){
+	      hasBeenUsed[fModulePointMapIt->second[jPoint]] += 1;
+	      multiHitCounterModule++;
+	    }
+	  }
+	}
+	Double_t xPPadSize(fModuleInfo->GetPadSizeX(pSectorId)), yPPadSize(fModuleInfo->GetPadSizeY(pSectorId)); // correspoondig pad sizes from point point of view 
+	//GetPadInfos( moduleAddress, p_local[0], p_local[1], xPpad, yPpad, xPPadSize, yPPadSize);
 	if (point->GetEnergyLoss() > 0.0) {
 	  if (Pdg_code == 211 || Pdg_code == -211)
 	    fdEdxPionMc->Fill(point->GetEnergyLoss());
@@ -680,9 +863,12 @@ void CbmTrdQa::Exec(Option_t * option)
 	  gGeoManager->MasterToLocal(h_global, h_local);
 	  //h_local[0] = h_global[0] - fModuleInfo->GetX();
 	  //h_local[1] = h_global[1] - fModuleInfo->GetY();
-	  Int_t xHpad(0), yHpad(0); // correspoondig digi from hit point of view
-	  Double_t xHPadSize(0), yHPadSize(0); // correspoondig pad sizes from hit point of view
-	  GetPadInfos( moduleAddress, h_local[0], h_local[1], xHpad, yHpad, xHPadSize, yHPadSize);
+	  Int_t xHpad(0), yHpad(0), hSectorId(-1); // correspoondig digi from hit point of view
+	  fModuleInfo->GetPadInfo(h_local, hSectorId, xHpad, yHpad);
+	  yHpad = fModuleInfo->GetModuleRow(hSectorId, yHpad);
+	  Double_t xHPadSize(fModuleInfo->GetPadSizeX(hSectorId)), yHPadSize(fModuleInfo->GetPadSizeY(hSectorId)); // correspoondig pad sizes from point point of view 
+	  //Double_t xHPadSize(0), yHPadSize(0); // correspoondig pad sizes from hit point of view
+	  //GetPadInfos( moduleAddress, h_local[0], h_local[1], xHpad, yHpad, xHPadSize, yHPadSize);
 	  //point_temp = new CbmTrdPoint(iTrack, hit->GetDetId(), );
 	  //r = sqrt(h_global[0] * h_global[0] + h_global[1] * h_global[1]);
 	  //r = sqrt(hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY());
@@ -691,21 +877,26 @@ void CbmTrdQa::Exec(Option_t * option)
 				   + 
 				   (p_local[1]-h_local[1]) * (p_local[1]-h_local[1]));
 	  fDistanceMcToHitAll->Fill(distance);
+	  //if (xHpad == xPpad && yHpad == yPpad)	  {
 	  if (distance < minimumDistance || (xHpad == xPpad && yHpad == yPpad)) { // distance between point and hit is smaller one pad diagonal or on the same pad
+	    //if (distance < minimumDistance){
 	    minimumDistance = distance;
 	    minDHitId = iHit;
 	    xDiviation = p_local[0]-h_local[0];
 	    yDiviation = p_local[1]-h_local[1];
 	    hitELoss = hit->GetELoss();
-	    if (xHpad == xPpad && yHpad == yPpad){
+	    /*
+	      if (xHpad == xPpad && yHpad == yPpad){
 	      multiHitCounter++;
 	      if (samePadMerge)
-		mergedELoss += hit->GetELoss();
-	    }
+	      mergedELoss += hit->GetELoss();
+	      }
+	    */
 	  }
 	}
+	
 	if (minDHitId > -1){ // If minimumDistance < pad diagonal -> delete point and hit from map
-	  multiHitCounterModule += multiHitCounter / Float_t(fModulePointMapIt->second.size());
+	  //multiHitCounterModule += multiHitCounter / Float_t(fModulePointMapIt->second.size());
 	  fModuleHitMap[moduleAddress].erase(fModuleHitMap[moduleAddress].begin() + minDHitId);
 	  fModulePointMapIt->second.erase(fModulePointMapIt->second.begin() + iPoint);
 	  if (samePadMerge){
@@ -747,6 +938,8 @@ void CbmTrdQa::Exec(Option_t * option)
       fModuleEfficiencyMap[moduleAddress]->Fill(100. * ( allPoints - Float_t(fModulePointMapIt->second.size() )) / Float_t(allPoints));
       fHitToPointEfficiencyVsR->Fill(r, 100. * ( allPoints - Float_t(fModulePointMapIt->second.size() )) / Float_t(allPoints));
       fHitToPointEfficiencyVsAlpha->Fill(alpha, 100. * ( allPoints - Float_t(fModulePointMapIt->second.size() )) / Float_t(allPoints));
+
+      fModuleMultiPointMap[moduleAddress]->Fill(100. * (Float_t(multiHitCounterModule)) / Float_t(allPoints));
     }
   }
   timer.Stop();
@@ -759,6 +952,8 @@ void CbmTrdQa::Exec(Option_t * option)
 }
 void CbmTrdQa::SaveHistos()
 {
+  TString title;
+  title.Form("_TH_%.2EGeV_",fTriggerThreshold);
   gDirectory->pwd();
   if (!gDirectory->Cd("TrdQa")) 
     gDirectory->mkdir("TrdQa");
@@ -781,7 +976,8 @@ void CbmTrdQa::SaveHistos()
   l->AddEntry(fdEdxPionHit,"Hit pion","l");
   fdEdxPionHit->DrawCopy("same");
   l->Draw("same");
-  c->SaveAs("pics/TrdQadEdx.pdf");
+  c->SaveAs("pics/TrdQadEdx"+title+".pdf");
+  c->SaveAs("pics/TrdQadEdx"+title+".png");
   /*
     delete l;
     TLegend *l = new TLegend(0.65,0.65,0.85,0.85);
@@ -799,16 +995,28 @@ void CbmTrdQa::SaveHistos()
   l->AddEntry(fLostPointVsR,"Lost points","p");
   fLostPointVsR->DrawCopy("same");
   l->Draw("same");
-  c->SaveAs("pics/TrdQaStatisticVsR.pdf");
+  c->SaveAs("pics/TrdQaStatisticVsR"+title+".pdf");
+  c->SaveAs("pics/TrdQaStatisticVsR"+title+".png");
   fHitToPointEfficiencyVsAlpha->DrawCopy();
   fGhostHitVsAlpha->DrawCopy("same");
   fLostPointVsAlpha->DrawCopy("same");
   l->Draw("same");
-  c->SaveAs("pics/TrdQaStatisticVsAlpha.pdf");
+  c->SaveAs("pics/TrdQaStatisticVsAlpha"+title+".pdf");
+  c->SaveAs("pics/TrdQaStatisticVsAlpha"+title+".png");
   gDirectory->pwd();
   fdEdxPoint->Write("", TObject::kOverwrite);
   fdEdxDigi->Write("", TObject::kOverwrite);
+  c->cd()->SetLogx(1);
+  c->cd()->SetLogy(1);
+  fdEdxDigi->Draw();
+  c->SaveAs("pics/TrdQadEdxDigi.pdf");
+  c->SaveAs("pics/TrdQadEdxDigi.png");
   fdEdxCluster->Write("", TObject::kOverwrite);
+  fdEdxCluster->Draw();
+  c->SaveAs("pics/TrdQadEdxCluster"+title+".pdf");
+  c->SaveAs("pics/TrdQadEdxCluster"+title+".png");
+  c->cd()->SetLogx(0);
+  c->cd()->SetLogy(0);
   fdEdxHit->Write("", TObject::kOverwrite);
   fdEdxPionMc->Write("", TObject::kOverwrite);
   fdEdxPionHit->Write("", TObject::kOverwrite);
@@ -828,10 +1036,12 @@ void CbmTrdQa::SaveHistos()
   fHitToPointEfficiencyVsAlpha->Write("", TObject::kOverwrite);
   fPositionResolutionShort->Write("", TObject::kOverwrite);
   fPositionResolutionShort->DrawCopy();
-  c->SaveAs("pics/TrdQaPositionResolutionShort.pdf");
+  c->SaveAs("pics/TrdQaPositionResolutionShort"+title+".pdf");
+  c->SaveAs("pics/TrdQaPositionResolutionShort"+title+".png");
   fPositionResolutionLong->Write("", TObject::kOverwrite);
   fPositionResolutionLong->DrawCopy();
-  c->SaveAs("pics/TrdQaPositionResolutionLong.pdf");
+  c->SaveAs("pics/TrdQaPositionResolutionLong"+title+".pdf");
+  c->SaveAs("pics/TrdQaPositionResolutionLong"+title+".png");
   fClusterSize->Write("", TObject::kOverwrite);
   fPointsPerDigi->Write("", TObject::kOverwrite);
   fDigiPerCluster->Write("", TObject::kOverwrite);
@@ -843,9 +1053,12 @@ void CbmTrdQa::SaveHistos()
 }
 void CbmTrdQa::FinishEvent()
 { 
-  if (fT) 
+  if (fT) {
+    fMCTracks->Clear();
     fMCTracks->Delete();
+  }
   if (fP) {
+    fPoints->Clear();
     fPoints->Delete();
     for (fModulePointMapIt = fModulePointMap.begin();
 	 fModulePointMapIt != fModulePointMap.end(); ++fModulePointMapIt) {
@@ -854,6 +1067,7 @@ void CbmTrdQa::FinishEvent()
     fModulePointMap.clear();
   }
   if (fD) {
+    fDigis->Clear();
     fDigis->Delete();
     for (fModuleDigiMapIt = fModuleDigiMap.begin();
 	 fModuleDigiMapIt != fModuleDigiMap.end(); ++fModuleDigiMapIt) {
@@ -862,6 +1076,7 @@ void CbmTrdQa::FinishEvent()
     fModuleDigiMap.clear();
   }
   if (fC) {
+    fClusters->Clear();
     fClusters->Delete();
     for (fModuleClusterMapIt = fModuleClusterMap.begin();
 	 fModuleClusterMapIt != fModuleClusterMap.end(); ++fModuleClusterMapIt) {
@@ -870,6 +1085,7 @@ void CbmTrdQa::FinishEvent()
     fModuleClusterMap.clear();
   }
   if (fH) {
+    fHits->Clear();
     fHits->Delete();
     for (fModuleHitMapIt = fModuleHitMap.begin();
 	 fModuleHitMapIt != fModuleHitMap.end(); ++fModuleHitMapIt) {
@@ -878,57 +1094,117 @@ void CbmTrdQa::FinishEvent()
     fModuleHitMap.clear();
   }
 }
-void CbmTrdQa::GetPadInfos(Int_t moduleAddress, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY)
-{
-  x += fModuleInfo->GetSizeX(); // move origin from module center to lower right corner
-  y += fModuleInfo->GetSizeY(); // move origin from module center to lower right corner
-  fModuleInfo = fDigiPar->GetModule(moduleAddress);
-  Int_t nSector = fModuleInfo->GetNofSectors();
-  Int_t iSectorX(0), iSectorY(0);
-  Double_t iSectorSizeX = fModuleInfo->GetSectorSizeX(iSectorX);
-  Double_t iSectorSizeY = fModuleInfo->GetSectorSizeY(iSectorY);
-  Double_t iPadSizeX = fModuleInfo->GetPadSizeX(iSectorX);
-  Double_t iPadSizeY = fModuleInfo->GetPadSizeY(iSectorY);
-  Int_t iPadX = 0;
-  Int_t iPadY = 0;
-  if (x > 2 * fModuleInfo->GetSizeX() || y > 2 * fModuleInfo->GetSizeY() || x < 0 || y < 0) {
-    printf("point out of module::\n   module %i (%.2f, %.2f) (%.2f, %.2f)\n",moduleAddress,x,y,2 * fModuleInfo->GetSizeX(),2 * fModuleInfo->GetSizeY());
-  } else {   
-    while (x > iSectorSizeX && iSectorX < nSector) {    
-      x -= iSectorSizeX;
-      iPadX += iSectorSizeX / iPadSizeX;
-      iSectorX++;
-      iSectorSizeX = fModuleInfo->GetSectorSizeX(iSectorX);
-      iPadSizeX = fModuleInfo->GetPadSizeX(iSectorX);          
-    }   
-    padSizeX = iPadSizeX;
-    iPadX += Int_t((x / padSizeX) + 0.5);
-    iCol = iPadX;
-    while (y > iSectorSizeY && iSectorY < nSector) {  
-      y -= iSectorSizeY;
-      iPadY += iSectorSizeY / iPadSizeY;
-      iSectorY++;
-      iSectorSizeY = fModuleInfo->GetSectorSizeY(iSectorY);
-      iPadSizeY = fModuleInfo->GetPadSizeY(iSectorY);      
+  void CbmTrdQa::GetPadInfos(Int_t moduleAddress, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY)
+  {
+    x += fModuleInfo->GetSizeX(); // move origin from module center to lower right corner
+    y += fModuleInfo->GetSizeY(); // move origin from module center to lower right corner
+    fModuleInfo = fDigiPar->GetModule(moduleAddress);
+    Int_t nSector = fModuleInfo->GetNofSectors();
+    Int_t iSectorX(0), iSectorY(0);
+    Double_t iSectorSizeX = fModuleInfo->GetSectorSizeX(iSectorX);
+    Double_t iSectorSizeY = fModuleInfo->GetSectorSizeY(iSectorY);
+    Double_t iPadSizeX = fModuleInfo->GetPadSizeX(iSectorX);
+    Double_t iPadSizeY = fModuleInfo->GetPadSizeY(iSectorY);
+    Int_t iPadX = 0;
+    Int_t iPadY = 0;
+    if (x > 2 * fModuleInfo->GetSizeX() || y > 2 * fModuleInfo->GetSizeY() || x < 0 || y < 0) {
+      printf("point out of module::\n   module %i (%.2f, %.2f) (%.2f, %.2f)\n",moduleAddress,x,y,2 * fModuleInfo->GetSizeX(),2 * fModuleInfo->GetSizeY());
+    } else {   
+      while (x > iSectorSizeX && iSectorX < nSector) {    
+	x -= iSectorSizeX;
+	iPadX += iSectorSizeX / iPadSizeX;
+	iSectorX++;
+	iSectorSizeX = fModuleInfo->GetSectorSizeX(iSectorX);
+	iPadSizeX = fModuleInfo->GetPadSizeX(iSectorX);          
+      }   
+      padSizeX = iPadSizeX;
+      iPadX += Int_t((x / padSizeX) + 0.5);
+      iCol = iPadX;
+      while (y > iSectorSizeY && iSectorY < nSector) {  
+	y -= iSectorSizeY;
+	iPadY += iSectorSizeY / iPadSizeY;
+	iSectorY++;
+	iSectorSizeY = fModuleInfo->GetSectorSizeY(iSectorY);
+	iPadSizeY = fModuleInfo->GetPadSizeY(iSectorY);      
+      }
+      padSizeY = iPadSizeY;
+      iPadY += Int_t((x / padSizeX) + 0.5);
+      iRow = iPadY;
     }
-    padSizeY = iPadSizeY;
-    iPadY += Int_t((x / padSizeX) + 0.5);
-    iRow = iPadY;
   }
+void CbmTrdQa::CreateLayerView(std::map<Int_t, TH1*>& Map, TString folder, TString pics, TString zAxisTitle, Double_t fmax, Double_t fmin, Bool_t logScale){
+  TString title(""), name("");
+  name.Form("_TH_%.2EGeV_",fTriggerThreshold);
+  TPaveText *text=NULL;
+  std::map<Int_t, TH1*>::iterator MapIt;
+  std::vector<Int_t> fColors;
+  std::vector<Double_t> fZLevel;
+  //Double_t fmax(20), fmin(0);
+  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+    fColors.push_back(TColor::GetColorPalette(i));
+    if (logScale)
+      fZLevel.push_back(fmin + TMath::Power(10, TMath::Log10(fmax) / TColor::GetNumberOfColors() * i));// log scale
+    else
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd(folder)) 
+    gDirectory->mkdir(folder);
+  gDirectory->Cd(folder);
+   
+  for (MapIt = Map.begin(); MapIt != Map.end(); ++MapIt) {
+    Double_t value = MapIt->second->GetMean(1);
+    Double_t valueE = MapIt->second->GetRMS(1);
+    fModuleInfo = fDigiPar->GetModule(MapIt->first);
+    Int_t Station  = CbmTrdAddress::GetLayerId(MapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+    Int_t Layer    = CbmTrdAddress::GetLayerId(MapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);
+    Int_t combiId = 10 * Station + Layer;
+    fLayerMap[combiId]->cd();
+    if (MapIt == Map.begin()){
+      fLayerDummy->SetZTitle(zAxisTitle);
+      fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+    }
+    fLayerMap[combiId]->cd()->Update();
+    text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+				    fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+				    fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+    text->SetFillStyle(1001);
+    text->SetLineColor(1);
+
+    Int_t j = 0;
+    while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+      //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+      j++;
+    }
+    text->SetFillColor(fColors[j]);
+    if (j >= (Int_t)fZLevel.size())
+      text->SetFillColor(2);
+
+    if (fColors[j]<65)
+      text->SetTextColor(kWhite);
+    title.Form("%.1f#pm%.1f",value,valueE);
+    text->AddText(title);
+    text->Draw("same");
+  }
+  for (fLayerMapIt = fLayerMap.begin(); fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQa%s_S%i_L%i_%s%s.pdf",pics.Data(),fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (MapIt = Map.begin(); MapIt != Map.end(); ++MapIt) {
+    MapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
 }
+
 void CbmTrdQa::CreateLayerView()
 {
-  TString title;
-  /*
-    for (fLayerPointMapIt = fLayerPointMap.begin();
-    fLayerPointMapIt != fLayerPointMap.end(); ++fLayerPointMapIt) {
-    fLayerPointMapIt->second;
-    } 
-    for (fLayerHitMapIt = fLayerHitMap.begin();
-    fLayerHitMapIt != fLayerHitMap.end(); ++fLayerHitMapIt) {
-    fLayerHitMapIt->second;
-    } 
-  */
+  TString title(""), name("");
+  TPaveText *text =NULL;
   {
     std::vector<Int_t> fColors;
     std::vector<Double_t> fZLevel;
@@ -943,8 +1219,13 @@ void CbmTrdQa::CreateLayerView()
     if (!gDirectory->Cd("TrdQa")) 
       gDirectory->mkdir("TrdQa");
     gDirectory->Cd("TrdQa");
-
-
+    /*
+      if (fLayerMap.find(combiId) == fLayerMap.end()){
+      title.Form("Station%i_Layer%i",Station,Layer);
+      fLayerMap[combiId] =  new TCanvas(title,title,1200,1000);
+      fLayerDummy->Draw("colz");
+      }
+    */
     printf("fModuleGhostMap: %i\n",(Int_t)fModuleGhostMap.size());
     for (fModuleGhostMapIt = fModuleGhostMap.begin();
 	 fModuleGhostMapIt != fModuleGhostMap.end(); ++fModuleGhostMapIt) {
@@ -956,15 +1237,15 @@ void CbmTrdQa::CreateLayerView()
       Int_t combiId = 10 * Station + Layer;
       fLayerMap[combiId]->cd();
       if (fModuleGhostMapIt == fModuleGhostMap.begin()){
-	fLayerDummy->SetZTitle("left over hits / all points [%]");
+	//fLayerDummy->SetZTitle("left over hits / all points [%]");
 	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
 	//fLayerDummy->DrawCopy("colz");
       }
       fLayerMap[combiId]->cd()->Update();
-      TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
-				      fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
-				      fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
-				      fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
       text->SetFillStyle(1001);
       text->SetLineColor(1);
 
@@ -979,25 +1260,6 @@ void CbmTrdQa::CreateLayerView()
 
       if (fColors[j]<65)
 	text->SetTextColor(kWhite);
-
-      /*
-	if (value >= 0 && value <= 5)
-	text->SetFillColor(kViolet);
-	if (value > 5 && value <= 10){
-	text->SetFillColor(kAzure);
-	text->SetTextColor(kWhite);
-	}
-	if (value > 10 && value <= 15)
-	text->SetFillColor(kTeal);
-	if (value > 15 && value <= 20)
-	text->SetFillColor(kSpring);
-	if (value > 20 && value <= 25)
-	text->SetFillColor(kYellow);
-	if (value > 25 && value <= 30)
-	text->SetFillColor(kOrange);
-	if (value > 30)
-	text->SetFillColor(kRed);
-      */
       title.Form("%.1f#pm%.1f",value,valueE);
       text->AddText(title);
       text->Draw("same");
@@ -1020,7 +1282,7 @@ void CbmTrdQa::CreateLayerView()
 	 fLayerMapIt = fLayerMap.begin();
 	 fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
       fLayerMapIt->second->Write("", TObject::kOverwrite);
-      title.Form("pics/Ghost_S%i_L%i_%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+      title.Form("pics/TrdQaGhost_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
       fLayerMapIt->second->SaveAs(title);
       title.ReplaceAll("pdf","png");
       fLayerMapIt->second->SaveAs(title);
@@ -1041,15 +1303,15 @@ void CbmTrdQa::CreateLayerView()
       Int_t combiId = 10 * Station + Layer;
       fLayerMap[combiId]->cd();
       if (fModuleLostMapIt == fModuleLostMap.begin()){
-	fLayerDummy->SetZTitle("left over points / all points [%]");
+	//fLayerDummy->SetZTitle("left over points / all points [%]");
 	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
 	//fLayerDummy->DrawCopy("colz");
       }
       fLayerMap[combiId]->cd()->Update();
-      TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
-				      fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
-				      fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
-				      fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
       text->SetFillStyle(1001);
       text->SetLineColor(1);
       Int_t j = 0;
@@ -1063,25 +1325,6 @@ void CbmTrdQa::CreateLayerView()
 
       if (fColors[j]<65)
 	text->SetTextColor(kWhite);
-      /*
-
-	if (value >= 0 && value <= 5)
-	text->SetFillColor(kViolet);
-	if (value > 5 && value <= 10){
-	text->SetFillColor(kAzure);
-	text->SetTextColor(kWhite);
-	}
-	if (value > 10 && value <= 15)
-	text->SetFillColor(kTeal);
-	if (value > 15 && value <= 20)
-	text->SetFillColor(kSpring);
-	if (value > 20 && value <= 25)
-	text->SetFillColor(kYellow);
-	if (value > 25 && value <= 30)
-	text->SetFillColor(kOrange);
-	if (value > 30)
-	text->SetFillColor(kRed);
-      */
       title.Form("%.1f#pm%.1f",value,valueE);
       text->AddText(title);
       text->Draw("same");
@@ -1089,14 +1332,6 @@ void CbmTrdQa::CreateLayerView()
   }
   
   {
-    std::vector<Int_t> fColors;
-    std::vector<Double_t> fZLevel;
-    Double_t fmax(100), fmin(0);
-    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
-      fColors.push_back(TColor::GetColorPalette(i));
-      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
-      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
-    }
     gDirectory->pwd();
     if (!gDirectory->Cd("Lost")) 
       gDirectory->mkdir("Lost");
@@ -1106,7 +1341,7 @@ void CbmTrdQa::CreateLayerView()
 	 fLayerMapIt = fLayerMap.begin();
 	 fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
       fLayerMapIt->second->Write("", TObject::kOverwrite);
-      title.Form("pics/Lost_S%i_L%i_%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+      title.Form("pics/TrdQaLost_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
       fLayerMapIt->second->SaveAs(title);
       title.ReplaceAll("pdf","png");
       fLayerMapIt->second->SaveAs(title);
@@ -1117,6 +1352,14 @@ void CbmTrdQa::CreateLayerView()
     }
     gDirectory->Cd("..");
 
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(100), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
     printf("fModuleEfficiencyMap: %i\n",(Int_t)fModuleEfficiencyMap.size());
     for (fModuleEfficiencyMapIt = fModuleEfficiencyMap.begin();
 	 fModuleEfficiencyMapIt != fModuleEfficiencyMap.end(); ++fModuleEfficiencyMapIt) {
@@ -1128,46 +1371,30 @@ void CbmTrdQa::CreateLayerView()
       Int_t combiId = 10 * Station + Layer;
       fLayerMap[combiId]->cd();
       if (fModuleEfficiencyMapIt == fModuleEfficiencyMap.begin()){
-	fLayerDummy->SetZTitle("found point hit pairs / all points [%]");
+	//fLayerDummy->SetZTitle("found point hit pairs / all points [%]");
 	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
 	//fLayerDummy->DrawCopy("colz");
       }
       fLayerMap[combiId]->cd()->Update();
-      TPaveText *text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
-				      fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
-				      fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
-				      fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
       text->SetFillStyle(1001);
       text->SetLineColor(1);    
       Int_t j = 0;
       while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
-	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], value, fZLevel[j]);
 	j++;
       }
+      //printf ("              %2i<%2i %2i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j]-50, value, fZLevel[j]);
       text->SetFillColor(fColors[j]);
       if (j >= (Int_t)fZLevel.size())
 	text->SetFillColor(2);
 
       if (fColors[j]<65)
 	text->SetTextColor(kWhite);
-      /*
-	if (value >= 0 && value <= 12.5)
-	text->SetFillColor(kViolet);
-	if (value > 12.5 && value <= 25){
-	text->SetFillColor(kAzure);
-	text->SetTextColor(kWhite);
-	}
-	if (value > 0 && value <= 50)
-	text->SetFillColor(kTeal);
-	if (value > 50 && value <= 70)
-	text->SetFillColor(kSpring);
-	if (value > 70 && value <= 80)
-	text->SetFillColor(kYellow);
-	if (value > 80 && value <= 90)
-	text->SetFillColor(kOrange);
-	if (value > 90)
-	text->SetFillColor(kRed);
-      */
+
       title.Form("%.1f#pm%.1f",value,valueE);
       text->AddText(title);
       text->Draw("same");
@@ -1183,7 +1410,7 @@ void CbmTrdQa::CreateLayerView()
        fLayerMapIt = fLayerMap.begin();
        fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
     fLayerMapIt->second->Write("", TObject::kOverwrite);
-    title.Form("pics/Efficiency_S%i_L%i_%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    title.Form("pics/TrdQaEfficiency_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
     fLayerMapIt->second->SaveAs(title);
     title.ReplaceAll("pdf","png");
     fLayerMapIt->second->SaveAs(title);
@@ -1193,28 +1420,596 @@ void CbmTrdQa::CreateLayerView()
     fModuleEfficiencyMapIt->second->Write("", TObject::kOverwrite);
   }
   gDirectory->Cd("..");
+
+  
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(10), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleMultiPointMap: %i\n",(Int_t)fModuleMultiPointMap.size());
+    for (fModuleMultiPointMapIt = fModuleMultiPointMap.begin();
+	 fModuleMultiPointMapIt != fModuleMultiPointMap.end(); ++fModuleMultiPointMapIt) {
+      Double_t value = fModuleMultiPointMapIt->second->GetMean(1);
+      Double_t valueE = fModuleMultiPointMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleMultiPointMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleMultiPointMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleMultiPointMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleMultiPointMapIt == fModuleMultiPointMap.begin()){
+	//fLayerDummy->SetZTitle("multi points per channel / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("MultiPoint")) 
+    gDirectory->mkdir("MultiPoint");
+  gDirectory->Cd("MultiPoint");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaMultiPoint_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleMultiPointMapIt = fModuleMultiPointMap.begin();
+       fModuleMultiPointMapIt != fModuleMultiPointMap.end(); ++fModuleMultiPointMapIt) {
+    fModuleMultiPointMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(10), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuledEdxMap: %i\n",(Int_t)fModuledEdxMap.size());
+    for (fModuledEdxMapIt = fModuledEdxMap.begin();
+	 fModuledEdxMapIt != fModuledEdxMap.end(); ++fModuledEdxMapIt) {
+      Double_t value = fModuledEdxMapIt->second->GetMean(1);
+      Double_t valueE = fModuledEdxMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuledEdxMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuledEdxMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuledEdxMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuledEdxMapIt == fModuledEdxMap.begin()){
+	//fLayerDummy->SetZTitle("dE/dx [keV]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("dEdx")) 
+    gDirectory->mkdir("dEdx");
+  gDirectory->Cd("dEdx");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQadEdx_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuledEdxMapIt = fModuledEdxMap.begin();
+       fModuledEdxMapIt != fModuledEdxMap.end(); ++fModuledEdxMapIt) {
+    fModuledEdxMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(2), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleTracklengthMap: %i\n",(Int_t)fModuleTracklengthMap.size());
+    for (fModuleTracklengthMapIt = fModuleTracklengthMap.begin();
+	 fModuleTracklengthMapIt != fModuleTracklengthMap.end(); ++fModuleTracklengthMapIt) {
+      Double_t value = fModuleTracklengthMapIt->second->GetMean(1);
+      Double_t valueE = fModuleTracklengthMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleTracklengthMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleTracklengthMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleTracklengthMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleTracklengthMapIt == fModuleTracklengthMap.begin()){
+	//fLayerDummy->SetZTitle("track length [cm]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("Tracklength")) 
+    gDirectory->mkdir("Tracklength");
+  gDirectory->Cd("Tracklength");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaTracklength_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleTracklengthMapIt = fModuleTracklengthMap.begin();
+       fModuleTracklengthMapIt != fModuleTracklengthMap.end(); ++fModuleTracklengthMapIt) {
+    fModuleTracklengthMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(1), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleDeltaEMap: %i\n",(Int_t)fModuleDeltaEMap.size());
+    for (fModuleDeltaEMapIt = fModuleDeltaEMap.begin();
+	 fModuleDeltaEMapIt != fModuleDeltaEMap.end(); ++fModuleDeltaEMapIt) {
+      Double_t value = fModuleDeltaEMapIt->second->GetMean(1);
+      Double_t valueE = fModuleDeltaEMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleDeltaEMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleDeltaEMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleDeltaEMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleDeltaEMapIt == fModuleDeltaEMap.begin()){
+	//fLayerDummy->SetZTitle("#delta-electrons / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("DeltaE")) 
+    gDirectory->mkdir("DeltaE");
+  gDirectory->Cd("DeltaE");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaDeltaE_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleDeltaEMapIt = fModuleDeltaEMap.begin();
+       fModuleDeltaEMapIt != fModuleDeltaEMap.end(); ++fModuleDeltaEMapIt) {
+    fModuleDeltaEMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(15), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleClusterSizeMap: %i\n",(Int_t)fModuleClusterSizeMap.size());
+    for (fModuleClusterSizeMapIt = fModuleClusterSizeMap.begin();
+	 fModuleClusterSizeMapIt != fModuleClusterSizeMap.end(); ++fModuleClusterSizeMapIt) {
+      Double_t value = fModuleClusterSizeMapIt->second->GetMean(1);
+      Double_t valueE = fModuleClusterSizeMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleClusterSizeMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleClusterSizeMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleClusterSizeMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleClusterSizeMapIt == fModuleClusterSizeMap.begin()){
+	//fLayerDummy->SetZTitle("#delta-electrons / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("ClusterSize")) 
+    gDirectory->mkdir("ClusterSize");
+  gDirectory->Cd("ClusterSize");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaClusterSize_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleClusterSizeMapIt = fModuleClusterSizeMap.begin();
+       fModuleClusterSizeMapIt != fModuleClusterSizeMap.end(); ++fModuleClusterSizeMapIt) {
+    fModuleClusterSizeMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(100), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleTrackableMap: %i\n",(Int_t)fModuleTrackableMap.size());
+    for (fModuleTrackableMapIt = fModuleTrackableMap.begin();
+	 fModuleTrackableMapIt != fModuleTrackableMap.end(); ++fModuleTrackableMapIt) {
+      Double_t value = fModuleTrackableMapIt->second->GetMean(1);
+      Double_t valueE = fModuleTrackableMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleTrackableMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleTrackableMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleTrackableMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleTrackableMapIt == fModuleTrackableMap.begin()){
+	//fLayerDummy->SetZTitle("#delta-electrons / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("Trackable")) 
+    gDirectory->mkdir("Trackable");
+  gDirectory->Cd("Trackable");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaTrackable_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleTrackableMapIt = fModuleTrackableMap.begin();
+       fModuleTrackableMapIt != fModuleTrackableMap.end(); ++fModuleTrackableMapIt) {
+    fModuleTrackableMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(50), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleTrackableMap2: %i\n",(Int_t)fModuleTrackableMap2.size());
+    for (fModuleTrackableMap2It = fModuleTrackableMap2.begin();
+	 fModuleTrackableMap2It != fModuleTrackableMap2.end(); ++fModuleTrackableMap2It) {
+      Double_t value = fModuleTrackableMap2It->second->GetMean(1);
+      Double_t valueE = fModuleTrackableMap2It->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleTrackableMap2It->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleTrackableMap2It->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleTrackableMap2It->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleTrackableMap2It == fModuleTrackableMap2.begin()){
+	//fLayerDummy->SetZTitle("#delta-electrons / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("Trackable")) 
+    gDirectory->mkdir("Trackable");
+  gDirectory->Cd("Trackable");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaTrackable2_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleTrackableMap2It = fModuleTrackableMap2.begin();
+       fModuleTrackableMap2It != fModuleTrackableMap2.end(); ++fModuleTrackableMap2It) {
+    fModuleTrackableMap2It->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  {
+    std::vector<Int_t> fColors;
+    std::vector<Double_t> fZLevel;
+    Double_t fmax(100), fmin(0);
+    for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+      fColors.push_back(TColor::GetColorPalette(i));
+      //fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
+    }
+
+    printf("fModuleAveragePointsMap: %i\n",(Int_t)fModuleAveragePointsMap.size());
+    for (fModuleAveragePointsMapIt = fModuleAveragePointsMap.begin();
+	 fModuleAveragePointsMapIt != fModuleAveragePointsMap.end(); ++fModuleAveragePointsMapIt) {
+      Double_t value = fModuleAveragePointsMapIt->second->GetMean(1);
+      Double_t valueE = fModuleAveragePointsMapIt->second->GetRMS(1);
+      fModuleInfo = fDigiPar->GetModule(fModuleAveragePointsMapIt->first);
+      Int_t Station  = CbmTrdAddress::GetLayerId(fModuleAveragePointsMapIt->first) / 4 + 1;//fGeoHandler->GetStation(moduleId);
+      Int_t Layer    = CbmTrdAddress::GetLayerId(fModuleAveragePointsMapIt->first) % 4 + 1;//fGeoHandler->GetLayer(moduleId);  
+      Int_t combiId = 10 * Station + Layer;
+      fLayerMap[combiId]->cd();
+      if (fModuleAveragePointsMapIt == fModuleAveragePointsMap.begin()){
+	//fLayerDummy->SetZTitle("#delta-electrons / all points [%]");
+	fLayerDummy->GetZaxis()->SetRangeUser(fmin,fmax);
+	//fLayerDummy->DrawCopy("colz");
+      }
+      fLayerMap[combiId]->cd()->Update();
+      text = new TPaveText(fModuleInfo->GetX()-fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()-fModuleInfo->GetSizeY(),
+			   fModuleInfo->GetX()+fModuleInfo->GetSizeX(),
+			   fModuleInfo->GetY()+fModuleInfo->GetSizeY());
+      text->SetFillStyle(1001);
+      text->SetLineColor(1);    
+      Int_t j = 0;
+      while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+	//printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+	j++;
+      }
+      text->SetFillColor(fColors[j]);
+      if (j >= (Int_t)fZLevel.size())
+	text->SetFillColor(2);
+
+      if (fColors[j]<65)
+	text->SetTextColor(kWhite);
+
+      title.Form("%.1f#pm%.1f",value,valueE);
+      text->AddText(title);
+      text->Draw("same");
+    }
+  }
+
+  gDirectory->pwd();
+  if (!gDirectory->Cd("Trackable")) 
+    gDirectory->mkdir("Trackable");
+  gDirectory->Cd("Trackable");
+
+  for (
+       fLayerMapIt = fLayerMap.begin();
+       fLayerMapIt != fLayerMap.end(); ++fLayerMapIt) {
+    fLayerMapIt->second->Write("", TObject::kOverwrite);
+    title.Form("pics/TrdQaAveragePoints_S%i_L%i_%s%s.pdf",fLayerMapIt->first/10,fLayerMapIt->first-(fLayerMapIt->first/10)*10,fGeo.Data(),name.Data());//(fLayerMapIt->first)/10,(fLayerMapIt->first)-(fLayerMapIt->first)/10*10,fGeo.Data());
+    fLayerMapIt->second->SaveAs(title);
+    title.ReplaceAll("pdf","png");
+    fLayerMapIt->second->SaveAs(title);
+  }
+  for (fModuleAveragePointsMapIt = fModuleAveragePointsMap.begin();
+       fModuleAveragePointsMapIt != fModuleAveragePointsMap.end(); ++fModuleAveragePointsMapIt) {
+    fModuleAveragePointsMapIt->second->Write("", TObject::kOverwrite);
+  }
+  gDirectory->Cd("..");
   gDirectory->Cd("..");
 
 }
-void CbmTrdQa::NormalizeHistos()
-{
-  Double_t Entries = fdEdxPoint->GetEntries();
-  fdEdxPoint->Scale(1./Entries);
-  Entries = fdEdxDigi->GetEntries();
-  fdEdxDigi->Scale(1./Entries);
-  Entries = fdEdxCluster->GetEntries();
-  fdEdxCluster->Scale(1./Entries);
-  Entries = fdEdxHit->GetEntries();
-  fdEdxHit->Scale(1./Entries);
-  Entries = fdEdxPionMc->GetEntries();
-  fdEdxPionMc->Scale(1./Entries);
-  Entries = fdEdxPionHit->GetEntries();
-  fdEdxPionHit->Scale(1./Entries);
-  Entries = fdEdxElectronMc->GetEntries();
-  fdEdxElectronMc->Scale(1./Entries);
-  Entries = fdEdxElectronHit->GetEntries();
-  fdEdxElectronHit->Scale(1./Entries);
-}
+
+  void CbmTrdQa::NormalizeHistos()
+  {
+    Double_t Entries = fdEdxPoint->GetEntries();
+    fdEdxPoint->Scale(1./Entries);
+    Entries = fdEdxDigi->GetEntries();
+    fdEdxDigi->Scale(1./Entries);
+    Entries = fdEdxCluster->GetEntries();
+    fdEdxCluster->Scale(1./Entries);
+    Entries = fdEdxHit->GetEntries();
+    fdEdxHit->Scale(1./Entries);
+    Entries = fdEdxPionMc->GetEntries();
+    fdEdxPionMc->Scale(1./Entries);
+    Entries = fdEdxPionHit->GetEntries();
+    fdEdxPionHit->Scale(1./Entries);
+    Entries = fdEdxElectronMc->GetEntries();
+    fdEdxElectronMc->Scale(1./Entries);
+    Entries = fdEdxElectronHit->GetEntries();
+    fdEdxElectronHit->Scale(1./Entries);
+  }
   void CbmTrdQa::FinishTask()
   {
     NormalizeHistos();

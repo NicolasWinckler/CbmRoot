@@ -279,13 +279,23 @@ void CbmTrdHitProducerCluster::CenterOfCharge(const CbmTrdCluster* cluster)
   // ---- Finish --------------------------------------------------------
   void CbmTrdHitProducerCluster::Finish()
   {
+
   }
 
 // -----   Public method EndOfEvent   --------------------------------------
 void CbmTrdHitProducerCluster::FinishEvent() {
-  if (fHits) fHits->Clear();
-  if (fDigis) fDigis->Clear();
-  if (fClusters) fClusters->Clear();
+  if (fHits){
+    fHits->Clear();
+    fHits->Delete();
+  }
+  if (fDigis) {
+    fDigis->Clear();
+    fDigis->Delete();
+  }
+  if (fClusters){
+    fClusters->Clear();
+    fClusters->Delete();
+  }
 }
 // -------------------------------------------------------------------------
 

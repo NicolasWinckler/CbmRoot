@@ -97,6 +97,8 @@ class CbmTrdClusterFinderFast : public FairTask
   virtual void Finish();
   void Register();
 
+  //static Double_t GetTriggerThreshold(){/*Double_t threshold = */return fMinimumChargeTH;/* return threshold;*/}
+
   void SetTriggerThreshold(Double_t triggerthreshold);
   void SetNeighbourTrigger(Bool_t trigger);
   void SetNeighbourRowTrigger(Bool_t trigger);
@@ -130,6 +132,7 @@ class CbmTrdClusterFinderFast : public FairTask
   //static const Float_t minimumChargeTH = 5e-03;
 
   Int_t ClusterSum;
+  //static 
   Double_t fMinimumChargeTH;
   Bool_t fNeighbourReadout; // trigger neighbouring channels (left, right in upper row, same row and lower row)
   Bool_t fNeighbourRowTrigger; // trigger channels in the neighbouring rows (if false and fNeighbourReadout == true: only left and right neighbour are triggered)

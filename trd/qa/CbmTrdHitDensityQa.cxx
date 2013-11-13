@@ -33,6 +33,12 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+
+#include "CbmTrdDigitizer.h"
+#include "CbmTrdDigitizerPRF.h"
+#include "CbmTrdClusterFinderFast.h"
+#include "CbmTrdHitProducerCluster.h"
+
 using std::cout;
 using std::endl;
 
@@ -142,7 +148,7 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
   timer.Start();
   fEventCounter->Fill(0);
   printf("\n  Event: %i\n\n",(Int_t)fEventCounter->GetEntries());
- 
+  //fNeighbourTrigger = CbmTrdClusterFinderFast::GetTriggerThreshold();
   CbmTrdDigi *digi = NULL;
   CbmTrdCluster *cluster = NULL;
   if (NULL != fClusters && fNeighbourTrigger == true){
@@ -277,7 +283,7 @@ void CbmTrdHitDensityQa::Finish()
       LayerMap[LayerId] = new TCanvas(name,title,1000,900);
       name.Form("hdH_S%d_L%d",fStation,fLayer);
       title.Form("hdH Station %d, Layer %d",fStation,fLayer);
-      TH2F *Layer = new TH2F(name,title,600,-6000,6000,600,-6000,6000);
+      TH2I *Layer = new TH2I(name,title,1,-6000,6000,1,-6000,6000);
       Layer->SetContour(99);
       Layer->SetXTitle("x-Coordinate [mm]");
       Layer->SetYTitle("y-Coordinate [mm]");
@@ -294,7 +300,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->GetZaxis()->SetTitleOffset(-2);
       Layer->GetZaxis()->SetRangeUser(min,max);
       LayerMap[LayerId]->cd()->SetLogz(1);
-      Layer->Fill(0.,0.,0.);
+      Layer->Fill(0.,0.,0);
       Layer->Draw("colz");
     }
  
@@ -303,6 +309,8 @@ void CbmTrdHitDensityQa::Finish()
     Int_t global_Row = 0;
     TVector3 padPos;
     TVector3 padSize;
+    TBox *pad = NULL;
+    TBox *module = NULL;
     //printf("Module: %6i   Maximum Trigger Rate: %EHz/Channel\n",fModuleHitMapIt->first,fModuleHitMapIt->second->GetBinContent(fModuleHitMapIt->second->GetMaximumBin()) / Double_t(fEventCounter->GetEntries()) * fEventRate);
     for (Int_t s = 0; s < nSec; s++){
       const Int_t nRow = fModuleInfo->GetNofRowsInSector(s);
@@ -325,7 +333,7 @@ void CbmTrdHitDensityQa::Finish()
 	    local_max[i] *= 10.;
 	  }
 	  Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;
-	  TBox *pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
+	  pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
 	  //printf("    %i %i %i  (%f, %f)   (%f, %f)   %f\n",s,r,c,local_min[0],local_min[1],global_min[0],global_min[1],rate);
 	  pad->SetLineColor(0);
 	  pad->SetLineWidth(0);	
@@ -344,7 +352,7 @@ void CbmTrdHitDensityQa::Finish()
 	global_Row++;
       }
     }
-    TBox *module = new TBox(fModuleInfo->GetX()*10-fModuleInfo->GetSizeX()*10,
+  module = new TBox(fModuleInfo->GetX()*10-fModuleInfo->GetSizeX()*10,
 			    fModuleInfo->GetY()*10-fModuleInfo->GetSizeY()*10,
 			    fModuleInfo->GetX()*10+fModuleInfo->GetSizeX()*10,
 			    fModuleInfo->GetY()*10+fModuleInfo->GetSizeY()*10);

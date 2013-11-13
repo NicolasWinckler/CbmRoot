@@ -22,6 +22,12 @@
 #include "TColor.h"
 #include <iostream>
 #include <cmath>
+
+#include "CbmTrdDigitizer.h"
+#include "CbmTrdDigitizerPRF.h"
+#include "CbmTrdClusterFinderFast.h"
+#include "CbmTrdHitProducerCluster.h"
+
 using std::cout;
 using std::cin;
 using std::endl;
@@ -36,7 +42,7 @@ CbmTrdOccupancyQa::CbmTrdOccupancyQa()
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiChargeSpectrum(new TH1I("DigiChargeSpectrum","DigiChargeSpectrum",1e6,0,1.0e-3)),
-    fLayerDummy(new TH2I("LayerDummy","",1200,-600,600,1000,-500,500)),
+    fLayerDummy(new TH2I("LayerDummy","",1,-600,600,1,-500,500)),
     fModuleMap(),
     fModuleMapIt(),
     fModuleOccupancyMap(),
@@ -231,6 +237,7 @@ void CbmTrdOccupancyQa::SetNeighbourTrigger(Bool_t trigger){
 void CbmTrdOccupancyQa::Exec(Option_t * option)
 {
   printf("================CbmTrdOccupancyQa=====================\n");
+  //fTriggerThreshold = CbmTrdClusterFinderFast::GetTriggerThreshold();
   printf("TriggerThreshold: %.2E\n",fTriggerThreshold);
   printf("NeigbourReadout:%i\n",Int_t(fNeigbourReadout));
   Bool_t debug = false;
@@ -275,7 +282,7 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
 	  title.Form("Module_%i",moduleAddress);
 	  //fModuleOccupancyMap[moduleAddress] = (TH2F*)outFile->Get(title);
 	  //if (!fModuleOccupancyMap[moduleAddress])
-	  fModuleOccupancyMap[moduleAddress] = new TH2F(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	  fModuleOccupancyMap[moduleAddress] = new TH2I(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
 	  //fModuleOccupancyMap[moduleAddress]->Reset();
 	  title.Form("M_%i",moduleAddress);
 	  fModuleOccupancyMemoryMap[moduleAddress] = new TH1F(title,title,10000,0,100);
@@ -331,7 +338,7 @@ void CbmTrdOccupancyQa::Exec(Option_t * option)
 	  title.Form("Module_%i",moduleAddress);
 	  //fModuleOccupancyMap[moduleAddress] = (TH2F*)outFile->Get(title);
 	  //if (!fModuleOccupancyMap[moduleAddress])
-	  fModuleOccupancyMap[moduleAddress] = new TH2F(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	  fModuleOccupancyMap[moduleAddress] = new TH2I(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
 	  //fModuleOccupancyMap[moduleAddress]->Reset();
 	  title.Form("M_%i",moduleAddress);
 	  fModuleOccupancyMemoryMap[moduleAddress] = new TH1F(title,title,10000,0,100);

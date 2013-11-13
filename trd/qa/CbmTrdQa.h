@@ -30,15 +30,18 @@ class CbmTrdQa : public FairTask {
   virtual InitStatus Init();
   virtual void SetParContainers();
   virtual void Exec(Option_t * option);
+  void CreateLayerView(std::map<Int_t, TH1*>& Map, TString folder, TString pics, TString zAxisTitle, Double_t fmax, Double_t fmin, Bool_t logScale);
+  virtual void FinishEvent();
+  virtual void FinishTask();
+  void Register();
+  void SetTriggerThreshold(Double_t triggerthreshold);
+ private:
+
   void SaveHistos();
   void NormalizeHistos();
   void CreateLayerView();
   void GetPadInfos(Int_t moduleAddress, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY);
-  virtual void FinishEvent();
-  virtual void FinishTask();
-  void Register();
-
- private:
+  Double_t GetTrackLength(CbmTrdPoint* point);
   CbmTrdQa& operator=(const CbmTrdQa&);
   CbmTrdQa(const CbmTrdQa&);
   TClonesArray *fMCTracks;
@@ -55,7 +58,7 @@ class CbmTrdQa : public FairTask {
   std::map<Int_t, TH2I*>::iterator fLayerPointMapIt; //! 
   std::map<Int_t, TH2I*> fLayerHitMap; 
   std::map<Int_t, TH2I*>::iterator fLayerHitMapIt; //! 
-
+ 
   std::map<Int_t, std::vector<Int_t> > fModulePointMap; //!
   std::map<Int_t, std::vector<Int_t> >::iterator fModulePointMapIt; //!  
   std::map<Int_t, std::vector<Int_t> > fModuleDigiMap; //!
@@ -65,12 +68,29 @@ class CbmTrdQa : public FairTask {
   std::map<Int_t, std::vector<Int_t> > fModuleHitMap; //!
   std::map<Int_t, std::vector<Int_t> >::iterator fModuleHitMapIt; //!  
 
-  std::map<Int_t, TH1F*> fModuleGhostMap; //!
-  std::map<Int_t, TH1F*>::iterator fModuleGhostMapIt; //!  
-  std::map<Int_t, TH1F*> fModuleLostMap; //!
-  std::map<Int_t, TH1F*>::iterator fModuleLostMapIt; //!
-  std::map<Int_t, TH1F*> fModuleEfficiencyMap; //!
-  std::map<Int_t, TH1F*>::iterator fModuleEfficiencyMapIt; //!
+
+  std::map<Int_t, TH1I*> fModuleAveragePointsMap;
+  std::map<Int_t, TH1I*>::iterator fModuleAveragePointsMapIt;
+  std::map<Int_t, TH1I*> fModuleTrackableMap2; //!
+  std::map<Int_t, TH1I*>::iterator fModuleTrackableMap2It; //! 
+  std::map<Int_t, TH1I*> fModuleTrackableMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleTrackableMapIt; //! 
+  std::map<Int_t, TH1I*> fModuleClusterSizeMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleClusterSizeMapIt; //! 
+  std::map<Int_t, TH1I*> fModuledEdxMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuledEdxMapIt; //! 
+  std::map<Int_t, TH1I*> fModuleTracklengthMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleTracklengthMapIt; //! 
+  std::map<Int_t, TH1I*> fModuleMultiPointMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleDeltaEMapIt; //! 
+  std::map<Int_t, TH1I*> fModuleDeltaEMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleMultiPointMapIt; //!  
+  std::map<Int_t, TH1I*> fModuleGhostMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleGhostMapIt; //!  
+  std::map<Int_t, TH1I*> fModuleLostMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleLostMapIt; //!
+  std::map<Int_t, TH1I*> fModuleEfficiencyMap; //!
+  std::map<Int_t, TH1I*>::iterator fModuleEfficiencyMapIt; //!
 
   Double_t fTriggerThreshold;
   TString fGeo;

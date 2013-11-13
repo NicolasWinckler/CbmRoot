@@ -58,6 +58,8 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
     fnSec(-1),
     fModuleId(-1),
     fLayerId(-1),
+    digi(NULL),
+    digiMatch(NULL),
     fTrdPoints(NULL),
     fDigis(new TClonesArray("CbmTrdDigi")),
     fDigiMatchs(NULL),
@@ -66,6 +68,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
     fModuleInfo(NULL),
     fRadiators(NULL),
     fDigiMap(),
+    fDigiMapIt(),
     fGeoHandler(new CbmTrdGeoHandler())
 {
 }
@@ -73,7 +76,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF()
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
-					     CbmTrdRadiator *radiator)
+				       CbmTrdRadiator *radiator)
   :FairTask(name),
    fTime(-1.),
    fDebug(false),
@@ -81,11 +84,13 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
    fModuleCopy(-1),
    fModuleAddress(-1),
    fMCPointId(-1),
-    fnRow(-1),
-    fnCol(-1),
-    fnSec(-1),
-    fModuleId(-1),
-    fLayerId(-1),
+   fnRow(-1),
+   fnCol(-1),
+   fnSec(-1),
+   fModuleId(-1),
+   fLayerId(-1),
+    digi(NULL),
+    digiMatch(NULL),
    fTrdPoints(NULL),
    fDigis(NULL),
    fDigiMatchs(NULL),
@@ -94,6 +99,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(const char *name, const char *title,
    fModuleInfo(NULL),
    fRadiators(radiator),
    fDigiMap(),
+   fDigiMapIt(),
    fGeoHandler(new CbmTrdGeoHandler())
 {
 }
@@ -199,8 +205,6 @@ InitStatus CbmTrdDigitizerPRF::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
 {
-  fDigis->Clear();
-  fDigiMatchs->Clear();
 
   fDebug = false;
   TStopwatch timer;
@@ -335,20 +339,28 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   }
   // Fill data from internally used stl map into output TClonesArray
   Int_t iDigi = 0;
-  map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
-  for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
-    CbmTrdDigi* digi = it->second.first;
-    new ((*fDigis)[iDigi]) CbmTrdDigi(*digi);
-    CbmMatch* digiMatch = it->second.second;
-    new ((*fDigiMatchs)[iDigi]) CbmMatch(*digiMatch);
-    delete digi;
-    delete digiMatch;
+  //map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it;
+  for (fDigiMapIt = fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++) {
+    new ((*fDigis)[iDigi])      CbmTrdDigi(*(fDigiMapIt->second.first));
+    //new ((*fDigiMatchs)[iDigi]) CbmTrdDigiMatch(*(fDigiMapIt->second.second)); // Memory LEAK !!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  
+    delete fDigiMapIt->second.first;
+    delete fDigiMapIt->second.second;
+    fDigiMap.erase((fDigiMapIt->first));
+    
     iDigi++;
   }
   fDigiMap.clear();
-  printf("\n   %i tracks pointing towards target (%5.1f%%)\n",iBackwardTrack,100.*iBackwardTrack/nEntries);
-  printf("\n   %i electron tracks through lattice material of %i electrons (%5.1f%%)\n",iLatticeHits,iElectrons,100*iLatticeHits/Double_t(iElectrons));
-  printf("\n   Created %i TrdDigis  %7.3f Digis/MC-Point\n",iDigi, Double_t(iDigi/nEntries));
+  if (nEntries > 0){
+    printf("\n   %i tracks pointing towards target (%5.1f%%)\n",iBackwardTrack,100.*iBackwardTrack/nEntries);
+    printf("\n   %i electron tracks through lattice material of %i electrons (%5.1f%%)\n",iLatticeHits,iElectrons,100*iLatticeHits/Double_t(iElectrons));
+    printf("\n   Created %i TrdDigis  %7.3f Digis/MC-Point\n",iDigi, Double_t(iDigi/nEntries));
+  } else {
+    printf("\n   %i tracks pointing towards target\n",iBackwardTrack);
+    printf("\n   %i electron tracks through lattice material of %i electrons\n",iLatticeHits,iElectrons);
+    printf("\n   Created %i TrdDigis  \n",iDigi);  
+  }
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -389,8 +401,8 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
     Double_t W(fModuleInfo->GetPadSizeX(sectorId)), H(fModuleInfo->GetPadSizeY(sectorId));
     fModuleInfo->TransformToLocalPad(local_point, displacement_x, displacement_y);
 
-    const Int_t maxCol(7), maxRow(3);
-
+    const Int_t maxCol(5/W+0.5), maxRow(5/H+3);// 7 and 3 in orig. minimum 5 times 5 cm area has to be scanned
+    //printf("%i x %i\n",maxCol,maxRow);
     //Estimate starting column and row and limits due to chamber dimensions
     Int_t startCol(columnId-maxCol/2), stopCol(columnId+maxCol/2), startRow(rowId-maxRow/2), stopRow(rowId+maxRow/2), startSec(0);
     Double_t sum = 0;
@@ -403,8 +415,9 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	  targSec = fModuleInfo->GetSector(iRow, secRow);
 	  //printf("secId digi1 %i\n",targSec);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, iCol); 
-	  if (secRow > 11 && fModuleId == 5)
-	    printf("address %i layer %i and modId %i modAddress %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,fModuleAddress,targSec,secRow,iCol);
+	  if (secRow > 11 && fModuleId == 5){
+	    //printf("address %i layer %i and modId %i modAddress %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,fModuleAddress,targSec,secRow,iCol);
+	  }
 	} else {
           targRow = iRow;
           targCol = iCol;
@@ -420,8 +433,9 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 	  targSec = fModuleInfo->GetSector(targRow, secRow);
 	  //printf("secId digi2 %i\n",targSec);
 	  address = CbmTrdAddress::GetAddress(fLayerId, fModuleId, targSec, secRow, targCol);
-	  if (secRow > 11 && fModuleId == 5)
-	    printf("address %i layer %i and modId %i modAddress %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,fModuleAddress,targSec,secRow,targCol);
+	  if (secRow > 11 && fModuleId == 5){
+	    //printf("address %i layer %i and modId %i modAddress %i  Sec%i Row:%i Col%i\n",address,fLayerId,fModuleId,fModuleAddress,targSec,secRow,targCol);
+	  }
 	}
 	Double_t chargeFraction = 0;
 	if (rowId == iRow && columnId == iCol) // if pad in center of 7x3 arrayxs
@@ -517,19 +531,40 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
 // --------------------------------------------------------------------
 void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
-  const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(pointId));
-  map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
-  if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
+  fDigiMapIt = fDigiMap.find(address);
+  
+  //map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator it = fDigiMap.find(address);
+  if (fDigiMapIt == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
      CbmMatch* digiMatch = new CbmMatch();
      digiMatch->AddReference(pointId, charge);
      fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
+    /*
+    delete fDigiMap[address].first;
+    delete fDigiMap[address].second;
+    fDigiMap.erase(address);
+    */
   } else { // Pixel already in map -> Add charge
-     CbmTrdDigi* digi = it->second.first;
-     digi->AddCharge(charge);
-     digi->SetTime(max(time, digi->GetTime()));
-     CbmMatch* digiMatch = it->second.second;
-     digiMatch->AddReference(pointId, charge);
+    fDigiMapIt->second.first->AddCharge(charge);
+    fDigiMapIt->second.first->SetTime(max(time, fDigiMapIt->second.first->GetTime()));
+    fDigiMapIt->second.second->AddPoint(pointId);
   }
+  
 }
 
+void CbmTrdDigitizerPRF::FinishEvent() {
+  fTrdPoints->Clear("C");
+  fTrdPoints->Delete();
+  fMCStacks->Clear("C");
+  fMCStacks->Delete();
+  fDigis->Clear("C");
+  fDigis->Delete();
+  fDigiMatchs->Clear("C");
+  fDigiMatchs->Delete();
+  for (fDigiMapIt = fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++) {
+    delete fDigiMapIt->second.first;
+    delete fDigiMapIt->second.second;
+    fDigiMap.erase((fDigiMapIt->first));
+  }
+  fDigiMap.clear();
+}
 ClassImp(CbmTrdDigitizerPRF)

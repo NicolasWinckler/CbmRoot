@@ -896,10 +896,17 @@ void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
   }
 
   // -----   Public method EndOfEvent   --------------------------------------
-  void CbmTrdClusterFinderFast::FinishEvent() {
-    //  cout<<"In CbmTrdClusterFinderFast::FinishEvent()"<<endl;  
-    if (fClusters) fClusters->Clear("C");
+void CbmTrdClusterFinderFast::FinishEvent() {
+  //  cout<<"In CbmTrdClusterFinderFast::FinishEvent()"<<endl;  
+  if (fDigis) {
+    fDigis->Clear("C");
+    fDigis->Delete();
   }
+  if (fClusters) {
+    fClusters->Clear("C");
+    fClusters->Delete();
+  }
+}
   // -------------------------------------------------------------------------
 
   ClassImp(CbmTrdClusterFinderFast)

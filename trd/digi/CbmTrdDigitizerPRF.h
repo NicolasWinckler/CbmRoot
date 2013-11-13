@@ -33,11 +33,11 @@ class CbmTrdDigitizerPRF : public FairTask {
 
   /** Standard constructor **/
   CbmTrdDigitizerPRF(const char *name, const char *title="CBM Task",
-			CbmTrdRadiator *radiator=NULL);
+		     CbmTrdRadiator *radiator=NULL);
   /*
     oneClusterPerPoint: produces just one cluster per MC-track if true -> less ghost hits
     produces n cluster per track depending on the path length within the detector volume -> leads to at least one hit per crossed pad row -> high number of ghost hits
-*/
+  */
 
   /** Destructor **/
   virtual ~CbmTrdDigitizerPRF();
@@ -49,6 +49,8 @@ class CbmTrdDigitizerPRF : public FairTask {
 
   /** Executed task **/
   virtual void Exec(Option_t * option);
+
+  void FinishEvent();
 
  private:
 
@@ -85,15 +87,19 @@ class CbmTrdDigitizerPRF : public FairTask {
   TClonesArray *fDigiMatchs; //! Corresponding MCPoints to TRD digis
   TClonesArray *fMCStacks;  //! MC Track information
 
+  CbmTrdDigi* digi;
+  CbmTrdDigiMatch* digiMatch;
+
   CbmTrdDigiPar  *fDigiPar;    //!
   CbmTrdModule   *fModuleInfo; //!
   CbmTrdRadiator *fRadiators;  //!
 
   CbmTrdGeoHandler* fGeoHandler; //!
 
-    // Temporary storage for digis.
-  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap;
- 
+  // Temporary storage for digis.
+  // map<address, pair<CbmTrdDigi*, CbmTrdDigiMatch*>
+  std::map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> > fDigiMap;
+  std::map<Int_t, pair<CbmTrdDigi*, CbmTrdDigiMatch*> >::iterator fDigiMapIt;
   ClassDef(CbmTrdDigitizerPRF,2)
 
     };

@@ -14,6 +14,7 @@
 
 class CbmHistManager;
 class CbmTrackMatch;
+class CbmTrackMatchNew;
 class CbmLitMCTrackCreator;
 class CbmLitGlobalElectronId;
 
@@ -219,6 +220,10 @@ private:
     */
    Bool_t CheckTrackQuality(
       const CbmTrackMatch* trackMatch,
+      DetectorId detId);
+
+   void FillTrackQualityHistograms(
+      const CbmTrackMatchNew* trackMatch,
       DetectorId detId);
 
    /**

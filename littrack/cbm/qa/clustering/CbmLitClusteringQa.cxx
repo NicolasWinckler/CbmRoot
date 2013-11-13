@@ -31,7 +31,9 @@
 #include "CbmMCTrack.h"
 #include "CbmTrdAddress.h"
 #include "CbmCluster.h"
-#include "CbmTrdDigiMatch.h"
+#include "CbmStsDigi.h"
+#include "CbmStsDigiMatch.h"
+#include "CbmMatch.h"
 
 #include "TSystem.h"
 #include "TClonesArray.h"
@@ -63,6 +65,7 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fStsDigis(NULL),
    fStsClusters(NULL),
    fStsHits(NULL),
+   fStsDigiMatches(NULL),
    fRichHits(NULL),
    fRichPoints(NULL),
    fMuchPoints(NULL),
@@ -76,6 +79,8 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fTrdClusters(NULL),
    fTrdHits(NULL),
    fTrdDigiMatches(NULL),
+   fTrdClusterMatches(NULL),
+   fTrdHitMatches(NULL),
    fTofPoints(NULL),
    fTofHits(NULL),
    fMuchGeoScheme(CbmMuchGeoScheme::Instance())
@@ -112,8 +117,6 @@ InitStatus CbmLitClusteringQa::Init()
 void CbmLitClusteringQa::Exec(
     Option_t* opt)
 {
-   MatchHitsToPoints();
-
    // Increase event counter
    ProcessPoints();
    ProcessDigis();
@@ -175,6 +178,7 @@ void CbmLitClusteringQa::ReadDataBranches()
    fStsDigis = (TClonesArray*) ioman->GetObject("StsDigi");
    fStsClusters = (TClonesArray*) ioman->GetObject("StsCluster");
    fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
+   fStsDigiMatches = (TClonesArray*) ioman->GetObject("StsDigiMatch");
 
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
    fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
@@ -193,6 +197,8 @@ void CbmLitClusteringQa::ReadDataBranches()
    fTrdClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
    fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
    fTrdDigiMatches = (TClonesArray*) ioman->GetObject("TrdDigiMatch");
+   fTrdClusterMatches = (TClonesArray*) ioman->GetObject("TrdClusterMatch");
+   fTrdHitMatches = (TClonesArray*) ioman->GetObject("TrdHitMatch");
 
    fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
    fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
@@ -210,14 +216,24 @@ void CbmLitClusteringQa::ProcessPoints()
 
 void CbmLitClusteringQa::ProcessDigis()
 {
+   if (NULL != fStsDigis && fHM->Exists("hno_NofObjects_StsDigis_Station")) {
+      for (Int_t i = 0; i < fStsDigis->GetEntriesFast(); i++) {
+         const CbmStsDigi* digi = static_cast<const CbmStsDigi*>(fStsDigis->At(i));
+         const CbmStsDigiMatch* digiMatch = static_cast<const CbmStsDigiMatch*>(fStsDigiMatches->At(i));
+         Int_t stationId = digi->GetSectorNr();
+         fHM->H1("hno_NofObjects_StsDigis_Station")->Fill(stationId);
+         //fHM->H1("hpa_StsDigi_NofPointsInDigi_H1")->Fill(digiMatch->GetGetNofRefs());
+         //fHM->H1("hpa_StsDigi_NofPointsInDigi_H2")->Fill(stationId, digiMatch->GetNofRefs());
+      }
+   }
    if (NULL != fTrdDigis && fHM->Exists("hno_NofObjects_TrdDigis_Station")) {
       for (Int_t i = 0; i < fTrdDigis->GetEntriesFast(); i++) {
          const CbmDigi* digi = static_cast<const CbmDigi*>(fTrdDigis->At(i));
-         const CbmTrdDigiMatch* digiMatch = static_cast<const CbmTrdDigiMatch*>(fTrdDigiMatches->At(i));
+         const CbmMatch* digiMatch = static_cast<const CbmMatch*>(fTrdDigiMatches->At(i));
          Int_t layerId = CbmTrdAddress::GetLayerId(digi->GetAddress());
          fHM->H1("hno_NofObjects_TrdDigis_Station")->Fill(layerId);
-         fHM->H1("hpa_TrdDigi_NofPointsInDigi_H1")->Fill(digiMatch->GetNofRefs());
-         fHM->H1("hpa_TrdDigi_NofPointsInDigi_H2")->Fill(layerId, digiMatch->GetNofRefs());
+         fHM->H1("hpa_TrdDigi_NofPointsInDigi_H1")->Fill(digiMatch->GetNofReferences());
+         fHM->H1("hpa_TrdDigi_NofPointsInDigi_H2")->Fill(layerId, digiMatch->GetNofReferences());
       }
    }
 }
@@ -312,9 +328,10 @@ void CbmLitClusteringQa::FillTrdResidualAndPullHistograms()
 
    Int_t nofHits = fTrdHits->GetEntriesFast();
 	for (Int_t iHit = 0; iHit < nofHits; iHit++) {
-      CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(iHit);
+      const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(fTrdHits->At(iHit));
+      const CbmMatch* match = static_cast<const CbmMatch*>(fTrdHitMatches->At(iHit));
       if (isnan(hit->GetX()) || (isnan(hit->GetY()))) continue;
-      const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(fTrdHitMatchPoint[iHit]));
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(match->GetMatchedReferenceId()));
       if (point == NULL) continue;
       //Float_t xPoint = (muchPoint->GetXIn() + muchPoint->GetXOut()) / 2;
       //Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
@@ -325,34 +342,6 @@ void CbmLitClusteringQa::FillTrdResidualAndPullHistograms()
       fHM->H2("hrp_Trd_ResidualY_H2")->Fill(layerId, residualY);
       fHM->H2("hrp_Trd_PullX_H2")->Fill(layerId, residualX / hit->GetDx());
       fHM->H2("hrp_Trd_PullY_H2")->Fill(layerId, residualY / hit->GetDy());
-   }
-}
-
-void CbmLitClusteringQa::MatchHitsToPoints()
-{
-   if (fTrdPoints && fTrdDigis && fTrdClusters && fTrdHits) {
-      fTrdHitMatchPoint.clear();
-      Int_t nofHits = fTrdHits->GetEntriesFast();
-      for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-         Double_t maxCharge = std::numeric_limits<Double_t>::min();
-         Int_t matchedPointIndex = -1;
-         const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(fTrdHits->At(iHit));
-         const CbmCluster* cluster = static_cast<const CbmCluster*>(fTrdClusters->At(hit->GetRefId()));
-         Int_t nofDigis = cluster->GetNofDigis();
-         for (Int_t iDigi = 0; iDigi < nofDigis; iDigi++) {
-            const CbmTrdDigiMatch* digiMatch = static_cast<const CbmTrdDigiMatch*>(fTrdDigiMatches->At(cluster->GetDigi(iDigi)));
-            Int_t nofPoints = digiMatch->GetNofRefs();
-            for (Int_t iPoint = 0; iPoint < nofPoints; iPoint++) {
-               Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
-               const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(pointIndex));
-               if (point->GetEnergyLoss() > maxCharge) {
-                  maxCharge = point->GetEnergyLoss();
-                  matchedPointIndex = pointIndex;
-               }
-            }
-         }
-         fTrdHitMatchPoint[iHit] = matchedPointIndex;
-      }
    }
 }
 
@@ -371,7 +360,7 @@ void CbmLitClusteringQa::CreateHistograms()
    CreateNofObjectsHistograms(kRICH, "Rich");
 
    //CreateClusterParametersHistograms(kMVD, "Mvd");
-   //CreateClusterParametersHistograms(kSTS, "Sts");
+   CreateClusterParametersHistograms(kSTS, "Sts");
    CreateClusterParametersHistograms(kTRD, "Trd");
    //CreateClusterParametersHistograms(kMUCH, "Much");
    //CreateClusterParametersHistograms(kTOF, "Tof");

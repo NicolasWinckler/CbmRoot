@@ -105,8 +105,6 @@ private:
 
     void FillTrdResidualAndPullHistograms();
 
-    void MatchHitsToPoints();
-
     void SetMuchClustersArray();
 
     void CreateMuchHistograms();
@@ -157,6 +155,7 @@ private:
     TClonesArray* fStsDigis; // CbmStsDigi array
     TClonesArray* fStsClusters; // CbmStsCluster array
     TClonesArray* fStsHits; // CbmStsHit array
+    TClonesArray* fStsDigiMatches; // CbmStsDigiMatch
 
     TClonesArray* fRichPoints; // CbmRichPoint array
     TClonesArray* fRichHits; // CbmRichHits array
@@ -172,13 +171,12 @@ private:
     TClonesArray* fTrdDigis; // CbmTrdDigi array
     TClonesArray* fTrdClusters; // CbmTrdCluster array
     TClonesArray* fTrdHits; // CbmTrdHit array
-    TClonesArray* fTrdDigiMatches; // CbmTrdDigiMatch array
+    TClonesArray* fTrdDigiMatches; // CbmMatch array
+    TClonesArray* fTrdClusterMatches; // CbmMatch array
+    TClonesArray* fTrdHitMatches; // CbmMatches array
 
     TClonesArray* fTofPoints; // CbmTofPoint array
     TClonesArray* fTofHits; // CbmTofHit array
-
-    map<Int_t, Int_t> fTrdHitMatchPoint; // TrdHit -> TrdPoint
-
 
     CbmMuchGeoScheme* fMuchGeoScheme;
     TString fMuchDigiFile;

@@ -19,6 +19,7 @@
 #include "FairMCPoint.h"
 #include "CbmStsTrack.h"
 #include "CbmMvdHitMatch.h"
+#include "CbmTrackMatchNew.h"
 
 #include "TH1.h"
 #include "TH2F.h"
@@ -892,12 +893,13 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
             ProcessMvd(stsId);
          }
       }
-      const CbmTrackMatch* trdTrackMatch;
+      const CbmTrackMatchNew* trdTrackMatch;
       if (isTrdOk) {
-         trdTrackMatch = static_cast<const CbmTrackMatch*>(fTrdMatches->At(trdId));
-         Int_t nofHits = trdTrackMatch->GetNofTrueHits() + trdTrackMatch->GetNofWrongHits() + trdTrackMatch->GetNofFakeHits();
+         trdTrackMatch = static_cast<const CbmTrackMatchNew*>(fTrdMatches->At(trdId));
+         Int_t nofHits = trdTrackMatch->GetNofHits();
          if (nofHits >= fMinNofHitsTrd) {
-            isTrdOk = CheckTrackQuality(trdTrackMatch, kTRD);
+            isTrdOk = trdTrackMatch->GetTrueOverAllHitsRatio() >= fQuota;
+            FillTrackQualityHistograms(trdTrackMatch, kTRD);
             if (!isTrdOk) { // ghost track
                fHM->H1("hng_NofGhosts_Trd_Nh")->Fill(nofHits);
             }
@@ -950,7 +952,7 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
       // Get MC indices of track segments
       Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1, richMCId = -1;
       if (isStsOk) { stsMCId = stsTrackMatch->GetMCTrackId(); }
-      if (isTrdOk) { trdMCId = trdTrackMatch->GetMCTrackId(); }
+      if (isTrdOk) { trdMCId = trdTrackMatch->GetMatchedReferenceId(); }
       if (isMuchOk) { muchMCId = muchTrackMatch->GetMCTrackId(); }
       if (isTofOk) {
          const CbmBaseHit* tofHit = static_cast<const CbmBaseHit*>(fTofHits->At(tofId));
@@ -1050,6 +1052,20 @@ Bool_t CbmLitTrackingQa::CheckTrackQuality(
       fHM->H1(histName + "_FakeOverAll")->Fill(fakequali);
    }
    return (detId == kRICH) ? quali >= fQuotaRich : quali >= fQuota;
+}
+
+void CbmLitTrackingQa::FillTrackQualityHistograms(
+   const CbmTrackMatchNew* trackMatch,
+   DetectorId detId)
+{
+   string detName = (detId == kSTS) ? "Sts" : (detId == kTRD) ? "Trd" : (detId == kMUCH) ? "Much" : (detId == kRICH) ? "Rich" : "";
+   assert(detName != "");
+   string histName = "hth_" + detName + "_TrackHits";
+   fHM->H1(histName + "_All")->Fill(trackMatch->GetNofHits());
+   fHM->H1(histName + "_True")->Fill(trackMatch->GetNofTrueHits());
+   fHM->H1(histName + "_Fake")->Fill(trackMatch->GetNofWrongHits());
+   fHM->H1(histName + "_TrueOverAll")->Fill(trackMatch->GetTrueOverAllHitsRatio());
+   fHM->H1(histName + "_FakeOverAll")->Fill(trackMatch->GetWrongOverAllHitsRatio());
 }
 
 void CbmLitTrackingQa::ProcessMcTracks()

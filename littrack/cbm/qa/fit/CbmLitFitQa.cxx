@@ -9,6 +9,7 @@
 #include "CbmHistManager.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmStsTrack.h"
 #include "CbmTrack.h"
 #include "CbmMvdHit.h"
@@ -183,13 +184,12 @@ void CbmLitFitQa::ProcessTrdTrack(
 {
    if (NULL == fTrdTracks || NULL == fTrdTrackMatches || trackId < 0) return;
 
-   CbmTrackMatch* match = static_cast<CbmTrackMatch*>(fTrdTrackMatches->At(trackId));
-   Int_t mcId = match->GetMCTrackId();
+   CbmTrackMatchNew* match = static_cast<CbmTrackMatchNew*>(fTrdTrackMatches->At(trackId));
+   Int_t mcId = match->GetMatchedReferenceId();
    if (mcId < 0) return; // Ghost or fake track
 
    // Check correctness of reconstructed track
-   Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
-   if ((match->GetNofTrueHits() / allHits) < fQuota) return;
+   if (match->GetTrueOverAllHitsRatio() < fQuota) return;
 
    CbmTrack* track = static_cast<CbmTrack*>(fTrdTracks->At(trackId));
    Int_t nofHits = track->GetNofHits();

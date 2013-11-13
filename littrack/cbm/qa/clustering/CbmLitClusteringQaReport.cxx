@@ -184,7 +184,6 @@ void CbmLitClusteringQaReport::Draw()
    }
 }
 
-
 void CbmLitClusteringQaReport::DrawNofObjectsHistograms(
 	  const string& detName,
       const string& parameter)

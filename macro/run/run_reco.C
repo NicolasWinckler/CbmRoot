@@ -249,9 +249,9 @@ void run_reco(Int_t nEvents = 2) {
   // =========================================================================
 
 
-  // -----   TRD track matching   --------------------------------------------
-  CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
-  run->AddTask(trdMatchTracks);
+  // -----   RECO-to-MC matching   --------------------------------------------
+  CbmMatchRecoToMC* matchTask = new CbmMatchRecoToMC();
+  run->AddTask(matchTask);
   // ----------------------------------------------------
 
   // ----------- TRD track Pid Wkn ----------------------

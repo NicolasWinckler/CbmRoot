@@ -12,7 +12,7 @@
 #include "CbmBaseHit.h"
 #include "CbmTrack.h"
 #include "FairMCPoint.h"
-
+#include "FairLogger.h"
 #include "TClonesArray.h"
 
 CbmMatchRecoToMC::CbmMatchRecoToMC() :

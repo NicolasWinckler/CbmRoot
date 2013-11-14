@@ -3,7 +3,7 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
-// 2013-11-14 - DE - v13q4 - include information about pads in this macro
+// 2013-11-14 - DE - v13q4 - include information about pad plane layout of all module types in this macro
 // 2013-11-04 - DE - v13p4 - adapt the number of front-end boards to the pad layout of the 540 mm modules
 // 2013-11-04 - DE - v13p4 - use 8 module types (4x S + 4x L) to better match the occupancy
 // 2013-10-31 - DE - v13p4 - modify the support structure of station 1 to match with the MUCH/RICH platform
@@ -72,10 +72,16 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion   = "trd_v13q_3e";
+const TString tagVersion   = "v13q";
+//const TString geoVersion   = "trd_" + tagVersion + "_1h";
+//const TString geoVersion   = "trd_" + tagVersion + "_1e";
+//const TString geoVersion   = "trd_" + tagVersion + "_1m";
+const TString geoVersion   = "trd_" + tagVersion + "_3e";
+//const TString geoVersion   = "trd_" + tagVersion + "_3m";
 const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
+const TString FileNamePads = "CbmTrdPads_" + tagVersion + ".h";
 
 // display switches
 const Bool_t IncludeRadiator    = true;  // false;  // true, if radiator is included in geometry
@@ -269,97 +275,17 @@ const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; 
 //const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
 
-
-//=AA=======================
-
-Int_t fst1_sect_count = 3;
-
-Double_t fst1_pad_type[8][3][4]  // 8 modules  // 3 sectors  // 4 values
-
-
-Float_t fst1_pad_type[8][3][4] =   // array of pad geometries in the TRD (trd1mod[1-8])
-  { { { 54., 18., 54./80,  1.50 },  
-      { 54., 18., 54./80,  1.50 },  
-      { 54., 18., 54./80,  1.50 } },
-
-    { { 54., 22., 54./80,  2.75 },  
-      { 54., 10., 54./80,  2.50 },  
-      { 54., 22., 54./80,  2.75 } },
-
-    { { 54.,  4.5, 54./80,  4.50 },  
-      { 54., 45.0, 54./80,  4.50 },  
-      { 54.,  4.5, 54./80,  4.50 } },
-
-    { { 54., 13.5, 54./80,  6.75 },  
-      { 54., 27.0, 54./80,  6.75 },  
-      { 54., 13.5, 54./80,  6.75 } },
-
-//---
-
-    { { 91., 37.5, 91./128,  3.75 },  
-      { 91., 16.0, 91./128,  4.00 },  
-      { 91., 37.5, 91./128,  3.75 } },
-
-    { { 91., 30.0, 91./128,  7.50 },  
-      { 91., 31.0, 91./128,  7.75 },  
-      { 91., 30.0, 91./128,  7.50 } },
-
-    { { 91., 22.5, 91./128, 11.25 },  
-      { 91., 46.0, 91./128, 11.50 },  
-      { 91., 22.5, 91./128, 11.25 } },
-
-    { { 91., 30.0, 91./128, 15.00 },  
-      { 91., 31.0, 91./128, 15.50 },  
-      { 91., 30.0, 91./128, 15.00 } } };
-
-#endif
-
-//=AA=======================
-
-#ifndef CBMTRDPADS_H
-#define CBMTRDPADS_H
-
-// v2.7
-Int_t fst1_sect_count = 3;
-Float_t fst1_pad_type[8][3][4] =   // array of pad geometries in the TRD (trd1mod[1-8])
-  { { { 54., 18., 54./80,  1.50 },  
-      { 54., 18., 54./80,  1.50 },  
-      { 54., 18., 54./80,  1.50 } },
-
-    { { 54., 22., 54./80,  2.75 },  
-      { 54., 10., 54./80,  2.50 },  
-      { 54., 22., 54./80,  2.75 } },
-
-    { { 54.,  4.5, 54./80,  4.50 },  
-      { 54., 45.0, 54./80,  4.50 },  
-      { 54.,  4.5, 54./80,  4.50 } },
-
-    { { 54., 13.5, 54./80,  6.75 },  
-      { 54., 27.0, 54./80,  6.75 },  
-      { 54., 13.5, 54./80,  6.75 } },
-
-//---
-
-    { { 91., 37.5, 91./128,  3.75 },  
-      { 91., 16.0, 91./128,  4.00 },  
-      { 91., 37.5, 91./128,  3.75 } },
-
-    { { 91., 30.0, 91./128,  7.50 },  
-      { 91., 31.0, 91./128,  7.75 },  
-      { 91., 30.0, 91./128,  7.50 } },
-
-    { { 91., 22.5, 91./128, 11.25 },  
-      { 91., 46.0, 91./128, 11.50 },  
-      { 91., 22.5, 91./128, 11.25 } },
-
-    { { 91., 30.0, 91./128, 15.00 },  
-      { 91., 31.0, 91./128, 15.50 },  
-      { 91., 30.0, 91./128, 15.00 } } };
-
-#endif
-
-//=AA=======================
-
+/* TODO: activate connector grouping info below
+// ultimate - grouping of pads to connectors
+const Int_t RowsPerConnector[NofModuleTypes]  = {  6,  4,  2,  2,  2,  2,  2,  2 };
+const Int_t ColsPerConnector[NofModuleTypes]  = { 10, 16, 16, 16, 16, 16, 16, 16 };
+// super    - grouping of pads to connectors
+const Int_t RowsPerConnector[NofModuleTypes]  = {  4,  4,  2,  2,  2,  2,  2,  2 };
+const Int_t ColsPerConnector[NofModuleTypes]  = { 16, 16, 16, 16, 16, 16, 16, 16 };
+// normal   - grouping of pads to connectors
+const Int_t RowsPerConnector[NofModuleTypes]  = {  2,  2,  2,  2,  2,  2,  2,  2 };
+const Int_t ColsPerConnector[NofModuleTypes]  = { 16, 16, 16, 16, 16, 16, 16, 16 };
+*/
 
 const Double_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 const Double_t asic_offset  = 0.2;  // 2 mm - offset of ASICs to FEBs to avoid overlaps
@@ -459,6 +385,7 @@ void create_box_supports();
 void add_trd_labels();
 void create_mag_field_vector();
 void dump_info_file();
+void dump_digi_file();
 
 
 void Create_TRD_Geometry_v13q_3e() {
@@ -535,6 +462,7 @@ void Create_TRD_Geometry_v13q_3e() {
   outfile->Close();
 
   dump_info_file();
+  dump_digi_file();
 
   top->Draw("ogl");
 
@@ -544,6 +472,141 @@ void Create_TRD_Geometry_v13q_3e() {
 //  cin.get();
 //  exit();
 }
+
+
+//=BB=============================================================
+void dump_digi_file()
+{
+  TDatime  datetime;   // used to get timestamp
+
+  const Double_t ActiveAreaX[2] = { DetectorSizeX[0] - 2 * FrameWidth[0],
+                                    DetectorSizeX[1] - 2 * FrameWidth[1] };
+  const Int_t NofSectors = 3;
+  const Int_t NofPadsInRow[2]  = { 80, 128 };
+
+  const Double_t PadHeightInSector[NofModuleTypes][NofSectors] =
+        { {  1.50,  1.50,  1.50 },   // module type 1
+          {  2.75,  2.50,  2.75 },   // module type 2
+          {  4.50,  4.50,  4.50 },   // module type 3
+          {  6.75,  6.75,  6.75 },   // module type 4
+          {  3.75,  4.00,  3.75 },   // module type 5
+          {  7.50,  7.75,  7.50 },   // module type 6
+          { 11.25, 11.50, 11.25 },   // module type 7
+          { 15.00, 15.50, 15.00 } }; // module type 8
+
+  const Int_t NofRowsInSector[NofModuleTypes][NofSectors] = 
+        { {  12,  12,  12 },         // module type 1
+          {   8,   4,   8 },         // module type 2
+          {   1,  10,   1 },         // module type 3
+          {   2,   4,   2 },         // module type 4
+          {  10,   4,  10 },         // module type 5
+          {   4,   4,   4 },         // module type 6
+          {   2,   4,   2 },         // module type 7
+          {   2,   2,   2 } };       // module type 8
+
+  Double_t HeightOfSector[NofModuleTypes][NofSectors];
+  Double_t PadWidth[NofModuleTypes];
+
+  // calculate pad width
+  for (Int_t im = 0; im < NofModuleTypes; im++)
+    PadWidth[im] = ActiveAreaX[ModuleType[im]] / NofPadsInRow[ModuleType[im]];
+
+  // calculate height of sectors
+  for (Int_t im = 0; im < NofModuleTypes; im++)
+    for (Int_t is = 0; is < NofSectors; is++)
+      HeightOfSector[im][is] = NofRowsInSector[im][is] * PadHeightInSector[im][is];
+
+  // check, if the entire module size is covered by pads
+  for (Int_t im = 0; im < NofModuleTypes; im++)
+    if (ActiveAreaX[ModuleType[im]] - (HeightOfSector[im][0] + HeightOfSector[im][1] + HeightOfSector[im][2]) != 0)
+    {
+      printf("WARNING: sector size does not add up to module size for module type %d\n", im+1);
+      printf("%.2f = %.2f + %.2f + %.2f\n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][0], HeightOfSector[im][1], HeightOfSector[im][2]);
+      exit();
+    }
+
+//==============================================================
+
+  printf("writing trd pad information file: %s\n", FileNamePads.Data());
+
+  FILE *ifile;
+  ifile = fopen(FileNamePads.Data(),"w");
+
+  if (ifile == NULL)
+    {
+      printf("error opening %s\n", FileNamePads.Data());
+      exit(1);
+    }
+
+  fprintf(ifile,"//\n");
+  fprintf(ifile,"//   TRD pad layout for geometry %s\n", tagVersion.Data());
+  fprintf(ifile,"//\n");
+  fprintf(ifile,"// created %d\n", datetime.GetDate());
+  fprintf(ifile,"//\n");
+
+  fprintf(ifile,"\n");
+  fprintf(ifile,"#ifndef CBMTRDPADS_H\n");
+  fprintf(ifile,"#define CBMTRDPADS_H\n");
+  fprintf(ifile,"\n");
+  fprintf(ifile,"Int_t fst1_sect_count = 3;\n");
+  fprintf(ifile,"// array of pad geometries in the TRD (trd1mod[1-8])\n");
+  fprintf(ifile,"// 8 modules  // 3 sectors  // 4 values \n");
+  fprintf(ifile,"Float_t fst1_pad_type[8][3][4] =        \n");
+//fprintf(ifile,"Double_t fst1_pad_type[8][3][4] =       \n");
+  fprintf(ifile,"			 		 \n");
+
+  for (Int_t im = 0; im < NofModuleTypes; im++)
+  {
+    if (im+1 == 5)
+      fprintf(ifile,"//---\n\n");
+    fprintf(ifile,"// module type %d\n", im+1);
+    for (Int_t is = 0; is < NofSectors; is++)
+    {
+      if ((im == 0) && (is == 0))   fprintf(ifile,"  { { ");
+      else if (is == 0)             fprintf(ifile,"    { ");
+      else                          fprintf(ifile,"      ");
+  
+      fprintf(ifile,"{ %.1f, %5.2f, %.1f/%3d, %5.2f }", 
+              ActiveAreaX[ModuleType[im]], HeightOfSector[im][is], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][is]);
+  
+      if ((im == NofModuleTypes-1) && (is == 2))   fprintf(ifile," } };");
+      else if (is == 2)                            fprintf(ifile," },");
+      else                                         fprintf(ifile,",");
+  
+      fprintf(ifile,"\n");
+    }
+
+    fprintf(ifile,"\n");
+  }
+
+  fprintf(ifile,"#endif\n");
+
+//  Int_t im = 0;
+//  fprintf(ifile,"// module type %d	 		   \n", im+1);
+//  fprintf(ifile,"  { { { %.1f, %5.2f, %.1f/%3d, %5.2f },    \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][0], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][0]);
+//  fprintf(ifile,"      { %.1f, %5.2f, %.1f/%3d, %5.2f },    \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][1], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][1]);
+//  fprintf(ifile,"      { %.1f, %5.2f, %.1f/%3d, %5.2f } },  \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][2], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][2]);
+//  fprintf(ifile,"\n");
+//
+//  for (Int_t im = 1; im < NofModuleTypes-1; im++)
+//  {
+//    fprintf(ifile,"// module type %d	 		     \n", im+1);
+//    fprintf(ifile,"    { { %.1f, %5.2f, %.1f/%3d, %5.2f },    \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][0], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][0]);
+//    fprintf(ifile,"      { %.1f, %5.2f, %.1f/%3d, %5.2f },    \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][1], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][1]);
+//    fprintf(ifile,"      { %.1f, %5.2f, %.1f/%3d, %5.2f } },  \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][2], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][2]);
+//    fprintf(ifile,"\n");
+//  }
+//
+//  Int_t im = 7;
+//  fprintf(ifile,"// module type %d	 		   \n", im+1);
+//  fprintf(ifile,"    { { %.1f, %5.2f, %.1f/%3d, %5.2f },    \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][0], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][0]);
+//  fprintf(ifile,"      { %.1f, %5.2f, %.1f/%3d, %5.2f },    \n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][1], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][1]);
+//  fprintf(ifile,"      { %.1f, %5.2f, %.1f/%3d, %5.2f } } };\n", ActiveAreaX[ModuleType[im]], HeightOfSector[im][2], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][2]);
+//  fprintf(ifile,"\n");
+
+  fclose(ifile);
+}
+
 
 void dump_info_file()
 {
@@ -567,7 +630,7 @@ void dump_info_file()
   Int_t    total_asics[NofModuleTypes+1]         = { 0 };   // total number of asics
   Int_t    total_channels[NofModuleTypes+1]      = { 0 };   // total number of channels
 
-  printf("writing info file: %s\n", FileNameInfo.Data());
+  printf("writing summary information file: %s\n", FileNameInfo.Data());
 
   FILE *ifile;
   ifile = fopen(FileNameInfo.Data(),"w");

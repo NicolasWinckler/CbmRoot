@@ -78,7 +78,7 @@ CbmClusteringSL::~CbmClusteringSL()
 
 void CbmClusteringSL::SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad)
 {
-	/*for(Int_t iPad = 0; iPad < moduleGeo->GetNeighborsNum(activePad); iPad++)
+	for(Int_t iPad = 0; iPad < moduleGeo->GetNeighborsNum(activePad); iPad++)
 	{
 		if(fS[moduleGeo->GetNeighbor(activePad, iPad)] == 1)
 		{
@@ -86,8 +86,7 @@ void CbmClusteringSL::SLRec1(CbmClusteringGeometry* moduleGeo, Int_t activePad)
 			fS[moduleGeo->GetNeighbor(activePad, iPad)] = 0;
 			SLRec1(moduleGeo, moduleGeo->GetNeighbor(activePad, iPad));
         }
-	}*/
-   std::cout<<"!NOT WORKING NOW.\n";
+	}
 }
 
 void CbmClusteringSL::SLRec2(CbmClusteringGeometry* moduleGeo, Int_t activePad)
@@ -122,7 +121,7 @@ void CbmClusteringSL::MainClusteringSL(CbmClusteringGeometry* moduleGeo, Int_t a
 			}
 			if((algVersion != 1)&&(algVersion != 2))
 			{
-				std::cout<<"Error! Unsupported version of the algorithm.\n";
+				std::cout<<" - CbmClusteringSL: Error! Unsupported version of the algorithm.\n";
 			}
 		}
 	}

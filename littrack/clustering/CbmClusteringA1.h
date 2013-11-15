@@ -19,7 +19,7 @@ public:
    virtual ~CbmClusteringA1();
 
    void MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t algVersion);                   //Clustering function
-   void ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1);
+   void ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1, Int_t algVersion);
 
    Int_t GetNofClusters()	const { return fNofClusters;}
    Int_t GetNofPads()		const { return fNofPads;}

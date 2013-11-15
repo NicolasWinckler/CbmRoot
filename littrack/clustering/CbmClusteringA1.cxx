@@ -88,14 +88,13 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 		{
 			localMaximum = iPad;
 			if(algVersion == 1){
-				/*for(Int_t nPad = 0; nPad < moduleGeo->GetNeighborsNum(iPad); nPad++)
+				for(Int_t nPad = 0; nPad < moduleGeo->GetNeighborsNum(iPad); nPad++)
 				{
 					if(fA1[moduleGeo->GetNeighbor(iPad, nPad)] > fA1[localMaximum])
 					{
 						localMaximum = moduleGeo->GetNeighbor(iPad, nPad);
 					}
-				}*/
-				std::cout<<"!NOT WORKING NOW.\n";
+				}
 			}
 			if(algVersion == 2){
 				for(Int_t nPad = 0; nPad < moduleGeo->GetGoodNeighborsNum(iPad); nPad++)
@@ -111,12 +110,12 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 				std::cout<<"Error! Unsupported version of the algorithm.\n";
 			}
 			fA2[localMaximum] += fA1[iPad];         //Filling secondary array of charges
-			//fA2[iPad] -= fA1[iPad]; - ???
+			//fA2[iPad] -= fA1[iPad];				//For a special cases
 			if(iPad != localMaximum)
 			{
 				fA2[iPad] = 0;
 				fNofActivePads--;
-				ChangeClusters(moduleGeo, iPad, fNumbersOfPads[iPad], fNumbersOfPads[localMaximum]);        //Changing relationships
+				ChangeClusters(moduleGeo, iPad, fNumbersOfPads[iPad], fNumbersOfPads[localMaximum], algVersion);        //Changing relationships
 			}
 		}
 	}
@@ -178,14 +177,17 @@ void CbmClusteringA1::MainClusteringA1(CbmClusteringGeometry* moduleGeo, Int_t a
 	fNofClusters = nomCl;
 }
 
-void CbmClusteringA1::ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1)
+void CbmClusteringA1::ChangeClusters(CbmClusteringGeometry* moduleGeo, Int_t nPad, Int_t Cl0, Int_t Cl1, Int_t vers)
 {
 	fNumbersOfPads[nPad] = Cl1;
-	for(Int_t iPad = 0; iPad < moduleGeo->GetGoodNeighborsNum(nPad); iPad++)
+	Int_t nofNeighbors = 0;
+	if(vers == 1)nofNeighbors = moduleGeo->GetNeighborsNum(nPad);
+	if(vers == 2)nofNeighbors = moduleGeo->GetGoodNeighborsNum(nPad);
+	for(Int_t iPad = 0; iPad < nofNeighbors; iPad++)
 	{
 		if(fNumbersOfPads[moduleGeo->GetNeighbor(nPad, iPad)] == Cl0)
 		{
-			ChangeClusters(moduleGeo, moduleGeo->GetNeighbor(nPad, iPad), Cl0, Cl1);
+			ChangeClusters(moduleGeo, moduleGeo->GetNeighbor(nPad, iPad), Cl0, Cl1, vers);
 		}
 	}
 }

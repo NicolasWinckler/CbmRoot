@@ -30,7 +30,6 @@ public:
    virtual void Finish();
 
    void SetAlgorithmVersion(Int_t AlgorithmVersion) { fAlgorithmVersion = AlgorithmVersion;}
-   void SetGeometryVersion(Int_t GeometryVersion)	{ fGeoVersion = GeometryVersion;}
 
    void CreateModulesGeometryArray();
    void SetDigiCharges();
@@ -49,11 +48,6 @@ private:
     * 5 - Ward's method (!) not tested
     */
    Int_t fAlgorithmVersion;
-   /* Detector geometry type
-    * 1 - Rectangular;
-    * 2 - Radial
-    */
-   Int_t fGeoVersion;
    Int_t fNofModules;                       // Number of modules in detector
    Int_t fNofClusters;                      // Number of clusters for event
 

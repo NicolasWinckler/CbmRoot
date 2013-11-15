@@ -55,7 +55,6 @@ CbmMuchClustering::CbmMuchClustering(const char* digiFileName):
 		fNofClusters()
 {
 	fAlgorithmVersion = 2;
-	fGeoVersion = 2;
 	fNofModules = 0;
 	fNofEvents = 0;
 }
@@ -156,7 +155,7 @@ void CbmMuchClustering::CreateModulesGeometryArray()
 			for(Int_t iMod = 0; iMod < nModules; iMod++)
 			{
 			   // Add special module geometry in array
-			   fModulesGeometryArray.push_back(new CbmClusteringGeometry(iSt, iL, 0, iMod, fScheme, fGeoVersion));
+			   fModulesGeometryArray.push_back(new CbmClusteringGeometry(iSt, iL, 0, iMod, fScheme));
 			   // Add module index in map
 			   fModulesByDetId[fModulesGeometryArray[iModule]->GetDetId()] = iModule;
 			   iModule++;
@@ -167,7 +166,7 @@ void CbmMuchClustering::CreateModulesGeometryArray()
 			for(Int_t iMod = 0; iMod < nModules; iMod++)
 			{
 			   // Add special module geometry in array
-			   fModulesGeometryArray.push_back(new CbmClusteringGeometry(iSt, iL, 1, iMod, fScheme, fGeoVersion));
+			   fModulesGeometryArray.push_back(new CbmClusteringGeometry(iSt, iL, 1, iMod, fScheme));
 			   // Add module index in map
 			   fModulesByDetId[fModulesGeometryArray[iModule]->GetDetId()] = iModule;
 			   iModule++;

@@ -15,12 +15,12 @@ class CbmClusteringGeometry
 {
 public:
 	CbmClusteringGeometry();
-	CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme, Int_t geoVersion);
+	CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
 	void CbmClusteringSetPad(Int_t nPad, Float_t x, Float_t y, Float_t dx, Float_t dy, Double_t phi1, Double_t phi2, Float_t r1, Float_t r2,
 			   Int_t digiNum, UInt_t charge, Long64_t chID);            //Addition of a single pad
    virtual ~CbmClusteringGeometry();
 
-   void SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);  //Old geometry version
+   //void SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);  //Old geometry version
    void SetMuchModuleGeometryRadial(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
 
    Int_t GetDetId()			const { return fDetId; }
@@ -39,7 +39,6 @@ public:
    Int_t GetNeighborsNum(Int_t iPad);
    Int_t GetGoodNeighborsNum(Int_t iPad);
    Int_t GetNeighbor(Int_t iPad, Int_t iNeighbor);
-   //Int_t GetGoodNeighbor(Int_t iPad, Int_t iNeighbor);
    Long64_t GetPadID(Int_t iPad);
    UInt_t GetPadCharge(Int_t iPad);
    void SetPadCharge(Int_t iPad, UInt_t iCharge);

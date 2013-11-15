@@ -44,25 +44,26 @@ CbmClusteringGeometry::CbmClusteringGeometry():
 	fNofActivePads = 0;
 }
 
-CbmClusteringGeometry::CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme, Int_t geoVersion)
+CbmClusteringGeometry::CbmClusteringGeometry(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
 {
-	switch(geoVersion){
-	case 1:
-	{
-		SetMuchModuleGeometryRectangular(nStation, nLayer, nSide, nModule, scheme);     //For old rectangular geometry
-		break;
-	}
-	case 2:
-	{
-		SetMuchModuleGeometryRadial(nStation, nLayer, nSide, nModule, scheme);          //For new radial geometry
-		break;
-	}
-	default:
-	{
-		std::cout<<"CbmClusteringGeometry: Error! Wrong detector geometry.\n";
-		break;
-	}
-	}
+	SetMuchModuleGeometryRadial(nStation, nLayer, nSide, nModule, scheme);
+//	switch(geoVersion){
+//	case 1:
+//	{
+//		SetMuchModuleGeometryRectangular(nStation, nLayer, nSide, nModule, scheme);     //For old rectangular geometry
+//		break;
+//	}
+//	case 2:
+//	{
+//		SetMuchModuleGeometryRadial(nStation, nLayer, nSide, nModule, scheme);          //For new radial geometry
+//		break;
+//	}
+//	default:
+//	{
+//		std::cout<<"CbmClusteringGeometry: Error! Wrong detector geometry.\n";
+//		break;
+//	}
+//	}
 }
 
 //Addition of a single pad
@@ -90,8 +91,7 @@ CbmClusteringGeometry::~CbmClusteringGeometry()
 	delete [] fPadList;
 }
 
-//TODO Complete this function or delete it
-void CbmClusteringGeometry::SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
+/*void CbmClusteringGeometry::SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
 {
 	CbmMuchModuleGem* module = (CbmMuchModuleGem*) scheme->GetModule(nStation, nLayer, nSide, nModule);
 	fNofPads = module->GetNPads();
@@ -142,25 +142,6 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRectangular(Int_t nStation, Int
 			Float_t yUp_2 = fPadList[iPadNeighbor].fY + (fPadList[iPadNeighbor].fDy / 2);
 			Float_t dX = fabs(xLeft_1 - xRight_1) * 0.1;
 			Float_t dY = fabs(yDown_1 - yUp_1) * 0.1;
-			/*if((((SubEqual(xLeft_1, xRight_2, dX) ||
-			SubEqual(xRight_1, xLeft_2, dX)) &&
-			(((GetMax(yDown_2, yUp_2) + dY) >=
-			(GetMin(yDown_1, yUp_1) - dY)) &&
-			((GetMin(yDown_2, yUp_2) - dY) <=
-			(GetMax(yDown_1, yUp_1) + dY)))) ||
-			((SubEqual(yDown_1, yUp_2, dY) ||
-			SubEqual(yUp_1, yDown_2, dY)) &&
-			(((GetMax(xLeft_2, xRight_2) + dX) >=
-			(GetMin(xLeft_1, xRight_1) - dX)) &&
-			((GetMin(xLeft_2, xRight_2) - dX) <=
-			(GetMax(xLeft_1, xRight_1) + dX))))) &&
-			(iPadMain != iPadNeighbor))
-			{
-				fSingleLayerGeo[iPadMain].allNeighbors[padIterator] = iPadNeighbor;
-				fSingleLayerGeo[iPadMain].nofNeighbors++;
-				padIterator++;
-				//std::cout<<"Neighbours: P1 = "<<iPadMain<<"; P2 = "<<iPadNeighbor<<"\n";
-			}*/
 			if((((SubEqual(xLeft_1, xRight_2, dX) ||
 			SubEqual(xRight_1, xLeft_2, dX)) &&
 			(((GetMax(yDown_2, yUp_2) - dY) >
@@ -176,13 +157,11 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRectangular(Int_t nStation, Int
 			(iPadMain != iPadNeighbor))
 			{
 				fPadList[iPadMain].fNeighbors.push_back(iPadNeighbor);
-				//fSingleLayerGeo[iPadMain].goodNeighbors[padIterator2] = iPadNeighbor;
 				fPadList[iPadMain].fNofGoodNeighbors++;
-				//padIterator2++;
 			}
 		}}
 	}
-}
+}*/
 
 void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme)
 {
@@ -218,6 +197,8 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nL
 		}
 	}
 	padIterator = 0;
+	vector<UInt_t> diagonalNeighbors;
+	diagonalNeighbors.clear();
 	for(Int_t iPadMain = 0; iPadMain < fNofPads; iPadMain++)
 	{
 		fPadList[iPadMain].fNofNeighbors = 0;
@@ -237,55 +218,33 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadial(Int_t nStation, Int_t nL
 			Double_t Right_2 = GetMax(fPadList[iPadNeighbor].fPhi1, fPadList[iPadNeighbor].fPhi2);
 			Float_t Down_2 = GetMin(fPadList[iPadNeighbor].fR1, fPadList[iPadNeighbor].fR2);
 			Float_t Up_2 = GetMax(fPadList[iPadNeighbor].fR1, fPadList[iPadNeighbor].fR2);
-			//if(SubEqual(Left_1, Right_2, dPhi) || SubEqual(Right_1, Left_2, dPhi))
 			if((Left_1 == Right_2) || (Right_1 == Left_2))
 			{
 				if(((Down_1 - lR) < Up_2) && ((Up_1 + lR) > Down_2))
-			   //if((Down_1 < Up_2) && (Up_1 > Down_2))
 				{
 					fPadList[iPadMain].fNeighbors.push_back(iPadNeighbor);
 					fPadList[iPadMain].fNofGoodNeighbors++;
 				}
 			}
-			//if(SubEqual(Up_1, Down_2, dPhi) || SubEqual(Down_1, Up_2, dPhi))
 			if((Up_1 == Down_2) || (Down_1 == Up_2))
 			{
 				if(((Left_1 - lPhi) < Right_2) && ((Right_1 + lPhi) > Left_2))
-			   //if((Left_1 < Right_2) && (Right_1 > Left_2))
 				{
 					fPadList[iPadMain].fNeighbors.push_back(iPadNeighbor);
 					fPadList[iPadMain].fNofGoodNeighbors++;
 				}
 			}
-			/*if((fabs(fPadList[iPadMain].fX - fPadList[iPadNeighbor].fX) < (fPadList[iPadMain].fDx * 3)) &&
-				(fabs(fPadList[iPadMain].fY - fPadList[iPadNeighbor].fY) < (fPadList[iPadNeighbor].fDy * 3))){
-			Float_t xLeft_2 = fPadList[iPadNeighbor].fX - (fPadList[iPadNeighbor].fDx / 2);
-			Float_t xRight_2 = fPadList[iPadNeighbor].fX + (fPadList[iPadNeighbor].fDx / 2);
-			Float_t yDown_2 = fPadList[iPadNeighbor].fY - (fPadList[iPadNeighbor].fDy / 2);
-			Float_t yUp_2 = fPadList[iPadNeighbor].fY + (fPadList[iPadNeighbor].fDy / 2);
-			Float_t dX = fabs(xLeft_1 - xRight_1) * 0.1;
-			Float_t dY = fabs(yDown_1 - yUp_1) * 0.1;
-			if((((SubEqual(xLeft_1, xRight_2, dX) ||
-			SubEqual(xRight_1, xLeft_2, dX)) &&
-			(((GetMax(yDown_2, yUp_2) - dY) >
-			(GetMin(yDown_1, yUp_1) + dY)) &&
-			((GetMin(yDown_2, yUp_2) + dY) <
-			(GetMax(yDown_1, yUp_1) - dY)))) ||
-			((SubEqual(yDown_1, yUp_2, dY) ||
-			SubEqual(yUp_1, yDown_2, dY)) &&
-			(((GetMax(xLeft_2, xRight_2) - dX) >
-			(GetMin(xLeft_1, xRight_1) + dX)) &&
-			((GetMin(xLeft_2, xRight_2) + dX) <
-			(GetMax(xLeft_1, xRight_1) - dX))))) &&
-			(iPadMain != iPadNeighbor))
-			{
-				fPadList[iPadMain].fNeighbors.push_back(iPadNeighbor);
-				//fSingleLayerGeo[iPadMain].goodNeighbors[padIterator2] = iPadNeighbor;
-				fPadList[iPadMain].fNofGoodNeighbors++;
-				//padIterator2++;
+			fPadList[iPadMain].fNofNeighbors = fPadList[iPadMain].fNofGoodNeighbors;
+			if(((Left_1 == Right_2) && (Up_1 == Down_2)) || ((Left_1 == Right_2) && (Up_2 == Down_1)) ||
+					((Left_2 == Right_1) && (Up_1 == Down_2)) || ((Left_2 == Right_1) && (Up_2 == Down_1))){
+				diagonalNeighbors.push_back(iPadNeighbor);
 			}
-			}*/
 		}
+		for(Int_t iNeighbor = 0; iNeighbor < diagonalNeighbors.size(); iNeighbor++){
+			fPadList[iPadMain].fNeighbors.push_back(diagonalNeighbors[iNeighbor]);
+			fPadList[iPadMain].fNofNeighbors++;
+		}
+		diagonalNeighbors.clear();
 	}
 }
 
@@ -333,11 +292,6 @@ Int_t CbmClusteringGeometry::GetNeighbor(Int_t iPad, Int_t iNeighbor)
 {
 	return fPadList[iPad].fNeighbors[iNeighbor];
 }
-
-/*Int_t CbmMuchGeoCl::GetGoodNeighbor(Int_t iPad, Int_t iNeighbor)
-{
-	return fSingleLayerGeo[iPad].goodNeighbors[iNeighbor];
-}*/
 
 Long64_t CbmClusteringGeometry::GetPadID(Int_t iPad)
 {

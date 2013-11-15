@@ -196,8 +196,10 @@ void CbmLitClusteringQaReport::DrawNofObjectsHistograms(
 	vector<string> labels = list_of("Points")("Digis")("Clusters")("Hits");
 	vector<TH1*> histos = list_of(HM()->H1("hno_NofObjects_" + detName + "Points_" + parameter))
 		(HM()->H1("hno_NofObjects_" + detName + "Digis_" + parameter))
-		(HM()->H1("hno_NofObjects_" + detName + "Clusters_" + parameter))
-		(HM()->H1("hno_NofObjects_" + detName + "Hits_" + parameter));
+		(HM()->H1("hno_NofObjects_" + detName + "Clusters_" + parameter));
+	if (HM()->Exists("hno_NofObjects_" + detName + "PixelHits_" + parameter)) histos.push_back(HM()->H1("hno_NofObjects_" + detName + "PixelHits_" + parameter));
+	else if (HM()->Exists("hno_NofObjects_" + detName + "StrawHits_" + parameter)) histos.push_back(HM()->H1("hno_NofObjects_" + detName + "StrawHits_" + parameter));
+	else if (HM()->Exists("hno_NofObjects_" + detName + "Hits_" + parameter)) histos.push_back(HM()->H1("hno_NofObjects_" + detName + "Hits_" + parameter));
 	DrawH1(histos, labels, kLinear, kLinear, true, 0.65, 0.75, 0.95, 0.99);
 }
 

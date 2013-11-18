@@ -218,7 +218,7 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
     if (rot == 0 && layer == 0) fhDx[station3]->Fill(hit->GetU()-x); // hit residual
     if (rot != 0 || layer != 0) continue;
     CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
-    FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex());
+    FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetMatchedReferenceId());
     Int_t id = p->GetTrackID();
     xz[0] = hit->GetU();
     xz[1] = hit->GetZ();
@@ -235,7 +235,7 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
       Int_t lay = CbmMuchAddress::GetLayerSideIndex(detId1); // layer of the doublet
       if (rot1 != 0 || lay == 0) continue;
       digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetRefId());
-      p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex());
+      p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetMatchedReferenceId());
       Int_t id1 = p->GetTrackID();
       Double_t ang = TMath::ATan2 (hit1->GetU()-xz[0], hit1->GetZ()-xz[1]);
       //cout << id << " " << id1 << " " << stat3 << " " << ang << " " << hit->GetCluster() << " " << hit1->GetCluster() << endl;
@@ -337,10 +337,10 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
     Int_t n2 = 0;
     hits[n2++] = hit;
     CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
-    Int_t nP = digiM->GetNPoints();
+    Int_t nP = digiM->GetNofReferences();
     Int_t id = 999999, id1 = 0;
     for (Int_t i1 = 0; i1 < nP; ++i1) {
-      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex(i1));
+      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetReferenceId(i1));
       id = TMath::Min (id,p->GetTrackID());
       if (i1 == 0) id1 = id;
     }
@@ -360,7 +360,7 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       if (hit->GetTube() != hits[0]->GetTube()) continue; // different tube
       if (hit->GetSegment() != hits[0]->GetSegment()) continue; // different segments
       digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
-      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex());
+      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetMatchedReferenceId());
       if (p->GetTrackID() != id1) continue; // different track ID
       hits[n2++] = hit;
       tmp[i1] = 0x0;
@@ -391,9 +391,9 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       if (rot1 != 0 || layer1 == 0) continue;
       if (hit1->GetSegment() != hits[0]->GetSegment()) continue; // different segments
       digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetRefId());
-      nP = digiM->GetNPoints();
+      nP = digiM->GetNofReferences();
       for (Int_t i2 = 0; i2 < nP; ++i2) {
-	FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex(i2));
+	FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetReferenceId(i2));
 	if (p->GetTrackID() != id) continue;
 	if (id < 2 && hit1->GetFlag()%2 > 0) fhAll->Fill(station3+1.1);
 	break;
@@ -421,9 +421,9 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
     digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hitMin->GetRefId());
     Int_t ok = 1;
     id1 = 99999;
-    nP = digiM->GetNPoints();
+    nP = digiM->GetNofReferences();
     for (Int_t i1 = 0; i1 < nP; ++i1) {
-      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex(i1));
+      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetReferenceId(i1));
       id1 = TMath::Min (id1,p->GetTrackID());
     }
     if (id1 != id) ok = 0;
@@ -450,9 +450,9 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
     if (TMath::Abs(angMin1-angMin) > -0.1) continue;
     digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hitMin1->GetRefId());
     id1 = 99999;
-    nP = digiM->GetNPoints();
+    nP = digiM->GetNofReferences();
     for (Int_t i1 = 0; i1 < nP; ++i1) {
-      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex(i1));
+      FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetReferenceId(i1));
       id1 = TMath::Min (id1,p->GetTrackID());
     }
     if (hits[iMin]->GetFlag()%2 > 0 || hitMin->GetFlag()%2 > 0) ok = 0; // mirror hit

@@ -25,12 +25,13 @@ using std::endl;
 using std::numeric_limits;
 using std::map;
 using std::pair;
+using std::make_pair;
 
 // -----   Default  constructor   ------------------------------------------
 CbmMuchDigiMatch::CbmMuchDigiMatch() 
-  : TObject(),
-    fRefIndex(0),
-    fCharge(0),
+  : CbmMatch(),
+  //  fRefIndex(0),
+  //  fCharge(0),
     fRefIndexPerPrimaryElectron(0),
     fChargePerPrimaryElectron(0),
     fTimePerPrimaryElectron(0),
@@ -45,9 +46,9 @@ CbmMuchDigiMatch::CbmMuchDigiMatch()
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match)
-  : TObject(*match),
-    fRefIndex(match->fRefIndex),
-    fCharge(match->fCharge),
+  : CbmMatch(*match),
+  //  fRefIndex(match->fRefIndex),
+  //  fCharge(match->fCharge),
     fRefIndexPerPrimaryElectron(match->fRefIndexPerPrimaryElectron),
     fChargePerPrimaryElectron(match->fChargePerPrimaryElectron),
     fTimePerPrimaryElectron(match->fTimePerPrimaryElectron),
@@ -65,122 +66,114 @@ CbmMuchDigiMatch::~CbmMuchDigiMatch() { };
 // -------------------------------------------------------------------------
 
 
-// -----   Public method AddPoint   ----------------------------------------
-Int_t CbmMuchDigiMatch::AddPoint(Int_t iPoint) {
-  if ( iPoint < 0 ) {
-    cout << "-W- CbmMuchDigiMatch::AddPoint: Illegal MuchPoint index "
-	 << iPoint << endl;
-    return 0;
-  }
-  Int_t n = fRefIndex.GetSize();
-  fRefIndex.Set(n+1);
-  fRefIndex.AddAt(iPoint, n);
-  return n+1;
-}
-// -------------------------------------------------------------------------
-
-
-// -----   Public method GetRefIndex   -------------------------------------
-Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
-  if ( i<0 || i>GetNPoints()-1 ) {
-    cout << "-W- CbmMuchDigiMatch::GetRefIndex: Illegal index number "
-	 << i << endl;
-    return -1;
-  }
-  return fRefIndex.At(i);
-}
-// -------------------------------------------------------------------------
-
-
-// -----   Public method AddCharge  ----------------------------------------
-UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
-//  if ( iCharge < 0 ) {
-//    cout << "-W- CbmMuchDigiMatch::AddCharge: Illegal charge value "
-//	 << iCharge << endl;
+//// -----   Public method AddPoint   ----------------------------------------
+//Int_t CbmMuchDigiMatch::AddPoint(Int_t iPoint) {
+//  if ( iPoint < 0 ) {
+//    cout << "-W- CbmMuchDigiMatch::AddPoint: Illegal MuchPoint index "
+//	 << iPoint << endl;
 //    return 0;
 //  }
-  Int_t n = fCharge.GetSize();
-  fCharge.Set(n+1);
-  fCharge.AddAt(iCharge, n);
-  assert(fCharge.At(n) == iCharge);
-  return n+1;
-}
-// -------------------------------------------------------------------------
+//  Int_t n = fRefIndex.GetSize();
+//  fRefIndex.Set(n+1);
+//  fRefIndex.AddAt(iPoint, n);
+//  return n+1;
+//}
+//// -------------------------------------------------------------------------
 
 
-// -----   Public method AddCharge  ----------------------------------------
-UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t iCharge) {
-  for (Int_t i=0;i<fRefIndex.GetSize();i++){
-    if (fRefIndex[i]!=iPoint) continue;
-    fCharge[i]+=iCharge;
-    return 0;
-  }
-  AddPoint(iPoint);
-  return AddCharge(iCharge);
-}
-// -------------------------------------------------------------------------
+//// -----   Public method GetRefIndex   -------------------------------------
+//Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
+//  if ( i<0 || i>GetNPoints()-1 ) {
+//    cout << "-W- CbmMuchDigiMatch::GetRefIndex: Illegal index number "
+//	 << i << endl;
+//    return -1;
+//  }
+//  return fRefIndex.At(i);
+//}
+//// -------------------------------------------------------------------------
 
 
-// -----   Public method GetCharge  ----------------------------------------
-UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
-  if ( i<0 || i>GetNPoints()-1 ) {
-    cout << "-W- CbmMuchDigiMatch::GetCharge: Illegal index number "
-	 << i << endl;
-    return 0;
-  }
-  return fCharge.At(i);
-}
-// -------------------------------------------------------------------------
+//// -----   Public method AddCharge  ----------------------------------------
+//UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
+////  if ( iCharge < 0 ) {
+////    cout << "-W- CbmMuchDigiMatch::AddCharge: Illegal charge value "
+////	 << iCharge << endl;
+////    return 0;
+////  }
+//  Int_t n = fCharge.GetSize();
+//  fCharge.Set(n+1);
+//  fCharge.AddAt(iCharge, n);
+//  assert(fCharge.At(n) == iCharge);
+//  return n+1;
+//}
+//// -------------------------------------------------------------------------
 
 
-// -----   Public method GetTotalCharge  -----------------------------------
-UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
-  UInt_t totCharge = 0;
-  for(Int_t iRef=0; iRef<GetNPoints(); ++iRef){
-    UInt_t first = totCharge;
-    totCharge += GetCharge(iRef);
-    if(totCharge < first || totCharge < GetCharge(iRef)) totCharge = numeric_limits<Int_t>::max();
-  }
-  return totCharge;
-}
-// -------------------------------------------------------------------------
+//// -----   Public method AddCharge  ----------------------------------------
+//UInt_t CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t iCharge) {
+//  for (Int_t i=0;i<fRefIndex.GetSize();i++){
+//    if (fRefIndex[i]!=iPoint) continue;
+//    fCharge[i]+=iCharge;
+//    return 0;
+//  }
+//  AddPoint(iPoint);
+//  return AddCharge(iCharge);
+//}
+//// -------------------------------------------------------------------------
+
+
+//// -----   Public method GetCharge  ----------------------------------------
+//UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
+//  if ( i<0 || i>GetNPoints()-1 ) {
+//    cout << "-W- CbmMuchDigiMatch::GetCharge: Illegal index number "
+//	 << i << endl;
+//    return 0;
+//  }
+//  return fCharge.At(i);
+//}
+//// -------------------------------------------------------------------------
+
+
+//// -----   Public method GetTotalCharge  -----------------------------------
+//UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
+//  UInt_t totCharge = 0;
+//  for(Int_t iRef=0; iRef<GetNPoints(); ++iRef){
+//    UInt_t first = totCharge;
+//    totCharge += GetCharge(iRef);
+//    if(totCharge < first || totCharge < GetCharge(iRef)) totCharge = numeric_limits<Int_t>::max();
+//  }
+//  return totCharge;
+//}
+//// -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
 void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
-  map<Double_t,Int_t> time_vs_index;
-  map<Double_t,Int_t> time_vs_charge;
-  map<Double_t,Int_t>::iterator it;
-  assert(points);
-  for (Int_t i=0;i<fRefIndex.GetSize();i++){
-    assert(fRefIndex[i]<points->GetEntriesFast());
-    CbmMuchPoint* point = (CbmMuchPoint*) points->At(fRefIndex[i]);
-    assert(point);
-    Double_t time = point->GetTime(); 
-    time_vs_index.insert(pair<Double_t,Int_t>(time,fRefIndex[i]));
-    time_vs_charge.insert(pair<Double_t,Int_t>(time,fCharge[i]));
+  assert(points != NULL);
+  map<Double_t, pair<Int_t, Double_t> > timeMap;
+  Int_t nofReferences = GetNofReferences();
+  for (Int_t i = 0; i < nofReferences; i++){
+    const CbmMuchPoint* point = static_cast<const CbmMuchPoint*>(points->At(GetReferenceId(i)));
+    assert(point != NULL);
+    timeMap[point->GetTime()] = make_pair(GetReferenceId(i), GetReferenceWeight(i));
   }
-  Int_t i=0;
-  for (it=time_vs_index.begin();it!=time_vs_index.end();++it) fRefIndex[i++] = it->second;
-  i=0;
-  for (it=time_vs_charge.begin();it!=time_vs_charge.end();++it) fCharge[i++] = it->second;
-  time_vs_index.clear();
-  time_vs_charge.clear();
+  Clear();
+  map<Double_t, pair<Int_t, Double_t> >::iterator it;
+  for (it = timeMap.begin(); it != timeMap.end(); ++it) {
+     AddReference(it->second.first, it->second.second);
+  }
 }
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
 void CbmMuchDigiMatch::Reset() {
-  fRefIndex.Reset();
-  fCharge.Reset();
+   Clear();
   fRefIndexPerPrimaryElectron.Reset(0);
   fChargePerPrimaryElectron.Reset(0);
   fTimePerPrimaryElectron.Reset(0);
   fMCtimePerPrimaryElectron.Reset(0);
   fSignalShape.Reset(0);
-  fRefIndex.Set(0);
-  fCharge.Set(0);
   fRefIndexPerPrimaryElectron.Set(0);
   fChargePerPrimaryElectron.Set(0);
   fTimePerPrimaryElectron.Set(0);
@@ -192,7 +185,7 @@ void CbmMuchDigiMatch::Reset() {
 
 // -------------------------------------------------------------------------
 void CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t charge, Double_t t, TArrayD shape, Double_t mcTime) {
-  AddCharge(iPoint,charge);
+  AddReference(iPoint, charge);
   Int_t n = fRefIndexPerPrimaryElectron.GetSize();
   fRefIndexPerPrimaryElectron.Set(n+1);
   fChargePerPrimaryElectron.Set(n+1);

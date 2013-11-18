@@ -331,10 +331,10 @@ void CbmMuchClusteringQa0::LinkingClustersToMCPoints()
 	for(Int_t iDigi = 0; iDigi < fNofDigis; iDigi++)
 	{
 		CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatch->At(iDigi);
-		Int_t nPoints = digiMatch->GetNPoints();
+		Int_t nPoints = digiMatch->GetNofReferences();
 		for(Int_t iPoint = 0; iPoint < nPoints; iPoint++)
 		{
-			Int_t refIndex = digiMatch->GetRefIndex(iPoint);
+			Int_t refIndex = digiMatch->GetReferenceId(iPoint);
 			fRealPoints[refIndex].nofDigis++;
 		}
 	}
@@ -350,11 +350,11 @@ void CbmMuchClusteringQa0::LinkingClustersToMCPoints()
 			Int_t digiIndex = cluster->GetDigi(iDigi);
 			//std::cout<<"digiIndex: "<<digiIndex<<"\n";
 			CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatch->At(digiIndex);
-			Int_t nPoints = digiMatch->GetNPoints();
+			Int_t nPoints = digiMatch->GetNofReferences();
 			if((iCl > cls)&&(iCl < cls + 10))/*if(nDigis > 6)*/std::cout<<"\niCl: "<<iCl<<"; iDigi: "<<digiIndex<<"; NP: "<<nPoints<<"\n";
 			for(Int_t iPoint = 0; iPoint < nPoints; iPoint++)
 			{
-				Int_t refIndex = digiMatch->GetRefIndex(iPoint);
+				Int_t refIndex = digiMatch->GetReferenceId(iPoint);
 				//---
 				const CbmMuchPoint* muchPoint = static_cast<const CbmMuchPoint*>(fMuchPoint->At(refIndex));
 				const CbmMuchPixelHit* hit = static_cast<const CbmMuchPixelHit*>(fMuchHit->At(iCl));

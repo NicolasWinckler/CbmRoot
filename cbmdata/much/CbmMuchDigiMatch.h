@@ -15,14 +15,14 @@
 #define CBMMUCHDIGIMATCH_H 1
 
 
-#include "TObject.h"
+#include "CbmMatch.h"
 #include "TArrayI.h"
 #include "TArrayD.h"
 class TClonesArray;
 
 static const Double_t gkResponseBin    = 1.;
 
-class CbmMuchDigiMatch : public TObject
+class CbmMuchDigiMatch : public CbmMatch
 {
 
  public:
@@ -41,7 +41,7 @@ class CbmMuchDigiMatch : public TObject
    * @param iPoint Point index
    * @value Number of indices present
    */
-  Int_t AddPoint(Int_t iPoint);
+  //Int_t AddPoint(Int_t iPoint);
 
   /**
    * Add a charge from a MC point. Index of the point can
@@ -49,20 +49,20 @@ class CbmMuchDigiMatch : public TObject
    * @param iCharge Charge from the MuchPoint [electrons]
    * @value Number of points the digi contains
    */
-  UInt_t AddCharge(UInt_t iCharge);
+  //UInt_t AddCharge(UInt_t iCharge);
 
   /**
    * Accessor to MuchPoint index.
    * @param i MuchPoint index in the internal array of the digi
    * @value   MuchPointIndex in the output array of MC transport file
    */
-  Int_t GetRefIndex(Int_t i = 0) const;
+  //Int_t GetRefIndex(Int_t i = 0) const;
 
   /**
    * Gets number of points corresponding to the digi.
    * @value Number of MuchPoints contained in the digi
    */
-  Int_t GetNPoints() const {return fRefIndex.GetSize();}
+ // Int_t GetNPoints() const {return fRefIndex.GetSize();}
 
   /**
    * Gets charge from a MC point. Index of the point can
@@ -70,8 +70,8 @@ class CbmMuchDigiMatch : public TObject
    * @param i MuchPoint index in the internal array of the digi
    * @value Charge from the corresponding MuchPoint [electrons]
    */
-  UInt_t GetCharge(Int_t i) const;
-  UInt_t GetTotalCharge() const;
+  //UInt_t GetCharge(Int_t i) const;
+  //UInt_t GetTotalCharge() const;
   void SortPointsInTime(TClonesArray* points);
   
   void Reset();
@@ -82,7 +82,7 @@ class CbmMuchDigiMatch : public TObject
    * @param iCharge Charge from the MuchPoint [electrons]
    * @value Number of points the digi contains
    */
-  UInt_t AddCharge(Int_t iPoint, UInt_t iCharge);
+  //UInt_t AddCharge(Int_t iPoint, UInt_t iCharge);
 
   void AddCharge(Int_t iPoint, UInt_t iCharge, Double_t driftTime, TArrayD shape, Double_t mcTime);
   
@@ -101,9 +101,9 @@ class CbmMuchDigiMatch : public TObject
   void SetDeadTime(Double_t deadTime) {fDeadTime = deadTime; }
  private:
 
-  TArrayI fRefIndex;                    // Array of MC point indices
+ // TArrayI fRefIndex;                    // Array of MC point indices
   TArrayD fMCtimePerPrimaryElectron;    // Array of MC point times
-  TArrayI fCharge;                      // Array of charges from each MC point
+ // TArrayI fCharge;                      // Array of charges from each MC point
   TArrayI fRefIndexPerPrimaryElectron;  // Array of ref indices per primary electron 
   TArrayI fChargePerPrimaryElectron;    // Array of charges per primary electron
   TArrayD fTimePerPrimaryElectron;      // Array of arrival times per primary electron 

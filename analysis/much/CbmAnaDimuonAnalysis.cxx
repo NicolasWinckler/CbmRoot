@@ -336,8 +336,8 @@ void CbmAnaDimuonAnalysis::DigiToTrackMatch(
 {
         CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) digiMatches->At(digiIndex);
         if (digiMatch == NULL) return;
-        for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {
-                Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
+        for (Int_t iPoint = 0; iPoint < digiMatch->GetNofReferences(); iPoint++) {
+                Int_t pointIndex = digiMatch->GetReferenceId(iPoint);
                 if (pointIndex < 0) { // Fake or background hit
                         matchMap[-1]++;
                         continue;

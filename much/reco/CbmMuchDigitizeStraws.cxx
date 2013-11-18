@@ -239,7 +239,7 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   //cout << iDigi << endl; //AZ
   CbmMuchStrawDigi* digi  = new ((*fDigis)[iDigi]) CbmMuchStrawDigi(detectorId,coord[0],coord[1],coord[2],point->GetTime());
   CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
-  match->AddPoint(iPoint);
+  match->AddReference(iPoint);
   return kTRUE;
 }
 // -------------------------------------------------------------------------

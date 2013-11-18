@@ -115,8 +115,8 @@ void CbmMuchTrackFinderIdeal::ProcessDigiMatches(
 	CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) digiMatches->At(digiIndex);
 	if (!digiMatch) return;
 
-	for (Int_t iDigi = 0; iDigi < digiMatch->GetNPoints(); iDigi++){
-		Int_t pointIndex = digiMatch->GetRefIndex(iDigi);
+	for (Int_t iDigi = 0; iDigi < digiMatch->GetNofReferences(); iDigi++){
+		Int_t pointIndex = digiMatch->GetReferenceId(iDigi);
 		if (pointIndex < 0) return;
 		FairMCPoint* mcPoint = (FairMCPoint*) (fMCPoints->At(pointIndex));
 		if (mcPoint == NULL) return;

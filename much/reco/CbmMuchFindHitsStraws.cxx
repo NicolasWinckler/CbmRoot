@@ -293,17 +293,17 @@ void CbmMuchFindHitsStraws::Merge()
       //cout << jhit << " " << hit1->GetRefId() << endl;
       if (drift < drift1) {
 	fHits->RemoveAt(jhit);
-        Int_t nPoints = digiM1->GetNPoints();
+        Int_t nPoints = digiM1->GetNofReferences();
         for (Int_t j = 0; j < nPoints; ++j) {
 	  hit->SetFlag(hit->GetFlag()+(1<<1)); // increase overlap multiplicity
-	  digiM->AddPoint(digiM1->GetRefIndex()); // add point
+	  digiM->AddReference(digiM1->GetMatchedReferenceId()); // add point
 	}
       } else {
 	fHits->RemoveAt(ihit);
-        Int_t nPoints = digiM->GetNPoints();
+        Int_t nPoints = digiM->GetNofReferences();
         for (Int_t j = 0; j < nPoints; ++j) {
 	  hit1->SetFlag(hit1->GetFlag()+(1<<1)); 
-	  digiM1->AddPoint(digiM->GetRefIndex());  
+	  digiM1->AddReference(digiM->GetMatchedReferenceId());
 	}
 	break;
       }

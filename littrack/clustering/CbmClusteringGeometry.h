@@ -22,6 +22,7 @@ public:
 
    //void SetMuchModuleGeometryRectangular(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);  //Old geometry version
    void SetMuchModuleGeometryRadial(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
+   void SetMuchModuleGeometryRadialFast(Int_t nStation, Int_t nLayer, Bool_t nSide, Int_t nModule, CbmMuchGeoScheme* scheme);
 
    Int_t GetDetId()			const { return fDetId; }
    Int_t GetNPads()			const { return fNofPads; }

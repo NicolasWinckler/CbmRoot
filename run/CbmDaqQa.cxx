@@ -76,8 +76,8 @@ void CbmDaqQa::Exec(Option_t* opt) {
     CbmMuchDigiMatch* match = digi->GetMatch();
     Double_t tot = match->GetTimeOverThreshold(10000);
     fChargeVsTOT->Fill(digi->GetAdc(),tot);
-    fTotChargeVsTOT->Fill(match->GetTotalCharge()/1000000.,tot);
-    fTotChargeVsAMP->Fill(match->GetTotalCharge()/1000000.,digi->GetAdc());
+    fTotChargeVsTOT->Fill(match->GetTotalWeight()/1000000.,tot);
+    fTotChargeVsAMP->Fill(match->GetTotalWeight()/1000000.,digi->GetAdc());
     if (iDigi>=20) continue;
 //    printf("match=%p\n",match);
     if (!match) printf("No match!!!\n");
@@ -117,7 +117,7 @@ void CbmDaqQa::Exec(Option_t* opt) {
       }
       if (mcRef==-1) break;
       mcTime = match->GetMCtimePerPrimaryElectron(0);
-      fTimeDiff2->Fill(t-mcTime,match->GetTotalCharge()/1000000.);
+      fTimeDiff2->Fill(t-mcTime,match->GetTotalWeight()/1000000.);
     }
     if (mcTime<0) continue;
     fTimeMUCHmc->Fill(mcTime);

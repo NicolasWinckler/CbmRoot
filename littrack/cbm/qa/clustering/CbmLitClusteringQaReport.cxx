@@ -206,6 +206,8 @@ void CbmLitClusteringQaReport::DrawNofObjectsHistograms(
 void CbmLitClusteringQaReport::DrawResidualsAndPulls(
       const string& detName)
 {
+   if (!(HM()->Exists("hrp_" + detName + "_ResidualX_H2") && HM()->Exists("hrp_" + detName + "_ResidualY_H2")
+         && HM()->Exists("hrp_" + detName + "_PullX_H2") && HM()->Exists("hrp_" + detName + "_ResidualX_H2"))) return;
    vector<string> par = list_of("ResidualX")("ResidualY")("PullX")("PullY");
    Int_t nofCanvases = par.size();
    for (Int_t iCanvas = 0; iCanvas < nofCanvases; iCanvas++) {

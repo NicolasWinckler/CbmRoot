@@ -1,82 +1,58 @@
-/** CbmMuchDigitizeStraws.h
-  * Add comment
+/**
+ * \file CbmMuchDigitizeStraws.h
+ * \brief Digitizer for MUCH straw detectors.
  **/
 
 #ifndef CBMMUCHDIGITIZESTRAWS_H
 #define CBMMUCHDIGITIZESTRAWS_H 1
 
 #include "FairTask.h"
-
-#include "TStopwatch.h"
-#include "TClonesArray.h"
 #include "TString.h"
 
-#include "CbmMuchPoint.h"
-#include "CbmMuchDigi.h"
-#include "CbmMuchDigiMatch.h"
-#include "CbmMuchGeoScheme.h"
+class TClonesArray;
+class CbmMuchGeoScheme;
 
 class CbmMuchDigitizeStraws : public FairTask
 {
+public:
 
- public:
+   /**
+   * \brief Constructor.
+   */
+   CbmMuchDigitizeStraws(const char* digiFileName);
 
-  /** Default constructor */
-  CbmMuchDigitizeStraws();
+   /**
+   * \brief Destructor.
+   */
+   virtual ~CbmMuchDigitizeStraws();
 
-  /** Standard constructor */
-  CbmMuchDigitizeStraws(Int_t iVerbose);
+   /**
+   * \brief Inherited from FairTask.
+   */
+   virtual void Exec(Option_t* opt);
 
-  /** Constructor with name */
-  CbmMuchDigitizeStraws(const char* name, const char* digiFileName, Int_t iVerbose);
+   /**
+   * \brief Inherited from FairTask.
+   **/
+   virtual void Finish();
 
-  /** Destructor */
-  virtual ~CbmMuchDigitizeStraws();
+   /**
+   * \brief Inherited from FairTask.
+   **/
+   virtual InitStatus Init();
 
-  /** Execution */
-  virtual void Exec(Option_t* opt);
+private:
 
-  /** Sets the time resolution. **/
-  void SetDTime(Double_t dTime) { fDTime = dTime; }
+   CbmMuchGeoScheme* fGeoScheme; // TODO add comments
+   TString fDigiFile; // Digitization file
 
-  /** Gets time resolution **/
-  Double_t GetDTime() { return fDTime; }
+   TClonesArray* fPoints; // Input array of CbmMuchPoint
+   TClonesArray* fDigis; // Output array of CbmMuchDigi
+   TClonesArray* fDigiMatches; // Output array of CbmMuchDigiMatches
 
- private:
+   CbmMuchDigitizeStraws(const CbmMuchDigitizeStraws&);
+   CbmMuchDigitizeStraws& operator=(const CbmMuchDigitizeStraws&);
 
-  CbmMuchGeoScheme*  fGeoScheme;     // TODO add comments
-  TString            fDigiFile;      // Digitization file
-
-  TClonesArray*      fPoints;        // Input array of CbmMuchPoint
-  TClonesArray*      fDigis;         // Output array of CbmMuchDigi
-  TClonesArray*      fDigiMatches;   // Output array of CbmMuchDigiMatches
-  Int_t              fNFailed;       // Total number of points which digitization has failed
-  Int_t              fNOutside;      // Total number of points which was found outside a detector
-  Int_t              fNMulti;        // Total number of channels that was hitby several points
-  Double_t           fDTime;         // Time resolution [ns]
-  Int_t              fEvent;         // Event counter
-  TStopwatch         fTimer;         // Timer
-
-  /** Finish **/
-  virtual void FinishTask();
-
-  /** Get parameter containers **/
-  virtual void SetParContainers();
-
-  /** Initialization **/
-  virtual InitStatus Init();
-
-  /** Reinitialization **/
-  virtual InitStatus ReInit();
-
-  /** Reset eventwise counters **/
-  void Reset();
-
-  Bool_t ExecStraws(CbmMuchPoint* point, Int_t iPoint);
-
-  CbmMuchDigitizeStraws(const CbmMuchDigitizeStraws&);
-  CbmMuchDigitizeStraws& operator=(const CbmMuchDigitizeStraws&);
-
-  ClassDef(CbmMuchDigitizeStraws,1)
+   ClassDef(CbmMuchDigitizeStraws,1)
 };
 #endif

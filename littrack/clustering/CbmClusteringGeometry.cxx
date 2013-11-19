@@ -315,7 +315,6 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadialFast(Int_t nStation, Int_
 			for(Int_t iNeighbor = 0; iNeighbor < diagonalNeighbors.size(); iNeighbor++){
 				fPadList[padIterator].fNeighbors.push_back(diagonalNeighbors.at(iNeighbor));
 				fPadList[padIterator].fNofNeighbors++;
-				std::cout<<"-------Add diagonal Pad: "<<diagonalNeighbors.at(iNeighbor)<<"\n";
 			}
 			diagonalNeighbors.clear();
 			padIterator++;

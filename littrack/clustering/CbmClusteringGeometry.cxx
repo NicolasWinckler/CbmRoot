@@ -290,18 +290,20 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadialFast(Int_t nStation, Int_
 		CbmMuchSectorRadial* sector = (CbmMuchSectorRadial*) module->GetSectorByIndex(iSector);
 		Int_t nofPadsInSector = sector->GetNChannels();
 		for(Int_t iPad = 0; iPad < nofPadsInSector; iPad++){
+			Double_t dPhi = fabs(fPadList[iPad].fPhi1 - fPadList[iPad].fPhi2) * 0.1;
+			Float_t dR = fabs(fPadList[iPad].fR1 - fPadList[iPad].fR2) * 0.1;
 			CbmMuchPadRadial* pad = (CbmMuchPadRadial*) sector->GetPadByChannelIndex(iPad);
 			vector<CbmMuchPad*> neighborsVector = pad->GetNeighbours();
 			for(Int_t iNeighbor = 0; iNeighbor < neighborsVector.size(); iNeighbor++){
 				Int_t padNeighbor = fPadByChannelId[neighborsVector.at(iNeighbor)->GetAddress()];
-				if(((fPadList[padIterator].fPhi1 == fPadList[padNeighbor].fPhi2) &&
-						(fPadList[padIterator].fR1 == fPadList[padNeighbor].fR2)) ||
-						((fPadList[padIterator].fPhi1 == fPadList[padNeighbor].fPhi2) &&
-						(fPadList[padIterator].fR2 == fPadList[padNeighbor].fR1)) ||
-					((fPadList[padIterator].fPhi2 == fPadList[padNeighbor].fPhi1) &&
-						(fPadList[padIterator].fR1 == fPadList[padNeighbor].fR2)) ||
-						((fPadList[padIterator].fPhi2 == fPadList[padNeighbor].fPhi1) &&
-						(fPadList[padIterator].fR2 == fPadList[padNeighbor].fR1))){
+				if((SubEqual(fPadList[padIterator].fPhi1, fPadList[padNeighbor].fPhi2, dPhi) &&
+						SubEqual(fPadList[padIterator].fR1, fPadList[padNeighbor].fR2, dR)) ||
+						(SubEqual(fPadList[padIterator].fPhi1, fPadList[padNeighbor].fPhi2, dPhi) &&
+						SubEqual(fPadList[padIterator].fR2, fPadList[padNeighbor].fR1, dR)) ||
+					(SubEqual(fPadList[padIterator].fPhi2, fPadList[padNeighbor].fPhi1, dPhi) &&
+						SubEqual(fPadList[padIterator].fR1, fPadList[padNeighbor].fR2, dR)) ||
+						(SubEqual(fPadList[padIterator].fPhi2, fPadList[padNeighbor].fPhi1, dPhi) &&
+						SubEqual(fPadList[padIterator].fR2, fPadList[padNeighbor].fR1, dR))){
 					diagonalNeighbors.push_back(padNeighbor);
 				}
 				else{
@@ -313,6 +315,7 @@ void CbmClusteringGeometry::SetMuchModuleGeometryRadialFast(Int_t nStation, Int_
 			for(Int_t iNeighbor = 0; iNeighbor < diagonalNeighbors.size(); iNeighbor++){
 				fPadList[padIterator].fNeighbors.push_back(diagonalNeighbors.at(iNeighbor));
 				fPadList[padIterator].fNofNeighbors++;
+				std::cout<<"-------Add diagonal Pad: "<<diagonalNeighbors.at(iNeighbor)<<"\n";
 			}
 			diagonalNeighbors.clear();
 			padIterator++;

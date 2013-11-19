@@ -196,13 +196,11 @@ void global_reco(Int_t nEvents = 100, // number of events
 			CbmMuchFindHitsGem* findHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
 			run->AddTask(findHits);
 
-		//	CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
-		//	      "MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
-		//	run->AddTask(strawDigitize);
-		//	CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
-		//			"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
-		//	strawFindHits->SetMerge(1);
-		//	run->AddTask(strawFindHits);
+			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(muchDigiFile.Data());
+			run->AddTask(strawDigitize);
+			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(muchDigiFile.Data());
+			strawFindHits->SetMerge(1);
+			run->AddTask(strawFindHits);
 			// -----------------------------------------------------------------
 		}
 

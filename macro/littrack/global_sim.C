@@ -34,7 +34,7 @@ void global_sim(Int_t nEvents = 100)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "events/much_v12c/"; // Directory for output simulation files
+	TString dir = "events/much_v12d/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 	TString plutoFile = "/Users/andrey/Development/cbm/d/pluto/omega.25gev.1M.root";
@@ -51,7 +51,7 @@ void global_sim(Int_t nEvents = 100)
 		shieldGeom = "shield_standard.geo";
 		mvdGeom    = "";//"mvd/mvd_v07a.geo";
 		stsGeom    = "sts/sts_v12b.geo.root";
-		muchGeom   = "much/much_v12c.geo";
+		muchGeom   = "much/much_v12d.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
 		tofGeom    = "";//"tof/tof_v13b.geo.root";
 		fieldMap   = "field_v12a";

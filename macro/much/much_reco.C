@@ -66,12 +66,12 @@ void much_reco(
    // ----- MUCH hits----------   ----------------------------------------------
    CbmMuchDigitizeGem* muchDigitize = new CbmMuchDigitizeGem(muchDigiFile.Data());
    run->AddTask(muchDigitize);
-   CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
+   CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(muchDigiFile.Data());
    run->AddTask(strawDigitize);
 
    CbmMuchFindHitsGem* muchFindHits = new CbmMuchFindHitsGem(muchDigiFile.Data());
    run->AddTask(muchFindHits);
-   CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
+   CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(muchDigiFile.Data());
    run->AddTask(strawFindHits);
    // --------------------------------------------------------------------------
 
@@ -82,8 +82,8 @@ void much_reco(
 	run->AddTask(finder);
 	// --------------------------------------------------------------------------
 
-   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-   run->AddTask(muchMatchTracks);
+   CbmMatchRecoToMC* matchTask = new CbmMatchRecoToMC();
+   run->AddTask(matchTask);
 
    // -----   Primary vertex finding   -----------------------------------------
    CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();

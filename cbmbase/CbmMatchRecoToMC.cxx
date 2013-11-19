@@ -241,12 +241,12 @@ void CbmMatchRecoToMC::MatchTracks(
 {
    if (!(hitMatches && points && tracks && trackMatches)) return;
 
-   Bool_t addMode = (trackMatches->GetEntriesFast() != 0);
+   Bool_t editMode = (trackMatches->GetEntriesFast() != 0);
 
    Int_t nofTracks = tracks->GetEntriesFast();
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
       const CbmTrack* track = static_cast<const CbmTrack*>(tracks->At(iTrack));
-      CbmTrackMatchNew* trackMatch = (addMode) ?
+      CbmTrackMatchNew* trackMatch = (editMode) ?
             static_cast<CbmTrackMatchNew*>(trackMatches->At(iTrack)) :
                new ((*trackMatches)[iTrack]) CbmTrackMatchNew();
       Int_t nofHits = track->GetNofHits();

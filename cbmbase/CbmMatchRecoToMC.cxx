@@ -26,19 +26,53 @@ CbmMatchRecoToMC::CbmMatchRecoToMC() :
    fTrdDigiMatches(NULL),
    fTrdClusterMatches(NULL),
    fTrdHitMatches(NULL),
-   fTrdTrackMatches(NULL)
+   fTrdTrackMatches(NULL),
+   fMuchPoints(NULL),
+   fMuchDigis(NULL),
+   fMuchClusters(NULL),
+   fMuchPixelHits(NULL),
+   fMuchStrawHits(NULL),
+   fMuchTracks(NULL),
+   fMuchDigiMatches(NULL),
+   fMuchClusterMatches(NULL),
+   fMuchPixelHitMatches(NULL),
+   fMuchStrawHitMatches(NULL),
+   fMuchTrackMatches(NULL)
 {
 
 }
 
 CbmMatchRecoToMC::~CbmMatchRecoToMC()
 {
-   fTrdClusterMatches->Clear("C");
-   delete fTrdClusterMatches;
-   fTrdHitMatches->Clear("C");
-   delete fTrdHitMatches;
-   fTrdTrackMatches->Clear("C");
-   delete fTrdTrackMatches;
+   if (fTrdClusterMatches != NULL) {
+      fTrdClusterMatches->Clear("C");
+      delete fTrdClusterMatches;
+   }
+   if (fTrdHitMatches != NULL) {
+      fTrdHitMatches->Clear("C");
+      delete fTrdHitMatches;
+   }
+   if (fTrdTrackMatches) {
+      fTrdTrackMatches->Clear("C");
+      delete fTrdTrackMatches;
+   }
+
+   if (fMuchClusterMatches != NULL) {
+      fMuchClusterMatches->Clear("C");
+      delete fMuchClusterMatches;
+   }
+   if (fMuchPixelHitMatches != NULL) {
+      fMuchPixelHitMatches->Clear("C");
+      delete fMuchPixelHitMatches;
+   }
+   if (fMuchStrawHitMatches != NULL) {
+      fMuchStrawHitMatches->Clear("C");
+      delete fMuchStrawHitMatches;
+   }
+   if (fMuchTrackMatches) {
+      fMuchTrackMatches->Clear("C");
+      delete fMuchTrackMatches;
+   }
 }
 
 InitStatus CbmMatchRecoToMC::Init()
@@ -51,9 +85,13 @@ InitStatus CbmMatchRecoToMC::Init()
 void CbmMatchRecoToMC::Exec(
     Option_t* opt)
 {
-   fTrdClusterMatches->Clear();
-   fTrdHitMatches->Clear();
-   fTrdTrackMatches->Clear();
+   if (fTrdClusterMatches != NULL) fTrdClusterMatches->Clear();
+   if (fTrdHitMatches != NULL) fTrdHitMatches->Clear();
+   if (fTrdTrackMatches != NULL) fTrdTrackMatches->Clear();
+   if (fMuchClusterMatches != NULL) fMuchClusterMatches->Clear();
+   if (fMuchPixelHitMatches != NULL) fMuchPixelHitMatches->Clear();
+   if (fMuchStrawHitMatches != NULL) fMuchStrawHitMatches->Clear();
+   if (fMuchTrackMatches != NULL) fMuchTrackMatches->Clear();
 
    // TRD
    if (fTrdDigis && fTrdClusters && fTrdHits) { // MC->digi->cluster->hit->track
@@ -63,6 +101,16 @@ void CbmMatchRecoToMC::Exec(
    } else if (fTrdHits) { // MC->hit->track
       MatchHitsSmearing(fTrdPoints, fTrdHits, fTrdHitMatches);
       MatchTracks(fTrdHitMatches, fTrdPoints, fTrdTracks, fTrdTrackMatches);
+   }
+
+   // MUCH
+   if (fMuchDigis && fMuchClusters && fMuchPixelHits) {
+      MatchClusters(fMuchDigiMatches, fMuchClusters, fMuchClusterMatches);
+      MatchHitsClustering(fMuchClusterMatches, fMuchPixelHits, fMuchPixelHitMatches);
+      MatchTracks(fMuchPixelHitMatches, fMuchPoints, fMuchTracks, fMuchTrackMatches);
+   } else {
+      MatchHitsSmearing(fMuchPoints, fMuchPixelHits, fMuchPixelHitMatches);
+      MatchTracks(fMuchPixelHitMatches, fMuchPoints, fMuchTracks, fMuchTrackMatches);
    }
 
    static Int_t eventNo = 0;
@@ -83,18 +131,50 @@ void CbmMatchRecoToMC::ReadAndCreateDataBranches()
 
    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
 
+   // TRD
    fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
    fTrdDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
    fTrdClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
    fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
    fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
    fTrdDigiMatches = (TClonesArray*) ioman->GetObject("TrdDigiMatch");
-   fTrdClusterMatches = new TClonesArray("CbmMatch", 100);
-   ioman->Register("TrdClusterMatch", "TRD", fTrdClusterMatches, kTRUE);
-   fTrdHitMatches = new TClonesArray("CbmMatch", 100);
-   ioman->Register("TrdHitMatch", "TRD", fTrdHitMatches, kTRUE);
-   fTrdTrackMatches = new TClonesArray("CbmTrackMatchNew", 100);
-   ioman->Register("TrdTrackMatch", "TRD", fTrdTrackMatches, kTRUE);
+   if (fTrdClusters != NULL) {
+      fTrdClusterMatches = new TClonesArray("CbmMatch", 100);
+      ioman->Register("TrdClusterMatch", "TRD", fTrdClusterMatches, kTRUE);
+   }
+   if (fTrdHits != NULL) {
+      fTrdHitMatches = new TClonesArray("CbmMatch", 100);
+      ioman->Register("TrdHitMatch", "TRD", fTrdHitMatches, kTRUE);
+   }
+   if (fTrdTracks != NULL) {
+      fTrdTrackMatches = new TClonesArray("CbmTrackMatchNew", 100);
+      ioman->Register("TrdTrackMatch", "TRD", fTrdTrackMatches, kTRUE);
+   }
+
+   // MUCH
+   fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+   fMuchDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
+   fMuchClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
+   fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+   fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
+   fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
+   fMuchDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+   if (fMuchClusters != NULL) {
+      fMuchClusterMatches = new TClonesArray("CbmMatch", 100);
+      ioman->Register("MuchClusterMatch", "MUCH", fMuchClusterMatches, kTRUE);
+   }
+   if (fMuchPixelHits) {
+      fMuchPixelHitMatches = new TClonesArray("CbmMatch", 100);
+      ioman->Register("MuchPixelHitMatch", "MUCH", fMuchPixelHitMatches, kTRUE);
+   }
+   if (fMuchStrawHits) {
+      fMuchStrawHits = new TClonesArray("CbmMatch", 100);
+      ioman->Register("MuchStrawHitMatch", "MUCH", fMuchStrawHits, kTRUE);
+   }
+   if (fMuchTracks) {
+      fMuchTrackMatches = new TClonesArray("CbmTrackMatchNew", 100);
+      ioman->Register("MuchTrackMatch", "MUCH", fMuchTrackMatches, kTRUE);
+   }
 }
 
 void CbmMatchRecoToMC::MatchClusters(

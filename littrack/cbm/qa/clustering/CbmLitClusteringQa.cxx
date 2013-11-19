@@ -74,6 +74,9 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fMuchPixelHits(NULL),
    fMuchStrawHits(NULL),
    fMuchDigiMatches(NULL),
+   fMuchClusterMatches(NULL),
+   fMuchPixelHitMatches(NULL),
+   fMuchStrawHitMatches(NULL),
    fTrdPoints(NULL),
    fTrdDigis(NULL),
    fTrdClusters(NULL),
@@ -83,7 +86,7 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fTrdHitMatches(NULL),
    fTofPoints(NULL),
    fTofHits(NULL),
-   fMuchGeoScheme(CbmMuchGeoScheme::Instance())
+   fMuchDigiFileName("")
 {
 
 }
@@ -101,15 +104,8 @@ InitStatus CbmLitClusteringQa::Init()
    fDet.DetermineSetup();
    ReadDataBranches();
 
-   if(fDet.GetDet(kMUCH)){
-      if(fMuchDigiFile != NULL){
-         MuchGeoSchemeInit(fMuchDigiFile);
-         CreateMuchHistograms();
-      }
-      else{
-         std::cout<<"Error! MuchDigiFile is not loaded.\n";
-      }
-   }
+   InitMuchGeoScheme(fMuchDigiFileName);
+
    CreateHistograms();
    return kSUCCESS;
 }
@@ -124,7 +120,8 @@ void CbmLitClusteringQa::Exec(
    ProcessHits();
    IncreaseCounters();
 
-   FillTrdResidualAndPullHistograms();
+   FillResidualAndPullHistograms(fTrdPoints, fTrdHits, fTrdHitMatches, "Trd");
+   FillResidualAndPullHistograms(fMuchPoints, fMuchPixelHits, fMuchPixelHitMatches, "Much");
 
    fHM->H1("hen_EventNo_ClusteringQa")->Fill(0.5);
    std::cout << "CbmLitClusteringQa::Exec: event=" << fHM->H1("hen_EventNo_ClusteringQa")->GetEntries() << std::endl;
@@ -152,15 +149,18 @@ void CbmLitClusteringQa::Finish()
    fBestPointsForHits.clear();
 }
 
-void CbmLitClusteringQa::MuchGeoSchemeInit(const TString& digiFileName)
+void CbmLitClusteringQa::InitMuchGeoScheme(
+      const string& digiFileName)
 {
-	TFile* oldfile=gFile;
-	TFile* file=new TFile(digiFileName);
-	TObjArray* stations = (TObjArray*) file->Get("stations");
-	file->Close();
-	file->Delete();
-	gFile=oldfile;
-	fMuchGeoScheme->Init(stations);
+   if (fDet.GetDet(kMUCH) && fMuchDigiFileName == "") {
+      TFile* oldfile = gFile;
+      TFile* file = new TFile(digiFileName.c_str());
+      TObjArray* stations = (TObjArray*) file->Get("stations");
+      file->Close();
+      file->Delete();
+      gFile=oldfile;
+      CbmMuchGeoScheme::Instance()->Init(stations);
+   }
 }
 
 void CbmLitClusteringQa::ReadDataBranches()
@@ -183,14 +183,15 @@ void CbmLitClusteringQa::ReadDataBranches()
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
    fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
 
-   if(fDet.GetDet(kMUCH)){
-      fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
-      fMuchDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
-      fMuchDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
-      fMuchClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
-      fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
-      fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
-   }
+   fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+   fMuchDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
+   fMuchClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
+   fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+   fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
+   fMuchDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+   fMuchClusterMatches = (TClonesArray*) ioman->GetObject("MuchClusterMatch");
+   fMuchPixelHitMatches = (TClonesArray*) ioman->GetObject("MuchPixelHitMatch");
+   fMuchStrawHitMatches = (TClonesArray*) ioman->GetObject("MuchStrawHitMatch");
 
    fTrdPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
    fTrdDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
@@ -320,28 +321,36 @@ void CbmLitClusteringQa::IncreaseCounters()
    if (NULL != fTofHits && fHM->Exists("hno_NofObjects_TofHits_Event")) fHM->H1("hno_NofObjects_TofHits_Event")->Fill(fTofHits->GetEntriesFast());
 }
 
-void CbmLitClusteringQa::FillTrdResidualAndPullHistograms()
+void CbmLitClusteringQa::FillResidualAndPullHistograms(
+      const TClonesArray* points,
+      const TClonesArray* hits,
+      const TClonesArray* hitMatches,
+      const string& detName)
 {
-   if (NULL == fTrdHits && NULL == fTrdPoints && !fHM->Exists("hrp_Trd_ResidualX_H2")
-         && !fHM->Exists("hrp_Trd_ResidualY_H2") && !fHM->Exists("hrp_Trd_PullX_H2")
-         && !fHM->Exists("hrp_Trd_PullY_H2")) return;
+   if (NULL == points || NULL == hits || NULL == hitMatches) return;
+   string nameResidualX = "hrp_" + detName + "_ResidualX_H2";
+   string nameResidualY = "hrp_" + detName + "_ResidualY_H2";
+   string namePullX = "hrp_" + detName + "_PullX_H2";
+   string namePullY = "hrp_" + detName + "_PullY_H2";
+   if (!fHM->Exists(nameResidualX) || !fHM->Exists(nameResidualY)
+         || !fHM->Exists(namePullX) || !fHM->Exists(namePullY)) return;
 
-   Int_t nofHits = fTrdHits->GetEntriesFast();
+   Int_t nofHits = hits->GetEntriesFast();
 	for (Int_t iHit = 0; iHit < nofHits; iHit++) {
-      const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(fTrdHits->At(iHit));
-      const CbmMatch* match = static_cast<const CbmMatch*>(fTrdHitMatches->At(iHit));
+      const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(hits->At(iHit));
+      const CbmMatch* match = static_cast<const CbmMatch*>(hitMatches->At(iHit));
       if (isnan(hit->GetX()) || (isnan(hit->GetY()))) continue;
-      const FairMCPoint* point = static_cast<const FairMCPoint*>(fTrdPoints->At(match->GetMatchedReferenceId()));
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(match->GetMatchedReferenceId()));
       if (point == NULL) continue;
       //Float_t xPoint = (muchPoint->GetXIn() + muchPoint->GetXOut()) / 2;
       //Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
       Float_t residualX =  point->GetX() - hit->GetX();
       Float_t residualY =  point->GetY() - hit->GetY();
       Int_t layerId = CbmTrdAddress::GetLayerId(hit->GetAddress());
-      fHM->H2("hrp_Trd_ResidualX_H2")->Fill(layerId, residualX);
-      fHM->H2("hrp_Trd_ResidualY_H2")->Fill(layerId, residualY);
-      fHM->H2("hrp_Trd_PullX_H2")->Fill(layerId, residualX / hit->GetDx());
-      fHM->H2("hrp_Trd_PullY_H2")->Fill(layerId, residualY / hit->GetDy());
+      fHM->H2(nameResidualX)->Fill(layerId, residualX);
+      fHM->H2(nameResidualY)->Fill(layerId, residualY);
+      fHM->H2(namePullX)->Fill(layerId, residualX / hit->GetDx());
+      fHM->H2(namePullY)->Fill(layerId, residualY / hit->GetDy());
    }
 }
 
@@ -479,11 +488,12 @@ void CbmLitClusteringQa::CreateMuchHistograms()
 	Int_t nofSteps = 10;
 	Float_t rMin = 0;
 	Float_t rMax = 0;
-	for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-	   CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+	CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+	for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+	   CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
 	   nofLayers += station->GetNLayers();
 	   if(iStation == 0)rMin = station->GetRmin();
-	   if(iStation == (fMuchGeoScheme->GetNStations() - 1))rMax = station->GetRmax();
+	   if(iStation == (geo->GetNStations() - 1))rMax = station->GetRmax();
 	}
 	fHM->Create2<TH2F>("he_MuchPixelHitsH2", "he_MuchPixelHitsH2;Layer;Radius;nofHits", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
 	fHM->Create2<TH2F>("hsc_Much_ClusterQuality_2D", "hsc_Much_ClusterQuality_2D;Layer;Radius;Quality", nofLayers, 0., nofLayers, nofSteps, 0., nofSteps);
@@ -722,8 +732,9 @@ void CbmLitClusteringQa::FillMuchPixelHitsHistogram()
       vector<Int_t> nofPixelHits;
       vector<Int_t> nofPixelHits_Muon;
       vector<Int_t> nofTruePixelHits;
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             nofPixelHits.push_back(0);
             nofPixelHits_Muon.push_back(0);
@@ -736,11 +747,11 @@ void CbmLitClusteringQa::FillMuchPixelHitsHistogram()
       for(Int_t iHit = 0; iHit < nofMuchHits; iHit++){
          CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
          if(isnan(hit->GetX()) || (isnan(hit->GetY())))continue;
-         Int_t nStation = fMuchGeoScheme->GetStationIndex(hit->GetAddress());
-         if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(hit->GetAddress());
+         Int_t nStation = geo->GetStationIndex(hit->GetAddress());
+         if((nStation < 0) || (nStation >geo->GetNStations()))continue;
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStationByDetId(hit->GetAddress());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(hit->GetAddress());
+         Int_t nLayer = geo->GetLayerIndex(hit->GetAddress());
          if((nLayer < 0) || (nLayer > nofLayers))continue;
          Int_t iLayer = (nStation * nofLayers) + nLayer;
          nofPixelHits[iLayer]++;
@@ -761,8 +772,8 @@ void CbmLitClusteringQa::FillMuchPixelHitsHistogram()
       }
       muonPoints.clear();
       trueHits.clear();
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             Int_t nLayer = (iStation * station->GetNLayers()) + iLayer;
             fHM->P1("hsh_Much_PixelHits")->Fill(nLayer, nofPixelHits[nLayer]);
@@ -778,8 +789,9 @@ void CbmLitClusteringQa::FillMuchClustersHistogram()
    if (NULL != fMuchClusters && fHM->Exists("hsh_Much_Clusters")){
       vector<Int_t> nofClusters;
       vector<Int_t> nofClusters_Muon;
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             nofClusters.push_back(0);
             nofClusters_Muon.push_back(0);
@@ -791,11 +803,11 @@ void CbmLitClusteringQa::FillMuchClustersHistogram()
          CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
          if(cluster->GetNofDigis() < 1)continue;
          CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigi(0));
-         Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
-         if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(digi->GetDetectorId());
+         Int_t nStation = geo->GetStationIndex(digi->GetDetectorId());
+         if((nStation < 0) || (nStation >geo->GetNStations()))continue;
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStationByDetId(digi->GetDetectorId());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(digi->GetDetectorId());
+         Int_t nLayer = geo->GetLayerIndex(digi->GetDetectorId());
          if((nLayer < 0) || (nLayer > nofLayers))continue;
          Int_t iLayer = (nStation * nofLayers) + nLayer;
          nofClusters[iLayer]++;
@@ -810,8 +822,8 @@ void CbmLitClusteringQa::FillMuchClustersHistogram()
          }
       }
       muonPoints.clear();
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             Int_t nLayer = (iStation * station->GetNLayers()) + iLayer;
             fHM->P1("hsh_Much_Clusters")->Fill(nLayer, nofClusters[nLayer]);
@@ -824,10 +836,11 @@ void CbmLitClusteringQa::FillMuchClustersHistogram()
 void CbmLitClusteringQa::FillMuchPointsHistogram()
 {
    if (NULL != fMuchPoints && fHM->Exists("hsh_Much_Points")){
+      const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
       vector<Int_t> nofPoints;
       vector<Int_t> nofPoints_Muon;
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             nofPoints.push_back(0);
             nofPoints_Muon.push_back(0);
@@ -836,11 +849,11 @@ void CbmLitClusteringQa::FillMuchPointsHistogram()
       Int_t nofMuchPoints = fMuchPoints->GetEntriesFast();
       for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(iPoint);
-         Int_t nStation = fMuchGeoScheme->GetStationIndex(point->GetDetectorId());
-         if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(point->GetDetectorId());
+         Int_t nStation = geo->GetStationIndex(point->GetDetectorId());
+         if((nStation < 0) || (nStation >geo->GetNStations()))continue;
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStationByDetId(point->GetDetectorId());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(point->GetDetectorId());
+         Int_t nLayer = geo->GetLayerIndex(point->GetDetectorId());
          if((nLayer < 0) || (nLayer > nofLayers))continue;
          Int_t iLayer = (nStation * nofLayers) + nLayer;
          nofPoints[iLayer]++;
@@ -849,8 +862,8 @@ void CbmLitClusteringQa::FillMuchPointsHistogram()
             nofPoints_Muon[iLayer]++;
          }
       }
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             Int_t nLayer = (iStation * station->GetNLayers()) + iLayer;
             fHM->P1("hsh_Much_Points")->Fill(nLayer, nofPoints[nLayer]);
@@ -863,10 +876,11 @@ void CbmLitClusteringQa::FillMuchPointsHistogram()
 void CbmLitClusteringQa::FillMuchDigisHistogram()
 {
    if (NULL != fMuchDigis && fHM->Exists("hsh_Much_Digis")){
+      const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
       vector<Int_t> nofDigis;
       vector<Int_t> nofDigis_Muon;
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             nofDigis.push_back(0);
             nofDigis_Muon.push_back(0);
@@ -875,11 +889,11 @@ void CbmLitClusteringQa::FillMuchDigisHistogram()
       Int_t nofMuchDigis = fMuchDigis->GetEntriesFast();
       for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
          CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
-         Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
-         if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(digi->GetDetectorId());
+         Int_t nStation = geo->GetStationIndex(digi->GetDetectorId());
+         if((nStation < 0) || (nStation >geo->GetNStations()))continue;
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStationByDetId(digi->GetDetectorId());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(digi->GetDetectorId());
+         Int_t nLayer = geo->GetLayerIndex(digi->GetDetectorId());
          if((nLayer < 0) || (nLayer > nofLayers))continue;
          Int_t iLayer = (nStation * nofLayers) + nLayer;
          nofDigis[iLayer]++;
@@ -892,8 +906,8 @@ void CbmLitClusteringQa::FillMuchDigisHistogram()
             }
          }
       }
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             Int_t nLayer = (iStation * station->GetNLayers()) + iLayer;
             fHM->P1("hsh_Much_Digis")->Fill(nLayer, nofDigis[nLayer]);
@@ -906,10 +920,11 @@ void CbmLitClusteringQa::FillMuchDigisHistogram()
 void CbmLitClusteringQa::FillDigiByPointHistogrm()
 {
    if (NULL != fMuchDigis && NULL != fMuchPoints && fHM->Exists("hss_Much_NofDigisByPoint")){
+      const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
       vector<Int_t> nofPointsByLayer;
       vector<Int_t> digisInPointsByLayer;
-      for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+      for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
          for(Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++){
             nofPointsByLayer.push_back(0);
             digisInPointsByLayer.push_back(0);
@@ -930,11 +945,11 @@ void CbmLitClusteringQa::FillDigiByPointHistogrm()
       }
       for(Int_t iPoint = 0; iPoint < nofMuchPoints; iPoint++){
          CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(iPoint);
-         Int_t nStation = fMuchGeoScheme->GetStationIndex(point->GetDetectorId());
-         if((nStation < 0) || (nStation >fMuchGeoScheme->GetNStations()))continue;
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(point->GetDetectorId());
+         Int_t nStation = geo->GetStationIndex(point->GetDetectorId());
+         if((nStation < 0) || (nStation >geo->GetNStations()))continue;
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStationByDetId(point->GetDetectorId());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = fMuchGeoScheme->GetLayerIndex(point->GetDetectorId());
+         Int_t nLayer = geo->GetLayerIndex(point->GetDetectorId());
          if((nLayer < 0) || (nLayer > nofLayers))continue;
          Int_t iLayer = (nStation * nofLayers) + nLayer;
          nofPointsByLayer[iLayer]++;
@@ -959,11 +974,12 @@ void CbmLitClusteringQa::FillDigiByPointHistogrm()
 void CbmLitClusteringQa::FillMuchClusterQualityHistogram()
 {
 	if (NULL != fMuchClusters && fHM->Exists("hss_Much_ClusterToPointRatio") && fHM->Exists("hss_Much_ClusterQuality")){
-		Int_t nofStations = fMuchGeoScheme->GetNStations();
+	   const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+		Int_t nofStations = geo->GetNStations();
 		std::vector<Int_t> nofLayers;
 		Int_t totalLayers = 0;
 		for(Int_t iStation = 0; iStation < nofStations; iStation++){
-			CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+			CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
 			nofLayers.push_back(station->GetNLayers());
 			totalLayers += station->GetNLayers();
 		}
@@ -979,8 +995,8 @@ void CbmLitClusteringQa::FillMuchClusterQualityHistogram()
 		for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
 		   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
 		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigi(0));
-			Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
-			Int_t nLayer = fMuchGeoScheme->GetLayerIndex(digi->GetDetectorId());
+			Int_t nStation = geo->GetStationIndex(digi->GetDetectorId());
+			Int_t nLayer = geo->GetLayerIndex(digi->GetDetectorId());
 			Int_t iLayer = (nStation * nofLayers[nStation]) + nLayer;
 			if((iLayer < totalLayers) && (iLayer >= 0)){
 			   clToPointsPerLayer[iLayer] += CalculateMuchClusterToPointRatio(iCl, fBestPoints[iCl]);
@@ -1010,8 +1026,9 @@ void CbmLitClusteringQa::FillMuchClusterQualityHistogram()
 void CbmLitClusteringQa::FillMuchClusterQuality2DHistogram()
 {
    Int_t nofSteps = fHM->H2("hsc_Much_ClusterQuality_2D")->GetNbinsY();
-   for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-      CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+   const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+   for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+      CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
       Float_t rMin = station->GetRmin();
       Float_t rMax = station->GetRmax();
       Float_t step = (rMax - rMin) / nofSteps;
@@ -1028,8 +1045,8 @@ void CbmLitClusteringQa::FillMuchClusterQuality2DHistogram()
          Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
          for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
             CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(fBestPoints[iCl]);
-            if((iStation == fMuchGeoScheme->GetStationIndex(point->GetDetectorId())) &&
-                  (iLayer == fMuchGeoScheme->GetLayerIndex(point->GetDetectorId()))){
+            if((iStation == geo->GetStationIndex(point->GetDetectorId())) &&
+                  (iLayer == geo->GetLayerIndex(point->GetDetectorId()))){
                Float_t xP = (point->GetXIn() + point->GetXOut()) / 2;
                Float_t yP = (point->GetYIn() + point->GetYOut()) / 2;
                Float_t rHit = sqrt((xP * xP) + (yP * yP));
@@ -1075,11 +1092,12 @@ void CbmLitClusteringQa::FillMuchClusterQuality2DHistogram()
 void CbmLitClusteringQa::FillMuchMCPointsInClusterHistogrm()
 {
 	if (NULL != fMuchClusters && fHM->Exists("hss_Much_NofPointsInCluster")){
-		Int_t nofStations = fMuchGeoScheme->GetNStations();
+	   const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+		Int_t nofStations = geo->GetNStations();
 		std::vector<Int_t> nofLayers;
 		Int_t totalLayers = 0;
 		for(Int_t iStation = 0; iStation < nofStations; iStation++){
-			CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+			CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
 			nofLayers.push_back(station->GetNLayers());
 			totalLayers += station->GetNLayers();
 		}
@@ -1093,8 +1111,8 @@ void CbmLitClusteringQa::FillMuchMCPointsInClusterHistogrm()
 		for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
 		   CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(iCl);
 		   CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(cluster->GetDigi(0));
-			Int_t nStation = fMuchGeoScheme->GetStationIndex(digi->GetDetectorId());
-			Int_t nLayer = fMuchGeoScheme->GetLayerIndex(digi->GetDetectorId());
+			Int_t nStation = geo->GetStationIndex(digi->GetDetectorId());
+			Int_t nLayer = geo->GetLayerIndex(digi->GetDetectorId());
 			Int_t iLayer = (nStation * nofLayers[nStation]) + nLayer;
 			if((iLayer < totalLayers) && (iLayer >= 0)){
 			   pointsInClustersPerLayer[iLayer] += GetNofPointsInCluster(iCl);
@@ -1119,8 +1137,9 @@ void CbmLitClusteringQa::FillMuchMCPointsInClusterHistogrm()
 void CbmLitClusteringQa::FillMuchMCPointsInCluster2DHistogrm()
 {
    Int_t nofSteps = fHM->H2("hsc_Much_NofPointsInCluster_2D")->GetNbinsY();
-   for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-      CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+   const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+   for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+      CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
       Float_t rMin = station->GetRmin();
       Float_t rMax = station->GetRmax();
       Float_t step = (rMax - rMin) / nofSteps;
@@ -1135,8 +1154,8 @@ void CbmLitClusteringQa::FillMuchMCPointsInCluster2DHistogrm()
          Int_t nofMuchClusters = fMuchClusters->GetEntriesFast();
          for(Int_t iCl = 0; iCl < nofMuchClusters; iCl++){
             CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(fBestPoints[iCl]);
-            if((iStation == fMuchGeoScheme->GetStationIndex(point->GetDetectorId())) &&
-                  (iLayer == fMuchGeoScheme->GetLayerIndex(point->GetDetectorId()))){
+            if((iStation == geo->GetStationIndex(point->GetDetectorId())) &&
+                  (iLayer == geo->GetLayerIndex(point->GetDetectorId()))){
                Float_t xP = (point->GetXIn() + point->GetXOut()) / 2;
                Float_t yP = (point->GetYIn() + point->GetYOut()) / 2;
                Float_t rHit = sqrt((xP * xP) + (yP * yP));
@@ -1192,11 +1211,12 @@ void CbmLitClusteringQa::CreateSingleLayerHistogram(Int_t nStation, Int_t nLayer
 void CbmLitClusteringQa::FillMuchMCPointsByDigiHistogram()
 {
 	if (NULL != fMuchDigis && fHM->Exists("hss_Much_NofPointsInDigi")){
-		Int_t nofStations = fMuchGeoScheme->GetNStations();
+	   const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+		Int_t nofStations = geo->GetNStations();
 		std::vector<Int_t> nofLayers;
 		Int_t totalLayers = 0;
 		for(Int_t iStation = 0; iStation < nofStations; iStation++){
-			CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+			CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
 			nofLayers.push_back(station->GetNLayers());
 			totalLayers += station->GetNLayers();
 		}
@@ -1210,8 +1230,8 @@ void CbmLitClusteringQa::FillMuchMCPointsByDigiHistogram()
 		for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
 			CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
 			Int_t detId = digi->GetDetectorId();
-			Int_t nStation = fMuchGeoScheme->GetStationIndex(detId);
-			Int_t nLayer = fMuchGeoScheme->GetLayerIndex(detId);
+			Int_t nStation = geo->GetStationIndex(detId);
+			Int_t nLayer = geo->GetLayerIndex(detId);
 			Int_t iLayer = (nStation * nofLayers[nStation]) + nLayer;
 			if((iLayer < totalLayers) && (iLayer >= 0)){
 			   CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(iDigi);
@@ -1237,8 +1257,9 @@ void CbmLitClusteringQa::FillMuchMCPointsByDigiHistogram()
 void CbmLitClusteringQa::FillMuchMCPointsByDigi2DHistogram()
 {
    Int_t nofSteps = fHM->H2("hsc_Much_NofPointsInDigi_2D")->GetNbinsY();
-   for(Int_t iStation = 0; iStation < fMuchGeoScheme->GetNStations(); iStation++){
-      CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStation(iStation);
+   const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
+   for(Int_t iStation = 0; iStation < geo->GetNStations(); iStation++){
+      CbmMuchStation* station = (CbmMuchStation*) geo->GetStation(iStation);
       Float_t rMin = station->GetRmin();
       Float_t rMax = station->GetRmax();
       Float_t step = (rMax - rMin) / nofSteps;
@@ -1254,9 +1275,9 @@ void CbmLitClusteringQa::FillMuchMCPointsByDigi2DHistogram()
          for(Int_t iDigi = 0; iDigi < nofMuchDigis; iDigi++){
             CbmMuchDigi* digi = (CbmMuchDigi*) fMuchDigis->At(iDigi);
             Int_t detId = digi->GetDetectorId();
-            if((iStation == fMuchGeoScheme->GetStationIndex(detId)) &&
-                  (iLayer == fMuchGeoScheme->GetLayerIndex(detId))){
-               CbmMuchModuleGem* module = (CbmMuchModuleGem*) fMuchGeoScheme->GetModuleByDetId(detId);
+            if((iStation == geo->GetStationIndex(detId)) &&
+                  (iLayer == geo->GetLayerIndex(detId))){
+               CbmMuchModuleGem* module = (CbmMuchModuleGem*) geo->GetModuleByDetId(detId);
                CbmMuchPad* pad = (CbmMuchPad*) module->GetPad(digi->GetChannelId());
                if(isnan(pad->GetX()) || (isnan(pad->GetY())))continue;
                Float_t rDigi = sqrt((pad->GetX() * pad->GetX()) + (pad->GetY() * pad->GetY()));
@@ -1333,6 +1354,7 @@ void CbmLitClusteringQa::FillDigisInClusterDistributionHistogrm()
 void CbmLitClusteringQa::FillMuchResidualHistograms()
 {
    if (NULL != fMuchPixelHits && NULL != fMuchPoints && fHM->Exists("hr_Much_ResidualX_2D") && fHM->Exists("hr_Much_ResidualY_2D")){
+      const CbmMuchGeoScheme* geo = CbmMuchGeoScheme::Instance();
      Int_t nofMuchHits = fMuchPixelHits->GetEntriesFast();
 	 for(Int_t iHit = 0; iHit < nofMuchHits; iHit++){
          CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
@@ -1342,10 +1364,10 @@ void CbmLitClusteringQa::FillMuchResidualHistograms()
          Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
          Float_t residualX =  xPoint - hit->GetX();
          Float_t residualY =  yPoint - hit->GetY();
-         CbmMuchStation* station = (CbmMuchStation*) fMuchGeoScheme->GetStationByDetId(hit->GetAddress());
+         CbmMuchStation* station = (CbmMuchStation*) geo->GetStationByDetId(hit->GetAddress());
          Int_t nofLayers = station->GetNLayers();
-         Int_t nLayer = (fMuchGeoScheme->GetStationIndex(hit->GetAddress())) * nofLayers +
-               fMuchGeoScheme->GetLayerIndex(hit->GetAddress());
+         Int_t nLayer = (geo->GetStationIndex(hit->GetAddress())) * nofLayers +
+               geo->GetLayerIndex(hit->GetAddress());
          fHM->H2("hr_Much_ResidualX_2D")->Fill(nLayer, residualX, 1);
          fHM->H2("hr_Much_ResidualY_2D")->Fill(nLayer, residualY, 1);
          //---

@@ -46,39 +46,39 @@ class CbmMuchGeoScheme: public TObject {
     Bool_t IsInitialized() { return fInitialized; }
 
     // Get geometry objects by indices
-    CbmMuchStation*   GetStation(Int_t iStation);
-    CbmMuchLayer*     GetLayer(Int_t iStation, Int_t iLayer);
-    CbmMuchLayerSide* GetLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide);
-    CbmMuchModule*    GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule);
+    CbmMuchStation*   GetStation(Int_t iStation) const;
+    CbmMuchLayer*     GetLayer(Int_t iStation, Int_t iLayer) const;
+    CbmMuchLayerSide* GetLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide) const;
+    CbmMuchModule*    GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule) const;
 
     // Get geometry objects by detector id
-    CbmMuchStation*   GetStationByDetId(Int_t detId);
-    CbmMuchLayer*     GetLayerByDetId(Int_t detId);
-    CbmMuchLayerSide* GetLayerSideByDetId(Int_t detId);
-    CbmMuchModule*    GetModuleByDetId(Int_t detId);
+    CbmMuchStation*   GetStationByDetId(Int_t detId) const;
+    CbmMuchLayer*     GetLayerByDetId(Int_t detId) const;
+    CbmMuchLayerSide* GetLayerSideByDetId(Int_t detId) const;
+    CbmMuchModule*    GetModuleByDetId(Int_t detId) const;
 
     static Int_t GetStationIndex(Int_t address)   { return CbmMuchAddress::GetElementId(address,kMuchStation);   }
     static Int_t GetLayerIndex(Int_t address)     { return CbmMuchAddress::GetElementId(address,kMuchLayer);     }
     static Int_t GetLayerSideIndex(Int_t address) { return CbmMuchAddress::GetElementId(address,kMuchLayerSide); }
 
     
-    Int_t      GetNStations() {return fStations->GetEntries();}
-    Int_t      GetNAbsorbers() {return fNabs;}
-    TObjArray* GetStations() {return fStations;}
-    TObjArray* GetAbsorbers() {return fAbsorbers;}
-    TGeoCone*  GetMuchCave() {return fMuchCave;}
-    Double_t   GetMuchCaveZ0() {return fMuchZ1+fMuchCave->GetDz();}
-    Double_t   GetAbsorberZ0(Int_t i) {return fMuchZ1+fAbsorberZ1[i]+((TGeoCone*) fAbsorbers->At(i))->GetDz();}
-    Char_t     GetAbsorberMat(Int_t i) {return fAbsorberMat[i];}
+    Int_t      GetNStations() const {return fStations->GetEntries();}
+    Int_t      GetNAbsorbers() const {return fNabs;}
+    TObjArray* GetStations() const {return fStations;}
+    TObjArray* GetAbsorbers() const {return fAbsorbers;}
+    TGeoCone*  GetMuchCave() const {return fMuchCave;}
+    Double_t   GetMuchCaveZ0() const {return fMuchZ1+fMuchCave->GetDz();}
+    Double_t   GetAbsorberZ0(Int_t i) const {return fMuchZ1+fAbsorberZ1[i]+((TGeoCone*) fAbsorbers->At(i))->GetDz();}
+    Char_t     GetAbsorberMat(Int_t i) const {return fAbsorberMat[i];}
 
-    Double_t GetActiveLx()  {return fActiveLx;}
-    Double_t GetActiveLy()  {return fActiveLy;}
-    Double_t GetActiveLz()  {return fActiveLz;}
-    Double_t GetSpacerLx()  {return fSpacerLx;}
-    Double_t GetSpacerLy()  {return fSpacerLy;}
-    Double_t GetSpacerR()   {return fSpacerR;}
-    Double_t GetSpacerPhi() {return fSpacerPhi;}
-    Double_t GetLayersDz(Int_t st) {return fLayersDz[st];}
+    Double_t GetActiveLx() const {return fActiveLx;}
+    Double_t GetActiveLy() const {return fActiveLy;}
+    Double_t GetActiveLz() const {return fActiveLz;}
+    Double_t GetSpacerLx() const {return fSpacerLx;}
+    Double_t GetSpacerLy() const {return fSpacerLy;}
+    Double_t GetSpacerR() const {return fSpacerR;}
+    Double_t GetSpacerPhi() const {return fSpacerPhi;}
+    Double_t GetLayersDz(Int_t st) const {return fLayersDz[st];}
 
     void Init(TObjArray* stations);
     void Init(TString digiFileName);
@@ -88,11 +88,11 @@ class CbmMuchGeoScheme: public TObject {
     void ClearPointArrays();
     void ClearHitArrays();
     void ClearClusterArrays();
-    vector<CbmMuchModule*>    GetModules();
-    vector<CbmMuchModuleGem*>    GetGemModules();
-    vector<CbmMuchModule*>    GetModules(Int_t iStation);
-    vector<CbmMuchLayerSide*> GetLayerSides(Int_t iStation);
-    Int_t GetLayerSideNr(Int_t detId);
+    vector<CbmMuchModule*>    GetModules() const;
+    vector<CbmMuchModuleGem*>    GetGemModules() const;
+    vector<CbmMuchModule*>    GetModules(Int_t iStation) const;
+    vector<CbmMuchLayerSide*> GetLayerSides(Int_t iStation) const;
+    Int_t GetLayerSideNr(Int_t detId) const;
 
     void ReadGeoFile(const char* geoName);
     void Print();

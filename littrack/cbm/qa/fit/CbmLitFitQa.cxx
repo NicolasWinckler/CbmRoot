@@ -228,13 +228,12 @@ void CbmLitFitQa::ProcessMuchTrack(
 {
    if (NULL == fMuchTracks || NULL == fMuchTrackMatches || trackId < 0) return;
 
-   CbmTrackMatch* match = static_cast<CbmTrackMatch*>(fMuchTrackMatches->At(trackId));
-   Int_t mcId = match->GetMCTrackId();
+   const CbmTrackMatchNew* match = static_cast<const CbmTrackMatchNew*>(fMuchTrackMatches->At(trackId));
+   Int_t mcId = match->GetMatchedReferenceId();
    if (mcId < 0) return; // Ghost or fake track
 
    // Check correctness of reconstructed track
-   Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
-   if ((match->GetNofTrueHits() / allHits) < fQuota) return;
+   if (match->GetTrueOverAllHitsRatio() < fQuota) return;
 
    CbmTrack* track = static_cast<CbmTrack*>(fMuchTracks->At(trackId));
    Int_t nofHits = track->GetNofHits();

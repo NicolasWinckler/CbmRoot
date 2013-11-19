@@ -12,7 +12,7 @@
 using std::cout;
 using std::endl;
 
-void global_reco(Int_t nEvents = 10, // number of events
+void global_reco(Int_t nEvents = 100, // number of events
 		TString opt = "all")
 // if opt == "all" STS + hit producers + global tracking are executed
 // if opt == "hits" STS + hit producers are executed
@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 10, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/trd_v13g/"; // Output directory
+	TString dir = "events/much_v12c/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -265,11 +265,6 @@ void global_reco(Int_t nEvents = 10, // number of events
 		finder->SetMergerType("nearest_hit");
 
 		run->AddTask(finder);
-
-		if (IsMuch(parFile)) {
-			CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-			run->AddTask(muchMatchTracks);
-		}
 	}
 
 	if (opt == "all" || opt == "tracking") {

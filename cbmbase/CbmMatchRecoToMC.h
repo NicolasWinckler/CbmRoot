@@ -76,10 +76,23 @@ private:
     TClonesArray* fTrdClusters; // CbmTrdCluster array
     TClonesArray* fTrdHits; // CbmTrdHit array
     TClonesArray* fTrdTracks; // CbmTrdTrack array
-    TClonesArray* fTrdDigiMatches; // Output CbmTrdDigiMatch array
-    TClonesArray* fTrdClusterMatches; // Output CbmTrdClusterMatch array
-    TClonesArray* fTrdHitMatches; // Output CbmTrdHitMatch array
-    TClonesArray* fTrdTrackMatches; // Output CbmTrdTrackMatch array
+    TClonesArray* fTrdDigiMatches; // Output CbmMatch array
+    TClonesArray* fTrdClusterMatches; // Output CbmMatch array
+    TClonesArray* fTrdHitMatches; // Output CbmMatch array
+    TClonesArray* fTrdTrackMatches; // Output CbmTrackMatchNew array
+
+    // MUCH
+    TClonesArray* fMuchPoints; // CbmMuchPoint array
+    TClonesArray* fMuchDigis; // CbmMuchDigi array
+    TClonesArray* fMuchClusters; // CbmMuchCluster array
+    TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
+    TClonesArray* fMuchStrawHits; // CbmMuchStrawHit array
+    TClonesArray* fMuchTracks; // CbmMuchTrack array
+    TClonesArray* fMuchDigiMatches; // Output CbmMatch array
+    TClonesArray* fMuchClusterMatches; // Output CbmMatch array
+    TClonesArray* fMuchPixelHitMatches; // Output CbmMatch array
+    TClonesArray* fMuchStrawHitMatches; // Output CbmMatch array
+    TClonesArray* fMuchTrackMatches; // Output CbmMatch array
 
     CbmMatchRecoToMC(const CbmMatchRecoToMC&);
     CbmMatchRecoToMC& operator=(const CbmMatchRecoToMC&);

@@ -51,7 +51,7 @@ public:
     /** Setters */
     void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
 
-    void SetMuchDigiFile(const string& digiFileName) { fMuchDigiFile = digiFileName; }
+    void SetMuchDigiFile(const string& digiFileName) { fMuchDigiFileName = digiFileName; }
 
     void MuchGeoSchemeInit(const TString& digiFileName);
 
@@ -60,6 +60,9 @@ private:
      * \brief Read data branches.
      */
     void ReadDataBranches();
+
+
+    void InitMuchGeoScheme(const string& digiFileName);
 
     void ProcessPoints();
 
@@ -103,7 +106,11 @@ private:
           const string& detName);
 
 
-    void FillTrdResidualAndPullHistograms();
+    void FillResidualAndPullHistograms(
+          const TClonesArray* points,
+          const TClonesArray* hits,
+          const TClonesArray* hitMatches,
+          const string& detName);
 
     void SetMuchClustersArray();
 
@@ -162,10 +169,13 @@ private:
 
     TClonesArray* fMuchPoints; // CbmMuchPoint array
     TClonesArray* fMuchDigis; // CbmMuchDigi array
-    TClonesArray* fMuchDigiMatches;
     TClonesArray* fMuchClusters; // CbmMuchCluster array
     TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
     TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
+    TClonesArray* fMuchDigiMatches; // CbmMatch array
+    TClonesArray* fMuchClusterMatches; // CbmMatch array
+    TClonesArray* fMuchPixelHitMatches; // CbmMatch array
+    TClonesArray* fMuchStrawHitMatches; // CbmMatch array
 
     TClonesArray* fTrdPoints; // CbmTrdPoint array
     TClonesArray* fTrdDigis; // CbmTrdDigi array
@@ -178,8 +188,7 @@ private:
     TClonesArray* fTofPoints; // CbmTofPoint array
     TClonesArray* fTofHits; // CbmTofHit array
 
-    CbmMuchGeoScheme* fMuchGeoScheme;
-    TString fMuchDigiFile;
+    string fMuchDigiFileName;
 
     map<Int_t, Int_t> fBestPoints;
     map<Int_t, Int_t> fBestPointsForHits;

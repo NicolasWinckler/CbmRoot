@@ -907,12 +907,13 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
             isTrdOk = false;
          }
       }
-      const CbmTrackMatch* muchTrackMatch;
+      const CbmTrackMatchNew* muchTrackMatch;
       if (isMuchOk) {
-         muchTrackMatch = static_cast<const CbmTrackMatch*>(fMuchMatches->At(muchId));
-         Int_t nofHits = muchTrackMatch->GetNofTrueHits() + muchTrackMatch->GetNofWrongHits() + muchTrackMatch->GetNofFakeHits();
+         muchTrackMatch = static_cast<const CbmTrackMatchNew*>(fMuchMatches->At(muchId));
+         Int_t nofHits = muchTrackMatch->GetNofHits();
          if (nofHits >= fMinNofHitsMuch) {
-            isMuchOk = CheckTrackQuality(muchTrackMatch, kMUCH);
+            isMuchOk = muchTrackMatch->GetTrueOverAllHitsRatio() >= fQuota;
+            FillTrackQualityHistograms(muchTrackMatch, kMUCH);
             if (!isMuchOk) { // ghost track
                fHM->H1("hng_NofGhosts_Much_Nh")->Fill(nofHits);
             }
@@ -953,7 +954,7 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
       Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1, richMCId = -1;
       if (isStsOk) { stsMCId = stsTrackMatch->GetMCTrackId(); }
       if (isTrdOk) { trdMCId = trdTrackMatch->GetMatchedReferenceId(); }
-      if (isMuchOk) { muchMCId = muchTrackMatch->GetMCTrackId(); }
+      if (isMuchOk) { muchMCId = muchTrackMatch->GetMatchedReferenceId(); }
       if (isTofOk) {
          const CbmBaseHit* tofHit = static_cast<const CbmBaseHit*>(fTofHits->At(tofId));
          const FairMCPoint* tofPoint = static_cast<const FairMCPoint*>(fTofPoints->At(tofHit->GetRefId()));

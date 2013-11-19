@@ -149,7 +149,7 @@ void CbmMuchGeoScheme::InitModules() {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchStation* CbmMuchGeoScheme::GetStation(Int_t iStation) {
+CbmMuchStation* CbmMuchGeoScheme::GetStation(Int_t iStation) const {
   if (!fStations)
     return NULL;
   Bool_t result = (iStation >= 0) || (iStation < fStations->GetEntries());
@@ -158,7 +158,7 @@ CbmMuchStation* CbmMuchGeoScheme::GetStation(Int_t iStation) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchLayer* CbmMuchGeoScheme::GetLayer(Int_t iStation, Int_t iLayer) {
+CbmMuchLayer* CbmMuchGeoScheme::GetLayer(Int_t iStation, Int_t iLayer) const {
   CbmMuchStation* station = GetStation(iStation);
   return station ? station->GetLayer(iLayer) : NULL;
 }
@@ -166,7 +166,7 @@ CbmMuchLayer* CbmMuchGeoScheme::GetLayer(Int_t iStation, Int_t iLayer) {
 
 // -------------------------------------------------------------------------
 CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSide(Int_t iStation, Int_t iLayer,
-    Bool_t iSide) {
+    Bool_t iSide) const {
   CbmMuchLayer* layer = GetLayer(iStation, iLayer);
   return layer ? layer->GetSide(iSide) : NULL;;
 }
@@ -174,14 +174,14 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSide(Int_t iStation, Int_t iLayer,
 
 // -------------------------------------------------------------------------
 CbmMuchModule* CbmMuchGeoScheme::GetModule(Int_t iStation, Int_t iLayer,
-    Bool_t iSide, Int_t iModule) {
+    Bool_t iSide, Int_t iModule) const {
   CbmMuchLayerSide* side = GetLayerSide(iStation, iLayer, iSide);
   return side ? side->GetModule(iModule) : NULL;
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
+CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) const {
   Int_t iStation = CbmMuchAddress::GetStationIndex(detId);
   assert(iStation < GetNStations());
   return GetStation(iStation);
@@ -189,7 +189,7 @@ CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
+CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) const {
   CbmMuchStation* station = GetStationByDetId(detId);
   Int_t iLayer = CbmMuchAddress::GetLayerIndex(detId);
   assert(iLayer < station->GetNLayers());
@@ -198,7 +198,7 @@ CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
+CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) const {
   CbmMuchLayer* layer = GetLayerByDetId(detId);
   Int_t iSide = CbmMuchAddress::GetLayerSideIndex(detId);
   assert(iSide < 2);
@@ -207,7 +207,7 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) {
+CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) const {
   CbmMuchLayerSide* side = GetLayerSideByDetId(detId);
   Int_t iModule = CbmMuchAddress::GetModuleIndex(detId);
   assert(iModule < side->GetNModules());
@@ -285,7 +285,7 @@ void CbmMuchGeoScheme::ClearClusterArrays() {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
+vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) const {
   try
   {
     return fSides.at(iStation);
@@ -311,11 +311,11 @@ vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
 //  return i;
 //}
 
-Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId) {
+Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId) const {
   Int_t sideId = GetLayerSideByDetId(detId)->GetDetectorId();
   if (fMapSides.find(sideId) == fMapSides.end())
     Fatal("GetLayerSideNr", "Wrong side id or no modules in the layer side");
-  return fMapSides[sideId] + 1;
+  return fMapSides.find(sideId)->second + 1;
 }
 // -------------------------------------------------------------------------
 
@@ -789,7 +789,7 @@ Int_t CbmMuchGeoScheme::Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy,
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
+vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules() const {
   vector<CbmMuchModule*> modules;
   for(Int_t iStation =0; iStation < GetNStations(); ++iStation){
     vector<CbmMuchModule*> stationModules = GetModules(iStation);
@@ -805,7 +805,7 @@ vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
 
 
 // -------------------------------------------------------------------------
-vector<CbmMuchModuleGem*> CbmMuchGeoScheme::GetGemModules(){
+vector<CbmMuchModuleGem*> CbmMuchGeoScheme::GetGemModules() const {
   vector<CbmMuchModuleGem*> modules;
   for(Int_t iStation =0; iStation < GetNStations(); ++iStation){
     vector<CbmMuchModule*> stationModules = GetModules(iStation);
@@ -822,7 +822,7 @@ vector<CbmMuchModuleGem*> CbmMuchGeoScheme::GetGemModules(){
 
 
 // -------------------------------------------------------------------------
-vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(Int_t iStation){
+vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(Int_t iStation) const {
   try
   {
     return fModules.at(iStation);

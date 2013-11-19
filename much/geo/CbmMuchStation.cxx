@@ -58,7 +58,7 @@ void CbmMuchStation::AddLayer(CbmMuchLayer* layer) {
 
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchStation::GetTubeDz(){
+Double_t CbmMuchStation::GetTubeDz() const {
   Double_t dzmax=0;
 
   for (Int_t l=0; l<GetNLayers(); l++){

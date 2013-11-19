@@ -61,7 +61,7 @@ class CbmMuchStation : public TObject{
    * Automatic calculation of the half-thickness of the layer as
    * a maximum distance to layer module edges
    */
-  Double_t GetTubeDz();
+  Double_t GetTubeDz() const;
 
  protected:
   Int_t      fDetectorId;       // Unique detector ID

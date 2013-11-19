@@ -114,7 +114,7 @@ void CbmMuchGeoScheme::InitModules() {
     fSides.clear();
     fModules.clear();
     for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
-      CbmMuchStation* station = GetStation(iStation);
+      const CbmMuchStation* station = GetStation(iStation);
       if (!station)  continue;
       assert(iStation == CbmMuchAddress::GetStationIndex(station->GetDetectorId()));
       vector<CbmMuchLayerSide*> sides;
@@ -168,7 +168,7 @@ CbmMuchLayer* CbmMuchGeoScheme::GetLayer(Int_t iStation, Int_t iLayer) const {
 CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSide(Int_t iStation, Int_t iLayer,
     Bool_t iSide) const {
   CbmMuchLayer* layer = GetLayer(iStation, iLayer);
-  return layer ? layer->GetSide(iSide) : NULL;;
+  return layer ? layer->GetSide(iSide) : NULL;
 }
 // -------------------------------------------------------------------------
 

@@ -44,18 +44,18 @@ class CbmMuchLayer : public TObject
   virtual ~CbmMuchLayer();
 
   /** Accessors **/
-  Int_t          GetDetectorId()  const { return fDetectorId; }
-  CbmMuchLayerSide* GetSideF()           { return &fSideF; }
-  CbmMuchLayerSide* GetSideB()           { return &fSideB; }
+  Int_t GetDetectorId()  const { return fDetectorId; }
+  CbmMuchLayerSide* GetSideF() { return &fSideF; }
+  CbmMuchLayerSide* GetSideB() { return &fSideB; }
   CbmMuchLayerSide* GetSide(Bool_t side) { return (side ? &fSideB : &fSideF); }
-  Double_t GetSupportDx()    const { return fSupportDx; }
-  Double_t GetSupportDy()    const { return fSupportDy; }
-  Double_t GetSupportDz()    const { return fSupportDz; }
+  Double_t GetSupportDx() const { return fSupportDx; }
+  Double_t GetSupportDy() const { return fSupportDy; }
+  Double_t GetSupportDz() const { return fSupportDz; }
   void SetSupportDx(Double_t supDx) { fSupportDx = supDx; }
   void SetSupportDy(Double_t supDy) { fSupportDy = supDy; }
   void SetSupportDz(Double_t supDz) { fSupportDz = supDz; }
-  Double_t GetZ() { return fZ; }
-  Double_t GetZtoStationCenter() { return fZtoStationCenter; }
+  Double_t GetZ() const { return fZ; }
+  Double_t GetZtoStationCenter() const { return fZtoStationCenter; }
 
   /*
    * Automatic calculation of the half-thickness of the layer as

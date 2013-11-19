@@ -348,7 +348,7 @@ void CbmMuch::ConstructGeometry() {
 
   // Create stations
   for (Int_t iStation=0;iStation<fGeoScheme->GetNStations();iStation++){
-    CbmMuchStation* station = fGeoScheme->GetStation(iStation);
+    const CbmMuchStation* station = fGeoScheme->GetStation(iStation);
 
     // Check if
     Int_t nLayers = station->GetNLayers();
@@ -406,7 +406,7 @@ void CbmMuch::ConstructGeometry() {
 
       // Create layer sides
       for (Int_t iSide=0;iSide<2;iSide++){
-        CbmMuchLayerSide* side = layer->GetSide(iSide);
+        const CbmMuchLayerSide* side = layer->GetSide(iSide);
         Char_t cside = (iSide==1) ? 'b' : 'f';
 
         // Create modules

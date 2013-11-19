@@ -71,7 +71,7 @@ CbmMuchLayer::~CbmMuchLayer() {
 
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchLayer::GetDz(){
+Double_t CbmMuchLayer::GetDz() {
   Double_t dzmax=fSupportDz;
 
   for (Int_t s=0; s<2; s++){

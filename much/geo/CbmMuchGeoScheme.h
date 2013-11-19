@@ -46,16 +46,16 @@ class CbmMuchGeoScheme: public TObject {
     Bool_t IsInitialized() { return fInitialized; }
 
     // Get geometry objects by indices
-    CbmMuchStation*   GetStation(Int_t iStation) const;
-    CbmMuchLayer*     GetLayer(Int_t iStation, Int_t iLayer) const;
+    CbmMuchStation* GetStation(Int_t iStation) const;
+    CbmMuchLayer* GetLayer(Int_t iStation, Int_t iLayer) const;
     CbmMuchLayerSide* GetLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide) const;
-    CbmMuchModule*    GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule) const;
+    CbmMuchModule* GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule) const;
 
     // Get geometry objects by detector id
-    CbmMuchStation*   GetStationByDetId(Int_t detId) const;
-    CbmMuchLayer*     GetLayerByDetId(Int_t detId) const;
+    CbmMuchStation* GetStationByDetId(Int_t detId) const;
+    CbmMuchLayer* GetLayerByDetId(Int_t detId) const;
     CbmMuchLayerSide* GetLayerSideByDetId(Int_t detId) const;
-    CbmMuchModule*    GetModuleByDetId(Int_t detId) const;
+    CbmMuchModule* GetModuleByDetId(Int_t detId) const;
 
     static Int_t GetStationIndex(Int_t address)   { return CbmMuchAddress::GetElementId(address,kMuchStation);   }
     static Int_t GetLayerIndex(Int_t address)     { return CbmMuchAddress::GetElementId(address,kMuchLayer);     }

@@ -1,4 +1,5 @@
-/** CbmMuchFindHitsStraws.cxx
+/**
+ * \file CbmMuchFindHitsStraws.cxx
  **/
 
 #include "CbmMuchFindHitsStraws.h"
@@ -13,91 +14,36 @@
 #include "FairGeoRotation.h"
 #include "TRandom.h" 
 #include "TVector3.h" 
-#include <iomanip>
+#include "TClonesArray.h"
+
 #include <cassert>
 
-using std::cout;
-using std::endl;
-using std::setw;
-using std::fixed;
-using std::left;
-using std::right;
-using std::setprecision;
-
-// -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsStraws::CbmMuchFindHitsStraws() 
-  : FairTask("MuchFindHits", 1),
-    fGeoScheme( CbmMuchGeoScheme::Instance()),
-    fDigiFile(""),
-    fDigis(NULL),
-    fDigiMatches(NULL),
-    fHits(NULL),
-    fTimer(), 
-    fEffic(0),
-    fMerge(0),
-    fMirror(0),
-    fBinary(1),
-    fPhis()
-{
-  SetPhis(0., 10., -10.);
-}
-// -------------------------------------------------------------------------
-
-// -----   Standard constructor   ------------------------------------------
-CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
-  : FairTask("MuchFindHits", iVerbose), 
-    fGeoScheme( CbmMuchGeoScheme::Instance()),
-    fDigiFile(""),
-    fDigis(NULL),
-    fDigiMatches(NULL),
-    fHits(NULL),
-    fTimer(), 
-    fEffic(0),
-    fMerge(0),
-    fMirror(0),
-    fBinary(1),
-    fPhis()
-{
-  SetPhis(0., 10., -10.);
-}
-// -------------------------------------------------------------------------
-
-// -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiFileName, Int_t iVerbose)
-  : FairTask(name, iVerbose),
+CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* digiFileName)
+  : FairTask("CbmMuchFindHitsStraws"),
     fGeoScheme( CbmMuchGeoScheme::Instance()),
     fDigiFile(digiFileName),
     fDigis(NULL),
     fDigiMatches(NULL),
     fHits(NULL),
-    fTimer(), 
     fEffic(0),
     fMerge(0),
     fMirror(0),
     fBinary(1),
     fPhis()
 {
-  SetPhis(0., 10, -10.);
+   SetPhis(0., 10, -10.);
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
-CbmMuchFindHitsStraws::~CbmMuchFindHitsStraws() {
-  if ( fHits ) {
-    fHits->Delete();
-    delete fHits;
-  }
+CbmMuchFindHitsStraws::~CbmMuchFindHitsStraws()
+{
+   if ( fHits ) {
+      fHits->Delete();
+      delete fHits;
+   }
 }
-// -------------------------------------------------------------------------
 
-
-// -----   Private method SetParContainers   -------------------------------
-void CbmMuchFindHitsStraws::SetParContainers() {
-}
-// -------------------------------------------------------------------------
-
-// -----   Private method Init   -------------------------------------------
-InitStatus CbmMuchFindHitsStraws::Init() {
+InitStatus CbmMuchFindHitsStraws::Init()
+{
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -119,128 +65,110 @@ InitStatus CbmMuchFindHitsStraws::Init() {
 
   return kSUCCESS;
 }
-// -------------------------------------------------------------------------
 
-// -----   Private method ReInit   -----------------------------------------
-InitStatus CbmMuchFindHitsStraws::ReInit() {
-  return kSUCCESS;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method Exec   --------------------------------------------
 void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 {
-  //*
-  // Make hits in straw tubes
+   if (fHits) fHits->Clear();
 
-  fTimer.Start();
-  // Clear output array
-  if(fHits) fHits->Clear();
+   static Int_t first = 1;
+   static Double_t radIn[6];
+   Double_t diam[6] = {0.62, 0.62, 0.62, 0.62, 0.62, 0.62}; // tube diameters
+   Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
+   const Double_t sigmaBin = diam[0] / TMath::Sqrt(12.);
 
-  static Int_t first = 1;
-  static Double_t radIn[6];
-  Double_t diam[6] = {0.62, 0.62, 0.62, 0.62, 0.62, 0.62}; // tube diameters
-  Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
-  //Double_t sigmaX = 0.5, sigmaY = 0.5; // 5mm
-  const Double_t sigmaBin = diam[0] / TMath::Sqrt(12.);
+   Double_t phi[3] = {fPhis[0] * TMath::DegToRad(), fPhis[1] * TMath::DegToRad(), fPhis[2] * TMath::DegToRad()}; // rotation angles of views (doublets)
 
-  Double_t phi[3] = {fPhis[0] * TMath::DegToRad(), fPhis[1] * TMath::DegToRad(), fPhis[2] * TMath::DegToRad()}; // rotation angles of views (doublets)
+   if (first) {
+      // Some initialization - should go somewhere else
+      cout << " Processing straws ... " << endl;
+      first = 0;
+      // Get inner radia of stations
+      Int_t nSt = fGeoScheme->GetNStations();
+      for (Int_t i = 0; i < nSt; ++i) {
+         CbmMuchStation *st = fGeoScheme->GetStation(i);
+         radIn[i] = st->GetRmin();
+         CbmMuchModule *mod = fGeoScheme->GetModule(i,0,0,0);
+         cout << i << " " << radIn[i] << " " << mod->GetSize().X() << " " << mod->GetSize().Y() << " " << mod->GetSize().Z() << " " << mod->GetDetectorType() << endl;
+         if (mod->GetDetectorType() == 2) assert (TMath::Abs(mod->GetSize().Z()-diam[i]) < 0.1); // tube diameter
+      }
+   }
 
-  if (first) {
-    // Some initialization - should go somewhere else
-    cout << " Processing straws ... " << endl;
-    first = 0;
-    // Get inner radia of stations
-    Int_t nSt = fGeoScheme->GetNStations();
-    for (Int_t i = 0; i < nSt; ++i) {
-      CbmMuchStation *st = fGeoScheme->GetStation(i);
-      radIn[i] = st->GetRmin();
-      CbmMuchModule *mod = fGeoScheme->GetModule(i,0,0,0);
-      cout << i << " " << radIn[i] << " " << mod->GetSize().X() << " " << mod->GetSize().Y() << " " << mod->GetSize().Z() << " " << mod->GetDetectorType() << endl;
-      if (mod->GetDetectorType() == 2) assert (TMath::Abs(mod->GetSize().Z()-diam[i]) < 0.1); // tube diameter
-    }
-  }
+   Int_t iarray[5] = {0}, nDigis = fDigis->GetEntriesFast(), nHits = fHits->GetEntriesFast();
+   TVector3 pos, dpos;
+   Double_t xyz[3] = {0}, array[5] = {0};
+   for (Int_t idig = 0; idig < nDigis; ++idig) {
+      CbmMuchStrawDigi *digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(idig);
+      xyz[0] = digi->GetX();
+      xyz[1] = digi->GetY();
+      xyz[2] = digi->GetZ();
+      UInt_t address =  CbmMuchAddress::GetElementAddress(digi->GetAddress(),kMuchModule);
+      Int_t station3 = CbmMuchAddress::GetStationIndex(address);
+      Int_t layer = CbmMuchAddress::GetLayerIndex(address);
+      Int_t side = CbmMuchAddress::GetLayerSideIndex(address);
+      Int_t rot = layer % 3;
+      Double_t plocX =  xyz[0] * TMath::Cos(phi[rot]) + xyz[1] * TMath::Sin(phi[rot]);
+      Double_t plocY = -xyz[0] * TMath::Sin(phi[rot]) + xyz[1] * TMath::Cos(phi[rot]);
+      //    std::cout << "phi=" << phi[rot] << " x=" << xyz[0] << " y=" << xyz[1] << " z=" << xyz[2] << " plocX=" << plocX << " plocY=" << plocY << std::endl;
+      Double_t xloc = plocX;
+      //cout << " Local: " << ploc.getX() << " " << ploc.getY() << " " << ploc.getZ() << endl;
+      if (side) xloc += diam[station3] / 2.; // half-tube shift
+      Int_t itube = (Int_t) (xloc / diam[station3]), iSegment;
+      if (xloc < 0) itube--;
+      Double_t xwire = (itube + 0.5) * diam[station3]; // wire position
+      //cout << itube << " " << layer << " " << side << " " << xloc << " " << xwire << endl;
+      Double_t times[3] = {0};
 
-  Int_t iarray[5] = {0}, nDigis = fDigis->GetEntriesFast(), nHits = fHits->GetEntriesFast();
-  TVector3 pos, dpos;
-  Double_t xyz[3] = {0}, array[5] = {0};
-  for (Int_t idig = 0; idig < nDigis; ++idig) {
-    CbmMuchStrawDigi *digi = (CbmMuchStrawDigi*) fDigis->UncheckedAt(idig);
-    xyz[0] = digi->GetX();
-    xyz[1] = digi->GetY();
-    xyz[2] = digi->GetZ();
-    UInt_t address =  CbmMuchAddress::GetElementAddress(digi->GetAddress(),kMuchModule);
-    Int_t station3 = CbmMuchAddress::GetStationIndex(address);
-    Int_t layer = CbmMuchAddress::GetLayerIndex(address);
-    Int_t side = CbmMuchAddress::GetLayerSideIndex(address);
-    Int_t rot = layer % 3;
-    Double_t plocX =  xyz[0] * TMath::Cos(phi[rot]) + xyz[1] * TMath::Sin(phi[rot]);
-    Double_t plocY = -xyz[0] * TMath::Sin(phi[rot]) + xyz[1] * TMath::Cos(phi[rot]);
-//    std::cout << "phi=" << phi[rot] << " x=" << xyz[0] << " y=" << xyz[1] << " z=" << xyz[2] << " plocX=" << plocX << " plocY=" << plocY << std::endl;
-    Double_t xloc = plocX;
-    //cout << " Local: " << ploc.getX() << " " << ploc.getY() << " " << ploc.getZ() << endl;
-    if (side) xloc += diam[station3] / 2.; // half-tube shift
-    Int_t itube = (Int_t) (xloc / diam[station3]), iSegment;
-    if (xloc < 0) itube--;
-    Double_t xwire = (itube + 0.5) * diam[station3]; // wire position
-    //cout << itube << " " << layer << " " << side << " " << xloc << " " << xwire << endl;
-    Double_t times[3] = {0};
-
-    /* No segmentation outside beam hole region
-    if (TMath::Abs(plocX) < radIn[station3]) {
+      /* No segmentation outside beam hole region
+      if (TMath::Abs(plocX) < radIn[station3]) {
       if (plocY > 0) iSegment = 1;
       else iSegment = -1;
-    } else iSegment = 0;
-    */
-    if (plocY > 0) iSegment = 1;
-    else iSegment = -1;
+      } else iSegment = 0;
+      */
+      if (plocY > 0) iSegment = 1;
+      else iSegment = -1;
 
-    // Global coordinates in rotated coordinate system
-    Double_t errU = gRandom->Gaus(0,sigmaX);
-    Double_t wXY = TMath::Sin(phi[rot]);
-    //cout << station3 << " " << layer << " " << " " << wXY << endl;
+      // Global coordinates in rotated coordinate system
+      Double_t errU = gRandom->Gaus(0,sigmaX);
+      Double_t wXY = TMath::Sin(phi[rot]);
+      //cout << station3 << " " << layer << " " << " " << wXY << endl;
 
-    pos.SetXYZ(xyz[0], xyz[1], xyz[2]);
-    dpos.SetXYZ(sigmaX, sigmaY, 0.);
+      pos.SetXYZ(xyz[0], xyz[1], xyz[2]);
+      dpos.SetXYZ(sigmaX, sigmaY, 0.);
 
-    //CbmMuchStrawHit(detectorId,u,phi,z,du,dphi,dz,refId,planeId);
-    //cout << " Local: " << ploc.getX()+errU << " " << ploc.getY() << " " << ploc.getZ() << endl;
-    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(address,
-			   plocX + errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0,
-                           idig, fGeoScheme->GetLayerSideNr(address));
-    hit->SetX(pos[0]);
-    hit->SetY(pos[1]);
-    hit->SetTube(itube);
-    hit->SetSegment(iSegment);
-    //hit->SetZ(fGeoScheme->GetLayerSideByDetId(detId)->GetZ());
-    iarray[0] = station3;
-    iarray[1] = itube;
-    array[0] = xwire - diam[station3] / 2. * side; // Xwire in global system
-    array[1] = xloc - xwire; // drift distance
-    array[2] = array[1] + errU; // drift distance with error
-    hit->SetDouble(3, array);
-    hit->SetInt(2, iarray);
-    hit->SetFlag(0);
-    if (fBinary) {
-      hit->SetU (array[0]);
-      hit->SetDu (sigmaBin);
-    }
-  }
-  //*/
+      //CbmMuchStrawHit(detectorId,u,phi,z,du,dphi,dz,refId,planeId);
+      //cout << " Local: " << ploc.getX()+errU << " " << ploc.getY() << " " << ploc.getZ() << endl;
+      CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(address,
+            plocX + errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0,
+               idig, fGeoScheme->GetLayerSideNr(address));
+      hit->SetX(pos[0]);
+      hit->SetY(pos[1]);
+      hit->SetTube(itube);
+      hit->SetSegment(iSegment);
+      //hit->SetZ(fGeoScheme->GetLayerSideByDetId(detId)->GetZ());
+      iarray[0] = station3;
+      iarray[1] = itube;
+      array[0] = xwire - diam[station3] / 2. * side; // Xwire in global system
+      array[1] = xloc - xwire; // drift distance
+      array[2] = array[1] + errU; // drift distance with error
+      hit->SetDouble(3, array);
+      hit->SetInt(2, iarray);
+      hit->SetFlag(0);
+      if (fBinary) {
+         hit->SetU (array[0]);
+         hit->SetDu (sigmaBin);
+      }
+   }
 
-  // Apply inefficiency (currently inside tube walls)
-  if (fEffic) Effic(diam);
-  // Merge hits inside the same tube
-  if (fMerge) Merge();
-  // Add mirror hits (left/right ambiguity)
-  if (fMirror) Mirror();
+   // Apply inefficiency (currently inside tube walls)
+   if (fEffic) Effic(diam);
+   // Merge hits inside the same tube
+   if (fMerge) Merge();
+   // Add mirror hits (left/right ambiguity)
+   if (fMirror) Mirror();
 
-  fTimer.Stop();
-  cout << "+ ";
-  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-       << fixed << right << fTimer.RealTime()
-       << " s, digis " << fDigis->GetEntriesFast() << ", hits: "
-       << fHits->GetEntriesFast() << endl;
+   static Int_t eventNo = 0;
+   LOG(INFO) << "CbmMuchFindHitsStraws::Exec eventNo=" << eventNo << " hits="
+            << fHits->GetEntriesFast() << " digis=" << fDigis->GetEntriesFast() << FairLogger::endl;
 }
 // -------------------------------------------------------------------------
 
@@ -248,38 +176,36 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 // ---------   Private method Effic   -------------------------------
 void CbmMuchFindHitsStraws::Effic(Double_t *diam) 
 {
-  // Apply straw inefficiency (currently inside tube walls)
+   // Apply straw inefficiency (currently inside tube walls)
 
-  Int_t nHits = fHits->GetEntriesFast();
-  for (Int_t ihit = 0; ihit < nHits; ++ihit) {
-    CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
+   Int_t nHits = fHits->GetEntriesFast();
+   for (Int_t ihit = 0; ihit < nHits; ++ihit) {
+      CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
 
-    // Apply inefficiency
-    Double_t drift = hit->GetDouble()[1];
-    Int_t station = hit->GetInt()[0];
-    //cout << drift << " " << diam[station]/2 << endl;
-    if (TMath::Abs(drift) < diam[station]/2-0.01) continue; // outside tube wall
-    fHits->RemoveAt(ihit);
-  }
-  fHits->Compress();
-  cout << " *** Effic - Number of original hits: " << nHits << endl;
-  cout << " *** Effic - Number of efficiency corrected hits: " << fHits->GetEntriesFast() << endl;
+      // Apply inefficiency
+      Double_t drift = hit->GetDouble()[1];
+      Int_t station = hit->GetInt()[0];
+      if (TMath::Abs(drift) < diam[station]/2-0.01) continue; // outside tube wall
+      fHits->RemoveAt(ihit);
+   }
+   fHits->Compress();
+   LOG(INFO) << "CbmMuchFindHitsStraws::Effic hits=" << nHits << " corrected hits="
+         << fHits->GetEntriesFast() << FairLogger::endl;
 }
 
 // ---------   Private method Merge   -----------------------------
 void CbmMuchFindHitsStraws::Merge() 
 {
-  // Merge hits inside the same tube
+   // Merge hits inside the same tube
+   Int_t nHits = fHits->GetEntriesFast();
+   for (Int_t ihit = 0; ihit < nHits; ++ihit) {
+      CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
+      if (hit == 0x0) continue;
+      Double_t drift = TMath::Abs (hit->GetDouble()[1]);
+      CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
+      //CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(ihit);
 
-  Int_t nHits = fHits->GetEntriesFast();
-  for (Int_t ihit = 0; ihit < nHits; ++ihit) {
-    CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
-    if (hit == 0x0) continue;
-    Double_t drift = TMath::Abs (hit->GetDouble()[1]);
-    CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
-    //CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(ihit);
-
-    for (Int_t jhit = ihit+1; jhit < nHits; ++jhit) {
+      for (Int_t jhit = ihit+1; jhit < nHits; ++jhit) {
       CbmMuchStrawHit *hit1 = (CbmMuchStrawHit*) fHits->UncheckedAt(jhit);
       if (hit1 == 0x0) continue;
 
@@ -292,47 +218,42 @@ void CbmMuchFindHitsStraws::Merge()
       //CbmMuchDigiMatch *digiM1 = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(jhit);
       //cout << jhit << " " << hit1->GetRefId() << endl;
       if (drift < drift1) {
-	fHits->RemoveAt(jhit);
-        Int_t nPoints = digiM1->GetNofReferences();
-        for (Int_t j = 0; j < nPoints; ++j) {
-	  hit->SetFlag(hit->GetFlag()+(1<<1)); // increase overlap multiplicity
-	  digiM->AddReference(digiM1->GetMatchedReferenceId()); // add point
-	}
+         fHits->RemoveAt(jhit);
+         Int_t nPoints = digiM1->GetNofReferences();
+         for (Int_t j = 0; j < nPoints; ++j) {
+            hit->SetFlag(hit->GetFlag()+(1<<1)); // increase overlap multiplicity
+            digiM->AddReference(digiM1->GetMatchedReferenceId()); // add point
+         }
       } else {
-	fHits->RemoveAt(ihit);
-        Int_t nPoints = digiM->GetNofReferences();
-        for (Int_t j = 0; j < nPoints; ++j) {
-	  hit1->SetFlag(hit1->GetFlag()+(1<<1)); 
-	  digiM1->AddReference(digiM->GetMatchedReferenceId());
-	}
-	break;
+         fHits->RemoveAt(ihit);
+         Int_t nPoints = digiM->GetNofReferences();
+         for (Int_t j = 0; j < nPoints; ++j) {
+            hit1->SetFlag(hit1->GetFlag()+(1<<1));
+            digiM1->AddReference(digiM->GetMatchedReferenceId());
+         }
+         break;
       }
-    }
-  }
-  fHits->Compress();
-  cout << " *** Merge - Number of original hits: " << nHits << endl;
-  cout << " *** Merge - Number of merged hits: " << fHits->GetEntriesFast() << endl;
+      }
+   }
+   fHits->Compress();
+   LOG(INFO) << "CbmMuchFindHitsStraws::Merge hits=" << nHits << " merged hits="
+         << fHits->GetEntriesFast() << FairLogger::endl;
 }
 
-// ---------   Private method Mirror   ----------------------------
 void CbmMuchFindHitsStraws::Mirror() 
 {
-  // Add mirror hits (left/right ambiguity)
-
-  Int_t nHits0 = fHits->GetEntriesFast();
-  Int_t nHits = nHits0;
-  for (Int_t ihit = 0; ihit < nHits0; ++ihit) {
-    CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
-
-    // Add mirror hit
-    Double_t xwire = hit->GetDouble()[0];
-    Double_t drift = hit->GetDouble()[2];
-    CbmMuchStrawHit *hitM = new ((*fHits)[nHits++]) CbmMuchStrawHit(*hit);
-    hitM->SetU(hit->GetU()-2*drift);
-    hitM->SetFlag(hitM->GetFlag()+1); // flag mirror hit
-    //cout << " Mirror: " << hit->GetU() << " " << xwire << " " << hitM->GetU() << endl;
-  }
+   // Add mirror hits (left/right ambiguity)
+   Int_t nHits0 = fHits->GetEntriesFast();
+   Int_t nHits = nHits0;
+   for (Int_t ihit = 0; ihit < nHits0; ++ihit) {
+      CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
+      // Add mirror hit
+      Double_t xwire = hit->GetDouble()[0];
+      Double_t drift = hit->GetDouble()[2];
+      CbmMuchStrawHit *hitM = new ((*fHits)[nHits++]) CbmMuchStrawHit(*hit);
+      hitM->SetU(hit->GetU()-2*drift);
+      hitM->SetFlag(hitM->GetFlag()+1); // flag mirror hit
+   }
 }
-// -------------------------------------------------------------------------
 
 ClassImp(CbmMuchFindHitsStraws)

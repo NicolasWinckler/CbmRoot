@@ -15,11 +15,11 @@ void run_reco(Int_t nEvents = 1000)
 	TString deltaFile = "";
 
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
+   TObjString stsDigiFile = parDir + "/sts/sts_v13c_std.digi.par"; // STS digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13p_3e.digi.par"; // TRD digi file
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par"; // TRD digi file
 
-   TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
+   TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v13c.root"; // Material budget file for L1 STS tracking
 
    TString resultDir = "recqa/";
    Double_t trdAnnCut = 0.85;
@@ -179,8 +179,28 @@ void run_reco(Int_t nEvents = 1000)
     // CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
       CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , "H++");
 
-      CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
-      run->AddTask(trdHitProd);
+    /*  if (trdHitProducerType == "smearing") {
+         CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
+         trdHitProd->SetUseDigiPar(false);
+         run->AddTask(trdHitProd);
+      } else if (trdHitProducerType == "digi") {
+         CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(radiator);
+         run->AddTask(trdDigitizer);
+
+         CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi();
+         run->AddTask(trdHitProd);
+      } else if (trdHitProducerType == "clustering") {*/
+         // ----- TRD clustering -----
+         CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF("TrdDigiPrf","TRD digi prf",radiator);
+         run->AddTask(trdDigiPrf);
+
+         CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
+         run->AddTask(trdCluster);
+
+         CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
+         run->AddTask(trdHit);
+         // ----- End TRD Clustering -----
+      //}
 	}// isTRD
 
 	// =========================================================================
@@ -208,20 +228,9 @@ void run_reco(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	if (IsTrd(parFile)) {
-		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
-		run->AddTask(trdMatchTracks);
-
-		//CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
-		//		new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
-		//run->AddTask(trdSetTracksPidTask);
-
 		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
       trdSetTracksPidAnnTask->SetTRDGeometryType("h++");
 		run->AddTask(trdSetTracksPidAnnTask);
-
-		//CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask =
-		//		new CbmTrdSetTracksPidLike("CbmTrdSetTracksPidLike","CbmTrdSetTracksPidLike");
-		//run->AddTask(trdSetTracksPidLikeTask);
 	}//isTrd
 
     // =========================================================================
@@ -244,6 +253,9 @@ void run_reco(Int_t nEvents = 1000)
       run->AddTask(matchRings);
 
 	}//isRich
+
+	CbmMatchRecoToMC* match = new CbmMatchRecoToMC();
+	run->AddTask(match);
 
    // Reconstruction Qa
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
@@ -280,9 +292,9 @@ void run_reco(Int_t nEvents = 1000)
    fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
 
-   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
+  /* CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);
+   run->AddTask(clusteringQa);*/
 
 
 

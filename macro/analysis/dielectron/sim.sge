@@ -1,7 +1,7 @@
 #$ -wd /tmp 
 #$ -j y
 # Number of subtasks to start
-#$ -t 1-200
+#$ -t 1-250
 
 #XXXXX=$(printf "%05d" "1")
 #XXXX=$(printf "%04d" "1")
@@ -9,7 +9,7 @@ XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
 # specify input and output directories
-outdir=/hera/cbm/users/slebedev/mc/dielectron/sep13/${coll_energy}/${trd}/${field_scale}field/${mvd}/${pluto_particle}/
+outdir=/hera/cbm/users/slebedev/mc/dielectron/nov13/${coll_energy}/${trd}/${field_scale}field/${mvd}/${pluto_particle}/
 cbmroot_config_path=/hera/cbm/users/slebedev/trunk/build/config.sh
 macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
 
@@ -54,15 +54,14 @@ export URQMD=yes
 export PLUTO=yes
 #Collision energy: 25gev or 8gev -> set proper weight into analysis
 export ENERGY=${coll_energy}
-if [ ${coll_energy} = "8gev" ] ; then
-   export ENERGY=10gev
-elif [ ${coll_energy} = "25gev" ]; then
-   export ENERGY=25gev 
-fi
+#if [ ${coll_energy} = "8gev" ] ; then
+#   export ENERGY=10gev
+#elif [ ${coll_energy} = "25gev" ]; then
+#   export ENERGY=25gev 
+#fi
 
 #Geometries
 export CAVE_GEOM=cave.geo
-export TARGET_GEOM=target/target_au_025mu.geo
 export PIPE_GEOM=pipe/pipe_standard.geo
 if [ ${mvd} = "mvd4" ] ; then
    export MVD_GEOM=mvd/mvd_Nov_2012.geo
@@ -71,15 +70,15 @@ elif [ ${mvd} = "nomvd" ]; then
 elif [ ${mvd} = "mvd" ]; then
    export MVD_GEOM=mvd/mvd_v08a.geo
 fi
-export STS_GEOM=sts/sts_v12b.geo.root
-export STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
-export STS_MATERIAL_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
+export STS_GEOM=sts/sts_v13c.geo.root
+export STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
+export STS_MATERIAL_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
 export RICH_GEOM=rich/rich_v08a.geo
 
 #Set TRD geometry
 if [ ${trd} = "trd" ] ; then
-    export TRD_GEOM=trd/trd_v13g.geo.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13g.digi.par
+    export TRD_GEOM=trd/trd_v13p_3e.geo.root
+    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13p_3e.digi.par
     export TRD_ANN_CUT=0.85
     export MIN_NOF_POINTS_TRD=6
 elif [ ${trd} = "notrd" ] ; then
@@ -98,13 +97,13 @@ elif [ ${trd} = "trd3" ] ; then
     export TRD_ANN_CUT=-0.2
     export MIN_NOF_POINTS_TRD=2
 elif [ ${trd} = "trd4" ] ; then
-    export TRD_GEOM=trd/trd_v13k.geo.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13k.digi.par
+    export TRD_GEOM=trd/trd_v13p_1e.geo.root
+    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13p_1e.digi.par
     export TRD_ANN_CUT=-0.1
     export MIN_NOF_POINTS_TRD=2
 fi
 
-export TOF_GEOM=tof/tof_v13b.root
+export TOF_GEOM=tof/tof_v13b.geo.root
 export TOF_DIGI=${VMCWORKDIR}/parameters/trd/tof_v13b.digi.par
 
 export FIELD_MAP=field_v12a
@@ -119,20 +118,20 @@ export PLUTO_PARTICLE=${pluto_particle}
 export PLUTO=yes
 
 if [ ${pluto_particle} = "rho0" ] ; then 
-  # export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/rho/epem/pluto.auau.${ENERGY}.rho.epem.${XXXX}.root
-    export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/ekrebs/pluto/cktA/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
+  #  export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/rho0/epem/pluto.auau.${ENERGY}.rho0.epem.${XXXX}.root
 elif [ ${pluto_particle} = "omegaepem" ] ; then 
- #  export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
-    export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/ekrebs/pluto/cktA/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
+ #   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/omega/epem/pluto.auau.${ENERGY}.omega.epem.${XXXX}.root
 elif [ ${pluto_particle} = "omegadalitz" ] ; then 
- #  export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
-    export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/ekrebs/pluto/cktA/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
+ #   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/omega/pi0epem/pluto.auau.${ENERGY}.omega.pi0epem.${XXXX}.root
 elif [ ${pluto_particle} = "phi" ] ; then 
- #  export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
-    export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/ekrebs/pluto/cktA/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
+ #   export PLUTO_FILE=/hera/cbm/users/slebedev/mc/pluto/auau/${ENERGY}/phi/epem/pluto.auau.${ENERGY}.phi.epem.${XXXX}.root
 elif [ ${pluto_particle} = "pi0" ] ; then 
- #  export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/pi0/gepem/pluto.auau.${ENERGY}.pi0.gepem.${XXXX}.root
-    export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/pi0/gepem/pluto.auau.${ENERGY}.pi0.gepem.${XXXX}.root
+   export PLUTO_FILE=/hera/cbm/users/ekrebs/pluto/cktA/${ENERGY}/pi0/gepem/pluto.auau.${ENERGY}.pi0.gepem.${XXXX}.root
+ #   export PLUTO_FILE=/hera/hades/user/ekrebs/cbm/pluto/auau/${ENERGY}/pi0/gepem/pluto.auau.${ENERGY}.pi0.gepem.${XXXX}.root
 elif [ ${pluto_particle} = "urqmd" ] ; then 
    export PLUTO=no
 fi 

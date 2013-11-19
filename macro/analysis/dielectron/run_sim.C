@@ -11,13 +11,12 @@ void run_sim(Int_t nEvents = 1000)
 
 
 	TString caveGeom = "cave.geo";
-	TString targetGeom = "target/target_au_025mu.geo";
 	TString pipeGeom = "pipe/pipe_standard.geo";
 	TString mvdGeom = "";//"mvd/mvd_v08a.geo";
-	TString stsGeom = "sts/sts_v12b.geo.root";
+	TString stsGeom = "sts/sts_v13c.geo.root";
 	TString richGeom = "rich/rich_v08a.geo";
-	TString trdGeom = "trd/trd_v13g.geo.root";
-	TString tofGeom = "tof/tof_v13b.root";
+	TString trdGeom = "trd/trd_v13p_3e.geo.root";
+	TString tofGeom = "tof/tof_v13b.geo.root";
 	TString fieldMap = "field_v12a";
 	TString magnetGeom = "magnet/magnet_v12a.geo";
 
@@ -38,7 +37,7 @@ void run_sim(Int_t nEvents = 1000)
 		mcFile = TString(gSystem->Getenv("MC_FILE"));
 
 		caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
-		targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
+		//targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
 		pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
 		mvdGeom = TString(gSystem->Getenv("MVD_GEOM"));
 		stsGeom = TString(gSystem->Getenv("STS_GEOM"));
@@ -85,11 +84,8 @@ void run_sim(Int_t nEvents = 1000)
 		fRun->AddModule(pipe);
 	}
 
-	if ( targetGeom != "" ) {
-		FairModule* target = new CbmTarget("Target");
-		target->SetGeometryFileName(targetGeom);
-		fRun->AddModule(target);
-	}
+   CbmTarget* target = new CbmTarget("Gold", 0.0025); // 25 mum
+   fRun->AddModule(target);
 
 	if ( magnetGeom != "" ) {
 		FairModule* magnet = new CbmMagnet("MAGNET");

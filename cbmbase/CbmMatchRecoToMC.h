@@ -51,12 +51,12 @@ private:
           const TClonesArray* clusters,
           TClonesArray* clusterMatches);
 
-    void MatchHitsClustering(
-          const TClonesArray* clusterMatches,
+    void MatchHits(
+          const TClonesArray* matches,
           const TClonesArray* hits,
           TClonesArray* hitMatches);
 
-    void MatchHitsSmearing(
+    void MatchHitsToPoints(
           const TClonesArray* points,
           const TClonesArray* hits,
           TClonesArray* hitMatches);
@@ -83,12 +83,14 @@ private:
 
     // MUCH
     TClonesArray* fMuchPoints; // CbmMuchPoint array
-    TClonesArray* fMuchDigis; // CbmMuchDigi array
+    TClonesArray* fMuchPixelDigis; // CbmMuchDigi array
+    TClonesArray* fMuchStrawDigis; // CbmMuchStrawDigi array
     TClonesArray* fMuchClusters; // CbmMuchCluster array
     TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
     TClonesArray* fMuchStrawHits; // CbmMuchStrawHit array
     TClonesArray* fMuchTracks; // CbmMuchTrack array
-    TClonesArray* fMuchDigiMatches; // Output CbmMatch array
+    TClonesArray* fMuchPixelDigiMatches; // Output CbmMatch array
+    TClonesArray* fMuchStrawDigiMatches; // Output CbmMatch array
     TClonesArray* fMuchClusterMatches; // Output CbmMatch array
     TClonesArray* fMuchPixelHitMatches; // Output CbmMatch array
     TClonesArray* fMuchStrawHitMatches; // Output CbmMatch array

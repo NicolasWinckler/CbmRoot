@@ -47,28 +47,12 @@ private:
     */
    string PrintNofObjects() const;
 
-   string PrintMuchAcuracy() const;
-
    void DrawNofObjectsHistograms(
       const string& detName,
       const string& parameter);
 
    void DrawResidualsAndPulls(
       const string& detName);
-
-   void DrawLogYHistogramsByPattern(
-            const string& histNamePattern);
-
-   void DrawHistogramsByLayer(const string& histNamePattern, const string& histName);
-
-   void DrawNofObjectsHistigrams(
-         const string& histNamePatternPixelHits,
-         const string& histNamePatternPoints,
-         const string& histNamePatternClusters,
-         const string& histNamePatternDigis,
-         const string& histName);
-
-   void DrawResidualHistogrms();
 
    void ScaleAndShrinkHistograms();
 

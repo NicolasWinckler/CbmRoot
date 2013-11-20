@@ -51,34 +51,50 @@ public:
     /** Setters */
     void SetOutputDir(const string& outputDir) { fOutputDir = outputDir; }
 
-    void SetMuchDigiFile(const string& digiFileName) { fMuchDigiFileName = digiFileName; }
+    void SetMuchDigiFileName(const string& digiFileName) { fMuchDigiFileName = digiFileName; }
 
-    void MuchGeoSchemeInit(const TString& digiFileName);
+ //   void MuchGeoSchemeInit(const TString& digiFileName);
 
 private:
+
+    Int_t GetStationId(
+          Int_t address,
+          DetectorId detId);
+
     /**
      * \brief Read data branches.
      */
     void ReadDataBranches();
 
-
     void InitMuchGeoScheme(const string& digiFileName);
 
-    void ProcessPoints();
+    void ProcessPoints(
+          const TClonesArray* points,
+          const string& detName,
+          DetectorId detId);
 
-    void ProcessDigis();
+    void ProcessDigis(
+          const TClonesArray* digis,
+          const TClonesArray* digiMatches,
+          const string& detName,
+          DetectorId detId);
 
-    void ProcessClusters();
+    void ProcessClusters(
+          const TClonesArray* clusters,
+          const TClonesArray* clusterMatches,
+          const string& detName,
+          DetectorId detId);
 
-    /**
-     * \brief Calculate statistics for hits.
-     */
-    void ProcessHits();
+    void ProcessHits(
+          const TClonesArray* hits,
+          const TClonesArray* hitMatches,
+          const string& detName,
+          DetectorId detId);
 
     /**
      *
      */
-    void IncreaseCounters();
+    void FillEventCounterHistograms();
 
     /**
      *
@@ -105,45 +121,45 @@ private:
           DetectorId detId,
           const string& detName);
 
-
     void FillResidualAndPullHistograms(
           const TClonesArray* points,
           const TClonesArray* hits,
           const TClonesArray* hitMatches,
-          const string& detName);
+          const string& detName,
+          DetectorId detId);
 
-    void SetMuchClustersArray();
-
-    void CreateMuchHistograms();
-    void CreateSingleLayerHistogram(Int_t nStation, Int_t nLayer,
-    		const string& histName, const string& histNameX, const string& histNameY, Int_t nofBins, Double_t minX, Double_t maxX);
-
-    void FillMuchHistograms();
-    void FillMuchClusterQualityHistogram();
-    void FillMuchClusterQuality2DHistogram();
-    void FillMuchMCPointsInClusterHistogrm();
-    void FillMuchMCPointsInCluster2DHistogrm();
-    void FillMuchMCPointsByDigiHistogram();
-    void FillMuchMCPointsByDigi2DHistogram();
-
-    void FillMuchResidualHistograms();
-
-    void FillMuchAccuracyHistograms();
-
-    void FillMuchPixelHitsHistogram();
-    void FillMuchPointsHistogram();
-    void FillMuchClustersHistogram();
-    void FillMuchDigisHistogram();
-
-    void FillDigiByPointHistogrm();
-
-    void FillDigiByPointDistributionHistogrm();
-    void FillPointsInDigiDistributionHistogrm();
-    void FillDigisInClusterDistributionHistogrm();
-
-    Float_t CalculateMuchClusterToPointRatio(Int_t nCluster, Int_t nPoint);
-    Float_t CalculateMuchDigisToClusterRatio(Int_t nCluster, Int_t nPoint);
-    Int_t GetNofPointsInCluster(Int_t nCluster);
+//    void SetMuchClustersArray();
+//
+//    void CreateMuchHistograms();
+//    void CreateSingleLayerHistogram(Int_t nStation, Int_t nLayer,
+//    		const string& histName, const string& histNameX, const string& histNameY, Int_t nofBins, Double_t minX, Double_t maxX);
+//
+//    void FillMuchHistograms();
+//    void FillMuchClusterQualityHistogram();
+//    void FillMuchClusterQuality2DHistogram();
+//    void FillMuchMCPointsInClusterHistogrm();
+//    void FillMuchMCPointsInCluster2DHistogrm();
+//    void FillMuchMCPointsByDigiHistogram();
+//    void FillMuchMCPointsByDigi2DHistogram();
+//
+//    void FillMuchResidualHistograms();
+//
+//    void FillMuchAccuracyHistograms();
+//
+//    void FillMuchPixelHitsHistogram();
+//    void FillMuchPointsHistogram();
+//    void FillMuchClustersHistogram();
+//    void FillMuchDigisHistogram();
+//
+//    void FillDigiByPointHistogrm();
+//
+//    void FillDigiByPointDistributionHistogrm();
+//    void FillPointsInDigiDistributionHistogrm();
+//    void FillDigisInClusterDistributionHistogrm();
+//
+//    Float_t CalculateMuchClusterToPointRatio(Int_t nCluster, Int_t nPoint);
+//    Float_t CalculateMuchDigisToClusterRatio(Int_t nCluster, Int_t nPoint);
+//    Int_t GetNofPointsInCluster(Int_t nCluster);
 
 
     CbmHistManager* fHM; // Histogram manager
@@ -190,8 +206,8 @@ private:
 
     string fMuchDigiFileName;
 
-    map<Int_t, Int_t> fBestPoints;
-    map<Int_t, Int_t> fBestPointsForHits;
+//    map<Int_t, Int_t> fBestPoints;
+//    map<Int_t, Int_t> fBestPointsForHits;
 
     CbmLitClusteringQa(const CbmLitClusteringQa&);
     CbmLitClusteringQa& operator=(const CbmLitClusteringQa&);

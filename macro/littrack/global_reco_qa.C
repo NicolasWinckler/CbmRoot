@@ -127,7 +127,7 @@ void global_reco_qa(Int_t nEvents = 100,
   // trackingQa->SetTrackCategories(trackCategories);
   // trackingQa->SetRingCategories(ringCategories);
    trackingQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(trackingQa);
+ //  run->AddTask(trackingQa);
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();
    fitQa->SetMvdMinNofHits(0);
@@ -138,7 +138,7 @@ void global_reco_qa(Int_t nEvents = 100,
   // run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-   clusteringQa->SetMuchDigiFile(muchDigiFile.Data());
+   clusteringQa->SetMuchDigiFileName(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
    run->AddTask(clusteringQa);
 

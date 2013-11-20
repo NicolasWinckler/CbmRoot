@@ -84,6 +84,7 @@ reco/CbmTrdClusterFinderFast.cxx
 reco/CbmTrdHitProducerCluster.cxx
 #reco/CbmTrdSimpleHitProducerCluster.cxx
 
+tools/CbmTrdUtils.cxx
 tools/CbmTrdElectronsTrainAnn.cxx
 tools/CbmTrdGeoHandler.cxx
 

@@ -761,126 +761,79 @@ void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
     delete c;
   }
 
-  //--------------------------------------------------------------------
-  void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
-  {
-    //cout << "----------addCluster----------" << endl;
-    ClusterSum = 0;
-    Float_t Charge;
-    Float_t qMax;
-    Float_t deltaCharge;
-    Float_t preDelta;
-    Int_t modCounter = 0;
-    for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) {
+//--------------------------------------------------------------------
+void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
+{
+   ClusterSum = 0;
+   Float_t deltaCharge;
+   Float_t preDelta;
+   Int_t modCounter = 0;
+   for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) {
       modCounter++;
       Int_t cluCounter = 0;
-      //cout << " module:" << iMod->first << "  " << modCounter << "/" << fModClusterMap.size() << endl;
       for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) {
-	cluCounter++;
-	//cout << "   cluster:" << cluCounter << "/" << (*iCluster)->size() << endl;
-	ClusterSum++;
-	//std::vector<Int_t> digiIndices( 3/*(*iCluster)->size()*/ ); // andrey
-	std::vector<Int_t> digiIndices( (*iCluster)->size() );
-	Int_t idigi = 0;
-	Int_t i = 1;
-	Charge = 0;
-	qMax = 0;
-	deltaCharge = 0;
-	preDelta = 0;
-	MyDigiList::iterator lastDigi = (*iCluster)->begin();
-	MyDigiList::iterator nextDigi = (*iCluster)->begin();
-	for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) {
-	  if (fMultiHit){
-	    if (idigi < (*iCluster)->size()-1) {
-	      nextDigi++;
-	    }
-	    if (nextDigi != (*iCluster)->end()) {
-	      //cout << (*iDigi)->charge << " " << (*nextDigi)->charge << "    ";
-	      deltaCharge = (*nextDigi)->charge - (*iDigi)->charge;
-	      if (preDelta >= 0 && deltaCharge <= 0) { // local maximum in charge distribution
-		//cout << "pre" << preDelta << " delta" << deltaCharge << endl;
-		//cout << (*lastDigi)->charge << " " << (*iDigi)->charge << " " << (*nextDigi)->charge << endl;
-		i = 1;
-		if ((*lastDigi) != (*iDigi))
-		  i++;
-		if ((*nextDigi) != (*iDigi))
-		  i++;
+         cluCounter++;
+         ClusterSum++;
+         std::vector<Int_t> digiIndices( (*iCluster)->size() );
+         Int_t idigi = 0;
+         Int_t i = 1;
+         deltaCharge = 0;
+         preDelta = 0;
+         MyDigiList::iterator lastDigi = (*iCluster)->begin();
+         MyDigiList::iterator nextDigi = (*iCluster)->begin();
+         for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) {
+            if (fMultiHit) {
+               if (idigi < (*iCluster)->size()-1) {
+                  nextDigi++;
+               }
+               if (nextDigi != (*iCluster)->end()) {
+                  deltaCharge = (*nextDigi)->charge - (*iDigi)->charge;
+                  if (preDelta >= 0 && deltaCharge <= 0) { // local maximum in charge distribution
+                     i = 1;
+                     if ((*lastDigi) != (*iDigi)) i++;
+                     if ((*nextDigi) != (*iDigi)) i++;
 
-		digiIndices.resize(i, 0.); // andrey
-		//		    digiIndices.Reset();
-		//		    digiIndices.Set(i);
+                     digiIndices.resize(i, 0.);
 
-		i = 0;
-		if ((*lastDigi) != (*iDigi)){
-		  digiIndices[i] = (*lastDigi)->digiId; // andrey
-		  //		      digiIndices.SetAt((*lastDigi)->digiId,i);
-		  Charge += (*lastDigi)->charge;
-		  i++;
-		}
+                     i = 0;
+                     if ((*lastDigi) != (*iDigi)){
+                        digiIndices[i] = (*lastDigi)->digiId;
+                        i++;
+                     }
 
-		digiIndices[i] = (*iDigi)->digiId; // andrey
-		//		    digiIndices.SetAt((*iDigi)->digiId,i);
-		Charge += (*iDigi)->charge;
-		i++;
- 
-		if ((*nextDigi) != (*iDigi)) {
-		  digiIndices[i] = (*nextDigi)->digiId; // andrey
-		  //		      digiIndices.SetAt((*nextDigi)->digiId,i);
-		  Charge += (*nextDigi)->charge;
-		}
+                     digiIndices[i] = (*iDigi)->digiId;
+                     i++;
 
-		qMax = (*iDigi)->charge;
+                     if ((*nextDigi) != (*iDigi)) {
+                        digiIndices[i] = (*nextDigi)->digiId;
+                     }
 
-		TClonesArray& clref = *fClusters;
-		Int_t size = clref.GetEntriesFast();
-
-		CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
-		cluster->SetDigis(digiIndices);
-		//cluster->SetCharge(Charge);
-		//cluster->SetMaxCharge(qMax);
-		digiIndices.clear();
-		//digiIndices.Reset();
-		//digiIndices.Set(3);
-		Charge = 0;
-		   
-	      }
-	      preDelta = deltaCharge;	     
-	      lastDigi = iDigi;
-	    }
-	    //cout << endl;
-	  } else {
-	    digiIndices[idigi] = (*iDigi)->digiId; // andrey
-
-	    //cout << "    fill digiIndices:" << idigi << "  "  << (*iDigi)->digiId << " size:" << digiIndices.size() <<  endl;
-	    //digiIndices.SetAt((*iDigi)->digiId,idigi);
-	    Charge += (*iDigi)->charge;
-	
-	    if (qMax < (*iDigi)->charge)
-	      {
-		qMax = (*iDigi)->charge;
-		//cout << "    new qMax:" <<  qMax << endl;
-	      }
-	  }
-	  idigi++;
-	}	 	  
-	if (!fMultiHit){
-	  //	cout << "2" << endl;
-	  TClonesArray& clref = *fClusters;
-	  Int_t size = clref.GetEntriesFast();
-	  //cout << "    size:" << size << endl;
-	  CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster(); // andrey
-	  //cout << "    vector:" << digiIndices.size() << endl;
-	  cluster->SetDigis(digiIndices); // andrey
-	  //cout << "test" << endl;
-	  //cluster->SetCharge(Charge); // andrey
-	  //cluster->SetMaxCharge(qMax); // andrey
-	}	  
-	//cout << "end of cluster" << endl;
-      } // for iCluster     
-      //cout << " end of module" << endl;
-    } // for iModule
-    cout << " Found " << ClusterSum << " Cluster" << endl;
-  }
+                     Int_t size = fClusters->GetEntriesFast();
+                     const CbmDigi* digi = static_cast<const CbmDigi*>(fDigis->At(digiIndices.front()));
+                     CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
+                     cluster->SetAddress(CbmTrdAddress::GetModuleAddress(digi->GetAddress()));
+                     cluster->SetDigis(digiIndices);
+                     digiIndices.clear();
+                  }
+                  preDelta = deltaCharge;
+                  lastDigi = iDigi;
+               }
+            } else {
+               digiIndices[idigi] = (*iDigi)->digiId;
+            }
+            idigi++;
+         }
+         if (!fMultiHit) {
+            Int_t size = fClusters->GetEntriesFast();
+            const CbmDigi* digi = static_cast<const CbmDigi*>(fDigis->At(digiIndices.front()));
+            CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();
+            cluster->SetAddress(CbmTrdAddress::GetModuleAddress(digi->GetAddress()));
+            cluster->SetDigis(digiIndices);
+         }
+      } // for iCluster
+   } // for iModule
+   cout << " Found " << ClusterSum << " Cluster" << endl;
+}
 
   // ---- Register ------------------------------------------------------
   void CbmTrdClusterFinderFast::Register()

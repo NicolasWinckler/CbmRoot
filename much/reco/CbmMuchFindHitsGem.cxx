@@ -130,7 +130,12 @@ void CbmMuchFindHitsGem::FindClusters() {
     for (Int_t iDigi = 0; iDigi < fDigiData.size(); iDigi++) {
       fDigiIndices.clear();
       fDigiIndices.push_back(iDigi);
+      const CbmDigi* digi = static_cast<const CbmDigi*>(fDigis->At(iDigi));
       CbmMuchCluster* cluster = new ((*fClusters)[nClusters++]) CbmMuchCluster();
+      Int_t address = CbmMuchAddress::GetAddress(CbmMuchAddress::GetStationIndex(digi->GetAddress()),
+            CbmMuchAddress::GetLayerIndex(digi->GetAddress()), CbmMuchAddress::GetLayerSideIndex(digi->GetAddress()),
+            CbmMuchAddress::GetModuleIndex(digi->GetAddress()));
+      cluster->SetAddress(address);
       cluster->AddDigis(fDigiIndices);
     }
     return;
@@ -179,7 +184,12 @@ void CbmMuchFindHitsGem::FindClusters() {
         fDigiIndices.clear();
         CreateCluster(fFiredPads[p]);
         if (fDigiIndices.size()==0) continue;
+        const CbmDigi* digi = static_cast<const CbmDigi*>(fDigis->At(fDigiIndices.front()));
         CbmMuchCluster* cluster = new ((*fClusters)[nClusters++]) CbmMuchCluster();
+        Int_t address = CbmMuchAddress::GetAddress(CbmMuchAddress::GetStationIndex(digi->GetAddress()),
+              CbmMuchAddress::GetLayerIndex(digi->GetAddress()), CbmMuchAddress::GetLayerSideIndex(digi->GetAddress()),
+              CbmMuchAddress::GetModuleIndex(digi->GetAddress()));
+        cluster->SetAddress(address);
         cluster->AddDigis(fDigiIndices);
       }
       //return;

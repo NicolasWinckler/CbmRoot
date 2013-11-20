@@ -36,7 +36,7 @@ class CbmTrdQa : public FairTask {
   void Register();
   void SetTriggerThreshold(Double_t triggerthreshold);
  private:
-
+  Double_t CalcAngle(const CbmTrdPoint* pointA, const CbmTrdPoint* pointB);
   void SaveHistos();
   void NormalizeHistos();
   void CreateLayerView();
@@ -104,6 +104,22 @@ class CbmTrdQa : public FairTask {
   Bool_t fH;
 
   TH2I *fLayerDummy;
+  TH2F *fStsTrdPoints;
+  TH2F *fStsTrdPointsTrackable;
+
+  TH1I *fMultiHitSamePadPerMcTrack;
+  TH1I *fMultiHitSamePadPerMcTrack_angle;
+  TH2I *fMultiHitSamePadPerMcTrack_zBirth;
+  TH2I *fMultiHitSamePadPerMcTrack_PID;
+  TH2I *fMultiHitSamePadPerMcTrack_motherPID;
+  TH2I *fMultiHitSamePadPerMcTrack_motherzBirth;
+
+  TH1I *fMultiHitAdjacentPadPerMcTrack;
+  TH1I *fMultiHitAdjacentPadPerMcTrack_angle;
+  TH2I *fMultiHitAdjacentPadPerMcTrack_zBirth;
+  TH2I *fMultiHitAdjacentPadPerMcTrack_PID;
+  TH2I *fMultiHitAdjacentPadPerMcTrack_motherzBirth;
+  TH2I *fMultiHitAdjacentPadPerMcTrack_motherPID;
 
   TH1I *fDistanceMcToHit;
   TH1I *fDistanceMcToHitAll;

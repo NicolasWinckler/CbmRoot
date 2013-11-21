@@ -119,7 +119,7 @@ void trd_digi2(Int_t nEvents = 1)
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
   // -----   TRD hit producer   ----------------------------------------------
-  CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF("TrdDigiPrf","TRD digi prf",radiator);
+  CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
   run->AddTask(trdDigiPrf);
 
   CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();

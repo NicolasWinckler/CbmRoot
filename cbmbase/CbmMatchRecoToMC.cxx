@@ -47,32 +47,32 @@ CbmMatchRecoToMC::CbmMatchRecoToMC() :
 CbmMatchRecoToMC::~CbmMatchRecoToMC()
 {
    if (fTrdClusterMatches != NULL) {
-      fTrdClusterMatches->Clear("C");
+      fTrdClusterMatches->Delete();
       delete fTrdClusterMatches;
    }
    if (fTrdHitMatches != NULL) {
-      fTrdHitMatches->Clear("C");
+      fTrdHitMatches->Delete();
       delete fTrdHitMatches;
    }
    if (fTrdTrackMatches) {
-      fTrdTrackMatches->Clear("C");
+      fTrdTrackMatches->Delete();
       delete fTrdTrackMatches;
    }
 
    if (fMuchClusterMatches != NULL) {
-      fMuchClusterMatches->Clear("C");
+      fMuchClusterMatches->Delete();
       delete fMuchClusterMatches;
    }
    if (fMuchPixelHitMatches != NULL) {
-      fMuchPixelHitMatches->Clear("C");
+      fMuchPixelHitMatches->Delete();
       delete fMuchPixelHitMatches;
    }
    if (fMuchStrawHitMatches != NULL) {
-      fMuchStrawHitMatches->Clear("C");
+      fMuchStrawHitMatches->Delete();
       delete fMuchStrawHitMatches;
    }
    if (fMuchTrackMatches) {
-      fMuchTrackMatches->Clear("C");
+      fMuchTrackMatches->Delete();
       delete fMuchTrackMatches;
    }
 }
@@ -87,13 +87,13 @@ InitStatus CbmMatchRecoToMC::Init()
 void CbmMatchRecoToMC::Exec(
     Option_t* opt)
 {
-   if (fTrdClusterMatches != NULL) fTrdClusterMatches->Clear();
-   if (fTrdHitMatches != NULL) fTrdHitMatches->Clear();
-   if (fTrdTrackMatches != NULL) fTrdTrackMatches->Clear();
-   if (fMuchClusterMatches != NULL) fMuchClusterMatches->Clear();
-   if (fMuchPixelHitMatches != NULL) fMuchPixelHitMatches->Clear();
-   if (fMuchStrawHitMatches != NULL) fMuchStrawHitMatches->Clear();
-   if (fMuchTrackMatches != NULL) fMuchTrackMatches->Clear();
+   if (fTrdClusterMatches != NULL) fTrdClusterMatches->Delete();
+   if (fTrdHitMatches != NULL) fTrdHitMatches->Delete();
+   if (fTrdTrackMatches != NULL) fTrdTrackMatches->Delete();
+   if (fMuchClusterMatches != NULL) fMuchClusterMatches->Delete();
+   if (fMuchPixelHitMatches != NULL) fMuchPixelHitMatches->Delete();
+   if (fMuchStrawHitMatches != NULL) fMuchStrawHitMatches->Delete();
+   if (fMuchTrackMatches != NULL) fMuchTrackMatches->Delete();
 
    // TRD
    if (fTrdDigis && fTrdClusters && fTrdHits) { // MC->digi->cluster->hit->track

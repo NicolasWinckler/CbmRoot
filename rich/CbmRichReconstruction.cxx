@@ -214,7 +214,7 @@ void CbmRichReconstruction::InitTrackAssign()
 
 void CbmRichReconstruction::RunExtrapolation()
 {
-   fRichTrackParamZ->Clear();
+   fRichTrackParamZ->Delete();
    fTrackExtrapolation->DoExtrapolation(fGlobalTracks, fRichTrackParamZ, fZTrackExtrapolation, fMinNofStsHits);
 }
 
@@ -225,7 +225,7 @@ void CbmRichReconstruction::RunProjection()
 
 void CbmRichReconstruction::RunFinder()
 {
-   fRichRings->Clear();
+   fRichRings->Delete();
    fRingFinder->DoFind(fRichHits, fRichProjections, fRichRings);
 }
 

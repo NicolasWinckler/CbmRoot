@@ -101,7 +101,7 @@ InitStatus CbmTrdHitProducerSmearing::Init()
 
 void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 {
-   fTrdHits->Clear();
+   fTrdHits->Delete();
 
    vector<CbmTrdHit*> hits; // Temporary storage for CbmTrdHits. Used for merging procedure.
    Int_t nofTrdPoints = fTrdPoints->GetEntries();

@@ -70,7 +70,7 @@ void hadd() {
              particle = "urqmd";
           }
 
-          string dir = "/hera/cbm/users/slebedev/mc/dielectron/sep13/25gev/trd/1.0field/nomvd/" + particle + "/";
+          string dir = "/hera/cbm/users/slebedev/mc/dielectron/nov13/25gev/trd/1.0field/nomvd/" + particle + "/";
           string fileNameAna = dir + string("analysis") + fileArray[iPs];
           string fileNameReco = dir + string("reco") + fileArray[iPs];
           cout << "-I- " << dir << endl;
@@ -83,7 +83,7 @@ void hadd() {
 
           int count = 0;
           TList* FileList = new TList();
-          for (int i = 1; i < 201; i++){
+          for (int i = 1; i < 200; i++){
              stringstream ssAna, ssReco;
              ssAna << fileNameAna ;
              ssAna.fill('0');
@@ -138,6 +138,7 @@ bool CheckFile(TFile* fileAna, TFile* fileReco) {
     if (fileAna == NULL || fileReco == NULL)  return false;
 
     if (fileAna->GetEND() < 4000 || fileReco->GetEND() < 4000) return false;
+   // return true;
 
     TTree* treeAna = (TTree*)fileAna->Get("cbmsim");
     TTree* treeReco = (TTree*)fileReco->Get("cbmsim");

@@ -1,9 +1,9 @@
 #####!/bin/sh
 
-dirFrom=/hera/cbm/users/slebedev/mc/dielectron/apr13_2/8gev/notrd/
-dirTo=/u/slebedev/Baykal/copytemp/8gev/notrd/
+dirFrom=/hera/cbm/users/slebedev/mc/dielectron/sep13/25gev/trd/
+dirTo=/u/slebedev/Baykal/copytemp/sep13/25gev/trd/
 
-filename=analysis.auau.8gev.centr.all.root
+filename=analysis.auau.25gev.centr.all.root
 
 function copy_func() {
    mkdir -p ${dirTo}/${2}/${1}/
@@ -12,9 +12,9 @@ function copy_func() {
 
 function copy_all() {
    copy_func rho0 ${1}
-  # copy_func omegaepem ${1}
-  # copy_func omegadalitz ${1}
-  # copy_func phi ${1}
+   copy_func omegaepem ${1}
+   copy_func omegadalitz ${1}
+   copy_func phi ${1}
   # copy_func urqmd ${1}
 }
 

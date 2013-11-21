@@ -7,9 +7,15 @@ void run_reco(Int_t nEvents = 1000)
 
 	//gRandom->SetSeed(10);
 
-   TString parFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.param.root";
+  /* TString parFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.param.root";
    TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.mc.root";
-   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.reco.root";
+   TString recoFile = "/Users/slebedev/Development/cbm/data/simulations/lmvm/test.reco.root";     */
+
+       TString dir = "/hera/cbm/users/slebedev/mc/dielectron/sep13/25gev/trd/1.0field/nomvd/rho0/";
+	TString mcFile = dir + "mc.auau.25gev.centr.00001.root";
+	TString parFile = dir + "/params.auau.25gev.centr.00001.root";
+	TString recoFile = dir + "/test.reco.test.auau.25gev.centr.00001.root";
+      //  TString analysisFile = dir + "/test.analysis.test.auau.25gev.centr.00001.root";
 
 	TString delta = "no"; // if "yes" Delta electrons will be embedded
 	TString deltaFile = "";
@@ -208,8 +214,9 @@ void run_reco(Int_t nEvents = 1000)
 	// =========================================================================
 	if (IsTof(parFile)) {
 		// ------   TOF hit producer   ---------------------------------------------
-		CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("CbmTofHitProducer", 1);
-		run->AddTask(tofHitProd);
+	    CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("CbmTofHitProducer", 1);
+            tofHitProd->SetInitFromAscii(kFALSE);
+	    run->AddTask(tofHitProd);
 	} //isTof
 
 	// =========================================================================

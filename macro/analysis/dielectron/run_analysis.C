@@ -48,6 +48,10 @@ void run_analysis(Int_t nEvents = 1000)
       tofDigiFile = TString(gSystem->Getenv("TOF_DIGI"));
    }
 
+    parFileList->Add(&stsDigiFile);
+   parFileList->Add(&trdDigiFile);
+   parFileList->Add(&tofDigiFile);
+
    // load libraries
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
    loadlibs();

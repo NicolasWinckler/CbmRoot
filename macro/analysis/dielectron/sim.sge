@@ -104,7 +104,7 @@ elif [ ${trd} = "trd4" ] ; then
 fi
 
 export TOF_GEOM=tof/tof_v13b.geo.root
-export TOF_DIGI=${VMCWORKDIR}/parameters/trd/tof_v13b.digi.par
+export TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
 
 export FIELD_MAP=field_v12a
 export MAGNET_GEOM=magnet/magnet_v12a.geo
@@ -143,7 +143,7 @@ mkdir -p $workdir
 cd $workdir
 
 # run the root simulation
-root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
+#root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
 root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
 root -b -l -q "${macro_dir}/run_analysis.C(${nevents})"
 

@@ -19,36 +19,35 @@
 #include "TImage.h"
 #include "TStopwatch.h"
 
-//#include <map>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 using std::cout;
 using std::endl;
 
-// ---- Default constructor -------------------------------------------
 CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
   :FairTask("TrdClusterFinderFast",1),
    fDigis(NULL),
    fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fGeoHandler(new CbmTrdGeoHandler()),
+   fGeoHandler(NULL),
    ClusterSum(-1),
    fMinimumChargeTH(1.0e-06),//1.0e-08),
-   fMultiHit(false),//true),
-   fRowClusterMerger(true),//false),
+   fMultiHit(false),
+   fRowClusterMerger(true),
    fNeighbourRowTrigger(true),
    fNeighbourReadout(true)
 {
 }
+
 CbmTrdClusterFinderFast::CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t NeighbourReadout, Bool_t RowClusterMerger, Double_t MinimumChargeTH)
   :FairTask("TrdClusterFinderFast",1),
    fDigis(NULL),
    fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fGeoHandler(new CbmTrdGeoHandler()),
+   fGeoHandler(NULL),
    ClusterSum(-1),
    fMinimumChargeTH(MinimumChargeTH),
    fMultiHit(MultiHit),
@@ -57,73 +56,32 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t Neighbo
    fNeighbourReadout(NeighbourReadout)
 {
 }
-// --------------------------------------------------------------------
 
-// ---- Destructor ----------------------------------------------------
 CbmTrdClusterFinderFast::~CbmTrdClusterFinderFast()
 {
-   if(fClusters){
-    fClusters->Clear("C");
     fClusters->Delete();
     delete fClusters;
-  }
-    if(fDigis){
-    fDigis->Delete();
-    delete fDigis;
-  }
-  if(fDigiPar){
-    delete fDigiPar;
-  }
-  if(fModuleInfo){
-    delete fModuleInfo;
-  }
-
 }
 
-// ----  Initialisation  ----------------------------------------------
 void CbmTrdClusterFinderFast::SetParContainers()
 {
-  // Get Base Container
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-  cout << " * CbmTrdClusterFinderFast * :: SetParContainers()" << endl;
-  fDigiPar = (CbmTrdDigiPar*)(rtdb->getContainer("CbmTrdDigiPar"));
-  
+  fDigiPar = (CbmTrdDigiPar*)(FairRunAna::Instance()->GetRuntimeDb()->getContainer("CbmTrdDigiPar"));
 }
-// --------------------------------------------------------------------
 
-// ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdClusterFinderFast::ReInit(){
-  
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-  
-  fDigiPar = (CbmTrdDigiPar*)(rtdb->getContainer("CbmTrdDigiPar"));
-  
-  return kSUCCESS;
-}
-// --------------------------------------------------------------------
-
-// ---- Init ----------------------------------------------------------
 InitStatus CbmTrdClusterFinderFast::Init()
 {
+   FairRootManager* ioman = FairRootManager::Instance();
 
-  FairRootManager *ioman = FairRootManager::Instance();
-  
-  fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
-  if ( ! fDigis ) {
-    cout << "-W CbmTrdHitProducerDigi::Init: No TrdDigi array!" << endl;
-    cout << "                            Task will be inactive" << endl;
-    return kERROR;
-  }
- 
-  fClusters = new TClonesArray("CbmTrdCluster", 100);
-  ioman->Register("TrdCluster","Trd Cluster",fClusters,kTRUE);
-  
-  fGeoHandler->Init();
+   fDigis = (TClonesArray*) ioman->GetObject("TrdDigi");
+   if (fDigis == NULL) LOG(FATAL) << "CbmTrdClusterFinderFast::Init No TrdDigi array" << FairLogger::endl;
 
-  return kSUCCESS;
-  
+   fClusters = new TClonesArray("CbmTrdCluster", 100);
+   ioman->Register("TrdCluster","Trd Cluster",fClusters,kTRUE);
+
+   fGeoHandler = new CbmTrdGeoHandler();
+   fGeoHandler->Init();
+
+   return kSUCCESS;
 } 
 // --------------------------------------------------------------------
 void CbmTrdClusterFinderFast::SetTriggerThreshold(Double_t minCharge){
@@ -144,6 +102,8 @@ void CbmTrdClusterFinderFast::SetPrimaryClusterRowMerger(Bool_t rowMerger){
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
+   fClusters->Delete();
+
   TStopwatch timer;
   timer.Start();
   cout << "================CbmTrdClusterFinderFast===============" << endl;
@@ -835,31 +795,4 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
    cout << " Found " << ClusterSum << " Cluster" << endl;
 }
 
-  // ---- Register ------------------------------------------------------
-  void CbmTrdClusterFinderFast::Register()
-  {
-    FairRootManager::Instance()->Register("TrdCluster","Trd Cluster", fClusters, kTRUE);
-  }
-  // --------------------------------------------------------------------
-
-
-  // ---- Finish --------------------------------------------------------
-  void CbmTrdClusterFinderFast::Finish()
-  {
-  }
-
-  // -----   Public method EndOfEvent   --------------------------------------
-void CbmTrdClusterFinderFast::FinishEvent() {
-  //  cout<<"In CbmTrdClusterFinderFast::FinishEvent()"<<endl;  
-  if (fDigis) {
-    fDigis->Clear("C");
-    fDigis->Delete();
-  }
-  if (fClusters) {
-    fClusters->Clear("C");
-    fClusters->Delete();
-  }
-}
-  // -------------------------------------------------------------------------
-
-  ClassImp(CbmTrdClusterFinderFast)
+ClassImp(CbmTrdClusterFinderFast)

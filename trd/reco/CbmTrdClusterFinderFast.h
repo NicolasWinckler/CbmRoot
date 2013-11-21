@@ -73,31 +73,26 @@ class CbmTrdClusterFinderFast : public FairTask
    */
   CbmTrdClusterFinderFast();
   CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t NeighbourReadout, Bool_t RowClusterMerger, Double_t MinimumChargeTH);
+
   /**
-   * Default destructor.
+   * \brief Destructor.
    */
   virtual ~CbmTrdClusterFinderFast();
  
-  /** Initialisation **/
-  virtual InitStatus ReInit();
+  /**
+   * \brief Inherited from FairTask.
+   */
   virtual InitStatus Init();
+
+  /**
+   * \breif Inherited from FairTask.
+   */
   virtual void SetParContainers();
   
-  /** Executed task **/
+  /**
+   * \breif Inherited from FairTask.
+   */
   virtual void Exec(Option_t * option);
-
-  /** Virtual method FinishEvent
-   **
-   ** Reset cluster collection at the
-   ** end of the event.
-   **/
-  virtual void FinishEvent();
-
-  /** Finish task **/
-  virtual void Finish();
-  void Register();
-
-  //static Double_t GetTriggerThreshold(){/*Double_t threshold = */return fMinimumChargeTH;/* return threshold;*/}
 
   void SetTriggerThreshold(Double_t triggerthreshold);
   void SetNeighbourTrigger(Bool_t trigger);

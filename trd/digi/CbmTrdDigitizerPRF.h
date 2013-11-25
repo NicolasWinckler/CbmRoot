@@ -7,83 +7,111 @@
 using std::map;
 using std::pair;
 
+#include <list>
+#include <vector>
+#include "CbmTrdDigi.h"
+
 class CbmTrdPoint;
+
 class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdRadiator;
 class CbmTrdGeoHandler;
 class CbmMatch;
-class CbmTrdDigi;
 
 class TClonesArray;
+class TH1F;
+class TH2F;
+class TProfile;
 
-class CbmTrdDigitizerPRF : public FairTask
-{
-public:
+class CbmTrdDigitizerPRF : public FairTask {
 
-   /**
-   * \brief Standard constructor.
-   **/
-   CbmTrdDigitizerPRF(CbmTrdRadiator* radiator = NULL);
+ public:
 
-   /**
-   * \brief Destructor.
-   **/
-   virtual ~CbmTrdDigitizerPRF();
+  /** Default constructor **/
+  CbmTrdDigitizerPRF();
 
-   /**
-   * \brief Inherited from FairTask
-   **/
-   virtual InitStatus Init();
+  /** Standard constructor **/
+  CbmTrdDigitizerPRF(const char *name, const char *title="CBM Task",
+		     CbmTrdRadiator *radiator=NULL);
+  /*
+    oneClusterPerPoint: produces just one cluster per MC-track if true -> less ghost hits
+    produces n cluster per track depending on the path length within the detector volume -> leads to at least one hit per crossed pad row -> high number of ghost hits
+  */
 
-   /**
-   * \brief Inherited from FairTask
-   **/
-   virtual void SetParContainers();
+  /** Destructor **/
+  virtual ~CbmTrdDigitizerPRF();
 
-   /**
-   * \brief Inherited from FairTask
-   **/
-   virtual void Exec(Option_t * option);
+  /** Initialisation **/
+  virtual InitStatus ReInit();
+  virtual InitStatus Init();
+  virtual void SetParContainers();
 
-private:
+  /** Executed task **/
+  virtual void Exec(Option_t * option);
 
-   CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
-   CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
+  void FinishEvent();
 
-   Double_t CalcPRF(Double_t x, Double_t W, Double_t h);
+  void SetTriangularPads(Bool_t triangles);
 
-   void ScanPadPlane(const Double_t* local_point, Double_t clusterELoss);
+ private:
 
-   void SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss);
+  CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
+  CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
 
-   void AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time);
+  Double_t CalcPRF(Double_t x, Double_t W, Double_t h);
 
-   Double_t fTime;
-   Int_t fnRow;
-   Int_t fnCol;
-   Int_t fnSec;
-   Int_t fLayerId;
-   Int_t fModuleId;
-   Int_t fModuleAddress;
+  void ScanPadPlane(const Double_t* local_point, Double_t clusterELoss);
 
-   Int_t fModuleType;
-   Int_t fModuleCopy;
-   Int_t fMCPointId;
+  void ScanPadPlaneTriangle(const Double_t* local_point, Double_t clusterELoss);
 
-   TClonesArray* fPoints; //! CbmTrdPoint array
-   TClonesArray* fDigis; //! CbmTrdDigi array
-   TClonesArray* fDigiMatches; //! CbmMatch array
-   TClonesArray* fMCTracks;  //! CbmMCTrack array
+  Double_t TriangleIntegration(Bool_t even, Double_t displacement_x, Double_t W, Double_t displacement_y, Double_t H, Double_t h);
 
-   CbmTrdDigiPar* fDigiPar; //!
-   CbmTrdModule* fModuleInfo; //!
-   CbmTrdRadiator* fRadiators; //!
-   CbmTrdGeoHandler* fGeoHandler; //!
+  Double_t TriangleIteration(Bool_t even, Int_t step, Double_t displacement_x, Double_t W, Double_t displacement_y, Double_t H, Double_t h);
 
-   // Temporary storage for digis.
-   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap;
+  void SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss);
 
-   ClassDef(CbmTrdDigitizerPRF,2)
-};
-#endif // CBMTRDDIGITIZERPRF_H
+  void AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time);
+
+  //Double_t GetMirroredDisplacement(Double_t dis, Double_t pSize);
+  //Double_t GetGlobalDisplacement(Int_t nPad, Double_t pSize, Double_t dis);
+  Bool_t fDebug;
+  Bool_t fTrianglePads;
+
+  Double_t fTime;
+  Int_t fnRow;
+  Int_t fnCol;
+  Int_t fnSec;
+  Int_t fLayerId;
+  Int_t fModuleId;
+  Int_t fModuleAddress;
+  //Int_t fnSecRow[3];
+
+  Int_t   fModuleType;
+  Int_t   fModuleCopy;
+  //Int_t   fModuleID;//Unique number for detector module
+  Int_t   fMCPointId;// index to MCPoint
+  //Double_t fELossTR;
+
+  TClonesArray *fTrdPoints; //! Trd MC points
+  TClonesArray *fDigis; //! TRD digis
+  TClonesArray *fDigiMatchs; //! Corresponding MCPoints to TRD digis
+  TClonesArray *fMCStacks;  //! MC Track information
+
+  CbmTrdDigi* digi;
+  //CbmTrdDigiMatch* digiMatch;
+
+  CbmTrdDigiPar  *fDigiPar;    //!
+  CbmTrdModule   *fModuleInfo; //!
+  CbmTrdRadiator *fRadiators;  //!
+
+  CbmTrdGeoHandler* fGeoHandler; //!
+
+  // Temporary storage for digis.
+  // map<address, pair<CbmTrdDigi*, CbmTrdDigiMatch*>
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap;
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator fDigiMapIt;
+  ClassDef(CbmTrdDigitizerPRF,2)
+
+    };
+#endif // CBMTRDDIGITIZER_PRF_H

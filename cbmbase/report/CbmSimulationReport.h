@@ -75,6 +75,14 @@ public:
          const string& histNamePattern);
 
    /**
+    * \brief Select by pattern TH1 histograms and draw all histograms on the same canvas.
+    * \param[in] histNamePattern Name pattern for histogram.
+    */
+   void DrawH1ByPattern(
+         const string& histNamePattern,
+         string (*labelFormatter)(const string&, const CbmHistManager*));
+
+   /**
     * \brief Select by pattern TH2 histograms and draw each histogram on separate canvas.
     * \param[in] histNamePattern Name pattern for histogram.
     * \param[in] logx Specify logarithmic or linear scale for X axis.

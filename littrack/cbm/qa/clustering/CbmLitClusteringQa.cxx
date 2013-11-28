@@ -44,6 +44,7 @@
 #include "TProfile.h"
 #include "TProfile2D.h"
 
+#include <boost/assign/list_of.hpp>
 #include <fstream>
 #include <cmath>
 #include <sstream>
@@ -51,6 +52,7 @@ using std::cout;
 using std::vector;
 using std::map;
 using std::binary_search;
+using boost::assign::list_of;
 
 CbmLitClusteringQa::CbmLitClusteringQa():
    fHM(NULL),
@@ -129,6 +131,9 @@ void CbmLitClusteringQa::Exec(
 
    FillResidualAndPullHistograms(fTrdPoints, fTrdHits, fTrdHitMatches, "Trd", kTRD);
    FillResidualAndPullHistograms(fMuchPoints, fMuchPixelHits, fMuchPixelHitMatches, "Much", kMUCH);
+
+   FillHitEfficiencyHistograms(fTrdPoints, fTrdHits, fTrdHitMatches, "Trd", kTRD);
+   FillHitEfficiencyHistograms(fMuchPoints, fMuchPixelHits, fMuchPixelHitMatches, "Much", kMUCH);
 
    fHM->H1("hen_EventNo_ClusteringQa")->Fill(0.5);
    std::cout << "CbmLitClusteringQa::Exec: event=" << fHM->H1("hen_EventNo_ClusteringQa")->GetEntries() << std::endl;
@@ -214,7 +219,7 @@ void CbmLitClusteringQa::ProcessPoints(
       DetectorId detId)
 {
    string histName = "hno_NofObjects_" + detName + "Points_Station";
-   if (NULL == points || !fHM->Exists(detName)) return;
+   if (NULL == points || !fHM->Exists(histName)) return;
    for (Int_t i = 0; i < points->GetEntriesFast(); i++) {
       const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(i));
       fHM->H1(histName)->Fill(GetStationId(point->GetDetectorID(), detId));
@@ -344,6 +349,37 @@ void CbmLitClusteringQa::FillResidualAndPullHistograms(
    }
 }
 
+void CbmLitClusteringQa::FillHitEfficiencyHistograms(
+      const TClonesArray* points,
+      const TClonesArray* hits,
+      const TClonesArray* hitMatches,
+      const string& detName,
+      DetectorId detId)
+{
+   if (NULL == points || NULL == hits || NULL == hitMatches) return;
+   string accName = "hhe_" + detName + "_All_Acc_Station";
+   if (NULL == points || !fHM->Exists(accName)) return;
+   for (Int_t i = 0; i < points->GetEntriesFast(); i++) {
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(i));
+      fHM->H1(accName)->Fill(GetStationId(point->GetDetectorID(), detId));
+   }
+
+   string recName = "hhe_" + detName + "_All_Rec_Station";
+   string cloneName = "hhe_" + detName + "_All_Clone_Station";
+   set<Int_t> mcPointSet; // IDs of MC points
+   Int_t nofHits = hits->GetEntriesFast();
+   for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+      const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(hits->At(iHit));
+      const CbmMatch* match = static_cast<const CbmMatch*>(hitMatches->At(iHit));
+      if (mcPointSet.find(match->GetMatchedReferenceId()) == mcPointSet.end()) {
+         fHM->H1(recName)->Fill(GetStationId(hit->GetAddress(), detId));
+         mcPointSet.insert(match->GetMatchedReferenceId());
+      } else {
+         fHM->H1(cloneName)->Fill(GetStationId(hit->GetAddress(), detId));
+      }
+   }
+}
+
 void CbmLitClusteringQa::CreateHistograms()
 {
    CreateNofObjectsHistograms(kMVD, "Mvd", "Station", "Station number");
@@ -361,6 +397,9 @@ void CbmLitClusteringQa::CreateHistograms()
    CreateClusterParametersHistograms(kTRD, "Trd");
    CreateClusterParametersHistograms(kMUCH, "Much");
 
+   CreateHitEfficiencyHistograms(kMUCH, "Much", "Station", "Station number", 100, -0.5, 99.5);
+   CreateHitEfficiencyHistograms(kTRD, "Trd", "Station", "Station number", 100, -0.5, 99.5);
+
    // Histogram stores number of events
    fHM->Create1<TH1F>("hen_EventNo_ClusteringQa", "hen_EventNo_ClusteringQa", 1, 0, 1.);
 }
@@ -369,21 +408,20 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
       DetectorId detId,
       const string& detName)
 {
+   if (!fDet.GetDet(detId)) return;
    assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
    Int_t nofBins = 100000;
    Double_t minX = -0.5;
    Double_t maxX = 99999.5;
-   if (fDet.GetDet(detId)) {
-      string name = "hno_NofObjects_" + detName;
-      fHM->Create1<TH1F>(name + "Points_Event", name + "Points_Event;Points per event;Counter", nofBins, minX, maxX);
-      fHM->Create1<TH1F>(name + "Digis_Event", name + "Digis_Event;Digis per event;Counter", nofBins, minX, maxX);
-      fHM->Create1<TH1F>(name + "Clusters_Event", name + "Clusters_Event;Clusters per event;Counter", nofBins, minX, maxX);
-      if (detId == kMUCH) {
-         fHM->Create1<TH1F>(name + "PixelHits_Event", name + "PixelHits_Event;Hits per event;Counter", nofBins, minX, maxX);
-         fHM->Create1<TH1F>(name + "StrawHits_Event", name + "StrawHits_Event;Hits per event;Counter", nofBins, minX, maxX);
-      } else {
-         fHM->Create1<TH1F>(name + "Hits_Event", name + "Hits_Event;Hits per event;Counter", nofBins, minX, maxX);
-      }
+   string name = "hno_NofObjects_" + detName;
+   fHM->Create1<TH1F>(name + "Points_Event", name + "Points_Event;Points per event;Counter", nofBins, minX, maxX);
+   fHM->Create1<TH1F>(name + "Digis_Event", name + "Digis_Event;Digis per event;Counter", nofBins, minX, maxX);
+   fHM->Create1<TH1F>(name + "Clusters_Event", name + "Clusters_Event;Clusters per event;Counter", nofBins, minX, maxX);
+   if (detId == kMUCH) {
+      fHM->Create1<TH1F>(name + "PixelHits_Event", name + "PixelHits_Event;Hits per event;Counter", nofBins, minX, maxX);
+      fHM->Create1<TH1F>(name + "StrawHits_Event", name + "StrawHits_Event;Hits per event;Counter", nofBins, minX, maxX);
+   } else {
+      fHM->Create1<TH1F>(name + "Hits_Event", name + "Hits_Event;Hits per event;Counter", nofBins, minX, maxX);
    }
 }
 
@@ -393,23 +431,23 @@ void CbmLitClusteringQa::CreateNofObjectsHistograms(
       const string& parameter,
       const string& xTitle)
 {
+   if (!fDet.GetDet(detId)) return;
    assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
    Int_t nofBins = 100;
    Double_t minX = -0.5;
    Double_t maxX = 99.5;
-   if (fDet.GetDet(detId)) {
-      string name = "hno_NofObjects_" + detName;
-      fHM->Create1<TH1F>(name + "Points_" + parameter, name + "Points_" + parameter + ";" + xTitle + ";Points per event", nofBins, minX, maxX);
-      fHM->Create1<TH1F>(name + "Digis_" + parameter, name + "Digis_" + parameter + ";" + xTitle + ";Digis per event", nofBins, minX, maxX);
-      fHM->Create1<TH1F>(name + "Clusters_" + parameter, name + "Clusters_" + parameter + ";" + xTitle + ";Clusters per event", nofBins, minX, maxX);
-      fHM->Create1<TH1F>(name + "Hits_" + parameter, name + "Hits_" + parameter + ";" + xTitle + ";Hits per event", nofBins, minX, maxX);
-   }
+   string name = "hno_NofObjects_" + detName;
+   fHM->Create1<TH1F>(name + "Points_" + parameter, name + "Points_" + parameter + ";" + xTitle + ";Points per event", nofBins, minX, maxX);
+   fHM->Create1<TH1F>(name + "Digis_" + parameter, name + "Digis_" + parameter + ";" + xTitle + ";Digis per event", nofBins, minX, maxX);
+   fHM->Create1<TH1F>(name + "Clusters_" + parameter, name + "Clusters_" + parameter + ";" + xTitle + ";Clusters per event", nofBins, minX, maxX);
+   fHM->Create1<TH1F>(name + "Hits_" + parameter, name + "Hits_" + parameter + ";" + xTitle + ";Hits per event", nofBins, minX, maxX);
 }
 
 void CbmLitClusteringQa::CreateClusterParametersHistograms(
       DetectorId detId,
       const string& detName)
 {
+   if (!fDet.GetDet(detId)) return;
    assert(detId == kMVD || detId == kSTS || detId == kRICH || detId == kMUCH || detId == kTRD || detId == kTOF);
    Int_t nofBinsStation = 100;
    Double_t minStation = -0.5;
@@ -426,41 +464,62 @@ void CbmLitClusteringQa::CreateClusterParametersHistograms(
    Int_t nofBinsPull = 100;
    Double_t minPull = -5.0;
    Double_t maxPull = 5.0;
-   if (fDet.GetDet(detId)) {
-      string nameH1 = "hpa_" + detName + "Cluster_NofDigisInCluster_H1";
-      fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of digis;Yield", nofBins, min, max);
-      string nameH2 = "hpa_" + detName + "Cluster_NofDigisInCluster_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of digis;Yield", nofBinsStation, minStation, max, nofBins, min, max);
-      nameH1 = "hpa_" + detName + "Cluster_NofPointsInCluster_H1";
-      fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
-      nameH2 = "hpa_" + detName + "Cluster_NofPointsInCluster_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, max, nofBins, min, max);
-      nameH1 = "hpa_" + detName + "Digi_NofPointsInDigi_H1";
-      fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
-      nameH2 = "hpa_" + detName + "Digi_NofPointsInDigi_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, maxStation, nofBins, min, max);
-      nameH1 = "hpa_" + detName + "Hit_NofPointsInHit_H1";
-      fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
-      nameH2 = "hpa_" + detName + "Hit_NofPointsInHit_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, max, nofBins, min, max);
-      nameH1 = "hpa_" + detName + "Hit_SigmaX_H1";
-      fHM->Create1<TH1F>(nameH1, nameH1 + ";#sigma_{X} [cm];Yield", nofBinsSigma, minSigma, maxSigma);
-      nameH2 = "hpa_" + detName + "Hit_SigmaX_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;#sigma_{X} [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsSigma, minSigma, maxSigma);
-      nameH1 = "hpa_" + detName + "Hit_SigmaY_H1";
-      fHM->Create1<TH1F>(nameH1, nameH1 + ";#sigma_{Y} [cm];Yield", nofBinsSigma, minSigma, maxSigma);
-      nameH2 = "hpa_" + detName + "Hit_SigmaY_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;#sigma_{Y} [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsSigma, minSigma, maxSigma);
 
-      // Residual and pull histograms
-      nameH2 = "hrp_" + detName + "_ResidualX_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Residual X [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsResidual, minResidual, maxResidual);
-      nameH2 = "hrp_" + detName + "_ResidualY_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Residual Y [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsResidual, minResidual, maxResidual);
-      nameH2 = "hrp_" + detName + "_PullX_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Pull X;Yield", nofBinsStation, minStation, maxStation, nofBinsPull, minPull, maxPull);
-      nameH2 = "hrp_" + detName + "_PullY_H2";
-      fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Pull Y;Yield", nofBinsStation, minStation, maxStation, nofBinsPull, minPull, maxPull);
+   string nameH1 = "hpa_" + detName + "Cluster_NofDigisInCluster_H1";
+   fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of digis;Yield", nofBins, min, max);
+   string nameH2 = "hpa_" + detName + "Cluster_NofDigisInCluster_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of digis;Yield", nofBinsStation, minStation, max, nofBins, min, max);
+   nameH1 = "hpa_" + detName + "Cluster_NofPointsInCluster_H1";
+   fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
+   nameH2 = "hpa_" + detName + "Cluster_NofPointsInCluster_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, max, nofBins, min, max);
+   nameH1 = "hpa_" + detName + "Digi_NofPointsInDigi_H1";
+   fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
+   nameH2 = "hpa_" + detName + "Digi_NofPointsInDigi_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, maxStation, nofBins, min, max);
+   nameH1 = "hpa_" + detName + "Hit_NofPointsInHit_H1";
+   fHM->Create1<TH1F>(nameH1, nameH1 + ";Number of points;Yield", nofBins, min, max);
+   nameH2 = "hpa_" + detName + "Hit_NofPointsInHit_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Number of points;Yield", nofBinsStation, minStation, max, nofBins, min, max);
+   nameH1 = "hpa_" + detName + "Hit_SigmaX_H1";
+   fHM->Create1<TH1F>(nameH1, nameH1 + ";#sigma_{X} [cm];Yield", nofBinsSigma, minSigma, maxSigma);
+   nameH2 = "hpa_" + detName + "Hit_SigmaX_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;#sigma_{X} [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsSigma, minSigma, maxSigma);
+   nameH1 = "hpa_" + detName + "Hit_SigmaY_H1";
+   fHM->Create1<TH1F>(nameH1, nameH1 + ";#sigma_{Y} [cm];Yield", nofBinsSigma, minSigma, maxSigma);
+   nameH2 = "hpa_" + detName + "Hit_SigmaY_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;#sigma_{Y} [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsSigma, minSigma, maxSigma);
+
+   // Residual and pull histograms
+   nameH2 = "hrp_" + detName + "_ResidualX_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Residual X [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsResidual, minResidual, maxResidual);
+   nameH2 = "hrp_" + detName + "_ResidualY_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Residual Y [cm];Yield", nofBinsStation, minStation, maxStation, nofBinsResidual, minResidual, maxResidual);
+   nameH2 = "hrp_" + detName + "_PullX_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Pull X;Yield", nofBinsStation, minStation, maxStation, nofBinsPull, minPull, maxPull);
+   nameH2 = "hrp_" + detName + "_PullY_H2";
+   fHM->Create2<TH2F>(nameH2, nameH2 + ";Station;Pull Y;Yield", nofBinsStation, minStation, maxStation, nofBinsPull, minPull, maxPull);
+}
+
+void CbmLitClusteringQa::CreateHitEfficiencyHistograms(
+      DetectorId detId,
+      const string& detName,
+      const string& parameter,
+      const string& xTitle,
+      Int_t nofBins,
+      Double_t minBin,
+      Double_t maxBin)
+{
+   if (!fDet.GetDet(detId)) return;
+   vector<string> types = list_of("Acc")("Rec")("Eff")("Clone")("CloneProb");
+   vector<string> cat = list_of("All");
+   for (Int_t iCat = 0; iCat < cat.size(); iCat++) {
+      for (Int_t iType = 0; iType < types.size(); iType++) {
+         string yTitle = (types[iType] == "Eff") ? "Efficiency [%]" : (types[iType] == "CloneProb") ? "Probability [%]" : "Counter";
+         string histName = "hhe_" + detName + "_" + cat[iCat] + "_" + types[iType] + "_" + parameter;
+         string histTitle = histName + ";" + xTitle + ";" + yTitle;
+         fHM->Add(histName, new TH1F(histName.c_str(), histTitle.c_str(), nofBins, minBin, maxBin));
+      }
    }
 }
 

@@ -31,6 +31,11 @@ public:
     */
    virtual ~CbmLitClusteringQaReport();
 
+   static Double_t CalcEfficiency(
+      const TH1* histRec,
+      const TH1* histAcc,
+      Double_t scale);
+
 private:
    /**
     * \brief Inherited from CbmSimulationReport.
@@ -54,7 +59,27 @@ private:
    void DrawResidualsAndPulls(
       const string& detName);
 
+//   void DrawAccAndRec(
+//         const string& canvasName,
+//         const string& histNamePattern);
+
+//   void DrawEfficiency(
+//         const string& canvasName,
+//         const string& histNamePattern,
+//         string (*labelFormatter)(const string&, const CbmHistManager*));
+
    void ScaleAndShrinkHistograms();
+
+   void DivideHistos(
+      TH1* histo1,
+      TH1* histo2,
+      TH1* histo3,
+      Double_t scale);
+
+   void CalculateEfficiencyHistos(
+         const string& acc,
+         const string& rec,
+         const string& eff);
 
    ClassDef(CbmLitClusteringQaReport, 1)
 };

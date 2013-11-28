@@ -21,6 +21,27 @@ using std::stringstream;
 using boost::assign::list_of;
 using lit::NumberToString;
 using lit::Split;
+using lit::FindAndReplace;
+
+string DefaultHitEfficiencyLabelFormatter(
+      const string& histName,
+      const CbmHistManager* hm)
+{
+   Double_t efficiency = (histName.find("_Eff_") != string::npos) ?
+         CbmLitClusteringQaReport::CalcEfficiency(hm->H1(FindAndReplace(histName, "_Eff_", "_Rec_")), hm->H1(FindAndReplace(histName, "_Eff_", "_Acc_")), 100.) :
+         CbmLitClusteringQaReport::CalcEfficiency(hm->H1(FindAndReplace(histName, "_CloneProb_", "_Clone_")), hm->H1(FindAndReplace(histName, "_CloneProb_", "_Acc_")), 100.);
+   vector<string> split = Split(histName, '_');
+   return split[1] + ":" + split[3] + "(" + NumberToString<Double_t>(efficiency, 1) + ")";
+}
+
+string DefaultAccAndRecLabelFormatter(
+      const string& histName,
+      const CbmHistManager* hm)
+{
+   Int_t nofEvents = hm->H1("hen_EventNo_ClusteringQa")->GetEntries();
+   vector<string> split = Split(histName, '_');
+   return split[3] + " (" + NumberToString<Double_t>(hm->H1(histName)->GetEntries() / nofEvents, 1) + ")";
+}
 
 CbmLitClusteringQaReport::CbmLitClusteringQaReport():
 		CbmSimulationReport()
@@ -60,74 +81,11 @@ string CbmLitClusteringQaReport::PrintNofObjects() const
    return str;
 }
 
-//string CbmLitClusteringQaReport::PrintMuchAcuracy() const
-//{
-//   Float_t totalMuonEff = 0;
-//   Float_t nofMuonPoints = 0;
-//   Float_t nofMuonHits = 0;
-//   Float_t totalEff = 0;
-//   Float_t nofPoints = 0;
-//   Float_t nofHits = 0;
-//   string str = R()->TableBegin("Efficiency of clustering", list_of("Layer")("Muon Points")("Muon Hits")("Muon Efficiency (%)")
-//         ("Total Points")("Total Hits")("Total Efficiency (%)"));
-//   for (Int_t i = 1; i <= HM()->H2("hsh_Much_Muon_Points")->GetXaxis()->GetNbins(); i++){
-//      Float_t muonEff = 0;
-//      if(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i) != 0){
-//         muonEff = (100. * (Float_t)(HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i))) /
-//               (Float_t)(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i));
-//      }
-//      Float_t eff = 0;
-//      if(HM()->H1("hsh_Much_Points")->GetBinContent(i) != 0){
-//         eff = (100. * (Float_t)(HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i))) /
-//               (Float_t)(HM()->H1("hsh_Much_Points")->GetBinContent(i));
-//      }
-//      nofMuonPoints += HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i);
-//      nofPoints += HM()->H1("hsh_Much_Points")->GetBinContent(i);
-//      nofMuonHits += HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i);
-//      nofHits += HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i);
-//      str += R()->TableRow(list_of(NumberToString<Int_t>(i))(NumberToString<Float_t>(HM()->H1("hsh_Much_Muon_Points")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("hsh_Much_Muon_PixelHits")->GetBinContent(i)))(NumberToString<Float_t>(muonEff))
-//            (NumberToString<Float_t>(HM()->H1("hsh_Much_Points")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("hsh_Much_True_PixelHits")->GetBinContent(i)))
-//            (NumberToString<Float_t>(eff)));
-//   }
-//   if(nofMuonPoints != 0){
-//      totalMuonEff = (100. * nofMuonHits) / nofMuonPoints;
-//   }
-//   if(nofPoints != 0){
-//      totalEff = (100. * nofHits) / nofPoints;
-//   }
-//   std::stringstream stream1;
-//   stream1 << "Total";
-//   str += R()->TableRow(list_of(stream1.str())(NumberToString<Float_t>(nofMuonPoints))
-//         (NumberToString<Float_t>(nofMuonHits))(NumberToString<Float_t>(totalMuonEff))
-//         (NumberToString<Float_t>(nofPoints))(NumberToString<Float_t>(nofHits))
-//         (NumberToString<Float_t>(totalEff)));
-//   str += R()->TableEnd();
-//   //---
-//   str += R()->TableBegin("Much Hit Residual", list_of("Layer")("Mean X")("Mean Y")("RMS X")("RMS Y")("Sigma X")("Sigma Y"));
-//   for (Int_t i = 1; i <= HM()->H2("hr_Much_ResidualX_2D")->GetXaxis()->GetNbins(); i++){
-//      str += R()->TableRow(list_of(NumberToString<Int_t>(i))(NumberToString<Float_t>(HM()->H1("h_Much_Mean_X")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("h_Much_Mean_Y")->GetBinContent(i)))(NumberToString<Float_t>(HM()->H1("h_Much_RMS_X")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("h_Much_RMS_Y")->GetBinContent(i)))(NumberToString<Float_t>(HM()->H1("h_Much_Sigma_X")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("h_Much_Sigma_Y")->GetBinContent(i))));
-//   }
-//   str += R()->TableEnd();
-//   str += R()->TableBegin("Much Hit Pull", list_of("Layer")("Mean X")("Mean Y")("RMS X")("RMS Y")("Sigma X")("Sigma Y"));
-//   for (Int_t i = 1; i <= HM()->H2("hr_Much_PullX_2D")->GetXaxis()->GetNbins(); i++){
-//      str += R()->TableRow(list_of(NumberToString<Int_t>(i))(NumberToString<Float_t>(HM()->H1("h_Much_PullMean_X")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("h_Much_PullMean_Y")->GetBinContent(i)))(NumberToString<Float_t>(HM()->H1("h_Much_PullRMS_X")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("h_Much_PullRMS_Y")->GetBinContent(i)))(NumberToString<Float_t>(HM()->H1("h_Much_PullSigma_X")->GetBinContent(i)))
-//            (NumberToString<Float_t>(HM()->H1("h_Much_PullSigma_Y")->GetBinContent(i))));
-//   }
-//   str += R()->TableEnd();
-//   str += R()->TableEnd();
-//   return str;
-//}
-
 void CbmLitClusteringQaReport::Draw()
 {
    ScaleAndShrinkHistograms();
+   CalculateEfficiencyHistos("Acc", "Rec", "Eff");
+   CalculateEfficiencyHistos("Acc", "Clone", "CloneProb");
 
    DrawNofObjectsHistograms("Mvd", "Event");
    DrawNofObjectsHistograms("Sts", "Event");
@@ -152,6 +110,13 @@ void CbmLitClusteringQaReport::Draw()
 
    DrawResidualsAndPulls("Trd");
    DrawResidualsAndPulls("Much");
+
+
+   DrawH1ByPattern("hhe_Trd_All_(Acc|Rec|Clone)_Station", DefaultAccAndRecLabelFormatter);
+   DrawH1ByPattern("hhe_Much_All_(Acc|Rec|Clone)_Station", DefaultAccAndRecLabelFormatter);
+
+   DrawH1ByPattern("hhe_Trd_All_(Eff|CloneProb)_Station", DefaultHitEfficiencyLabelFormatter);
+   DrawH1ByPattern("hhe_Much_All_(Eff|CloneProb)_Station", DefaultHitEfficiencyLabelFormatter);
 }
 
 void CbmLitClusteringQaReport::DrawNofObjectsHistograms(
@@ -206,9 +171,23 @@ void CbmLitClusteringQaReport::DrawResidualsAndPulls(
    DrawH2ByPattern("hrp_" + detName + "_.*_H2", kLinear, kLinear, kLinear, "colz");
 }
 
+Double_t CbmLitClusteringQaReport::CalcEfficiency(
+   const TH1* histRec,
+   const TH1* histAcc,
+   Double_t scale)
+{
+   if (histAcc->Integral() == 0 || histRec->Integral() == 0) {
+      return 0.;
+   } else {
+      return scale * Double_t(histRec->Integral()) / Double_t(histAcc->Integral());
+   }
+}
+
 void CbmLitClusteringQaReport::ScaleAndShrinkHistograms()
 {
    Int_t nofEvents = HM()->H1("hen_EventNo_ClusteringQa")->GetEntries();
+
+   HM()->ScaleByPattern("hhe_.+_.+_(Acc|Rec|Clone)_Station", 1. / nofEvents);
 
    HM()->ScaleByPattern("hno_NofObjects_.*_Station", 1. / nofEvents);
    HM()->ShrinkEmptyBinsH1ByPattern("hno_NofObjects_.*_Station");
@@ -227,6 +206,37 @@ void CbmLitClusteringQaReport::ScaleAndShrinkHistograms()
    HM()->NormalizeToIntegralByPattern("hpa_.*Hit_Sigma.*_.*");
    HM()->ShrinkEmptyBinsH1ByPattern("hpa_.*Hit_Sigma.*_H1");
    HM()->ShrinkEmptyBinsH2ByPattern("hpa_.*Hit_Sigma.*_H2");
+}
+
+void CbmLitClusteringQaReport::DivideHistos(
+   TH1* histo1,
+   TH1* histo2,
+   TH1* histo3,
+   Double_t scale)
+{
+   histo1->Sumw2();
+   histo2->Sumw2();
+   histo3->Sumw2();
+   histo3->Divide(histo1, histo2, 1., 1., "B");
+   histo3->Scale(scale);
+}
+
+void CbmLitClusteringQaReport::CalculateEfficiencyHistos(
+      const string& acc,
+      const string& rec,
+      const string& eff)
+{
+    vector<TH1*> effHistos = HM()->H1Vector("hhe_.+_" + eff + "_.+");
+    Int_t nofEffHistos = effHistos.size();
+    for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
+      TH1* effHist = effHistos[iHist];
+      string effHistName = effHist->GetName();
+      string accHistName = FindAndReplace(effHistName, "_" + eff + "_", "_" + acc + "_");
+      string recHistName = FindAndReplace(effHistName, "_" + eff + "_", "_" + rec + "_");
+      DivideHistos(HM()->H1(recHistName), HM()->H1(accHistName), effHist, 100.);
+      effHist->SetMinimum(0.);
+      effHist->SetMaximum(100.);
+    }
 }
 
 ClassImp(CbmLitClusteringQaReport)

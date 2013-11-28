@@ -66,6 +66,25 @@ void CbmSimulationReport::DrawH1ByPattern(
    }
 }
 
+void CbmSimulationReport::DrawH1ByPattern(
+      const string& histNamePattern,
+      string (*labelFormatter)(const string&, const CbmHistManager*))
+{
+   vector<TH1*> histos = HM()->H1Vector(histNamePattern);
+   if (histos.size() == 0) return;
+   string canvasName = GetReportName() + histos[0]->GetName();
+   TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
+
+   Int_t nofHistos = histos.size();
+   vector<string> labels(nofHistos);
+   for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
+      string name = histos[iHist]->GetName();
+      labels[iHist] = labelFormatter(name, HM());
+   }
+
+   DrawH1(histos, labels, kLinear, kLinear, true, 0.3, 0.3, 0.85, 0.6, "PE1");
+}
+
 void CbmSimulationReport::DrawH2ByPattern(
       const string& histNamePattern,
       HistScale logx,

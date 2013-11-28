@@ -769,9 +769,9 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
       trackLength += cluster_delta[i] * cluster_delta[i];
     }
     trackLength = TMath::Sqrt(trackLength);
-  //if (fDebug)
-    const Int_t nCluster = 1;//trackLength / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
-    //const Int_t nCluster = trackLength / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
+    //if (fDebug)
+    //const Int_t nCluster = 1;//trackLength / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
+    const Int_t nCluster = trackLength / nClusterPerCm + 0.9;// Track length threshold of minimum 0.1cm track length in gas volume
     if (nCluster < 1){
       LOG(WARNING) << "CbmTrdDigitizerPRF::SplitTrackPath: nCluster: "<<nCluster<<"   track length: "<<std::setprecision(5)<<trackLength<<"cm  nCluster/cm: "<<std::setprecision(2)<<nClusterPerCm<<"  ELoss: "<<std::setprecision(5)<<ELoss*1e-6<<"keV " << FairLogger::endl;
       return;

@@ -1,0 +1,15 @@
+ Create parameter file from geom file for geometry v13x, x=a,b,c,d….
+1) Create geom file
+2) Copy root geom file to geometry/tof
+3) Run root -l 'make_geofile.C("tof_v13x")' to create the geo file named geofile_tof_v13x.root
+4) Run root -l 'create_digipar.C("tof_v13x")'
+4-b) Add a "###################################" line at the end of digi file if missing
+5) Copy digi par file to parameter/tof
+
+ Create parameter file from geom file for geometry v13-Nx.geo, N=4,5,... & x=a,b,c,d….
+1) Create geom file
+2) Copy root geom file to geometry/tof
+3) Run root -l 'make_geofile.C("tof_v13-Nx.geo")' to create the geo file named geofile_tof_v13-Nx.geo.root
+4) Run root -l 'create_digipar.C("tof_v13x-Nx.geo")'
+4-b) Add a "###################################" line at the end of digi file if missing
+5) Copy digi par file to parameter/tof and remove the ".geo" part in its name

@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/much_v12c/"; // Output directory
+	TString dir = "events/trd_v13p_3e/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -33,28 +33,16 @@ void global_reco(Int_t nEvents = 100, // number of events
    // Digi files
    TList* parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13p_3e.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v12c.digi.root"; // MUCH digi file
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
-//   // Directory for output results
-//   TString resultDir = "./test/";
-
    // Reconstruction parameters
    TString globalTrackingType = "nn"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
-   TString trdHitProducerType = "digi"; // TRD hit producer type: smearing, digi, clustering
+   TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
-
-//   // Normalization for efficiency
-//   Int_t normStsPoints = 4;
-//   Int_t normTrdPoints = 6;
-//   Int_t normMuchPoints = 16;
-//   Int_t normTofPoints = 1;
-//   Int_t normTrdHits = 6;
-//   Int_t normMuchHits = 16;
-//   Int_t normTofHits = 1;
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));
@@ -62,8 +50,6 @@ void global_reco(Int_t nEvents = 100, // number of events
 		globalRecoFile = TString(gSystem->Getenv("LIT_GLOBAL_RECO_FILE"));
 		globalHitsFile = TString(gSystem->Getenv("LIT_GLOBAL_HITS_FILE"));
 		globalTracksFile = TString(gSystem->Getenv("LIT_GLOBAL_TRACKS_FILE"));
-
-//		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 
 		globalTrackingType = TString(gSystem->Getenv("LIT_GLOBAL_TRACKING_TYPE"));
 		stsHitProducerType = TString(gSystem->Getenv("LIT_STS_HITPRODUCER_TYPE"));
@@ -75,14 +61,6 @@ void global_reco(Int_t nEvents = 100, // number of events
 		muchDigiFile = TString(gSystem->Getenv("LIT_MUCH_DIGI"));
 		tofDigiFile = TString(gSystem->Getenv("LIT_TOF_DIGI"));
 		stsMatBudgetFile = TString(gSystem->Getenv("LIT_STS_MAT_BUDGET_FILE"));
-
-//		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
-//		normTrdPoints = TString(gSystem->Getenv("LIT_NORM_TRD_POINTS")).Atoi();
-//		normMuchPoints = TString(gSystem->Getenv("LIT_NORM_MUCH_POINTS")).Atoi();
-//		normTofPoints = TString(gSystem->Getenv("LIT_NORM_TOF_POINTS")).Atoi();
-//		normTrdHits = TString(gSystem->Getenv("LIT_NORM_TRD_HITS")).Atoi();
-//		normMuchHits = TString(gSystem->Getenv("LIT_NORM_MUCH_HITS")).Atoi();
-//		normTofHits = TString(gSystem->Getenv("LIT_NORM_TOF_HITS")).Atoi();
 	}
 
    parFileList->Add(&stsDigiFile);
@@ -206,14 +184,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 
 		if (IsTrd(parFile)) {
 			// ----- TRD reconstruction-----------------------------------------
-			// Update of the values for the radiator F.U. 17.08.07
-			Int_t trdNFoils = 130; // number of polyetylene foils
-			Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
-			Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
-			Bool_t simpleTR = kTRUE; // use fast and simple version for TR production
-
-			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
-
+			CbmTrdRadiator *radiator = new CbmTrdRadiator(kTRUE , "H++");
 			if (trdHitProducerType == "smearing") {
 				CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
 				trdHitProd->SetUseDigiPar(false);
@@ -226,7 +197,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 				run->AddTask(trdHitProd);
 			} else if (trdHitProducerType == "clustering") {
 				// ----- TRD clustering -----
-			   CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF("TrdDigiPrf","TRD digi prf",radiator);
+			   CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
 			   run->AddTask(trdDigiPrf);
 
 			   CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();

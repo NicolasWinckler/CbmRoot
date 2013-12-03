@@ -4,15 +4,15 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2013
  */
-void radlength_ana(Int_t nEvents = 31000000)
+void radlength_ana(Int_t nEvents = 1210000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir = "events/radlen_trd_v13g_30M/"; // Output directory
+   TString dir = "events/radlength_rich_v08a/"; // Output directory
    TString mcFile = dir + "radlength.mc.0000.root"; // MC transport file
    TString parFile = dir + "radlength.param.0000.root"; // Parameter file
    TString radLengthQaFile = dir + "radlength.qa.root"; // MC transport file
-   TString resultDir = "events/results_radlen_trd_v13g_30M/";
+   TString resultDir = "events/results_radlength_rich_v08a/";
 
    if (script == "yes") {
       mcFile = TString(gSystem->Getenv("LIT_MC_FILE"));

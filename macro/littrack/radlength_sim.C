@@ -3,19 +3,19 @@
 using std::cout;
 using std::endl;
 
-void radlength_sim(Int_t nEvents = 30250000)
+void radlength_sim(Int_t nEvents = 1210000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir  = "events/radlen_trd_v13g_30M/";
+   TString dir  = "events/radlength_rich_v08a/";
    TString mcFile = dir + "radlength.mc.0000.root";
    TString parFile = dir + "radlength.param.0000.root";
 
    TString caveGeom = "cave.geo";
    TString mvdGeom = "";//"mvd/mvd_v07a.geo";
    TString stsGeom = "";//"sts/sts_v12b.geo.root";
-   TString richGeom = "";//"rich/rich_v08a.geo";
-   TString trdGeom = "trd/trd_v13g.geo.root";
+   TString richGeom = "rich/rich_v08a.geo";
+   TString trdGeom = "";//"trd/trd_v13p_3e.geo.root";
    TString muchGeom = "";//"much/much_v12b.geo";
    TString tofGeom = "";//"tof/tof_v13b.geo.root";
 
@@ -91,11 +91,11 @@ void radlength_sim(Int_t nEvents = 30250000)
 
    const Double_t minX = -550; // cm
    const Double_t maxX = 550; // cm
-   const Double_t stepX = 0.2; // cm
+   const Double_t stepX = 1.; // cm
    const Int_t nofBinsX = (maxX - minX) / stepX;
    const Double_t minY = -550; // cm
    const Double_t maxY = 550; // cm
-   const Double_t stepY = 0.2; // cm
+   const Double_t stepY = 1.; // cm
    const Int_t nofBinsY = (maxY - minY) / stepY;
    const Int_t nofEvents = nofBinsX * nofBinsY;
 

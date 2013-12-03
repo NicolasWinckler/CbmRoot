@@ -21,7 +21,7 @@ void global_reco_qa(Int_t nEvents = 100,
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir = "events/much_v12c/"; // Output directory
+	TString dir = "events/trd_v13p_3e/"; // Output directory
 	TString resultDir = "test/"; // Output directory for results
 	TString mcFile = dir + "mc.0000.root"; // MC transport file
 	TString parFile = dir + "param.0000.root"; // Parameter file
@@ -127,7 +127,7 @@ void global_reco_qa(Int_t nEvents = 100,
   // trackingQa->SetTrackCategories(trackCategories);
   // trackingQa->SetRingCategories(ringCategories);
    trackingQa->SetOutputDir(std::string(resultDir));
- //  run->AddTask(trackingQa);
+   run->AddTask(trackingQa);
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();
    fitQa->SetMvdMinNofHits(0);
@@ -135,7 +135,7 @@ void global_reco_qa(Int_t nEvents = 100,
    fitQa->SetMuchMinNofHits(normMuchPoints);
    fitQa->SetTrdMinNofHits(normTrdPoints);
    fitQa->SetOutputDir(std::string(resultDir));
-  // run->AddTask(fitQa);
+   run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFileName(muchDigiFile.Data());

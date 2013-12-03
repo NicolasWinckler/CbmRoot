@@ -149,10 +149,6 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
       fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
       fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
 
-      const Double_t *global_point = gGeoManager->GetCurrentPoint();
-      Double_t local_point[3];
-      gGeoManager->MasterToLocal(global_point, local_point);
-
       fModuleInfo = fDigiPar->GetModule(point->GetDetectorID());
       fnCol = fModuleInfo->GetNofColumns();
       fnRow = fModuleInfo->GetNofRows();

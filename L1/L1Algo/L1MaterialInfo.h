@@ -33,10 +33,14 @@ class L1Material{
   float GetRadThick( float x, float y ) {
     x = ( x < RMax && x >= -RMax ) ? x : 0;
     y = ( y < RMax && y >= -RMax ) ? y : 0;
-    // L1_ASSERT( x < RMax && x >= -RMax, "x = " << x );
-    // L1_ASSERT( y < RMax && y >= -RMax, "y = " << y );
-    return table[ (x + RMax)*iD ][ (y + RMax)*iD ];
+    int i = static_cast<int>( (x + RMax)*iD );
+    int j = static_cast<int>(  (y + RMax)*iD );
+    i = ( i < NBins && i >= 0 ) ? i : NBins/2;
+    j = ( j < NBins && j >= 0 ) ? j : NBins/2;
+    return table[ i ][ j ];
   }
+
+
   fvec GetRadThick( fvec x, fvec y ) {
     fvec r;
     for ( int i = 0; i < fvecLen; i++ )

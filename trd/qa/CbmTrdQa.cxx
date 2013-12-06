@@ -24,6 +24,7 @@
 #include "TBox.h"
 #include "TPaveText.h"
 #include "TColor.h"
+#include "TPolyLine.h"
 #include <iostream>
 #include <cmath>
 
@@ -703,6 +704,19 @@ void CbmTrdQa::SetTriggerThreshold(Double_t triggerthreshold){
   fTriggerThreshold = triggerthreshold;
 }
 
+TPolyLine *CbmTrdQa::CreateTriangularPad(Int_t column, Int_t row, Double_t content){
+  const Int_t nCoordinates = 4;
+  Double_t x[nCoordinates] = {column-0.5,column+0.5,column+0.5,column-0.5};
+  Double_t y[nCoordinates] = {row-0.5,   row-0.5,   row+0.5,   row-0.5   };
+  if (row%2 != 0){
+    y[1] = row+0.5;
+    y[2] = row+0.5;
+  }
+  TPolyLine *pad = new TPolyLine(nCoordinates,x,y);
+  pad->SetFillColor(content);
+  return pad;
+}
+
 void CbmTrdQa::Exec(Option_t * option)
 {
   Bool_t samePadMerge = false;//true;
@@ -1250,6 +1264,12 @@ void CbmTrdQa::Exec(Option_t * option)
   printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
   printf("*********************************************************\n\n");
 }
+void CbmTrdQa::SetTriangularPads(Bool_t triangles)
+{
+  fTrianglePads = triangles;
+}
+
+
 void CbmTrdQa::SaveHistos()
 {
   TString title;

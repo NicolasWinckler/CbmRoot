@@ -35,9 +35,10 @@
 #include "TLine.h"
 #include "TPaveText.h"
 #include "TCanvas.h"
-
+#include "TPolyLine.h"
+#include "TColor.h"
 #include "TStopwatch.h"
-
+#include "CbmTrdUtils.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -56,6 +57,8 @@ CbmTrdRecoQa::CbmTrdRecoQa()
     fModuleMapCluster(),
     fModuleMapHit(),
     fModuleMapTrack(),
+    fTriggerTH(1.0e-6),
+    fTrianglePads(false),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler())
@@ -78,6 +81,8 @@ CbmTrdRecoQa::CbmTrdRecoQa(const char* name,
     fModuleMapCluster(),
     fModuleMapHit(),
     fModuleMapTrack(),
+    fTriggerTH(1.0e-6),
+    fTrianglePads(false),
     fDigiPar(NULL),
     fModuleInfo(NULL),
     fGeoHandler(new CbmTrdGeoHandler())
@@ -91,7 +96,9 @@ CbmTrdRecoQa::~CbmTrdRecoQa()
 {
 }
 // --------------------------------------------------------------------------
-
+void CbmTrdRecoQa::SetTriggerThreshold(Double_t minCharge){
+  fTriggerTH = minCharge;//  To be used for test beam data processing
+}
 
 // ---- Initialisation ------------------------------------------------------
 InitStatus CbmTrdRecoQa::Init()
@@ -178,10 +185,26 @@ InitStatus CbmTrdRecoQa::ReInit(){
   
   return kSUCCESS;
 }
-
+void CbmTrdRecoQa::SetTriangularPads(Bool_t triangles)
+{
+  fTrianglePads = triangles;
+}
+TPolyLine *CbmTrdRecoQa::CreateTriangularPad(Int_t column, Int_t row, Double_t content){
+  const Int_t nCoordinates = 4;
+  Double_t x[nCoordinates] = {column-0.5,column+0.5,column+0.5,column-0.5};
+  Double_t y[nCoordinates] = {row-0.5,   row-0.5,   row+0.5,   row-0.5   };
+  if (row%2 != 0){
+    y[1] = row+0.5;
+    y[2] = row+0.5;
+  }
+  TPolyLine *pad = new TPolyLine(nCoordinates,x,y);
+  pad->SetFillColor(content);
+  return pad;
+}
 // ---- Task execution ------------------------------------------------------
 void CbmTrdRecoQa::Exec(Option_t* option)
 {
+  CbmTrdUtils *utils = new CbmTrdUtils();
   TStopwatch timer;
   timer.Start();
   cout << "================CbmTrdRecoQa==============" << endl;
@@ -241,8 +264,10 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	TH2I* dummy = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	name.Form("ModuleAddress%iDigis",moduleAddress);   
 	fModuleMapDigi[moduleAddress] = new TH2D(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
+	fModuleMapDigi[moduleAddress]->SetContour(99);
 	name.Form("ModuleAddress%iClusters",moduleAddress);   
 	fModuleMapCluster[moduleAddress] = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
+	fModuleMapCluster[moduleAddress]->SetContour(99);
 	name.Form("ModuleAddress%iHits",moduleAddress);   
 	fModuleMapHit[moduleAddress] = new TGraphErrors();//name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	fModuleMapHit[moduleAddress]->SetMarkerStyle(24);
@@ -413,13 +438,48 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     ptext->Draw("same");
     it->second->cd(1)->Update();
     it->second->cd(2);
-    fModuleMapDigi[it->first]->DrawCopy("colz");
+    fModuleMapDigi[it->first]->DrawCopy("colz");   
+
+    if (fTrianglePads){
+      TPolyLine *pad = NULL;
+      const Int_t nRow = fModuleMapDigi[it->first]->GetNbinsY();
+      const Int_t nCol = fModuleMapDigi[it->first]->GetNbinsX();
+      const Double_t max_Range = fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin());
+      for (Int_t iRow = 1; iRow <= nRow; iRow++){
+	for (Int_t iCol = 1; iCol <= nCol; iCol++){
+	  Double_t charge = fModuleMapDigi[it->first]->GetBinContent(iCol, iRow);
+	  if (charge > 0.0){
+	    pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, 0.0, max_Range, false);
+	    pad->Draw("f,same");
+	  }
+	}
+      }
+    }
+
     for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
       fModuleMapTrack[it->first]->at(t)->Draw("same");
-  
+
     it->second->cd(3)->SetLogz(1);
-    fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(9.9e-7,fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin()));
+    fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(fTriggerTH,fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin()));
     fModuleMapDigi[it->first]->DrawCopy("colz");
+    if (fTrianglePads){
+      TPolyLine *pad = NULL;
+      const Int_t nRow = fModuleMapDigi[it->first]->GetNbinsY();
+      const Int_t nCol = fModuleMapDigi[it->first]->GetNbinsX();
+      const Double_t max_Range = fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin());
+      for (Int_t iRow = 1; iRow <= nRow; iRow++){
+	for (Int_t iCol = 1; iCol <= nCol; iCol++){
+	  Double_t charge = fModuleMapDigi[it->first]->GetBinContent(iCol, iRow);
+	  if (charge > fTriggerTH){
+	    pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, fTriggerTH, max_Range, true);
+	    pad->Draw("f,same");
+	  }
+	}
+      }
+    }
+
+
+
     for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
       fModuleMapTrack[it->first]->at(t)->Draw("same");
 

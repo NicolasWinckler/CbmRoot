@@ -19,7 +19,7 @@ class TH1I;
 class TH2I;
 class TH2F;
 class TCanvas;
-
+class TPolyLine;
 class CbmTrdQa : public FairTask {
 
  public:
@@ -35,9 +35,11 @@ class CbmTrdQa : public FairTask {
   virtual void FinishTask();
   void Register();
   void SetTriggerThreshold(Double_t triggerthreshold);
+  void SetTriangularPads(Bool_t triangles);
  private:
   Double_t CalcAngle(const CbmTrdPoint* pointA, const CbmTrdPoint* pointB);
   void SaveHistos();
+  TPolyLine *CreateTriangularPad(Int_t column, Int_t row, Double_t content);
   void NormalizeHistos();
   void CreateLayerView();
   void GetPadInfos(Int_t moduleAddress, Double_t x, Double_t y, Int_t &iCol, Int_t &iRow, Double_t &padSizeX, Double_t &padSizeY);
@@ -102,6 +104,8 @@ class CbmTrdQa : public FairTask {
   Bool_t fP;
   Bool_t fC;
   Bool_t fH;
+
+  Bool_t fTrianglePads;
 
   TH2I *fLayerDummy;
   TH2F *fStsTrdPoints;

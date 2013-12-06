@@ -11,6 +11,53 @@
 CbmTrdUtils::CbmTrdUtils(){}
 CbmTrdUtils::~CbmTrdUtils(){}
 
+TPolyLine *CbmTrdUtils::CreateTriangularPad(Int_t column, Int_t row, Double_t value, Double_t min_range, Double_t max_range, Bool_t logScale){
+  const Int_t nCoordinates = 4;
+  Double_t x[nCoordinates];
+  Double_t y[nCoordinates];
+  if (row%2 != 0){
+    x[0] = column-0.5;
+    y[0] = row-1.5;
+    x[1] = column+0.5;
+    y[1] = row+0.5;
+    x[2] = column-0.5;
+    y[2] = row+0.5;
+    x[3] = column-0.5;
+    y[3] = row-1.5;
+  } else {
+    x[0] = column-0.5;
+    y[0] = row-0.5;
+    x[1] = column+0.5;
+    y[1] = row-0.5;
+    x[2] = column+0.5;
+    y[2] = row+1.5;
+    x[3] = column-0.5;
+    y[3] = row-0.5;
+  }
+  TPolyLine *pad = new TPolyLine(nCoordinates,x,y);
+  pad->SetLineColor(1);
+  std::vector<Int_t> fColors;
+  std::vector<Double_t> fZLevel;
+  //Double_t fmax(20), fmin(0);
+  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+    fColors.push_back(TColor::GetColorPalette(i));
+    if (logScale)
+      fZLevel.push_back(min_range + TMath::Power(10, TMath::Log10(max_range) / TColor::GetNumberOfColors() * i));// log scale
+    else
+      fZLevel.push_back(min_range + (max_range / TColor::GetNumberOfColors() * i)); // lin scale
+  }
+  Int_t j = 0;
+  while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+    //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+    j++;
+  }
+  pad->SetFillColor(fColors[j]);
+  if (j >= (Int_t)fZLevel.size())
+    pad->SetFillColor(2);
+
+  return pad;
+}
+
    void CbmTrdUtils::NiceTH1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) 
   {
     h->SetStats(kFALSE);

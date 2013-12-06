@@ -34,6 +34,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
    fGeoHandler(NULL),
    ClusterSum(-1),
    fMinimumChargeTH(1.0e-06),//1.0e-08),
+   fTrianglePads(false),
    fMultiHit(false),
    fRowClusterMerger(true),
    fNeighbourRowTrigger(true),
@@ -50,6 +51,7 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast(Bool_t MultiHit, Bool_t Neighbo
    fGeoHandler(NULL),
    ClusterSum(-1),
    fMinimumChargeTH(MinimumChargeTH),
+   fTrianglePads(false),
    fMultiHit(MultiHit),
    fRowClusterMerger(RowClusterMerger),
    fNeighbourRowTrigger(true),
@@ -84,6 +86,11 @@ InitStatus CbmTrdClusterFinderFast::Init()
    return kSUCCESS;
 } 
 // --------------------------------------------------------------------
+void CbmTrdClusterFinderFast::SetTriangularPads(Bool_t triangles)
+{
+  fTrianglePads = triangles;
+}
+// --------------------------------------------------------------------
 void CbmTrdClusterFinderFast::SetTriggerThreshold(Double_t minCharge){
   fMinimumChargeTH = minCharge;//  To be used for test beam data processing
 }
@@ -102,7 +109,7 @@ void CbmTrdClusterFinderFast::SetPrimaryClusterRowMerger(Bool_t rowMerger){
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
-   fClusters->Delete();
+  fClusters->Delete();
 
   TStopwatch timer;
   timer.Start();
@@ -284,20 +291,20 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       d->charge = digi->GetCharge();
 
       if (optimization && fMinimumChargeTH == 0){
-	  DigiChargeSpectrum->Fill(digi->GetCharge());
-	}
+	DigiChargeSpectrum->Fill(digi->GetCharge());
+      }
       //cout << "Searching neighbour digis below threshold" << endl;
       if (ModuleNeighbourDigiMap.find(moduleAddress) == ModuleNeighbourDigiMap.end()) {	     
 	ModuleNeighbourDigiMap[moduleAddress] = new MyDigiList;
       } 
       ModuleNeighbourDigiMap[moduleAddress]->push_back(d);
       if (digi->GetCharge() >= fMinimumChargeTH)	{
-	  digiCounter++;
-	  if (modules.find(moduleAddress) == modules.end()) {	     
-	    modules[moduleAddress] = new MyDigiList;
-	  } 
-	  modules[moduleAddress]->push_back(d);
-	}
+	digiCounter++;
+	if (modules.find(moduleAddress) == modules.end()) {	     
+	  modules[moduleAddress] = new MyDigiList;
+	} 
+	modules[moduleAddress]->push_back(d);
+      }
       // Since the pointer is stored in a stl container which is used later out of the scope of this loop
       // the pointer is set to NULL here to make clear that the objects must deleted elswhere. If the objects 
       // are not deleted later this is a perfect memory leak. 
@@ -332,8 +339,13 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       //if (it->first==5)
       fModClusterMap[it->first] = clusterModule(it->second/*, ModuleNeighbourDigiMap[it->first]*/);
       //drawCluster(it->first, fModClusterMap[it->first]);
-      if (fNeighbourReadout)
-	addNeighbourDigis(fDigiPar->GetModule(it->first)->GetNofColumns(), fModClusterMap[it->first], ModuleNeighbourDigiMap[it->first]);
+      if (fNeighbourReadout){
+	if (fTrianglePads)
+	  addNeighbourDigisTriangular(fDigiPar->GetModule(it->first)->GetNofColumns(), fModClusterMap[it->first], ModuleNeighbourDigiMap[it->first]);
+	else
+	  addNeighbourDigis(fDigiPar->GetModule(it->first)->GetNofColumns(), fModClusterMap[it->first], ModuleNeighbourDigiMap[it->first]);
+
+      }
     }
     //cout << "addCluster(fModClusterMap)" << endl;
     addCluster(fModClusterMap);
@@ -413,7 +425,90 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 
   //----------------------------------------------------------------------
 bool digiSorter(MyDigi *a, MyDigi *b)
-{ return (a->combiId < b->combiId); }
+{ return (a->combiId < b->combiId); } 
+//----------------------------------------------------------------------
+void CbmTrdClusterFinderFast::addNeighbourDigisTriangular(Int_t nCol, ClusterList *clusters, MyDigiList *neighbours)
+{
+  Int_t activeCombiId(0), testCombiId(0);
+  Int_t activeRow(0), firstRow(0), lastRow(0);
+  Int_t activeCol(0), firstCol(0), lastCol(0);
+
+  neighbours->sort(digiSorter);
+
+  for (ClusterList::iterator it = clusters->begin(); it != clusters->end(); ++it) {
+    MyDigiList *tobeIncluded = new MyDigiList;
+    for (MyDigiList::iterator i = (*it)->begin(); i != (*it)->end(); i++){
+      activeCombiId = (*i)->combiId;
+      activeRow = (*i)->rowId;
+      activeCol = (*i)->colId;
+      firstCol = activeCol-1;
+      lastCol = activeCol+1;
+      if (activeRow%2 == 0){
+	firstRow = activeRow;
+	lastRow = activeRow+1;
+      } else {
+	firstRow = activeRow-1;
+	lastRow = activeRow;
+      }
+      /*
+	if(fNeighbourRowTrigger){
+	lastRow = activeRow+1;
+	if (activeCol > 0)
+	firstCol = activeCol-1;
+	else 
+	firstCol = 0;
+	if (activeRow > 0)
+	firstRow = activeRow-1;
+	else
+	firstRow = 0;
+	} else {
+	firstRow = activeRow;
+	lastRow = activeRow;
+	if (activeCol > 0)
+	firstCol = activeCol-1;
+	else 
+	firstCol = 0;
+	}
+      */
+    
+      /*
+       * walk around the active digi and test if neigbours are already included in second list. second list is used to avoid neighbours of neighbours to be included
+       */
+      for (Int_t iRow = firstRow; iRow <= lastRow; iRow++){
+	for (Int_t iCol = firstCol; iCol <= lastCol; iCol++){
+	  Bool_t alreadyInList = false;
+	  testCombiId = iRow * (nCol+1) + iCol;
+	  if (testCombiId != activeCombiId){
+	    for (MyDigiList::iterator n = neighbours->begin(); n != neighbours->end(); n++){
+	      if (testCombiId == (*n)->combiId){ 
+		for (MyDigiList::iterator t = tobeIncluded->begin(); t != tobeIncluded->end(); t++){ // list of neighbours to be included in cluster
+		  if ((*t)->combiId == testCombiId) {
+		    alreadyInList = true;
+		  }
+		}
+		if (!alreadyInList)	      
+		  for (MyDigiList::iterator d = (*it)->begin(); d != (*it)->end(); d++){ // digis which are already inside cluster
+		    if ((*d)->combiId == testCombiId){
+		      alreadyInList = true;
+		    }
+		  }
+		if (!alreadyInList){
+		  tobeIncluded->push_back(*n);
+		}
+	      }
+	    } 
+	  } //else cout << " test == active" << endl;
+	}
+      }
+    }
+    tobeIncluded->sort(digiSorter);
+    for (MyDigiList::iterator t = tobeIncluded->begin(); t != tobeIncluded->end(); t++){
+      (*it)->push_back(*t);
+    }
+    delete tobeIncluded;
+  }
+}
+  //----------------------------------------------------------------------
   //----------------------------------------------------------------------
 void CbmTrdClusterFinderFast::addNeighbourDigis(Int_t nCol, ClusterList *clusters, MyDigiList *neighbours)
 {

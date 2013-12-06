@@ -99,7 +99,7 @@ class CbmTrdClusterFinderFast : public FairTask
   void SetNeighbourRowTrigger(Bool_t trigger);
   void SetPrimaryClusterRowMerger(Bool_t rowMerger);
   //void SetMinimumChargeThreshold(Double_t minCharge);
-
+  void SetTriangularPads(Bool_t triangles);
  private:
   //static const Bool_t fMultiHit = true;
 
@@ -113,6 +113,8 @@ class CbmTrdClusterFinderFast : public FairTask
   void drawCluster(Int_t moduleId, ClusterList *clusterList);
 
   void addNeighbourDigis(Int_t nRow, ClusterList *clusters, MyDigiList *neighbours);
+
+  void addNeighbourDigisTriangular(Int_t nRow, ClusterList *clusters, MyDigiList *neighbours);
 
   void addCluster(std::map<Int_t, ClusterList*> fModClusterMap);
 
@@ -133,7 +135,7 @@ class CbmTrdClusterFinderFast : public FairTask
   Bool_t fNeighbourRowTrigger; // trigger channels in the neighbouring rows (if false and fNeighbourReadout == true: only left and right neighbour are triggered)
   Bool_t fRowClusterMerger;  // merge self triggered channels accross rows
   Bool_t fMultiHit;
-
+  Bool_t fTrianglePads;
   CbmTrdClusterFinderFast(const CbmTrdClusterFinderFast&);
   CbmTrdClusterFinderFast& operator=(const CbmTrdClusterFinderFast&);
 

@@ -1,24 +1,26 @@
-*** Create_TRD_Geometry_v14a300.C	2013-12-06 17:04:35.084573025 +0100
---- Create_TRD_Geometry_v14a100.C	2013-12-06 17:07:04.105153920 +0100
+*** Create_TRD_Geometry_v14a300.C	2013-12-09 14:40:51.923076768 +0100
+--- Create_TRD_Geometry_v14a100.C	2013-12-09 14:43:07.703925258 +0100
 ***************
-*** 72,78 ****
-  #include <iostream>
+*** 74,81 ****
   
   // Name of output file with geometry
-! const TString geoVersion   = "trd_v14a300";  // "trd_v14a100";
-  const TString FileNameSim  = geoVersion + ".geo.root";
-  const TString FileNameGeo  = geoVersion + "_geo.root";
-  const TString FileNameInfo = geoVersion + ".geo.info";
---- 72,78 ----
-  #include <iostream>
+  const TString tagVersion   = "v14a";
+! //const TString geoVersion   = "trd_" + tagVersion + "100";
+! const TString geoVersion   = "trd_" + tagVersion + "300";
+  //
+  //const TString geoVersion   = "trd_" + tagVersion + "_1h";
+  //const TString geoVersion   = "trd_" + tagVersion + "_1e";
+--- 74,81 ----
   
   // Name of output file with geometry
-! const TString geoVersion   = "trd_v14a100";  // "trd_v14a100";
-  const TString FileNameSim  = geoVersion + ".geo.root";
-  const TString FileNameGeo  = geoVersion + "_geo.root";
-  const TString FileNameInfo = geoVersion + ".geo.info";
+  const TString tagVersion   = "v14a";
+! const TString geoVersion   = "trd_" + tagVersion + "100";
+! //const TString geoVersion   = "trd_" + tagVersion + "300";
+  //
+  //const TString geoVersion   = "trd_" + tagVersion + "_1h";
+  //const TString geoVersion   = "trd_" + tagVersion + "_1e";
 ***************
-*** 128,136 ****
+*** 138,146 ****
   //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
   //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-3l  // 1: plot, 0: hide
   //
@@ -28,7 +30,7 @@
   
   Int_t    PlaneId[MaxLayers]; // automatically filled with layer ID
   
---- 128,136 ----
+--- 138,146 ----
   //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-2l  // 1: plot, 0: hide
   //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };  // SIS100-3l  // 1: plot, 0: hide
   //
@@ -39,16 +41,16 @@
   Int_t    PlaneId[MaxLayers]; // automatically filled with layer ID
   
 ***************
-*** 371,377 ****
-  void dump_info_file();
+*** 394,400 ****
+  void dump_digi_file();
   
   
 ! void Create_TRD_Geometry_v14a300() {
     // Load the necessary FairRoot libraries 
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
     basiclibs();
---- 371,377 ----
-  void dump_info_file();
+--- 394,400 ----
+  void dump_digi_file();
   
   
 ! void Create_TRD_Geometry_v14a100() {

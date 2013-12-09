@@ -140,16 +140,71 @@ CbmTrdModule::~CbmTrdModule()
     delete AsicMapIt->second;
   fAsicMap.clear();
 }
-// 20131209 - CB 
 
+// 20131209 - CB 
 CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
+  Int_t iAsic = 0;
+  Double_t xAsic = 0;  // x position of Asic
+  Double_t yAsic = 0;  // y position of Asic
+  Int_t nChannels = 32;
+  Int_t iFebGroup = 0; // 1; 2; // normal, super, ultimate
+  Int_t gRow[3] = {  2, 4, 6 };
+  Int_t gCol[3] = { 16, 8, 5 };
+  Int_t rowId = 0;
+  Int_t secId = 0;
+
   if (fAsicMap.size() == 0){ // Init ASICs
     //for (Int_t s = 0; s < fNofSectors; s++)
       {
       for (Int_t r = 0; r < GetNofRows(); r++){
 	for (Int_t c = 0; c < GetNofColumns(); c++){
 
+          // ultimate density 6 rows,  5 pads
+          // super    density 4 rows,  8 pads
+          // normal   density 2 rows, 16 pads
+          if ((r % gRow[iFebGroup]) == 0)
+	    if ((c % gCol[iFebGroup]) == 0)
+            {
+              xAsic = c + gCol[iFebGroup] / 2.;
+              yAsic = r + gRow[iFebGroup] / 2.;
+              secId = GetSector((Int_t)yAsic, rowId);
 
+	      Double_t local_point[3];
+	      Double_t padsizex = fPadSizeX.At(secId);
+	      Double_t padsizey = fPadSizeY.At(secId);
+
+	      // calculate position in sector coordinate system
+	      // with the origin in the lower left corner (looking upstream)
+	      local_point[0] = (((Double_t)xAsic + 0.5) * padsizex);
+	      local_point[1] = (((Double_t)yAsic + 0.5) * padsizey);
+
+	      // calculate position in module coordinate system
+	      // with the origin in the lower left corner (looking upstream)
+	      local_point[0] += fSectorBeginX.GetAt(secId);
+	      local_point[1] += fSectorBeginY.GetAt(secId);
+
+	      // local_point[i] must be >= 0 at this point      Double_t local_point[3];
+
+              fAsicMap[iAsic] = new CbmTrdAsic(
+                 iAsic, nChannels, iFebGroup,
+                 local_point[0], local_point[1], 0.,
+                 2., 2., 0.5);
+
+              for (Int_t ir = r; ir < r + gRow[iFebGroup]; ir++)
+              {
+           	for (Int_t ic = c; ic < c + gCol[iFebGroup]; ic++)
+                {
+                  if (ir >= GetNofRows())     LOG(ERROR) << "ir " << ir << " is out of bounds!" << FairLogger::endl;
+                  if (ic >= GetNofColumns())  LOG(ERROR) << "ic " << ic << " is out of bounds!" << FairLogger::endl;
+                  fAsicMap[iAsic]->fChannelAddresses.push_back(CbmTrdAddress::GetAddress(CbmTrdAddress::GetLayerId(fModuleAddress),
+                                                                                         CbmTrdAddress::GetModuleId(fModuleAddress),
+                                                                                         CbmTrdAddress::GetSectorId(fModuleAddress), ir, ic));
+                } 
+              } 
+
+              iAsic++;  // next Asic
+
+            }
 
 	}
       }

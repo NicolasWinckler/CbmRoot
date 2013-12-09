@@ -12,7 +12,6 @@
 CbmTrdAsic::CbmTrdAsic() 
   : TNamed(),
     fAsicAddress(0),
-    fOrientation(0),
     fX(0.),
     fY(0.),
     fZ(0.),
@@ -26,12 +25,11 @@ CbmTrdAsic::CbmTrdAsic()
 }
 
 CbmTrdAsic::CbmTrdAsic(
-		       Int_t address, Int_t orientation,  Int_t nofChannels, Int_t FebGrouping, 
+		       Int_t address, Int_t nofChannels, Int_t FebGrouping, 
 		       Double_t x, Double_t y, Double_t z,
 		       Double_t sizex, Double_t sizey, Double_t sizez)
   : TNamed(),
     fAsicAddress(address),
-    fOrientation(orientation),
     fX(x),
     fY(y),
     fZ(z),

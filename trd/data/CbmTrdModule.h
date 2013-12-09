@@ -59,6 +59,9 @@ public:
   Double_t GetAnodeWireOffset() const { return fAnodeWireOffset; }
   Double_t GetAnodeWireSpacing() const { return fAnodeWireSpacing; }
 
+  CbmTrdAsic *GetAsic(Int_t AsicAddress);
+  Int_t GetNofAsics() const { return fNofAsics; }
+
   Int_t GetNofSectors() const { return fNofSectors; }
 
   Int_t GetModuleRow(
@@ -155,6 +158,7 @@ private:
   TArrayD fPadSizeY; // size of the readout pad in y [cm]
 
   std::map<Int_t, CbmTrdAsic*> fAsicMap;
+  Int_t fNofAsics;
 
   ClassDef(CbmTrdModule, 3);
 };

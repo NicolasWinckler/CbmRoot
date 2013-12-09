@@ -34,6 +34,7 @@ CbmTrdModule::CbmTrdModule()
     fSectorSizeY(0),
     fPadSizeX(0),
     fPadSizeY(0),
+    fNofAsics(0),
     fAsicMap()
 {
 }
@@ -67,6 +68,7 @@ CbmTrdModule::CbmTrdModule(
     fSectorSizeY(sectorSizeY),
     fPadSizeX(padSizeX),
     fPadSizeY(padSizeY) ,
+    fNofAsics(0),
     fAsicMap()  
 {
   // Calculate the coordinates of the begin and the end of each sector
@@ -138,7 +140,23 @@ CbmTrdModule::~CbmTrdModule()
     delete AsicMapIt->second;
   fAsicMap.clear();
 }
+// 20131209 - CB 
 
+CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
+  if (fAsicMap.size() == 0){ // Init ASICs
+    //for (Int_t s = 0; s < fNofSectors; s++)
+      {
+      for (Int_t r = 0; r < GetNofRows(); r++){
+	for (Int_t c = 0; c < GetNofColumns(); c++){
+
+
+
+	}
+      }
+    }
+  }
+  return fAsicMap[AsicAddress];
+}
 
 // 20131009 - DE - checked OK
 void CbmTrdModule::ProjectPositionToNextAnodeWire(

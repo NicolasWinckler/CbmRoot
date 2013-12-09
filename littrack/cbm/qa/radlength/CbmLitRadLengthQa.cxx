@@ -104,8 +104,8 @@ void CbmLitRadLengthQa::CreateHistograms()
    const Int_t nofBins = 1000;
    const Int_t nofBinsX = 1000;
    const Int_t nofBinsY = 1000;
-   const Int_t nofBinsSiliconThicknessX = 5500;
-   const Int_t nofBinsSiliconThicknessY = 5500;
+   const Int_t nofBinsSiliconThicknessX = 1100;
+   const Int_t nofBinsSiliconThicknessY = 1100;
    const Double_t minX = -550.1;
    const Double_t maxX = 549.9;
    const Double_t minY = -550.1;
@@ -323,6 +323,8 @@ Int_t CbmLitRadLengthQa::GetTrdStationId(
    Int_t layerId = -1;
    if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_0/layer[0-9][0-9]_[0-9][0-9][0-9][0-9][0-9]/module[0-9]_.+"))) { // trd_v13x NEW
       layerId = std::atoi(string(nodePath.Data() + 24, 2).c_str()) - 1;
+   } else if (nodePath.Contains(TRegexp("/cave_1/trd_v13[a-z]_[0-9][a-z]_0/layer[0-9][0-9]_[0-9][0-9][0-9][0-9][0-9]/module[0-9]_.+"))) { // trd_v13x NEW
+	  layerId = std::atoi(string(nodePath.Data() + 27, 2).c_str()) - 1;
    }
    return layerId;
 }

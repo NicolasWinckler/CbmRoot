@@ -49,6 +49,8 @@ void CbmLitTofQaReport::Create()
 
 void CbmLitTofQaReport::Draw()
 {
+   HM()->NormalizeToIntegralByPattern("hmp_TofTrack_All_.+");
+
 	DrawH2ByPattern("hmp_Tof_Reco_.+_m2p", kLinear, kLinear, kLog, "colz");
 	DrawH2ByPattern("hmp_Tof_RecoMCID_.+_m2p", kLinear, kLinear, kLog, "colz");
    DrawH2ByPattern("hmp_Tof_RecoAccTof_.+_m2p", kLinear, kLinear, kLog, "colz");

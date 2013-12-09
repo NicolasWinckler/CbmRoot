@@ -184,9 +184,7 @@ void lit::parallel::LitTrackFinderNN::FollowTracks()
          for (unsigned int iHit = 0; iHit < nofHits; iHit++) {
             const LitScalPixelHit* hit = hits[iHit];
             int bin = fHitData.GetBinByZPos(iStation, hit->Z);
-            if (binParamMap.find(bin) == binParamMap.end()) { // This should never happen
-               cout << "-E- LitTrackFinderNN::FollowTracks: Z position " << hit->Z << " not found in map. Something is wrong.\n";
-            }
+            assert(binParamMap.find(bin) != binParamMap.end());
             LitTrackParamScal tpar(binParamMap[bin]);
 
             // Check preliminary if hit is in the validation gate.

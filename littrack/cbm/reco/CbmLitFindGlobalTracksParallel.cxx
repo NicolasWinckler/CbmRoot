@@ -66,8 +66,8 @@ InitStatus CbmLitFindGlobalTracksParallel::Init()
 void CbmLitFindGlobalTracksParallel::Exec(
    Option_t* opt)
 {
-   if (fDet.GetDet(kTRD)) { fTrdTracks->Clear(); }
-   fGlobalTracks->Clear();
+   if (fDet.GetDet(kTRD)) { fTrdTracks->Delete(); }
+   fGlobalTracks->Delete();
 
    DoTracking();
 
@@ -186,17 +186,17 @@ void CbmLitFindGlobalTracksParallel::ConstructGlobalTracks()
 
 void CbmLitFindGlobalTracksParallel::PrintStopwatchStatistics()
 {
-   cout << "CbmLitFindGlobalTracksParallel::PrintStopwatchStatistics: " << endl;
-   cout << "tracking without IO: counts=" << fTrackingWatch.Counter()
-        << ", real=" << fTrackingWatch.RealTime() / fTrackingWatch.Counter()
-        << "/" << fTrackingWatch.RealTime()
-        << " s, cpu=" << fTrackingWatch.CpuTime() / fTrackingWatch.Counter()
-        << "/" << fTrackingWatch.CpuTime() << endl;
-   cout << "tracking with IO: counts=" << fTrackingWithIOWatch.Counter()
+   LOG(INFO) << "CbmLitFindGlobalTracksParallel::PrintStopwatchStatistics: " << FairLogger::endl
+   	   	<< "tracking without IO: counts=" << fTrackingWatch.Counter()
+		<< ", real=" << fTrackingWatch.RealTime() / fTrackingWatch.Counter()
+		<< "/" << fTrackingWatch.RealTime()
+		<< " s, cpu=" << fTrackingWatch.CpuTime() / fTrackingWatch.Counter()
+		<< "/" << fTrackingWatch.CpuTime() << FairLogger::endl
+   	    << "tracking with IO: counts=" << fTrackingWithIOWatch.Counter()
         << ", real=" << fTrackingWithIOWatch.RealTime() / fTrackingWithIOWatch.Counter()
         << "/" << fTrackingWithIOWatch.RealTime()
         << " s, cpu=" << fTrackingWithIOWatch.CpuTime() / fTrackingWithIOWatch.Counter()
-        << "/" << fTrackingWithIOWatch.CpuTime() << endl;
+        << "/" << fTrackingWithIOWatch.CpuTime() << FairLogger::endl;
 }
 
 ClassImp(CbmLitFindGlobalTracksParallel);

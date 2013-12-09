@@ -11,126 +11,132 @@
 
 CbmTrdModule::CbmTrdModule() 
   : TNamed(),
-  fModuleAddress(0),
-  fOrientation(0),
-  fX(0.),
-  fY(0.),
-  fZ(0.),
-  fSizeX(0.),
-  fSizeY(0.),
-  fSizeZ(0.),
-  fAnodeWireOffset(0),
-  fAnodeWireSpacing(0),
-  fAnodeWireToPadPlaneDistance(0),
-  fNofSectors(0),  
-  fSectorX(0),    
-  fSectorY(0),    
-  fSectorZ(0),    
-  fSectorBeginX(0),
-  fSectorBeginY(0),
-  fSectorEndX(0),
-  fSectorEndY(0),
-  fSectorSizeX(0),
-  fSectorSizeY(0),
-  fPadSizeX(0),
-  fPadSizeY(0)   
+    fModuleAddress(0),
+    fOrientation(0),
+    fX(0.),
+    fY(0.),
+    fZ(0.),
+    fSizeX(0.),
+    fSizeY(0.),
+    fSizeZ(0.),
+    fAnodeWireOffset(0),
+    fAnodeWireSpacing(0),
+    fAnodeWireToPadPlaneDistance(0),
+    fNofSectors(0),  
+    fSectorX(0),    
+    fSectorY(0),    
+    fSectorZ(0),    
+    fSectorBeginX(0),
+    fSectorBeginY(0),
+    fSectorEndX(0),
+    fSectorEndY(0),
+    fSectorSizeX(0),
+    fSectorSizeY(0),
+    fPadSizeX(0),
+    fPadSizeY(0),
+    fAsicMap()
 {
 }
 
 CbmTrdModule::CbmTrdModule(
-      Int_t address, Int_t orientation, Double_t x, Double_t y, Double_t z,
-      Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
-      const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
-      const TArrayD& padSizeX, const TArrayD& padSizeY)
+			   Int_t address, Int_t orientation, Double_t x, Double_t y, Double_t z,
+			   Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
+			   const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
+			   const TArrayD& padSizeX, const TArrayD& padSizeY)
   : TNamed(),
-  fModuleAddress(address),
-  fOrientation(orientation),
-  fX(x),
-  fY(y),
-  fZ(z),
-  fSizeX(sizex),
-  fSizeY(sizey),
-  fSizeZ(sizez),
-  fAnodeWireOffset(0.375),
-  fAnodeWireSpacing(0.25),
-  fAnodeWireToPadPlaneDistance(0.35),
-  fNofSectors(nofSectors),
-  fSectorX(nofSectors),
-  fSectorY(nofSectors),
-  fSectorZ(nofSectors),
-  fSectorBeginX(nofSectors),
-  fSectorBeginY(nofSectors),
-  fSectorEndX(nofSectors),
-  fSectorEndY(nofSectors),
-  fSectorSizeX(sectorSizeX),
-  fSectorSizeY(sectorSizeY),
-  fPadSizeX(padSizeX),
-  fPadSizeY(padSizeY)   
+    fModuleAddress(address),
+    fOrientation(orientation),
+    fX(x),
+    fY(y),
+    fZ(z),
+    fSizeX(sizex),
+    fSizeY(sizey),
+    fSizeZ(sizez),
+    fAnodeWireOffset(0.375),
+    fAnodeWireSpacing(0.25),
+    fAnodeWireToPadPlaneDistance(0.35),
+    fNofSectors(nofSectors),
+    fSectorX(nofSectors),
+    fSectorY(nofSectors),
+    fSectorZ(nofSectors),
+    fSectorBeginX(nofSectors),
+    fSectorBeginY(nofSectors),
+    fSectorEndX(nofSectors),
+    fSectorEndY(nofSectors),
+    fSectorSizeX(sectorSizeX),
+    fSectorSizeY(sectorSizeY),
+    fPadSizeX(padSizeX),
+    fPadSizeY(padSizeY) ,
+    fAsicMap()  
 {
-   // Calculate the coordinates of the begin and the end of each sector
-   // as well as the coordinates of the center of the sector
-   // In the moment it is assumed that there are sectors which have either
-   // in x- or y-direction the size of the chamber.
+  // Calculate the coordinates of the begin and the end of each sector
+  // as well as the coordinates of the center of the sector
+  // In the moment it is assumed that there are sectors which have either
+  // in x- or y-direction the size of the chamber.
 
-   if (nofSectors > 1) {
-      Double_t beginx, beginy, endx, endy;
-      Double_t summed_sectsize;
-      if (sectorSizeX.GetAt(0) == 2 * sizex) { //substructure only in y-direction
-         beginx = 0;
-         endx = 2 * sizex;
-         summed_sectsize = 0;
-         for (Int_t i = 0; i < fNofSectors; i++) {
-            if (0 == i) {
-               beginy = 0.;
-               endy = sectorSizeY.GetAt(i);
-               summed_sectsize += sectorSizeY.GetAt(i);
-            } else {
-               beginy = summed_sectsize;
-               endy = summed_sectsize += sectorSizeY.GetAt(i);
-            }
-            fSectorBeginX.AddAt(beginx, i);
-            fSectorBeginY.AddAt(beginy, i);
-            fSectorEndX.AddAt(endx, i);
-            fSectorEndY.AddAt(endy, i);
-            fSectorX.AddAt(beginx + (sectorSizeX.GetAt(i) / 2.), i);
-            fSectorY.AddAt(beginy + (sectorSizeY.GetAt(i) / 2.), i);
-            fSectorZ.AddAt(fZ, i);
-         }
-      } else {
-         beginy = 0;
-         endy = 2 * sizey;
-         summed_sectsize = 0;
-         for (Int_t i = 0; i < fNofSectors; i++) {
-            if (0 == i) {
-               beginx = 0.;
-               endx = sectorSizeX.GetAt(i);
-               summed_sectsize += sectorSizeX.GetAt(i);
-            } else {
-               beginx = summed_sectsize;
-               endx = summed_sectsize += sectorSizeX.GetAt(i);
-            }
-            fSectorBeginX.AddAt(beginx, i);
-            fSectorBeginY.AddAt(beginy, i);
-            fSectorEndX.AddAt(endx, i);
-            fSectorEndY.AddAt(endy, i);
-            fSectorX.AddAt(beginx + (sectorSizeX.GetAt(i) / 2.), i);
-            fSectorY.AddAt(beginy + (sectorSizeY.GetAt(i) / 2.), i);
-            fSectorZ.AddAt(fZ, i);
-         }
+  if (nofSectors > 1) {
+    Double_t beginx, beginy, endx, endy;
+    Double_t summed_sectsize;
+    if (sectorSizeX.GetAt(0) == 2 * sizex) { //substructure only in y-direction
+      beginx = 0;
+      endx = 2 * sizex;
+      summed_sectsize = 0;
+      for (Int_t i = 0; i < fNofSectors; i++) {
+	if (0 == i) {
+	  beginy = 0.;
+	  endy = sectorSizeY.GetAt(i);
+	  summed_sectsize += sectorSizeY.GetAt(i);
+	} else {
+	  beginy = summed_sectsize;
+	  endy = summed_sectsize += sectorSizeY.GetAt(i);
+	}
+	fSectorBeginX.AddAt(beginx, i);
+	fSectorBeginY.AddAt(beginy, i);
+	fSectorEndX.AddAt(endx, i);
+	fSectorEndY.AddAt(endy, i);
+	fSectorX.AddAt(beginx + (sectorSizeX.GetAt(i) / 2.), i);
+	fSectorY.AddAt(beginy + (sectorSizeY.GetAt(i) / 2.), i);
+	fSectorZ.AddAt(fZ, i);
       }
-   } else {
-      fSectorBeginX.AddAt(0., 0);
-      fSectorBeginY.AddAt(0., 0);
-      fSectorEndX.AddAt(sectorSizeX.GetAt(0), 0);
-      fSectorEndY.AddAt(sectorSizeY.GetAt(0), 0);
-      fSectorX.AddAt(x, 0);
-      fSectorY.AddAt(y, 0);
-      fSectorZ.AddAt(z, 0);
-   }
+    } else {
+      beginy = 0;
+      endy = 2 * sizey;
+      summed_sectsize = 0;
+      for (Int_t i = 0; i < fNofSectors; i++) {
+	if (0 == i) {
+	  beginx = 0.;
+	  endx = sectorSizeX.GetAt(i);
+	  summed_sectsize += sectorSizeX.GetAt(i);
+	} else {
+	  beginx = summed_sectsize;
+	  endx = summed_sectsize += sectorSizeX.GetAt(i);
+	}
+	fSectorBeginX.AddAt(beginx, i);
+	fSectorBeginY.AddAt(beginy, i);
+	fSectorEndX.AddAt(endx, i);
+	fSectorEndY.AddAt(endy, i);
+	fSectorX.AddAt(beginx + (sectorSizeX.GetAt(i) / 2.), i);
+	fSectorY.AddAt(beginy + (sectorSizeY.GetAt(i) / 2.), i);
+	fSectorZ.AddAt(fZ, i);
+      }
+    }
+  } else {
+    fSectorBeginX.AddAt(0., 0);
+    fSectorBeginY.AddAt(0., 0);
+    fSectorEndX.AddAt(sectorSizeX.GetAt(0), 0);
+    fSectorEndY.AddAt(sectorSizeY.GetAt(0), 0);
+    fSectorX.AddAt(x, 0);
+    fSectorY.AddAt(y, 0);
+    fSectorZ.AddAt(z, 0);
+  }
 }
 
 CbmTrdModule::~CbmTrdModule() 
 {
+  std::map<Int_t, CbmTrdAsic*>::iterator AsicMapIt;
+  for (AsicMapIt = fAsicMap.begin(); AsicMapIt != fAsicMap.end(); AsicMapIt++)
+    delete AsicMapIt->second;
+  fAsicMap.clear();
 }
 
 

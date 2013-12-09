@@ -3,6 +3,9 @@
 
 #include "TNamed.h"
 #include "TArrayD.h"
+#include "CbmTrdAsic.h"
+
+#include <map>
 
 class CbmTrdPoint;
 class TVector3;
@@ -150,6 +153,8 @@ private:
 
   TArrayD fPadSizeX; // size of the readout pad in x [cm]
   TArrayD fPadSizeY; // size of the readout pad in y [cm]
+
+  std::map<Int_t, CbmTrdAsic*> fAsicMap;
 
   ClassDef(CbmTrdModule, 3);
 };

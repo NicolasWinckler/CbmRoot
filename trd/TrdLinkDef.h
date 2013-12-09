@@ -39,6 +39,7 @@
 #pragma link C++ class  CbmTrdGas+;
 #pragma link C++ class  CbmTrdDigitizer+;
 #pragma link C++ class  CbmTrdModule+;
+#pragma link C++ class  CbmTrdAsic+;
 #pragma link C++ class  CbmTrdCreateDigiPar+;
 #pragma link C++ class  CbmTrdDigiPar+;
 #pragma link C++ class  CbmTrdHitProducerDigi+;

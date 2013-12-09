@@ -91,7 +91,7 @@ tools/CbmTrdGeoHandler.cxx
 data/CbmTrdRadiator.cxx  
 data/CbmTrdGas.cxx
 data/CbmTrdModule.cxx
-
+data/CbmTrdAsic.cxx
 #beamtime/CbmTrdRawToDigiSpadic03.cxx
 
 

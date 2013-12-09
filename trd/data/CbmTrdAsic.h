@@ -3,13 +3,14 @@
 
 #include "TNamed.h"
 #include "TArrayD.h"
+#include <vector>
 
 class CbmTrdPoint;
 class TVector3;
 
 class CbmTrdAsic : public TNamed
 {
-public:
+ public:
 
   /**
    * \brief Default constructor.
@@ -20,9 +21,9 @@ public:
    * \brief Constructor with parameters.
    */
   CbmTrdAsic(
-        Int_t address, Int_t orientation, 
-        Double_t x, Double_t y, Double_t z,
-        Double_t sizex, Double_t sizey, Double_t sizez);
+	     Int_t address, Int_t orientation, Int_t nofChannels, Int_t FebGrouping, 
+	     Double_t x, Double_t y, Double_t z,
+	     Double_t sizex, Double_t sizey, Double_t sizez);
 
   /**
    * \brief Destructor.
@@ -38,8 +39,12 @@ public:
   Double_t GetSizeX() const { return fSizeX; }
   Double_t GetSizeY() const { return fSizeY; }
   Double_t GetSizeZ() const { return fSizeZ; }
+  Int_t GetnofChannels() const {return fnofChannels; }
+  Int_t GetFebGrouping() const {return fFebGrouping; }
+  std::vector<Int_t> GetChannelAddresses() const {return fChannelAddresses; }
+  void SetChannelAddresses( std::vector<Int_t> addresses );
 
-private:
+ private:
 
   Int_t fAsicAddress; // unique detector ID
   Int_t fOrientation; // angle between long pad axis and y-axis in steps of 90 deg [0..3]
@@ -49,6 +54,9 @@ private:
   Double_t fSizeX; // asic half size in x [cm]
   Double_t fSizeY; // asic half size in y [cm]
   Double_t fSizeZ; // asic half size in z [cm]
+  Int_t fnofChannels;
+  Int_t fFebGrouping;
+  std::vector<Int_t> fChannelAddresses;
 
   ClassDef(CbmTrdAsic, 3);
 };

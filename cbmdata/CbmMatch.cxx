@@ -12,7 +12,7 @@ using std::make_pair;
 using std::stringstream;
 
 CbmMatch::CbmMatch() :
-      fReferences(),
+      fLinks(),
       fTotalWeight(0.),
       fMatchedIndex(-1)
 {
@@ -28,49 +28,47 @@ string CbmMatch::ToString() const
 {
    stringstream ss;
    ss << "CbmMatch: ";
-   Int_t nofReferences = GetNofReferences();
-   ss << "nofReferences=" << nofReferences << " | ";
-   for (Int_t i = 0; i < nofReferences; i++) {
-      const pair<Int_t, Double_t>& ref = fReferences[i];
-      ss << "(" << ref.first << "," << ref.second << ") ";
+   Int_t nofLinks = GetNofLinks();
+   ss << "nofLinks=" << nofLinks << "\n";
+   for (Int_t i = 0; i < nofLinks; i++) {
+      const CbmLink& link = fLinks[i];
+      ss << link.ToString();
    }
-   ss << "| totalWeight=" << fTotalWeight << ", matchedIndex="
+   ss << " totalWeight=" << fTotalWeight << ", matchedIndex="
          << fMatchedIndex << std::endl;
    return ss.str();
 }
 
-void CbmMatch::AddReference(const CbmMatch* match)
+void CbmMatch::AddLink(const CbmMatch& match)
 {
-   const vector<pair<Int_t, Double_t> >& refs = match->GetReferences();
-   Int_t nofReferences = match->GetNofReferences();
-   for (Int_t i = 0; i < nofReferences; i++) {
-      const pair<Int_t, Double_t>& ref = refs[i];
-      AddReference(ref.first, ref.second);
+   Int_t nofLinks = match.GetNofLinks();
+   for (Int_t i = 0; i < nofLinks; i++) {
+      AddLink(match.GetLink(i));
    }
 }
 
-void CbmMatch::AddReference(Int_t referenceId, Double_t referenceWeight)
+void CbmMatch::AddLink(const CbmLink& newLink)
 {
    Int_t addedIndex = -1;
-   Int_t nofReferences = GetNofReferences();
-   for (Int_t i = 0; i < nofReferences; i++) {
-      pair<Int_t, Double_t>& ref = fReferences[i];
-      if (ref.first == referenceId) {
-         ref.second += referenceWeight;
+   Int_t nofLinks = GetNofLinks();
+   for (Int_t i = 0; i < nofLinks; i++) {
+      CbmLink& link = fLinks[i];
+      if (link == newLink) {
+         link.AddWeight(newLink.GetWeight());
          addedIndex = i;
          break;
       }
    }
    if (addedIndex < 0) {
-      fReferences.push_back(make_pair(referenceId, referenceWeight));
-      addedIndex = fReferences.size() - 1;
+      fLinks.push_back(newLink);
+      addedIndex = fLinks.size() - 1;
    }
 
-   fTotalWeight += referenceWeight;
+   fTotalWeight += newLink.GetWeight();
    if (fMatchedIndex < 0) {
       fMatchedIndex = addedIndex;
    } else {
-      if (fReferences[addedIndex].second > fReferences[fMatchedIndex].second) {
+      if (fLinks[addedIndex].GetWeight() > fLinks[fMatchedIndex].GetWeight()) {
          fMatchedIndex = addedIndex;
       }
    }
@@ -78,7 +76,7 @@ void CbmMatch::AddReference(Int_t referenceId, Double_t referenceWeight)
 
 void CbmMatch::Clear()
 {
-   fReferences.clear();
+   fLinks.clear();
    fTotalWeight = 0.;
    fMatchedIndex = -1;
 }

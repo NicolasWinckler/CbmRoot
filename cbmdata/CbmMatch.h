@@ -10,6 +10,7 @@
 #define CBMMATCH_H_
 
 #include "TObject.h"
+#include "CbmLink.h"
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -32,18 +33,15 @@ public:
    virtual ~CbmMatch();
 
    /* Accessors */
-   Int_t GetReferenceId(Int_t i) const { return fReferences[i].first; }
-   Int_t GetReferenceWeight(Int_t i) const { return fReferences[i].second; }
-   const pair<Int_t, Double_t>& GetReference(Int_t i) const { return fReferences[i]; }
-   Int_t GetMatchedReferenceId() const { return fReferences[fMatchedIndex].first; }
-   Int_t GetMatchedReferenceWeight() const { return fReferences[fMatchedIndex].second; }
-   const vector<pair<Int_t, Double_t> >& GetReferences() const { return fReferences; }
-   Int_t GetNofReferences() const { return fReferences.size(); }
+   const CbmLink& GetLink(Int_t i) const { return fLinks[i]; }
+   const vector<CbmLink>& GetLinks() const { return fLinks; }
+   const CbmLink& GetMatchedLink() const { return fLinks[fMatchedIndex]; }
+   Int_t GetNofLinks() const { return fLinks.size(); }
    Double_t GetTotalWeight() const { return fTotalWeight; }
 
    /* Modifiers */
-   void AddReference(const CbmMatch* match);
-   void AddReference(Int_t referenceId, Double_t referenceWeight = 1.);
+   void AddLink(const CbmMatch& match);
+   void AddLink(const CbmLink& newLink);
    void Clear();
 
    /**
@@ -53,7 +51,7 @@ public:
    virtual string ToString() const;
 
 protected:
-   vector<pair<Int_t, Double_t> > fReferences; // List of indices to MCPoint or MCTrack
+   vector<CbmLink> fLinks; // List of links to MC
    Double_t fTotalWeight; // Sum of all reference weights
    Int_t fMatchedIndex; // Index of the matched reference in fReferences array
 

@@ -914,10 +914,10 @@ void CbmMuchHitFinderQa::DigitizerQa(){
     CbmMuchModuleGem* module1 = (CbmMuchModuleGem*) module;
     CbmMuchPad* pad = module1->GetPad(digi->GetAddress());
     area = pad->GetDx()*pad->GetDy();
-    Int_t nofReferences = match->GetNofReferences();
-    for (Int_t pt = 0; pt < nofReferences; pt++) {
-      Int_t pointId = match->GetReferenceId(pt);
-      Int_t charge  = match->GetReferenceWeight(pt);
+    Int_t nofLinks = match->GetNofLinks();
+    for (Int_t pt = 0; pt < nofLinks; pt++) {
+      Int_t pointId = match->GetLink(pt).GetIndex();
+      Int_t charge  = match->GetLink(pt).GetWeight();
       CbmMuchPointInfo* info = (CbmMuchPointInfo*) fPointInfos->At(pointId);
       if (info->GetPdgCode()==0) continue;
       info->AddCharge(charge);
@@ -1012,9 +1012,9 @@ void CbmMuchHitFinderQa::StatisticsQa(){
     for(Int_t digiId=0;digiId<nDigis;digiId++){
       Int_t index = cluster->GetDigi(digiId);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(index);
-      Int_t nPoints = match->GetNofReferences();
+      Int_t nPoints = match->GetNofLinks();
       for (Int_t iRefPoint=0;iRefPoint<nPoints;iRefPoint++){
-        Int_t pointId = match->GetReferenceId(iRefPoint);
+        Int_t pointId = match->GetLink(iRefPoint).GetIndex();
         map_points[pointId]=1;
       }
     }
@@ -1077,14 +1077,14 @@ void CbmMuchHitFinderQa::PullsQa(){
 //      printf("%i\n",index);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(index);
       // Not unique if the pad has several mcPoint references
-      if (verbose) printf(" n=%i",match->GetNofReferences());
-      if (match->GetNofReferences()==0) {
+      if (verbose) printf(" n=%i",match->GetNofLinks());
+      if (match->GetNofLinks()==0) {
         printf(" noise hit");
         point_unique=0;
         break;
       }
-      if (match->GetNofReferences()>1) { point_unique=0; break; }
-      Int_t currentPointId = match->GetReferenceId(0);
+      if (match->GetNofLinks()>1) { point_unique=0; break; }
+      Int_t currentPointId = match->GetLink(0).GetIndex();
       CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
       CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetAddress());
       if(!module) continue;
@@ -1182,8 +1182,8 @@ void CbmMuchHitFinderQa::ClusterDeconvQa(){
       Int_t iDigi = cluster->GetDigi(id);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
       if(!match) continue;
-      for(Int_t ip=0; ip<match->GetNofReferences();++ip){
-        Int_t iPoint = match->GetReferenceId(ip);
+      for(Int_t ip=0; ip<match->GetNofLinks();++ip){
+        Int_t iPoint = match->GetLink(ip).GetIndex();
         it = find(pIndices.begin(), pIndices.end(), iPoint);
         if(it != pIndices.end()) continue;
         pIndices.push_back(iPoint);

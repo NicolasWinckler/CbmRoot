@@ -195,7 +195,7 @@ void CbmMatchRecoToMC::MatchClusters(
       Int_t nofDigis = cluster->GetNofDigis();
       for (Int_t iDigi = 0; iDigi < nofDigis; iDigi++) {
          const CbmMatch* digiMatch = static_cast<const CbmMatch*>(digiMatches->At(cluster->GetDigi(iDigi)));
-         clusterMatch->AddReference(digiMatch);
+         clusterMatch->AddLink(*digiMatch);
       }
       //std::cout << "cluster " << iCluster << " " << clusterMatch->ToString();
    }
@@ -212,7 +212,7 @@ void CbmMatchRecoToMC::MatchHits(
       const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(hits->At(iHit));
       CbmMatch* hitMatch = new ((*hitMatches)[iHit]) CbmMatch();
       const CbmMatch* clusterMatch = static_cast<const CbmMatch*>(matches->At(hit->GetRefId()));
-      hitMatch->AddReference(clusterMatch);
+      hitMatch->AddLink(*clusterMatch);
     //  std::cout << "hit " << iHit << " " << hitMatch->ToString();
    }
 }
@@ -228,7 +228,7 @@ void CbmMatchRecoToMC::MatchHitsToPoints(
       const CbmBaseHit* hit = static_cast<const CbmBaseHit*>(hits->At(iHit));
       CbmMatch* hitMatch = new ((*hitMatches)[iHit]) CbmMatch();
       const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(hit->GetRefId()));
-      hitMatch->AddReference(hit->GetRefId(), point->GetEnergyLoss());
+      hitMatch->AddLink(CbmLink(point->GetEnergyLoss(), hit->GetRefId()));
     //  std::cout << "hit " << iHit << " " << hitMatch->ToString();
    }
 }
@@ -252,11 +252,11 @@ void CbmMatchRecoToMC::MatchTracks(
       Int_t nofHits = track->GetNofHits();
       for (Int_t iHit = 0; iHit < nofHits; iHit++) {
          const CbmMatch* hitMatch = static_cast<CbmMatch*>(hitMatches->At(track->GetHitIndex(iHit)));
-         Int_t nofReferences = hitMatch->GetNofReferences();
-         for (Int_t iReference = 0; iReference < nofReferences; iReference++) {
-            const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(hitMatch->GetReferenceId(iReference)));
+         Int_t nofLinks = hitMatch->GetNofLinks();
+         for (Int_t iLink = 0; iLink < nofLinks; iLink++) {
+            const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(hitMatch->GetLink(iLink).GetIndex()));
             if (NULL == point) continue;
-            trackMatch->AddReference(point->GetTrackID());
+            trackMatch->AddLink(CbmLink(1., point->GetTrackID()));
          }
       }
       // Calculate number of true and wrong hits
@@ -264,12 +264,12 @@ void CbmMatchRecoToMC::MatchTracks(
       Int_t wrongCounter = trackMatch->GetNofWrongHits();
       for (Int_t iHit = 0; iHit < nofHits; iHit++) {
          const CbmMatch* hitMatch = static_cast<CbmMatch*>(hitMatches->At(track->GetHitIndex(iHit)));
-         Int_t nofReferences = hitMatch->GetNofReferences();
+         Int_t nofLinks = hitMatch->GetNofLinks();
          Bool_t hasTrue = false;
-         for (Int_t iReference = 0; iReference < nofReferences; iReference++) {
-            const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(hitMatch->GetReferenceId(iReference)));
+         for (Int_t iLink = 0; iLink < nofLinks; iLink++) {
+            const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(hitMatch->GetLink(iLink).GetIndex()));
             if (NULL == point) continue;
-            if (point->GetTrackID() == trackMatch->GetMatchedReferenceId()) {
+            if (point->GetTrackID() == trackMatch->GetMatchedLink().GetIndex()) {
                hasTrue = true;
                break;
             }
@@ -278,7 +278,7 @@ void CbmMatchRecoToMC::MatchTracks(
       }
       trackMatch->SetNofTrueHits(trueCounter);
       trackMatch->SetNofWrongHits(wrongCounter);
-      //std::cout << "track " << iTrack << " " << trackMatch->ToString();
+     // std::cout << iTrack << " "; track->Print(); std::cout << " " << trackMatch->ToString();
    }
 }
 

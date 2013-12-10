@@ -238,8 +238,8 @@ void CbmLitClusteringQa::ProcessDigis(
       const CbmMatch* digiMatch = static_cast<const CbmMatch*>(digiMatches->At(i));
       Int_t stationId = GetStationId(digi->GetAddress(), detId);
       fHM->H1("hno_NofObjects_" + detName + "Digis_Station")->Fill(stationId);
-      fHM->H1("hpa_" + detName + "Digi_NofPointsInDigi_H1")->Fill(digiMatch->GetNofReferences());
-      fHM->H1("hpa_" + detName + "Digi_NofPointsInDigi_H2")->Fill(stationId, digiMatch->GetNofReferences());
+      fHM->H1("hpa_" + detName + "Digi_NofPointsInDigi_H1")->Fill(digiMatch->GetNofLinks());
+      fHM->H1("hpa_" + detName + "Digi_NofPointsInDigi_H2")->Fill(stationId, digiMatch->GetNofLinks());
    }
 }
 
@@ -257,8 +257,8 @@ void CbmLitClusteringQa::ProcessClusters(
          fHM->H1("hno_NofObjects_" + detName + "Clusters_Station")->Fill(stationId);
          fHM->H1("hpa_" + detName + "Cluster_NofDigisInCluster_H1")->Fill(cluster->GetNofDigis());
          fHM->H1("hpa_" + detName + "Cluster_NofDigisInCluster_H2")->Fill(stationId, cluster->GetNofDigis());
-         fHM->H1("hpa_" + detName + "Cluster_NofPointsInCluster_H1")->Fill(clusterMatch->GetNofReferences());
-         fHM->H1("hpa_" + detName + "Cluster_NofPointsInCluster_H2")->Fill(stationId, clusterMatch->GetNofReferences());
+         fHM->H1("hpa_" + detName + "Cluster_NofPointsInCluster_H1")->Fill(clusterMatch->GetNofLinks());
+         fHM->H1("hpa_" + detName + "Cluster_NofPointsInCluster_H2")->Fill(stationId, clusterMatch->GetNofLinks());
       }
    }
 }
@@ -279,8 +279,8 @@ void CbmLitClusteringQa::ProcessHits(
          fHM->H1("hpa_" + detName + "Hit_SigmaX_H2")->Fill(stationId, hit->GetDx());
          fHM->H1("hpa_" + detName + "Hit_SigmaY_H1")->Fill(hit->GetDy());
          fHM->H1("hpa_" + detName + "Hit_SigmaY_H2")->Fill(stationId, hit->GetDy());
-         fHM->H1("hpa_" + detName + "Hit_NofPointsInHit_H1")->Fill(hitMatch->GetNofReferences());
-         fHM->H1("hpa_" + detName + "Hit_NofPointsInHit_H2")->Fill(stationId, hitMatch->GetNofReferences());
+         fHM->H1("hpa_" + detName + "Hit_NofPointsInHit_H1")->Fill(hitMatch->GetNofLinks());
+         fHM->H1("hpa_" + detName + "Hit_NofPointsInHit_H2")->Fill(stationId, hitMatch->GetNofLinks());
       }
    }
 }
@@ -335,7 +335,7 @@ void CbmLitClusteringQa::FillResidualAndPullHistograms(
       const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(hits->At(iHit));
       const CbmMatch* match = static_cast<const CbmMatch*>(hitMatches->At(iHit));
       if (isnan(hit->GetX()) || (isnan(hit->GetY()))) continue;
-      const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(match->GetMatchedReferenceId()));
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(points->At(match->GetMatchedLink().GetIndex()));
       if (point == NULL) continue;
       //Float_t xPoint = (muchPoint->GetXIn() + muchPoint->GetXOut()) / 2;
       //Float_t yPoint = (muchPoint->GetYIn() + muchPoint->GetYOut()) / 2;
@@ -371,9 +371,9 @@ void CbmLitClusteringQa::FillHitEfficiencyHistograms(
    for (Int_t iHit = 0; iHit < nofHits; iHit++) {
       const CbmPixelHit* hit = static_cast<const CbmPixelHit*>(hits->At(iHit));
       const CbmMatch* match = static_cast<const CbmMatch*>(hitMatches->At(iHit));
-      if (mcPointSet.find(match->GetMatchedReferenceId()) == mcPointSet.end()) {
+      if (mcPointSet.find(match->GetMatchedLink().GetIndex()) == mcPointSet.end()) {
          fHM->H1(recName)->Fill(GetStationId(hit->GetAddress(), detId));
-         mcPointSet.insert(match->GetMatchedReferenceId());
+         mcPointSet.insert(match->GetMatchedLink().GetIndex());
       } else {
          fHM->H1(cloneName)->Fill(GetStationId(hit->GetAddress(), detId));
       }

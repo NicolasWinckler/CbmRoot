@@ -583,12 +583,12 @@ void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, 
    map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
    if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
       CbmMatch* digiMatch = new CbmMatch();
-      digiMatch->AddReference(pointId, charge);
+      digiMatch->AddLink(CbmLink(charge, pointId));
       fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
    } else { // Pixel already in map -> Add charge
       it->second.first->AddCharge(charge);
       it->second.first->SetTime(max(time, it->second.first->GetTime()));
-      it->second.second->AddReference(pointId, charge);
+      it->second.second->AddLink(CbmLink(charge, pointId));
    }
 }
   ClassImp(CbmTrdDigitizerPRF)

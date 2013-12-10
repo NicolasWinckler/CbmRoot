@@ -150,17 +150,18 @@ CbmMuchDigiMatch::~CbmMuchDigiMatch() { };
 // -------------------------------------------------------------------------
 void CbmMuchDigiMatch::SortPointsInTime(TClonesArray* points) {
   assert(points != NULL);
-  map<Double_t, pair<Int_t, Double_t> > timeMap;
-  Int_t nofReferences = GetNofReferences();
-  for (Int_t i = 0; i < nofReferences; i++){
-    const CbmMuchPoint* point = static_cast<const CbmMuchPoint*>(points->At(GetReferenceId(i)));
+  map<Double_t, CbmLink> timeMap;
+  Int_t nofLinks = GetNofLinks();
+  for (Int_t i = 0; i < nofLinks; i++){
+    const CbmLink& link = GetLink(i);
+    const CbmMuchPoint* point = static_cast<const CbmMuchPoint*>(points->At(link.GetIndex()));
     assert(point != NULL);
-    timeMap[point->GetTime()] = make_pair(GetReferenceId(i), GetReferenceWeight(i));
+    timeMap[point->GetTime()] = link;
   }
   Clear();
-  map<Double_t, pair<Int_t, Double_t> >::iterator it;
+  map<Double_t, CbmLink>::iterator it;
   for (it = timeMap.begin(); it != timeMap.end(); ++it) {
-     AddReference(it->second.first, it->second.second);
+     AddLink(it->second);
   }
 }
 // -------------------------------------------------------------------------
@@ -185,7 +186,7 @@ void CbmMuchDigiMatch::Reset() {
 
 // -------------------------------------------------------------------------
 void CbmMuchDigiMatch::AddCharge(Int_t iPoint, UInt_t charge, Double_t t, TArrayD shape, Double_t mcTime) {
-  AddReference(iPoint, charge);
+  AddLink(CbmLink(charge, iPoint));
   Int_t n = fRefIndexPerPrimaryElectron.GetSize();
   fRefIndexPerPrimaryElectron.Set(n+1);
   fChargePerPrimaryElectron.Set(n+1);

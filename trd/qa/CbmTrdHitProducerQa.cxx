@@ -276,7 +276,7 @@ void CbmTrdHitProducerQa::Exec(Option_t* option)
 	trdDigiMatch = (CbmMatch*) fTrdDigiMatchCollection->At(trdHit->GetRefId());
 	if(NULL == trdDigiMatch) continue;
 
-	trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdDigiMatch->GetMatchedReferenceId());
+	trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdDigiMatch->GetMatchedLink().GetIndex());
 	if(NULL == trdPoint) continue;
 
         plane = trdHit->GetPlaneId();

@@ -65,7 +65,7 @@ void CbmMuchDigitizeStraws::Exec(Option_t* opt)
       Double_t z = (point->GetZIn() + point->GetZOut()) / 2.;
       CbmMuchStrawDigi* digi = new ((*fDigis)[iDigi]) CbmMuchStrawDigi(point->GetDetectorID(), x, y, z, point->GetTime());
       CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
-      match->AddReference(iPoint);
+      match->AddLink(CbmLink(1., iPoint));
       iDigi++;
    }
 

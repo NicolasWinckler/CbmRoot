@@ -33,6 +33,7 @@ CbmMCEpoch.cxx
 CbmMCEventHeader.cxx
 CbmMCTrack.cxx
 
+CbmLink.cxx
 CbmMatch.cxx
 CbmTrackMatchNew.cxx
 

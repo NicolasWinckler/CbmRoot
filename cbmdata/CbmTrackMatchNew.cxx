@@ -27,12 +27,12 @@ CbmTrackMatchNew::~CbmTrackMatchNew()
 string CbmTrackMatchNew::ToString() const
 {
    stringstream ss;
-   ss << "CbmTrackMatchNew: ";
-   Int_t nofReferences = GetNofReferences();
-   ss << "nofReferences=" << nofReferences << " | ";
-   for (Int_t i = 0; i < nofReferences; i++) {
-      const pair<Int_t, Double_t>& ref = fReferences[i];
-      ss << "(" << ref.first << "," << ref.second << ") ";
+   ss << "CbmMatch: ";
+   Int_t nofLinks = GetNofLinks();
+   ss << "nofLinks=" << nofLinks << "\n";
+   for (Int_t i = 0; i < nofLinks; i++) {
+      const CbmLink& link = fLinks[i];
+      ss << link.ToString();
    }
    ss << "| totalWeight=" << fTotalWeight << ", matchedIndex="
          << fMatchedIndex << " nofTrueHits=" << fNofTrueHits

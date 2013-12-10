@@ -433,7 +433,7 @@ void CbmMuchDigitizeGem::AddCharge(CbmMuchPad* pad, UInt_t charge, Int_t iPoint,
   CbmMuchDigiMatch* match = pad->GetMatch();
   CbmMuchDigi* digi = pad->GetDigi();
   
-  if (match->GetNofReferences()==0) {
+  if (match->GetNofLinks()==0) {
     digi->SetTime(time);
     match->SetDeadTime(fDeadTime);
   }

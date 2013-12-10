@@ -154,14 +154,14 @@ void CbmTrdDigitizer::AddDigi(
    map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
    if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
       CbmMatch* digiMatch = new CbmMatch();
-      digiMatch->AddReference(pointId, energyLoss);
+      digiMatch->AddLink(CbmLink(energyLoss, pointId));
       fDigiMap[address] = make_pair(new CbmTrdDigi(address, energyLoss, time), digiMatch);
    } else { // Pixel already in map -> Add charge
       CbmTrdDigi* digi = it->second.first;
       digi->AddCharge(energyLoss);
       digi->SetTime(max(time, digi->GetTime()));
       CbmMatch* digiMatch = it->second.second;
-      digiMatch->AddReference(pointId, energyLoss);
+      digiMatch->AddLink(CbmLink(energyLoss, pointId));
    }
 }
 

@@ -185,7 +185,7 @@ void CbmLitFitQa::ProcessTrdTrack(
    if (NULL == fTrdTracks || NULL == fTrdTrackMatches || trackId < 0) return;
 
    CbmTrackMatchNew* match = static_cast<CbmTrackMatchNew*>(fTrdTrackMatches->At(trackId));
-   Int_t mcId = match->GetMatchedReferenceId();
+   Int_t mcId = match->GetMatchedLink().GetIndex();
    if (mcId < 0) return; // Ghost or fake track
 
    // Check correctness of reconstructed track
@@ -229,7 +229,7 @@ void CbmLitFitQa::ProcessMuchTrack(
    if (NULL == fMuchTracks || NULL == fMuchTrackMatches || trackId < 0) return;
 
    const CbmTrackMatchNew* match = static_cast<const CbmTrackMatchNew*>(fMuchTrackMatches->At(trackId));
-   Int_t mcId = match->GetMatchedReferenceId();
+   Int_t mcId = match->GetMatchedLink().GetIndex();
    if (mcId < 0) return; // Ghost or fake track
 
    // Check correctness of reconstructed track

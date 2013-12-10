@@ -953,8 +953,8 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
       // Get MC indices of track segments
       Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1, richMCId = -1;
       if (isStsOk) { stsMCId = stsTrackMatch->GetMCTrackId(); }
-      if (isTrdOk) { trdMCId = trdTrackMatch->GetMatchedReferenceId(); }
-      if (isMuchOk) { muchMCId = muchTrackMatch->GetMatchedReferenceId(); }
+      if (isTrdOk) { trdMCId = trdTrackMatch->GetMatchedLink().GetIndex(); }
+      if (isMuchOk) { muchMCId = muchTrackMatch->GetMatchedLink().GetIndex(); }
       if (isTofOk) {
          const CbmBaseHit* tofHit = static_cast<const CbmBaseHit*>(fTofHits->At(tofId));
          const FairMCPoint* tofPoint = static_cast<const FairMCPoint*>(fTofPoints->At(tofHit->GetRefId()));

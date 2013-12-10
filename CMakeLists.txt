@@ -228,8 +228,8 @@ EndIf(${EveIsBuild} STREQUAL yes)
 
 #set(BUILD_BEAMTIME FALSE CACHE BOOL "Build everything needed (DABC, RocLib ...) to read testbeam data.")
 If(BUILD_BEAMTIME)
-  add_subdirectory (roc3)
-  add_subdirectory (beamtime)
+  add_subdirectory (roc)
+#  add_subdirectory (beamtime)
 EndIf(BUILD_BEAMTIME)
 
 

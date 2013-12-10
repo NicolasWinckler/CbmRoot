@@ -1,54 +1,54 @@
 # copy files from source directory to build directory
 
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc
                      COMMAND cmake -E copy_directory  ${CMAKE_CURRENT_SOURCE_DIR}                             
-                             ${CMAKE_CURRENT_BINARY_DIR}/roc3
+                             ${CMAKE_CURRENT_BINARY_DIR}/roc
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    )
 
 If(CMAKE_SYSTEM_NAME MATCHES Darwin)
   # Unpack the dabc tarball and patch the needed files
-  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3/dabc/Makefile
+  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/dabc/Makefile
                    COMMAND tar -xzf dabcroc19.tar.gz
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3/dabc
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3/
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc/dabc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc/
                    )
-  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3/patch_okay
+  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/patch_okay
                    COMMAND patch -p0 < roclib_macos.patch
                    COMMAND touch patch_okay
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3/dabc/Makefile
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc/dabc/Makefile
                    )
 Else(CMAKE_SYSTEM_NAME MATCHES Darwin)
-  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3/patch_okay
+  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/patch_okay
                    COMMAND patch -p0 < roclib_linux.patch
                    COMMAND touch patch_okay
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc
                    )
 EndIf(CMAKE_SYSTEM_NAME MATCHES Darwin)
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libRoc.so
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRoc.so
                    COMMAND LD_LIBRARY_PATH=${ROOT_LIBRARY_DIR}
                            ROOTSYS=${ROOTSYS} make roclib 
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3/patch_okay
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc/patch_okay
                   )
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcBase.so
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcBase.so
                    COMMAND make dabccore 
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libRoc.so
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRoc.so
                   )
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcRoc.so
-                          ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcMbs.so
-                          ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libRocDict.rootmap
-                          ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libRocDict.so
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcRoc.so
+                          ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcMbs.so
+                          ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRocDict.rootmap
+                          ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRocDict.so
                    COMMAND LD_LIBRARY_PATH=${ROOT_LIBRARY_DIR}
                            ROOTSYS=${ROOTSYS} make rocdict
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcBase.so
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcBase.so
                   )
 
 add_custom_command(OUTPUT 
@@ -63,12 +63,12 @@ add_custom_command(OUTPUT
                    COMMAND cmake -E copy_if_different lib/libDabcMbs.so ${LIBRARY_OUTPUT_PATH}
                    COMMAND cmake -E copy_if_different lib/libRocDict.rootmap ${LIBRARY_OUTPUT_PATH}
                    COMMAND cmake -E copy_if_different lib/libRocDict.so ${LIBRARY_OUTPUT_PATH}
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc3
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libRoc.so 
-                           ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcBase.so 
-                           ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcMbs.so 
-                           ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libDabcRoc.so 
-                           ${CMAKE_CURRENT_BINARY_DIR}/roc3/lib/libRocDict.rootmap 
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRoc.so 
+                           ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcBase.so 
+                           ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcMbs.so 
+                           ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libDabcRoc.so 
+                           ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRocDict.rootmap 
                   )
 
 # create a target which will always be build and does actually nothing. The target is only

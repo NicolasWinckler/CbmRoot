@@ -19,7 +19,8 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
    fDigis(NULL),
    fClusters(NULL),
    fHits(NULL),
-   fDigiPar(NULL)
+   fDigiPar(NULL),
+   fTrianglePads(false)
 {
 }
 
@@ -103,6 +104,7 @@ void CbmTrdHitProducerCluster::TriangularPadReconstruction(Int_t clusterId){
   Double_t maxCharge = 0;
   for (Int_t iDigi = 0; iDigi < nofDigis; iDigi++) {
     const CbmTrdDigi* digi = static_cast<const CbmTrdDigi*>(fDigis->At(cluster->GetDigi(iDigi)));
+    moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());
     Double_t charge = digi->GetCharge();
     if (charge > maxCharge){
       maxCharge = charge;

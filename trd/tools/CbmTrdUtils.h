@@ -24,6 +24,8 @@ class CbmTrdUtils
 
   CbmTrdUtils();
   virtual ~CbmTrdUtils();
+  void InitColorVector(Bool_t logScale, Double_t min, Double_t max);
+  Int_t GetColorCode(Double_t value);
   void Statusbar(Int_t i, Int_t n);
   void NiceLegend(TLegend *l);
   void NiceTProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) ;
@@ -235,7 +237,8 @@ class CbmTrdUtils
     return 49;
   };
  private:
-
+  std::vector<Int_t> fColors;
+  std::vector<Double_t> fZLevel;
 
 };
 #endif

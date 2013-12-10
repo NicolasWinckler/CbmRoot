@@ -141,8 +141,7 @@ CbmTrdModule::~CbmTrdModule()
   fAsicMap.clear();
 }
 
-// 20131209 - CB 
-CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
+void CbmTrdModule::InitAsics() {
   Int_t iAsic = 0;
   Double_t xAsic = 0;  // x position of Asic
   Double_t yAsic = 0;  // y position of Asic
@@ -152,18 +151,16 @@ CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
   Int_t gCol[3] = { 16, 8, 5 };
   Int_t rowId = 0;
   Int_t secId = 0;
+  //for (Int_t s = 0; s < fNofSectors; s++)
+  {
+    for (Int_t r = 0; r < GetNofRows(); r++){
+      for (Int_t c = 0; c < GetNofColumns(); c++){
 
-  if (fAsicMap.size() == 0){ // Init ASICs
-    //for (Int_t s = 0; s < fNofSectors; s++)
-      {
-      for (Int_t r = 0; r < GetNofRows(); r++){
-	for (Int_t c = 0; c < GetNofColumns(); c++){
-
-          // ultimate density 6 rows,  5 pads
-          // super    density 4 rows,  8 pads
-          // normal   density 2 rows, 16 pads
-          if ((r % gRow[iFebGroup]) == 0)
-	    if ((c % gCol[iFebGroup]) == 0)
+	// ultimate density 6 rows,  5 pads
+	// super    density 4 rows,  8 pads
+	// normal   density 2 rows, 16 pads
+	if ((r % gRow[iFebGroup]) == 0)
+	  if ((c % gCol[iFebGroup]) == 0)
             {
               xAsic = c + gCol[iFebGroup] / 2.;
               yAsic = r + gRow[iFebGroup] / 2.;
@@ -175,8 +172,9 @@ CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
 
 	      // calculate position in sector coordinate system
 	      // with the origin in the lower left corner (looking upstream)
-	      local_point[0] = (((Double_t)xAsic + 0.5) * padsizex);
-	      local_point[1] = (((Double_t)yAsic + 0.5) * padsizey);
+	      local_point[0] = ((Int_t)(xAsic + 0.5) * padsizex);
+	      local_point[1] = ((Int_t)(rowId + 0.5) * padsizey);
+	      //	      local_point[1] = ((Int_t)(yAsic + 0.5) * padsizey);
 
 	      // calculate position in module coordinate system
 	      // with the origin in the lower left corner (looking upstream)
@@ -186,33 +184,73 @@ CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
 	      // local_point[i] must be >= 0 at this point      Double_t local_point[3];
 
               fAsicMap[iAsic] = new CbmTrdAsic(
-                 iAsic, nChannels, iFebGroup,
-                 local_point[0], local_point[1], 0.,
-                 2., 2., 0.5);
-
+					       iAsic, nChannels, iFebGroup,
+					       local_point[0] - fSizeX, local_point[1] - fSizeY, 0.,
+					       2., 2., 0.5);
+	      if (local_point[0] > 2*fSizeX)     LOG(ERROR) << "asic position x=" << local_point[0] << " is out of bounds [0," << 2*fSizeX<< "]!" << FairLogger::endl;
+	      if (local_point[1] > 2*fSizeY)     LOG(ERROR) << "asic position y=" << local_point[1] << " is out of bounds [0," << 2*fSizeY<< "]!" << FairLogger::endl;
               for (Int_t ir = r; ir < r + gRow[iFebGroup]; ir++)
-              {
-           	for (Int_t ic = c; ic < c + gCol[iFebGroup]; ic++)
-                {
-                  if (ir >= GetNofRows())     LOG(ERROR) << "ir " << ir << " is out of bounds!" << FairLogger::endl;
-                  if (ic >= GetNofColumns())  LOG(ERROR) << "ic " << ic << " is out of bounds!" << FairLogger::endl;
-                  fAsicMap[iAsic]->fChannelAddresses.push_back(CbmTrdAddress::GetAddress(CbmTrdAddress::GetLayerId(fModuleAddress),
-                                                                                         CbmTrdAddress::GetModuleId(fModuleAddress),
-                                                                                         CbmTrdAddress::GetSectorId(fModuleAddress), ir, ic));
-                } 
-              } 
+		{
+		  for (Int_t ic = c; ic < c + gCol[iFebGroup]; ic++)
+		    {
+		      /*
+		      printf("s: %i  rowId: %4i  ic: %4i r: %4i c: %4i   address:%10i\n",GetSector((Int_t)ir, rowId), rowId, ic, r, c,
+			     CbmTrdAddress::GetAddress(CbmTrdAddress::GetLayerId(fModuleAddress),
+						       CbmTrdAddress::GetModuleId(fModuleAddress),
+						       GetSector((Int_t)ir, rowId), rowId, ic));
+		      */
+		      if (ir >= GetNofRows())     LOG(ERROR) << "ir " << ir << " is out of bounds!" << FairLogger::endl;
+		      if (ic >= GetNofColumns())  LOG(ERROR) << "ic " << ic << " is out of bounds!" << FairLogger::endl;
+		      fAsicMap[iAsic]->fChannelAddresses.push_back(CbmTrdAddress::GetAddress(CbmTrdAddress::GetLayerId(fModuleAddress),
+											     CbmTrdAddress::GetModuleId(fModuleAddress),
+											     GetSector((Int_t)ir, rowId), rowId, ic));
+		    } 
+		} 
 
               iAsic++;  // next Asic
 
             }
-
-	}
       }
     }
   }
+
+}
+// 20131209 - CB 
+CbmTrdAsic *CbmTrdModule::GetAsic(Int_t AsicAddress) {
+  if (fAsicMap.size() == 0){ // Init ASICs
+    InitAsics();
+  }
   return fAsicMap[AsicAddress];
 }
+Int_t CbmTrdModule::GetAsicAddress(Int_t channelAddress) {
+  if (fAsicMap.size() == 0){ // Init ASICs
+    InitAsics();
+  }
+  std::map<Int_t, CbmTrdAsic*>::iterator it;
+  for (it = fAsicMap.begin(); it != fAsicMap.end(); it++)
+    for (Int_t ch = 0; ch < it->second->fChannelAddresses.size(); ch++) {
+      if (it->second->fChannelAddresses[ch] == channelAddress)
+	return it->first;
+  }
+  return -1;
+}
+Int_t CbmTrdModule::GetNofAsics(){
+  if (fAsicMap.size() == 0)
+    InitAsics(); 
+  fNofAsics = fAsicMap.size();
+  return fNofAsics; 
+}
 
+std::vector<Int_t> CbmTrdModule::GetAsicAddresses(){
+  if (fAsicMap.size() == 0){ // Init ASICs
+    InitAsics();
+  }
+  std::vector<Int_t> addresses;
+  std::map<Int_t, CbmTrdAsic*>::iterator fAsicMapIt;
+  for (fAsicMapIt = fAsicMap.begin(); fAsicMapIt != fAsicMap.end(); fAsicMapIt++)
+    addresses.push_back(fAsicMapIt->first);
+  return addresses;
+}
 // 20131009 - DE - checked OK
 void CbmTrdModule::ProjectPositionToNextAnodeWire(
       Double_t* local_point) const

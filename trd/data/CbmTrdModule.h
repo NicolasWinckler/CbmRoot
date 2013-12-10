@@ -12,7 +12,7 @@ class TVector3;
 
 class CbmTrdModule : public TNamed
 {
-public:
+ public:
 
   /**
    * \brief Default constructor.
@@ -23,11 +23,11 @@ public:
    * \brief Constructor with parameters.
    */
   CbmTrdModule(
-        Int_t address, Int_t orientation, 
-        Double_t x, Double_t y, Double_t z,
-        Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
-        const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
-        const TArrayD& padSizeX, const TArrayD& padSizeY);
+	       Int_t address, Int_t orientation, 
+	       Double_t x, Double_t y, Double_t z,
+	       Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
+	       const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
+	       const TArrayD& padSizeX, const TArrayD& padSizeY);
 
   /**
    * \brief Destructor.
@@ -60,75 +60,79 @@ public:
   Double_t GetAnodeWireSpacing() const { return fAnodeWireSpacing; }
 
   CbmTrdAsic *GetAsic(Int_t AsicAddress);
-  Int_t GetNofAsics() const { return fNofAsics; }
+  Int_t GetNofAsics();
+  Int_t GetAsicAddress(Int_t channelAddress);
+  std::vector<Int_t> GetAsicAddresses();
 
   Int_t GetNofSectors() const { return fNofSectors; }
 
   Int_t GetModuleRow(
-        Int_t& sectorId,
-        Int_t& rowId) const;
+		     Int_t& sectorId,
+		     Int_t& rowId) const;
 
   Bool_t GetPadInfo(
-        const Double_t* local_point,
-        Int_t& sectorId,
-        Int_t& columnId,
-        Int_t& rowId) const;
+		    const Double_t* local_point,
+		    Int_t& sectorId,
+		    Int_t& columnId,
+		    Int_t& rowId) const;
 
   void GetPadInfo(
-        const CbmTrdPoint* trdPoint,
-        Int_t& sectorId,
-        Int_t& columnId,
-        Int_t& rowId) const;
+		  const CbmTrdPoint* trdPoint,
+		  Int_t& sectorId,
+		  Int_t& columnId,
+		  Int_t& rowId) const;
 
   void GetPadPosition(
-        const Int_t digiAddress,
-	TVector3& padPos,
-	TVector3& padPosErr) const;
+		      const Int_t digiAddress,
+		      TVector3& padPos,
+		      TVector3& padPosErr) const;
 
   void GetPosition(
-        Int_t moduleAddress,
-        Int_t sectorId,
-        Int_t columnId,
-        Int_t rowId,
-        TVector3& padPos,
-        TVector3& padSize) const;
+		   Int_t moduleAddress,
+		   Int_t sectorId,
+		   Int_t columnId,
+		   Int_t rowId,
+		   TVector3& padPos,
+		   TVector3& padSize) const;
 
   void TransformHitError(
-	TVector3& hitErr) const;
+			 TVector3& hitErr) const;
 
   void TransformToLocalPad(
-        const Double_t* local_point,
-        Double_t& posX,
-        Double_t& posY) const;
+			   const Double_t* local_point,
+			   Double_t& posX,
+			   Double_t& posY) const;
 
   void ProjectPositionToNextAnodeWire(
-        Double_t* local_point) const;
+				      Double_t* local_point) const;
 
   Int_t GetSector(
-        Int_t npady,
-        Int_t& rowId) const;
+		  Int_t npady,
+		  Int_t& rowId) const;
 
-private:
+ private:
 
   void GetModuleInformation(
-        Int_t moduleAddress,
-        const Double_t* local_point,
-        Int_t& sectorId,
-        Int_t& columnId,
-        Int_t& rowId) const;
+			    Int_t moduleAddress,
+			    const Double_t* local_point,
+			    Int_t& sectorId,
+			    Int_t& columnId,
+			    Int_t& rowId) const;
 
   void TransformToLocalCorner(
-        const Double_t* local_point,
-        Double_t& posX,
-        Double_t& posY) const;
+			      const Double_t* local_point,
+			      Double_t& posX,
+			      Double_t& posY) const;
 
   void TransformToLocalSector(
-        const Double_t* local_point,
-        Double_t& posX,
-        Double_t& posY) const;
+			      const Double_t* local_point,
+			      Double_t& posX,
+			      Double_t& posY) const;
 
   Int_t GetSector(
-        const Double_t* local_point) const;
+		  const Double_t* local_point) const;
+
+  void InitAsics();
 
   Int_t fModuleAddress; // unique detector ID
   Int_t fOrientation; // angle between long pad axis and y-axis in steps of 90 deg [0..3]

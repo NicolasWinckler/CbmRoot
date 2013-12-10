@@ -11,7 +11,31 @@
 CbmTrdUtils::CbmTrdUtils(){}
 CbmTrdUtils::~CbmTrdUtils(){}
 
+void CbmTrdUtils::InitColorVector(Bool_t logScale, Double_t min, Double_t max){
+  fColors.clear();
+  fZLevel.clear();
+  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
+    fColors.push_back(TColor::GetColorPalette(i));
+    if (logScale)
+      fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));// log scale
+    else
+      fZLevel.push_back(min + (max / TColor::GetNumberOfColors() * i)); // lin scale
+  }
+}
+Int_t CbmTrdUtils::GetColorCode(Double_t value){
+  Int_t j = 0;
+  while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
+    //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
+    j++;
+  }
+  if (j >= (Int_t)fZLevel.size())
+    return 2;
+  else
+    return fColors[j];
+}
+
 TPolyLine *CbmTrdUtils::CreateTriangularPad(Int_t column, Int_t row, Double_t value, Double_t min_range, Double_t max_range, Bool_t logScale){
+  InitColorVector(logScale, min_range, max_range);
   const Int_t nCoordinates = 4;
   Double_t x[nCoordinates];
   Double_t y[nCoordinates];
@@ -36,24 +60,7 @@ TPolyLine *CbmTrdUtils::CreateTriangularPad(Int_t column, Int_t row, Double_t va
   }
   TPolyLine *pad = new TPolyLine(nCoordinates,x,y);
   pad->SetLineColor(1);
-  std::vector<Int_t> fColors;
-  std::vector<Double_t> fZLevel;
-  //Double_t fmax(20), fmin(0);
-  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
-    fColors.push_back(TColor::GetColorPalette(i));
-    if (logScale)
-      fZLevel.push_back(min_range + TMath::Power(10, TMath::Log10(max_range) / TColor::GetNumberOfColors() * i));// log scale
-    else
-      fZLevel.push_back(min_range + (max_range / TColor::GetNumberOfColors() * i)); // lin scale
-  }
-  Int_t j = 0;
-  while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
-    //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
-    j++;
-  }
-  pad->SetFillColor(fColors[j]);
-  if (j >= (Int_t)fZLevel.size())
-    pad->SetFillColor(2);
+  pad->SetFillColor(GetColorCode(value));
 
   return pad;
 }
@@ -165,16 +172,7 @@ void CbmTrdUtils::CreateLayerView(std::map<Int_t/*moduleAddress*/, TH1*>& Map, C
   //name.Form("_TH_%.2EGeV_",fTriggerThreshold);
   TPaveText *text=NULL;
   std::map<Int_t, TH1*>::iterator MapIt;
-  std::vector<Int_t> fColors;
-  std::vector<Double_t> fZLevel;
-  //Double_t fmax(20), fmin(0);
-  for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
-    fColors.push_back(TColor::GetColorPalette(i));
-    if (logScale)
-      fZLevel.push_back(fmin + TMath::Power(10, TMath::Log10(fmax) / TColor::GetNumberOfColors() * i));// log scale
-    else
-      fZLevel.push_back(fmin + (fmax / TColor::GetNumberOfColors() * i)); // lin scale
-  }
+  InitColorVector(logScale, fmin, fmax);
   TH2I* fLayerDummy = new TH2I("LayerDummy","",1,-600,600,1,-500,500);
   fLayerDummy->SetXTitle("x-coordinate [cm]");
   fLayerDummy->SetYTitle("y-coordinate [cm]");
@@ -221,16 +219,9 @@ void CbmTrdUtils::CreateLayerView(std::map<Int_t/*moduleAddress*/, TH1*>& Map, C
     text->SetFillStyle(1001);
     text->SetLineColor(1);
 
-    Int_t j = 0;
-    while ((value > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
-      //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
-      j++;
-    }
-    text->SetFillColor(fColors[j]);
-    if (j >= (Int_t)fZLevel.size())
-      text->SetFillColor(2);
-
-    if (fColors[j]<65)
+    text->SetFillColor(GetColorCode(value));
+  
+    if (GetColorCode(value)<65)
       text->SetTextColor(kWhite);
     title.Form("%.1f#pm%.1f",value,valueE);
     text->AddText(title);

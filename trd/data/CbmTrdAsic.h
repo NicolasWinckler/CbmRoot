@@ -31,13 +31,15 @@ class CbmTrdAsic : public TNamed
   virtual ~CbmTrdAsic();
 
   /** Accessors **/
-  Int_t GetAsicAddress() const { return fAsicAddress; }
   Double_t GetX() const { return fX; }
   Double_t GetY() const { return fY; }
   Double_t GetZ() const { return fZ; }
   Double_t GetSizeX() const { return fSizeX; }
   Double_t GetSizeY() const { return fSizeY; }
   Double_t GetSizeZ() const { return fSizeZ; }
+
+  Int_t GetAsicAddress(Int_t channelAddress);
+  Int_t GetAsicAddress() const { return fAsicAddress; }
   Int_t GetnofChannels() const {return fnofChannels; }
   Int_t GetFebGrouping() const {return fFebGrouping; }
   std::vector<Int_t> GetChannelAddresses() const {return fChannelAddresses; }
@@ -45,7 +47,7 @@ class CbmTrdAsic : public TNamed
   std::vector<Int_t> fChannelAddresses;
 
  private:
-
+  void InitAsics();
   Int_t fAsicAddress; // unique detector ID
   Double_t fX; // center of asic in global c.s. [cm]
   Double_t fY; // center of asic in global c.s. [cm]

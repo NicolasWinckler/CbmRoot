@@ -22,6 +22,9 @@
 #include "TGeoManager.h"
 #include "TStopwatch.h"
 
+#include <iomanip>
+#include <iostream>
+
 using std::make_pair;
 using std::max;
 using std::fabs;
@@ -158,7 +161,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 
    // Fill data from internally used stl map into output TClonesArray
    Int_t iDigi = 0;
-   map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
+   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
    for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
       new ((*fDigis)[iDigi]) CbmTrdDigi(*(it->second.first));
       new ((*fDigiMatches)[iDigi]) CbmMatch(*(it->second.second));
@@ -498,16 +501,16 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
                else
                   printf(" %3i:%5.3E  ",iCol,chargeFraction);
                if (iCol == fnCol-1)
-                  cout << "|";
+                  std::cout << "|";
             }
 
          } // for iCol
 
          if (fDebug) {
             if (iRow == fnRow-1)
-               cout << endl << "-------------------------------------" << endl;
+               std::cout << std::endl << "-------------------------------------" << std::endl;
             else
-               cout << endl;
+               std::cout << std::endl;
          }
       
       } // for iRow
@@ -580,7 +583,7 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
 void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
    const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId));
-   map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
+   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
    if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
       CbmMatch* digiMatch = new CbmMatch();
       digiMatch->AddLink(CbmLink(charge, pointId));

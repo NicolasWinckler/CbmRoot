@@ -9,6 +9,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 #include "TArray.h"

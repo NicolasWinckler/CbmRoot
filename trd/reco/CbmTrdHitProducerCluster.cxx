@@ -8,6 +8,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 #include "TClonesArray.h"
 #include "TStopwatch.h"
 #include "TGeoManager.h"

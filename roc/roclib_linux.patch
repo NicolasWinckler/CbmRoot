@@ -1,0 +1,14 @@
+--- Makefile	2013-10-24 10:21:54.000000000 +0200
++++ ../roc_new/Makefile	2013-10-23 16:25:38.000000000 +0200
+@@ -144,9 +144,9 @@
+ ## from here is configuration part, not required in other tools
+ 
+ ifdef debug
+-CXXOPT = -g -O2 -Wall -fPIC
++CXXOPT = -g -O2 -Wall -fPIC -I$(SIMPATH)/include
+ else
+-CXXOPT = -O2 -fPIC
++CXXOPT = -O2 -fPIC -I$(SIMPATH)/include
+ endif
+ 
+ ifeq ($(shell uname -m),x86_64)

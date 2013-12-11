@@ -43,3 +43,4 @@ string CbmLink::ToString() const
    return ss.str();
 }
 
+ClassImp(CbmLink)

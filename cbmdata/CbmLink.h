@@ -61,6 +61,8 @@ private:
    Int_t fEntry; // Entry number
    Int_t fIndex; // Index in array
    Float_t fWeight; // Weight
+
+   ClassDef(CbmLink, 1)
 };
 
 #endif /* CBMLINK_H_ */

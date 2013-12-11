@@ -303,11 +303,11 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   sprintf(title,"HitAsic_Station %d, Layer %d",fStation,fLayer);
   TH1F* h1HitAsic = new TH1F(name,title,10000,1e03,1e07*fBitPerHit);
   if (fBitPerHit == 1.)
-  h1HitAsic->SetXTitle("Hits/Asic [Hz]");
+    h1HitAsic->SetXTitle("Hits/Asic [Hz]");
   else
     h1HitAsic->SetXTitle("Data/Asic [Bit/s]");
   h1HitAsic->SetYTitle("count");
-  h1HitAsic->GetYaxis()->SetRangeUser(1,100);
+  h1HitAsic->GetYaxis()->SetRangeUser(0,20);
 
   TH1F* h1HitPad = NULL;
   TH2F* h2Layer  = NULL;
@@ -523,8 +523,9 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 	    
 	  c2->cd(1);
 	  h1HitPad->Draw("same"); 
-	  c2->cd(2);
-	  h1HitAsic->Draw();      
+	  c2->cd(2)->SetLogy(0);
+	  h1HitAsic->Draw();   
+	  h1HitAsic->Write("", TObject::kOverwrite);
 	  Outimage2 = TImage::Create();
 	  Outimage2->FromPad(c2);
 	  Outimage2->WriteImage(OutFile2);
@@ -532,6 +533,8 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 	  c2->SaveAs(OutFile2);  
 	  OutFile1.ReplaceAll("Pad","ASIC");
 	  c2->SaveAs(OutFile2);
+
+	  h1HitAsic->Reset();
 	  if (c2)
 	    delete c2;
 	  if (Outimage1)

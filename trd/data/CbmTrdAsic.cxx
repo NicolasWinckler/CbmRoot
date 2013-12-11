@@ -49,10 +49,13 @@ CbmTrdAsic::~CbmTrdAsic()
 
 void CbmTrdAsic::SetChannelAddresses(std::vector<Int_t> addresses){
   Int_t nofChannels = addresses.size();
-  LOG(WARNING) << "CbmTrdAsic::SetChannelAddresses previous nof channels:" << fnofChannels << " will be set to:" <<  nofChannels << FairLogger::endl;
-  fnofChannels = nofChannels;
+  if (nofChannels != fnofChannels){
+    LOG(WARNING) << "CbmTrdAsic::SetChannelAddresses previous nof channels:" << fnofChannels << " will be set to:" <<  nofChannels << FairLogger::endl;
+    fnofChannels = nofChannels;
+  }
   for (Int_t i = 0; i < nofChannels; i++)
-    fChannelAddresses[i] = addresses[i];
+    fChannelAddresses.push_back(addresses[i]);
+  addresses.clear();
 }
 
 ClassImp(CbmTrdAsic)

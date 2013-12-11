@@ -189,7 +189,7 @@ class CbmTrdHitRateFastQa : public FairTask {
 
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
-    
+  Double_t fBitPerHit;
   /**  map to store digis for pair of x,y position in module **/
   // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
   std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* > fDigiMap; 

@@ -13,10 +13,14 @@ static TString mvdGeom;
 static TString stsGeom;
 static TString richGeom;
 static TString muchGeom;
+static TString shieldGeom;
 static TString trdGeom;
 static TString tofGeom;
 static TString ecalGeom;
 static TString platformGeom;
+static TString psdGeom;
+static Double_t psdZpos;
+static Double_t psdXpos;
 
 static TString  fieldMap;
 static Double_t fieldZ;
@@ -45,5 +49,8 @@ void sis100_hadron_setup()
   trdGeom      = "trd/trd_v13p_1h.geo.root";
   tofGeom      = "tof/tof_v13-5a.geo.root";
   ecalGeom     = "";
+  psdGeom      = "psd_geo_xy.txt";
+  psdZpos = 800.;
+  psdXpos = 11.;
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

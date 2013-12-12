@@ -13,10 +13,14 @@ static TString mvdGeom;
 static TString stsGeom;
 static TString richGeom;
 static TString muchGeom;
+static TString shieldGeom;
 static TString trdGeom;
 static TString tofGeom;
 static TString ecalGeom;
 static TString platformGeom;
+static TString psdGeom;
+static Double_t psdZpos;
+static Double_t psdXpos;
 
 static TString  fieldMap;
 static Double_t fieldZ;
@@ -35,15 +39,19 @@ void sis300_muon_setup()
 
   // -----  Geometries  -----------------------------------------------------
   caveGeom     = "cave.geo";
-  pipeGeom     = "pipe/pipe_v13c.geo.root";
-  magnetGeom   = "magnet/magnet_v12b_much.geo.root";
+  pipeGeom     = "pipe/pipe_v13a.geo.root";
+  magnetGeom   = "magnet/magnet_v12b.geo.root";
   mvdGeom      = "";
   stsGeom      = "sts/sts_v13c.geo.root";
   richGeom     = "";
-  muchGeom     = "much/much_v13c.geo";
+  muchGeom     = "much/much_v13e.geo";
+  shieldGeom   = "shield_v13e.geo";
   platformGeom = ""; // "passive/platform_v13b.geo";
   trdGeom      = "trd/trd_v13p_3m.geo.root";
   tofGeom      = "tof/tof_v13-5e.geo.root";
   ecalGeom     = "";
+  psdGeom      = "psd_geo_xy.txt";
+  psdZpos = 1500.;
+  psdXpos = 10.;
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

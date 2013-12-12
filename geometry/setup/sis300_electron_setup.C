@@ -14,10 +14,14 @@ static TString mvdGeom;
 static TString stsGeom;
 static TString richGeom;
 static TString muchGeom;
+static TString shieldGeom;
 static TString trdGeom;
 static TString tofGeom;
 static TString ecalGeom;
 static TString platformGeom;
+static TString psdGeom;
+static Double_t psdZpos;
+static Double_t psdXpos;
 
 static TString  fieldMap;
 static Double_t fieldZ;
@@ -42,9 +46,13 @@ void sis300_electron_setup()
   stsGeom      = "sts/sts_v13c.geo.root";
   richGeom     = "rich/rich_v08a.geo";
   muchGeom     = "";
+  shieldGeom   = "";
   platformGeom = ""; // "passive/platform_v13b.geo";
   trdGeom      = "trd/trd_v13p_3e.geo.root";
   tofGeom      = "tof/tof_v13-5d.geo.root";
   ecalGeom     = "";
+  psdGeom      = "psd_geo_xy.txt";
+  psdZpos = 1500.;
+  psdXpos = 10.;
   cout<<"Reading geometry setup and magnetic field settings from "<< gSystem->UnixPathName(gInterpreter->GetCurrentMacroName())<<endl;
 }

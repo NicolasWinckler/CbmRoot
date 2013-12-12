@@ -36,39 +36,6 @@ void run_sim(Int_t nEvents = 2, const char* setup = "sis300_electron")
   
   CbmTarget* target = new CbmTarget("Gold", 0.025);
   
-  /**
-
-  if (CbmSetup == 1)
-  {
-    TString macro = inDir + "/geometry/setup/sis100_hadron_setup.C";
-    gROOT->LoadMacro(macro);
-    gInterpreter->ProcessLine("sis100_hadron_setup()");
-  }
-  if (CbmSetup == 2)
-  {
-    TString macro = inDir + "/geometry/setup/sis100_electron_setup.C";
-    gROOT->LoadMacro(macro);
-    gInterpreter->ProcessLine("sis100_electron_setup()");
-  }
-  if (CbmSetup == 3)
-  {
-    TString macro = inDir + "/geometry/setup/sis100_muon_setup.C";
-    gROOT->LoadMacro(macro);
-    gInterpreter->ProcessLine("sis100_muon_setup()");
-  }
-  if (CbmSetup == 4)  // default setup
-  {
-    TString macro = inDir + "/geometry/setup/sis300_electron_setup.C";
-    gROOT->LoadMacro(macro);
-    gInterpreter->ProcessLine("sis300_electron_setup()");
-  }
-  if (CbmSetup == 5)
-  {
-    TString macro = inDir + "/geometry/setup/sis300_muon_setup.C";
-    gROOT->LoadMacro(macro);
-    gInterpreter->ProcessLine("sis300_muon_setup()");
-  }
-  **/
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -150,6 +117,12 @@ void run_sim(Int_t nEvents = 2, const char* setup = "sis300_electron")
     much->SetGeometryFileName(muchGeom);
     fRun->AddModule(much);
   }
+  
+  if ( shieldGeom != "" ) {
+  	FairModule* shield = new CbmShield("SHIELD");
+  	shield->SetGeometryFileName(shieldGeom);
+  	fRun->AddModule(shield);
+  }
 
   if ( trdGeom != "" ) {
     FairDetector* trd = new CbmTrd("TRD",kTRUE );
@@ -166,6 +139,15 @@ void run_sim(Int_t nEvents = 2, const char* setup = "sis300_electron")
   if ( ecalGeom != "" ) {
     FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
+  }
+  
+  if ( psdGeom != "" ) {
+  	cout << "Constructing PSD" << endl;
+  	CbmPsdv1* psd= new CbmPsdv1("PSD", kTRUE);  
+ 	psd->SetZposition(psdZpos); // in cm
+ 	psd->SetXshift(psdXpos);  // in cm    
+ 	psd->SetGeoFile(psdGeom);  
+	fRun->AddModule(psd);
   }
   
   // ------------------------------------------------------------------------

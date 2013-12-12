@@ -2,6 +2,8 @@
 /** CbmPsdHit.cxx
  **@author Alla Maevskaya <alla@inr.ru>
  **@since 3.08.20212
+ **
+ ** Modified to simplify fEdep[49] -> fEdep (S. Seddiki)
   **/
 
 
@@ -14,19 +16,21 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmPsdHit::CbmPsdHit() 
   : TObject(),
-    fModuleID(-1) 
+    fModuleID(-1),
+    fEdep(-1)                        // SELIM: simplification vector [49] -> simple double
 {
   
-    for (Int_t j=0; j<44; j++)
-      fEdep[j]=0;
+    //for (Int_t j=0; j<49; j++)     // SELIM: simplification vector [49] -> simple double
+    //  fEdep[j]=0;
   
 }
-CbmPsdHit::CbmPsdHit(Int_t module, Float_t edep) 
+CbmPsdHit::CbmPsdHit(Int_t module, Double_t edep)
   : TObject(),
-    fModuleID(module)
+    fModuleID(module),
+    fEdep(edep)                      // SELIM: simplification vector [49] -> simple double
 { 
-    for (Int_t j=0; j<44; j++)
-      fEdep[j] = edep;
+    //for (Int_t j=0; j<49; j++)     // SELIM: simplification vector [49] -> simple double
+      //fEdep[j] = edep;
   
 }
 
@@ -37,7 +41,7 @@ CbmPsdHit::~CbmPsdHit() { }
 // -------------------------------------------------------------------------
 
 void CbmPsdHit::Print() {
-  cout<<"module : "<<fModuleID <<" ELoss "<<fEdep[fModuleID]  <<  endl;
+  cout<<"module : "<<fModuleID <<" ELoss "<<fEdep <<  endl;
 
 }
 

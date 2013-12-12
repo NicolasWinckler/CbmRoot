@@ -1,6 +1,6 @@
 // -------------------------------------------------------------------------
 // -----                 CbmPsdHitProducerIdel header file             -----
-// -----                  Created 15/05/12  by Alla                   -----
+// -----                  Created 15/05/12  by Alla & modified by SELIM                  -----
 // -------------------------------------------------------------------------
 
 
@@ -9,6 +9,8 @@
  **
  ** The ideal digitizer produces digits  of type CbmPsdDigi as sum of Edep
  **for 6 scintilators .
+ **
+ ** Modified to correct bugs and simplify fEdep[10][44] -> fEdep (S. Seddiki)
  **/
 
 

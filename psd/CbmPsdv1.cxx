@@ -20,22 +20,11 @@
 using std::cout;
 using std::endl;
 
+
 // -----   Default constructor   -------------------------------------------
-CbmPsdv1::CbmPsdv1() 
- : CbmPsd(),
-   fTrackID(0),
-   fVolumeID(0),
-   fModuleID(),
-   fPos(),
-   fMom(),
-   fTime(0.),
-   fLength(0.),
-   fEloss(0.),
-   fPosIndex(0),
-   fPsdCollection(new TClonesArray("CbmPsdPoint")),
-   fXshift(0.),
-   fZposition(0.)
-{
+CbmPsdv1::CbmPsdv1() {
+  fPsdCollection = new TClonesArray("CbmPsdPoint");
+  fPosIndex = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -43,20 +32,7 @@ CbmPsdv1::CbmPsdv1()
 
 // -----   Standard constructor   ------------------------------------------
 CbmPsdv1::CbmPsdv1(const char* name, Bool_t active)
-  : CbmPsd(name, active),
-    fTrackID(0),
-    fVolumeID(0),
-    fModuleID(),
-    fPos(),
-    fMom(),
-    fTime(0.),
-    fLength(0.),
-    fEloss(0.),
-    fPosIndex(0),
-    fPsdCollection(new TClonesArray("CbmPsdPoint")),
-    fXshift(0.),
-    fZposition(0.)
-{
+  : CbmPsd(name, active) {
 }
 
 // -------------------------------------------------------------------------
@@ -78,11 +54,13 @@ CbmPsdv1::~CbmPsdv1() {
 Bool_t  CbmPsdv1::ProcessHits(FairVolume* vol)
 {
   //  cout<<" CbmPsdv1::ProcessHits in "<<vol->GetName()<<endl;
-   if (TMath::Abs(gMC->TrackCharge()) <= 0) return kFALSE;
+  if (TMath::Abs(gMC->TrackCharge()) <= 0) return kFALSE;
 
-   Int_t pdg;
+  Int_t pdg;
   // Set parameters at entrance of volume. Reset ELoss.
-  if ( gMC->IsTrackEntering() ) {
+  
+  if ( gMC->IsTrackEntering() ) 
+  {
     ResetParameters();
     fEloss   = 0.;
     fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
@@ -94,22 +72,26 @@ Bool_t  CbmPsdv1::ProcessHits(FairVolume* vol)
     gMC->CurrentVolID(copyNo);
     //fVolumeID=copyNo;
     Int_t iCell, iNumm ;
-    gMC->CurrentVolOffID(1, iCell);
-    fModuleID=iCell;
-    gMC->CurrentVolOffID(2, iNumm);
-    fVolumeID=iNumm;
+    gMC->CurrentVolOffID(2, iCell);  // SELIM: change 1 -> 2
+    fModuleID=iCell;//module
+    gMC->CurrentVolOffID(1, iNumm);  // SELIM: change 2 -> 1
+    fVolumeID=iNumm;//scint
     pdg = gMC->TrackPid();
-    }
-  if (gMC->IsTrackInside() ) {
+  }
+  
+  if (gMC->IsTrackInside() ) 
+  {
     // Sum energy loss for all steps in the active volume
     fEloss += gMC->Edep();
+    
     if( gMC->IsTrackStop() ||
-	gMC->IsTrackDisappeared()   ) {
+	gMC->IsTrackDisappeared()   ) 
+    {
       fEloss += gMC->Edep();
       
-     if (pdg == 1000791970)
-     // if (strstr(fDebug,"hit"))
-	Info("ProcessHits track inside","track %d pdg %d volume %d %s, x=(%.1f,%.1f,%.1f), p=(%.2e,%.2e,%.2e), time %f fLength %f dE=%.3e",
+      if (pdg == 1000791970)
+      // if (strstr(fDebug,"hit"))
+      Info("ProcessHits track inside","track %d pdg %d volume %d %s, x=(%.1f,%.1f,%.1f), p=(%.2e,%.2e,%.2e), time %f fLength %f dE=%.3e",
 	     fTrackID, pdg, fVolumeID, gMC->CurrentVolName(),
 	     fPos.X(),fPos.Y(),fPos.Z(),fMom.Px(),fMom.Py(),fMom.Pz(),fTime, fLength, fEloss);
       
@@ -123,14 +105,14 @@ Bool_t  CbmPsdv1::ProcessHits(FairVolume* vol)
   
   if ( gMC->IsTrackExiting() /*   ||
        gMC->IsTrackStop()       ||
-       gMC->IsTrackDisappeared() */  ) {
+       gMC->IsTrackDisappeared() */  ) 
+  {
      // Sum energy loss for all steps in the active volume
-    fEloss += gMC->Edep();
-    
+    fEloss += gMC->Edep();    
    
-     if (pdg == 1000791970)
+    if (pdg == 1000791970)
       //    if (strstr(fDebug,"hit"))
-      Info("ProcessHits","track %d pdg %d volume %d %s, x=(%.1f,%.1f,%.1f), p=(%.2e,%.2e,%.2e), time %f fLength %f dE=%.3e",
+    Info("ProcessHits","track %d pdg %d volume %d %s, x=(%.1f,%.1f,%.1f), p=(%.2e,%.2e,%.2e), time %f fLength %f dE=%.3e",
 	   fTrackID, pdg, fVolumeID, gMC->CurrentVolName(),
 	   fPos.X(),fPos.Y(),fPos.Z(),fMom.Px(),fMom.Py(),fMom.Pz(),fTime, fLength, fEloss);
     
@@ -141,7 +123,7 @@ Bool_t  CbmPsdv1::ProcessHits(FairVolume* vol)
     fPoint->SetTrackID(fTrackID);
   }
   
-   ((CbmStack*)gMC->GetStack())->AddPoint(kPSD, fTrackID);
+  ((CbmStack*)gMC->GetStack())->AddPoint(kPSD, fTrackID);
  
   //  ResetParameters();
     
@@ -218,8 +200,22 @@ void CbmPsdv1::ConstructGeometry() {
   
   Float_t xPSD = fXshift;
   Float_t zPSD = fZposition;
-  gGeoManager->Node("VETO", 1, "cave", xPSD, 0, zPSD, 0, kTRUE, buf, 0);
-  //  gGeoManager->Node("VMDL", 1, "VETO", 60, 60,0., 0, kTRUE, buf, 0);
+  Float_t rotPSD = fRotYAngle; //in deg.//marina
+  
+  Float_t zdcSize[3]   = {  70.,   70.,  62.4 }; // SELIM: fZposition = 1 scintillator, not PSD center
+  zPSD += zdcSize[2];
+  
+  TGeoRotation *rot = new TGeoRotation();
+  rot->RotateY(rotPSD);
+
+  //gGeoManager->Node("VETO", 1, "cave", xPSD, 0, zPSD, 0, kTRUE, buf, 0);
+  ////gGeoManager->Node("VMDL", 1, "VETO", 60, 60,0., 0, kTRUE, buf, 0);
+
+  //TGeoCombiTrans* rottrans = new TGeoCombiTrans(xPSD, 0., zPSD, rot);
+  //gGeoManager->GetVolume("cave")->AddNode(VETO, 1, rottrans);//marina
+
+  gGeoManager->GetVolume("cave")->AddNode(VETO, 1, new TGeoCombiTrans(xPSD, 0.,zPSD, rot));//marina
+
   gGeoManager->Node("VFEL",1,"VMDL", 0, 0, -61.4, 0, kTRUE, buf, 0 );
   gGeoManager->Node("VRFL",1,"VFEL", 9.8, 0.75, 0, 0,kTRUE, buf, 0);
   gGeoManager->Node("VFEL",2,"VMDL", 0, 0, 61.4, 0, kTRUE, buf, 0 );
@@ -241,41 +237,48 @@ void CbmPsdv1::ConstructGeometry() {
       gGeoManager->Node("VPBL",ivol+1, "VMDL", 0, 0, zvpbl , 0, kTRUE, buf, 0); 
       fNbOfSensitiveVol++;
     }
+    
   //XY positions written to the file to be read in reconstruction
   Float_t xi[44], yi[44];
   Float_t xCur=-60., yCur=-60.;
   Int_t iMod=0, iModNoHole=0;
-  for(Int_t iy=0; iy<7; iy++) {
-    for(Int_t ix=0; ix<7; ix++) {
+  
+  ofstream fxypos(fGeoFile);
+  
+  for(Int_t iy=0; iy<7; iy++) 
+  {
+    for(Int_t ix=0; ix<7; ix++) 
+    {
       iMod++;
-      if(iMod==1 || iMod==7 || iMod==43 || iMod==25 || iMod==49) {
+      if(iMod==1 || iMod==7 || iMod==43 || iMod==25 || iMod==49) 
+      {
       	gGeoManager->Node("VHLL", iMod, "VETO", xCur,yCur,0,  0,kTRUE, buf, 0); 
 	cout <<"HOLE::::iMod,xxxx,yyyy " <<iMod <<" " <<xCur <<" " <<yCur <<endl;
       }
       else
-	{
-	  iModNoHole++;
+      {
+	iModNoHole++;
 	gGeoManager->Node("VMDL", iModNoHole, "VETO", xCur,yCur,0, 0, kTRUE, buf, 0); 
 	cout <<"MODULE :::::iMod,xxxx,yyyy " <<iModNoHole <<" " <<xCur <<" " <<yCur <<endl;
+	
 	xi[iModNoHole-1] = xCur + xPSD;
-	yi[iModNoHole-1] = yCur;
-	}
+	yi[iModNoHole-1] = yCur;         // change: put fxzpos << etc here
+	
+	fxypos << xi[iModNoHole-1]<< " " << yi[iModNoHole-1] << endl;
+	cout << xi[iModNoHole-1] << " " << yi[iModNoHole-1] << endl;
+      }
 
-
-	fNbOfSensitiveVol++;
-	// }
-      // if(ix==6) xCur=80.;
+      fNbOfSensitiveVol++;	
       xCur=xCur + 20.;      
-    }//for(Int_t ix==0; ix<9; ix++)
+    }
     xCur=-60;
     yCur=yCur + 20.;
-  }//for(Int_t iy==0; iy<9; iy++)
-
-  ofstream fxypos("psd_geo_xy.txt");
-  for (Int_t ii=0; ii<44; ii++) {
-    fxypos<<xi[ii]<<" "<<yi[ii]<<endl;
-    cout<<xi[ii]<<" "<<yi[ii]<<endl;
   }
+
+  
+  //for (Int_t ii=0; ii<44; ii++) 
+  //{    
+  //}
   fxypos.close();
   
 

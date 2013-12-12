@@ -63,6 +63,8 @@ class CbmPsdv1 : public CbmPsd
 
   void SetXshift(Float_t shift) { fXshift = shift;}
   void SetZposition(Float_t position) {fZposition = position; }
+  void SetRotYAngle(Float_t rotation) {fRotYAngle = rotation; }//[deg.] //marina
+  void SetGeoFile(TString geoFile) { fGeoFile = geoFile; }  
 
  private:
 
@@ -81,8 +83,9 @@ class CbmPsdv1 : public CbmPsd
   TClonesArray*  fPsdCollection;     //! Hit collection
   
   Float_t   fXshift;                 //  shift on X axis to have ion beam inside the hole
-  Float_t   fZposition;              //  Z position PSD surface
-  
+  Float_t   fZposition;              //  Z position PSD surface  
+  Float_t   fRotYAngle;              //  PSD rotation around Y axis [deg.] //marina
+  TString fGeoFile;  
 
   /** Private method ResetParameters
    **
@@ -90,10 +93,8 @@ class CbmPsdv1 : public CbmPsd
    **/
   void ResetParameters();
 
-  CbmPsdv1(const CbmPsdv1&);
-  CbmPsdv1& operator=(const CbmPsdv1&);
-  
-  ClassDef(CbmPsdv1,3)
+
+  ClassDef(CbmPsdv1,4)
 
 };
 

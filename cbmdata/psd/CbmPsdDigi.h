@@ -9,6 +9,8 @@
  ** Ideal case - Edep in GeV, idel  detector response
  **
  ** The time is relative to the event time. 
+ **
+ ** Modified to simplify fEdep[10][44] -> fEdep (S. Seddiki)
  **/
 
 
@@ -29,7 +31,7 @@ class CbmPsdDigi : public TObject
   /**   Default constructor   **/
   CbmPsdDigi() ;
   
-  CbmPsdDigi(Int_t section, Int_t module, Float_t edep) ;
+  CbmPsdDigi(Int_t section, Int_t module, Double_t edep) ;
   
   
   /**   Destructor   **/
@@ -37,16 +39,19 @@ class CbmPsdDigi : public TObject
      
   /**   Setter - Getter   **/
   
-  Float_t GetEdep(Int_t module, Int_t section) const { return fEdep[module][section]; }
-  void SetEdep(Float_t edep, Int_t module, Int_t section) {fEdep[module][section]=edep;}
+  //Float_t GetEdep(Int_t module, Int_t section) const { return fEdep[module][section]; }        
+  //void SetEdep(Float_t edep, Int_t module, Int_t section) {fEdep[module][section]=edep;}
+
+  Double_t GetEdep() const { return fEdep; }         // SELIM: simplification matrix [10][44] -> simple double 
+  void SetEdep(Double_t edep) { fEdep = edep; }
 
   Int_t GetModuleID() const { return fModuleID; }
   void SetModuleID(Int_t mod) {  fModuleID = mod; }
 
   Int_t GetSectionID() const { return fSectionID; }
   void SetSectionID(Int_t sec) {  fSectionID = sec; }
-  
-   void Print();
+
+  void Print();
   
  private:
 
@@ -55,7 +60,7 @@ class CbmPsdDigi : public TObject
  
   Int_t fModuleID;
   Int_t fSectionID;
-  Float_t fEdep[10][44];
+  Double_t fEdep;//[10][44];       // SELIM: simplification matrix [10][44] -> simple double 
 
   
   ClassDef(CbmPsdDigi,1);

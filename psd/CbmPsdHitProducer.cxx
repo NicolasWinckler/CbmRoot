@@ -1,6 +1,6 @@
 // -------------------------------------------------------------------------
 // -----                CbmPsdHitProducer source file             -----
-// -----                  Created 15/05/12  by     Alla                -----
+// -----                  Created 15/05/12  by     Alla & modified by SELIM               -----
 // -------------------------------------------------------------------------
 #include <iostream>
 #include <fstream>
@@ -21,12 +21,9 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmPsdHitProducer::CbmPsdHitProducer() :
   FairTask("Ideal Psd Hit Producer",1),
-  fNHits(0),
   fHitArray(NULL),
   fDigiArray(NULL),
-  fXi(),
-  fYi(),
-  fhModXNewEn(NULL)  
+  fNHits(0)
 { 
   //  Reset();
 }
@@ -51,41 +48,31 @@ CbmPsdHitProducer::~CbmPsdHitProducer()
 
 
 // -----   Public method Init   --------------------------------------------
-InitStatus CbmPsdHitProducer::Init() {
+InitStatus CbmPsdHitProducer::Init() {    
 
- ifstream fxypos("psd_geo_xy.txt");
-  for (Int_t ii=0; ii<44; ii++) {
-    fxypos>>fXi[ii]>>fYi[ii];
-    cout<<ii<<" "<<fXi[ii]<<" "<<fYi[ii]<<endl;
-  }
-  fxypos.close();
-  fhModXNewEn = new TH1F("hModXNewEn","X distr, En",300,-150.,150.); 
-  fhModXNewEn->Print();
+    // Get RootManager
+    FairRootManager* ioman = FairRootManager::Instance();
+    if ( ! ioman )
+    {
+	LOG(FATAL) << "-W- CbmPsdHitProducer::Init: RootManager not instantised!" << FairLogger::endl;    // SELIM: precaution
+	return kFATAL;
+    }
 
-  // Get RootManager
-  FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) {
-    cout << "-E- CbmPsdHitProducer::Init: "
-	 << "RootManager not instantised!" << endl;
-    return kFATAL;
-  }
+    // Get input array
+    fDigiArray = (TClonesArray*) ioman->GetObject("PsdDigi");
+    if ( ! fDigiArray )
+    {
+	LOG(FATAL) << "-E- CbmPsdHitProducer::Init: No PSD digits array!" << FairLogger::endl;    //SELIM: precaution
+	return kFATAL;
+    }
 
-  // Get input array
-  fDigiArray = (TClonesArray*) ioman->GetObject("PsdDigi");
-  if ( ! fDigiArray ) {
-    cout << "-W- CbmPsdHitProducer::Init: "
-	 << "No PSD digits array!" << endl;
-    return kERROR;
-  }
+    // Create and register output array
+    fHitArray = new TClonesArray("CbmPsdHit", 1000);
+    ioman->Register("PsdHit", "PSD", fHitArray, kTRUE);
 
-  // Create and register output array
-  fHitArray = new TClonesArray("CbmPsdHit", 1000);
-  ioman->Register("PsdHit", "PSD", fHitArray, kTRUE);
-
-  fHitArray->Dump();
-  cout << "-I- CbmPsdHitProducer: Intialisation successfull " << kSUCCESS<< endl;
-  return kSUCCESS;
-
+    fHitArray->Dump();
+    cout << "-I- CbmPsdHitProducer: Intialisation successfull " << kSUCCESS<< endl;
+    return kSUCCESS;
 }
 
 
@@ -96,55 +83,46 @@ InitStatus CbmPsdHitProducer::Init() {
 // -----   Public method Exec   --------------------------------------------
 void CbmPsdHitProducer::Exec(Option_t* opt) {
 
-  cout<<" CbmPsdHitProducer::Exec(Option_t* opt) "<<endl;
-  fhModXNewEn->Print();
+    cout<<" CbmPsdHitProducer::Exec(Option_t* opt) "<<endl;
+    
+    // Reset output array
+    if ( ! fDigiArray ) Fatal("Exec", "No PsdDigi array");
+    Reset();
 
-  // Reset output array
-   if ( ! fDigiArray ) Fatal("Exec", "No PsdDigi array");
-   Reset();
-   
-  // Declare some variables
-  CbmPsdDigi* dig = NULL;
-  Float_t edep[44];
- 
-  for (Int_t imod=0; imod<44; imod++)  edep[imod]=0;
- 
-  // Loop over PsdDigits
-  Int_t nDigi = fDigiArray->GetEntriesFast();
-  cout<<" nDigits "<<nDigi<<endl;
-  for (Int_t idig=0; idig<nDigi; idig++) {
-    dig = (CbmPsdDigi*) fDigiArray->At(idig);
-    if ( ! dig) continue;
-    Int_t mod = dig->GetModuleID();
-    Int_t sec = dig->GetSectionID();
-    edep[mod] += dig->GetEdep(sec,mod);
-   }// Loop over MCPoints
+    // Declare some variables
+    CbmPsdDigi* dig = NULL;
+    Double_t edep[100];                      // SELIM: can include up to 100 modules (can be extended)    
+    for (Int_t imod=0; imod<100; imod++)  { edep[imod]=0.; }
 
+    // Loop over PsdDigits
+    Int_t nDigi = fDigiArray->GetEntriesFast();
+    cout<<" nDigits "<<nDigi<<endl;
 
+    for (Int_t idig=0; idig<nDigi; idig++)
+    {
+	dig = (CbmPsdDigi*) fDigiArray->At(idig);
+	if ( ! dig) continue;
+	Int_t mod = dig->GetModuleID();	
+	edep[mod] += dig->GetEdep();       // SELIM: simplification related with CbmPsdDigit objects
+    }// Loop over MCPoints
 
-  for (Int_t imod=0; imod<44; imod++) {
-    if (edep[imod]>0) {
-      new ((*fHitArray)[fNHits]) CbmPsdHit(imod, edep[imod]);
-      fNHits++;
-      //    cout<<"CbmPsdHitProducer "<<fNHits<<" "<<imod<<" "<<edep[imod]<<endl;
-     fhModXNewEn->Fill(fXi[imod],TMath::Sqrt(edep[imod]) );
-      cout<<"CbmPsdHitProducer "<<fNHits<<" "<<imod<<" "<<edep[imod]<<endl;
-     }
-  }   
-  // }//module
+    for (Int_t imod=0; imod<100; imod++)   // SELIM: can include up to 100 modules (can be extended)
+    {              
+	if (edep[imod]>0.)
+	{
+	    new ((*fHitArray)[fNHits]) CbmPsdHit(imod, edep[imod]);
+	    fNHits++;	    
+	}
+    }
 
-  // Event summary
-  cout << "-I- CbmPsdHitProducer: " <<fNHits<< " CbmPsdHits created." << endl;
+    // Event summary
+    cout << "-I- CbmPsdHitProducer: " <<fNHits<< " CbmPsdHits created." << endl;
 
 }
 // -------------------------------------------------------------------------
 void CbmPsdHitProducer::Finish()
 {
-  cout<<" CbmPsdHitProducer::Finish() "<<endl;
-   TFile * outfile = new TFile("EdepHistos.root","RECREATE");
-    outfile->cd();
-   fhModXNewEn->Write();
-   outfile->Close();
+    cout<<" CbmPsdHitProducer::Finish() "<<endl;
 }
 
 // -----   Private method Reset   ------------------------------------------

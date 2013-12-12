@@ -1,6 +1,6 @@
 // -------------------------------------------------------------------------
 // -----                 CbmPsdHitProducerIdel header file             -----
-// -----                  Created 15/05/12  by Alla                   -----
+// -----                  Created 15/05/12  by Alla & modified by SELIM                  -----
 // -----------------------------------------------------------
 //--------------
 
@@ -10,6 +10,8 @@
  **
  ** The ideal hit producer produces hits of type CbmPsdHit as 
  ** full energy deposited in 1 module
+ **
+ ** Modified to simplify fEdep[49] -> fEdep (S. Seddiki)
  **/
 
 #ifndef CBMPSDHitProducer_H
@@ -20,8 +22,6 @@
 #include "TH1F.h"
 
 class TClonesArray;
-
-
 
 class CbmPsdHitProducer : public FairTask
 {
@@ -54,14 +54,10 @@ class CbmPsdHitProducer : public FairTask
   /** Output array of CbmPsdDigits **/
   TClonesArray* fDigiArray; 
 
-  Float_t       fXi[44];  //X coordinate of center of module
-  Float_t       fYi[44];  //X coordinate of center of module
-  TH1F *fhModXNewEn; //edep in each module for Marina
- 
-  void Reset();
-
   CbmPsdHitProducer(const CbmPsdHitProducer&);
   CbmPsdHitProducer operator=(const CbmPsdHitProducer&);
+
+  void Reset(); 
 
   ClassDef(CbmPsdHitProducer,2);
 

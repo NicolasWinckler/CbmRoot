@@ -111,9 +111,12 @@ void run_reco(Int_t nEvents = 1)
   // -----   TRD hit producer   ----------------------------------------------
   //CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
 
-  CbmTrdDigitizerPRF* trdHitProd = new CbmTrdDigitizerPRF("trd","trd",radiator);
+  CbmTrdDigitizerPRF* trdHitProd = new CbmTrdDigitizerPRF(radiator);
   run->AddTask(trdHitProd);
 
+  //  CbmTrdHitRateFastQa* trdHFQ = new CbmTrdHitRateFastQa();
+  //  run->AddTask(trdHFQ);
+  //
   //  CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(radiator);
   //  run->AddTask(trdDigitizer);
   //

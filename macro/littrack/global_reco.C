@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/trd_v13p_3e/"; // Output directory
+	TString dir = "events/much_v13f/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -32,16 +32,16 @@ void global_reco(Int_t nEvents = 100, // number of events
 
    // Digi files
    TList* parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+   TObjString stsDigiFile = parDir + "/sts/sts_v13c_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13p_3e.digi.par"; // TRD digi file
-   TString muchDigiFile = parDir + "/much/much_v12c.digi.root"; // MUCH digi file
-   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v12b.root";
+   TString muchDigiFile = parDir + "/much/much_v13f.digi.root"; // MUCH digi file
+   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13c.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
    // Reconstruction parameters
-   TString globalTrackingType = "nn"; // Global tracking type
+   TString globalTrackingType = "branch"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
-   TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
+   TString trdHitProducerType = "clustering"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
 
 	if (script == "yes") {
@@ -230,7 +230,8 @@ void global_reco(Int_t nEvents = 100, // number of events
 		finder->SetTrackingType(std::string(globalTrackingType));
 
 		// Hit-to-track merger method to be used
-		// "nearest_hit" - assigns nearest hit to the track
+		// "nearest_hit" - assigns nearest hit to track
+		// "all_hits" - assigns all hits in the searching area to track
 		finder->SetMergerType("nearest_hit");
 
 		run->AddTask(finder);

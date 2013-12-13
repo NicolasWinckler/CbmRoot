@@ -57,15 +57,14 @@ function set_default_file_names() {
 # Function sets the default muon geometry
 function set_default_muon_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target/target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe/pipe_much.geo
-    export LIT_SHIELD_GEOM=shield_standard.geo
+    export LIT_PIPE_GEOM=pipe/pipe_v13c.geo.root
+    export LIT_SHIELD_GEOM=shield_v13f.geo
     export LIT_MVD_GEOM=
-    export LIT_STS_GEOM=sts/sts_v12b.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
-    export LIT_MUCH_GEOM=much/much_v12b.geo
-    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v12b.digi.root
+    export LIT_STS_GEOM=sts/sts_v13c.geo.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
+    export LIT_MUCH_GEOM=much/much_v13f.geo
+    export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v13f.digi.root
     export LIT_RICH_GEOM=
     export LIT_TRD_GEOM=
     export LIT_TRD_DIGI=
@@ -73,7 +72,7 @@ function set_default_muon_geometry() {
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -90,23 +89,22 @@ function set_default_muon_geometry() {
 # Function sets the default electron geometry
 function set_default_electron_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target/target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe/pipe_standard.geo
+    export LIT_PIPE_GEOM=pipe/pipe_v13a.geo.root
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
-    export LIT_STS_GEOM=sts/sts_v12b.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
+    export LIT_STS_GEOM=sts/sts_v13c.geo.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=rich/rich_v08a.geo
-    export LIT_TRD_GEOM=trd/trd_v13g.geo.root
-    export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13g.digi.par
+    export LIT_TRD_GEOM=trd/trd_v13p_3e.geo.root
+    export LIT_TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13p_3e.digi.par
     export LIT_TOF_GEOM=tof/tof_v13b.geo.root
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -123,13 +121,12 @@ function set_default_electron_geometry() {
 # Function set default mvd geometry
 function set_default_mvd_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target/target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe/pipe_much.geo
-    export LIT_SHIELD_GEOM=shield_standard.geo
+    export LIT_PIPE_GEOM=pipe/pipe_v13a.geo.root
+    export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=mvd/mvd_v07a.geo
-    export LIT_STS_GEOM=sts/sts_v12b.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
+    export LIT_STS_GEOM=sts/sts_v13c.geo.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=
@@ -139,7 +136,7 @@ function set_default_mvd_geometry() {
     export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -154,13 +151,12 @@ function set_default_mvd_geometry() {
 # Function set default sts geometry
 function set_default_sts_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target/target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe/pipe_standard.geo
+    export LIT_PIPE_GEOM=pipe/pipe_v13a.geo.root
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
-    export LIT_STS_GEOM=sts/sts_v12b.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
+    export LIT_STS_GEOM=sts/sts_v13c.geo.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=
@@ -170,7 +166,7 @@ function set_default_sts_geometry() {
     export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4
@@ -187,13 +183,12 @@ function set_default_sts_geometry() {
 # Function set default sts geometry
 function set_default_sts_tof_geometry() {
     export LIT_CAVE_GEOM=cave.geo
-    export LIT_TARGET_GEOM=target/target_au_250mu.geo
-    export LIT_PIPE_GEOM=pipe/pipe_standard.geo
+    export LIT_PIPE_GEOM=pipe/pipe_v13a.geo.root
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
-    export LIT_STS_GEOM=sts/sts_v12b.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v12b_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v12b.root
+    export LIT_STS_GEOM=sts/sts_v13c.geo.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=
@@ -203,7 +198,7 @@ function set_default_sts_tof_geometry() {
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
     export LIT_FIELD_MAP=field_v12a
-    export LIT_MAGNET_GEOM=magnet/magnet_v12a.geo
+    export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
     export LIT_NORM_STS_POINTS=4

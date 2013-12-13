@@ -268,7 +268,7 @@ InitStatus CbmTrdHitRateFastQa::Init()
 void CbmTrdHitRateFastQa::Exec(Option_t * option)
 {
 
-  fBitPerHit = 112;
+  fBitPerHit = 112;  // 6 time samples 3 + (9 * 6 + 3 / 15) = 7 words = 7 * 16 bit = 112 bits 
   //TStyle::SetNumberContours(99); 
   gStyle->SetNumberContours(99); 
   //TH2::SetContour(99); 
@@ -301,11 +301,11 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 
   sprintf(name,"HA_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitAsic_Station %d, Layer %d",fStation,fLayer);
-  TH1F* h1HitAsic = new TH1F(name,title,10000,1e03,1e07*fBitPerHit);
+  TH1F* h1HitAsic = new TH1F(name,title,50*fBitPerHit,1,10*fBitPerHit);
   if (fBitPerHit == 1.)
     h1HitAsic->SetXTitle("Hits/Asic [Hz]");
   else
-    h1HitAsic->SetXTitle("Data/Asic [Bit/s]");
+    h1HitAsic->SetXTitle("Data/32ch Asic [MBit/s]");
   h1HitAsic->SetYTitle("count");
   h1HitAsic->GetYaxis()->SetRangeUser(0,20);
 
@@ -676,7 +676,7 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
       asic->SetFillColor(kBlack);
     else
       asic->SetFillColor( utils->GetColorCode(ratePerAsicMap[AsicAddresses[iAsic]]));
-    HitAsic->Fill(ratePerAsicMap[AsicAddresses[iAsic]] * fBitPerHit);
+    HitAsic->Fill(ratePerAsicMap[AsicAddresses[iAsic]] * 1e-6 * fBitPerHit);
     asic->Draw("same");
     //c2->Update();
   }
@@ -705,7 +705,7 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
       c2->cd(1)->SetGridx(1);
       c2->cd(1)->SetGridy(1);  
       HitPad->Draw();
-      c2->cd(2)->SetLogx(1);
+      c2->cd(2)->SetLogx(1);  // Data/ 32 ch Asic lin log scale
       c2->cd(2)->SetLogy(1);
       c2->cd(2)->SetGridx(1);
       c2->cd(2)->SetGridy(1); 
@@ -746,7 +746,7 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
       c3->Divide(1,1);
       c3->cd(1)->SetLogz(1);
       Layer->GetZaxis()->SetRangeUser(1.,4e6);
-      Layer->SetZTitle("Hits/ASIC [Hz]");
+      Layer->SetZTitle("Hits/Asic [Hz]");
       Layer->DrawCopy("colz");
     }
   }

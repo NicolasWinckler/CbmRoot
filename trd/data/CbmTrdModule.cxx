@@ -153,6 +153,9 @@ void CbmTrdModule::InitAsics() {
   Int_t rowId = 0;
   Int_t isecId = 0;
   Int_t irowId = 0;
+  Double_t sizeAsicX = 6.0; // 2.0;
+  Double_t sizeAsicY = 3.0; // 2.0;
+  Double_t sizeAsicZ = 0.5;
 
   for (Int_t s = 0; s < fNofSectors; s++) { //new    
     for (Int_t r = 0; r < GetNofRowsInSector(s); r++){ //new
@@ -181,13 +184,12 @@ void CbmTrdModule::InitAsics() {
 	    local_point[0] += fSectorBeginX.GetAt(s);
 	    local_point[1] += fSectorBeginY.GetAt(s);
 
-
 	    // local_point[i] must be >= 0 at this point      Double_t local_point[3];
 
 	    fAsicMap[iAsic] = new CbmTrdAsic(
 					     iAsic, nChannels, iFebGroup,
 					     local_point[0] - fSizeX, local_point[1] - fSizeY, 0.,
-					     2., 2., 0.5);
+					     sizeAsicX, sizeAsicY, sizeAsicZ);
 	    if (local_point[0] > 2*fSizeX)     LOG(ERROR) << "CbmTrdModule::InitAsics: asic position x=" << local_point[0] << " is out of bounds [0," << 2*fSizeX<< "]!" << FairLogger::endl;
 	    if (local_point[1] > 2*fSizeY)     LOG(ERROR) << "CbmTrdModule::InitAsics: asic position y=" << local_point[1] << " is out of bounds [0," << 2*fSizeY<< "]!" << FairLogger::endl;
 

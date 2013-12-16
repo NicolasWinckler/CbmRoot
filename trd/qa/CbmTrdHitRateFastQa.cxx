@@ -105,7 +105,9 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa()
     //fRadiators(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
-    fDigiMapIt()
+    fDigiMapIt(),
+    h1DataModule(NULL),
+    h1OptLinksModule(NULL)
 {
 }
 // --------------------------------------------------------------------
@@ -172,10 +174,12 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa(const char *name, const char *title)
     fMCStacks(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
-    //fRadiators(radiator),
+  //fRadiators(radiator),
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
-    fDigiMapIt()
+    fDigiMapIt(),
+    h1DataModule(NULL),
+    h1OptLinksModule(NULL)
 {
 }
 // --------------------------------------------------------------------
@@ -300,14 +304,34 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 
 
   sprintf(name,"HA_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitAsic_Station %d, Layer %d",fStation,fLayer);
+  //  sprintf(title,"DataAsic_Station %d, Layer %d",fStation,fLayer);
+  sprintf(title,"Data_per_Asic");
   TH1F* h1HitAsic = new TH1F(name,title,50*fBitPerHit,1,10*fBitPerHit);
   if (fBitPerHit == 1.)
     h1HitAsic->SetXTitle("Hits/Asic [Hz]");
   else
-    h1HitAsic->SetXTitle("Data/32ch Asic [MBit/s]");
+    h1HitAsic->SetXTitle("Data/32ch Asic [Mbit/s]");
   h1HitAsic->SetYTitle("count");
   h1HitAsic->GetYaxis()->SetRangeUser(0,20);
+
+  sprintf(name,"HM_S%d_L%d",fStation,fLayer);
+  //  sprintf(title,"DataModule_Station %d, Layer %d",fStation,fLayer);
+  sprintf(title,"Data_per_Module");
+  h1DataModule = new TH1F(name,title,50*fBitPerHit,10,100*10*fBitPerHit);
+  if (fBitPerHit == 1.)
+    h1DataModule->SetXTitle("Hits/Module [Hz]");
+  else
+    h1DataModule->SetXTitle("Data/Module [Mbit/s]");
+  h1DataModule->SetYTitle("count");
+  //  h1DataModule->GetYaxis()->SetRangeUser(0,20);
+
+  sprintf(name,"HO_S%d_L%d",fStation,fLayer);
+  //  sprintf(title,"OptLinksModule_Station %d, Layer %d",fStation,fLayer);
+  sprintf(title,"5_Gbps_optical_links_per_Module");
+  h1OptLinksModule = new TH1F(name,title,10,0.5,10.5);
+  h1OptLinksModule->SetXTitle("optical links");
+  h1OptLinksModule->SetYTitle("count");
+  //  h1OptLinksModule->GetYaxis()->SetRangeUser(0,20);
 
   TH1F* h1HitPad = NULL;
   TH2F* h2Layer  = NULL;
@@ -488,7 +512,7 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
       if (nModulesInThisLayer > 0)
 	for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++){
 	  printf("     ModuleAddress: %i\n",LiSi[j][i]);
-	  ScanPlane(LiSi[j][i], c1, c3, h1HitPad, h1HitAsic);
+	  ScanModulePlane(LiSi[j][i], c1, c3, h1HitPad, h1HitAsic);
 	  
 	}
       /*
@@ -502,7 +526,7 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 
 	Lines = true;
 	for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++)
-	ScanPlane();
+	ScanModulePlane();
 	GetModuleInformationFromDigiPar(GeoPara, Fast, Lines, LiSi[j][i], h2Layer ,c1, h1HitPad, c2, h2Topview, c0, mm2bin);
       */
       if(fDraw)  // dump png file for this layer
@@ -523,9 +547,19 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 	    
 	  c2->cd(1);
 	  h1HitPad->Draw("same"); 
-	  c2->cd(2)->SetLogy(0);
+
+          c2->cd(2);
 	  h1HitAsic->Draw();   
 	  h1HitAsic->Write("", TObject::kOverwrite);
+
+	  c2->cd(3);
+	  h1DataModule->Draw();   
+	  h1DataModule->Write("", TObject::kOverwrite);
+
+	  c2->cd(4);
+	  h1OptLinksModule->Draw();   
+	  h1OptLinksModule->Write("", TObject::kOverwrite);
+
 	  Outimage2 = TImage::Create();
 	  Outimage2->FromPad(c2);
 	  Outimage2->WriteImage(OutFile2);
@@ -535,6 +569,9 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
 	  c2->SaveAs(OutFile2);
 
 	  h1HitAsic->Reset();
+	  h1DataModule->Reset();   
+	  h1OptLinksModule->Reset();   
+
 	  if (c2)
 	    delete c2;
 	  if (Outimage1)
@@ -554,9 +591,11 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   h1HitAsic->Write("", TObject::kOverwrite);
 }
 
-void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCanvas*& c2, TH1F*& HitPad, TH1F*& HitAsic)
+
+void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c1, TCanvas*& c2, TH1F*& HitPad, TH1F*& HitAsic)
 {
   c1->cd(1);
+  Double_t ratePerModule = 0;  // sum of data from this module
   TVector3 padPos;
   TVector3 padSize;
   fModuleInfo = fDigiPar->GetModule(moduleAddress);
@@ -610,6 +649,8 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
 	//Double_t rate = CalcHitRatePad(global_min[0], global_max[0], global_min[1], global_max[1], global_max[2]);
 	Double_t rate = CalcHitRatePad(local_min[0], local_max[0], local_min[1], local_max[1], local_max[2]);
 	HitPad->Fill(rate);
+        ratePerModule += rate;  // increase sum by rate of this asic
+
 	//TBox *pad = new TBox(global_min[0], global_min[1], global_max[0], global_max[1]);
 	TBox *pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
 	//printf("    %i %i %i  (%f, %f)   (%f, %f)   %f\n",s,r,c,local_min[0],local_min[1],global_min[0],global_min[1],rate);
@@ -629,7 +670,7 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
 	//delete pad;
 	Int_t AsicAddress = fModuleInfo->GetAsicAddress(channelAddress);
 	if (AsicAddress < 0) 
-	  LOG(ERROR) << "CbmTrdHitRateFastQa::ScanPlane: Channel address:" << channelAddress << " is not initialized in module " << moduleAddress << "(s:" << s << ", r:" << r << ", c:" << c << ")" << FairLogger::endl;
+	  LOG(ERROR) << "CbmTrdHitRateFastQa::ScanModulePlane: Channel address:" << channelAddress << " is not initialized in module " << moduleAddress << "(s:" << s << ", r:" << r << ", c:" << c << ")" << FairLogger::endl;
 	ratePerAsicMap[AsicAddress] += rate;
       }
     }
@@ -680,9 +721,15 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
     asic->Draw("same");
     //c2->Update();
   }
-
+  h1DataModule->Fill(ratePerModule * 1e-6 * fBitPerHit);
+  h1OptLinksModule->Fill(1+floor(ratePerModule * fBitPerHit / 5e9));  // 1 links plus one more for each 5 Gbps
+  printf("     data rate: %10.4f (Gbit/s)\n", ratePerModule * 1e-9 * fBitPerHit);
+  printf("     opt links: %8.2f\n",           1+floor(ratePerModule * fBitPerHit / 5e9) );
+  printf("     --------------------------\n");
 }
-  void CbmTrdHitRateFastQa::HistoInit(TCanvas*& c1, TCanvas*& c2, TCanvas*& c3, TH2F*& Layer,TH1F*& HitPad, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
+
+
+void CbmTrdHitRateFastQa::HistoInit(TCanvas*& c1, TCanvas*& c2, TCanvas*& c3, TH2F*& Layer,TH1F*& HitPad, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin)
   {
     Char_t name[50];
     Char_t title[50];
@@ -698,17 +745,31 @@ void CbmTrdHitRateFastQa::ScanPlane(const Int_t moduleAddress, TCanvas*& c1, TCa
     sprintf(name,"c2_S%d_L%d",fStation,fLayer);
     sprintf(title,"c2 Station %d, Layer %d",fStation,fLayer);
     if(fDraw){
-      c2 = new TCanvas(name,title,2000,900/2);	
-      c2->Divide(2,1);
+      c2 = new TCanvas(name,title,1600,900);	
+      c2->Divide(2,2); // (3,1);
       c2->cd(1)->SetLogx(1);
       c2->cd(1)->SetLogy(1);
       c2->cd(1)->SetGridx(1);
       c2->cd(1)->SetGridy(1);  
       HitPad->Draw();
-      c2->cd(2)->SetLogx(1);  // Data/ 32 ch Asic lin log scale
-      c2->cd(2)->SetLogy(1);
+
+      // h1HitAsic
+      c2->cd(2)->SetLogx(1);  // Data per 32ch Asic lin/log scale
+      c2->cd(2)->SetLogy(0);  // will be overwritten later
       c2->cd(2)->SetGridx(1);
       c2->cd(2)->SetGridy(1); 
+
+      // h1DataModule
+      c2->cd(3)->SetLogx(1);  // Data per Module lin/log scale
+      c2->cd(3)->SetLogy(0);  // will be overwritten later
+      c2->cd(3)->SetGridx(1);
+      c2->cd(3)->SetGridy(1); 
+
+      // h1OptLinksModule
+      c2->cd(4)->SetLogx(0);  // Data per Module lin/log scale
+      c2->cd(4)->SetLogy(0);  // will be overwritten later
+      c2->cd(4)->SetGridx(1);
+      c2->cd(4)->SetGridy(1); 
     }
 
     sprintf(name,"S%d_L%d",fStation,fLayer);

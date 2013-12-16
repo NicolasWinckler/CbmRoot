@@ -87,9 +87,12 @@ class CbmTrdHitRateFastQa : public FairTask {
 
  private:
 
+  TH1F* h1DataModule;
+  TH1F* h1OptLinksModule;
+
   void HistoInit(TCanvas*& c1, TCanvas*& c2, TCanvas*& c3, TH2F*& Layer,TH1F*& HitPad, Double_t ZRangeL, Double_t ZRangeU, Double_t mm2bin);
 
-  void ScanPlane(const Int_t moduleId, TCanvas*& c1, TCanvas*& c2, TH1F*& HitPad, TH1F*& HitAsic);
+  void ScanModulePlane(const Int_t moduleId, TCanvas*& c1, TCanvas*& c2, TH1F*& HitPad, TH1F*& HitAsic);
 
   void GetModuleInformationFromDigiPar(HitRateGeoPara2 *GeoPara, Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, TH1F* HitPad, TCanvas* c2, TH2F* Topview[3], TCanvas* c0, Double_t mm2bin);
 

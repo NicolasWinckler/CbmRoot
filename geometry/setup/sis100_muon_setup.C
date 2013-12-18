@@ -39,16 +39,16 @@ void sis100_muon_setup()
 
   // -----  Geometries  -----------------------------------------------------
   caveGeom     = "cave.geo";
-  pipeGeom     = "pipe/pipe_v13a.geo.root";
+  pipeGeom     = "pipe/pipe_v13c.geo.root";
   magnetGeom   = "magnet/magnet_v12b.geo.root";
   mvdGeom      = "";
   stsGeom      = "sts/sts_v13c.geo.root";
   richGeom     = "";
   muchGeom     = "much/much_v13d.geo";
-  shieldGeom   = "shield_v13d.geo";
+  shieldGeom   = "much/shield_v13d.geo";
   platformGeom = ""; // "passive/platform_v13a.geo";
-  trdGeom      = "trd/trd_v13p_1m.geo.root";
-  tofGeom      = "tof/tof_v13-5c.geo.root";
+  trdGeom      = "trd/trd_v13p_1e.geo.root";
+  tofGeom      = "tof/tof_v13-5b.geo.root";
   ecalGeom     = "";
   psdGeom      = "psd_geo_xy.txt";
   psdZpos = 800.;

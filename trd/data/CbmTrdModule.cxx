@@ -144,18 +144,21 @@ CbmTrdModule::~CbmTrdModule()
 
 void CbmTrdModule::InitAsics() {
   Int_t iAsic = 0;
+  Int_t nChannels = 32;
+  Int_t iFebGroup = 0; // 1; 2;  // normal, super, ultimate
+  Int_t gRow[3] = {  2, 2, 3 };  // re-ordering on the feb -> same mapping for normal and super
+  Int_t gCol[3] = { 16,16,10 };  // re-ordering on the feb -> same mapping for normal and super
+//  Int_t gRow[3] = {  2, 4, 6 };  // intuitive, but wrong mapping
+//  Int_t gCol[3] = { 16, 8, 5 };  // intuitive, but wrong mapping
+  Double_t sizeAsicX = 6.0; // 2.0; // in cm
+  Double_t sizeAsicY = 3.0; // 2.0; // in cm
+  Double_t sizeAsicZ = 0.5;         // in cm
   Double_t xAsic = 0;  // x position of Asic
   Double_t yAsic = 0;  // y position of Asic
-  Int_t nChannels = 32;
-  Int_t iFebGroup = 0; // 1; 2; // normal, super, ultimate
-  Int_t gRow[3] = {  2, 4, 6 };
-  Int_t gCol[3] = { 16, 8, 5 };
+
   Int_t rowId = 0;
   Int_t isecId = 0;
   Int_t irowId = 0;
-  Double_t sizeAsicX = 6.0; // 2.0;
-  Double_t sizeAsicY = 3.0; // 2.0;
-  Double_t sizeAsicZ = 0.5;
 
   for (Int_t s = 0; s < fNofSectors; s++) { //new    
     for (Int_t r = 0; r < GetNofRowsInSector(s); r++){ //new

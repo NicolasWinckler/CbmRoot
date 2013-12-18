@@ -106,6 +106,9 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa()
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt(),
+    nTotalAsics(0.),
+    nTotalOptLinks(0.),
+    trdTotalDataRate(0.),
     h1DataModule(NULL),
     h1OptLinksModule(NULL)
 {
@@ -178,6 +181,9 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa(const char *name, const char *title)
     fGeoHandler(new CbmTrdGeoHandler()),
     fDigiMap(),
     fDigiMapIt(),
+    nTotalAsics(0.),
+    nTotalOptLinks(0.),
+    trdTotalDataRate(0.),
     h1DataModule(NULL),
     h1OptLinksModule(NULL)
 {
@@ -271,8 +277,10 @@ InitStatus CbmTrdHitRateFastQa::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitRateFastQa::Exec(Option_t * option)
 {
-
-  fBitPerHit = 112;  // 6 time samples 3 + (9 * 6 + 3 / 15) = 7 words = 7 * 16 bit = 112 bits 
+  fBitPerHit = 112 * 1.5; // (112 + 4*16) * 10 / 8.;   // 6 time samples, 8b/10b encoding, CBMnet header 
+  //  fBitPerHit = 220; // (112 + 4*16) * 10 / 8.;   // 6 time samples, 8b/10b encoding, CBMnet header 
+  //  fBitPerHit = 112;  // 6 time samples 3 + (9 * 6 + 3) / 15 = 7 words = 7 * 16 bit = 112 bits 
+  
   //TStyle::SetNumberContours(99); 
   gStyle->SetNumberContours(99); 
   //TH2::SetContour(99); 
@@ -306,18 +314,20 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   sprintf(name,"HA_S%d_L%d",fStation,fLayer);
   //  sprintf(title,"DataAsic_Station %d, Layer %d",fStation,fLayer);
   sprintf(title,"Data_per_Asic");
-  TH1F* h1HitAsic = new TH1F(name,title,50*fBitPerHit,1,10*fBitPerHit);
+  //  TH1F* h1HitAsic = new TH1F(name,title,50*fBitPerHit,1,10*fBitPerHit);
+  TH1F* h1HitAsic = new TH1F(name,title,1000,1,2000);  // Mbit
   if (fBitPerHit == 1.)
     h1HitAsic->SetXTitle("Hits/Asic [Hz]");
   else
     h1HitAsic->SetXTitle("Data/32ch Asic [Mbit/s]");
   h1HitAsic->SetYTitle("count");
-  h1HitAsic->GetYaxis()->SetRangeUser(0,20);
+  //  h1HitAsic->GetYaxis()->SetRangeUser(0,20);
 
   sprintf(name,"HM_S%d_L%d",fStation,fLayer);
   //  sprintf(title,"DataModule_Station %d, Layer %d",fStation,fLayer);
   sprintf(title,"Data_per_Module");
-  h1DataModule = new TH1F(name,title,50*fBitPerHit,10,100*10*fBitPerHit);
+  //  h1DataModule = new TH1F(name,title,50*fBitPerHit,10,100*10*fBitPerHit);
+  h1DataModule = new TH1F(name,title,1000,10,100*2000);
   if (fBitPerHit == 1.)
     h1DataModule->SetXTitle("Hits/Module [Hz]");
   else
@@ -473,6 +483,14 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   MaxHitRatePerPad->SetLineColor(2);  // make it red
   MaxHitRatePerPad->SetLineWidth(8);  // make it thick
 
+  TLine* MaxDataRatePerUplink = new TLine(500,12,500,25);  // 500 Mbit per Uplink
+  MaxDataRatePerUplink->SetLineColor(2);  // make it red
+  MaxDataRatePerUplink->SetLineWidth(8);  // make it thick
+
+  TLine* MaxDataRatePerOptLink = new TLine(5000,5,5000,10);  // 500 Mbit per Uplink
+  MaxDataRatePerOptLink->SetLineColor(2);  // make it red
+  MaxDataRatePerOptLink->SetLineWidth(8);  // make it thick
+
   /*
     h2Layer  = new TH2F("dummy1","dummy1",1,-0.5,0.5,1,-0.5,0.5);
     h1HitPad = new TH1F("dummy2","dummy2",1,-0.5,0.5);
@@ -551,10 +569,12 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
           c2->cd(2);
 	  h1HitAsic->Draw();   
 	  h1HitAsic->Write("", TObject::kOverwrite);
+          MaxDataRatePerUplink->Draw("same");  // draw red line
 
 	  c2->cd(3);
 	  h1DataModule->Draw();   
 	  h1DataModule->Write("", TObject::kOverwrite);
+          MaxDataRatePerOptLink->Draw("same");  // draw red line
 
 	  c2->cd(4);
 	  h1OptLinksModule->Draw();   
@@ -589,6 +609,14 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   if(fDraw)
     c0->Update();
   h1HitAsic->Write("", TObject::kOverwrite);
+
+  printf("     --------------------------\n");
+  printf("     total number of ASICs        : %d\n", nTotalAsics);
+  printf("     total number of optical links: %d\n", nTotalOptLinks);
+  printf("     total TRD data rate          : %.2f (Gbit/s)\n", trdTotalDataRate * 1e-3 );
+  printf("     --------------------------\n");
+  printf("     --------------------------\n");
+
 }
 
 
@@ -608,6 +636,7 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
   std::vector<Int_t> AsicAddresses = fModuleInfo->GetAsicAddresses();
   Int_t nofAsics = fModuleInfo->GetNofAsics();
   printf("     NofASICS:     %3i\n",nofAsics);
+  nTotalAsics += nofAsics;
   std::map<Int_t, Double_t> ratePerAsicMap;
   for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
     ratePerAsicMap[AsicAddresses[iAsic]] = 0.;
@@ -717,14 +746,24 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
       asic->SetFillColor(kBlack);
     else
       asic->SetFillColor( utils->GetColorCode(ratePerAsicMap[AsicAddresses[iAsic]]));
-    HitAsic->Fill(ratePerAsicMap[AsicAddresses[iAsic]] * 1e-6 * fBitPerHit);
+
+    Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]] * 3 * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+    HitAsic->Fill(dataPerAsic);
     asic->Draw("same");
     //c2->Update();
   }
-  h1DataModule->Fill(ratePerModule * 1e-6 * fBitPerHit);
-  h1OptLinksModule->Fill(1+floor(ratePerModule * fBitPerHit / 5e9));  // 1 links plus one more for each 5 Gbps
-  printf("     data rate: %10.4f (Gbit/s)\n", ratePerModule * 1e-9 * fBitPerHit);
-  printf("     opt links: %8.2f\n",           1+floor(ratePerModule * fBitPerHit / 5e9) );
+
+  Double_t dataPerModule = ratePerModule * 3 * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+  Int_t    nOptLinks     = 1 + dataPerModule / 5000.;   // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
+  h1DataModule->Fill(dataPerModule);
+  h1OptLinksModule->Fill(nOptLinks);
+
+  // global statistics
+  nTotalOptLinks += nOptLinks;
+  trdTotalDataRate += dataPerModule;
+
+  printf("     data rate: %11.4f (Gbit/s)\n", dataPerModule * 1e-3 );
+  printf("     opt links: %6i\n", nOptLinks );
   printf("     --------------------------\n");
 }
 

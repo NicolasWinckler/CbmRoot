@@ -87,6 +87,10 @@ class CbmTrdHitRateFastQa : public FairTask {
 
  private:
 
+  Int_t nTotalAsics;
+  Int_t nTotalOptLinks;
+  Double_t trdTotalDataRate;
+
   TH1F* h1DataModule;
   TH1F* h1OptLinksModule;
 

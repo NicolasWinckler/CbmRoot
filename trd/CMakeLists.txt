@@ -6,6 +6,16 @@ set(INCLUDE_DIRECTORIES
 ${BASE_INCLUDE_DIRECTORIES} 
 ${Boost_INCLUDE_DIR}
 
+# needed by run/FairMCBuffer.h
+${CBMROOT_SOURCE_DIR}/run 
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
+${CBMROOT_SOURCE_DIR}/cbmdata/rich 
+${CBMROOT_SOURCE_DIR}/cbmdata/much 
+${CBMROOT_SOURCE_DIR}/cbmdata/trd 
+${CBMROOT_SOURCE_DIR}/cbmdata/tof 
+${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
+${CBMROOT_SOURCE_DIR}/cbmdata/psd 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmbase/draw
 
@@ -61,6 +71,7 @@ param/CbmTrdCreateDigiPar.cxx
 
 #digi/CbmTrdDigitizerMathieson.cxx 
 digi/CbmTrdDigitizerPRF.cxx
+digi/CbmTrdDigitizerPRF_TB.cxx
 digi/CbmTrdDigitizer.cxx
 #digi/CbmTrdDigiWriteoutBuffer.cxx
 

@@ -277,6 +277,13 @@ InitStatus CbmTrdHitRateFastQa::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitRateFastQa::Exec(Option_t * option)
 {
+  myfile.open("hits_per_asic.txt",std::fstream::out);
+  myfile << "#" << endl;
+  myfile << "##   TRD data per ASIC" << endl;
+  myfile << "#" << endl;
+  myfile << "#" << endl;
+  myfile << "#--------------------------" << endl;
+
   fBitPerHit = 112 * 1.5; // (112 + 4*16) * 10 / 8.;   // 6 time samples, 8b/10b encoding, CBMnet header 
   //  fBitPerHit = 220; // (112 + 4*16) * 10 / 8.;   // 6 time samples, 8b/10b encoding, CBMnet header 
   //  fBitPerHit = 112;  // 6 time samples 3 + (9 * 6 + 3) / 15 = 7 words = 7 * 16 bit = 112 bits 
@@ -315,7 +322,22 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   //  sprintf(title,"DataAsic_Station %d, Layer %d",fStation,fLayer);
   sprintf(title,"Data_per_Asic");
   //  TH1F* h1HitAsic = new TH1F(name,title,50*fBitPerHit,1,10*fBitPerHit);
-  TH1F* h1HitAsic = new TH1F(name,title,1000,1,2000);  // Mbit
+  //  TH1F* h1HitAsic = new TH1F(name,title,1000,1,2000);  // Mbit
+
+  // set even bin size on logx scale
+  const Int_t anbins = 100;
+  Double_t axmin = 1;     // Mbit
+  Double_t axmax = 2000;  // Mbit
+  Double_t alogxmin = TMath::Log10(axmin);
+  Double_t alogxmax = TMath::Log10(axmax);
+  Double_t abinwidth = (alogxmax-alogxmin)/anbins;
+  Double_t axbins[anbins+1];
+  axbins[0] = axmin;
+  for (Int_t i=1;i<=anbins;i++) {
+    axbins[i] = axmin + TMath::Power(10,alogxmin+i*abinwidth);
+  }
+  TH1F* h1HitAsic = new TH1F(name,title,anbins,axbins);  // Mbit
+
   if (fBitPerHit == 1.)
     h1HitAsic->SetXTitle("Hits/Asic [Hz]");
   else
@@ -327,7 +349,22 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   //  sprintf(title,"DataModule_Station %d, Layer %d",fStation,fLayer);
   sprintf(title,"Data_per_Module");
   //  h1DataModule = new TH1F(name,title,50*fBitPerHit,10,100*10*fBitPerHit);
-  h1DataModule = new TH1F(name,title,1000,10,100*2000);
+  //  h1DataModule = new TH1F(name,title,1000,10,100*2000);
+
+  // set even bin size on logx scale
+  const Int_t bnbins = 100;
+  Double_t bxmin = 10;        // Mbit
+  Double_t bxmax = 100*2000;  // Mbit
+  Double_t blogxmin = TMath::Log10(bxmin);
+  Double_t blogxmax = TMath::Log10(bxmax);
+  Double_t bbinwidth = (blogxmax-blogxmin)/bnbins;
+  Double_t bxbins[bnbins+1];
+  bxbins[0] = bxmin;
+  for (Int_t i=1;i<=bnbins;i++) {
+    bxbins[i] = bxmin + TMath::Power(10,blogxmin+i*bbinwidth);
+  }
+  h1DataModule = new TH1F(name,title,bnbins,bxbins);  // Mbit
+
   if (fBitPerHit == 1.)
     h1DataModule->SetXTitle("Hits/Module [Hz]");
   else
@@ -338,7 +375,7 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   sprintf(name,"HO_S%d_L%d",fStation,fLayer);
   //  sprintf(title,"OptLinksModule_Station %d, Layer %d",fStation,fLayer);
   sprintf(title,"5_Gbps_optical_links_per_Module");
-  h1OptLinksModule = new TH1F(name,title,10,0.5,10.5);
+  h1OptLinksModule = new TH1F(name,title,20,0.5,20.5);
   h1OptLinksModule->SetXTitle("optical links");
   h1OptLinksModule->SetYTitle("count");
   //  h1OptLinksModule->GetYaxis()->SetRangeUser(0,20);
@@ -483,14 +520,6 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   MaxHitRatePerPad->SetLineColor(2);  // make it red
   MaxHitRatePerPad->SetLineWidth(8);  // make it thick
 
-  TLine* MaxDataRatePerUplink = new TLine(500,12,500,25);  // 500 Mbit per Uplink
-  MaxDataRatePerUplink->SetLineColor(2);  // make it red
-  MaxDataRatePerUplink->SetLineWidth(8);  // make it thick
-
-  TLine* MaxDataRatePerOptLink = new TLine(5000,5,5000,10);  // 500 Mbit per Uplink
-  MaxDataRatePerOptLink->SetLineColor(2);  // make it red
-  MaxDataRatePerOptLink->SetLineWidth(8);  // make it thick
-
   /*
     h2Layer  = new TH2F("dummy1","dummy1",1,-0.5,0.5,1,-0.5,0.5);
     h1HitPad = new TH1F("dummy2","dummy2",1,-0.5,0.5);
@@ -530,6 +559,7 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
       if (nModulesInThisLayer > 0)
 	for (vector<int>::size_type i = 0; i < nModulesInThisLayer; i++){
 	  printf("     ModuleAddress: %i\n",LiSi[j][i]);
+          myfile << "# ModuleAddress: " << LiSi[j][i] << endl;
 	  ScanModulePlane(LiSi[j][i], c1, c3, h1HitPad, h1HitAsic);
 	  
 	}
@@ -569,11 +599,22 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
           c2->cd(2);
 	  h1HitAsic->Draw();   
 	  h1HitAsic->Write("", TObject::kOverwrite);
+          c2->Update();
+          TLine* MaxDataRatePerUplink = new TLine(500,0.7*gPad->GetUymax(),500,gPad->GetUymax());  // 500 Mbit per Uplink
+          // TLine* MaxDataRatePerUplink = new TLine(500,60,500,80);  // 500 Mbit per Uplink
+          MaxDataRatePerUplink->SetLineColor(2);  // make it red
+          MaxDataRatePerUplink->SetLineWidth(8);  // make it thick
           MaxDataRatePerUplink->Draw("same");  // draw red line
 
 	  c2->cd(3);
 	  h1DataModule->Draw();   
 	  h1DataModule->Write("", TObject::kOverwrite);
+          c2->Update();
+
+          TLine* MaxDataRatePerOptLink = new TLine(5000,0.7*gPad->GetUymax(),5000,gPad->GetUymax());  // 500 Mbit per Uplink
+          // TLine* MaxDataRatePerOptLink = new TLine(5000,5,5000,8);  // 500 Mbit per Uplink
+          MaxDataRatePerOptLink->SetLineColor(2);  // make it red
+          MaxDataRatePerOptLink->SetLineWidth(8);  // make it thick
           MaxDataRatePerOptLink->Draw("same");  // draw red line
 
 	  c2->cd(4);
@@ -617,6 +658,10 @@ void CbmTrdHitRateFastQa::Exec(Option_t * option)
   printf("     --------------------------\n");
   printf("     --------------------------\n");
 
+  myfile << "# total number of ASICs: " << nTotalAsics << endl;
+  myfile << "#--------------------------" << endl;
+  myfile << "#--------------------------" << endl;
+  myfile.close();
 }
 
 
@@ -635,7 +680,8 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
   */
   std::vector<Int_t> AsicAddresses = fModuleInfo->GetAsicAddresses();
   Int_t nofAsics = fModuleInfo->GetNofAsics();
-  printf("     NofASICS:     %3i\n",nofAsics);
+  printf("     NofAsics:     %3i\n",nofAsics);
+  myfile << "# NofAsics     : " << nofAsics << endl;
   nTotalAsics += nofAsics;
   std::map<Int_t, Double_t> ratePerAsicMap;
   for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
@@ -747,6 +793,11 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
     else
       asic->SetFillColor( utils->GetColorCode(ratePerAsicMap[AsicAddresses[iAsic]]));
 
+    //    myfile << iAsic << " " << AsicAddresses[iAsic] << " " << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
+    myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
+    myfile << moduleAddress << " " << setw(2) << iAsic << " " 
+           << setw(8) << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
+
     Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]] * 3 * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
     HitAsic->Fill(dataPerAsic);
     asic->Draw("same");
@@ -754,7 +805,7 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
   }
 
   Double_t dataPerModule = ratePerModule * 3 * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
-  Int_t    nOptLinks     = 1 + dataPerModule / 5000.;   // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
+  Int_t    nOptLinks     = 1 + dataPerModule / 4000.; // 5000.; // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
   h1DataModule->Fill(dataPerModule);
   h1OptLinksModule->Fill(nOptLinks);
 
@@ -765,6 +816,8 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
   printf("     data rate: %11.4f (Gbit/s)\n", dataPerModule * 1e-3 );
   printf("     opt links: %6i\n", nOptLinks );
   printf("     --------------------------\n");
+
+  myfile << "#--------------------------" << endl;
 }
 
 
@@ -776,7 +829,22 @@ void CbmTrdHitRateFastQa::HistoInit(TCanvas*& c1, TCanvas*& c2, TCanvas*& c3, TH
 
     sprintf(name,"HP_S%d_L%d",fStation,fLayer);
     sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-    HitPad = new TH1F(name,title,10000,1e02,1e06);
+
+    // set even bin size on logx scale
+    const Int_t cnbins = 200;
+    Double_t cxmin = 1e2;
+    Double_t cxmax = 1e6;
+    Double_t clogxmin = TMath::Log10(cxmin);
+    Double_t clogxmax = TMath::Log10(cxmax);
+    Double_t cbinwidth = (clogxmax-clogxmin)/cnbins;
+    Double_t cxbins[cnbins+1];
+    cxbins[0] = cxmin;
+    for (Int_t i=1;i<=cnbins;i++) {
+      cxbins[i] = cxmin + TMath::Power(10,clogxmin+i*cbinwidth);
+    }
+    HitPad = new TH1F(name,title,cnbins,cxbins);
+
+    //    HitPad = new TH1F(name,title,10000,1e02,1e06);
     HitPad->SetXTitle("Hits/Pad [Hz]");
     HitPad->SetYTitle("count");
     HitPad->GetYaxis()->SetRangeUser(1,1e04);

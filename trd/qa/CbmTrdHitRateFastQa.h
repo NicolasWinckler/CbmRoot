@@ -7,6 +7,7 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <fstream>
 
 class CbmTrdDigiPar;
 class CbmTrdModule;
@@ -86,6 +87,8 @@ class CbmTrdHitRateFastQa : public FairTask {
   void Register();
 
  private:
+
+  std::ofstream myfile;
 
   Int_t nTotalAsics;
   Int_t nTotalOptLinks;

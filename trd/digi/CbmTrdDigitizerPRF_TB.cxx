@@ -41,6 +41,8 @@ CbmTrdDigitizerPRF_TB::CbmTrdDigitizerPRF_TB(CbmTrdRadiator *radiator)
    fnCol(-1),
    fModuleId(-1),
    fLayerId(-1),
+   fnDigi(0),
+   fnPoint(0),
    fPoints(NULL),
    fDigis(NULL),
    fDigiMatches(NULL),
@@ -123,7 +125,7 @@ void CbmTrdDigitizerPRF_TB::Exec(Option_t * option)
   CbmTrdPoint* point =  (CbmTrdPoint*) (CbmMCBuffer::Instance()->GetNextPoint(kTRD));
   while ( point ) {
     nofPoints++;
-
+    fnPoint++;
     if(NULL == point) continue;
 
 
@@ -167,6 +169,7 @@ void CbmTrdDigitizerPRF_TB::Exec(Option_t * option)
 
     if (!TString(gGeoManager->GetPath()).Contains("gas")){
       LOG(ERROR) << "CbmTrdDigitizerPRF_TB::Exec: MC-track not in TRD! Node:" << TString(gGeoManager->GetPath()).Data() << " gGeoManager->MasterToLocal() failed!" << FairLogger::endl;
+      point = /*dynamic_cast<const*/ (CbmTrdPoint*)/*>*/(CbmMCBuffer::Instance()->GetNextPoint(kTRD));
       continue;
     }
 
@@ -596,14 +599,19 @@ void CbmTrdDigitizerPRF_TB::SplitTrackPath(const CbmTrdPoint* point, Double_t EL
 void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator data = fDigiMap.find(address);
-  std::map<Int_t, Double_t > ::iterator previous = fDigiTimeMap.begin();
   if (data == fDigiMap.end()){
     fDigiTimeMap[address] = time;
   }
+  std::map<Int_t, Double_t > ::iterator previous = fDigiTimeMap.begin();
+
+  printf("____________________________________________________________________\n  Time:%8.2fns point:%8i  digi:%8i  address:%10i\n  %8i digis in time map\n  %8i digis in data map\n",time,fnPoint,fnDigi,address,(Int_t)fDigiTimeMap.size(),(Int_t)fDigiMap.size());
   while (previous != fDigiTimeMap.end()){ // look in address time stamp map
     data = fDigiMap.find((*previous).first);  // find address which can be pushed to DAQ_Buffer
+    //printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
     if (time - (*previous).second > fDetectorDeadTime){  // readout to buffer -> detector dead time is over   
       if (data != fDigiMap.end()) { // if address is found push to buffer
+	printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	printf("                          ------> Push to DAQ\n");
 	Int_t iDigi = fDigis->GetEntries();
 	CbmDaqBuffer::Instance()->InsertData(data->second.first);
 	delete data->second.first;
@@ -611,25 +619,35 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 	fDigiMap.erase(data);   // clear map entries
 	fDigiTimeMap.erase(previous); // previous++ is coverd by map::erase(previous)
       } else { // if no address is found create new one and go to next element in address time stamp map
+	printf("                          Did not find data on address %10i\n",(*previous).first);
 	//printf("Should not happen!!! There should be no element in the time stamp map which is not in the data map!!\n");
 	previous++;
       }       
     } else { // Add information to existing element in digi data map
       if ((*previous).first == address) {
+	printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	printf("                          ------> Add Info to existing digi %8i\n",fnDigi);
 	fDigiTimeMap[address] = time;
 	//const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId)); 
 	//FairMCPoint* point = (FairMCPoint*) (fPoints->At(pointId)); 
 	if (data == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
+	  fnDigi++;
+	  printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	  printf("                          ------> Creat new digi %8i\n",fnDigi);
 	  CbmMatch* digiMatch = new CbmMatch();
 	  //digiMatch->AddLink(CbmLink(charge, pointId));
 	  fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
+	  previous++;
 	} else { // Pixel already in map -> Add charge
+	  printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	  printf("                          ------> Add Info to existing digi %8i\n",fnDigi);
 	  data->second.first->AddCharge(charge);
 	  data->second.first->SetTime(max(time, data->second.first->GetTime()));
 	  data->second.second->AddLink(CbmLink(charge, pointId));
+	  previous++;
 	}
-      }
-      previous++;
+      } else
+	previous++;
     } 
   }
   /*

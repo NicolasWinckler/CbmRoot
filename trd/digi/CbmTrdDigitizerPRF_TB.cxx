@@ -63,7 +63,14 @@ CbmTrdDigitizerPRF_TB::~CbmTrdDigitizerPRF_TB()
 
 void CbmTrdDigitizerPRF_TB::SetParContainers()
 {
-	fDigiPar = (CbmTrdDigiPar*)(FairRunAna::Instance()->GetRuntimeDb()->getContainer("CbmTrdDigiPar"));
+  // Get run and runtime database
+  FairRunAna* run = FairRunAna::Instance();
+  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+
+  FairRuntimeDb* db = run->GetRuntimeDb();
+  if ( ! db ) Fatal("SetParContainers", "No runtime database");
+
+  fDigiPar = (CbmTrdDigiPar*)(FairRunAna::Instance()->GetRuntimeDb()->getContainer("CbmTrdDigiPar"));
 }
 
 InitStatus CbmTrdDigitizerPRF_TB::Init()
@@ -79,10 +86,10 @@ InitStatus CbmTrdDigitizerPRF_TB::Init()
   /*
     fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
     if (fPoints == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF_TB::Init: No TrdPoint array" << FairLogger::endl;
-
-    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-    if (fMCTracks == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF_TB::Init: No MCTrack array" << FairLogger::endl;
   */
+  fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+  if (fMCTracks == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF_TB::Init: No MCTrack array" << FairLogger::endl;
+  
   fDigis = new TClonesArray("CbmTrdDigi", 100);
   ioman->Register("TrdDigi", "TRD Digis", fDigis, kTRUE);
 
@@ -112,14 +119,16 @@ void CbmTrdDigitizerPRF_TB::Exec(Option_t * option)
   Int_t nofElectrons = 0;
   Int_t nofBackwardTracks = 0;
   Int_t nofPoints = 0;
-  /*const*/ CbmTrdPoint* point = NULL;
-
-  point = /*dynamic_cast<const*/ (CbmTrdPoint*)/*>*/(CbmMCBuffer::Instance()->GetNextPoint(kTRD));
+  //const CbmTrdPoint* point = dynamic_cast< const CbmTrdPoint*> (CbmMCBuffer::Instance()->GetNextPoint(kTRD));
+  CbmTrdPoint* point =  (CbmTrdPoint*) (CbmMCBuffer::Instance()->GetNextPoint(kTRD));
   while ( point ) {
     nofPoints++;
 
     if(NULL == point) continue;
-    /*const*/ CbmMCTrack* track = /*static_cast<const*/ (CbmMCTrack*)/*>*/(fMCTracks->At(point->GetTrackID()));
+
+
+    //const CbmMCTrack* track = dynamic_cast< const CbmMCTrack*>(fMCTracks->At(point->GetTrackID()));
+    CbmMCTrack* track = (CbmMCTrack*)(fMCTracks->At(point->GetTrackID()));
     if(NULL == track) continue;
 
     Double_t dz = point->GetZOut() - point->GetZIn();
@@ -175,7 +184,7 @@ void CbmTrdDigitizerPRF_TB::Exec(Option_t * option)
  
    
   LOG(INFO) << "CbmTrdDigitizerPRF_TB::Exec nofPoints=" << nofPoints << " nofDigis=" << fDigis->GetEntriesFast()
-            << " digis/points=" << fDigis->GetEntriesFast() / nofPoints
+    //<< " digis/points=" << fDigis->GetEntriesFast() / nofPoints
             << " nofBackwardTracks=" << nofBackwardTracks << " nofLatticeHits=" << nofLatticeHits
             << " nofElectrons=" << nofElectrons << " latticeHits/electrons="
             << (Double_t) nofLatticeHits / (Double_t) nofElectrons << FairLogger::endl;
@@ -608,10 +617,11 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
     } else { // Add information to existing element in digi data map
       if ((*previous).first == address) {
 	fDigiTimeMap[address] = time;
-	const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId)); 
+	//const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId)); 
+	//FairMCPoint* point = (FairMCPoint*) (fPoints->At(pointId)); 
 	if (data == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
 	  CbmMatch* digiMatch = new CbmMatch();
-	  digiMatch->AddLink(CbmLink(charge, pointId));
+	  //digiMatch->AddLink(CbmLink(charge, pointId));
 	  fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
 	} else { // Pixel already in map -> Add charge
 	  data->second.first->AddCharge(charge);
@@ -619,7 +629,7 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 	  data->second.second->AddLink(CbmLink(charge, pointId));
 	}
       }
-	previous++;
+      previous++;
     } 
   }
   /*
@@ -683,7 +693,7 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 
 void CbmTrdDigitizerPRF_TB::Finish()
 {
- Int_t iDigi = fDigis->GetEntries();
+  Int_t iDigi = fDigis->GetEntries();
   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
   for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
     //new ((*fDigis)[iDigi]) CbmTrdDigi(*(it->second.first));
@@ -694,5 +704,7 @@ void CbmTrdDigitizerPRF_TB::Finish()
     iDigi++;
   }
   fDigiMap.clear();
+  Exec(""); // Digitise the remaining points in the MCBuffer
+  //fNEvents -= 1; // Correct for extra call to Exec
 }
   ClassImp(CbmTrdDigitizerPRF_TB)

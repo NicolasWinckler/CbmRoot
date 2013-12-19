@@ -41,7 +41,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    // Reconstruction parameters
    TString globalTrackingType = "branch"; // Global tracking type
    TString stsHitProducerType = "real"; // STS hit producer type: real, ideal
-   TString trdHitProducerType = "clustering"; // TRD hit producer type: smearing, digi, clustering
+   TString trdHitProducerType = "smearing"; // TRD hit producer type: smearing, digi, clustering
    TString muchHitProducerType = "advanced"; // MUCH hit producer type: simple, advanced
 
 	if (script == "yes") {

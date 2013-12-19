@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Pathes and parameters
-test_dir=/data.local1/andrey/tests/cdash_tests
-build_dir=${test_dir}/cbmroot_build_sep12
+test_dir=/data.local2/andrey/tests/cdash_tests
+build_dir=${test_dir}/cbmroot_build_oct13
 
 function checkout_cbmroot
 {
@@ -10,8 +10,8 @@ function checkout_cbmroot
     rm -rf ${dir}/*
     cd ${dir}/
     svn co  https://subversion.gsi.de/fairroot/cbmroot/trunk cbmroot
-    cp -R /data.local1/andrey/tests/fieldmaps/fieldmaps/field_v* ${dir}/cbmroot/input/
-    cp /data.local1/andrey/tests/cdash_config/Dart.cfg ${dir}/cbmroot/Dart.cfg
+    cp -R /data.local2/andrey/tests/fieldmaps/fieldmaps/field_v* ${dir}/cbmroot/input/
+    cp /data.local2/andrey/tests/cdash_config/Dart.cfg ${dir}/cbmroot/Dart.cfg
 }
 
 function build_cbmroot 
@@ -41,7 +41,7 @@ function copy_results_to_web
 # Run test without CDash
 if [ "$1" = "build" ] ; then
     checkout_cbmroot ${test_dir}
-    build_cbmroot ${test_dir}/cbmroot ${build_dir} /data.local1/fairsoft/sep12/
+    build_cbmroot ${test_dir}/cbmroot ${build_dir} /data.local2/fairsoft/oct13/
 
     # Run tests
     . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_electron.sh
@@ -53,7 +53,7 @@ elif [ "$1" = "cdash" ] ; then
     
     # Patch CbmRoot_test.cmake
     rm ${test_dir}/cbmroot/CbmRoot_test.cmake
-    cp /data.local1/andrey/tests/patch/CbmRoot_test.cmake ${test_dir}/cbmroot/CbmRoot_test.cmake
+    cp /data.local2/andrey/tests/patch/CbmRoot_test.cmake ${test_dir}/cbmroot/CbmRoot_test.cmake
     
     # Run tests with CDash
     ${test_dir}/cbmroot/Dart.sh Experimental ${test_dir}/cbmroot/Dart.cfg

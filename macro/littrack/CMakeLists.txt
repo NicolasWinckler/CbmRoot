@@ -64,7 +64,7 @@ If(BUILD_LITTRACK_EXPERIMENTAL)
   EndForEach(geo IN  LISTS  electron_geo)
   
   
-  List(APPEND muon_geo  v12c)
+  List(APPEND muon_geo  v13f)
   List(APPEND muon_collision auau_25gev_centr auau_25gev_mbias) 
   ForEach(geo IN  LISTS  muon_geo)
     ForEach(collision IN  LISTS  muon_collision)

@@ -44,7 +44,7 @@ public:
 	virtual void Exec(Option_t * option);
 
 	void SetTriangularPads(Bool_t triangles);
-
+	virtual void Finish();
 private:
 
 	CbmTrdDigitizerPRF_TB& operator=(const CbmTrdDigitizerPRF_TB&);
@@ -85,8 +85,8 @@ private:
 	CbmTrdRadiator* fRadiator;  //!
 
 	std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap; // Temporary storage for digis
-	std::map<Double_t, std::vector<Int_t> > fDigiTimeMap; // [ns], [address]
-
+	//std::map<Double_t, std::vector<Int_t> > fDigiTimeMap; // [ns], [address]
+	std::map<Int_t ,Double_t > fDigiTimeMap; //[address], [ns]
 
 	ClassDef(CbmTrdDigitizerPRF_TB, 2);
 };

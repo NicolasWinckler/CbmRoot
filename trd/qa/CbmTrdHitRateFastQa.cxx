@@ -682,6 +682,7 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
   Int_t nofAsics = fModuleInfo->GetNofAsics();
   printf("     NofAsics:     %3i\n",nofAsics);
   myfile << "# NofAsics     : " << nofAsics << endl;
+  myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
   nTotalAsics += nofAsics;
   std::map<Int_t, Double_t> ratePerAsicMap;
   for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
@@ -794,9 +795,9 @@ void CbmTrdHitRateFastQa::ScanModulePlane(const Int_t moduleAddress, TCanvas*& c
       asic->SetFillColor( utils->GetColorCode(ratePerAsicMap[AsicAddresses[iAsic]]));
 
     //    myfile << iAsic << " " << AsicAddresses[iAsic] << " " << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
-    myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
-    myfile << moduleAddress << " " << setw(2) << iAsic << " " 
-           << setw(8) << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
+    myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
+           << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
+           << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
 
     Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]] * 3 * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
     HitAsic->Fill(dataPerAsic);

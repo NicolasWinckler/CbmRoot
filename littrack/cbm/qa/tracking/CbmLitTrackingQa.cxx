@@ -850,7 +850,9 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
    // Clear all maps for MC to reco matching
    map<string, multimap<Int_t, Int_t> >::iterator it;
    for (it = fMcToRecoMap.begin(); it != fMcToRecoMap.end(); it++) {
-      (*it).second.clear();
+      multimap<Int_t, Int_t>& mcRecoMap = (*it).second;
+      mcRecoMap.clear();
+      //(*it).second.clear();
    }
 
    ProcessRichRings();

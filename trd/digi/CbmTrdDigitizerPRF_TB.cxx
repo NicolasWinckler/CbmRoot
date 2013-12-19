@@ -600,7 +600,7 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 	delete data->second.first;
 	delete data->second.second;
 	fDigiMap.erase(data);   // clear map entries
-	fDigiTimeMap.erase(previous);
+	fDigiTimeMap.erase(previous); // previous++ is coverd by map::erase(previous)
       } else { // if no address is found create new one and go to next element in address time stamp map
 	//printf("Should not happen!!! There should be no element in the time stamp map which is not in the data map!!\n");
 	previous++;

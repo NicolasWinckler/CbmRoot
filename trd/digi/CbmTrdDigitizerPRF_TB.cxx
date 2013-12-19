@@ -603,7 +603,7 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 	fDigiTimeMap.erase(previous);
       } else { // if no address is found create new one and go to next element in address time stamp map
 	//printf("Should not happen!!! There should be no element in the time stamp map which is not in the data map!!\n");
-	//previous++;
+	previous++;
       }       
     } else { // Add information to existing element in digi data map
       if ((*previous).first == address) {
@@ -619,6 +619,7 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 	  data->second.second->AddLink(CbmLink(charge, pointId));
 	}
       }
+	previous++;
     } 
   }
   /*

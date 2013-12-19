@@ -39,7 +39,7 @@ inline void LitAddMaterial(
    static const T SILICON_DENSITY = 2.33; // g*cm^-3
 //   static const T SILICON_A = 28.08855; // silicon atomic weight
 //   static const T SILICON_Z = 14.0; // silicon atomic number
-   static const T SILICON_Z_OVER_A = 2.006325; // Z/A ratio for silicon
+   static const T SILICON_Z_OVER_A = 0.4984;//2.006325; // Z/A ratio for silicon
    static const T SILICON_RAD_LENGTH = 9.365; // cm
    static const T SILICON_I = 173 * 1e-9 ; // mean excitation energy [GeV]
    static const T SILICON_I_SQ = SILICON_I * SILICON_I; // squared mean excitation energy

@@ -87,8 +87,8 @@ private:
 	CbmTrdRadiator* fRadiator;  //!
 
 	std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap; // Temporary storage for digis
-	//std::map<Double_t, std::vector<Int_t> > fDigiTimeMap; // [ns], [address]
-	std::map<Int_t ,Double_t > fDigiTimeMap; //[address], [ns]
+	std::map<Int_t, std::vector<Int_t> > fTimeAddressMap; // [ns], [address]
+	std::map<Int_t ,Double_t > fAddressTimeMap; //[address], [ns]
 
 	ClassDef(CbmTrdDigitizerPRF_TB, 2);
 };

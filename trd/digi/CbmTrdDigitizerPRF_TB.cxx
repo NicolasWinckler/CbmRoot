@@ -51,7 +51,8 @@ CbmTrdDigitizerPRF_TB::CbmTrdDigitizerPRF_TB(CbmTrdRadiator *radiator)
    fModuleInfo(NULL),
    fRadiator(radiator),
    fDigiMap(),
-   fDigiTimeMap()
+   fAddressTimeMap(),
+   fTimeAddressMap()
 {
 }
 
@@ -600,113 +601,100 @@ void CbmTrdDigitizerPRF_TB::AddDigi(Int_t pointId, Int_t address, Double_t charg
 {
   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator data = fDigiMap.find(address);
   if (data == fDigiMap.end()){
-    fDigiTimeMap[address] = time;
+    fAddressTimeMap[address] = time;
+    fTimeAddressMap[Int_t(time)].push_back(address);
   }
-  std::map<Int_t, Double_t > ::iterator previous = fDigiTimeMap.begin();
+  std::map<Int_t, Double_t > ::iterator previousAddress = fAddressTimeMap.begin();
 
-  printf("____________________________________________________________________\n  Time:%8.2fns point:%8i  digi:%8i  address:%10i\n  %8i digis in time map\n  %8i digis in data map\n",time,fnPoint,fnDigi,address,(Int_t)fDigiTimeMap.size(),(Int_t)fDigiMap.size());
-  while (previous != fDigiTimeMap.end()){ // look in address time stamp map
-    data = fDigiMap.find((*previous).first);  // find address which can be pushed to DAQ_Buffer
-    //printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
-    if (time - (*previous).second > fDetectorDeadTime){  // readout to buffer -> detector dead time is over   
+  printf("____________________________________________________________________\n  Time:%8.2fns point:%8i  digi:%8i  address:%10i\n  %8i digis in time map\n  %8i digis in data map\n",time,fnPoint,fnDigi,address,(Int_t)fAddressTimeMap.size(),(Int_t)fDigiMap.size());
+  while (previousAddress != fAddressTimeMap.end()){ // look in address time stamp map
+    data = fDigiMap.find((*previousAddress).first);  // find address which can be pushed to DAQ_Buffer
+    //printf("          %8.2fns (delta:%8.2fns)\n",(*previousAddress).second,time - (*previousAddress).second);
+    if (time - (*previousAddress).second > fDetectorDeadTime){  // readout to buffer -> detector dead time is over   
       if (data != fDigiMap.end()) { // if address is found push to buffer
-	printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	printf("          %8.2fns (delta:%8.2fns)\n",(*previousAddress).second,time - (*previousAddress).second);
 	printf("                          ------> Push to DAQ\n");
 	Int_t iDigi = fDigis->GetEntries();
 	CbmDaqBuffer::Instance()->InsertData(data->second.first);
 	delete data->second.first;
 	delete data->second.second;
 	fDigiMap.erase(data);   // clear map entries
-	fDigiTimeMap.erase(previous); // previous++ is coverd by map::erase(previous)
+	fAddressTimeMap.erase(previousAddress); // previousAddress++ is coverd by map::erase(previousAddress)
       } else { // if no address is found create new one and go to next element in address time stamp map
-	printf("                          Did not find data on address %10i\n",(*previous).first);
+	printf("                          Did not find data on address %10i\n",(*previousAddress).first);
 	//printf("Should not happen!!! There should be no element in the time stamp map which is not in the data map!!\n");
-	previous++;
+	previousAddress++;
       }       
     } else { // Add information to existing element in digi data map
-      if ((*previous).first == address) {
-	printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+      if ((*previousAddress).first == address) {
+	printf("          %8.2fns (delta:%8.2fns)\n",(*previousAddress).second,time - (*previousAddress).second);
 	printf("                          ------> Add Info to existing digi %8i\n",fnDigi);
-	fDigiTimeMap[address] = time;
+	fAddressTimeMap[address] = time;
 	//const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId)); 
 	//FairMCPoint* point = (FairMCPoint*) (fPoints->At(pointId)); 
 	if (data == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
 	  fnDigi++;
-	  printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	  printf("          %8.2fns (delta:%8.2fns)\n",(*previousAddress).second,time - (*previousAddress).second);
 	  printf("                          ------> Creat new digi %8i\n",fnDigi);
 	  CbmMatch* digiMatch = new CbmMatch();
 	  //digiMatch->AddLink(CbmLink(charge, pointId));
 	  fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
-	  previous++;
+	  previousAddress++;
 	} else { // Pixel already in map -> Add charge
-	  printf("          %8.2fns (delta:%8.2fns)\n",(*previous).second,time - (*previous).second);
+	  printf("          %8.2fns (delta:%8.2fns)\n",(*previousAddress).second,time - (*previousAddress).second);
 	  printf("                          ------> Add Info to existing digi %8i\n",fnDigi);
 	  data->second.first->AddCharge(charge);
 	  data->second.first->SetTime(max(time, data->second.first->GetTime()));
 	  data->second.second->AddLink(CbmLink(charge, pointId));
-	  previous++;
+	  previousAddress++;
 	}
       } else
-	previous++;
+	previousAddress++;
     } 
   }
-  /*
-    std::map<Double_t, std::vector<Int_t> > ::iterator previous; 
-    //printf("Time: %E\n",time);
-    for (previous = fDigiTimeMap.begin(); previous != fDigiTimeMap.end(); previous++){ // look in time stamp map
-    //printf("        %4i %6.2f - %6.2f = %6.2f < %5.1f ",Int_t((*previous).second.size()),time,(*previous).first,time-(*previous).first,fDetectorDeadTime);
-    if ( time - (*previous).first > fDetectorDeadTime){  // readout to buffer -> detector dead time is over
-    //std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;  
-    //printf("------->readout\n");
-    for (Int_t i = 0; i < (*previous).second.size(); i++) { // loop over all addresses with the same time stamp
-    //printf("%i ",i);
-    it = fDigiMap.find((*previous).second[i]);  
-    if (it != fDigiMap.end()) { 
-    Int_t iDigi = fDigis->GetEntries();
-    //new ((*fDigis)[iDigi]) CbmTrdDigi(*(it->second.first));
-    //new ((*fDigiMatches)[iDigi]) CbmMatch(*(it->second.second));
-    CbmDaqBuffer::Instance()->InsertData(it->second.first);
-    //fDigis->AddLast (new CbmTrdDigi(*(it->second.first)));
-    //fDigiMatches->AddLast (new CbmMatch(*(it->second.second)));
-    delete it->second.first;
-    delete it->second.second;
-    fDigiMap.erase(it);
-    //printf("   %i Digi\n",iDigi);
+  
+  std::map<Int_t, std::vector<Int_t> > ::iterator previous = fTimeAddressMap.begin(); 
+  //printf("Time: %E\n",time);
+  //for (previous = fTimeAddressMap.begin(); previous != fTimeAddressMap.end(); previous++){ // look in time stamp map
+  while (previous != fTimeAddressMap.end()){ 
+    if ( Int_t(time) - (*previous).first > fDetectorDeadTime){  // readout to buffer -> detector dead time is over
+      for (Int_t i = 0; i < (*previous).second.size(); i++) { // loop over all addresses with the same time stamp
+	//std::vector<Int_t> ::iterator AddressIt = (*previous).second.begin();
+	//while ((*previous).second.size() > 0){
+	data = fDigiMap.find((*previous).second[/*(*AddressIt)*/i]);  
+	if (data != fDigiMap.end()) { 
+	  Int_t iDigi = fDigis->GetEntries();
+	  CbmDaqBuffer::Instance()->InsertData(data->second.first);
+	  delete data->second.first;
+	  delete data->second.second;
+	  fDigiMap.erase(data); // erase data field from data map
+	  //(*previous).second.erase(AddressIt);
+	} else {
+	}
+      }
+      (*previous).second.clear(); // Clear Address vectors for this time stamp
+      fTimeAddressMap.erase(fTimeAddressMap.find((*previous).first)); // clear time stamp from map
     } else {
-    //printf("%i == fDigiMap.end()\n",(*previous).second[i]);
+      const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId)); 
+      data = fDigiMap.find(address);
+      if (data == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
+	//printf("new pixel\n");
+	CbmMatch* digiMatch = new CbmMatch();
+	digiMatch->AddLink(CbmLink(charge, pointId));
+	fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
+	//fTimeAddressMap[time].push_back(address);
+      } else { // Pixel already in map -> Add charge
+	//printf("existing pixel\n");
+	data->second.first->AddCharge(charge);
+	data->second.first->SetTime(max(time, data->second.first->GetTime()));
+	data->second.second->AddLink(CbmLink(charge, pointId));
+      } 
+      previous++;
     }
-    //printf("...finished\n");
-    }
-    //printf("clear...\n");
-    (*previous).second.clear();
-    //printf("(*previous).second.clear()\n");
-    fDigiTimeMap.erase(fDigiTimeMap.find((*previous).first));
-    //printf("fDigiTimeMap.erase(previous)\n");
-    //printf("...finished\n");
-    }
-    else {
-
-    }
-    //printf("next time stamp\n");
-    }
+  }
  
-    const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId)); 
-    it = fDigiMap.find(address);
-    if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-    //printf("new pixel\n");
-    CbmMatch* digiMatch = new CbmMatch();
-    digiMatch->AddLink(CbmLink(charge, pointId));
-    fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
-
-    } else { // Pixel already in map -> Add charge
-    //printf("existing pixel\n");
-    it->second.first->AddCharge(charge);
-    it->second.first->SetTime(max(time, it->second.first->GetTime()));
-    it->second.second->AddLink(CbmLink(charge, pointId));
-    }
- 
-    //fDigiTimeMap[time].push_back(address);
-    */
+  //fTimeAddressMap[time].push_back(address);
+    
 }
 
 void CbmTrdDigitizerPRF_TB::Finish()

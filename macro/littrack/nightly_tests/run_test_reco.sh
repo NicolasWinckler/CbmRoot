@@ -44,7 +44,7 @@ export LIT_MUCH_HITPRODUCER_TYPE=advanced
 
 set_default_file_names ${LIT_DIR} 0000
 
-export LIT_URQMD_FILE=/data.local1/andrey/tests/urqmd/${system}/${energy}/${collision_type}/urqmd.${system}.${energy}.${collision_type}.0001.ftn14
+export LIT_URQMD_FILE=/data.local2/andrey/tests/urqmd/${system}/${energy}/${collision_type}/urqmd.${system}.${energy}.${collision_type}.0001.ftn14
 
 $ROOTSYS/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_sim.C(${nevents})"
 $ROOTSYS/bin/root -b -q -l "${VMCWORKDIR}/macro/littrack/global_reco.C(${nevents}, \"hits\")"

@@ -2,7 +2,7 @@
 
 # Pathes and parameters
 test_dir=/data.local2/andrey/tests/cdash_tests
-build_dir=${test_dir}/cbmroot_build_oct13
+build_dir=${test_dir}/cbmroot_build_dec13
 
 function checkout_cbmroot
 {
@@ -41,7 +41,7 @@ function copy_results_to_web
 # Run test without CDash
 if [ "$1" = "build" ] ; then
     checkout_cbmroot ${test_dir}
-    build_cbmroot ${test_dir}/cbmroot ${build_dir} /data.local2/fairsoft/oct13/
+    build_cbmroot ${test_dir}/cbmroot ${build_dir} /data.local2/fairsoft/dec13/
 
     # Run tests
     . ${VMCWORKDIR}/macro/littrack/nightly_tests/run_test_electron.sh

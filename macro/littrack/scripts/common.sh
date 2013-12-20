@@ -23,7 +23,7 @@ function set_simulation_parameters() {
     export LIT_NOF_AU_IONS=${pars[8]}
     # If "yes" than UrQMD will be used as background
     export LIT_URQMD=${pars[9]}
-    # If "yes" than CbmUnigenGenerator will be useed instead of FairUrqmdGenerator
+    # If "yes" than CbmUnigenGenerator will be used instead of FairUrqmdGenerator
     export LIT_UNIGEN=${pars[10]}
     # If "yes" than PLUTO will be used
     export LIT_PLUTO=${pars[11]}
@@ -58,7 +58,7 @@ function set_default_file_names() {
 function set_default_muon_geometry() {
     export LIT_CAVE_GEOM=cave.geo
     export LIT_PIPE_GEOM=pipe/pipe_v13c.geo.root
-    export LIT_SHIELD_GEOM=shield_v13f.geo
+    export LIT_SHIELD_GEOM=much/shield_v13f.geo
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
     export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par

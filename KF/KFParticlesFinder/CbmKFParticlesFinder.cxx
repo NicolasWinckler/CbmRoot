@@ -198,7 +198,7 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
 //       Bool_t isElectronRICH = 0;
 //       Bool_t isElectron = 0;
 
-      FairTrackParam *stsPar = vRTracks[stsTrackIndex].GetParamFirst();
+      const FairTrackParam *stsPar = vRTracks[stsTrackIndex].GetParamFirst();
       TVector3 mom;
       stsPar->Momentum(mom);
 

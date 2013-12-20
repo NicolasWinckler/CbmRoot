@@ -103,7 +103,7 @@ void CbmAnaMuchBgd::Exec(Option_t* opt){
     CbmMuchTrack*  muchTrack = (CbmMuchTrack*)  fMuchTracks->At(iMuchTrack);
     CbmStsTrack*   stsTrack = (CbmStsTrack*) fStsTracks->At(iStsTrack);
     fMuon.fMuchHits = muchTrack->GetNofHits();
-    fMuon.fStsHits  = stsTrack->GetNStsHits();
+    fMuon.fStsHits  = stsTrack->GetNofHits();
     fMuon.fChi      = fFitter->GetChiToVertex(stsTrack);
     fNAll++;
     if (fMuon.fStsHits <4)  continue;

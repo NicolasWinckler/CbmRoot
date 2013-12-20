@@ -84,10 +84,13 @@ Int_t CbmL1StsTrackFinder::DoFind() {
       new((*fTracks)[ntracks]) CbmStsTrack();
       CbmStsTrack *t = L1_DYNAMIC_CAST<CbmStsTrack*>( fTracks->At(ntracks++) );
       t->SetFlag(0);
-      FairTrackParam* fpar = t->GetParamFirst(), * lpar = t->GetParamLast();      
-      CbmKFMath::CopyTC2TrackParam( fpar, T.T, T.C );
-      CbmKFMath::CopyTC2TrackParam( lpar, T.TLast, T.CLast );
-      t->SetChi2(T.chi2);
+      //FairTrackParam* fpar = t->GetParamFirst(), * lpar = t->GetParamLast();
+      FairTrackParam fpar(*t->GetParamFirst()), lpar(*t->GetParamLast());
+      CbmKFMath::CopyTC2TrackParam( &fpar, T.T, T.C );
+      CbmKFMath::CopyTC2TrackParam( &lpar, T.TLast, T.CLast );
+      t->SetParamFirst(&fpar);
+      t->SetParamLast(&lpar);
+      t->SetChiSq(T.chi2);
       t->SetNDF(T.NDF);
       t->SetPidHypo( T.T[4]>=0 ?211 :-211 );
       
@@ -96,13 +99,13 @@ Int_t CbmL1StsTrackFinder::DoFind() {
 	  CbmL1HitStore &h = L1->vHitStore[*ih];
 	  double zref = L1->algo->vStations[h.iStation].z[0];
 	  if( h.ExtIndex<0 ){
-	    CbmMvdHit tmp;
-	    tmp.SetZ(zref);
-	    t->AddMvdHit( -h.ExtIndex-1, &tmp );
+	   // CbmMvdHit tmp;
+	   // tmp.SetZ(zref);
+	    t->AddMvdHit( -h.ExtIndex-1);//, &tmp );
 	  }else{
-	    CbmStsHit tmp;
-	    tmp.SetZ(zref);
-	    t->AddStsHit( h.ExtIndex , &tmp );
+	    //CbmStsHit tmp;
+	    //tmp.SetZ(zref);
+	    t->AddHit( h.ExtIndex, kSTSHIT );//, &tmp );
 	  }
 	}
     }

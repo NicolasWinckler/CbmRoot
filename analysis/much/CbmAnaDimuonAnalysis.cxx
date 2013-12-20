@@ -256,7 +256,7 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     
     if (iStsTrack<0) continue;
     CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(iStsTrack);
-    Int_t nStsHits = stsTrack->GetNStsHits();
+    Int_t nStsHits = stsTrack->GetNofHits();
 //    printf("nStsHits=%i\n",nStsHits);
     mu->SetNStsHits(nStsHits);
     Double_t chi = fFitter->GetChiToVertex(stsTrack);

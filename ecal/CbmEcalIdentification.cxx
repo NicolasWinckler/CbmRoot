@@ -426,7 +426,7 @@ void CbmEcalIdentification::WriteTree()
   {
     CbmStsTrack* gtr=(CbmStsTrack*)fStsTracks->At(fStsTrackNum);
     fPDG=gtr->GetPidHypo();
-    fTrChi2=gtr->GetChi2();
+    fTrChi2=gtr->GetChiSq();
     fTrNDF=gtr->GetNDF();
   }
   else

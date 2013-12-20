@@ -310,8 +310,8 @@ void trackfinderOutputData::addTrack(trackFrameworkMomentum& momentum) {
 	trackParameter.SetY(-1);
 	trackParameter.SetZ(-1);
 
-	actualTrack->SetParamFirst(trackParameter);
-	actualTrack->SetParamLast(trackParameter);
+	actualTrack->SetParamFirst(&trackParameter);
+	actualTrack->SetParamLast(&trackParameter);
 
 }
 
@@ -321,40 +321,40 @@ void trackfinderOutputData::addTrack(trackFrameworkMomentum& momentum) {
 
 void trackfinderOutputData::addHitToActualTrack(trackfinderInputHit* hit) {
 
-	FairTrackParam* firstTrackParameter;
-	FairTrackParam* lastTrackParameter;
+	FairTrackParam firstTrackParameter;
+	FairTrackParam lastTrackParameter;
 
 	if (actualTrack != NULL) {
 
-		firstTrackParameter = actualTrack->GetParamFirst();
-		lastTrackParameter  = actualTrack->GetParamLast();
+		firstTrackParameter = *actualTrack->GetParamFirst();
+		lastTrackParameter  = *actualTrack->GetParamLast();
 		
 		/* first input for trackParameter has to delete the dummies */
-		if (lastTrackParameter->GetZ() < 0) {
+		if (lastTrackParameter.GetZ() < 0) {
 
-			firstTrackParameter->SetX(hit->getPosX());
-			firstTrackParameter->SetY(hit->getPosY());
-			firstTrackParameter->SetZ(hit->getPosZ());
-			lastTrackParameter->SetX(hit->getPosX());
-			lastTrackParameter->SetY(hit->getPosY());
-			lastTrackParameter->SetZ(hit->getPosZ());
+			firstTrackParameter.SetX(hit->getPosX());
+			firstTrackParameter.SetY(hit->getPosY());
+			firstTrackParameter.SetZ(hit->getPosZ());
+			lastTrackParameter.SetX(hit->getPosX());
+			lastTrackParameter.SetY(hit->getPosY());
+			lastTrackParameter.SetZ(hit->getPosZ());
 
 		}
 		/* not first input for trackParameter */
 		else {
 
-			if (hit->getPosZ() < firstTrackParameter->GetZ()) {
+			if (hit->getPosZ() < firstTrackParameter.GetZ()) {
 
-				firstTrackParameter->SetX(hit->getPosX());
-				firstTrackParameter->SetY(hit->getPosY());
-				firstTrackParameter->SetZ(hit->getPosZ());
+				firstTrackParameter.SetX(hit->getPosX());
+				firstTrackParameter.SetY(hit->getPosY());
+				firstTrackParameter.SetZ(hit->getPosZ());
 
 			}
-			if (hit->getPosZ() > lastTrackParameter->GetZ()) {
+			if (hit->getPosZ() > lastTrackParameter.GetZ()) {
 
-				lastTrackParameter->SetX(hit->getPosX());
-				lastTrackParameter->SetY(hit->getPosY());
-				lastTrackParameter->SetZ(hit->getPosZ());
+				lastTrackParameter.SetX(hit->getPosX());
+				lastTrackParameter.SetY(hit->getPosY());
+				lastTrackParameter.SetZ(hit->getPosZ());
 
 			}
 
@@ -374,11 +374,14 @@ void trackfinderOutputData::addHitToActualTrack(trackfinderInputHit* hit) {
 #else
 
 		if (hit->isMapsHit())
-			actualTrack->AddMvdHit(hit->getHitIndex(), (FairHit*)hit->getHit());
+			actualTrack->AddMvdHit(hit->getHitIndex());//, (FairHit*)hit->getHit());
 		else
-			actualTrack->AddStsHit(hit->getHitIndex(), (FairHit*)hit->getHit());
+			actualTrack->AddHit(hit->getHitIndex(), kSTSHIT);//, (FairHit*)hit->getHit());
 
 #endif
+
+		actualTrack->SetParamFirst(&firstTrackParameter);
+		actualTrack->SetParamLast(&lastTrackParameter);
 
 	}
 	else

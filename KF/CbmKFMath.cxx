@@ -794,7 +794,7 @@ void CbmKFMath::CopyTC2TrackParam(FairTrackParam* par, Double_t T[], Double_t C[
     }
 }
 
-void CbmKFMath::CopyTrackParam2TC(FairTrackParam* par, Double_t T[], Double_t C[] )
+void CbmKFMath::CopyTrackParam2TC(const FairTrackParam* par, Double_t T[], Double_t C[] )
 {
   if( T )
     {  

@@ -8,12 +8,11 @@
 
 #include "FairMultiLinkedData.h"
 
-#include <iostream>
+#include <sstream>
 #include <memory>
-using std::cout;
+using std::stringstream;
 using std::endl;
 
-// -----   Default constructor   -------------------------------------------
 CbmTrack::CbmTrack() :
     TObject(),
     fHitIndex(),
@@ -28,7 +27,6 @@ CbmTrack::CbmTrack() :
     fLinks(NULL)
 {
 }
-// -------------------------------------------------------------------------
 
 CbmTrack::CbmTrack(const CbmTrack& rhs)
  : TObject(rhs),
@@ -75,33 +73,27 @@ CbmTrack& CbmTrack::operator=(const CbmTrack& rhs)
   return *this;
 }
 
-
-
-// -----   Destructor   ----------------------------------------------------
 CbmTrack::~CbmTrack()
 {
 }
-// -------------------------------------------------------------------------
 
-// -----   Public method AddHit   ------------------------------------------
 void CbmTrack::AddHit(
 		Int_t index,
 		HitType type)
 {
-	fHitIndex.push_back(index);//std::make_pair(type, index));
+	fHitIndex.push_back(index);
 	fHitType.push_back(type);
 }
-// -------------------------------------------------------------------------
 
-// -----   Public method Print   -------------------------------------------
-void CbmTrack::Print() const
+string CbmTrack::ToString() const
 {
-	cout << "CbmTrack: nof hits=" << fHitIndex.size() << ", chiSq=" << fChiSq
+   stringstream ss;
+	ss << "CbmTrack: nof hits=" << fHitIndex.size() << ", chiSq=" << fChiSq
 		<< ", NDF=" << fNDF << ", pidHypo=" << fPidHypo
-		<< ", previousTrackId=" << fPreviousTrackId << ", flag=" << fFlag << endl;
+		<< ", previousTrackId=" << fPreviousTrackId << ", flag=" << fFlag << "\n";
 //	fParamFirst.Print();
 //	fParamLast.Print();
+	return ss.str();
 }
-// -------------------------------------------------------------------------
 
 ClassImp(CbmTrack);

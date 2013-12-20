@@ -132,7 +132,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
       warn = kTRUE;
       continue;
     }
-    nHits = track->GetNStsHits();
+    nHits = track->GetNofHits();
     nAll = nTrue = nWrong = nFake = nMCTracks = 0;
     fMatchMap.clear();
     if (fVerbose > 2) cout << endl << "Track " << iTrack << ", Hits "
@@ -140,7 +140,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
 
     // Loop over StsHits of track
     for (Int_t iHit=0; iHit<nHits; iHit++) {
-      hit = (CbmStsHit*) fHits->At(track->GetStsHitIndex(iHit));
+      hit = (CbmStsHit*) fHits->At(track->GetHitIndex(iHit));
       if ( ! hit ) {
 	cout << "-E- CbmStsMatchTracks::Exec: "
 	     << "No StsHit " << iHit << " for track " << iTrack << endl;
@@ -162,7 +162,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
       }
       iMCTrack = point->GetTrackID();
       if ( fVerbose > 2 ) cout << "Track " << iTrack << ", MAPS hit "
-			       << track->GetStsHitIndex(iHit)
+			       << track->GetHitIndex(iHit)
 			       << ", StsPoint " << iPoint << ", MCTrack "
 			       << iMCTrack << endl;
       fMatchMap[iMCTrack]++;

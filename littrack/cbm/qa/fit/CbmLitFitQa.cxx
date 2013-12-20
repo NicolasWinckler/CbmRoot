@@ -140,15 +140,15 @@ void CbmLitFitQa::ProcessStsTrack(
    if ((match->GetNofTrueHits() / allHits) < fQuota) return;
 
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(trackId));
-   Int_t nofStsHits = track->GetNStsHits();
-   Int_t nofMvdHits = track->GetNMvdHits();
+   Int_t nofStsHits = track->GetNofHits();
+   Int_t nofMvdHits = track->GetNofMvdHits();
    if (nofStsHits < 1) return; // No hits in STS
    if (nofMvdHits < fMvdMinNofHits || nofStsHits < fStsMinNofHits) return; // cut on number of hits in track
 
    const CbmLitMCTrack& mcTrack = fMCTrackCreator->GetTrack(mcId);
 
-   FairTrackParam* firstParam = track->GetParamFirst();
-   FairTrackParam* lastParam = track->GetParamLast();
+   const FairTrackParam* firstParam = track->GetParamFirst();
+   const FairTrackParam* lastParam = track->GetParamLast();
 
    FillTrackParamHistogramm("htp_Sts_FirstParam", firstParam);
    FillTrackParamHistogramm("htp_Sts_LastParam", lastParam);
@@ -162,7 +162,7 @@ void CbmLitFitQa::ProcessStsTrack(
          FillResidualsAndPulls(firstParam, &firstPoint, "htf_Sts_FirstParam_", nofMvdHits + nofStsHits, kMVD);
       }
    } else { // first track parameters in STS
-      const CbmStsHit* firstHit = static_cast<const CbmStsHit*>(fStsHits->At(track->GetStsHitIndex(0)));
+      const CbmStsHit* firstHit = static_cast<const CbmStsHit*>(fStsHits->At(track->GetHitIndex(0)));
       Int_t firstStation = firstHit->GetStationNr() - 1; // to start with 0
       if (mcTrack.GetNofPointsAtStation(kSTS, firstStation) > 0) {
          const CbmLitMCPoint& firstPoint = mcTrack.GetPointAtStation(kSTS, firstStation, 0);
@@ -171,7 +171,7 @@ void CbmLitFitQa::ProcessStsTrack(
    }
 
    // Fill histograms for last track parameters
-   const CbmStsHit* lastHit = static_cast<const CbmStsHit*>(fStsHits->At(track->GetStsHitIndex(nofStsHits - 1)));
+   const CbmStsHit* lastHit = static_cast<const CbmStsHit*>(fStsHits->At(track->GetHitIndex(nofStsHits - 1)));
    Int_t lastStation = lastHit->GetStationNr() - 1; // to start with 0
    if (mcTrack.GetNofPointsAtStation(kSTS, lastStation) > 0) {
       const CbmLitMCPoint& lastPoint = mcTrack.GetPointAtStation(kSTS, lastStation, 0);

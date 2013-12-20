@@ -1009,9 +1009,9 @@ void CbmAnaDielectronTask::FillTopologyCandidates()
         vector<L1FieldRegion> vField;
         vector<float> chiPrim;
         fPFFitter.GetChiToVertex(stsTracks, vField, chiPrim, fKFVertex, 3e6);
-        cand.chi2sts = stsTracks[0].GetChi2() / stsTracks[0].GetNDF();
+        cand.chi2sts = stsTracks[0].GetChiSq() / stsTracks[0].GetNDF();
         cand.chi2Prim = chiPrim[0];
-        FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
+        const FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
 
         vtxTrack->Position(cand.position);
         vtxTrack->Momentum(cand.momentum);
@@ -1101,9 +1101,9 @@ void CbmAnaDielectronTask::FillCandidates()
       vector<L1FieldRegion> vField;
       vector<float> chiPrim;
       fPFFitter.GetChiToVertex(stsTracks, vField, chiPrim, fKFVertex, 3e6);
-      cand.chi2sts = stsTracks[0].GetChi2() / stsTracks[0].GetNDF();
+      cand.chi2sts = stsTracks[0].GetChiSq() / stsTracks[0].GetNDF();
       cand.chi2Prim = chiPrim[0];
-      FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
+      const FairTrackParam* vtxTrack = stsTracks[0].GetParamFirst();
 
       vtxTrack->Position(cand.position);
       vtxTrack->Momentum(cand.momentum);
@@ -2026,8 +2026,8 @@ void CbmAnaDielectronTask::DifferenceSignalAndBg()
 
          CbmStsTrack *track = (CbmStsTrack*) fStsTracks->At(fCandidates[i].stsInd);
          if (NULL == track) continue;
-         int nofMvdHits = track->GetNMvdHits();
-         int nofStsHits = track->GetNStsHits();
+         int nofMvdHits = track->GetNofMvdHits();
+         int nofStsHits = track->GetNofHits();
          double mvd1x = 0., mvd1y = 0., mvd2x = 0., mvd2y = 0.;
 
          for(Int_t ith = 0; ith < nofMvdHits; ith++) {
@@ -2175,7 +2175,7 @@ void CbmAnaDielectronTask::CheckClosestMvdHit(
       if (fCandidates[i].chi2Prim < fChiPrimCut && fCandidates[i].isElectron){
          CbmStsTrack *track = (CbmStsTrack*) fStsTracks->At(fCandidates[i].stsInd);
          if(NULL == track) continue;
-         Int_t nhits = track->GetNMvdHits();
+         Int_t nhits = track->GetNofMvdHits();
          for(Int_t ith = 0; ith < nhits; ith++) {
             Int_t iHit = track->GetMvdHitIndex(ith);
             CbmMvdHit *pmh = (CbmMvdHit*) fMvdHits->At(iHit);
@@ -2306,7 +2306,7 @@ void CbmAnaDielectronTask::MvdCutMcDistance()
          CbmStsTrack *track = (CbmStsTrack*) fStsTracks->At(fCandidates[i].stsInd);
          if(NULL == track) continue;
          int stsMcTrackId = fCandidates[i].stsMcTrackId;
-         Int_t nhits = track->GetNMvdHits();
+         Int_t nhits = track->GetNofMvdHits();
          for(Int_t ith = 0; ith < nhits; ith++) {
             Int_t iHit = track->GetMvdHitIndex(ith);
             CbmMvdHit *pmh1 = (CbmMvdHit*) fMvdHits->At(iHit);

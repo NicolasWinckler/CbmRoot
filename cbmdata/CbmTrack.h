@@ -34,12 +34,11 @@ public:
 	/** Destructor **/
 	virtual ~CbmTrack();
 
-        /** Copy Constructor **/
-        CbmTrack(const CbmTrack&);
+   /** Copy Constructor **/
+   CbmTrack(const CbmTrack&);
 
-        /** Assignment Operator **/
-        CbmTrack& operator=(const CbmTrack&);
-
+   /** Assignment Operator **/
+   CbmTrack& operator=(const CbmTrack&);
 
 	/** Add a hit to the list, using index and HitType
 	 * @param index Index of the hit in the array
@@ -72,7 +71,7 @@ public:
 	void SetParamLast(const FairTrackParam* par){ fParamLast  = *par; }
    void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
 
-	virtual void Print() const;
+	virtual string ToString() const;
 
 private:
 	/** Array contains the hit indices of the hits attached to the track **/
@@ -99,7 +98,7 @@ private:
 	Int_t fPreviousTrackId;
 
 	/** Monte-Carlo link collection **/
-        FairMultiLinkedData* fLinks;
+   FairMultiLinkedData* fLinks;
 
 	ClassDef(CbmTrack, 2);
 };

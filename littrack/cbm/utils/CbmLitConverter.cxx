@@ -139,7 +139,7 @@ void CbmLitConverter::CbmStsTrackToCbmLitTrack(
    // TODO note that hits are not copied now
 
    litTrack->SetQuality(kLITGOOD);
-   litTrack->SetChi2(stsTrack->GetChi2());
+   litTrack->SetChi2(stsTrack->GetChiSq());
    litTrack->SetNDF(stsTrack->GetNDF());
    litTrack->SetPreviousTrackId(-1);
    CbmLitTrackParam paramFirst, paramLast;

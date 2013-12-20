@@ -127,13 +127,13 @@ void CbmLitFindMvdTracks::ConvertOutputData()
          const CbmLitHit* litHit = litTrack->GetHit(iHit);
          Int_t refId = litHit->GetRefId();
          FairHit* hit = static_cast<FairHit*>(fMvdHits->At(refId));
-         track->AddMvdHit(refId, hit);
+         track->AddMvdHit(refId);
       }
-      track->SortMvdHits();
+      //track->SortMvdHits();
 
       FairTrackParam parFirst;
       CbmLitConverter::CbmLitTrackParamToFairTrackParam(litTrack->GetParamLast(), &parFirst);
-      track->SetParamFirst(parFirst);
+      track->SetParamFirst(&parFirst);
    }
 }
 

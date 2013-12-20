@@ -520,8 +520,8 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 
       // Get MC points;
       vector<CbmStsPoint*> vPoints;
-      for( Int_t i=0; i<track->GetNStsHits(); i++ ){
-	Int_t hitID = track->GetStsHitIndex(i);
+      for( Int_t i=0; i<track->GetNofHits(); i++ ){
+	Int_t hitID = track->GetHitIndex(i);
 	if( hitID<0 ) continue;
 	CbmStsHit* hit = (CbmStsHit*) fStsHitArray->At(hitID);
 	if( !hit ) continue;
@@ -532,7 +532,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	vPoints.push_back(point);
       }
       vector<CbmMvdPoint*> vMPoints;
-      for( Int_t i=0; i<track->GetNMvdHits(); i++ ){
+      for( Int_t i=0; i<track->GetNofMvdHits(); i++ ){
 	Int_t hitID = track->GetMvdHitIndex(i);
 	if( hitID<0 ) continue;
 	CbmMvdHit* hit = (CbmMvdHit*) fMvdHitArray->At(hitID);
@@ -555,7 +555,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       mci[5] = mcTrack->GetStartZ();
       if( !vPoints.empty() )
 	{
-	  if( track->GetNStsHits()+track->GetNMvdHits()>=8 ){
+	  if( track->GetNofHits()+track->GetNofMvdHits()>=8 ){
 	    Double_t p1 = mcTrack->GetP();
 	    TVector3 mom;
 	    vPoints.back()->MomentumOut(mom);
@@ -605,7 +605,9 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	// fit track to Primary Vertex
 
 	CbmStsTrack tt(*track);
-	fFitter.FitToVertex( &tt, fPrimaryVertex, tt.GetParamFirst() );
+	FairTrackParam par(*tt.GetParamFirst());
+	fFitter.FitToVertex( &tt, fPrimaryVertex, &par);
+	tt.SetParamFirst(&par);
 	//FillTrackHisto(mci,&tt,fhVfit);
 
 	// fill momentum resolution
@@ -618,8 +620,8 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       }
 
       if( track->GetNDF()>0 ){
-	fhChi2->Fill(track->GetChi2()/track->GetNDF());
-	fhProb->Fill(TMath::Prob(track->GetChi2(),track->GetNDF()));
+	fhChi2->Fill(track->GetChiSq()/track->GetNDF());
+	fhProb->Fill(TMath::Prob(track->GetChiSq(),track->GetNDF()));
       }
     }
   }
@@ -917,12 +919,12 @@ Double_t CbmStsFitPerformanceTask::GetCharge(CbmMCTrack* mcTrack){
 
 // -------------------------------------------------------------------------
 Bool_t CbmStsFitPerformanceTask::IsLong(CbmStsTrack* track){
-  Int_t nHits = track->GetNStsHits();
+  Int_t nHits = track->GetNofHits();
   if (nHits <4) return 0;
   Int_t stmin=1000, stmax=-1000;
   Int_t st,iHit,hitID;
   for (iHit=0;iHit<nHits; iHit++){
-    hitID=track->GetStsHitIndex(iHit);
+    hitID=track->GetHitIndex(iHit);
     st=((CbmStsHit*) fStsHitArray->At(hitID))->GetDetectorID();
     if (st<stmin) stmin=st;
     if (st>stmax) stmax=st;

@@ -213,8 +213,8 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 		At(stsTrackIndex);
 	    if(NULL != stsTrack) {
 		stsPointIndex = -1;
-		if(stsTrack->GetNStsHits()) {
-		    stsHitIndex = stsTrack->GetStsHitIndex(0);
+		if(stsTrack->GetNofHits()) {
+		    stsHitIndex = stsTrack->GetHitIndex(0);
 		    stsHit = (CbmStsHit*) fArrayStsHit->At(stsHitIndex);
 		    if(NULL != stsHit) {
 			stsPointIndex = stsHit->GetRefIndex();
@@ -329,8 +329,8 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 		At(stsTrackIndex);
 	    if(NULL != stsTrack) {
 		stsPointIndex = -1;
-		if(stsTrack->GetNStsHits()) {
-		    stsHitIndex = stsTrack->GetStsHitIndex(stsTrack->GetNStsHits()-1);
+		if(stsTrack->GetNofHits()) {
+		    stsHitIndex = stsTrack->GetHitIndex(stsTrack->GetNofHits()-1);
 		    stsHit = (CbmStsHit*) fArrayStsHit->At(stsHitIndex);
 		    if(NULL != stsHit) {
 			stsPointIndex = stsHit->GetRefIndex();

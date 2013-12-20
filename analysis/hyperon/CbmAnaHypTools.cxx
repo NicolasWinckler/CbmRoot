@@ -79,10 +79,10 @@ void CbmAnaHypTools::SetFlagsOnly(){
 
 
 void CbmAnaHypTools::CopyTrack(CbmStsTrack* trIn, CbmStsTrack* trOut){
-  trOut->SetParamFirst(*trIn->GetParamFirst());
-  trOut->SetParamLast(*trIn->GetParamLast());
+  trOut->SetParamFirst(trIn->GetParamFirst());
+  trOut->SetParamLast(trIn->GetParamLast());
   trOut->SetFlag(trIn->GetFlag());
-  trOut->SetChi2(trIn->GetChi2());
+  trOut->SetChiSq(trIn->GetChiSq());
   trOut->SetPidHypo(trIn->GetPidHypo());
   trOut->SetB(trIn->GetB());
 }

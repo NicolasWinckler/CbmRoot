@@ -225,8 +225,8 @@ void CbmProduceDst::Exec(Option_t *option)
 	stsTrack = (CbmStsTrack*) fArrayStsTrack->
 	    At(track->GetStsTrackIndex());
 	if(NULL == stsTrack) continue;
-	nMvdHits = stsTrack->GetNMvdHits();
-        nStsHits = stsTrack->GetNStsHits();
+	nMvdHits = stsTrack->GetNofMvdHits();
+        nStsHits = stsTrack->GetNofHits();
 
 	// Get pointer to the STS track match
 	if(track->GetStsTrackIndex() < 0) continue;

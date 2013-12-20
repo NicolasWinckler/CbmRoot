@@ -700,8 +700,8 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
     for(iVec=0; iVec<nTracks_SIMD; iVec++)
     {
-      int nHitsTrackMvd = t[iVec]->GetNMvdHits();
-      int nHitsTrackSts = t[iVec]->GetNStsHits();
+      int nHitsTrackMvd = t[iVec]->GetNofMvdHits();
+      int nHitsTrackSts = t[iVec]->GetNofHits();
       int nHitsTrack = nHitsTrackMvd + nHitsTrackSts;
       for(i = 0; i < nHitsTrack; i++ )
       {
@@ -721,7 +721,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
         else
         {
           if(!listStsHits) continue;
-          int hitIndex = t[iVec]->GetStsHitIndex(i - nHitsTrackMvd);
+          int hitIndex = t[iVec]->GetHitIndex(i - nHitsTrackMvd);
           CbmStsHit *hit = L1_DYNAMIC_CAST<CbmStsHit*>(listStsHits->At(hitIndex));
 
           posx = hit->GetX();
@@ -790,31 +790,33 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
     for(iVec=0; iVec<nTracks_SIMD; iVec++)
     {
-      t[iVec]->GetParamFirst()->SetX(T.x[iVec]);
-      t[iVec]->GetParamFirst()->SetY(T.y[iVec]);
-      t[iVec]->GetParamFirst()->SetTx(T.tx[iVec]);
-      t[iVec]->GetParamFirst()->SetTy(T.ty[iVec]);
-      t[iVec]->GetParamFirst()->SetQp(T.qp[iVec]);
+      FairTrackParam par;
+      par.SetX(T.x[iVec]);
+      par.SetY(T.y[iVec]);
+      par.SetTx(T.tx[iVec]);
+      par.SetTy(T.ty[iVec]);
+      par.SetQp(T.qp[iVec]);
       //t[iVec]->TFirst[5] = z_start[iVec];
-      t[iVec]->GetParamFirst()->SetZ(T.z[iVec]);
+      par.SetZ(T.z[iVec]);
 
-      t[iVec]->GetParamFirst()->SetCovariance(0,0,T.C00[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(1,0,T.C10[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(1,1,T.C11[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(2,0,T.C20[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(2,1,T.C21[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(2,2,T.C22[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(3,0,T.C30[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(3,1,T.C31[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(3,2,T.C32[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(3,3,T.C33[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(4,0,T.C40[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(4,1,T.C41[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(4,2,T.C42[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(4,3,T.C43[iVec]);
-      t[iVec]->GetParamFirst()->SetCovariance(4,4,T.C44[iVec]);
+      par.SetCovariance(0,0,T.C00[iVec]);
+      par.SetCovariance(1,0,T.C10[iVec]);
+      par.SetCovariance(1,1,T.C11[iVec]);
+      par.SetCovariance(2,0,T.C20[iVec]);
+      par.SetCovariance(2,1,T.C21[iVec]);
+      par.SetCovariance(2,2,T.C22[iVec]);
+      par.SetCovariance(3,0,T.C30[iVec]);
+      par.SetCovariance(3,1,T.C31[iVec]);
+      par.SetCovariance(3,2,T.C32[iVec]);
+      par.SetCovariance(3,3,T.C33[iVec]);
+      par.SetCovariance(4,0,T.C40[iVec]);
+      par.SetCovariance(4,1,T.C41[iVec]);
+      par.SetCovariance(4,2,T.C42[iVec]);
+      par.SetCovariance(4,3,T.C43[iVec]);
+      par.SetCovariance(4,4,T.C44[iVec]);
+      t[iVec]->SetParamFirst(&par);
 
-      t[iVec]->SetChi2(T.chi2[iVec]);
+      t[iVec]->SetChiSq(T.chi2[iVec]);
       t[iVec]->SetNDF(static_cast<int>(T.NDF[iVec]));
     }
 
@@ -862,29 +864,31 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
 
     for(iVec=0; iVec<nTracks_SIMD; iVec++)
     {
-      t[iVec]->GetParamLast()->SetX(T.x[iVec]);
-      t[iVec]->GetParamLast()->SetY(T.y[iVec]);
-      t[iVec]->GetParamLast()->SetTx(T.tx[iVec]);
-      t[iVec]->GetParamLast()->SetTy(T.ty[iVec]);
-      t[iVec]->GetParamLast()->SetQp(T.qp[iVec]);
+       FairTrackParam par;
+      par.SetX(T.x[iVec]);
+      par.SetY(T.y[iVec]);
+      par.SetTx(T.tx[iVec]);
+      par.SetTy(T.ty[iVec]);
+      par.SetQp(T.qp[iVec]);
       //t[iVec]->TFirst[5] = z_start[iVec];
-      t[iVec]->GetParamLast()->SetZ(T.z[iVec]);
+      par.SetZ(T.z[iVec]);
 
-      t[iVec]->GetParamLast()->SetCovariance(0,0,T.C00[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(1,0,T.C10[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(1,1,T.C11[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(2,0,T.C20[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(2,1,T.C21[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(2,2,T.C22[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(3,0,T.C30[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(3,1,T.C31[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(3,2,T.C32[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(3,3,T.C33[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(4,0,T.C40[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(4,1,T.C41[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(4,2,T.C42[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(4,3,T.C43[iVec]);
-      t[iVec]->GetParamLast()->SetCovariance(4,4,T.C44[iVec]);
+      par.SetCovariance(0,0,T.C00[iVec]);
+      par.SetCovariance(1,0,T.C10[iVec]);
+      par.SetCovariance(1,1,T.C11[iVec]);
+      par.SetCovariance(2,0,T.C20[iVec]);
+      par.SetCovariance(2,1,T.C21[iVec]);
+      par.SetCovariance(2,2,T.C22[iVec]);
+      par.SetCovariance(3,0,T.C30[iVec]);
+      par.SetCovariance(3,1,T.C31[iVec]);
+      par.SetCovariance(3,2,T.C32[iVec]);
+      par.SetCovariance(3,3,T.C33[iVec]);
+      par.SetCovariance(4,0,T.C40[iVec]);
+      par.SetCovariance(4,1,T.C41[iVec]);
+      par.SetCovariance(4,2,T.C42[iVec]);
+      par.SetCovariance(4,3,T.C43[iVec]);
+      par.SetCovariance(4,4,T.C44[iVec]);
+      t[iVec]->SetParamLast(&par);
     }
   }
 
@@ -961,7 +965,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<L1FieldRe
       const float mass = CbmKFParticleDatabase::Instance()->GetMass(t[iVec]->GetPidHypo());
       mass2[iVec] = mass*mass;
 
-      int nHitsTrackMvd = t[iVec]->GetNMvdHits();
+      int nHitsTrackMvd = t[iVec]->GetNofMvdHits();
       for(int iH = 0; iH < 2; iH++ )
       {
         float posx = 0.f, posy = 0.f, posz = 0.f;
@@ -980,7 +984,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<L1FieldRe
         else
         {
           if(!listStsHits) continue;
-          int hitIndex = t[iVec]->GetStsHitIndex(iH - nHitsTrackMvd);
+          int hitIndex = t[iVec]->GetHitIndex(iH - nHitsTrackMvd);
           CbmStsHit *hit = L1_DYNAMIC_CAST<CbmStsHit*>(listStsHits->At(hitIndex));
 
           posx = hit->GetX();
@@ -1037,28 +1041,30 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<L1FieldRe
       {
         if( chi[iVec] < chiPrim )
         {
-          t[iVec]->GetParamFirst()->SetX(T.x[iVec]);
-          t[iVec]->GetParamFirst()->SetY(T.y[iVec]);
-          t[iVec]->GetParamFirst()->SetTx(T.tx[iVec]);
-          t[iVec]->GetParamFirst()->SetTy(T.ty[iVec]);
-          t[iVec]->GetParamFirst()->SetQp(T.qp[iVec]);
-          t[iVec]->GetParamFirst()->SetZ(T.z[iVec]);
+           FairTrackParam par;
+          par.SetX(T.x[iVec]);
+          par.SetY(T.y[iVec]);
+          par.SetTx(T.tx[iVec]);
+          par.SetTy(T.ty[iVec]);
+          par.SetQp(T.qp[iVec]);
+          par.SetZ(T.z[iVec]);
 
-          t[iVec]->GetParamFirst()->SetCovariance(0,0,T.C00[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(1,0,T.C10[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(1,1,T.C11[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(2,0,T.C20[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(2,1,T.C21[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(2,2,T.C22[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(3,0,T.C30[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(3,1,T.C31[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(3,2,T.C32[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(3,3,T.C33[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(4,0,T.C40[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(4,1,T.C41[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(4,2,T.C42[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(4,3,T.C43[iVec]);
-          t[iVec]->GetParamFirst()->SetCovariance(4,4,T.C44[iVec]);
+          par.SetCovariance(0,0,T.C00[iVec]);
+          par.SetCovariance(1,0,T.C10[iVec]);
+          par.SetCovariance(1,1,T.C11[iVec]);
+          par.SetCovariance(2,0,T.C20[iVec]);
+          par.SetCovariance(2,1,T.C21[iVec]);
+          par.SetCovariance(2,2,T.C22[iVec]);
+          par.SetCovariance(3,0,T.C30[iVec]);
+          par.SetCovariance(3,1,T.C31[iVec]);
+          par.SetCovariance(3,2,T.C32[iVec]);
+          par.SetCovariance(3,3,T.C33[iVec]);
+          par.SetCovariance(4,0,T.C40[iVec]);
+          par.SetCovariance(4,1,T.C41[iVec]);
+          par.SetCovariance(4,2,T.C42[iVec]);
+          par.SetCovariance(4,3,T.C43[iVec]);
+          par.SetCovariance(4,4,T.C44[iVec]);
+          t[iVec]->SetParamFirst(&par);
         }
       }
     }
@@ -1101,7 +1107,7 @@ void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1F
 
     for(int iVec=0; iVec<nTracks_SIMD; iVec++)
     {
-      int nHitsTrackMvd = t[iVec]->GetNMvdHits();
+      int nHitsTrackMvd = t[iVec]->GetNofMvdHits();
       for(int iH = 0; iH < 2; iH++ )
       {
         float posx = 0.f, posy = 0.f, posz = 0.f;
@@ -1120,7 +1126,7 @@ void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1F
         else
         {
           if(!listStsHits) continue;
-          int hitIndex = t[iVec]->GetStsHitIndex(iH - nHitsTrackMvd);
+          int hitIndex = t[iVec]->GetHitIndex(iH - nHitsTrackMvd);
           CbmStsHit *hit = L1_DYNAMIC_CAST<CbmStsHit*>(listStsHits->At(hitIndex));
 
           posx = hit->GetX();

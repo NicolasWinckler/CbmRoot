@@ -221,7 +221,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
       success = kFALSE;
       continue;
     }
-    pTrck->AddStsHit(iHit, pHit);
+    pTrck->AddHit(iHit, kSTSHIT);
     if (fVerbose>2) cout << "Sts Hit " << iHit << " from StsPoint "
 			 << ptIndex << " (MCTrack "
 			 << mcTrackIndex << ") added to StsTrack " 

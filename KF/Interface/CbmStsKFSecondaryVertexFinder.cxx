@@ -80,10 +80,13 @@ void CbmStsKFSecondaryVertexFinder::GetMotherTrack( CbmStsTrack *MotherTrack ){
   if( !MotherTrack ) return;
   double T[6], C[15];
   Finder.GetMotherTrack( T, C );
-  CbmKFMath::CopyTC2TrackParam( MotherTrack->GetParamFirst(), T, C );
-  CbmKFMath::CopyTC2TrackParam( MotherTrack->GetParamLast(), T, C );
+  FairTrackParam parFirst(*MotherTrack->GetParamFirst()), parLast(*MotherTrack->GetParamLast());
+  CbmKFMath::CopyTC2TrackParam(&parFirst, T, C);// MotherTrack->GetParamFirst(), T, C );
+  CbmKFMath::CopyTC2TrackParam(&parLast, T, C);//MotherTrack->GetParamLast(), T, C );
+  MotherTrack->SetParamFirst(&parFirst);
+  MotherTrack->SetParamLast(&parLast);
   MotherTrack->SetPidHypo(211);
-  MotherTrack->SetChi2(0);
+  MotherTrack->SetChiSq(0);
   MotherTrack->SetNDF(1);
 }
 

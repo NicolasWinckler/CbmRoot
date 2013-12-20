@@ -58,8 +58,8 @@ void CbmStsKFTrackFitter::SetKFHits(CbmKFTrack &T, CbmStsTrack* track){
 
   if( !fIsInitialised ) Init();
   
-  Int_t NStsHits   = ( fStsHitsArray   ) ?track->GetNStsHits()   :0;
-  Int_t NMvdHits= ( fMvdHitsArray) ?track->GetNMvdHits()   :0;
+  Int_t NStsHits   = ( fStsHitsArray   ) ?track->GetNofHits()   :0;
+  Int_t NMvdHits= ( fMvdHitsArray) ?track->GetNofMvdHits()   :0;
 
   fHits.resize( NMvdHits + NStsHits );
   if ( NMvdHits > 0 ){
@@ -71,7 +71,7 @@ void CbmStsKFTrackFitter::SetKFHits(CbmKFTrack &T, CbmStsTrack* track){
   }  
   if( NStsHits>0 && fStsHitsArray ){  
     for (Int_t i=0; i<NStsHits;i++){
-      Int_t j = track->GetStsHitIndex(i);
+      Int_t j = track->GetHitIndex(i);
       fHits[NMvdHits+i].Create( reinterpret_cast<CbmStsHit*>(fStsHitsArray->At(j)) );
       T.fHits.push_back(&(fHits[NMvdHits+i]));
     }
@@ -93,7 +93,10 @@ Int_t CbmStsKFTrackFitter::DoFit( CbmStsTrack* track, Int_t pidHypo )
   Int_t err = T.Fit( 1 ); // fit downstream 
   Bool_t ok = (!err) && CheckTrack( T );
   if( ok ){
-    T.GetTrackParam( *track->GetParamLast() ); // store fitted track & cov.matrix
+     FairTrackParam par;
+    //T.GetTrackParam( *track->GetParamLast() ); // store fitted track & cov.matrix
+    T.GetTrackParam( par );
+    track->SetParamLast(&par);
     err = T.Fit( 0 ); // fit upstream
     ok = ok && (!err) && CheckTrack( T );
     if( ok ) T.GetStsTrack( *track, 1 );          // store fitted track & cov.matrix & chi2 & NDF  
@@ -131,7 +134,7 @@ void CbmStsKFTrackFitter::Extrapolate( CbmStsTrack* track, Double_t z, FairTrack
   if( !track ) return;
   CbmKFTrack T;
   T.SetPID( track->GetPidHypo() );
-  FairTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
+  const FairTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
   
   if( z<=fpar->GetZ() ){ // extrapolate first parameters
     T.SetTrackParam( *fpar );

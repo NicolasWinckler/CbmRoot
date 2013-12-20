@@ -85,7 +85,7 @@ void CbmLitCreateStandaloneData::Exec(
    fSeedsFile << fEventNo << " " << fStsTracks->GetEntriesFast() << std::endl;
    for (Int_t iStsTrack = 0; iStsTrack < fStsTracks->GetEntriesFast(); iStsTrack++) {
       CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(iStsTrack);
-      FairTrackParam* par = stsTrack->GetParamLast();
+      const FairTrackParam* par = stsTrack->GetParamLast();
       fSeedsFile << par->GetX() << " " << par->GetY() << " " << par->GetZ() << " "
                  << par->GetTx() << " " << par->GetTy() << " " << par->GetQp() << " ";
       double cov[15];

@@ -98,10 +98,10 @@ void CbmStsFindTracks::Exec(Option_t* opt) {
 
   fTracks->Delete();
   Int_t nTracks = fFinder->DoFind();
-  for (Int_t iTrack=0; iTrack<fTracks->GetEntriesFast(); iTrack++) {
-    CbmStsTrack* track = (CbmStsTrack*) fTracks->At(iTrack);
-    track->SortHits();
-  }
+//  for (Int_t iTrack=0; iTrack<fTracks->GetEntriesFast(); iTrack++) {
+//    CbmStsTrack* track = (CbmStsTrack*) fTracks->At(iTrack);
+//    track->SortHits();
+//  }
 
   fTimer.Stop();
   if ( fVerbose ) 

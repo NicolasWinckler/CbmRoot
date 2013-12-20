@@ -54,7 +54,7 @@ class CbmKFMath :public TObject
 			 Bool_t downstream_direction, 
 			 Double_t *Q5, Double_t *Q8, Double_t *Q9, Double_t *Ecor );
 
-  static void CopyTrackParam2TC( FairTrackParam* par, Double_t T[], Double_t C[] );
+  static void CopyTrackParam2TC(const FairTrackParam* par, Double_t T[], Double_t C[] );
   static void CopyTC2TrackParam( FairTrackParam* par, Double_t T[], Double_t C[] );
   
   ClassDef(CbmKFMath, 1)

@@ -20,10 +20,10 @@ Int_t CbmPVFinderKF::FindPrimaryVertex(TClonesArray* tracks, CbmVertex* vertex )
   CbmKFTrack* CloneArray = new CbmKFTrack[NTracks];
   for( Int_t i=0; i<NTracks; i++ ){    
     CbmStsTrack* st = (CbmStsTrack*) tracks->At(i);
-    Int_t NHits = st->GetNStsHits();
+    Int_t NHits = st->GetNofHits();
     if( NHits < 4 ) continue;
     if( st->GetFlag() ) continue;
-    if( st->GetChi2()<0. || st->GetChi2()>3.5*3.5*st->GetNDF() ) continue;
+    if( st->GetChiSq()<0. || st->GetChiSq()>3.5*3.5*st->GetNDF() ) continue;
     CbmKFTrack &T = CloneArray[i];
     T.SetStsTrack( *st );
     if( !finite(T.GetTrack()[0]) || !finite(T.GetCovMatrix()[0])) continue;

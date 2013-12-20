@@ -598,7 +598,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       Int_t nTrue  = match->GetNofTrueHits();
       Int_t nWrong = match->GetNofWrongHits();
       Int_t nFake  = match->GetNofFakeHits();
-      Int_t nAllHits  = stsTrack->GetNStsHits();
+      Int_t nAllHits  = stsTrack->GetNofHits();
       if ( nTrue + nWrong + nFake != nAllHits ) {
 	cout << "True " << nTrue << " wrong " << nWrong << " Fake "
 	     << nFake << " Hits " << nAllHits << endl;
@@ -1540,7 +1540,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
 	   << "No StsTrack at index " << iRec << endl;
       Fatal("Exec", "No StsTrack in array");
       }
-    Int_t nHits = stsTrack->GetNStsHits();
+    Int_t nHits = stsTrack->GetNofHits();
       
     FairTrackParam* trParF = (FairTrackParam*)stsTrack->GetParamFirst();
     FairTrackParam* trParL = (FairTrackParam*)stsTrack->GetParamLast();
@@ -1562,7 +1562,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
     }
     fhStsTrackFMom->Fill(trParF->GetQp());
     fhStsTrackLMom->Fill(trParL->GetQp());
-    fhStsTrackChiSq->Fill(stsTrack->GetChi2());
+    fhStsTrackChiSq->Fill(stsTrack->GetChiSq());
 
     CbmTrackMatch* match = (CbmTrackMatch*) fMatches->At(iRec);
     if ( ! match ) {
@@ -1607,7 +1607,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
 	if ( fQualiMap[iMC] < quali ) {
 	  CbmStsTrack* oldTrack 
 	    = (CbmStsTrack*) fStsTracks->At(fMatchMap[iMC]);	  
-	  fhNhClones->Fill(Double_t(oldTrack->GetNStsHits()));
+	  fhNhClones->Fill(Double_t(oldTrack->GetNofHits()));
 	  if ( oldTrack->GetParamFirst()->GetQp() )
 	    fhMomClones->Fill(1./TMath::Abs(oldTrack->GetParamFirst()->GetQp()));
 	  fMatchMap[iMC] = iRec;

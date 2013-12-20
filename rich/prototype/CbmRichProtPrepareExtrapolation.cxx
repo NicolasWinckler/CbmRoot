@@ -113,7 +113,6 @@ void CbmRichProtPrepareExtrapolation::Exec(Option_t *option)
     Float_t qp;
     Int_t nStsTracks = 0;
     CbmStsTrack *stsTrack;
-    FairTrackParam *paramLast;
     Int_t charge;
     CbmGlobalTrack *track;
     for(Int_t i = 0; i < nMCTracks; i++) {
@@ -152,12 +151,13 @@ void CbmRichProtPrepareExtrapolation::Exec(Option_t *option)
 	if(NULL == stsTrack) {
             continue;
 	}
-	paramLast = stsTrack->GetParamLast();
-	paramLast->SetX(x);
-	paramLast->SetY(y);
-	paramLast->SetZ(mcTrack->GetStartZ());
-        paramLast->SetTx(px/pz);
-	paramLast->SetTy(py/pz);
+	FairTrackParam paramLast(*stsTrack->GetParamLast());
+	//paramLast = stsTrack->GetParamLast();
+	paramLast.SetX(x);
+	paramLast.SetY(y);
+	paramLast.SetZ(mcTrack->GetStartZ());
+        paramLast.SetTx(px/pz);
+	paramLast.SetTy(py/pz);
         /*paramLast->SetCovariance(0, 0, 2.56);
         paramLast->SetCovariance(1, 1, 0.5476);
         paramLast->SetCovariance(2, 2, 0.0308);
@@ -168,7 +168,7 @@ void CbmRichProtPrepareExtrapolation::Exec(Option_t *option)
             charge = 1;
 	}
 	if(p > 0) {
-	    paramLast->SetQp((Double_t)charge/p);
+	    paramLast.SetQp((Double_t)charge/p);
 	}
 	new ((*fArrayGlobalTracks)[nStsTracks]) CbmGlobalTrack();
 	track = (CbmGlobalTrack*) fArrayGlobalTracks->At(nStsTracks);
@@ -177,7 +177,7 @@ void CbmRichProtPrepareExtrapolation::Exec(Option_t *option)
 	}
         track->SetStsTrackIndex(nStsTracks);
 	nStsTracks += 1;
-        track->SetParamLast(paramLast);
+        track->SetParamLast(&paramLast);
     }
 
 

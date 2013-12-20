@@ -115,7 +115,7 @@ void CbmAnaHypSelectLambda::Exec(Option_t * option){
     CbmStsTrack* tr = (CbmStsTrack*) fRCTracks->At(i);
     Int_t sign = (tr->GetParamFirst()->GetQp()>0) ? 1 : -1;
     if (fVerbose>1) printf("Track: %4i sign=%2i",i,sign);
-    if (tr->GetNStsHits()<4) {
+    if (tr->GetNofHits()<4) {
       if (fVerbose>1) printf("\n");
       continue;
     }
@@ -202,11 +202,14 @@ void CbmAnaHypSelectLambda::Exec(Option_t * option){
       Double_t bmo = sqrt(pow(T[0]-pv[0],2)+pow(T[1]-pv[1],2));
 
       CbmStsTrack mother;
-      CbmKFMath::CopyTC2TrackParam(mother.GetParamFirst(),T,C);
-      CbmKFMath::CopyTC2TrackParam(mother.GetParamLast() ,T,C);
+      FairTrackParam parFirst, parLast;
+      CbmKFMath::CopyTC2TrackParam(&parFirst,T,C);
+      CbmKFMath::CopyTC2TrackParam(&parLast,T,C);
+      mother.SetParamFirst(&parFirst);
+      mother.SetParamLast(&parLast);
       mother.SetPidHypo(3122);
       mother.SetFlag(sig);
-      mother.SetChi2(0);
+      mother.SetChiSq(0);
       mother.SetNDF(1);
       mother.SetB(bmo);
 

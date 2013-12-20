@@ -1000,7 +1000,7 @@ void CbmLitTrackingQa::ProcessMvd(
 {
    if (!fDet.GetDet(kMVD)) return;
    const CbmStsTrack* track = static_cast<const CbmStsTrack*>(fStsTracks->At(stsId));
-   Int_t nofHits = track->GetNMvdHits();
+   Int_t nofHits = track->GetNofMvdHits();
    fHM->H1("hth_Mvd_TrackHits_All")->Fill(nofHits);
 
    const CbmTrackMatch* stsTrackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsId));

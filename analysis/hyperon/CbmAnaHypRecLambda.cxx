@@ -111,7 +111,7 @@ void CbmAnaHypRecLambda::Exec(Option_t* option){
   for (Int_t i=0;i<fRCTracks->GetEntriesFast();i++){
     CbmStsTrack* tr = (CbmStsTrack*) fRCTracks->At(i);
     Int_t sign = (tr->GetParamFirst()->GetQp()>0) ? 1 : -1;
-    if (tr->GetNStsHits()<4) continue;
+    if (tr->GetNofHits()<4) continue;
 
 // TODO Refit
 //    if (sign>0) {

@@ -287,7 +287,7 @@ void CbmL1TrdTrackFinderSts::Sts2Trd(Double_t pmin, Double_t pmax,
         // Copy track parameters at plane of last hit
 	trdTrack->SetParamLast( stsTrack->GetParamLast() );
         // Copy chi2
-        trdTrack->SetChiSq(stsTrack->GetChi2());
+        trdTrack->SetChiSq(stsTrack->GetChiSq());
         trdTrack->SetNDF(stsTrack->GetNDF());
         // Set sts track index
         trdTrack->SetPreviousTrackId(iStsTrack);

@@ -365,7 +365,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	stsMCid = stsMatch->GetMCTrackId();
         if (stsMCid == -1) goto add;
 
-        if(((Double_t)(stsMatch->GetNofTrueHits()))/((Double_t)(stsTrack->GetNStsHits()))< 0.6) FakeTrack = true;
+        if(((Double_t)(stsMatch->GetNofTrueHits()))/((Double_t)(stsTrack->GetNofHits()))< 0.6) FakeTrack = true;
 
 	mcTrack = (CbmMCTrack*)fArrayMCTrack->At(stsMCid);
 	if(!mcTrack) goto add;
@@ -552,7 +552,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	Int_t MCPdg = mcTrack->GetPdgCode();
         Int_t MCMotherId = mcTrack->GetMotherId();
 
-        Int_t nStsFound = stsTrack->GetNStsHits() + stsTrack->GetNMvdHits();
+        Int_t nStsFound = stsTrack->GetNofHits() + stsTrack->GetNofMvdHits();
 
 	Double_t chiPrimary = fFitter.GetChiToVertex(stsTrack);
 

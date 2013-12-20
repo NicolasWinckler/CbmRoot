@@ -141,7 +141,7 @@ void CbmGlobalTrackFitterKF::DoFit(CbmGlobalTrack* glbTrack)
   if(NULL == stsTrack) {
     return;
   }
-  FairTrackParam *paramFirst;
+  const FairTrackParam *paramFirst;
   paramFirst = stsTrack->GetParamFirst();
   fKfTrack->SetTrackParam(*paramFirst);
   fKfTrack->Extrapolate(z);

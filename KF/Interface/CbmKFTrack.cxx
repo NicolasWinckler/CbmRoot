@@ -27,7 +27,7 @@ void CbmKFTrack::SetTrack( CbmKFTrackInterface &track ){
   fNDF  = track.GetRefNDF();
 }
 
-void CbmKFTrack::SetTrackParam( FairTrackParam &track )
+void CbmKFTrack::SetTrackParam(const FairTrackParam &track )
 {
   CbmKFMath::CopyTrackParam2TC( &track, fT, fC ); 
 }
@@ -36,7 +36,7 @@ void CbmKFTrack::SetStsTrack( CbmStsTrack &track, bool first )
 {
   SetPID( track.GetPidHypo() );
   SetTrackParam( first? *track.GetParamFirst() : *track.GetParamLast() );
-  GetRefChi2() = track.GetChi2();
+  GetRefChi2() = track.GetChiSq();
   GetRefNDF() = track.GetNDF();
 }
 
@@ -47,8 +47,10 @@ void CbmKFTrack::GetTrackParam( FairTrackParam &track )
 
 void CbmKFTrack::GetStsTrack( CbmStsTrack &track, bool first )
 {
-  GetTrackParam( first? *track.GetParamFirst() : *track.GetParamLast() );
-  track.SetChi2( GetRefChi2() );
+  FairTrackParam par(first? *track.GetParamFirst() : *track.GetParamLast());
+  GetTrackParam(par);//first? *track.GetParamFirst() : *track.GetParamLast() );
+  first ? track.SetParamFirst(&par) : track.SetParamLast(&par);
+  track.SetChiSq( GetRefChi2() );
   track.SetNDF( GetRefNDF() );
 }
 

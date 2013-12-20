@@ -125,7 +125,7 @@ void CbmAnaHypRecCascade::CreateDaVector(){
   vDa.clear();
   for (Int_t i=0;i<fRCTracks->GetEntriesFast();i++){
     CbmStsTrack* tr = (CbmStsTrack*) fRCTracks->At(i);
-    if (tr->GetNStsHits()<4) continue;
+    if (tr->GetNofHits()<4) continue;
     Int_t sign = (tr->GetParamFirst()->GetQp()>0) ? 1 : -1;
     if (sign>0) continue;
     tr->SetPidHypo(fSisterPdg);
@@ -206,7 +206,9 @@ void CbmAnaHypRecCascade::CreatePair(CbmAnaHypTrack da, CbmAnaHypLambdaCandidate
   fSVF->GetMotherTrack(T,C);
   T[4]=-T[4]; // the track in SVF is created with positive sign.
   CbmStsTrack mother;
-  CbmKFMath::CopyTC2TrackParam(mother.GetParamFirst(),T,C);
+  FairTrackParam par;
+  CbmKFMath::CopyTC2TrackParam(&par,T,C);
+  mother.SetParamFirst(&par);
   CbmKFTrack mo(mother);
   mo.SetPID(fMotherPdg);
   mo.Extrapolate(pv[2]);

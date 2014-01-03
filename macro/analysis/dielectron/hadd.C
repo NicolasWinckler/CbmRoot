@@ -40,97 +40,76 @@ bool CheckFile(TFile* fileAna, TFile* fileReco);
 
 
 void hadd() {
-   // in an interactive ROOT session, edit the file names
-   // Target and FileList, then
-   // root > .L hadd.C
-   // root > hadd()
 
-    string particle = "";
+	string dir = "/hera/cbm/users/slebedev/mc/dielectron/nov13/25gev/trd/1.0field/nomvd/";
+    string fileArray = ".auau.25gev.centr.";
+    string particleDir[5] = {"omegaepem", "phi", "omegadalitz", "rho0", "urqmd"};
+    string addString = "analysis"; //analysis or litqa
+    int nofFiles = 250;
 
-    string fileArray[8] = {"analysis.pisupp0.01.25gev.centr.", "analysis.pisupp0.002.25gev.centr.", "analysis.pisupp0.001.25gev.centr.",
-    "analysis.pisupp0.0004.25gev.centr.","analysis.pisupp0.0002.25gev.centr.",
-    "analysis.pisupp0.0001.25gev.centr.", "analysis.pisupp0.0.25gev.centr.", ".auau.25gev.centr."};
+	for (int iF = 0; iF < 4; iF++){
+		string fileNameAna = dir + particleDir[iF] + "/" + string("analysis") + fileArray;
+		string fileNameReco = dir + particleDir[iF] + "/" + string("reco") + fileArray;
+		string fileNameQa = dir + particleDir[iF] + "/" + string("litqa") + fileArray;
 
-    string addString = "analysis"; //analysis or reco
+		cout << "-I- " << dir << endl;
 
-    for (int iPs = 7; iPs < 8; iPs++){
-       cout << "-I- " << fileArray[iPs] << endl;
+		string outputFile = fileNameAna;
+		if (addString == "litqa") outputFile = fileNameQa;
+		outputFile += "all.root";
+		cout << "-I- OUTPUT: " << outputFile << endl;
+		TFile* Target = TFile::Open( outputFile.c_str(), "RECREATE" );
 
-       for (int iF = 0; iF < 4; iF++){
+		int count = 0;
+		TList* FileList = new TList();
+		for (int i = 1; i < nofFiles; i++){
+			stringstream ss;
+			ss.fill('0');
+			ss.width(5);
+			ss  << i << ".root";
 
-          if (iF == 0) {
-             particle = "omegaepem";
-          } else if (iF == 1) {
-             particle = "phi";
-          } else if (iF == 2) {
-             particle = "omegadalitz";
-          } else if (iF == 3) {
-             particle = "rho0";
-          } else if (iF == 4) {
-             particle = "urqmd";
-          }
+			fileNameAna += ss.str();
+			fileNameReco += ss.str();
+			fileNameQa += ss.str();
 
-          string dir = "/hera/cbm/users/slebedev/mc/dielectron/nov13/25gev/trd/1.0field/nomvd/" + particle + "/";
-          string fileNameAna = dir + string("analysis") + fileArray[iPs];
-          string fileNameReco = dir + string("reco") + fileArray[iPs];
-          cout << "-I- " << dir << endl;
+			TFile* fileAna = TFile::Open(fileNameAna.c_str(), "READ");
+			TFile* fileReco = TFile::Open(fileNameReco.c_str(), "READ");
+			TFile* fileQa = TFile::Open(fileNameQa.c_str(), "READ");
 
-          string outputFile = fileNameAna;
-          if (addString == "reco") outputFile = fileNameReco;
-          outputFile += "all.root";
-          cout << "-I- OUTPUT: " << outputFile << endl;
-          TFile* Target = TFile::Open( outputFile.c_str(), "RECREATE" );
+			Bool_t isGoodFile = CheckFile(fileAna, fileReco);
 
-          int count = 0;
-          TList* FileList = new TList();
-          for (int i = 1; i < 200; i++){
-             stringstream ssAna, ssReco;
-             ssAna << fileNameAna ;
-             ssAna.fill('0');
-             ssAna.width(5);
-             ssAna  << i << ".root";
-             ssReco << fileNameReco ;
-             ssReco.fill('0');
-             ssReco.width(5);
-             ssReco  << i << ".root";
+			if (fileReco != NULL) fileReco->Close();
 
-             TFile* fileAna = TFile::Open(ssAna.str().c_str());
-             TFile* fileReco = TFile::Open(ssReco.str().c_str());
-             // cout << ssAna.str() << endl << ssReco.str() << endl << endl;;
-             if ( CheckFile(fileAna, fileReco) ){
-                //  cout << "-I- Add file " << ss.str() << endl;
-                if (addString == "analysis"){
-                   FileList->Add( fileAna );
-                   count++;
-                }
-                if (addString == "reco"){
-                   FileList->Add( fileReco );
-                   count++;
-                }
-             } else {
-                if (fileAna != NULL) {
-                   fileAna->Close();
-                }
-                if ( fileReco != NULL) {
-                   fileReco->Close();
-                }
-             }
-          }
-          cout << endl<< "-I- number of files to merge = " << count << endl << endl;
+			if ( isGoodFile ){
+				if (addString == "analysis"){
+					FileList->Add( fileAna );
+					count++;
+					if (fileQa != NULL) fileQa->Close();
+				}
+				if (addString == "litqa"){
+					FileList->Add( fileQa );
+					count++;
+					if (fileAna != NULL) fileAna->Close();
+				}
+			} else {
+				if ( fileAna != NULL) fileAna->Close();
+				if ( fileQa != NULL) fileReco->Close();
+			}
+		}
+		cout << endl<< "-I- number of files to merge = " << count << endl << endl;
 
-          MergeRootfile( Target, FileList );
+		MergeRootfile( Target, FileList );
 
-          Target->Close();
-          int nFL = FileList->GetEntries();
-          for (int iFL = 0; iFL < nFL; iFL++){
-             TFile* f = (TFile*)FileList->At(iFL);
-             f->Close();
-             delete f;
-          }
-          delete Target;
-          delete FileList;
-       }//iF
-    } //iPs
+		Target->Close();
+		int nFL = FileList->GetEntries();
+		for (int iFL = 0; iFL < nFL; iFL++){
+			TFile* f = (TFile*)FileList->At(iFL);
+			f->Close();
+			delete f;
+		}
+		delete Target;
+		delete FileList;
+	}//iF
 }
 
 bool CheckFile(TFile* fileAna, TFile* fileReco) {
@@ -138,7 +117,6 @@ bool CheckFile(TFile* fileAna, TFile* fileReco) {
     if (fileAna == NULL || fileReco == NULL)  return false;
 
     if (fileAna->GetEND() < 4000 || fileReco->GetEND() < 4000) return false;
-   // return true;
 
     TTree* treeAna = (TTree*)fileAna->Get("cbmsim");
     TTree* treeReco = (TTree*)fileReco->Get("cbmsim");

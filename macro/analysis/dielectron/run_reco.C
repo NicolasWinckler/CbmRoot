@@ -264,47 +264,6 @@ void run_reco(Int_t nEvents = 1000)
 	CbmMatchRecoToMC* match = new CbmMatchRecoToMC();
 	run->AddTask(match);
 
-   // Reconstruction Qa
-   CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
-   trackingQa->SetMinNofPointsSts(4);
-   trackingQa->SetUseConsecutivePointsInSts(true);
-   trackingQa->SetMinNofPointsTrd(minNofPointsTrd);
-   trackingQa->SetMinNofPointsMuch(10);
-   trackingQa->SetMinNofPointsTof(1);
-   trackingQa->SetQuota(0.7);
-   trackingQa->SetMinNofHitsTrd(minNofPointsTrd);
-   trackingQa->SetMinNofHitsMuch(10);
-   trackingQa->SetVerbose(0);
-   trackingQa->SetMinNofHitsRich(7);
-   trackingQa->SetQuotaRich(0.6);
-   trackingQa->SetPRange(30, 0., 6.);
-   trackingQa->SetOutputDir(std::string(resultDir));
-   std::vector<std::string> trackCat, richCat;
-   trackCat.push_back("All");
-   trackCat.push_back("Electron");
-   richCat.push_back("All");
-   richCat.push_back("Electron");
-   richCat.push_back("ElectronReference");
-   trackingQa->SetTrackCategories(trackCat);
-   trackingQa->SetRingCategories(richCat);
-   trackingQa->SetTrdAnnCut(trdAnnCut);
-   run->AddTask(trackingQa);
-
-   CbmLitFitQa* fitQa = new CbmLitFitQa();
-   fitQa->SetMvdMinNofHits(0);
-   fitQa->SetStsMinNofHits(4);
-   fitQa->SetMuchMinNofHits(10);
-   fitQa->SetTrdMinNofHits(minNofPointsTrd);
-   fitQa->SetPRange(30, 0., 3.);
-   fitQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(fitQa);
-
-  /* CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-   clusteringQa->SetOutputDir(std::string(resultDir));
-   run->AddTask(clusteringQa);*/
-
-
-
     // -----  Parameter database   --------------------------------------------
    FairRuntimeDb* rtdb = run->GetRuntimeDb();
    FairParRootFileIo* parIo1 = new FairParRootFileIo();

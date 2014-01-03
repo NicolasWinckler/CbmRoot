@@ -38,6 +38,7 @@ export URQMD_FILE=/hera/cbm/prod/gen/urqmd/auau/${coll_energy}/centr/urqmd.auau.
 export MC_FILE=${outdir}/mc.auau.${coll_energy}.centr.${XXXXX}.root
 export PAR_FILE=${outdir}/params.auau.${coll_energy}.centr.${XXXXX}.root
 export RECO_FILE=${outdir}/reco.auau.${coll_energy}.centr.${XXXXX}.root
+export LITQA_FILE=${outdir}/litqa.auau.${coll_energy}.centr.${XXXXX}.root
 export ANALYSIS_FILE=${outdir}/analysis.auau.${coll_energy}.centr.${XXXXX}.root
 #export ANALYSIS_FILE=${outdir}/analysis.auau.pisupp${PION_MISIDENTIFICATION_LEVEL}.${coll_energy}.centr.${XXXXX}.root 
 export RESULT_DIR=
@@ -145,6 +146,7 @@ cd $workdir
 # run the root simulation
 #root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
 root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
+root -b -l -q "${macro_dir}/run_litqa.C(${nevents})"
 root -b -l -q "${macro_dir}/run_analysis.C(${nevents})"
 
 cp -v ${SGE_STDOUT_PATH} ${outdir}/log/${JOB_ID}.${SGE_TASK_ID}.log

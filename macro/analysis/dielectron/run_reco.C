@@ -196,8 +196,7 @@ void run_reco(Int_t nEvents = 1000)
          CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi();
          run->AddTask(trdHitProd);
       } else if (trdHitProducerType == "clustering") {*/
-         // ----- TRD clustering -----
-         CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF("TrdDigiPrf","TRD digi prf",radiator);
+         CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
          run->AddTask(trdDigiPrf);
 
          CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
@@ -205,7 +204,6 @@ void run_reco(Int_t nEvents = 1000)
 
          CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
          run->AddTask(trdHit);
-         // ----- End TRD Clustering -----
       //}
 	}// isTRD
 

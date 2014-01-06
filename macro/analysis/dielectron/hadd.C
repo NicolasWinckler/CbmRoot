@@ -41,16 +41,16 @@ bool CheckFile(TFile* fileAna, TFile* fileReco);
 
 void hadd() {
 
-	string dir = "/hera/cbm/users/slebedev/mc/dielectron/nov13/25gev/trd/1.0field/nomvd/";
+    string dir = "/hera/cbm/users/slebedev/mc/dielectron/nov13/25gev/trd/1.0field/nomvd/";
     string fileArray = ".auau.25gev.centr.";
     string particleDir[5] = {"omegaepem", "phi", "omegadalitz", "rho0", "urqmd"};
     string addString = "analysis"; //analysis or litqa
     int nofFiles = 250;
 
 	for (int iF = 0; iF < 4; iF++){
-		string fileNameAna = dir + particleDir[iF] + "/" + string("analysis") + fileArray;
-		string fileNameReco = dir + particleDir[iF] + "/" + string("reco") + fileArray;
-		string fileNameQa = dir + particleDir[iF] + "/" + string("litqa") + fileArray;
+	        string fileNameAna = dir + particleDir[iF] + "/" + string("analysis") + fileArray;
+	        string fileNameReco = dir + particleDir[iF] + "/" + string("reco") + fileArray;
+	        string fileNameQa = dir + particleDir[iF] + "/" + string("litqa") + fileArray;
 
 		cout << "-I- " << dir << endl;
 
@@ -68,13 +68,9 @@ void hadd() {
 			ss.width(5);
 			ss  << i << ".root";
 
-			fileNameAna += ss.str();
-			fileNameReco += ss.str();
-			fileNameQa += ss.str();
-
-			TFile* fileAna = TFile::Open(fileNameAna.c_str(), "READ");
-			TFile* fileReco = TFile::Open(fileNameReco.c_str(), "READ");
-			TFile* fileQa = TFile::Open(fileNameQa.c_str(), "READ");
+			TFile* fileAna = TFile::Open( (fileNameAna + ss.str() ).c_str(), "READ");
+			TFile* fileReco = TFile::Open( (fileNameReco + ss.str() ).c_str(), "READ");
+			TFile* fileQa = TFile::Open( (fileNameQa+ss.str() ).c_str(), "READ");
 
 			Bool_t isGoodFile = CheckFile(fileAna, fileReco);
 

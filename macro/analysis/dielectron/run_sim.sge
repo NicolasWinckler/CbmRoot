@@ -4,16 +4,16 @@ qsub -l mem=3G,ct=20:00:00 -v trd=trd -v coll_energy=25gev -v field_scale=1.0 -v
 qsub -l mem=3G,ct=20:00:00 -v trd=trd -v coll_energy=25gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=phi ./sim.sge
 #qsub -l mem=3G,ct=20:00:00 -v trd=trd -v coll_energy=25gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=urqmd ./sim.sge
 
-qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=rho0 ./sim.sge
-qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegaepem ./sim.sge
-qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegadalitz ./sim.sge
-qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=phi ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=rho0 ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegaepem ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegadalitz ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=trd4 -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=phi ./sim.sge
 #qsub -l mem=3G,ct=20:00:00 -v trd=trd -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=urqmd ./sim.sge
 
-qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=rho0 ./sim.sge
-qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegaepem ./sim.sge
-qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegadalitz ./sim.sge
-qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=phi ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=rho0 ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegaepem ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=omegadalitz ./sim.sge
+#qsub -l mem=3G,ct=20:00:00 -v trd=notrd -v coll_energy=8gev -v field_scale=1.0 -v mvd=nomvd -v pluto_particle=phi ./sim.sge
 
 
 #qsub -l mem=3G,ct=20:00:00 -v coll_energy=8gev -v field_scale=1.0 -v mvd=mvd -v pluto_particle=rho0 ./sim.sge

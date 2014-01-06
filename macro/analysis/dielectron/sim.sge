@@ -145,8 +145,8 @@ cd $workdir
 
 # run the root simulation
 #root -b -l -q "${macro_dir}/run_sim.C(${nevents})"
-root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
-root -b -l -q "${macro_dir}/run_litqa.C(${nevents})"
+#root -b -l -q "${macro_dir}/run_reco.C(${nevents})"
+#root -b -l -q "${macro_dir}/run_litqa.C(${nevents})"
 root -b -l -q "${macro_dir}/run_analysis.C(${nevents})"
 
 cp -v ${SGE_STDOUT_PATH} ${outdir}/log/${JOB_ID}.${SGE_TASK_ID}.log

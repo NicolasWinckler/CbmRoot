@@ -1726,6 +1726,11 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
       const string& source)
 {
    Int_t nCand = fCandidates.size();
+   vector<bool> isAdded;
+   isAdded.resize(nCand);
+   for (Int_t iP = 0; iP < nCand; iP++){
+	   isAdded[iP] = false;
+   }
    for (Int_t iP = 0; iP < nCand; iP++){
       if (fCandidates[iP].McMotherId == -1) continue;
       if ( source == "pi0" && !fCandidates[iP].isMcPi0Electron) continue;
@@ -1733,43 +1738,45 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
 
       if ( !(fCandidates[iP].chi2Prim < fChiPrimCut && fCandidates[iP].isElectron) ) continue;
 
-      Bool_t cAdded =false;
+      if (isAdded[iP]) continue;
+
       for (Int_t iM = 0; iM < fSTCandidates.size(); iM++){
          if (fSTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
             h_nof_pairs->Fill(1.5);
-            cAdded = true;
+            isAdded[iP] = true;
             break;
          }
       }
-      if (cAdded) continue;
+      if (isAdded[iP]) continue;
 
       for (Int_t iM = 0; iM < fRTCandidates.size(); iM++){
          if (fRTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
             h_nof_pairs->Fill(2.5);
-            cAdded = true;
+            isAdded[iP] = true;
             break;
          }
       }
-      if (cAdded) continue;
+      if (isAdded[iP]) continue;
 
       for (Int_t iM = 0; iM < fTTCandidates.size(); iM++){
          if (fTTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
             h_nof_pairs->Fill(3.5);
-            cAdded = true;
+            isAdded[iP] = true;
             break;
          }
       }
-      if (cAdded) continue;
+      if (isAdded[iP]) continue;
 
       for (Int_t iM = 0; iM < fCandidates.size(); iM++){
          if (iM != iP && fCandidates[iM].McMotherId == fCandidates[iP].McMotherId && fCandidates[iM].chi2Prim < fChiPrimCut && fCandidates[iM].isElectron) {
             h_nof_pairs->Fill(4.5);
-            cAdded = true;
+            isAdded[iP] = true;
+            isAdded[iM] = true;
             break;
          }
       }
 
-      if (cAdded) continue;
+      if (isAdded[iP]) continue;
       h_nof_pairs->Fill(0.5);
    }
 }

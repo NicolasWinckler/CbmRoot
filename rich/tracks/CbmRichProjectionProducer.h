@@ -12,6 +12,7 @@
 #define CBM_RICH_PROJECTION_PRODUCER
 
 #include "CbmRichProjectionProducerBase.h"
+#include "CbmRichRecGeoPar.h"
 
 class TClonesArray;
 class CbmGeoRichPar;
@@ -65,29 +66,7 @@ private:
    int fNHits; // Number of hits
    int fEvent; // number of events
 
-   double fDetX; // X-coordinate of photodetector
-   double fDetY; // Y-coordinate of photodetector
-   double fDetZ; // Z-coordinate of photodetector
-   double fDetWidthX; // width of photodetector in x
-   double fDetWidthY; // width of photodetector in y
-   double fThetaDet; // tilting angle of photodetector (around x-axis)
-   double fPhiDet; // tilting angle of photodetector (around y-axis)
-  
-   double fDetXTransf; // X-coordinate of photodetector (transformed system)
-   double fDetYTransf; // Y-coordinate of photodetector (transformed system)
-   double fDetZTransf; // Z-coordinate of photodetector (transformed system)
-
-   double fZm; // Z-coordinate of mirror center
-   double fYm; // Y-coordinate of mirror center
-   double fXm; // X-coordinate of mirror center
-   double fR; // mirror radius
-  
-   double fMaxXTrackExtr; // reasonable max x value for track extrapolation
-   double fMaxYTrackExtr; // reasonable max y value for track extrapolation
-
-   TObjArray* fSensNodes;
-   TObjArray* fPassNodes;
-   CbmGeoRichPar* fPar;
+   CbmRichRecGeoPar fGP;
 
   /**
    * \brief Copy constructor.

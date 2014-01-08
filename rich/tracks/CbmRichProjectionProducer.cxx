@@ -35,31 +35,7 @@ CbmRichProjectionProducer::CbmRichProjectionProducer(
    fListRICHImPlanePoint(NULL),
 
    fNHits(0),
-   fEvent(0),
-
-   fDetX(0.0),
-   fDetY(0.0),
-   fDetZ(0.0),
-   fDetWidthX(0.0),
-   fDetWidthY(0.0),
-   fThetaDet(0.0),
-   fPhiDet(0.0),
-
-   fDetXTransf(0.0),
-   fDetYTransf(0.0),
-   fDetZTransf(0.0),
-
-   fZm(0.0),
-   fYm(0.0),
-   fXm(0.0),
-   fR(0.0),
-
-   fMaxXTrackExtr(0.0),
-   fMaxYTrackExtr(0.0),
-
-   fSensNodes(NULL),
-   fPassNodes(NULL),
-   fPar(NULL)
+   fEvent(0)
 {
 }
 
@@ -71,93 +47,20 @@ CbmRichProjectionProducer::~CbmRichProjectionProducer()
 
 void CbmRichProjectionProducer::SetParContainers()
 {
-   FairRunAna* sim = FairRunAna::Instance();
-   FairRuntimeDb* rtdb=sim->GetRuntimeDb();
-   fPar = (CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+
 }
 
 void CbmRichProjectionProducer::Init()
 {
-   FairRootManager* fManager = FairRootManager::Instance();
+   FairRootManager* manager = FairRootManager::Instance();
 
-   fSensNodes = fPar->GetGeoSensitiveNodes();
-   fPassNodes = fPar->GetGeoPassiveNodes();
+   fGP = CbmRichHitProducer::InitGeometry();
 
-   // get detector position:
-   FairGeoNode *det= (FairGeoNode *) fSensNodes->FindObject("rich1d#1");
-   FairGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
-   FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
-   FairGeoTransform detCen=det->getCenterPosition();  // center in Detector system
-   FairGeoVector detPosCen=detCen.getTranslation();
-   fDetZ = detPosLab.Z() + detPosCen.Z(); // z coordinate of photodetector (Labsystem, cm)
-   fDetY = detPosLab.Y() + detPosCen.Y(); // y coordinate of photodetector (Labsystem, cm)
-   fDetX = detPosLab.X() + detPosCen.X(); // x coordinate of photodetector (Labsystem, cm)
-
-   TArrayD *fdetA=det->getParameters();
-   fDetWidthX = fdetA->At(0);
-   fDetWidthY = fdetA->At(1);
-//  for(Int_t i=0;i<fdetA->GetSize();i++) cout << "Array detector " << fdetA->At(i)<< endl;
-   // detector might be rotated by theta around x-axis:
-   FairGeoRotation fdetR=detTr->getRotMatrix();
-
-   // possible tilting around x-axis (theta) and y-axis (phi)
-   // fdetR(0) = cos(phi)
-   // fdetR(1) = 0
-   // fdetR(2) = -sin(phi)
-   // fdetR(3) = -sin(theta)sin(phi)
-   // fdetR(4) = cos(theta) 
-   // fdetR(5) = -sin(theta)cos(phi)
-   // fdetR(6) = cos(theta)sin(phi)
-   // fdetR(7) = sin(theta)
-   // fdetR(8) = cos(theta)cos(phi)
-   
-   // theta = tilting angle around x-axis
-   fThetaDet = TMath::ASin(fdetR(7));
-   // phi = tilting angle around y-axis
-   fPhiDet = -1.*TMath::ASin(fdetR(2));
-
-   cout << "---------------------- RICH Projection Producer ---------------------------------------" << endl;
-   cout << "   detector position in (x,y,z): " << fDetX << "  " << fDetY << "  " << fDetZ << endl;
-   cout << "   detector size in x and y: " << fDetWidthX << "  " << fDetWidthY << endl;
-   cout << "   detector tilting angle (around x): " << fThetaDet*180./TMath::Pi() << " degrees" << endl;
-   cout << "   detector tilting angle (around y): " << fPhiDet*180./TMath::Pi() << " degrees" << endl;
-  
-   // transform nominal detector position (for tilted photodetector):
-   // shift x back by fDetZ_org*TMath::Sin(phi) in order to avoid overlap
-   fDetXTransf = fDetX*TMath::Cos(fPhiDet)+fDetZ*TMath::Sin(fPhiDet)-fDetZ*TMath::Sin(fPhiDet);
-   fDetYTransf = -fDetX*TMath::Sin(fThetaDet)*TMath::Sin(fPhiDet) + fDetY*TMath::Cos(fThetaDet) + fDetZ*TMath::Sin(fThetaDet)*TMath::Cos(fPhiDet);
-   fDetZTransf = -fDetX*TMath::Cos(fThetaDet)*TMath::Sin(fPhiDet) - fDetY*TMath::Sin(fThetaDet) + fDetZ*TMath::Cos(fThetaDet)*TMath::Cos(fPhiDet);
-  
-   // get mirror position:
-   //FairGeoNode *mir= (FairGeoNode *) fPassNodes->FindObject("rich1mgl#1");
-   FairGeoNode *mir= (FairGeoNode *) fSensNodes->FindObject("rich1mgl#1");
-   FairGeoTransform* mirTr=mir->getLabTransform();  // position of mirror center in labsystem
-   FairGeoVector mirPosLab=mirTr->getTranslation(); // ... in cm
-   fZm = mirPosLab.Z();
-   fYm = mirPosLab.Y();
-   fXm = mirPosLab.X();
-
-   TArrayD *fmirA=mir->getParameters();  // get other geometry parameters: radius,
-   fR = fmirA->At(0);                    // mirror radius
-   Double_t spheTheta = TMath::Abs(90. - fmirA->At(2));   // opening angle for SPHERE in theta (90 degree +- theta)
-   Double_t sphePhi = TMath::Abs(90. - fmirA->At(4));   // opening angle for SPHERE in phi (90 degree +- phi)
-   // from that calculate (with safety factor 1.3) maximum x-y positions for track extrapolation:
-   fMaxXTrackExtr = 1.3*(fR*TMath::Tan(sphePhi*TMath::Pi()/180.));
-   fMaxYTrackExtr = 1.3*(TMath::Abs(fYm) + fR*TMath::Tan(spheTheta*TMath::Pi()/180.));
-  
-   // mirror might be rotated by theta around x-axis:
-   FairGeoRotation fmirR=mirTr->getRotMatrix();
-   Double_t thetaM = -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2 ;
-
-   // note that mirror is by default tilted by 90 degrees in order to get the necessary shape in GEANT
-   // the "extra" tilting angle is then: fThetaM =  -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2.
-   cout << "Mirror center (x,y,z): " << fXm << " " << fYm << " " << fZm << endl;
-   cout << "Mirror radius: " << fR << endl;
-   cout << "Mirror tilting angle: " << thetaM*180./TMath::Pi() << " degrees" << endl;
+   fGP.Print();
 
    fEvent = 0;
 
-   fListRICHImPlanePoint = (TClonesArray*)fManager->GetObject("RichTrackParamZ");
+   fListRICHImPlanePoint = (TClonesArray*)manager->GetObject("RichTrackParamZ");
    if (fZflag == 1) cout << "   use tracks in imaginary plane for projection to photodetector plane" << endl;
    if (fZflag == 2) cout << "   use tracks in RICH mirror for projection to photodetector plane" << endl;
    if ( NULL == fListRICHImPlanePoint) {
@@ -185,16 +88,8 @@ void CbmRichProjectionProducer::DoProjection(
       new((*richProj)[j]) FairTrackParam(0., 0., 0., 0., 0., 0., covMat);
     
       // check if Array was filled
-      if (point->GetX() == 0 && point->GetY() == 0 && point->GetZ() == 0 &&
-            point->GetTx() == 0 && point->GetTy() ==0) continue;
+      if (point->GetX() == 0 && point->GetY() == 0 && point->GetZ() == 0 && point->GetTx() == 0 && point->GetTy() ==0) continue;
       if (point->GetQp()==0) continue;
-    
-      // check that x and y value make sense (sometimes strange extrapolations may appear)
-      //if (TMath::Abs(point->GetX()) > fMaxXTrackExtr || TMath::Abs(point->GetY()) > fMaxYTrackExtr){
-      //   cout << " -W- RichProjectionProducer: strange (x,y) values for track extrapolation: " <<
-      //         point->GetX() << " " << point->GetY() << endl;
-		//   continue;
-      //}
 
       Double_t rho1 = 0.;
       Double_t rho2 = 0.;
@@ -215,7 +110,7 @@ void CbmRichProjectionProducer::DoProjection(
          Double_t py = pz*point->GetTy();
          momP.SetXYZ(px,py,pz);
          point->Position(startP);
-         if ((fYm*startP.y())<0) fYm = -fYm; // check that mirror center and startP are in same hemisphere
+         if ((fGP.fMirrorY*startP.y())<0) fGP.fMirrorY = -fGP.fMirrorY; // check that mirror center and startP are in same hemisphere
 
          // calculation of intersection of track with selected mirror
          // corresponds to calculation of intersection between a straight line and a sphere:
@@ -225,9 +120,10 @@ void CbmRichProjectionProducer::DoProjection(
          // dist = r^2 - fR^2
          // -> rho1 = (-RxP+sqrt(RxP^2-normP2*dist))/normP2  extrapolation factor for:
          // intersection point crossP = startP + rho1 * momP
-         Double_t RxP=(momP.x()*(startP.x()-fXm)+momP.y()*(startP.y()-fYm)+momP.z()*(startP.z()-fZm));
+         Double_t RxP=(momP.x()*(startP.x()-fGP.fMirrorX)+momP.y()*(startP.y()-fGP.fMirrorY)+momP.z()*(startP.z()-fGP.fMirrorZ));
          Double_t normP2=(momP.x()*momP.x()+momP.y()*momP.y()+momP.z()*momP.z());
-         Double_t dist=(startP.x()*startP.x()+fXm*fXm+startP.y()*startP.y()+fYm*fYm+startP.z()*startP.z()+fZm*fZm-2*startP.x()*fXm-2*startP.y()*fYm-2*startP.z()*fZm-fR*fR);
+         Double_t dist=(startP.x()*startP.x()+fGP.fMirrorX*fGP.fMirrorX+startP.y()*startP.y()+fGP.fMirrorY*fGP.fMirrorY+startP.z()*startP.z()+
+               fGP.fMirrorZ*fGP.fMirrorZ-2*startP.x()*fGP.fMirrorX-2*startP.y()*fGP.fMirrorY-2*startP.z()*fGP.fMirrorZ-fGP.fMirrorR*fGP.fMirrorR);
 
          if ((RxP*RxP-normP2*dist) > 0.) {
             if (normP2!=0.)  rho1=(-RxP+TMath::Sqrt(RxP*RxP-normP2*dist))/normP2;
@@ -243,11 +139,12 @@ void CbmRichProjectionProducer::DoProjection(
 
          // check if crosspoint with mirror and chosen mirrorcenter (y) are in same hemisphere
          // if not recalculate crossing point
-         if ((fYm*crossP.y())<0) {
-            fYm = -fYm;
-            RxP=(momP.x()*(startP.x()-fXm)+momP.y()*(startP.y()-fYm)+momP.z()*(startP.z()-fZm));
+         if ((fGP.fMirrorY*crossP.y())<0) {
+            fGP.fMirrorY = -fGP.fMirrorY;
+            RxP=(momP.x()*(startP.x()-fGP.fMirrorX)+momP.y()*(startP.y()-fGP.fMirrorY)+momP.z()*(startP.z()-fGP.fMirrorZ));
             normP2=(momP.x()*momP.x()+momP.y()*momP.y()+momP.z()*momP.z());
-            dist=(startP.x()*startP.x()+fXm*fXm+startP.y()*startP.y()+fYm*fYm+startP.z()*startP.z()+fZm*fZm-2*startP.x()*fXm-2*startP.y()*fYm-2*startP.z()*fZm-fR*fR);
+            dist=(startP.x()*startP.x()+fGP.fMirrorX*fGP.fMirrorX+startP.y()*startP.y()+fGP.fMirrorY*fGP.fMirrorY+startP.z()*startP.z()+
+                  fGP.fMirrorZ*fGP.fMirrorZ-2*startP.x()*fGP.fMirrorX-2*startP.y()*fGP.fMirrorY-2*startP.z()*fGP.fMirrorZ-fGP.fMirrorR*fGP.fMirrorR);
 
             if ((RxP*RxP-normP2*dist) > 0.) {
                if (normP2!=0.)  rho1=(-RxP+TMath::Sqrt(RxP*RxP-normP2*dist))/normP2;
@@ -262,7 +159,7 @@ void CbmRichProjectionProducer::DoProjection(
             crossP.SetXYZ(crossPx,crossPy,crossPz);
          }
 
-         centerP.SetXYZ(fXm,fYm,fZm);    // mirror center
+         centerP.SetXYZ(fGP.fMirrorX,fGP.fMirrorY,fGP.fMirrorZ);    // mirror center
       }// if (fZflag ==1)
 
       // operate on Rich Mirror point
@@ -280,9 +177,9 @@ void CbmRichProjectionProducer::DoProjection(
          Double_t py = pz*point->GetTy();
          momP.SetXYZ(px,py,pz);
          point->Position(crossP);
-         if ((fYm*crossP.y())<0) fYm = -fYm; // check that mirror center and crossP are in same hemisphere
+         if ((fGP.fMirrorY*crossP.y())<0) fGP.fMirrorY = -fGP.fMirrorY; // check that mirror center and crossP are in same hemisphere
 
-         centerP.SetXYZ(fXm,fYm,fZm); // mirror center
+         centerP.SetXYZ(fGP.fMirrorX,fGP.fMirrorY,fGP.fMirrorZ); // mirror center
       } // if (fZflag ==2)
 
       //   calculate normal on crosspoint with mirror
@@ -311,16 +208,16 @@ void CbmRichProjectionProducer::DoProjection(
       //        -> first calculate for case x>0, then check
       if (refZ!=0.) {
          if (centerP.y() > 0){
-            rho2 = (-TMath::Sin(fPhiDet)*(fDetX-crossP.x())
-                  -TMath::Sin(fThetaDet)*TMath::Cos(fPhiDet)*(fDetY-crossP.y())
-                  + TMath::Cos(fThetaDet)*TMath::Cos(fPhiDet)*(fDetZ-crossP.z()))/
-                  (-TMath::Sin(fPhiDet)*refX-TMath::Sin(fThetaDet)*TMath::Cos(fPhiDet)*refY + TMath::Cos(fThetaDet)*TMath::Cos(fPhiDet)*refZ);
+            rho2 = (-TMath::Sin(fGP.fPmtPhi)*(fGP.fPmtXOrig-crossP.x())
+                  -TMath::Sin(fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*(fGP.fPmtYOrig-crossP.y())
+                  + TMath::Cos(fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*(fGP.fPmtZOrig-crossP.z()))/
+                  (-TMath::Sin(fGP.fPmtPhi)*refX-TMath::Sin(fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*refY + TMath::Cos(fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*refZ);
          }
          if (centerP.y() < 0){
-            rho2 = (-TMath::Sin(fPhiDet)*(fDetX-crossP.x())
-                  -TMath::Sin(-fThetaDet)*TMath::Cos(fPhiDet)*(-fDetY-crossP.y())
-                  + TMath::Cos(-fThetaDet)*TMath::Cos(fPhiDet)*(fDetZ-crossP.z()))/
-                  (-TMath::Sin(fPhiDet)*refX-TMath::Sin(-fThetaDet)*TMath::Cos(fPhiDet)*refY + TMath::Cos(-fThetaDet)*TMath::Cos(fPhiDet)*refZ);
+            rho2 = (-TMath::Sin(fGP.fPmtPhi)*(fGP.fPmtXOrig-crossP.x())
+                  -TMath::Sin(-fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*(-fGP.fPmtYOrig-crossP.y())
+                  + TMath::Cos(-fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*(fGP.fPmtZOrig-crossP.z()))/
+                  (-TMath::Sin(fGP.fPmtPhi)*refX-TMath::Sin(-fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*refY + TMath::Cos(-fGP.fPmtTheta)*TMath::Cos(fGP.fPmtPhi)*refZ);
          }
 	      
          //rho2 = -1*(crossP.z() - fDetZ)/refZ;    // only for theta = 0, phi=0
@@ -330,16 +227,16 @@ void CbmRichProjectionProducer::DoProjection(
       
          if (xX < 0) {
             if (centerP.y() > 0){
-               rho2 = (-TMath::Sin(-fPhiDet)*(-fDetX-crossP.x())
-                     -TMath::Sin(fThetaDet)*TMath::Cos(-fPhiDet)*(fDetY-crossP.y())
-                     + TMath::Cos(fThetaDet)*TMath::Cos(-fPhiDet)*(fDetZ-crossP.z()))/
-                     (-TMath::Sin(-fPhiDet)*refX-TMath::Sin(fThetaDet)*TMath::Cos(-fPhiDet)*refY + TMath::Cos(fThetaDet)*TMath::Cos(-fPhiDet)*refZ);
+               rho2 = (-TMath::Sin(-fGP.fPmtPhi)*(-fGP.fPmtXOrig-crossP.x())
+                     -TMath::Sin(fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*(fGP.fPmtYOrig-crossP.y())
+                     + TMath::Cos(fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*(fGP.fPmtZOrig-crossP.z()))/
+                     (-TMath::Sin(-fGP.fPmtPhi)*refX-TMath::Sin(fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*refY + TMath::Cos(fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*refZ);
             }
             if (centerP.y() < 0){
-               rho2 = (-TMath::Sin(-fPhiDet)*(-fDetX-crossP.x())
-                     -TMath::Sin(-fThetaDet)*TMath::Cos(-fPhiDet)*(-fDetY-crossP.y())
-                     + TMath::Cos(-fThetaDet)*TMath::Cos(-fPhiDet)*(fDetZ-crossP.z()))/
-                     (-TMath::Sin(-fPhiDet)*refX-TMath::Sin(-fThetaDet)*TMath::Cos(-fPhiDet)*refY + TMath::Cos(-fThetaDet)*TMath::Cos(-fPhiDet)*refZ);
+               rho2 = (-TMath::Sin(-fGP.fPmtPhi)*(-fGP.fPmtXOrig-crossP.x())
+                     -TMath::Sin(-fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*(-fGP.fPmtYOrig-crossP.y())
+                     + TMath::Cos(-fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*(fGP.fPmtZOrig-crossP.z()))/
+                     (-TMath::Sin(-fGP.fPmtPhi)*refX-TMath::Sin(-fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*refY + TMath::Cos(-fGP.fPmtTheta)*TMath::Cos(-fGP.fPmtPhi)*refZ);
             }
        
             xX = crossP.x() + refX * rho2;
@@ -351,14 +248,14 @@ void CbmRichProjectionProducer::DoProjection(
          // transformed in HitProducer before stored as Hit:
          TVector3 inPos(xX, yY, zZ);
          TVector3 outPos;
-         CbmRichHitProducer::TiltPoint(&inPos, &outPos, fPhiDet, fThetaDet, fDetZ);
+         CbmRichHitProducer::TiltPoint(&inPos, &outPos, fGP.fPmtPhi, fGP.fPmtTheta, fGP.fPmtZOrig);
          Double_t xDet = outPos.X();
          Double_t yDet = outPos.Y();
          Double_t zDet = outPos.Z();
 
          //check that crosspoint inside the plane
-         if( xDet > (-fDetX-fDetWidthX) && xDet < (fDetX+fDetWidthX)){
-            if(TMath::Abs(yDet) > (fDetYTransf-fDetWidthY) && TMath::Abs(yDet) < (fDetYTransf+fDetWidthY)){
+         if( xDet > (-fGP.fPmtXOrig-fGP.fPmtWidthX) && xDet < (fGP.fPmtXOrig+fGP.fPmtWidthX)){
+            if(TMath::Abs(yDet) > (fGP.fPmtY-fGP.fPmtWidthY) && TMath::Abs(yDet) < (fGP.fPmtY+fGP.fPmtWidthY)){
 	                 FairTrackParam richtrack(xDet,yDet,zDet,0.,0.,0.,covMat);
 	                 * (FairTrackParam*)(richProj->At(j)) = richtrack;
             }

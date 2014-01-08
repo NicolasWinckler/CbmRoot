@@ -11,6 +11,8 @@
 #define CBMRICHGEOTEST
 
 #include "FairTask.h"
+#include "CbmRichRecGeoPar.h"
+
 class TH1;
 class TH2;
 class TH1D;
@@ -21,7 +23,7 @@ class CbmRichRingFitterCOP;
 class CbmRichRingFitterEllipseTau;
 class CbmRichRing;
 class CbmRichRingLight;
-class CbmGeoRichPar;
+//class CbmGeoRichPar;
 class TCanvas;
 
 #include <vector>
@@ -285,12 +287,7 @@ private:
 	TClonesArray* fMCTracks;
 	TClonesArray* fRichRingMatches; 
 	
-   Double_t fDetZOrig; // X-coordinate of photodetector (original from parameter file)
-   Double_t fTheta; // angle by which photodetector was tilted around x-axis
-   Double_t fPhi; // angle by which photodetector was tilted around y-axis
-   TObjArray* fSensNodes;
-   TObjArray* fPassNodes;
-   CbmGeoRichPar* fPar;
+   CbmRichRecGeoPar fGP; // RICH geometry parameters
 
    // rings will be fitted on a fly
 	CbmRichRingFitterCOP* fCopFit;

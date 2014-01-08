@@ -69,13 +69,6 @@ CbmRichGeoTest::CbmRichGeoTest():
    fMCTracks(NULL),
    fRichRingMatches(NULL),
 
-   fDetZOrig(0.),
-   fTheta(0.),
-   fPhi(0.),
-   fSensNodes(NULL),
-   fPassNodes(NULL),
-   fPar(NULL),
-
    fCopFit(NULL),
    fTauFit(NULL),
    fCanvas(),
@@ -167,9 +160,7 @@ CbmRichGeoTest::~CbmRichGeoTest()
 
 void CbmRichGeoTest::SetParContainers()
 {
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-  fPar=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+
 }
 
 InitStatus CbmRichGeoTest::Init()
@@ -179,22 +170,8 @@ InitStatus CbmRichGeoTest::Init()
    if (NULL == ioman) { Fatal("CbmRichGeoTest::Init","RootManager not instantised!"); }
 
    if (fRichDetectorType == "standard") {
-      fSensNodes = fPar->GetGeoSensitiveNodes();
-      fPassNodes = fPar->GetGeoPassiveNodes();
-
-      // get detector position:
-      FairGeoNode *det= dynamic_cast<FairGeoNode*> (fSensNodes->FindObject("rich1d#1"));
-      if (NULL == det) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
-
-      FairGeoTransform* detTr=det->getLabTransform(); // detector position in labsystem
-      FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
-      FairGeoTransform detCen=det->getCenterPosition(); // center in Detector system
-      FairGeoVector detPosCen=detCen.getTranslation();
-
-      fDetZOrig = detPosLab.Z() + detPosCen.Z(); // z coordinate of photodetector (Labsystem, cm)
-      FairGeoRotation fdetR=detTr->getRotMatrix();
-      fTheta = TMath::ASin(fdetR(7)); // tilting angle around x-axis
-      fPhi = -1.*TMath::ASin(fdetR(2)); // tilting angle around y-axis
+      //fGP = CbmRichHitProducer::InitAsciiGeometry();
+      fGP = CbmRichHitProducer::InitRootGeometry();
    }
 
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
@@ -494,8 +471,7 @@ void CbmRichGeoTest::RingParameters()
 		      TVector3 posPoint;
 		      richPoint->Position(posPoint);
 		      TVector3 detPoint;
-		      //cout << "phi= " << fPhi << " fTheta = " << fTheta << " fDetZOrig = " << fDetZOrig << endl;
-		      CbmRichHitProducer::TiltPoint(&posPoint, &detPoint, fPhi, fTheta, fDetZOrig);
+		      CbmRichHitProducer::TiltPoint(&posPoint, &detPoint, fGP.fPmtPhi, fGP.fPmtTheta, fGP.fPmtZOrig);
 		      CbmRichHitLight hit(detPoint.X(), detPoint.Y());
 		      ringPoint.AddHit(hit);
 		   }
@@ -639,7 +615,7 @@ void CbmRichGeoTest::HitsAndPoints()
 
       TVector3 inPos(point->GetX(), point->GetY(), point->GetZ());
       TVector3 outPos;
-      CbmRichHitProducer::TiltPoint(&inPos, &outPos, fPhi, fTheta, fDetZOrig);
+      CbmRichHitProducer::TiltPoint(&inPos, &outPos, fGP.fPmtPhi, fGP.fPmtTheta, fGP.fPmtZOrig);
       fhHitsXY->Fill(hit->GetX(), hit->GetY());
       fhDiffXhit->Fill(hit->GetX() - outPos.X());
       fhDiffYhit->Fill(hit->GetY() - outPos.Y());
@@ -651,7 +627,7 @@ void CbmRichGeoTest::HitsAndPoints()
       if ( point == NULL ) continue;
       TVector3 inPos(point->GetX(), point->GetY(), point->GetZ());
       TVector3 outPos;
-      CbmRichHitProducer::TiltPoint(&inPos, &outPos, fPhi, fTheta, fDetZOrig);
+      CbmRichHitProducer::TiltPoint(&inPos, &outPos, fGP.fPmtPhi, fGP.fPmtTheta, fGP.fPmtZOrig);
       fhPointsXY->Fill(outPos.X(), outPos.Y());
    }
 }

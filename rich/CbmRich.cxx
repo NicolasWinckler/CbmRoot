@@ -1,5 +1,3 @@
-
-
 #include "CbmRich.h"
 
 #include "CbmGeoRichPar.h"
@@ -38,9 +36,7 @@
 using std::cout;
 using std::endl;
 
-
-std::map<TString, Int_t> CbmRich::fFixedMats;
-Bool_t CbmRich::fIsFirstGDML = kTRUE;
+std::map<TString, TGeoMedium*> CbmRich::fFixedMedia;
 
 CbmRich::CbmRich() :
    FairDetector("RICH", kTRUE, kRICH),
@@ -111,11 +107,11 @@ void CbmRich::Initialize()
 
 Bool_t CbmRich::CheckIfSensitive(std::string name)
 {
-  TString volName = name;
-  if ( volName.Contains("rich1d")){
-     return kTRUE;
-  }
-  return kFALSE;
+   TString volName = name;
+   if ( volName.Contains("rich1d")){
+      return kTRUE;
+   }
+   return kFALSE;
 }
 
 
@@ -127,7 +123,7 @@ Bool_t CbmRich::ProcessHits(
    TString volName = TString(vol->GetName());
   // cout << volName << endl;
    //Treat photodetectors : All particles
-   if (volName.Contains("rich1d") || volName.Contains("RICH_PMT") ){
+   if (volName.Contains("rich1d")){
       if (gMC->IsTrackEntering()){
 
          TParticle* part = gMC->GetStack()->GetCurrentTrack();
@@ -223,7 +219,6 @@ Bool_t CbmRich::ProcessHits(
       }
    }
 
-
    return kFALSE;
 }
 
@@ -253,7 +248,7 @@ void CbmRich::Print() const
 {
    Int_t nHits = fRichPoints->GetEntriesFast();
    cout << "-I- CbmRich: " << nHits << " points registered in this event." << endl;
-	
+
    if (fVerboseLevel > 1) for (Int_t i=0; i<nHits; i++) (*fRichPoints)[i]->Print();
 }
 
@@ -286,25 +281,25 @@ void CbmRich::CopyClones(
 
 void CbmRich::ConstructOpGeometry() 
 {
-	LOG(INFO) << "CbmRich::ConstructOpGeometry()" << FairLogger::endl;
+   LOG(INFO) << "CbmRich::ConstructOpGeometry()" << FairLogger::endl;
 }
 
 void CbmRich::ConstructGeometry()
 {
-  TString fileName = GetGeometryFileName();
-  if ( fileName.EndsWith(".root") ) {
-     LOG(INFO) << "Constructing RICH geometry from ROOT  file " << fileName.Data() << FairLogger::endl;
-     ConstructRootGeometry();
-  } else if ( fileName.EndsWith(".geo") ) {
-     LOG(INFO) << "Constructing RICH geometry from ASCII file " << fileName.Data() << FairLogger::endl;
-     ConstructAsciiGeometry();
-  } else if (fileName.EndsWith(".gdml") ) {
-     LOG(INFO) << "Constructing RICH geometry from GDML  file " << fileName.Data() << FairLogger::endl;
-     ConstructGdmlGeometry(fPositionRotation);
-  } else {
-    LOG(FATAL) << "Geometry format of RICH file " << fileName.Data()
-               << " not supported." << FairLogger::endl;
-  }
+   TString fileName = GetGeometryFileName();
+   if ( fileName.EndsWith(".root") ) {
+       LOG(INFO) << "Constructing RICH geometry from ROOT  file " << fileName.Data() << FairLogger::endl;
+       ConstructRootGeometry();
+   } else if ( fileName.EndsWith(".geo") ) {
+       LOG(INFO) << "Constructing RICH geometry from ASCII file " << fileName.Data() << FairLogger::endl;
+       ConstructAsciiGeometry();
+   } else if (fileName.EndsWith(".gdml") ) {
+       LOG(INFO) << "Constructing RICH geometry from GDML  file " << fileName.Data() << FairLogger::endl;
+       ConstructGdmlGeometry(fPositionRotation);
+   } else {
+      LOG(FATAL) << "Geometry format of RICH file " << fileName.Data()
+                 << " not supported." << FairLogger::endl;
+   }
 }
 
 void CbmRich::ConstructAsciiGeometry()
@@ -350,7 +345,7 @@ void CbmRich::ConstructAsciiGeometry()
 
    gGeoManager->Matrix(123456, 180, 0, 90, 90 , 90 , 0);//z rotation
    gGeoManager->Matrix(123457, 90, 0, 180, 0, 90, 90);// y rotation
-   
+
    Double_t * buf = 0;
    for (Int_t i = 0; i< 11; i++) {
       if (i == 5) continue;
@@ -364,67 +359,147 @@ void CbmRich::ConstructGdmlGeometry(TGeoMatrix* geoMatrix)
    TFile *old = gFile;
    TGDMLParse parser;
    TGeoVolume* gdmlTop;
+
+   // Before importing GDML
+   Int_t maxInd = gGeoManager->GetListOfMedia()->GetEntries() - 1;
+
    gdmlTop = parser.GDMLReadFile(GetGeometryFileName());
+
+   // Cheating - reassigning media indices after GDML import (need to fix this in TGDMLParse class!!!)
+//   for (Int_t i=0; i<gGeoManager->GetListOfMedia()->GetEntries(); i++)
+//      gGeoManager->GetListOfMedia()->At(i)->Dump();
+   // After importing GDML
+   Int_t j = gGeoManager->GetListOfMedia()->GetEntries() - 1;
+   Int_t curId;
+   TGeoMedium* m;
+   do {
+      m = (TGeoMedium*)gGeoManager->GetListOfMedia()->At(j);
+      curId = m->GetId();
+      m->SetId(curId+maxInd);
+      j--;
+   } while (curId > 1);
+//   LOG(DEBUG) << "====================================================================" << FairLogger::endl;
+//   for (Int_t i=0; i<gGeoManager->GetListOfMedia()->GetEntries(); i++)
+//      gGeoManager->GetListOfMedia()->At(i)->Dump();
+
+   Int_t newMaxInd = gGeoManager->GetListOfMedia()->GetEntries() - 1;
+
    gGeoManager->GetTopVolume()->AddNode(gdmlTop,1,geoMatrix);
    ExpandNodeForGdml(gGeoManager->GetTopVolume()->GetNode(gGeoManager->GetTopVolume()->GetNdaughters()-1));
-   fIsFirstGDML = 0;
-        gFile = old;
+
+   for (Int_t k = maxInd+1; k < newMaxInd+1; k++) {
+      TGeoMedium* medToDel = (TGeoMedium*)(gGeoManager->GetListOfMedia()->At(maxInd+1));
+      LOG(DEBUG) << "    removing media " << medToDel->GetName() << " with id " << medToDel->GetId() << " (k=" << k << ")" << FairLogger::endl;
+      gGeoManager->GetListOfMedia()->Remove(medToDel);
+   }
+   gGeoManager->SetAllIndex();
+
+   gFile = old;
 }
 
 void CbmRich::ExpandNodeForGdml(TGeoNode* node)
 {
+   LOG(DEBUG) << "----------------------------------------- ExpandNodeForGdml for node " << node->GetName() << FairLogger::endl;
+
    TGeoVolume* curVol = node->GetVolume();
 
-   //! Assembly-volumes are skipped as they do not have any material
-   if (!curVol->IsAssembly()) {
-      TString curMedName = node->GetMedium()->GetName();
-      TGeoMedium* curMedInGeoManager = gGeoManager->GetMedium(curMedName);
-      Int_t matIndToDel = gGeoManager->GetMaterialIndex(curMedName);
+   LOG(DEBUG) << "    volume: " << curVol->GetName() << FairLogger::endl;
 
-      if (curMedName.BeginsWith("G4_")) {
-         curMedName.Remove(0, 3);
-      }
+   if (curVol->IsAssembly()) {
+      LOG(DEBUG) << "    skipping volume-assembly" << FairLogger::endl;
+   } else {
 
-      Int_t nmed;
+      TGeoMedium* curMed = curVol->GetMedium();
+      TGeoMaterial* curMat = curVol->GetMaterial();
+      TGeoMedium* curMedInGeoManager = gGeoManager->GetMedium(curMed->GetName());
+      TGeoMaterial* curMatOfMedInGeoManager = curMedInGeoManager->GetMaterial();
+      TGeoMaterial* curMatInGeoManager = gGeoManager->GetMaterial(curMat->GetName());
 
-      FairGeoLoader* geoLoad = FairGeoLoader::Instance();
-      FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-      FairGeoMedia* geoMediaBase =  geoFace->getMedia();
-      FairGeoBuilder* geobuild = geoLoad->getGeoBuilder();
-      FairGeoMedium* curMedInGeo;
+      // Current medium and material assigned to the volume from GDML
+      LOG(DEBUG2) << "    curMed\t\t\t\t" << curMed << "\t" << curMed->GetName() << "\t" << curMed->GetId() << FairLogger::endl;
+      LOG(DEBUG2) << "    curMat\t\t\t\t" << curMat << "\t" << curMat->GetName() << "\t" << curMat->GetIndex() << FairLogger::endl;
 
-      if (curMedInGeoManager == 0) {
-         std::cout << "[ExpandNodeForGDML] New medium found in gmdl - it is not in gGeoManager list." << std::endl;
-         //! New medium found in gmdl - it is not in gGeoManager list.
-         //! This should never happen as GDML parser adds medium into the list.
-         //! If happens - something is extremely strange.
-      } else {
-         //! Medium is in the list in gGeoManager.
-         //! Trying to replace it with the one from the Geo file.
+      // Medium and material found in the gGeoManager - either the pre-loaded one or one from GDML
+      LOG(DEBUG2) << "    curMedInGeoManager\t\t" << curMedInGeoManager
+               << "\t" << curMedInGeoManager->GetName() << "\t" << curMedInGeoManager->GetId() << FairLogger::endl;
+      LOG(DEBUG2) << "    curMatOfMedInGeoManager\t\t" << curMatOfMedInGeoManager
+               << "\t" << curMatOfMedInGeoManager->GetName() << "\t" << curMatOfMedInGeoManager->GetIndex() << FairLogger::endl;
+      LOG(DEBUG2) << "    curMatInGeoManager\t\t" << curMatInGeoManager
+               << "\t" << curMatInGeoManager->GetName() << "\t" << curMatInGeoManager->GetIndex() << FairLogger::endl;
 
-         curMedInGeo = geoMediaBase->getMedium(curMedName);
-         if (curMedInGeo == 0)
-         {
-            std::cout << "[ExpandNodeForGDML] Media not found in Geo file." << std::endl;
-            //! This should not happen.
-            //! This means that somebody uses material in GDML that is not in the media.geo file.
-            //! Most probably this is the sign to the user to check materials' names in the CATIA model.
-         }
-         else
-         {
-            if (fFixedMats.find(curMedName) == fFixedMats.end()) {
-               nmed = geobuild->createMedium(curMedInGeo);
-               fFixedMats[curMedName] = gGeoManager->GetListOfMedia()->GetEntries();
+      TString matName = curMat->GetName();
+      TString medName = curMed->GetName();
+
+      if (curMed->GetId() != curMedInGeoManager->GetId()) {
+         if (fFixedMedia.find(medName) == fFixedMedia.end()) {
+            LOG(DEBUG) << "    Medium needs to be fixed" << FairLogger::endl;
+            fFixedMedia[medName] = curMedInGeoManager;
+            Int_t ind = curMat->GetIndex();
+            gGeoManager->RemoveMaterial(ind);
+            LOG(DEBUG) << "    removing material " << curMat->GetName()
+               << " with index " << ind << FairLogger::endl;
+            for (Int_t i=ind; i<gGeoManager->GetListOfMaterials()->GetEntries(); i++) {
+               TGeoMaterial* m = (TGeoMaterial*)gGeoManager->GetListOfMaterials()->At(i);
+               m->SetIndex(m->GetIndex()-1);
             }
-            node->GetVolume()->SetMedium(gGeoManager->GetMedium(curMedName));
-            gGeoManager->SetAllIndex();
+
+            LOG(DEBUG) << "    Medium fixed" << FairLogger::endl;
+         } else {
+            LOG(DEBUG) << "    Already fixed medium found in the list    " << FairLogger::endl;
+         }
+
+      } else {
+         if (fFixedMedia.find(medName) == fFixedMedia.end()) {
+            LOG(DEBUG) << "    There is no correct medium in the memory yet" << FairLogger::endl;
+
+            FairGeoLoader* geoLoad = FairGeoLoader::Instance();
+            FairGeoInterface* geoFace = geoLoad->getGeoInterface();
+            FairGeoMedia* geoMediaBase =  geoFace->getMedia();
+            FairGeoBuilder* geobuild = geoLoad->getGeoBuilder();
+
+            FairGeoMedium* curMedInGeo = geoMediaBase->getMedium(medName);
+            if (curMedInGeo == 0)
+            {
+               LOG(FATAL) << "    Media not found in Geo file." << FairLogger::endl;
+               //! This should not happen.
+               //! This means that somebody uses material in GDML that is not in the media.geo file.
+               //! Most probably this is the sign to the user to check materials' names in the CATIA model.
+            }
+            else
+            {
+               LOG(DEBUG) << "    Found media in Geo file" << medName << FairLogger::endl;
+               Int_t nmed = geobuild->createMedium(curMedInGeo);
+               fFixedMedia[medName] = (TGeoMedium*)gGeoManager->GetListOfMedia()->Last();
+               gGeoManager->RemoveMaterial(curMatOfMedInGeoManager->GetIndex());
+               LOG(DEBUG) << "    removing material " << curMatOfMedInGeoManager->GetName()
+                  << " with index " << curMatOfMedInGeoManager->GetIndex() << FairLogger::endl;
+               for (Int_t i=curMatOfMedInGeoManager->GetIndex(); i<gGeoManager->GetListOfMaterials()->GetEntries(); i++) {
+                  TGeoMaterial* m = (TGeoMaterial*)gGeoManager->GetListOfMaterials()->At(i);
+                  m->SetIndex(m->GetIndex()-1);
+               }
+            }
+
+            if (curMedInGeo->getSensitivityFlag()) {
+               LOG(DEBUG) << "    Adding sensitive  " << curVol->GetName() << FairLogger::endl;
+               AddSensitiveVolume(curVol);
+            }
+
+         } else {
+            LOG(DEBUG) << "    Already fixed medium found in the list" << FairLogger::endl;
+            LOG(DEBUG) << "!!! Sensitivity: " << fFixedMedia[medName]->GetParam(0) << FairLogger::endl;
+            if (fFixedMedia[medName]->GetParam(0) == 1) {
+               LOG(DEBUG) << "    Adding sensitive  " << curVol->GetName() << FairLogger::endl;
+               AddSensitiveVolume(curVol);
+            }
          }
       }
 
-      //! The volume is sensitive => add it to the list
-      if (curMedInGeo->getSensitivityFlag()) {
-         AddSensitiveVolume(curVol);
-      }
+      curVol->SetMedium(fFixedMedia[medName]);
+      gGeoManager->SetAllIndex();
+
+//      gGeoManager->GetListOfMaterials()->Print();
+//      gGeoManager->GetListOfMedia()->Print();
+
    }
 
    //! Recursevly go down the tree of nodes
@@ -444,10 +519,10 @@ CbmRichPoint* CbmRich::AddHit(
       Int_t trackID,
       Int_t detID,
       TVector3 pos,
-	   TVector3 mom,
-	   Double_t time,
-	   Double_t length,
-	   Double_t eLoss)
+      TVector3 mom,
+      Double_t time,
+      Double_t length,
+      Double_t eLoss)
 {
    TClonesArray& clref = *fRichPoints;
    Int_t size = clref.GetEntriesFast();
@@ -457,11 +532,11 @@ CbmRichPoint* CbmRich::AddHit(
 CbmRichPoint* CbmRich::AddRefPlaneHit(
       Int_t trackID,
       Int_t detID,
-		TVector3 pos,
-		TVector3 mom,
-		Double_t time,
-		Double_t length,
-		Double_t eLoss)
+      TVector3 pos,
+      TVector3 mom,
+      Double_t time,
+      Double_t length,
+      Double_t eLoss)
 {
    TClonesArray& clref = *fRichRefPlanePoints;
    Int_t tsize = clref.GetEntriesFast();
@@ -469,13 +544,13 @@ CbmRichPoint* CbmRich::AddRefPlaneHit(
 }
 
 CbmRichPoint* CbmRich::AddMirrorHit(
-         Int_t trackID,
-         Int_t detID,
-         TVector3 pos,
-         TVector3 mom,
-         Double_t time,
-         Double_t length,
-         Double_t eLoss)
+      Int_t trackID,
+      Int_t detID,
+      TVector3 pos,
+      TVector3 mom,
+      Double_t time,
+      Double_t length,
+      Double_t eLoss)
 {
    TClonesArray& clref = *fRichMirrorPoints;
    Int_t tsize = clref.GetEntriesFast();

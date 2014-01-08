@@ -11,8 +11,9 @@
 #define CBM_RICH_HIT_PRODUCER
 
 #include "FairTask.h"
+#include "CbmRichRecGeoPar.h"
 
-class CbmGeoRichPar;
+//class CbmGeoRichPar;
 class TClonesArray;
 class TVector3;
 
@@ -57,6 +58,21 @@ public:
     * \brief Inherited from FairTask.
     */
    virtual void Finish();
+
+   /**
+    * \brief Init geometry parameters for ascii geometries.
+    */
+   static CbmRichRecGeoPar InitAsciiGeometry();
+
+   /**
+    * \brief Init geometry parameters for root and gdml geometries.
+    */
+   static CbmRichRecGeoPar InitRootGeometry();
+
+   /**
+    * \brief Init geometry parameters. The Geometry type will be chosen automatically.
+    */
+   static CbmRichRecGeoPar InitGeometry();
 
    /**
     * \brief Set detector type (choose: 1=Protvino, 2=CsI, 3=Hamamatsu, 4=Hamamatsu H8500-03)
@@ -222,20 +238,14 @@ private:
    static const Double_t h = 6.626E-34; // Planck constant
    static const Double_t e = 1.6022E-19; // elementary charge
 
-   Double_t fNRefrac; // refraction index
+   CbmRichRecGeoPar fGP; // RICH geometry parameters
+
    Int_t fDetection; // flag for detection
    Int_t fNEvents; // event number
 
-   Double_t fDetX; // X-coordinate of photodetector
-   Double_t fDetY; // Y-coordinate of photodetector
-   Double_t fDetZ; // Z-coordinate of photodetector
-   Double_t fDetZ_org; // X-coordinate of photodetector (original from parameter file)
-   Double_t fDetWidthX; // width of photodetector in x
-   Double_t fDetWidthY; // width of photodetector in y
-
-   TObjArray *fSensNodes;
-   TObjArray *fPassNodes;
-   CbmGeoRichPar *fPar;
+  // TObjArray *fSensNodes;
+ //  TObjArray *fPassNodes;
+   //CbmGeoRichPar *fPar;
 
    // Parameters of photodetector
    Double_t fPhotomulRadius; // radius of photomultiplier [cm], set according to detector type
@@ -244,9 +254,6 @@ private:
    Int_t fNofNoiseHits; // number of noise hits
    Double_t fCollectionEfficiency; // collection efficiency for photoelectrons in PMT optics
    Double_t fSigmaMirror; // additinal smearing of MC Points due to light scattering in mirror
-
-   Double_t fTheta; // angle by which photodetector was tilted around x-axis
-   Double_t fPhi; // angle by which photodetector was tilted around y-axis
 
    Double_t fCrossTalkHitProb;// probability of cross talk hit
    Int_t fNofCrossTalkHits; // Number of cross talk hits

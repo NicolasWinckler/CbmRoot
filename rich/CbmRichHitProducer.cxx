@@ -21,6 +21,9 @@
 #include "FairGeoMedium.h"
 #include "FairGeoNode.h"
 
+#include "TGeoMatrix.h"
+#include "TGeoBBox.h"
+
 #include "TVector3.h"
 #include "TRandom.h"
 #include "TFormula.h"
@@ -40,20 +43,8 @@ CbmRichHitProducer::CbmRichHitProducer():
    fNHits(0),
    fNDoubleHits(0),
 
-   fNRefrac(0.),
    fDetection(0),
    fNEvents(0),
-
-   fDetX(0.),
-   fDetY(0.),
-   fDetZ(0.),
-   fDetZ_org(0.),
-   fDetWidthX(0.),
-   fDetWidthY(0.),
-
-   fSensNodes(NULL),
-   fPassNodes(NULL),
-   fPar(NULL),
 
    fPhotomulRadius(0.0),
    fPhotomulDist(0.),
@@ -61,9 +52,6 @@ CbmRichHitProducer::CbmRichHitProducer():
    fNofNoiseHits(220),
    fCollectionEfficiency(1.),
    fSigmaMirror(0.06),
-
-   fTheta(0.),
-   fPhi(0.),
 
    fCrossTalkHitProb(0.02),
    fNofCrossTalkHits(0)
@@ -79,156 +67,24 @@ CbmRichHitProducer::~CbmRichHitProducer()
 
 void CbmRichHitProducer::SetParContainers()
 {
-  // Get Base Container
-  FairRunAna* ana = FairRunAna::Instance();
-  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-  fPar = (CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
-  // fPar1=(FairBaseParSet*)(rtdb->getContainer("FairBaseParSet"));
-  // fPar->print();
-//  fPar->setStatic();    // setting the parameters on static mode: <explanation>
 }
 
 InitStatus CbmRichHitProducer::Init()
 {
-   FairRootManager* fManager = FairRootManager::Instance();
+   fGP =  InitGeometry();
 
-   fSensNodes = fPar->GetGeoSensitiveNodes();
-   fPassNodes = fPar->GetGeoPassiveNodes();
-   //fSensNodes->ls();
+   fGP.Print();
 
-   // get detector position:
-   FairGeoNode *det= dynamic_cast<FairGeoNode*> (fSensNodes->FindObject("rich1d#1"));
-   if (NULL == det) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
-   //det->Dump();
-   //det->print();
-   FairGeoTransform* detTr=det->getLabTransform(); // detector position in labsystem
-   FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
-   FairGeoTransform detCen=det->getCenterPosition(); // center in Detector system
-   FairGeoVector detPosCen=detCen.getTranslation();
-   fDetZ = detPosLab.Z() + detPosCen.Z(); // z coordinate of photodetector (Labsystem, cm)
-   fDetY = detPosLab.Y() + detPosCen.Y(); // y coordinate of photodetector (Labsystem, cm)
-   fDetX = detPosLab.X() + detPosCen.X(); // x coordinate of photodetector (Labsystem, cm)
+   FairRootManager* manager = FairRootManager::Instance();
 
-   TArrayD *fdetA=det->getParameters(); // get other geometry parameters: width in x, width in y, thickness
-   fDetWidthX = fdetA->At(0);
-   fDetWidthY = fdetA->At(1);
-   for(Int_t i = 0; i < fdetA->GetSize(); i++) cout << "Array detector " << fdetA->At(i)<< endl;
-   FairGeoRotation fdetR=detTr->getRotMatrix();
-   // detector might be rotated by theta around x-axis:
-   if (fVerbose) {
-      cout << "Rotation matrix of photodetector " << endl;
-      for(Int_t i = 0; i < 9; i++) cout << "Rot(" << i << ") = " << fdetR(i) << endl;
-   }
-
-   // possible tilting around x-axis (theta) and y-axis (phi)
-   // fdetR(0) = cos(phi)
-   // fdetR(1) = 0
-   // fdetR(2) = -sin(phi)
-   // fdetR(3) = -sin(theta)sin(phi)
-   // fdetR(4) = cos(theta)
-   // fdetR(5) = -sin(theta)cos(phi)
-   // fdetR(6) = cos(theta)sin(phi)
-   // fdetR(7) = sin(theta)
-   // fdetR(8) = cos(theta)cos(phi)
-
-
-   fTheta = TMath::ASin(fdetR(7)); // tilting angle around x-axis
-   fPhi = -1.*TMath::ASin(fdetR(2)); // tilting angle around y-axis
-
-   if (fVerbose) cout << "Rich Photodetector was tilted around x by " << fTheta*180./TMath::Pi() << " degrees" << endl;
-   if (fVerbose) cout << "Rich Photodetector was tilted around y by " << fPhi*180./TMath::Pi() << " degrees" << endl;
-
-   // get refractive index of gas
-   FairGeoNode *gas= dynamic_cast<FairGeoNode*> (fPassNodes->FindObject("rich1gas1"));
-   if (NULL == gas) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
-   FairGeoMedium* med = gas->getMedium();
-   //  med->Dump();
-
-   Int_t npckov = med->getNpckov();
-   Double_t* cerpar;
-   cerpar=new Double_t[4];
-   if (fVerbose) cout << "Number of optical parameters for Cherenkov " << npckov << endl;
-   med->getCerenkovPar(0,cerpar);
-
-//   for(Int_t i=0;i<4;i++) {
-//      if (i==0) cout << " photon energy " << cerpar[0] << endl;
-//      if (i==1) cout << " absorption lenght" << cerpar[1] << endl;
-//      if (i==2) cout << " detection efficiency " << cerpar[2] << endl;
-//      if (i==3) cout << " refractive index (n-1)*10000 " << (cerpar[3]-1.)*10000. << endl;
-//   }
-
-   fNRefrac = cerpar[3];
-   delete cerpar;
-   if (fVerbose) cout << " refractive index for lowest photon energies (n-1)*10000  " << (fNRefrac-1.0)*10000.0 << endl;
-
-   // transform nominal detector position (for tilted photodetector), x>0, y>0:
-   Double_t fDetY_org, fDetX_org;
-   fDetZ_org = fDetZ;
-   fDetY_org = fDetY;
-   fDetX_org = fDetX;
-   fDetX = fDetX_org*TMath::Cos(fPhi)+fDetZ_org*TMath::Sin(fPhi);
-   fDetY = -fDetX_org*TMath::Sin(fTheta)*TMath::Sin(fPhi) + fDetY_org*TMath::Cos(fTheta) + fDetZ_org*TMath::Sin(fTheta)*TMath::Cos(fPhi);
-   fDetZ = -fDetX_org*TMath::Cos(fTheta)*TMath::Sin(fPhi) - fDetY_org*TMath::Sin(fTheta) + fDetZ_org*TMath::Cos(fTheta)*TMath::Cos(fPhi);
-
-   if (fVerbose > 0) {
-      cout << "---------------------- RICH Hit Producer ---------------------------------------" << endl;
-      cout << "   detector position in (x,y,z) [cm]: " << fDetX << "  " << fDetY_org << "  " << fDetZ_org << endl;
-      cout << "   tilted detector position in (x,y,z) [cm]: " << fDetX << "  " << fDetY << "  " << fDetZ << endl;
-      cout << "   detector size in x and y [cm]: " << fDetWidthX << "  " << fDetWidthY << endl;
-      if (fDetType==0)
-      cout << "   ideal detector " << endl;
-      if (fDetType==1)
-      cout << "   detector type: Protvino PMT with PMT radius = " << fPhotomulRadius << " cm, distance between PMTs = " << fPhotomulDist << " cm" << endl;
-      if (fDetType==3)
-      cout << "   detector type: CSI with pad size = " << fPhotomulRadius << " cm, distance between panels = " << fPhotomulDist << " cm" << endl;
-      if (fDetType==2 || fDetType == 4 || fDetType == 5 || fDetType == 6)
-      cout << "   detector type: Hamamatsu H8500 with pad size = " << fPhotomulRadius << " cm, distance between elements = " << fPhotomulDist << " cm" << endl;
-      cout << "   number of noise hits (to be reduced by geometrical efficiency) " << fNofNoiseHits << endl;
-      cout << "--------------------------------------------------------------------------------" << endl;
-   }
-
-  //------------- example for getting more parameters from the data base: -------------------
-/*
-  // 1) get and print medium
-     FairGeoMedium* med = det->getMedium();
-     med->Dump();
-
-  // 2) retrieve relevant parameter
-  // Shape
-     Int_t npoints = det->getNumPoints();
-     Double_t para[npoints][3];
-     TString shapeName = det->getShape();
-     for (Int_t i=0;i<npoints;i++) {
-         for (Int_t j=0;j<3; j++){
-              para[i][j] = det->getVolParameter(i,j);
-              cout << "i: " << i << "j: " << j << "par: " << para[i][j] << endl;
-         }
-     }
-
-  // 3) Lab Transform
-     FairGeoTransform* transf =  det->getLabTransform();
-     FairGeoRotation rot = transf->getRotMatrix();
-     FairGeoVector trans = transf->getTransVector();
-
-     Double_t rotp[9];
-     cout << " Lab rotation : " << endl;
-     for (Int_t i=0; i<9; i++) {
-                                  rotp[i] = rot(i);
-                                  cout << " i: " << i << " val: " << rotp[i] ;
-     }
-     cout << endl;
-     cout << " Lab translation : " << endl;
-     cout << " tX: " << trans.X() << " tY: " << trans.Y() << " tZ: " << trans.Z() << endl;
-*/
-
-   fRichPoints = (TClonesArray*)fManager->GetObject("RichPoint");
+   fRichPoints = (TClonesArray*)manager->GetObject("RichPoint");
    if (NULL == fRichPoints) { Fatal("CbmRichHitProducer::Init","No RichPoint array!"); }
 
-   fMcTracks = (TClonesArray *)fManager->GetObject("MCTrack");
+   fMcTracks = (TClonesArray *)manager->GetObject("MCTrack");
    if (NULL == fMcTracks) { Fatal("CbmRichHitProducer::Init","No MCTrack array!"); }
 
    fRichHits = new TClonesArray("CbmRichHit");
-   fManager->Register("RichHit","RICH", fRichHits, kTRUE);
+   manager->Register("RichHit","RICH", fRichHits, kTRUE);
 
    // Set photodetector parameters according to its type
    if (fDetType == 0){
@@ -248,9 +104,202 @@ InitStatus CbmRichHitProducer::Init()
    return kSUCCESS;
 }
 
+CbmRichRecGeoPar CbmRichHitProducer::InitGeometry()
+{
+	FairRunAna* ana = FairRunAna::Instance();
+	FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+	CbmGeoRichPar* par = (CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+	TObjArray* sensNodes = par->GetGeoSensitiveNodes();
+	TObjArray* passNodes = par->GetGeoPassiveNodes();
+
+	if (sensNodes->GetEntriesFast() > 0 && passNodes->GetEntriesFast() > 0 ) {
+		return InitAsciiGeometry();
+	} else {
+		return InitRootGeometry();
+	}
+}
+
+CbmRichRecGeoPar CbmRichHitProducer::InitAsciiGeometry()
+{
+   cout << "-I- CbmRichHitProducer::InitAsciiGeometry" << endl;
+
+   CbmRichRecGeoPar gp;
+
+   FairRunAna* ana = FairRunAna::Instance();
+   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+   CbmGeoRichPar* par = (CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
+
+   TObjArray* sensNodes = par->GetGeoSensitiveNodes();
+   TObjArray* passNodes = par->GetGeoPassiveNodes();
+
+   // get detector position:
+   FairGeoNode *det= dynamic_cast<FairGeoNode*> (sensNodes->FindObject("rich1d#1"));
+   if (NULL == det) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
+   FairGeoTransform* detTr=det->getLabTransform(); // detector position in labsystem
+   FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
+   FairGeoTransform detCen=det->getCenterPosition(); // center in Detector system
+   FairGeoVector detPosCen=detCen.getTranslation();
+   gp.fPmtZOrig = detPosLab.Z() + detPosCen.Z(); // z coordinate of photodetector (Labsystem, cm)
+   gp.fPmtYOrig = detPosLab.Y() + detPosCen.Y(); // y coordinate of photodetector (Labsystem, cm)
+   gp.fPmtXOrig = detPosLab.X() + detPosCen.X(); // x coordinate of photodetector (Labsystem, cm)
+
+   TArrayD *fdetA=det->getParameters(); // get other geometry parameters: width in x, width in y, thickness
+   gp.fPmtWidthX = fdetA->At(0);
+   gp.fPmtWidthY = fdetA->At(1);
+   for(Int_t i = 0; i < fdetA->GetSize(); i++) cout << "Array detector " << fdetA->At(i)<< endl;
+   FairGeoRotation fdetR=detTr->getRotMatrix();
+
+   // possible tilting around x-axis (theta) and y-axis (phi)
+   // fdetR(0) = cos(phi)
+   // fdetR(1) = 0
+   // fdetR(2) = -sin(phi)
+   // fdetR(3) = -sin(theta)sin(phi)
+   // fdetR(4) = cos(theta)
+   // fdetR(5) = -sin(theta)cos(phi)
+   // fdetR(6) = cos(theta)sin(phi)
+   // fdetR(7) = sin(theta)
+   // fdetR(8) = cos(theta)cos(phi)
+
+   gp.fPmtTheta = TMath::ASin(fdetR(7)); // tilting angle around x-axis
+   gp.fPmtPhi = -1.*TMath::ASin(fdetR(2)); // tilting angle around y-axis
+
+   // get refractive index of gas
+   FairGeoNode *gas= dynamic_cast<FairGeoNode*> (passNodes->FindObject("rich1gas1"));
+   if (NULL == gas) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
+   FairGeoMedium* med = gas->getMedium();
+
+   Int_t npckov = med->getNpckov();
+   Double_t cerpar[4];
+   med->getCerenkovPar(0,cerpar);
+
+   //   for(Int_t i=0;i<4;i++) {
+   //      if (i==0) cout << " photon energy " << cerpar[0] << endl;
+   //      if (i==1) cout << " absorption lenght" << cerpar[1] << endl;
+   //      if (i==2) cout << " detection efficiency " << cerpar[2] << endl;
+   //      if (i==3) cout << " refractive index (n-1)*10000 " << (cerpar[3]-1.)*10000. << endl;
+   //   }
+
+   gp.fNRefrac = cerpar[3];
+
+   // transform nominal detector position (for tilted photodetector), x>0, y>0:
+   gp.fPmtX = gp.fPmtXOrig*TMath::Cos(gp.fPmtPhi)+gp.fPmtZOrig*TMath::Sin(gp.fPmtPhi);
+   gp.fPmtY = -gp.fPmtXOrig*TMath::Sin(gp.fPmtTheta)*TMath::Sin(gp.fPmtPhi) + gp.fPmtYOrig*TMath::Cos(gp.fPmtTheta) + gp.fPmtZOrig*TMath::Sin(gp.fPmtTheta)*TMath::Cos(gp.fPmtPhi);
+   gp.fPmtZ = -gp.fPmtXOrig*TMath::Cos(gp.fPmtTheta)*TMath::Sin(gp.fPmtPhi) - gp.fPmtYOrig*TMath::Sin(gp.fPmtTheta) + gp.fPmtZOrig*TMath::Cos(gp.fPmtTheta)*TMath::Cos(gp.fPmtPhi);
+
+   // get mirror position:
+   //FairGeoNode *mir= (FairGeoNode *) fPassNodes->FindObject("rich1mgl#1");
+   FairGeoNode *mir= (FairGeoNode *) sensNodes->FindObject("rich1mgl#1");
+   FairGeoTransform* mirTr=mir->getLabTransform();  // position of mirror center in labsystem
+   FairGeoVector mirPosLab=mirTr->getTranslation(); // ... in cm
+   gp.fMirrorX = mirPosLab.X();
+   gp.fMirrorY = mirPosLab.Y();
+   gp.fMirrorZ = mirPosLab.Z();
+
+   TArrayD *fmirA=mir->getParameters();  // get other geometry parameters: radius,
+   gp.fMirrorR = fmirA->At(0); // mirror radius
+//   Double_t spheTheta = TMath::Abs(90. - fmirA->At(2));   // opening angle for SPHERE in theta (90 degree +- theta)
+//   Double_t sphePhi = TMath::Abs(90. - fmirA->At(4));   // opening angle for SPHERE in phi (90 degree +- phi)
+//   // from that calculate (with safety factor 1.3) maximum x-y positions for track extrapolation:
+//   fMaxXTrackExtr = 1.3*(fR*TMath::Tan(sphePhi*TMath::Pi()/180.));
+//   fMaxYTrackExtr = 1.3*(TMath::Abs(fYm) + fR*TMath::Tan(spheTheta*TMath::Pi()/180.));
+
+   // mirror might be rotated by theta around x-axis:
+   // note that mirror is by default tilted by 90 degrees in order to get the necessary shape in GEANT
+   // the "extra" tilting angle is then: fThetaM =  -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2.
+   FairGeoRotation fmirR=mirTr->getRotMatrix();
+   gp.fMirrorTheta = -1.*TMath::ASin(fmirR(5)) - TMath::Pi()/2 ;
+
+   return gp;
+}
+
+
+CbmRichRecGeoPar CbmRichHitProducer::InitRootGeometry()
+{
+   cout << "-I- CbmRichHitProducer::InitRootGeometry" << endl;
+   CbmRichRecGeoPar gp;
+   TObjArray* nodes1 = NULL;
+   TObjArray* nodesTop = gGeoManager->GetTopNode()->GetNodes();
+   for (Int_t i1 = 0; i1 < nodesTop->GetEntriesFast(); i1++) {
+         TGeoNode* topNode = (TGeoNode*) nodesTop->At(i1);
+         if ( TString(topNode->GetName()).Contains("TOP") ) {
+        	 nodes1 = topNode->GetNodes();
+         }
+   }
+
+   for (Int_t i1 = 0; i1 < nodes1->GetEntriesFast(); i1++) {
+      TGeoNode* richNode = (TGeoNode*) nodes1->At(i1);
+      if ( TString(richNode->GetName()).Contains("rich") ) {
+         const Double_t *trRich = richNode->GetMatrix()->GetTranslation();
+         TObjArray* nodes2 = richNode->GetNodes();
+         for (Int_t i2 = 0; i2 < nodes2->GetEntriesFast(); i2++) {
+            TGeoNode* gasNode = (TGeoNode*) nodes2->At(i2);
+            if ( TString(gasNode->GetName()).Contains("RICH_gas") ) {
+               const Double_t *trGas = gasNode->GetMatrix()->GetTranslation();
+               //TODO: get refractive index from material
+               gp.fNRefrac = 1.000446242;
+               const TGeoMaterial* gasMaterial = gasNode->GetVolume()->GetMedium()->GetMaterial();
+
+               TObjArray* nodes3 = gasNode->GetNodes();
+               for (Int_t i3 = 0; i3 < nodes3->GetEntriesFast(); i3++) {
+                  TGeoNode* pmtNode = (TGeoNode*) nodes3->At(i3);
+                  if ( TString(pmtNode->GetName()).Contains("rich1d") ) {
+                	 const Double_t *trPmt = pmtNode->GetMatrix()->GetTranslation();
+                     const TGeoBBox* pmtShape = (const TGeoBBox*)(pmtNode->GetVolume()->GetShape());
+                	 Double_t pmtX = trRich[0] + trGas[0] + trPmt[0];
+                	 Double_t pmtY = trRich[1] + trGas[1] + trPmt[1];
+                	 if (pmtX > 0. && pmtY > 0) {
+						 const Double_t *rm = pmtNode->GetMatrix()->GetRotationMatrix();
+						 gp.fPmtTheta = TMath::ASin(rm[7]); // tilting angle around x-axis
+						 gp.fPmtPhi = -1.*TMath::ASin(rm[2]); // tilting angle around y-axis
+
+						 gp.fPmtXOrig = pmtX;
+						 gp.fPmtYOrig = pmtY;
+						 gp.fPmtZOrig = trRich[2] + trGas[2] + trPmt[2] + pmtShape->GetDZ();
+
+						 gp.fPmtWidthX = pmtShape->GetDX();
+						 gp.fPmtWidthY = pmtShape->GetDY();
+
+						 gp.fPmtX = gp.fPmtXOrig * TMath::Cos(gp.fPmtPhi) + gp.fPmtZOrig * TMath::Sin(gp.fPmtPhi);
+						 gp.fPmtY = -gp.fPmtXOrig * TMath::Sin(gp.fPmtTheta) * TMath::Sin(gp.fPmtPhi) + gp.fPmtYOrig*TMath::Cos(gp.fPmtTheta) + gp.fPmtZOrig*TMath::Sin(gp.fPmtTheta)*TMath::Cos(gp.fPmtPhi);
+						 gp.fPmtZ = -gp.fPmtXOrig * TMath::Cos(gp.fPmtTheta) * TMath::Sin(gp.fPmtPhi) - gp.fPmtYOrig*TMath::Sin(gp.fPmtTheta) + gp.fPmtZOrig*TMath::Cos(gp.fPmtTheta)*TMath::Cos(gp.fPmtPhi);
+
+                	 }
+                  }
+               }
+            } // if RICH_gas
+
+            if ( TString(gasNode->GetName()).Contains("RICH_gas") ) {
+               const Double_t *trGas = gasNode->GetMatrix()->GetTranslation();
+               TObjArray* nodes3 = gasNode->GetNodes();
+               for (Int_t i3 = 0; i3 < nodes3->GetEntriesFast(); i3++) {
+                  TGeoNode* mirrorNode = (TGeoNode*) nodes3->At(i3);
+                  if ( TString(mirrorNode->GetName()).Contains("RICH_mirror_half_total") ) {
+
+                     const Double_t *rm = mirrorNode->GetMatrix()->GetRotationMatrix();
+                     gp.fMirrorTheta = TMath::ASin(rm[7]); // tilting angle around x-axis
+                     //gp.fPmtPhi = -1.*TMath::ASin(rm[2]); // tilting angle around y-axis
+
+                     const Double_t *trMirror = mirrorNode->GetMatrix()->GetTranslation();
+                     const TGeoBBox* mirrorShape = (const TGeoBBox*)(mirrorNode->GetVolume()->GetShape());
+
+                     gp.fMirrorX = trRich[0] + trGas[0] + trMirror[0];
+                     gp.fMirrorY = trRich[1] + trGas[1] + trMirror[1];
+                     gp.fMirrorZ = trRich[2] + trGas[2] + trMirror[2];// + mirrorShape->GetDZ();
+                     //TODO: set mirror radius form geometry
+                     gp.fMirrorR = 300;
+                  }
+               }
+            } // if RICH_gas_2
+         }
+      }// if rich
+   }
+   return gp;
+}
+
 void CbmRichHitProducer::Exec(
       Option_t* option)
 {
+
    Int_t RichDetID = 0;
 
    fNEvents++;
@@ -271,7 +320,7 @@ void CbmRichHitProducer::Exec(
       TVector3 posPoint;
       pt->Position(posPoint);
       TVector3 detPoint;
-      TiltPoint(&posPoint, &detPoint, fPhi, fTheta, fDetZ_org);
+      TiltPoint(&posPoint, &detPoint, fGP.fPmtPhi, fGP.fPmtTheta, fGP.fPmtZOrig);
 
       if (fVerbose > 1) cout << " position in Labsystem " << posPoint.X() << " " << posPoint.Y() << " " << posPoint.Z() << endl;
       if (fVerbose > 1) cout << " tilted position in Labsystem " << detPoint.X() << " " << detPoint.Y() << " " << detPoint.Z() << endl;
@@ -280,8 +329,8 @@ void CbmRichHitProducer::Exec(
       CbmMCTrack* p = (CbmMCTrack*) fMcTracks->At(trackID);
       Int_t gcode = TMath::Abs(p->GetPdgCode());
 
-      if ((fVerbose) && ((detPoint.Z() < (fDetZ-0.25)) || (detPoint.Z() > (fDetZ+0.25)))) {
-         cout << " z-position not at " << fDetZ << " but " << detPoint.Z() << endl;
+      if ((fVerbose) && ((detPoint.Z() < (fGP.fPmtZ-0.25)) || (detPoint.Z() > (fGP.fPmtZ+0.25)))) {
+        // cout << " not at " << fGP.fPmtZ << " but " << detPoint.Z() << endl;
       }
 
       // hit position as a center of PMT
@@ -301,7 +350,7 @@ void CbmRichHitProducer::Exec(
       if (fDetType == 3) FindRichHitPositionCsI(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
 
       //Double_t zHit = detPoint.Z();
-      Double_t zHit = fDetZ; // fix z-position to nominal value: either tilted (fDetZ = zDet) or untilted (fDetZ_org)
+      Double_t zHit = fGP.fPmtZ; // fix z-position to nominal value: either tilted (fDetZ = zDet) or untilted (fDetZ_org)
       //TVector3 posHit(xHit,yHit,zHit);
 
       //error of hit position at the moment nothing better than +-tube_radius
@@ -332,7 +381,7 @@ void CbmRichHitProducer::Exec(
             TVector3 mom;
             pt->Momentum(mom);
             Double_t etot = sqrt(mom.Px()*mom.Px() + mom.Py()*mom.Py() + mom.Pz()*mom.Pz());
-            Double_t lambda=c/fNRefrac*h/e/etot;// wavelength in nm
+            Double_t lambda=c/fGP.fNRefrac*h/e/etot;// wavelength in nm
             fDetection=0;
             if (lambda >= lambda_min && lambda < lambda_max) {
                Int_t ilambda=(Int_t)((lambda-lambda_min)/lambda_step);
@@ -379,11 +428,11 @@ void CbmRichHitProducer::Exec(
    // add noise hits
    for(Int_t j = 0; j < fNofNoiseHits; j++) {
       Double_t rand = gRandom->Rndm();
-      Double_t xRand = (fDetX-fDetZ_org*TMath::Sin(fPhi))-fDetWidthX + rand*2.*fDetWidthX;
+      Double_t xRand = (fGP.fPmtX-fGP.fPmtZOrig*TMath::Sin(fGP.fPmtPhi))-fGP.fPmtWidthX + rand*2.*fGP.fPmtWidthX;
       rand = gRandom->Rndm();
       if (rand < 0.5 ) xRand = -1.*xRand;
       rand = gRandom->Rndm();
-      Double_t yRand = fDetY-fDetWidthY + rand*2.*fDetWidthY;
+      Double_t yRand = fGP.fPmtY-fGP.fPmtWidthY + rand*2.*fGP.fPmtWidthY;
       rand = gRandom->Rndm();
       if (rand < 0.5 ) yRand = -1.*yRand;
 
@@ -402,7 +451,7 @@ void CbmRichHitProducer::Exec(
 
       // add Hit
       if (xHit!=0.0 && yHit!=0.0) {
-         Double_t zHit = fDetZ;
+         Double_t zHit = fGP.fPmtZ;
          TVector3 posHit(xHit,yHit,zHit);
          Double_t ampl = GetAmplitude();
 
@@ -546,7 +595,7 @@ void CbmRichHitProducer::AddCrossTalkHits(
 
 
    if (xHit != 0.0 && yHit != 0.0) {
-      Double_t zHit = fDetZ;
+      Double_t zHit = fGP.fPmtZ;
       TVector3 posHit(xHit,yHit,zHit);
       Double_t ampl = GetAmplitude();
       TVector3 posHitErr(fPhotomulRadius,fPhotomulRadius,0.);
@@ -874,11 +923,11 @@ void CbmRichHitProducer::FindRichHitPositionSinglePMT(
    xPoint = xPoint + gRandom->Gaus(0,fSigmaMirror);
    yPoint = yPoint + gRandom->Gaus(0,fSigmaMirror);
 
-   uPoint = 2.*fDetWidthX - (fPhotomulRadius+fPhotomulDist) + xPoint;
+   uPoint = 2.*fGP.fPmtWidthX - (fPhotomulRadius+fPhotomulDist) + xPoint;
    if (yPoint > 0)
-      vPoint = (- fDetY + fDetWidthY - (fPhotomulRadius+fPhotomulDist) + yPoint)/ TMath::Cos(alpha);
+      vPoint = (- fGP.fPmtY + fGP.fPmtWidthY - (fPhotomulRadius+fPhotomulDist) + yPoint)/ TMath::Cos(alpha);
    if (yPoint < 0)
-      vPoint = (fDetY + fDetWidthY - (fPhotomulRadius+fPhotomulDist) + yPoint)/ TMath::Cos(alpha);
+      vPoint = (fGP.fPmtY + fGP.fPmtWidthY - (fPhotomulRadius+fPhotomulDist) + yPoint)/ TMath::Cos(alpha);
 
    // Calculate Position of nearest PMT
    uPMT = (fPhotomulRadius+fPhotomulDist)*((Int_t)(uPoint/(fPhotomulRadius+fPhotomulDist)+0.999));
@@ -890,11 +939,11 @@ void CbmRichHitProducer::FindRichHitPositionSinglePMT(
    // if distance < (fPhotomulRadius+fPhotomulDist)
    // ==> retransform to global (x,y) and store Hit (center of PMT)
    if (distance <= (fPhotomulRadius+fPhotomulDist)){
-      xHit = uPMT - 2.*fDetWidthX + (fPhotomulRadius+fPhotomulDist);
+      xHit = uPMT - 2.*fGP.fPmtWidthX + (fPhotomulRadius+fPhotomulDist);
       if (yPoint > 0)
-         yHit = vPMT*TMath::Cos(alpha) + fDetY - fDetWidthY + (fPhotomulRadius+fPhotomulDist);
+         yHit = vPMT*TMath::Cos(alpha) + fGP.fPmtY - fGP.fPmtWidthY + (fPhotomulRadius+fPhotomulDist);
       if (yPoint < 0)
-         yHit = vPMT*TMath::Cos(alpha) - fDetY - fDetWidthY + (fPhotomulRadius+fPhotomulDist);
+         yHit = vPMT*TMath::Cos(alpha) - fGP.fPmtY - fGP.fPmtWidthY + (fPhotomulRadius+fPhotomulDist);
 
       pmtID = (Int_t)(uPMT/(fPhotomulRadius+fPhotomulDist))*100000+(Int_t)(vPMT/(fPhotomulRadius+fPhotomulDist));
       if (yPoint<0.) pmtID = -1*pmtID;
@@ -940,11 +989,11 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(
       yPoint = yPoint + gRandom->Gaus(0,sigma);
    }
 
-   uPoint = 2.*fDetWidthX + xPoint;
+   uPoint = 2.*fGP.fPmtWidthX + xPoint;
    if (yPoint > 0)
-      vPoint = - fDetY + fDetWidthY + yPoint;
+      vPoint = - fGP.fPmtY + fGP.fPmtWidthY + yPoint;
    if (yPoint < 0)
-      vPoint = fDetY + fDetWidthY + yPoint;
+      vPoint = fGP.fPmtY + fGP.fPmtWidthY + yPoint;
 
    // calculate lower left corner of effective area of MAPMT unit which has been hit
    uPMT = length*(Int_t)(uPoint/length)+fPhotomulDist;
@@ -963,9 +1012,9 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(
       vPMTs = fPhotomulRadius*(Int_t)((vPoint-vPMT)/fPhotomulRadius)+fPhotomulRadius/2. + vPMT;
 
       // ==> retransform to global (x,y) and store Hit
-      xHit = uPMTs - 2.*fDetWidthX;
-      if (yPoint > 0) yHit = vPMTs + fDetY - fDetWidthY;
-      if (yPoint < 0) yHit = vPMTs - fDetY - fDetWidthY;
+      xHit = uPMTs - 2.*fGP.fPmtWidthX;
+      if (yPoint > 0) yHit = vPMTs + fGP.fPmtY - fGP.fPmtWidthY;
+      if (yPoint < 0) yHit = vPMTs - fGP.fPmtY - fGP.fPmtWidthY;
 
       pmtID = ((Int_t)(uPoint/length)*100 + (Int_t)((uPoint-uPMT)/fPhotomulRadius))*100000
             + ((Int_t)(vPoint/length)*100 + (Int_t)((vPoint-vPMT)/fPhotomulRadius));
@@ -995,8 +1044,8 @@ void CbmRichHitProducer::FindRichHitPositionCsI(
 
    xHit = 0.;
    yHit = 0.;
-   Double_t xlength = 2.*fDetWidthX * 2. / 3.;
-   Double_t ylength = fDetWidthY * 2.;
+   Double_t xlength = 2.*fGP.fPmtWidthX * 2. / 3.;
+   Double_t ylength = fGP.fPmtWidthY * 2.;
 
    // Transformation of global (x,y) coordinates to local coordinates in photodetector plane (u,v)
    // the center of (u,v) CS is in the lower left corner of each photodetector
@@ -1008,9 +1057,9 @@ void CbmRichHitProducer::FindRichHitPositionCsI(
    xPoint = xPoint + gRandom->Gaus(0,fSigmaMirror);
    yPoint = yPoint + gRandom->Gaus(0,fSigmaMirror);
 
-   uPoint = 2.*fDetWidthX + xPoint;
-   if (yPoint > 0) vPoint = - fDetY + fDetWidthY + yPoint;
-   if (yPoint < 0) vPoint = fDetY + fDetWidthY + yPoint;
+   uPoint = 2.*fGP.fPmtWidthX + xPoint;
+   if (yPoint > 0) vPoint = - fGP.fPmtY + fGP.fPmtWidthY + yPoint;
+   if (yPoint < 0) vPoint = fGP.fPmtY + fGP.fPmtWidthY + yPoint;
 
    // calculate lower left corner of effective area of panel which has been hit
    uPMT = xlength*(Int_t)(uPoint/xlength)+fPhotomulDist;
@@ -1029,9 +1078,9 @@ void CbmRichHitProducer::FindRichHitPositionCsI(
       vPMTs = fPhotomulRadius*(Int_t)((vPoint-vPMT)/fPhotomulRadius)+fPhotomulRadius/2. + vPMT;
 
       // ==> retransform to global (x,y) and store Hit
-      xHit = uPMTs - 2.*fDetWidthX;
-      if (yPoint > 0) yHit = vPMTs + fDetY - fDetWidthY;
-      if (yPoint < 0) yHit = vPMTs - fDetY - fDetWidthY;
+      xHit = uPMTs - 2.*fGP.fPmtWidthX;
+      if (yPoint > 0) yHit = vPMTs + fGP.fPmtY - fGP.fPmtWidthY;
+      if (yPoint < 0) yHit = vPMTs - fGP.fPmtY - fGP.fPmtWidthY;
 
       pmtID = ((Int_t)(uPoint/xlength)*1000 + (Int_t)((uPoint-uPMT)/fPhotomulRadius))*100000
             + ((Int_t)(vPoint/ylength)*1000 + (Int_t)((vPoint-vPMT)/fPhotomulRadius));

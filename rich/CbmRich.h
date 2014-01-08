@@ -182,8 +182,7 @@ private:
    TClonesArray* fRichMirrorPoints; // mirror points
 
    // GDML geometry
-   static std::map<TString, Int_t> fFixedMats; // materials for the GDML geometry
-   static Bool_t fIsFirstGDML;
+   static std::map<TString, TGeoMedium*> fFixedMedia; // List of media "repaired" after importing GMDL
    TGeoRotation* fRotation; // Rotation matrix of the RICH detector
    TGeoCombiTrans* fPositionRotation;  // Full combined matrix for position and rotation of the RICH detector
 
@@ -235,6 +234,5 @@ private:
 
    ClassDef(CbmRich,2)
 };
-
 
 #endif

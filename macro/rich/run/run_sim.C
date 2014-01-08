@@ -1,4 +1,4 @@
-void run_sim(Int_t nEvents = 2)
+void run_sim(Int_t nEvents = 10)
 {
    TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
@@ -9,17 +9,17 @@ void run_sim(Int_t nEvents = 2)
 	//gRandom->SetSeed(10);
 
 	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
-	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/eventdisplay.param.root";
-	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/eventdisplay.mc.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.param.root";
+	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.mc.root";
+
 	TString caveGeom = "cave.geo";
-	TString targetGeom = "target_au_250mu.geo";
-	TString pipeGeom   = "pipe_standard.geo";
-	TString magnetGeom = "passive/magnet_v12a.geo";
+	TString pipeGeom = "pipe/pipe_standard.geo";
+	TString magnetGeom = "magnet/magnet_v12a.geo";
 	TString mvdGeom = "";
 	TString stsGeom = "sts/sts_v12b.geo.root";
-	TString richGeom= "rich/rich_v08a.geo";
-	TString trdGeom = "trd/trd_v10b.geo";
-	TString tofGeom = "tof/tof_v13a.geo";
+	TString richGeom= "rich/rich_v13b_0deg.root";//"rich/rich_v08a.geo";//
+	TString trdGeom = "trd/trd_v13g.geo.root";
+	TString tofGeom = "tof/tof_v13b.geo.root";
 	TString ecalGeom = "";
 	TString fieldMap = "field_v12a";
 
@@ -39,7 +39,6 @@ void run_sim(Int_t nEvents = 2)
 		parFile = TString(gSystem->Getenv("PAR_FILE"));
 
 		caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
-		targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
 		pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
 		mvdGeom = TString(gSystem->Getenv("MVD_GEOM"));
 		stsGeom = TString(gSystem->Getenv("STS_GEOM"));
@@ -64,11 +63,8 @@ void run_sim(Int_t nEvents = 2)
 	TStopwatch timer;
 	timer.Start();
 
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-
-	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-	cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 
 	FairRunSim* fRun = new FairRunSim();
 	fRun->SetName("TGeant3"); // Transport engine
@@ -90,11 +86,8 @@ void run_sim(Int_t nEvents = 2)
 		fRun->AddModule(pipe);
 	}
 
-	if ( targetGeom != "" ) {
-		FairModule* target = new CbmTarget("Target");
-		target->SetGeometryFileName(targetGeom);
-		fRun->AddModule(target);
-	}
+	CbmTarget* target = new CbmTarget("Gold", 0.025); // 250 mum
+	fRun->AddModule(target);
 
 	if ( magnetGeom != "" ) {
 		FairModule* magnet = new CbmMagnet("MAGNET");

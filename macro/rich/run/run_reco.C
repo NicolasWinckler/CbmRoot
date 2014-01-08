@@ -1,7 +1,4 @@
-
-#include "../../../cbmbase/CbmDetectorList.h";
-
-void run_reco(Int_t nEvents = 10)
+void run_reco(Int_t nEvents = 1)
 {
    TTree::SetMaxTreeSize(90000000000);
 
@@ -13,9 +10,9 @@ void run_reco(Int_t nEvents = 10)
 
 	gRandom->SetSeed(10);
 
-	TString inFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.mc.root";
-	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/richreco/test.param.root";
-	TString outFile ="/Users/slebedev/Development/cbm/data/simulations/richreco/test.reco.root";
+	TString inFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.mc.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.param.root";
+	TString outFile ="/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.reco.root";
 	std::string resultDir = "recqa/";
 	int nofNoiseHitsInRich = 220;
 	double collectionEff = 1.0;
@@ -35,7 +32,7 @@ void run_reco(Int_t nEvents = 10)
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
-   TObjString trdDigiFile = parDir + "/trd/trd_v13c.digi.par"; // TRD digi file
+   TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
    gDebug = 0;
@@ -44,10 +41,8 @@ void run_reco(Int_t nEvents = 10)
     timer.Start();
 
 	// ----  Load libraries   -------------------------------------------------
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-	cbmlibs();
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/loadlibs.C");
+   loadlibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
 	// -----   Reconstruction run   -------------------------------------------
@@ -59,7 +54,8 @@ void run_reco(Int_t nEvents = 10)
     // =========================================================================
     // ===                     MVD local reconstruction                      ===
 	// =========================================================================
-    CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("MVD Digitizer", 0, iVerbose);
+	if (IsMvd(parFile)) {
+	CbmMvdDigitizeL* mvdDigitizeL = new CbmMvdDigitizeL("MVD Digitizer", 0, iVerbose);
     run->AddTask(mvdDigitizeL);
 
     CbmMvdFindHits* mvdFindHits = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
@@ -70,6 +66,7 @@ void run_reco(Int_t nEvents = 10)
     //CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
     //run->AddTask(mvdHitProd);
     //}
+	}
 
 	// =========================================================================
 	// ===                      STS local reconstruction                     ===
@@ -179,13 +176,6 @@ void run_reco(Int_t nEvents = 10)
 
 
 	if (IsTrd(parFile)) {
-		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
-		run->AddTask(trdMatchTracks);
-
-		//CbmTrdSetTracksPidWkn* trdSetTracksPidTask =
-		//		new CbmTrdSetTracksPidWkn("CbmTrdSetTracksPidWkn","CbmTrdSetTracksPidWkn");
-		//run->AddTask(trdSetTracksPidTask);
-
 		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("CbmTrdSetTracksPidANN","CbmTrdSetTracksPidANN");
 		trdSetTracksPidAnnTask->SetTRDGeometryType("h++");
 		run->AddTask(trdSetTracksPidAnnTask);
@@ -214,6 +204,10 @@ void run_reco(Int_t nEvents = 10)
 		run->AddTask(matchRings);
 	}//isRich
 
+
+	CbmMatchRecoToMC* matchRecoToMc = new CbmMatchRecoToMC();
+	run->AddTask(matchRecoToMc);
+
 	// Reconstruction Qa
    CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
    trackingQa->SetMinNofPointsSts(4);
@@ -228,10 +222,10 @@ void run_reco(Int_t nEvents = 10)
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir(resultDir);
-   trackingQa->SetPRange(24, 0., 12.);
+   trackingQa->SetPRange(15, 0., 3.);
 
    std::vector<std::string> trackCat, richCat;
-// trackCat.push_back("All");
+   trackCat.push_back("All");
    trackCat.push_back("Electron");
 //   richCat.push_back("All");
    richCat.push_back("Electron");
@@ -246,13 +240,14 @@ void run_reco(Int_t nEvents = 10)
    fitQa->SetMvdMinNofHits(0);
    fitQa->SetStsMinNofHits(4);
    fitQa->SetMuchMinNofHits(10);
-   fitQa->SetTrdMinNofHits(8);
+   fitQa->SetTrdMinNofHits(6);
    fitQa->SetOutputDir(resultDir);
    run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetOutputDir(resultDir);
    run->AddTask(clusteringQa);
+
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===

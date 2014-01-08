@@ -1,5 +1,5 @@
 
-void run_reco_urqmdtest(Int_t nEvents = 1000)
+void run_reco_urqmdtest(Int_t nEvents = 50)
 {
    TTree::SetMaxTreeSize(90000000000);
    TString script = TString(gSystem->Getenv("SCRIPT"));

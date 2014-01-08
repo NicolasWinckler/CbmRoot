@@ -1,4 +1,4 @@
-void run_sim_urqmdtest(Int_t nEvents = 10)
+void run_sim_urqmdtest(Int_t nEvents = 50)
 {
    TTree::SetMaxTreeSize(90000000000);
 
@@ -11,11 +11,12 @@ void run_sim_urqmdtest(Int_t nEvents = 10)
    TString outFile = outDir + "25gev.centr.mc.0000.root";
 
    TString caveGeom = "cave.geo";
-   TString targetGeom = "target/target_au_250mu.geo";
    TString pipeGeom   = "pipe/pipe_standard.geo";
    TString magnetGeom = "magnet/magnet_v12a.geo";
    TString stsGeom = "sts/sts_v12b.geo.root";
-   TString richGeom= /*"rich/rich_v08a.geo"*/"rich/rich_v13a.gdml";
+   TString richGeom= "rich/rich_v08a.geo";
+		  // "rich/rich_v13b.root";
+   	   	   //"rich/rich_gdml_identical_to_geo.root";
    TString fieldMap = "field_v12a";
    Double_t fieldZ = 50.; // field center z position
    Double_t fieldScale =  1.0; // field scaling factor
@@ -46,11 +47,8 @@ void run_sim_urqmdtest(Int_t nEvents = 10)
       fRun->AddModule(pipe);
    }
 
-   if ( targetGeom != "") {
-      FairModule* target = new CbmTarget("Target");
-      target->SetGeometryFileName(targetGeom);
-      fRun->AddModule(target);
-   }
+	CbmTarget* target = new CbmTarget("Gold", 0.025); // 250 mum
+	fRun->AddModule(target);
 
    if ( magnetGeom != "") {
       FairModule* magnet = new CbmMagnet("MAGNET");

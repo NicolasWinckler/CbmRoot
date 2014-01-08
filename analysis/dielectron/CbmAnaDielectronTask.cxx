@@ -1823,18 +1823,18 @@ void CbmAnaDielectronTask::IsElectron(
        if (cand->stsMcTrackId < 0 || cand->stsMcTrackId >= fMCTracks->GetEntries()){
 	   cand->isElectron = false;
        } else {
-	   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(cand->stsMcTrackId);
-	   Int_t pdg = mcTrack->GetPdgCode();
-	   if (pdg == 11 || pdg == -11){
-	       cand->isElectron = true;
-	   } else {
-	       Double_t r = fRandom3->Rndm();
-	       if (r < fPionMisidLevel){
-		   cand->isElectron = true;
-	       } else {
-		   cand->isElectron = false;
-	       }
-	   }
+		   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(cand->stsMcTrackId);
+		   Int_t pdg = mcTrack->GetPdgCode();
+		   if (pdg == 11 || pdg == -11){
+			   cand->isElectron = true;
+		   } else {
+			   Double_t r = fRandom3->Rndm();
+			   if (r < fPionMisidLevel){
+			   cand->isElectron = true;
+			   } else {
+			   cand->isElectron = false;
+			   }
+		   }
        }
    }
 }

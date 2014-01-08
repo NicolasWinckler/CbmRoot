@@ -27,5 +27,4 @@ void qa_simulation_report()
 
    CbmSimulationReport* tofQaReport = new CbmLitTofQaReport();
    tofQaReport->Create(fileName, outputDir);
-
 }

@@ -1,4 +1,4 @@
-void run_sim_geotest(Int_t nEvents = 5)
+void run_sim_geotest(Int_t nEvents = 20)
 {
    TTree::SetMaxTreeSize(90000000000);
 
@@ -9,11 +9,10 @@ void run_sim_geotest(Int_t nEvents = 5)
    TString parFile =  outDir + "test.param.0000.root";
    TString outFile = outDir + "test.mc.0000.root";
    TString caveGeom = "cave.geo";
-   TString targetGeom = "target/target_au_250mu.geo";
    TString pipeGeom   = "pipe/pipe_standard.geo";
    TString magnetGeom = "magnet/magnet_v12a.geo";
    TString stsGeom = "sts/sts_v12b.geo.root";
-   TString richGeom= /*"rich/rich_v08a.geo"*/"rich/rich_v13a.gdml";
+   TString richGeom= /*"rich/rich_v08a.geo"*/"rich/rich_v13c.root";
    TString fieldMap = "field_v12a";
    TString richDetectorType = "standard"; // "standard" or "prototype"
    Double_t fieldZ = 50.; // field center z position
@@ -23,7 +22,6 @@ void run_sim_geotest(Int_t nEvents = 5)
       outFile = TString(gSystem->Getenv("MC_FILE"));
       parFile = TString(gSystem->Getenv("PAR_FILE"));
       caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
-      targetGeom = TString(gSystem->Getenv("TARGET_GEOM"));
       pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
       stsGeom = TString(gSystem->Getenv("STS_GEOM"));
       richGeom = TString(gSystem->Getenv("RICH_GEOM"));
@@ -59,11 +57,8 @@ void run_sim_geotest(Int_t nEvents = 5)
       fRun->AddModule(pipe);
    }
 
-   if ( targetGeom != "" && richDetectorType == "standard") {
-      FairModule* target = new CbmTarget("Target");
-      target->SetGeometryFileName(targetGeom);
-      fRun->AddModule(target);
-   }
+	CbmTarget* target = new CbmTarget("Gold", 0.025); // 250 mum
+	fRun->AddModule(target);
 
    if ( magnetGeom != "" && richDetectorType == "standard") {
       FairModule* magnet = new CbmMagnet("MAGNET");

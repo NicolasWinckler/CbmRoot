@@ -217,17 +217,10 @@ CbmRichRecGeoPar CbmRichHitProducer::InitRootGeometry()
 {
    cout << "-I- CbmRichHitProducer::InitRootGeometry" << endl;
    CbmRichRecGeoPar gp;
-   TObjArray* nodes1 = NULL;
+
    TObjArray* nodesTop = gGeoManager->GetTopNode()->GetNodes();
    for (Int_t i1 = 0; i1 < nodesTop->GetEntriesFast(); i1++) {
-         TGeoNode* topNode = (TGeoNode*) nodesTop->At(i1);
-         if ( TString(topNode->GetName()).Contains("TOP") ) {
-        	 nodes1 = topNode->GetNodes();
-         }
-   }
-
-   for (Int_t i1 = 0; i1 < nodes1->GetEntriesFast(); i1++) {
-      TGeoNode* richNode = (TGeoNode*) nodes1->At(i1);
+      TGeoNode* richNode = (TGeoNode*) nodesTop->At(i1);
       if ( TString(richNode->GetName()).Contains("rich") ) {
          const Double_t *trRich = richNode->GetMatrix()->GetTranslation();
          TObjArray* nodes2 = richNode->GetNodes();
@@ -276,7 +269,7 @@ CbmRichRecGeoPar CbmRichHitProducer::InitRootGeometry()
                   if ( TString(mirrorNode->GetName()).Contains("RICH_mirror_half_total") ) {
 
                      const Double_t *rm = mirrorNode->GetMatrix()->GetRotationMatrix();
-                     gp.fMirrorTheta = TMath::ASin(rm[7]); // tilting angle around x-axis
+                     gp.fMirrorTheta = TMath::ASin(rm[3]); // tilting angle around x-axis
                      //gp.fPmtPhi = -1.*TMath::ASin(rm[2]); // tilting angle around y-axis
 
                      const Double_t *trMirror = mirrorNode->GetMatrix()->GetTranslation();

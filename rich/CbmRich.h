@@ -61,7 +61,7 @@ public:
          Bool_t active,
          Double_t px=0.,
          Double_t py=0.,
-         Double_t pz=0.,
+         Double_t pz=270.,
          Double_t rx=0.,
          Double_t ry=0.,
          Double_t rz=0.);

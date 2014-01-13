@@ -44,7 +44,7 @@ public:
     * \brief Print geometry parameters
     */
    void Print() {
-      cout << "-I- RICH geometry parameters" << endl;
+      cout << endl << "-I- RICH geometry parameters" << endl;
       cout << "PMT position in (x,y,z) [cm]: " << fPmtXOrig << "  " << fPmtYOrig << "  " << fPmtZOrig << endl;
       cout << "Tilted PMT position in (x,y,z) [cm]: " << fPmtX << "  " << fPmtY << "  " << fPmtZ << endl;
       cout << "PMT size in x and y [cm]: " << fPmtWidthX << "  " << fPmtWidthY << endl;
@@ -54,7 +54,7 @@ public:
 
       cout << "Mirror center (x,y,z): " << fMirrorX << " " << fMirrorY << " " << fMirrorZ << endl;
       cout << "Mirror radius: " << fMirrorR << endl;
-      cout << "Mirror tilting angle: " << fMirrorTheta*180./TMath::Pi() << " degrees" << endl;
+      cout << "Mirror tilting angle: " << fMirrorTheta*180./TMath::Pi() << " degrees" << endl << endl;
    }
 
 

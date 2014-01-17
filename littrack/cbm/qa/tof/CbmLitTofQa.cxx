@@ -4,6 +4,7 @@
  * \date 2011
  */
 #include "CbmLitTofQa.h"
+#include "qa/base/CbmLitAcceptanceFunction.h"
 #include "CbmLitTofQaReport.h"
 #include "CbmHistManager.h"
 #include "CbmGlobalTrack.h"
@@ -26,143 +27,6 @@ using std::pair;
 using boost::assign::list_of;
 using std::min;
 using std::sqrt;
-
-Bool_t AllTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   return index > -1;
-}
-
-Bool_t NegativeTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   const TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(mcTrack->GetPdgCode());
-   if (particle == NULL) return false;
-   return particle->Charge() < 0;
-}
-
-Bool_t PositiveTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   const TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(mcTrack->GetPdgCode());
-   if (particle == NULL) return false;
-   return particle->Charge() > 0;
-}
-
-Bool_t PrimaryTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetMotherId() == -1);
-}
-
-Bool_t SecondaryTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetMotherId() != -1);
-}
-
-Bool_t ElectronTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 11;
-}
-
-Bool_t MuonTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 13;
-}
-
-Bool_t ProtonTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return mcTrack->GetPdgCode() == 2212;
-}
-
-Bool_t AntiProtonTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return mcTrack->GetPdgCode() == -2212;
-}
-
-Bool_t PionTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 211;
-}
-
-Bool_t PionPlusTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return mcTrack->GetPdgCode() == 211;
-}
-
-Bool_t PionMinusTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return mcTrack->GetPdgCode() == -211;
-}
-
-Bool_t KaonTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return std::abs(mcTrack->GetPdgCode()) == 321;
-}
-
-Bool_t KaonPlusTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return mcTrack->GetPdgCode() == 321;
-}
-
-Bool_t KaonMinusTrackAcceptanceFunctionTof(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   if (index < 0) return false;
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return mcTrack->GetPdgCode() == -321;
-}
 
 CbmLitTofQa::CbmLitTofQa():
    fIsFixedBounds(true),
@@ -241,21 +105,21 @@ void CbmLitTofQa::FillTrackCategoriesAndAcceptanceFunctions()
 {
    fTrackCategories = list_of("All")("Positive")("Negative")("Primary")("Secondary")("Electron")("Muon")("Proton")("AntiProton")("Pion")("PionPlus")("PionMinus")("Kaon")("KaonPlus")("KaonMinus");
    // List of all supported track categories
-   fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Positive"] = PositiveTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Negative"] = NegativeTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Primary"] = PrimaryTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Secondary"] = SecondaryTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Electron"] = ElectronTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Muon"] = MuonTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["AntiProton"] = AntiProtonTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunctionTof;
-   fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunctionTof;
+   fTrackAcceptanceFunctions["All"] = CbmLitAcceptanceFunction::AllTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Positive"] = CbmLitAcceptanceFunction::PositiveTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Negative"] = CbmLitAcceptanceFunction::NegativeTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Primary"] = CbmLitAcceptanceFunction::PrimaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Secondary"] = CbmLitAcceptanceFunction::SecondaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Electron"] = CbmLitAcceptanceFunction::ElectronTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Muon"] = CbmLitAcceptanceFunction::MuonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Proton"] = CbmLitAcceptanceFunction::ProtonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["AntiProton"] = CbmLitAcceptanceFunction::AntiProtonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Pion"] = CbmLitAcceptanceFunction::PionTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionPlus"] = CbmLitAcceptanceFunction::PionPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionMinus"] = CbmLitAcceptanceFunction::PionMinusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Kaon"] = CbmLitAcceptanceFunction::KaonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonPlus"] = CbmLitAcceptanceFunction::KaonPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonMinus"] = CbmLitAcceptanceFunction::KaonMinusTrackAcceptanceFunction;
 }
 
 void CbmLitTofQa::CreateHistograms()

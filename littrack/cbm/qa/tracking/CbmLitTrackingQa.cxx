@@ -10,6 +10,7 @@
 #include "CbmHistManager.h"
 #include "utils/CbmLitUtils.h"
 #include "qa/mc/CbmLitMCTrackCreator.h"
+#include "qa/base/CbmLitAcceptanceFunction.h"
 #include "elid/CbmLitGlobalElectronId.h"
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
@@ -34,198 +35,6 @@ using std::cout;
 using boost::assign::list_of;
 using lit::Split;
 using lit::FindAndReplace;
-
-Bool_t AllTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   return true;
-}
-
-Bool_t PrimaryTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetMotherId() == -1);
-}
-
-Bool_t ReferenceTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetMotherId() == -1) && (mcTrack->GetP() > 1.);
-}
-
-Bool_t SecondaryTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetMotherId() != -1);
-}
-
-Bool_t PrimaryElectronTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetMotherId() == -1);
-}
-
-Bool_t PrimaryMuonTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 13) && (mcTrack->GetMotherId() == -1);
-}
-
-Bool_t ProtonTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 2212);
-}
-
-Bool_t PionTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 211);
-}
-
-Bool_t PionPlusTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetPdgCode() == 211);
-}
-
-Bool_t PionMinusTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetPdgCode() == -211);
-}
-
-Bool_t KaonTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (std::abs(mcTrack->GetPdgCode()) == 321);
-}
-
-Bool_t KaonPlusTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetPdgCode() == 321);
-}
-
-Bool_t KaonMinusTrackAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-   return (mcTrack->GetPdgCode() == -321);
-}
-
-Bool_t AllRingAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index,
-      Int_t nofHitsInRing)
-{
-   return true;
-}
-
-Bool_t AllReferenceRingAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index,
-      Int_t nofHitsInRing)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-    return (mcTrack->GetMotherId() == -1) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
-}
-
-Bool_t PrimaryElectronRingAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index,
-      Int_t nofHitsInRing)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-    return (mcTrack->GetMotherId() == -1) && (std::abs(mcTrack->GetPdgCode()) == 11);
-}
-
-Bool_t PrimaryElectronReferenceRingAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index,
-      Int_t nofHitsInRing)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-    return (mcTrack->GetMotherId() == -1) && (std::abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
-}
-
-Bool_t PionRingAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index,
-      Int_t nofHitsInRing)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-    return (std::abs(mcTrack->GetPdgCode()) == 211);
-}
-
-Bool_t PionReferenceRingAcceptanceFunction(
-      const TClonesArray* mcTracks,
-      Int_t index,
-      Int_t nofHitsInRing)
-{
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-    return (std::abs(mcTrack->GetPdgCode()) == 211) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
-}
-
-Bool_t AllPiSuppAcceptanceFunction(
-      const TClonesArray* globalTracks,
-      const TClonesArray* stsMatches,
-      const TClonesArray* richMatches,
-      Int_t index)
-{
-   return true;
-}
-
-Bool_t TrueMatchPiSuppAcceptanceFunction(
-      const TClonesArray* globalTracks,
-      const TClonesArray* stsMatches,
-      const TClonesArray* richMatches,
-      Int_t index)
-{
-   const CbmGlobalTrack* gTrack = static_cast<const CbmGlobalTrack*>(globalTracks->At(index));
-   Int_t stsInd = gTrack->GetStsTrackIndex();
-   Int_t richInd = gTrack->GetRichRingIndex();
-   if (stsInd == -1 || richInd == -1) return false;
-   const CbmTrackMatch* stsMatch = static_cast<const CbmTrackMatch*>(stsMatches->At(stsInd));
-   const CbmTrackMatch* richMatch = static_cast<const CbmTrackMatch*>(richMatches->At(richInd));
-   if (NULL == stsMatch || NULL == richMatch) return false;
-
-   if (stsMatch->GetMCTrackId() == richMatch->GetMCTrackId()) return true;
-   return false;
-}
-
-Bool_t WrongMatchPiSuppAcceptanceFunction(
-      const TClonesArray* globalTracks,
-      const TClonesArray* stsMatches,
-      const TClonesArray* richMatches,
-      Int_t index)
-{
-   return !TrueMatchPiSuppAcceptanceFunction(globalTracks, stsMatches, richMatches, index);
-}
 
 CbmLitTrackingQa::CbmLitTrackingQa():
    FairTask("LitTrackingQA", 1),
@@ -424,33 +233,32 @@ void CbmLitTrackingQa::FillDefaultPiSuppCategories()
 void CbmLitTrackingQa::FillTrackAndRingAcceptanceFunctions()
 {
    // List of all supported track categories
-   fTrackAcceptanceFunctions["All"] = AllTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Primary"] = PrimaryTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Secondary"] = SecondaryTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Reference"] = ReferenceTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Electron"] = PrimaryElectronTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Muon"] = PrimaryMuonTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Proton"] = ProtonTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Pion"] = PionTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["PionPlus"] = PionPlusTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["PionMinus"] = PionMinusTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["Kaon"] = KaonTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["KaonPlus"] = KaonPlusTrackAcceptanceFunction;
-   fTrackAcceptanceFunctions["KaonMinus"] = KaonMinusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["All"] = CbmLitAcceptanceFunction::AllTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Primary"] = CbmLitAcceptanceFunction::PrimaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Secondary"] = CbmLitAcceptanceFunction::SecondaryTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Reference"] = CbmLitAcceptanceFunction::ReferenceTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Electron"] = CbmLitAcceptanceFunction::PrimaryElectronTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Muon"] = CbmLitAcceptanceFunction::PrimaryMuonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Proton"] = CbmLitAcceptanceFunction::ProtonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Pion"] = CbmLitAcceptanceFunction::PionTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionPlus"] = CbmLitAcceptanceFunction::PionPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["PionMinus"] = CbmLitAcceptanceFunction::PionMinusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["Kaon"] = CbmLitAcceptanceFunction::KaonTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonPlus"] = CbmLitAcceptanceFunction::KaonPlusTrackAcceptanceFunction;
+   fTrackAcceptanceFunctions["KaonMinus"] = CbmLitAcceptanceFunction::KaonMinusTrackAcceptanceFunction;
 
    // List of all supported ring categories
-   fRingAcceptanceFunctions["All"] = AllRingAcceptanceFunction;
-   fRingAcceptanceFunctions["AllReference"] = AllReferenceRingAcceptanceFunction;
-   fRingAcceptanceFunctions["Electron"] = PrimaryElectronRingAcceptanceFunction;
-   fRingAcceptanceFunctions["ElectronReference"] = PrimaryElectronReferenceRingAcceptanceFunction;
-   fRingAcceptanceFunctions["Pion"] = PionRingAcceptanceFunction;
-   fRingAcceptanceFunctions["PionReference"] = PionReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["All"] = CbmLitAcceptanceFunction::AllRingAcceptanceFunction;
+   fRingAcceptanceFunctions["AllReference"] = CbmLitAcceptanceFunction::AllReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["Electron"] = CbmLitAcceptanceFunction::PrimaryElectronRingAcceptanceFunction;
+   fRingAcceptanceFunctions["ElectronReference"] = CbmLitAcceptanceFunction::PrimaryElectronReferenceRingAcceptanceFunction;
+   fRingAcceptanceFunctions["Pion"] = CbmLitAcceptanceFunction::PionRingAcceptanceFunction;
+   fRingAcceptanceFunctions["PionReference"] = CbmLitAcceptanceFunction::PionReferenceRingAcceptanceFunction;
 
    // list of pion suppression categories
-   fPiSuppAcceptanceFunctions["All"] = AllPiSuppAcceptanceFunction;
-   fPiSuppAcceptanceFunctions["TrueMatch"] = TrueMatchPiSuppAcceptanceFunction;
-   fPiSuppAcceptanceFunctions["WrongMatch"] = WrongMatchPiSuppAcceptanceFunction;
-
+   fPiSuppAcceptanceFunctions["All"] = CbmLitAcceptanceFunction::AllPiSuppAcceptanceFunction;
+   fPiSuppAcceptanceFunctions["TrueMatch"] = CbmLitAcceptanceFunction::TrueMatchPiSuppAcceptanceFunction;
+   fPiSuppAcceptanceFunctions["WrongMatch"] = CbmLitAcceptanceFunction::WrongMatchPiSuppAcceptanceFunction;
 }
 
 void CbmLitTrackingQa::CreateH1Efficiency(

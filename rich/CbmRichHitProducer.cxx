@@ -4,6 +4,46 @@
 * \author B. Polichtchouk
 * \date 2004
 **/
+//____________________________________________________________________________________
+// updated with QE from measurements, July 2012
+// and AddCrossTalkHits() (implementation from Dima as in CBM-RICH simulation, May 2011)
+// from LED measurements: fCrossTalkHitProb = 0.02 for H8500
+// QE curves extrapolated to 180 nm using pol3 for clean and pol2 for WLS coated MAPMTs
+//
+//  0) det_type == 0
+//     Hamamatsu H8500 with constant QE=0.99
+//  1) det_type == 1
+//     Protvino-type PMT
+//  2) det_type == 2
+//     Hamamatsu H8500 from data sheet
+//  3) det_type == 3
+//     CsI photocathode, NIM A 433 (1999) 201 (HADES)
+//  4) det_type == 4
+//     Hamamatsu H8500-03 from data sheet, with UV window
+//  5) det_type == 5
+//     Hamamatsu H8500 + WLS film with UV window, estimation
+//  6) det_type == 6
+//     Hamamatsu H8500-03 posF in CernOct2011 setup (BUW measurement)
+//  10) det_type == 10
+//      Hamamatsu H8500-03 posH with dipcoated WLS film (BUW measurement)
+//  11) det_type == 11
+//      Hamamatsu H8500-03 posH with dipcoated WLS film -3.8 % due to inhomogeneity (BUW measurement)
+//  12) det_type == 12
+//      Hamamatsu H8500-03 posD in CernOct2011 setup (BUW measurement)
+//  13) det_type == 13
+//      Hamamatsu R11265, average from ZN0590, ZN0593, ZN0731, ZN0733 (BUW measurement)
+//  14) det_type == 14
+//      Hamamatsu R11265, average from ZN0590, ZN0593, ZN0731, ZN0733 with dipcoated WLS film (BUW measurement)
+//  15) det_type == 15
+//      Hamamatsu H8500D-03, posC in CernOct2012 setup, DA0141 ,DA0142, DA0147, DA0154 (BUW measurement)
+//  16) det_type == 16
+//      Hamamatsu H8500D-03, posC in CernOct2012 setup, DA0141, DA0142, DA0147, DA0154 with dipcoated WLS film (BUW measurement)
+//  17) det_type == 17
+//      Hamamatsu H10966A-103, posE in CernOct2012 setup, ZL0003 (BUW measurement)
+//  18) det_type == 18
+//      Hamamatsu H10966A-103, posE in CernOct2012 setup, ZL0003 with dipcoated WLS film (BUW measurement)
+//____________________________________________________________________________________
+
 #include "CbmRichHitProducer.h"
 
 #include "CbmRichPoint.h"
@@ -91,9 +131,9 @@ InitStatus CbmRichHitProducer::Init()
       fPhotomulRadius = 0.;
       fPhotomulDist = 0.;
    }
-   if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) {
+   if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16 || fDetType == 17 || fDetType == 18) {
       fPhotomulRadius = 0.6125;
-      fPhotomulDist = 0.2;
+      fPhotomulDist = 0.25; // corresponds to 2mm spacing
      // fCrossTalkHitProb = 0.02;
    }
    if (fDetType == 3) {
@@ -329,8 +369,10 @@ void CbmRichHitProducer::Exec(
       // hit position as a center of PMT
       Double_t xHit, yHit;
       Int_t pmtID;
-      Double_t sigma0 = 0.;
-      Double_t sigma = 0.19; // sigma (cm) for additional smearing of HitPosition due to WLS film
+      Double_t sigma_0 = 0.09;     // 0.09 for standard MAPMT H8500D-03
+      Double_t sigma_wls = 0.164; // sigma (cm) for additional smearing of HitPosition due to WLS film
+				  // depending on det_type
+				  // 0.164 for standard MAPMT H8500D-03 with WLS coateding
 
       // FindRichHitPosition
       if (fDetType == 0) {
@@ -339,7 +381,7 @@ void CbmRichHitProducer::Exec(
          pmtID = j;
       }
       if (fDetType == 1) FindRichHitPositionSinglePMT(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) FindRichHitPositionMAPMT(sigma0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
+      if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16 || fDetType == 17 || fDetType == 18) FindRichHitPositionMAPMT(sigma_0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
       if (fDetType == 3) FindRichHitPositionCsI(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
 
       //Double_t zHit = detPoint.Z();
@@ -356,13 +398,13 @@ void CbmRichHitProducer::Exec(
                if (TMath::Sqrt((detPoint.X()-xHit)*(detPoint.X()-xHit)+(detPoint.Y()-yHit)*(detPoint.Y()-yHit)) > (fPhotomulRadius+fPhotomulDist)*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)!" << endl;
          }
-         if (fDetType == 2 || fDetType == 3 || fDetType == 4 || fDetType == 6) {
+         if (fDetType == 0 || fDetType == 2 || fDetType == 3 || fDetType == 4 || fDetType == 6 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16 || fDetType == 17 || fDetType == 18) {
             if (fVerbose)
                if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)! " <<
                   detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
          }
-         if (fDetType == 5) { // fDetType 5: additional smearing with RMS=3mm due to WLS film
+         if (fDetType == 5 || fDetType == 10 || fDetType == 11 || fDetType == 14 || fDetType == 16 || fDetType == 18) { // fDetType 5: additional smearing with RMS=3mm due to WLS film
             if (fVerbose)
                if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius+1.5 || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
                   cout << "-E- RichHitProducer: wrongly assigned Hits ? (distance point-hit too large)! " <<
@@ -380,8 +422,8 @@ void CbmRichHitProducer::Exec(
                Int_t ilambda=(Int_t)((lambda-lambda_min)/lambda_step);
                Double_t rand = gRandom->Rndm();
                fDetection = 0;
-               if (fDetType == 5 && lambda < 300.) {// smear Hit position for lambda < 300 nm (WLS film!)
-                  FindRichHitPositionMAPMT(sigma,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
+               if ( (fDetType == 5 || fDetType == 10 || fDetType == 11 || fDetType == 14 || fDetType == 16 || fDetType == 18 ) && lambda < 300.) {// smear Hit position for lambda < 300 nm (WLS film!)
+                  FindRichHitPositionMAPMT(sigma_wls,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
                }
                if (efficiency[ilambda]*fCollectionEfficiency > rand ) fDetection = 1;
             } // min <= lambda < max
@@ -439,7 +481,7 @@ void CbmRichHitProducer::Exec(
          pmtID = -j;
       }
       if (fDetType == 1) FindRichHitPositionSinglePMT(xRand,yRand,xHit,yHit,pmtID);
-      if (fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
+      if (fDetType == 0 || fDetType == 2 || fDetType == 4 || fDetType == 5 || fDetType == 6 || fDetType == 10 || fDetType == 11 || fDetType == 12 || fDetType == 13 || fDetType == 14 || fDetType == 15 || fDetType == 16 || fDetType == 17 || fDetType == 18) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
       if (fDetType == 3) FindRichHitPositionCsI(xRand,yRand,xHit,yHit,pmtID);
 
       // add Hit
@@ -545,7 +587,7 @@ void CbmRichHitProducer::AddCrossTalkHits(
       Int_t RichDetID)
 {
    // only for MAMPT
-   if (fDetType != 2 && fDetType != 4 && fDetType != 5 && fDetType != 6) return;
+   if (fDetType != 0 && fDetType != 2 && fDetType != 4 && fDetType != 5 && fDetType != 6 && fDetType != 10 && fDetType != 11 && fDetType != 12 && fDetType != 13 && fDetType != 14 && fDetType != 15 && fDetType != 16 && fDetType != 17 && fDetType != 18) return;
 
    Double_t xHit = 0.0, yHit = 0.0;
    Int_t pmtID = -1;
@@ -800,84 +842,634 @@ void CbmRichHitProducer::SetPhotoDetPar(
       fEfficiency[21] = 0.017;
       fEfficiency[22] = 0.007;
       fEfficiency[23] = 0.0033;
-   } else if (det_type == 6) {
-      //QE measured at Wuppertal University (BUW), spring 2011
-      // H8500C-03 (BA + UV glass)
-      /**  Measured PMT efficiencies for MAPMTs at posF (BUW measurement) ##### CernOct2011 #####
-            (Flat type Multianode Photomultiplier with BA cathode + UV window)
-            corresponding range in lambda: 160nm  - 700nm in steps of 10nm */
-      
-     fLambdaMin = 160.;
-     fLambdaMax = 700.;
-     fLambdaStep = 10.;
-     
-     fEfficiency[0] = 0.0272;
-     fEfficiency[1] = 0.0443;
-     fEfficiency[2] = 0.06;
-     fEfficiency[3] = 0.08;
-     fEfficiency[4] = 0.0945;
-     fEfficiency[5] = 0.1061;
-     fEfficiency[6] = 0.1265;
-     fEfficiency[7] = 0.1482;
-     fEfficiency[8] = 0.1668;
-     fEfficiency[9] = 0.1887;
-     fEfficiency[10] = 0.2093;
-     fEfficiency[11] = 0.2134;
-     fEfficiency[12] = 0.2303;
-     fEfficiency[13] = 0.2482;
-     fEfficiency[14] = 0.2601;
-     fEfficiency[15] = 0.2659;
-     fEfficiency[16] = 0.2702;
-     fEfficiency[17] = 0.283;
-     fEfficiency[18] = 0.2863;
-     fEfficiency[19] = 0.2863;
-     fEfficiency[20] = 0.2884;
-     fEfficiency[21] = 0.286;
-     fEfficiency[22] = 0.2811;
-     fEfficiency[23] = 0.2802;
-     fEfficiency[24] = 0.272;
-     fEfficiency[25] = 0.2638;
-     fEfficiency[26] = 0.2562;
-     fEfficiency[27] = 0.2472;
-     fEfficiency[28] = 0.2368;
-     fEfficiency[29] = 0.2218;
-     fEfficiency[30] = 0.2032;
-     fEfficiency[31] = 0.186;
-     fEfficiency[32] = 0.1735;
-     fEfficiency[33] = 0.1661;
-     fEfficiency[34] = 0.1483;
-     fEfficiency[35] = 0.121;
-     fEfficiency[36] = 0.0959;
-     fEfficiency[37] = 0.0782;
-     fEfficiency[38] = 0.0647;
-     fEfficiency[39] = 0.0538;
-     fEfficiency[40] = 0.0372;
-     fEfficiency[41] = 0.0296;
-     fEfficiency[42] = 0.0237;
-     fEfficiency[43] = 0.0176;
-     fEfficiency[44] = 0.0123;
-     fEfficiency[45] = 0.0083;
-     fEfficiency[46] = 0.005;
-     fEfficiency[47] = 0.003;
-     fEfficiency[48] = 0.0017;
-     fEfficiency[49] = 0.0008;
-     fEfficiency[50] = 0.0006;
-     fEfficiency[51] = 0.0003;
-     fEfficiency[52] = 0.0003;
-     fEfficiency[53] = 0.0002;
-     fEfficiency[54] = 0.0001;
-     
-     
-   } else if (det_type == 0){
+      }
 
-      // ideal detector
+// -------------------------------------------------------------------------------------------
+//   QE measured at Wuppertal University (BUW), spring 2011
+// -------------------------------------------------------------------------------------------
 
-      fLambdaMin = 100.;
-      fLambdaMax = 700.;
-      fLambdaStep = 600.;
+    else if(det_type == 6) {
+       /**  Measured PMT efficiencies for MAPMTs (H8500D-03) at posF (BUW measurement) ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with BA cathode + UV window)
+	    corresponding range in lambda: 160nm  - 700nm in steps of 10nm */
 
-      fEfficiency[0] = 1.;
-   } else {
+       fLambdaMin = 160.;
+       fLambdaMax = 700.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.0;
+       fEfficiency[1] = 0.0;
+       fEfficiency[2] = 0.0324;
+       fEfficiency[3] = 0.0586;
+       fEfficiency[4] = 0.0945;
+       fEfficiency[5] = 0.1061;
+       fEfficiency[6] = 0.1265;
+       fEfficiency[7] = 0.1482;
+       fEfficiency[8] = 0.1668;
+       fEfficiency[9] = 0.1887;
+       fEfficiency[10] = 0.2093;
+       fEfficiency[11] = 0.2134;
+       fEfficiency[12] = 0.2303;
+       fEfficiency[13] = 0.2482;
+       fEfficiency[14] = 0.2601;
+       fEfficiency[15] = 0.2659;
+       fEfficiency[16] = 0.2702;
+       fEfficiency[17] = 0.283;
+       fEfficiency[18] = 0.2863;
+       fEfficiency[19] = 0.2863;
+       fEfficiency[20] = 0.2884;
+       fEfficiency[21] = 0.286;
+       fEfficiency[22] = 0.2811;
+       fEfficiency[23] = 0.2802;
+       fEfficiency[24] = 0.272;
+       fEfficiency[25] = 0.2638;
+       fEfficiency[26] = 0.2562;
+       fEfficiency[27] = 0.2472;
+       fEfficiency[28] = 0.2368;
+       fEfficiency[29] = 0.2218;
+       fEfficiency[30] = 0.2032;
+       fEfficiency[31] = 0.186;
+       fEfficiency[32] = 0.1735;
+       fEfficiency[33] = 0.1661;
+       fEfficiency[34] = 0.1483;
+       fEfficiency[35] = 0.121;
+       fEfficiency[36] = 0.0959;
+       fEfficiency[37] = 0.0782;
+       fEfficiency[38] = 0.0647;
+       fEfficiency[39] = 0.0538;
+       fEfficiency[40] = 0.0372;
+       fEfficiency[41] = 0.0296;
+       fEfficiency[42] = 0.0237;
+       fEfficiency[43] = 0.0176;
+       fEfficiency[44] = 0.0123;
+       fEfficiency[45] = 0.0083;
+       fEfficiency[46] = 0.005;
+       fEfficiency[47] = 0.003;
+       fEfficiency[48] = 0.0017;
+       fEfficiency[49] = 0.0008;
+       fEfficiency[50] = 0.0006;
+       fEfficiency[51] = 0.0003;
+       fEfficiency[52] = 0.0003;
+       fEfficiency[53] = 0.0002;
+       fEfficiency[54] = 0.0001;
+       
+       }
+
+ else if(det_type == 10) {
+       /**  Measured PMT efficiencies for MAPMTs (H8500D-03) at posH (BUW measurement) --dipcoated WLS film -- ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.178;
+       fEfficiency[1] = 0.200;
+       fEfficiency[2] = 0.218;
+       fEfficiency[3] = 0.222;
+       fEfficiency[4] = 0.226;
+       fEfficiency[5] = 0.228;
+       fEfficiency[6] = 0.214;
+       fEfficiency[7] = 0.210;
+       fEfficiency[8] = 0.229;
+       fEfficiency[9] = 0.231;
+       fEfficiency[10] = 0.244;
+       fEfficiency[11] = 0.253;
+       fEfficiency[12] = 0.259;
+       fEfficiency[13] = 0.263;
+       fEfficiency[14] = 0.266;
+       fEfficiency[15] = 0.277;
+       fEfficiency[16] = 0.280;
+       fEfficiency[17] = 0.274;
+       fEfficiency[18] = 0.275;
+       fEfficiency[19] = 0.270;
+       fEfficiency[20] = 0.264;
+       fEfficiency[21] = 0.263;
+       fEfficiency[22] = 0.254;
+       fEfficiency[23] = 0.246;
+       fEfficiency[24] = 0.239;
+       fEfficiency[25] = 0.229;
+       fEfficiency[26] = 0.219;
+       fEfficiency[27] = 0.207;
+       fEfficiency[28] = 0.193;
+       fEfficiency[29] = 0.179;
+       fEfficiency[30] = 0.161;
+       fEfficiency[31] = 0.149;
+       fEfficiency[32] = 0.135;
+       fEfficiency[33] = 0.117;
+       fEfficiency[34] = 0.103;
+       fEfficiency[35] = 0.082;
+       fEfficiency[36] = 0.065;
+       fEfficiency[37] = 0.056;
+       fEfficiency[38] = 0.036;
+       fEfficiency[39] = 0.030;
+       fEfficiency[40] = 0.024;
+       fEfficiency[41] = 0.018;
+       fEfficiency[42] = 0.013;
+       fEfficiency[43] = 0.009;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.002;
+     }
+
+ else if(det_type == 11) {
+       /**  Measured PMT efficiencies for MAPMTs (H8500D-03) at posH (BUW measurement) --dipcoated WLS film -- ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with UV window)		   ##### -3.8 % due to inhomogeneity #####
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.202;
+       fEfficiency[1] = 0.207;
+       fEfficiency[2] = 0.210;
+       fEfficiency[3] = 0.214;
+       fEfficiency[4] = 0.218;
+       fEfficiency[5] = 0.219;
+       fEfficiency[6] = 0.206;
+       fEfficiency[7] = 0.202;
+       fEfficiency[8] = 0.220;
+       fEfficiency[9] = 0.222;
+       fEfficiency[10] = 0.235;
+       fEfficiency[11] = 0.243;
+       fEfficiency[12] = 0.249;
+       fEfficiency[13] = 0.253;
+       fEfficiency[14] = 0.256;
+       fEfficiency[15] = 0.266;
+       fEfficiency[16] = 0.270;
+       fEfficiency[17] = 0.264;
+       fEfficiency[18] = 0.265;
+       fEfficiency[19] = 0.260;
+       fEfficiency[20] = 0.254;
+       fEfficiency[21] = 0.253;
+       fEfficiency[22] = 0.244;
+       fEfficiency[23] = 0.237;
+       fEfficiency[24] = 0.229;
+       fEfficiency[25] = 0.221;
+       fEfficiency[26] = 0.210;
+       fEfficiency[27] = 0.199;
+       fEfficiency[28] = 0.186;
+       fEfficiency[29] = 0.172;
+       fEfficiency[30] = 0.155;
+       fEfficiency[31] = 0.143;
+       fEfficiency[32] = 0.129;
+       fEfficiency[33] = 0.113;
+       fEfficiency[34] = 0.099;
+       fEfficiency[35] = 0.079;
+       fEfficiency[36] = 0.063;
+       fEfficiency[37] = 0.054;
+       fEfficiency[38] = 0.035;
+       fEfficiency[39] = 0.028;
+       fEfficiency[40] = 0.023;
+       fEfficiency[41] = 0.018;
+       fEfficiency[42] = 0.013;
+       fEfficiency[43] = 0.009;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.002;
+     }
+
+ else if(det_type == 12) {
+       /**  Measured PMT efficiencies for MAPMTs (H8500D-03) at posD (BUW measurement) ##### CernOct2011 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.060;
+       fEfficiency[1] = 0.080;
+       fEfficiency[2] = 0.096;
+       fEfficiency[3] = 0.109;
+       fEfficiency[4] = 0.130;
+       fEfficiency[5] = 0.152;
+       fEfficiency[6] = 0.172;
+       fEfficiency[7] = 0.194;
+       fEfficiency[8] = 0.214;
+       fEfficiency[9] = 0.218;
+       fEfficiency[10] = 0.235;
+       fEfficiency[11] = 0.253;
+       fEfficiency[12] = 0.265;
+       fEfficiency[13] = 0.271;
+       fEfficiency[14] = 0.275;
+       fEfficiency[15] = 0.288;
+       fEfficiency[16] = 0.291;
+       fEfficiency[17] = 0.292;
+       fEfficiency[18] = 0.294;
+       fEfficiency[19] = 0.292;
+       fEfficiency[20] = 0.287;
+       fEfficiency[21] = 0.286;
+       fEfficiency[22] = 0.278;
+       fEfficiency[23] = 0.269;
+       fEfficiency[24] = 0.262;
+       fEfficiency[25] = 0.252;
+       fEfficiency[26] = 0.242;
+       fEfficiency[27] = 0.227;
+       fEfficiency[28] = 0.208;
+       fEfficiency[29] = 0.178;
+       fEfficiency[30] = 0.170;
+       fEfficiency[31] = 0.155;
+       fEfficiency[32] = 0.129;
+       fEfficiency[33] = 0.102;
+       fEfficiency[34] = 0.083;
+       fEfficiency[35] = 0.069;
+       fEfficiency[36] = 0.058;
+       fEfficiency[37] = 0.041;
+       fEfficiency[38] = 0.033;
+       fEfficiency[39] = 0.027;
+       fEfficiency[40] = 0.020;
+       fEfficiency[41] = 0.015;
+       fEfficiency[42] = 0.010;
+       fEfficiency[43] = 0.006;
+       fEfficiency[44] = 0.004;
+       fEfficiency[45] = 0.002;
+       fEfficiency[46] = 0.001;
+     }
+
+ else if(det_type == 13) {
+       /**  Measured PMT efficiencies for R11265 (BUW measurement)
+	    (Flat type Multianode Photomultiplier with UV window, SBA, 1 square inch)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.043;
+       fEfficiency[1] = 0.078;
+       fEfficiency[2] = 0.123;
+       fEfficiency[3] = 0.146;
+       fEfficiency[4] = 0.173;
+       fEfficiency[5] = 0.202;
+       fEfficiency[6] = 0.225;
+       fEfficiency[7] = 0.253;
+       fEfficiency[8] = 0.281;
+       fEfficiency[9] = 0.290;
+       fEfficiency[10] = 0.315;
+       fEfficiency[11] = 0.344;
+       fEfficiency[12] = 0.366;
+       fEfficiency[13] = 0.378;
+       fEfficiency[14] = 0.384;
+       fEfficiency[15] = 0.400;
+       fEfficiency[16] = 0.403;
+       fEfficiency[17] = 0.404;
+       fEfficiency[18] = 0.407;
+       fEfficiency[19] = 0.403;
+       fEfficiency[20] = 0.396;
+       fEfficiency[21] = 0.395;
+       fEfficiency[22] = 0.383;
+       fEfficiency[23] = 0.370;
+       fEfficiency[24] = 0.359;
+       fEfficiency[25] = 0.347;
+       fEfficiency[26] = 0.331;
+       fEfficiency[27] = 0.310;
+       fEfficiency[28] = 0.285;
+       fEfficiency[29] = 0.263;
+       fEfficiency[30] = 0.244;
+       fEfficiency[31] = 0.232;
+       fEfficiency[32] = 0.213;
+       fEfficiency[33] = 0.182;
+       fEfficiency[34] = 0.151;
+       fEfficiency[35] = 0.126;
+       fEfficiency[36] = 0.106;
+       fEfficiency[37] = 0.092;
+       fEfficiency[38] = 0.069;
+       fEfficiency[39] = 0.060;
+       fEfficiency[40] = 0.051;
+       fEfficiency[41] = 0.042;
+       fEfficiency[42] = 0.034;
+       fEfficiency[43] = 0.026;
+       fEfficiency[44] = 0.019;
+       fEfficiency[45] = 0.014;
+       fEfficiency[46] = 0.009;
+     }
+
+ else if(det_type == 14) {
+       /**  Measured PMT efficiencies for R11265 -- dipcoated WLS film -- (BUW measurement)
+	    (Flat type Multianode Photomultiplier with UV window, SBA, 1 square inch)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.239;
+       fEfficiency[1] = 0.294;
+       fEfficiency[2] = 0.332;
+       fEfficiency[3] = 0.351;
+       fEfficiency[4] = 0.352;
+       fEfficiency[5] = 0.338;
+       fEfficiency[6] = 0.303;
+       fEfficiency[7] = 0.286;
+       fEfficiency[8] = 0.307;
+       fEfficiency[9] = 0.307;
+       fEfficiency[10] = 0.324;
+       fEfficiency[11] = 0.340;
+       fEfficiency[12] = 0.354;
+       fEfficiency[13] = 0.364;
+       fEfficiency[14] = 0.371;
+       fEfficiency[15] = 0.390;
+       fEfficiency[16] = 0.389;
+       fEfficiency[17] = 0.392;
+       fEfficiency[18] = 0.395;
+       fEfficiency[19] = 0.393;
+       fEfficiency[20] = 0.388;
+       fEfficiency[21] = 0.388;
+       fEfficiency[22] = 0.378;
+       fEfficiency[23] = 0.367;
+       fEfficiency[24] = 0.358;
+       fEfficiency[25] = 0.347;
+       fEfficiency[26] = 0.333;
+       fEfficiency[27] = 0.310;
+       fEfficiency[28] = 0.384;
+       fEfficiency[29] = 0.265;
+       fEfficiency[30] = 0.248;
+       fEfficiency[31] = 0.238;
+       fEfficiency[32] = 0.220;
+       fEfficiency[33] = 0.188;
+       fEfficiency[34] = 0.150;
+       fEfficiency[35] = 0.123;
+       fEfficiency[36] = 0.104;
+       fEfficiency[37] = 0.089;
+       fEfficiency[38] = 0.068;
+       fEfficiency[39] = 0.058;
+       fEfficiency[40] = 0.050;
+       fEfficiency[41] = 0.041;
+       fEfficiency[42] = 0.033;
+       fEfficiency[43] = 0.025;
+       fEfficiency[44] = 0.018;
+       fEfficiency[45] = 0.013;
+       fEfficiency[46] = 0.008;
+     }
+
+ else if(det_type == 15) {
+       /**  Measured PMT efficiencies for MAPMTs (H8500D-03) at posC (BUW measurement) ##### CernOct2012 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.037;
+       fEfficiency[1] = 0.063;
+       fEfficiency[2] = 0.103;
+       fEfficiency[3] = 0.110;
+       fEfficiency[4] = 0.131;
+       fEfficiency[5] = 0.153;
+       fEfficiency[6] = 0.172;
+       fEfficiency[7] = 0.195;
+       fEfficiency[8] = 0.215;
+       fEfficiency[9] = 0.217;
+       fEfficiency[10] = 0.232;
+       fEfficiency[11] = 0.249;
+       fEfficiency[12] = 0.261;
+       fEfficiency[13] = 0.267;
+       fEfficiency[14] = 0.271;
+       fEfficiency[15] = 0.285;
+       fEfficiency[16] = 0.286;
+       fEfficiency[17] = 0.285;
+       fEfficiency[18] = 0.287;
+       fEfficiency[19] = 0.285;
+       fEfficiency[20] = 0.280;
+       fEfficiency[21] = 0.279;
+       fEfficiency[22] = 0.272;
+       fEfficiency[23] = 0.264;
+       fEfficiency[24] = 0.256;
+       fEfficiency[25] = 0.248;
+       fEfficiency[26] = 0.239;
+       fEfficiency[27] = 0.223;
+       fEfficiency[28] = 0.204;
+       fEfficiency[29] = 0.189;
+       fEfficiency[30] = 0.177;
+       fEfficiency[31] = 0.170;
+       fEfficiency[32] = 0.155;
+       fEfficiency[33] = 0.130;
+       fEfficiency[34] = 0.105;
+       fEfficiency[35] = 0.087;
+       fEfficiency[36] = 0.073;
+       fEfficiency[37] = 0.060;
+       fEfficiency[38] = 0.041;
+       fEfficiency[39] = 0.033;
+       fEfficiency[40] = 0.027;
+       fEfficiency[41] = 0.020;
+       fEfficiency[42] = 0.015;
+       fEfficiency[43] = 0.010;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.003;
+     }
+
+ else if(det_type == 16) {
+       /**  Measured PMT efficiencies for MAPMTs (H8500D-03) at posC -- optimized dipcoated WLS film -- (BUW measurement) ##### CernOct2012 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.202;
+       fEfficiency[1] = 0.240;
+       fEfficiency[2] = 0.269;
+       fEfficiency[3] = 0.277;
+       fEfficiency[4] = 0.279;
+       fEfficiency[5] = 0.273;
+       fEfficiency[6] = 0.245;
+       fEfficiency[7] = 0.228;
+       fEfficiency[8] = 0.243;
+       fEfficiency[9] = 0.243;
+       fEfficiency[10] = 0.253;
+       fEfficiency[11] = 0.259;
+       fEfficiency[12] = 0.262;
+       fEfficiency[13] = 0.263;
+       fEfficiency[14] = 0.265;
+       fEfficiency[15] = 0.278;
+       fEfficiency[16] = 0.279;
+       fEfficiency[17] = 0.281;
+       fEfficiency[18] = 0.283;
+       fEfficiency[19] = 0.281;
+       fEfficiency[20] = 0.277;
+       fEfficiency[21] = 0.275;
+       fEfficiency[22] = 0.267;
+       fEfficiency[23] = 0.260;
+       fEfficiency[24] = 0.253;
+       fEfficiency[25] = 0.245;
+       fEfficiency[26] = 0.234;
+       fEfficiency[27] = 0.219;
+       fEfficiency[28] = 0.201;
+       fEfficiency[29] = 0.187;
+       fEfficiency[30] = 0.175;
+       fEfficiency[31] = 0.167;
+       fEfficiency[32] = 0.150;
+       fEfficiency[33] = 0.124;
+       fEfficiency[34] = 0.098;
+       fEfficiency[35] = 0.080;
+       fEfficiency[36] = 0.066;
+       fEfficiency[37] = 0.055;
+       fEfficiency[38] = 0.040;
+       fEfficiency[39] = 0.033;
+       fEfficiency[40] = 0.026;
+       fEfficiency[41] = 0.020;
+       fEfficiency[42] = 0.014;
+       fEfficiency[43] = 0.010;
+       fEfficiency[44] = 0.006;
+       fEfficiency[45] = 0.004;
+       fEfficiency[46] = 0.002;
+     }
+
+ else if(det_type == 17) {
+       /**  Measured PMT efficiencies for one MAPMT (H10966A-103) at posE (BUW measurement) ##### CernOct2012 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.007;
+       fEfficiency[1] = 0.040;
+       fEfficiency[2] = 0.085;
+       fEfficiency[3] = 0.103;
+       fEfficiency[4] = 0.130;
+       fEfficiency[5] = 0.160;
+       fEfficiency[6] = 0.186;
+       fEfficiency[7] = 0.215;
+       fEfficiency[8] = 0.244;
+       fEfficiency[9] = 0.256;
+       fEfficiency[10] = 0.281;
+       fEfficiency[11] = 0.310;
+       fEfficiency[12] = 0.332;
+       fEfficiency[13] = 0.344;
+       fEfficiency[14] = 0.355;
+       fEfficiency[15] = 0.376;
+       fEfficiency[16] = 0.382;
+       fEfficiency[17] = 0.386;
+       fEfficiency[18] = 0.390;
+       fEfficiency[19] = 0.390;
+       fEfficiency[20] = 0.387;
+       fEfficiency[21] = 0.386;
+       fEfficiency[22] = 0.376;
+       fEfficiency[23] = 0.365;
+       fEfficiency[24] = 0.356;
+       fEfficiency[25] = 0.345;
+       fEfficiency[26] = 0.328;
+       fEfficiency[27] = 0.302;
+       fEfficiency[28] = 0.278;
+       fEfficiency[29] = 0.257;
+       fEfficiency[30] = 0.241;
+       fEfficiency[31] = 0.227;
+       fEfficiency[32] = 0.191;
+       fEfficiency[33] = 0.153;
+       fEfficiency[34] = 0.128;
+       fEfficiency[35] = 0.112;
+       fEfficiency[36] = 0.098;
+       fEfficiency[37] = 0.085;
+       fEfficiency[38] = 0.064;
+       fEfficiency[39] = 0.055;
+       fEfficiency[40] = 0.047;
+       fEfficiency[41] = 0.039;
+       fEfficiency[42] = 0.030;
+       fEfficiency[43] = 0.023;
+       fEfficiency[44] = 0.017;
+       fEfficiency[45] = 0.011;
+       fEfficiency[46] = 0.007;
+     }
+
+ else if(det_type == 18) {
+       /**  Measured PMT efficiencies for one MAPMT (H10966A-103) at posE -- optimized dipcoated WLS film -- (BUW measurement) ##### CernOct2012 #####
+	    (Flat type Multianode Photomultiplier with UV window)
+	    corresponding range in lambda: 180nm  - 640nm in steps of 10nm */
+
+       fLambdaMin = 180.;
+       fLambdaMax = 640.;
+       fLambdaStep = 10.;
+	   
+       fEfficiency[0] = 0.241;
+       fEfficiency[1] = 0.304;
+       fEfficiency[2] = 0.351;
+       fEfficiency[3] = 0.364;
+       fEfficiency[4] = 0.368;
+       fEfficiency[5] = 0.357;
+       fEfficiency[6] = 0.311;
+       fEfficiency[7] = 0.279;
+       fEfficiency[8] = 0.299;
+       fEfficiency[9] = 0.304;
+       fEfficiency[10] = 0.321;
+       fEfficiency[11] = 0.329;
+       fEfficiency[12] = 0.336;
+       fEfficiency[13] = 0.342;
+       fEfficiency[14] = 0.350;
+       fEfficiency[15] = 0.370;
+       fEfficiency[16] = 0.374;
+       fEfficiency[17] = 0.379;
+       fEfficiency[18] = 0.383;
+       fEfficiency[19] = 0.384;
+       fEfficiency[20] = 0.381;
+       fEfficiency[21] = 0.382;
+       fEfficiency[22] = 0.372;
+       fEfficiency[23] = 0.362;
+       fEfficiency[24] = 0.354;
+       fEfficiency[25] = 0.344;
+       fEfficiency[26] = 0.327;
+       fEfficiency[27] = 0.300;
+       fEfficiency[28] = 0.275;
+       fEfficiency[29] = 0.259;
+       fEfficiency[30] = 0.244;
+       fEfficiency[31] = 0.231;
+       fEfficiency[32] = 0.195;
+       fEfficiency[33] = 0.155;
+       fEfficiency[34] = 0.130;
+       fEfficiency[35] = 0.113;
+       fEfficiency[36] = 0.097;
+       fEfficiency[37] = 0.083;
+       fEfficiency[38] = 0.065;
+       fEfficiency[39] = 0.055;
+       fEfficiency[40] = 0.046;
+       fEfficiency[41] = 0.038;
+       fEfficiency[42] = 0.030;
+       fEfficiency[43] = 0.022;
+       fEfficiency[44] = 0.016;
+       fEfficiency[45] = 0.011;
+       fEfficiency[46] = 0.007;
+     }
+
+else if (det_type == 0){
+      //   ideal detector
+      fLambdaMin = 160.;
+      fLambdaMax = 640.;
+      fLambdaStep = 20.;
+
+      fEfficiency[0] = 0.99;
+      fEfficiency[1] = 0.99;
+      fEfficiency[2] = 0.99;
+      fEfficiency[3] = 0.99;
+      fEfficiency[4] = 0.99;
+      fEfficiency[5] = 0.99;
+      fEfficiency[6] = 0.99;
+      fEfficiency[7] = 0.99;
+      fEfficiency[8] = 0.99;
+      fEfficiency[9] = 0.99;
+      fEfficiency[10] = 0.99;
+      fEfficiency[11] = 0.99;
+      fEfficiency[12] = 0.99;
+      fEfficiency[13] = 0.99;
+      fEfficiency[14] = 0.99;
+      fEfficiency[15] = 0.99;
+      fEfficiency[16] = 0.99;
+      fEfficiency[17] = 0.99;
+      fEfficiency[18] = 0.99;
+      fEfficiency[19] = 0.99;
+      fEfficiency[20] = 0.99;
+      fEfficiency[21] = 0.99;
+      fEfficiency[22] = 0.99;
+      fEfficiency[23] = 0.99;
+    }
+
+    else {
       cout << "ERROR: photodetector type not specified" << endl;
 
       fLambdaMin = 100.;
@@ -885,7 +1477,7 @@ void CbmRichHitProducer::SetPhotoDetPar(
       fLambdaStep = 100.;
 
       fEfficiency[0] = 0.;
-   }
+    }
 }
 
 void CbmRichHitProducer::FindRichHitPositionSinglePMT(

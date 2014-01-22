@@ -46,6 +46,7 @@ void CbmLitRadLengthQaReport::Draw()
    DrawDetectorStation("Sts");
    DrawDetectorStation("Trd");
    DrawDetectorStation("Much");
+   DrawDetectorStation("MuchAbsorber");
 }
 
 void CbmLitRadLengthQaReport::DrawDetector(

@@ -117,6 +117,14 @@ private:
           const TString& nodePath);
 
     /**
+     * \brief Return MUCH absorber ID by path to the node or -1 in case node does not exists.
+     * \param[in] nodePath Full path to the node.
+     * \return MUCH absorber ID by path to the node or -1 in case node does not exists.
+     */
+    static Int_t GetMuchAbsorberId(
+          const TString& nodePath);
+
+    /**
      * \brief Save silicon equivalent histograms to a separate files for each detector.
      */
     void SaveMaterialBudgetToFile();
@@ -125,9 +133,9 @@ private:
           const string& detName);
 
     // Material properties of silicon
-    static const Double_t SILICON_DENSITY = 2.33; // g*cm^-3
-    static const Double_t SILICON_A = 28.08855; // silicon atomic weight
-    static const Double_t SILICON_Z = 14.0; // silicon atomic number
+    //static const Double_t SILICON_DENSITY = 2.33; // g*cm^-3
+    //static const Double_t SILICON_A = 28.08855; // silicon atomic weight
+    //static const Double_t SILICON_Z = 14.0; // silicon atomic number
     static const Double_t SILICON_RAD_LENGTH = 9.365; // cm
 
     CbmHistManager* fHM; // Histogram manager

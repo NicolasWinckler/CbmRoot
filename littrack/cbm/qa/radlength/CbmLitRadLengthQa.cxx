@@ -79,6 +79,7 @@ void CbmLitRadLengthQa::Exec(
    ExecDetector("Sts", CbmLitRadLengthQa::GetStsStationId);
    ExecDetector("Trd", CbmLitRadLengthQa::GetTrdStationId);
    ExecDetector("Much", CbmLitRadLengthQa::GetMuchStationId);
+   ExecDetector("MuchAbsorber", CbmLitRadLengthQa::GetMuchAbsorberId);
 }
 
 void CbmLitRadLengthQa::Finish()
@@ -130,14 +131,15 @@ void CbmLitRadLengthQa::CreateHistograms()
    }
 
    // Additional histograms for each station in tracking detectors
-   vector<string> trackingDetNames = list_of("Mvd")("Sts")("Trd")("Much");
+   vector<string> trackingDetNames = list_of("Mvd")("Sts")("Trd")("Much")("MuchAbsorber");
    Int_t nofTrackingDetNames = trackingDetNames.size();
    for (Int_t iDet = 0; iDet < nofTrackingDetNames; iDet++) {
       string dname = trackingDetNames[iDet];
       Int_t nofStations = (dname == "Mvd") ? CbmLitTrackingGeometryConstructor::Instance()->GetNofMvdStations() :
                           (dname == "Sts") ? CbmLitTrackingGeometryConstructor::Instance()->GetNofStsStations() :
                           (dname == "Trd") ? CbmLitTrackingGeometryConstructor::Instance()->GetNofTrdStations() :
-                          (dname == "Much") ? CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchStations() : 0;
+                          (dname == "Much") ? CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchStations() :
+                          (dname == "MuchAbsorber") ? CbmLitTrackingGeometryConstructor::Instance()->GetNofMuchAbsorbers() : 0;
       for (Int_t iStation = 0; iStation < nofStations; iStation++) {
          string name = "hrl_RadThickness_" + dname + "_" + ToString<Int_t>(iStation) + "_H1";
          fHM->Add(name, new TH1D(name.c_str(), string(name + ";Radiation thickness [%];Entries").c_str(), nofBins, 0, 0));
@@ -153,6 +155,9 @@ void CbmLitRadLengthQa::CreateHistograms()
          fHM->Add(name, new TProfile2D(name.c_str(), string(name + ";X [cm];Y [cm];Thickness [cm]").c_str(), nofBinsSiliconThicknessX, minX, maxX, nofBinsSiliconThicknessY, minY, maxY));
       }
    }
+
+   // Additional histograms for MUCH absorbers
+
 
    std::cout << fHM->ToString();
 }
@@ -226,7 +231,8 @@ void CbmLitRadLengthQa::ExecDetector(
       Int_t (*getStationId)(const TString&))
 {
    if (!((detName == "Mvd" && fDet.GetDet(kMVD)) || (detName == "Sts" && fDet.GetDet(kSTS))
-           || (detName == "Trd" && fDet.GetDet(kTRD)) || (detName == "Much" && fDet.GetDet(kMUCH)))) return;
+           || (detName == "Trd" && fDet.GetDet(kTRD)) || (detName == "Much" && fDet.GetDet(kMUCH))
+           || (detName == "MuchAbsorber" && fDet.GetDet(kMUCH)))) return;
 
    // track ID -> TRD station ID -> parameter
    map<Int_t, map<Int_t, Double_t> > radThicknessOnTrack; // track ID -> sum of radiation thickness on track
@@ -343,6 +349,16 @@ Int_t CbmLitRadLengthQa::GetMuchStationId(
    return (nodeExists) ? CbmLitTrackingGeometryConstructor::Instance()->ConvertMuchToAbsoluteStationNr(station - 1, layer - 1) : -1;
 }
 
+Int_t CbmLitRadLengthQa::GetMuchAbsorberId(
+      const TString& nodePath)
+{
+   Int_t absorberId = -1;
+   if (nodePath.Contains(TRegexp("/cave_1/much_0/muchabsorber[0-9][0-9]_0"))) { // much_v11x
+      absorberId = std::atoi(string(gGeoManager->GetPath() + 27, 2).c_str()) - 1; // 42-43th elements are station number
+   }
+   return absorberId;
+}
+
 void CbmLitRadLengthQa::SaveMaterialBudgetToFile()
 {
    SaveDetectorMaterialBudgetToFile("Mvd");
@@ -350,6 +366,7 @@ void CbmLitRadLengthQa::SaveMaterialBudgetToFile()
    SaveDetectorMaterialBudgetToFile("Rich");
    SaveDetectorMaterialBudgetToFile("Trd");
    SaveDetectorMaterialBudgetToFile("Much");
+   SaveDetectorMaterialBudgetToFile("MuchAbsorber");
    SaveDetectorMaterialBudgetToFile("Tof");
 }
 
@@ -365,6 +382,12 @@ void CbmLitRadLengthQa::SaveDetectorMaterialBudgetToFile(
    TFile* file = new TFile(string(fOutputDir + "/" + boost::algorithm::to_lower_copy(detName) + ".silicon.root").c_str(), "RECREATE");
    for (vector<TH1*>::const_iterator it = histos.begin(); it != histos.end(); it++) {
       (*it)->Write();
+   }
+   if (detName == "Much") {
+      vector<TH1*> histos = fHM->H1Vector("hrl_ThicknessSilicon_MuchAbsorber_.+_P2");
+      for (vector<TH1*>::const_iterator it = histos.begin(); it != histos.end(); it++) {
+         (*it)->Write();
+      }
    }
    file->Close();
    delete file;

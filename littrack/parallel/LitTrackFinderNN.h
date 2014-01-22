@@ -69,6 +69,10 @@ protected:
    void PropagateVirtualStations(
          LitTrackParamScal& par);
 
+   void PropagateToStation(
+         unsigned char stationId,
+         LitTrackParamScal& par);
+
    /**
     * \brief Follow tracks through detector
     */

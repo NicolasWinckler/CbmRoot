@@ -103,6 +103,12 @@ public:
    Int_t GetNofStsStations();
 
    /**
+    * \brief Return number of MUCH absorbers.
+    * \return Number of MUCH absorbers.
+    */
+   Int_t GetNofMuchAbsorbers();
+
+   /**
     *
     */
 //   Int_t ConvertTrdToAbsoluteStationNr(
@@ -144,6 +150,7 @@ private:
    Int_t fNofMuchStations; // Number of MUCH stations
    Int_t fNofMvdStations; // Number of MVD stations
    Int_t fNofStsStations; // Number of STS stations
+   Int_t fNofMuchAbsorbers; // Number of MUCH absorbers
    CbmLitDetectorSetup fDet; //
 };
 

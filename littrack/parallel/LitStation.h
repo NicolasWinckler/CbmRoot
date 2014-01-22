@@ -8,11 +8,12 @@
 #ifndef LITSTATION_H_
 #define LITSTATION_H_
 
-#include "LitMaterialGrid.h"
-#include "LitFieldGrid.h"
+#include "LitVirtualStation.h"
 #include <sstream>
+#include <vector>
 using std::stringstream;
 using std::ostream;
+using std::vector;
 
 namespace lit {
 namespace parallel {
@@ -23,8 +24,7 @@ namespace parallel {
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2009
  *
- * Station stores Z position of its center material approximation
- * in silicon equivalent and field approximation.
+ * Station stores list of virtual stations which are used in track propagation.
  *
  */
 template<class T>
@@ -35,24 +35,37 @@ public:
     * \brief Constructor.
     */
    LitStation():
-      fMaterial(),
-      fField(),
-      fZ(0.) {}
+      fVirtualStations() {}
 
    /**
     * \brief Destructor
     */
    virtual ~LitStation() {}
 
-   /* Setters */
-   void SetMaterial(const LitMaterialGrid& material) { fMaterial = material; }
-   void SetField(const LitFieldGrid& field) { fField = field; }
-   void SetZ(T z) { fZ = z; }
+   /**
+    * \brief Add virtual station to detector layout.
+    * \param[in] virtualStation Virtual station to be added.
+    */
+   void AddVirtualStation(const LitVirtualStation<T>& virtualStation) {
+      fVirtualStations.push_back(virtualStation);
+   }
 
-   /* Getters */
-   const LitMaterialGrid& GetMaterial() const { return fMaterial; }
-   const LitFieldGrid& GetField() const { return fField; }
-   T GetZ() const { return fZ; }
+   /**
+    * \brief Return number of virtual stations.
+    * \return Number of virtual stations.
+    */
+   unsigned char GetNofVirtualStations() const {
+      return fVirtualStations.size();
+   }
+
+   /**
+    * \brief Return virtual station by index.
+    * \param[in] station Virtual station index.
+    * \return Virtual station by index.
+    */
+   const LitVirtualStation<T>& GetVirtualStation(unsigned char virtualStation) const {
+      return fVirtualStations[virtualStation];
+   }
 
    /**
     * \brief Returns string representation of the class.
@@ -60,9 +73,11 @@ public:
     */
    string ToString() const {
       stringstream ss;
-      ss << "LitStation: Z=" << GetZ() << "\n";
-      ss << "   material: " << GetMaterial().ToString() << "\n";
-      ss << "   field: " << GetField().ToString();
+      ss << "LitVirtualStation:\n";
+      ss << "virtual stations: nofVirtualStations=" << (int)GetNofVirtualStations() << "\n";
+      for (unsigned char i = 0; i < GetNofVirtualStations(); i++) {
+         ss << (int)i << " " << GetVirtualStation(i).ToString() << "\n";
+      }
       return ss.str();
    }
 
@@ -76,9 +91,7 @@ public:
    }
 
 private:
-   LitMaterialGrid fMaterial; // Material approximation
-   LitFieldGrid fField; // Field approximation
-   T fZ; // Z center of the station [cm]
+   vector<LitVirtualStation<T> > fVirtualStations; // List of virtual stations
 } _fvecalignment;
 
 /**

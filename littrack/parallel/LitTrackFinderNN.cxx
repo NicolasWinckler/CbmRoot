@@ -112,9 +112,9 @@ void lit::parallel::LitTrackFinderNN::PropagateVirtualStations(
    unsigned char nofVirtualStations = fLayout.GetNofVirtualStations();
    unsigned char nofSteps = (nofVirtualStations - 1) / 2;
    for (unsigned char iStep = 0; iStep < nofSteps; iStep++) {
-      const LitStationScal& vsFront = fLayout.GetVirtualStation(2 * iStep + 0);
-      const LitStationScal& vsMiddle = fLayout.GetVirtualStation(2 * iStep + 1);
-      const LitStationScal& vsBack = fLayout.GetVirtualStation(2 * iStep + 2);
+      const LitVirtualStationScal& vsFront = fLayout.GetVirtualStation(2 * iStep + 0);
+      const LitVirtualStationScal& vsMiddle = fLayout.GetVirtualStation(2 * iStep + 1);
+      const LitVirtualStationScal& vsBack = fLayout.GetVirtualStation(2 * iStep + 2);
       if (vsFront.GetField().IsEmpty() || vsMiddle.GetField().IsEmpty() || vsBack.GetField().IsEmpty()) {
          LitLineExtrapolation(par, vsBack.GetZ());
       } else {
@@ -134,6 +134,50 @@ void lit::parallel::LitTrackFinderNN::PropagateVirtualStations(
       if (!vsBack.GetMaterial().IsEmpty()) {
          fscal thickness = vsBack.GetMaterial().GetMaterial(par.X, par.Y);
          if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
+      }
+   }
+}
+
+void lit::parallel::LitTrackFinderNN::PropagateToStation(
+      unsigned char stationId,
+      LitTrackParamScal& par)
+{
+   const LitStationScal& station = fLayout.GetStation(stationId);
+   unsigned char nofVirtualStations = station.GetNofVirtualStations();
+   if (nofVirtualStations == 1) {
+      const LitVirtualStationScal& vs = station.GetVirtualStation(0);
+      fscal z = vs.GetZ();
+      LitLineExtrapolation(par, z);
+      if (!vs.GetMaterial().IsEmpty()) {
+         fscal thickness = vs.GetMaterial().GetMaterial(par.X, par.Y);
+         if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
+      }
+   } else {
+      unsigned char nofSteps = (nofVirtualStations - 1) / 2;
+      for (unsigned char iStep = 0; iStep < nofSteps; iStep++) {
+         const LitVirtualStationScal& vsFront = station.GetVirtualStation(2 * iStep + 0);
+         const LitVirtualStationScal& vsMiddle = station.GetVirtualStation(2 * iStep + 1);
+         const LitVirtualStationScal& vsBack = station.GetVirtualStation(2 * iStep + 2);
+         if (vsFront.GetField().IsEmpty() || vsMiddle.GetField().IsEmpty() || vsBack.GetField().IsEmpty()) {
+            LitLineExtrapolation(par, vsBack.GetZ());
+         } else {
+            LitRK4Extrapolation(par, vsBack.GetZ(), vsFront.GetField(), vsMiddle.GetField(), vsBack.GetField());
+         }
+
+         if (!vsFront.GetMaterial().IsEmpty()) {
+            fscal thickness = vsFront.GetMaterial().GetMaterial(par.X, par.Y);
+            if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
+         }
+
+         if (!vsMiddle.GetMaterial().IsEmpty()) {
+            fscal thickness = vsMiddle.GetMaterial().GetMaterial(par.X, par.Y);
+            if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
+         }
+
+         if (!vsBack.GetMaterial().IsEmpty()) {
+            fscal thickness = vsBack.GetMaterial().GetMaterial(par.X, par.Y);
+            if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
+         }
       }
    }
 }
@@ -168,11 +212,12 @@ void lit::parallel::LitTrackFinderNN::FollowTracks()
             (*itMap).second = par;
             fscal z = fHitData.GetZPosByBin(iStation, (*itMap).first);
             LitTrackParamScal& tpar = (*itMap).second;
-            LitLineExtrapolation(tpar, z);
-            if (!station.GetMaterial().IsEmpty()) {
-               fscal thickness = station.GetMaterial().GetMaterial(tpar.X, tpar.Y);
-               if (thickness > 0) LitAddMaterial<fscal>(tpar, thickness);
-            }
+            PropagateToStation(iStation, tpar);
+//            LitLineExtrapolation(tpar, z);
+//            if (!station.GetVirtualStation().GetMaterial().IsEmpty()) {
+//               fscal thickness = station.GetVirtualStation().GetMaterial().GetMaterial(tpar.X, tpar.Y);
+//               if (thickness > 0) LitAddMaterial<fscal>(tpar, thickness);
+//            }
          }
 
          // Loop over hits

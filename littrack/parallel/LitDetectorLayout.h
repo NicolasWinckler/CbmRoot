@@ -15,6 +15,7 @@
 #define LITDETECTORLAYOUT_H_
 
 #include "LitStation.h"
+#include "LitVirtualStation.h"
 
 namespace lit {
 namespace parallel {
@@ -56,7 +57,7 @@ public:
     * \brief Add virtual station to detector layout.
     * \param[in] virtualStation Virtual station to be added.
     */
-   void AddVirtualStation(const LitStation<T>& virtualStation) {
+   void AddVirtualStation(const LitVirtualStation<T>& virtualStation) {
       fVirtualStations.push_back(virtualStation);
    }
 
@@ -90,7 +91,7 @@ public:
     * \param[in] station Virtual station index.
     * \return Virtual station by index.
     */
-   const LitStation<T>& GetVirtualStation(unsigned char virtualStation) const {
+   const LitVirtualStation<T>& GetVirtualStation(unsigned char virtualStation) const {
       return fVirtualStations[virtualStation];
    }
 
@@ -123,7 +124,7 @@ public:
 
 private:
    vector<LitStation<T> > fStations; // Array with stations
-   vector<LitStation<T> > fVirtualStations; // Array with virtual stations
+   vector<LitVirtualStation<T> > fVirtualStations; // Array with virtual stations
 } _fvecalignment;
 
 /**

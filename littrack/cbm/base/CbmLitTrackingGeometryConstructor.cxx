@@ -223,7 +223,7 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
       lit::parallel::LitFieldGrid fieldGrid;
       gridCreator.CreateGrid(z, fieldGrid);
 
-      lit::parallel::LitStation<T> station;
+      lit::parallel::LitVirtualStation<T> station;
       station.SetZ(z);
       station.SetField(fieldGrid);
       if (iStation == 10) station.SetMaterial(richMaterial);
@@ -240,8 +240,11 @@ void CbmLitTrackingGeometryConstructor::GetTrdLayout(
       lit::parallel::LitMaterialGrid material;
       ConvertTProfile2DToLitMaterialGrid(profile, &material);
 
+      lit::parallel::LitVirtualStation<T> vs;
+      vs.SetMaterial(material);
+
       lit::parallel::LitStation<T> station;
-      station.SetMaterial(material);
+      station.AddVirtualStation(vs);
 
       layout.AddStation(station);
    }
@@ -384,6 +387,26 @@ Int_t CbmLitTrackingGeometryConstructor::GetNofMuchStations()
       firstTime = false;
    }
    return fNofMuchStations;
+}
+
+Int_t CbmLitTrackingGeometryConstructor::GetNofMuchAbsorbers()
+{
+   static Bool_t firstTime = true;
+   if (firstTime) {
+      fNofMuchAbsorbers = 0;
+      const TGeoNode* much = static_cast<const TGeoNode*>(fGeo->GetTopNode()->GetNodes()->FindObject("much_0"));
+      if (NULL == much) { // No MUCH detector return 0 stations
+         firstTime = false;
+         return fNofMuchAbsorbers;
+      }
+      TObjArray* muchNodes = much->GetNodes();
+      for (Int_t iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
+         const TGeoNode* muchNode = static_cast<const TGeoNode*>(muchNodes->At(iMuchNode));
+         if (TString(muchNode->GetName()).Contains("absorber")) fNofMuchAbsorbers++;
+      }
+      firstTime = false;
+   }
+   return fNofMuchAbsorbers;
 }
 
 Int_t CbmLitTrackingGeometryConstructor::GetNofMuchTrdStations()

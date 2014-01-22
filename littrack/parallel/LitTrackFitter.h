@@ -31,9 +31,9 @@ inline void LitTrackFitter(
    unsigned char nofVirtualStations = layout.GetNofVirtualStations();
    unsigned char nofSteps = (nofVirtualStations - 1) / 2;
    for (unsigned char iStep = 0; iStep < nofSteps; iStep++) {
-      const LitStationScal& vsFront = layout.GetVirtualStation(2 * iStep + 0);
-      const LitStationScal& vsMiddle = layout.GetVirtualStation(2 * iStep + 1);
-      const LitStationScal& vsBack = layout.GetVirtualStation(2 * iStep + 2);
+      const LitVirtualStationScal& vsFront = layout.GetVirtualStation(2 * iStep + 0);
+      const LitVirtualStationScal& vsMiddle = layout.GetVirtualStation(2 * iStep + 1);
+      const LitVirtualStationScal& vsBack = layout.GetVirtualStation(2 * iStep + 2);
       if (vsFront.GetField().IsEmpty() || vsMiddle.GetField().IsEmpty() || vsBack.GetField().IsEmpty()) {
          LitLineExtrapolation(par, vsBack.GetZ());
       } else {
@@ -69,9 +69,9 @@ inline void LitTrackFitter(
 
       // Add material taking into account missing hits
       for (unsigned char iStation = prevStationId + 1; iStation <= hit->stationId; iStation++) {
-         const LitStationScal& station = layout.GetStation(iStation);
-         if (!station.GetMaterial().IsEmpty()) {
-            fscal thickness = station.GetMaterial().GetMaterial(par.X, par.Y);
+         const LitVirtualStationScal& vs = layout.GetStation(iStation).GetVirtualStation(0);
+         if (!vs.GetMaterial().IsEmpty()) {
+            fscal thickness = vs.GetMaterial().GetMaterial(par.X, par.Y);
             if (thickness > 0) LitAddMaterial<fscal>(par, thickness);
          }
       }

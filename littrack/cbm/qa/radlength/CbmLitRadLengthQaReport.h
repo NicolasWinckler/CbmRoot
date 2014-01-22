@@ -56,18 +56,6 @@ protected:
    void DrawDetectorStation(
          const string& detName);
 
-   /**
-    * \brief Draw TProfile2D by pattern name.
-    */
-   void DrawP2ByPattern(
-         const string& pattern);
-
-   /**
-    * \brief Draw TH1 by pattern name.
-    */
-   void DrawH1ByPattern(
-         const string& pattern);
-
    ClassDef(CbmLitRadLengthQaReport, 1)
 };
 

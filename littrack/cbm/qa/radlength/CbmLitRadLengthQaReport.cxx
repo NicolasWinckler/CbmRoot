@@ -8,7 +8,6 @@
 #include "CbmHistManager.h"
 #include "CbmDrawHist.h"
 
-#include "TH1.h"
 #include "TProfile2D.h"
 
 CbmLitRadLengthQaReport::CbmLitRadLengthQaReport():
@@ -87,37 +86,11 @@ void CbmLitRadLengthQaReport::DrawDetectorStation(
       const string& detName)
 {
    DrawH1ByPattern("hrl_RadThickness_" + detName + "_.+_H1");
-   DrawP2ByPattern("hrl_RadThickness_" + detName + "_.+_P2");
+   DrawH2ByPattern("hrl_RadThickness_" + detName + "_.+_P2");
    DrawH1ByPattern("hrl_Thickness_" + detName + "_.+_H1");
-   DrawP2ByPattern("hrl_Thickness_" + detName + "_.+_P2");
+   DrawH2ByPattern("hrl_Thickness_" + detName + "_.+_P2");
    DrawH1ByPattern("hrl_ThicknessSilicon_" + detName + "_.+_H1");
-   DrawP2ByPattern("hrl_ThicknessSilicon_" + detName + "_.+_P2");
-}
-
-void CbmLitRadLengthQaReport::DrawH1ByPattern(
-      const string& pattern)
-{
-   std::vector<TH1*> histos = HM()->H1Vector(pattern);
-   Int_t nofHistos = histos.size();
-   if (nofHistos < 1) return;
-   for (Int_t i = 0; i < nofHistos; i++) {
-      TH1* hist = histos[i];
-      TCanvas* canvas = CreateCanvas(hist->GetName(), hist->GetName(), 1200, 1000);
-      DrawH1(hist);
-   }
-}
-
-void CbmLitRadLengthQaReport::DrawP2ByPattern(
-      const string& pattern)
-{
-   std::vector<TProfile2D*> profiles = HM()->P2Vector(pattern);
-   Int_t nofProfiles = profiles.size();
-   if (nofProfiles < 1) return;
-   for (Int_t i = 0; i < nofProfiles; i++) {
-      TProfile2D* profile = profiles[i];
-      TCanvas* canvas = CreateCanvas(profile->GetName(), profile->GetName(), 1200, 1000);
-      DrawH2(profile);
-   }
+   DrawH2ByPattern("hrl_ThicknessSilicon_" + detName + "_.+_P2");
 }
 
 ClassImp(CbmLitRadLengthQaReport)

@@ -56,8 +56,8 @@ void CbmSimulationReport::DrawH1ByPattern(
       const string& histNamePattern)
 {
    vector<TH1*> histos = HM()->H1Vector(histNamePattern);
-   if (histos.size() == 0) return;
    Int_t nofHistos = histos.size();
+   if (nofHistos < 1) return;
    for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
       TH1* hist = histos[iHist];
       string canvasName = GetReportName() + hist->GetName();
@@ -71,11 +71,11 @@ void CbmSimulationReport::DrawH1ByPattern(
       string (*labelFormatter)(const string&, const CbmHistManager*))
 {
    vector<TH1*> histos = HM()->H1Vector(histNamePattern);
-   if (histos.size() == 0) return;
+   Int_t nofHistos = histos.size();
+   if (nofHistos < 1) return;
    string canvasName = GetReportName() + histos[0]->GetName();
    TCanvas* canvas = CreateCanvas(canvasName.c_str(), canvasName.c_str(), 600, 500);
 
-   Int_t nofHistos = histos.size();
    vector<string> labels(nofHistos);
    for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
       string name = histos[iHist]->GetName();
@@ -93,8 +93,8 @@ void CbmSimulationReport::DrawH2ByPattern(
       const string& drawOpt)
 {
     vector<TH2*> histos = HM()->H2Vector(histNamePattern);
-    if (histos.size() == 0) return;
     Int_t nofHistos = histos.size();
+    if (nofHistos < 1) return;
     for (UInt_t iHist = 0; iHist < nofHistos; iHist++) {
         TH2* hist = histos[iHist];
         string canvasName = GetReportName() + hist->GetName();

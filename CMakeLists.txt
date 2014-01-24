@@ -2,7 +2,7 @@
 # refer to the root source directory of the project as ${CBMROOT_SOURCE_DIR} or
 # as ${CMAKE_SOURCE_DIR} and to the root binary directory of the project as 
 # ${CBMROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}.
-# This difference is is important for the base classes which are in CBMROOT 
+# This difference is important for the base classes which are in CBMROOT 
 # and PANDAROOT.
 
 # Check if cmake has the required version
@@ -12,14 +12,38 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4.3 FATAL_ERROR)
 # after check of cmake version                        
 project(CBMROOT)
 
+FIND_PATH(FAIRBASE NAMES FairRun.h  PATHS
+  ${CMAKE_SOURCE_DIR}/base/steer
+  NO_DEFAULT_PATH
+)
+
+if(!FAIRBASE)
+  IF(NOT DEFINED ENV{FAIRROOTPATH})
+     MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
+  ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
+
+  SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
+endif(!FAIRBASE)
+
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ 
 # is checked
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules"  ${CMAKE_MODULE_PATH})
 
 # Check if the compiler support specific C++11 features
 # Up to now this is only a check since the code does not use
 # any of the features of the new standard
-Set(CheckSrcDir "${CMAKE_SOURCE_DIR}/cmake/checks")
+
+IF(FAIRROOTPATH)
+  Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
+ELSE(FAIRROOTPATH)
+  Set(CheckSrcDir "${CMAKE_SOURCE_DIR}/cmake/checks")
+ENDIF(FAIRROOTPATH)
+
+if(!FAIRBASE)
+find_package(FairRoot)
+endif(!FAIRBASE)
+
 include(CheckCXX11Features)
 
 # Load some basic macros which are needed later on
@@ -160,16 +184,22 @@ If(BUILD_BEAMTIME)
   Set(BUILD_MBS FALSE)
 EndIf(BUILD_BEAMTIME)
 
+IF(NOT FAIRROOT_FOUND)
+
 add_subdirectory (fairtools)
 add_subdirectory (MbsAPI)
 add_subdirectory (base)
 add_subdirectory (dbase)
 add_subdirectory (geobase)
 add_subdirectory (parbase) 
+add_subdirectory (generators)
+add_subdirectory (geane)
+add_subdirectory (trackbase)
+ENDIF (NOT FAIRROOT_FOUND)
+
 add_subdirectory (cbmbase)
 add_subdirectory (cbmdata)
 add_subdirectory (field)  
-add_subdirectory (generators)
 add_subdirectory (passive)
 add_subdirectory (rich) 
 add_subdirectory (mvd) 
@@ -188,8 +218,6 @@ add_subdirectory (L1)
 add_subdirectory (macro)
 add_subdirectory (dilept)
 add_subdirectory (stt)
-add_subdirectory (geane)
-add_subdirectory (trackbase)
 add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial1/src)
 #add_subdirectory (tutorials/Tutorial2/src)
@@ -199,7 +227,7 @@ add_subdirectory (hadron)
 add_subdirectory (analysis)
 #add_subdirectory (vis)
 
-Option(BUILD_UNITTESTS "Build all unittests and add them as new tests" OFF)
+Option(BUILD_UNITTESTS "Build all unit tests and add them as new tests" OFF)
 If(BUILD_UNITTESTS)
 
   Message("Build the unit tests.")
@@ -220,8 +248,12 @@ Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
 
 If(${EveIsBuild} STREQUAL yes)
   Message("Build the eventdisplay.")
+IF(NOT FAIRROOT_FOUND)
   add_subdirectory (eventdisplay)
+ENDIF(NOT FAIRROOT_FOUND)
+
   add_subdirectory (cbmdisplay)
+
 Else(${EveIsBuild} STREQUAL yes)
   Message("The eventdisplay is not build, there is no OpenGL support.")
 EndIf(${EveIsBuild} STREQUAL yes)

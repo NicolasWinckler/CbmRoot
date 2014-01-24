@@ -3,6 +3,7 @@
  * \author Andrey Lebedev <andrey.lebedev@gsi.de>
  * \date 2013
  **/
+#include "FairLogger.h"
 
 #include "CbmLitFindGlobalTracksParallel.h"
 #include "parallel/LitDetectorLayout.h"

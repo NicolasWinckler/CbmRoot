@@ -37,6 +37,7 @@ include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
+${FAIRROOT_LIBRARY_DIR}
 #${ROCSYS}/lib
 #${GO4SYS}/include
 #${GO4SYS}/Go4Event

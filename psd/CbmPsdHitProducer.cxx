@@ -8,6 +8,7 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 
+#include "FairLogger.h"
 #include "FairRootManager.h"
 
 #include "CbmPsdDigi.h"

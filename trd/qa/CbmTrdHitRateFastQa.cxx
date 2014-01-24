@@ -8,6 +8,7 @@
 
 #include "CbmTrdUtils.h"
 
+#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"

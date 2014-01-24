@@ -27,6 +27,7 @@ class CbmRichMirrorPoint;
 class FairVolume; 
 class TGeoMatrix;
 class TGeoNode;
+class TGeoMedium;
 /**
 * \class CbmRich
 *

@@ -19,6 +19,7 @@
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
 #include "TGeoManager.h"
+#include "TGeoMedium.h"
 #include "TLorentzVector.h"
 #include "TParticle.h"
 #include "TParticlePDG.h"

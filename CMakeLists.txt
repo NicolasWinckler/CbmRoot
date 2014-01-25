@@ -17,13 +17,15 @@ FIND_PATH(FAIRBASE NAMES FairRun.h  PATHS
   NO_DEFAULT_PATH
 )
 
-if(!FAIRBASE)
+
+if(NOT DEFINED ${FAIRBASE})
+
   IF(NOT DEFINED ENV{FAIRROOTPATH})
      MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
   ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
 
   SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
-endif(!FAIRBASE)
+endif(NOT DEFINED ${FAIRBASE})
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ 
 # is checked
@@ -40,9 +42,9 @@ ELSE(FAIRROOTPATH)
   Set(CheckSrcDir "${CMAKE_SOURCE_DIR}/cmake/checks")
 ENDIF(FAIRROOTPATH)
 
-if(!FAIRBASE)
-find_package(FairRoot)
-endif(!FAIRBASE)
+if(NOT DEFINED ${FAIRBASE})
+  find_package(FairRoot)
+endif(NOT DEFINED ${FAIRBASE})
 
 include(CheckCXX11Features)
 

@@ -171,11 +171,12 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
    }
    fDigiMap.clear();
 
+   Double_t digisOverPoints = (nofPoints > 0) ? fDigis->GetEntriesFast() / nofPoints : 0;
+   Double_t latticeHitsOverElectrons = (nofElectrons > 0) ? (Double_t) nofLatticeHits / (Double_t) nofElectrons : 0;
    LOG(INFO) << "CbmTrdDigitizerPRF::Exec nofPoints=" << nofPoints << " nofDigis=" << fDigis->GetEntriesFast()
-            << " digis/points=" << fDigis->GetEntriesFast() / nofPoints
-            << " nofBackwardTracks=" << nofBackwardTracks << " nofLatticeHits=" << nofLatticeHits
-            << " nofElectrons=" << nofElectrons << " latticeHits/electrons="
-            << (Double_t) nofLatticeHits / (Double_t) nofElectrons << FairLogger::endl;
+            << " digis/points=" << digisOverPoints << " nofBackwardTracks=" << nofBackwardTracks
+            << " nofLatticeHits=" << nofLatticeHits << " nofElectrons=" << nofElectrons
+            << " latticeHits/electrons=" << latticeHitsOverElectrons << FairLogger::endl;
    timer.Stop();
    LOG(INFO) << "CbmTrdDigitizerPRF::Exec real time=" << timer.RealTime()
             << " CPU time=" << timer.CpuTime() << FairLogger::endl;

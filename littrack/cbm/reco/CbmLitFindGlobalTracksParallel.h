@@ -81,6 +81,8 @@ private:
    TClonesArray* fStsTracks; // CbmStsTrack array
    TClonesArray* fTrdHits; // CbmTrdHit array
    TClonesArray* fTrdTracks; // output CbmTrdTrack array
+   TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
+   TClonesArray* fMuchTracks; // output CbmMuchTrack array
    TClonesArray* fGlobalTracks; //output CbmGlobalTrack array
 
    // Settings

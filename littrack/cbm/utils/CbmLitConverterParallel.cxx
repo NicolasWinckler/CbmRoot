@@ -10,6 +10,7 @@
 #include "parallel/LitScalPixelHit.h"
 #include "CbmTrack.h"
 #include "CbmTrdTrack.h"
+#include "CbmMuchTrack.h"
 #include "CbmPixelHit.h"
 #include "FairTrackParam.h"
 #include "TClonesArray.h"
@@ -194,6 +195,18 @@ void CbmLitConverterParallel::LitScalTrackArrayToCbmTrdTrackArray(
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
       lit::parallel::LitScalTrack* ltrack = ltracks[iTrack];
       CbmTrdTrack* track = new ((*tracks)[iTrack]) CbmTrdTrack();
+      LitScalTrackToCbmTrack(ltrack, track);
+   }
+}
+
+void CbmLitConverterParallel::LitScalTrackArrayToCbmMuchTrackArray(
+      const vector<lit::parallel::LitScalTrack*>& ltracks,
+      TClonesArray* tracks)
+{
+   Int_t nofTracks = ltracks.size();
+   for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+      lit::parallel::LitScalTrack* ltrack = ltracks[iTrack];
+      CbmMuchTrack* track = new ((*tracks)[iTrack]) CbmMuchTrack();
       LitScalTrackToCbmTrack(ltrack, track);
    }
 }

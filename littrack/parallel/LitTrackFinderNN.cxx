@@ -54,7 +54,7 @@ void lit::parallel::LitTrackFinderNN::DoFind(
    fHitData.SetNofStations(fLayout.GetNofStations());
 
    for (fIteration = 0; fIteration < fNofIterations; fIteration++) {
-     // cout << "LitTrackFinderNN::DoFind: iteration=" << fIteration << endl;
+    //  cout << "LitTrackFinderNN::DoFind: iteration=" << fIteration << endl;
       ArrangeHits(hits);
     //  cout << fHitData.ToString();
 
@@ -70,7 +70,7 @@ void lit::parallel::LitTrackFinderNN::DoFind(
    }
 
    static int eventNo = 0;
-   cout << "LitTrackFinderNN::DoFind: " << eventNo++ << " events processed" << endl;
+   cout << "LitTrackFinderNN::DoFind: eventNo=" << eventNo++ << endl;
 }
 
 void lit::parallel::LitTrackFinderNN::ArrangeHits(

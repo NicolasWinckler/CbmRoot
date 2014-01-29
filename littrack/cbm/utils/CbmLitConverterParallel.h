@@ -104,6 +104,15 @@ public:
    static void LitScalTrackArrayToCbmTrdTrackArray(
          const vector<lit::parallel::LitScalTrack*>& ltracks,
          TClonesArray* tracks);
+
+   /**
+    * \brief Convert array of LitScalTrack to array of CbmTrack.
+    * \param[in] ltracks Vector of LitScalTrack.
+    * \param[out] tracks TClonesArray of CbmTrack.
+    */
+   static void LitScalTrackArrayToCbmMuchTrackArray(
+         const vector<lit::parallel::LitScalTrack*>& ltracks,
+         TClonesArray* tracks);
 };
 
 #endif /* CBMLITCONVERTERPARALLEL_H_ */

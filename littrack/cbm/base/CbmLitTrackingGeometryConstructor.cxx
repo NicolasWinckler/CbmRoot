@@ -75,109 +75,66 @@ void CbmLitTrackingGeometryConstructor::GetMuchLayoutScal(
 template<class T> void CbmLitTrackingGeometryConstructor::GetMuchLayout(
    lit::parallel::LitDetectorLayout<T>& layout)
 {
-//   std::cout << "Getting detector layout for parallel MUCH tracking..." << std::endl;
-//
-//   CbmLitFieldGridCreator gridCreator;
-//
-//   const TGeoNode* much = static_cast<const TGeoNode*>(fGeo->GetTopNode()->GetNodes()->FindObject("much_0"));
-//   const double* muchPos  = much->GetMatrix()->GetTranslation();
-//   TObjArray* muchNodes = much->GetNodes();
-//   for (Int_t iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
-//      const TGeoNode* muchNode = static_cast<const TGeoNode*>(muchNodes->At(iMuchNode));
-//
-//      // If MUCH node is an absorber
-//      if (TString(muchNode->GetName()).Contains("absorber")) {
-//         const TGeoCone* absorberShape = static_cast<const TGeoCone*>(muchNode->GetVolume()->GetShape());
-//         const TGeoMaterial* absorberMaterial = muchNode->GetVolume()->GetMedium()->GetMaterial();
-//
-//         Double_t zPos = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]; // Z center position
-//         Double_t thickness = 2. * absorberShape->GetDz();
-//
-//         lit::parallel::LitAbsorber<T> absorber;
-//         absorber.SetZ(zPos);
-//
-//         lit::parallel::LitMaterialInfo<T> material;
-//         material.Thickness = thickness;
-//         material.A = absorberMaterial->GetA();
-//         material.Z = absorberMaterial->GetZ();
-//         material.Rho = absorberMaterial->GetDensity();
-//         material.X0 = absorberMaterial->GetRadLen();
-//         material.I = (absorberMaterial->GetZ() > 16.) ? 10. * absorberMaterial->GetZ() * 1e-9 : 16. * std::pow(absorberMaterial->GetZ(), 0.9) * 1e-9;
-//         absorber.SetMaterial(material);
-//
-//         Double_t gridZ[3] = { zPos - 0.5 * thickness, zPos, zPos + 0.5 * thickness};
-//         lit::parallel::LitFieldGrid frontGrid, middleGrid, backGrid;
-//         gridCreator.CreateGrid(gridZ[0], frontGrid);
-//         gridCreator.CreateGrid(gridZ[1], middleGrid);
-//         gridCreator.CreateGrid(gridZ[2], backGrid);
-//         absorber.SetFieldGridFront(frontGrid);
-//         absorber.SetFieldGridMiddle(middleGrid);
-//         absorber.SetFieldGridBack(backGrid);
-//      }
-//
-//      // If MUCH node is a station
-//      if (TString(muchNode->GetName()).Contains("station")) {
-//    	 // Create station group
-//    	 lit::parallel::LitStationGroupMuon<T> sg;
-//         TObjArray* layerNodes = muchNode->GetNodes();
-//         // Calculate minimum and maximum Z of the substation which is needed for field approximation.
-//         Double_t minZ = std::numeric_limits<Double_t>::max(), maxZ = std::numeric_limits<Double_t>::min();
-//         for (Int_t iLayerNode = 0; iLayerNode < layerNodes->GetEntriesFast(); iLayerNode++) {
-//        	// Create station
-//        	lit::parallel::LitStationMuon<T> st;
-//        	st.SetType(lit::parallel::kLITPIXELHIT);
-//            const TGeoNode* sideNode = static_cast<const TGeoNode*>(layerNodes->At(iLayerNode));
-//            Bool_t bactive = false, factive = false;
-//            TObjArray* sideNodes = sideNode->GetNodes();
-//            for (Int_t iSideNode = 0; iSideNode < sideNodes->GetEntriesFast(); iSideNode++) {
-//               const TGeoNode* active = static_cast<const TGeoNode*>(sideNode->GetNodes()->At(iSideNode));
-//               if (TString(active->GetName()).Contains("active")) {
-//                  if (bactive && TString(active->GetName()).Contains("bactive")) { continue; }
-//                  if (factive && TString(active->GetName()).Contains("factive")) { continue; }
-//
-//                  const TGeoBBox* activeShape = static_cast<const TGeoBBox*>(active->GetVolume()->GetShape());
-//                  const TGeoMaterial* activeMaterial = active->GetVolume()->GetMedium()->GetMaterial();
-//
-//                  Double_t zPos = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
-//                          + sideNode->GetMatrix()->GetTranslation()[2] + active->GetMatrix()->GetTranslation()[2] + activeShape->GetDZ();
-//
-//                  minZ = std::min(minZ, zPos);
-//                  maxZ = std::max(maxZ, zPos);
-//
-//                  lit::parallel::LitSubstationMuon<T> ss;
-//                  ss.SetZ(zPos);
-//
-//                  lit::parallel::LitMaterialInfo<T> material;
-//                  material.Thickness = 2. * activeShape->GetDZ();
-//                  material.A = activeMaterial->GetA();
-//                  material.Z = activeMaterial->GetZ();
-//                  material.Rho = activeMaterial->GetDensity();
-//                  material.X0 = activeMaterial->GetRadLen();
-//                  material.I = (activeMaterial->GetZ() > 16.) ? 10. * activeMaterial->GetZ() * 1e-9 : 16. * std::pow(activeMaterial->GetZ(), 0.9) * 1e-9;
-//                  ss.SetMaterial(material);
-//
-//                  st.AddSubstation(ss);
-//
-//                  bactive = TString(active->GetName()).Contains("bactive");
-//                  factive = TString(active->GetName()).Contains("factive");
-//                  if (factive && bactive) { break; }
-//               }
-//            }
-//            sg.AddStation(st);
-//         }
-//         // Magnetic field approximation for the station group
-//         lit::parallel::LitFieldGrid frontGrid, middleGrid, backGrid;
-//         gridCreator.CreateGrid(minZ, frontGrid);
-//         gridCreator.CreateGrid((minZ + 0.5 * (maxZ - minZ)), middleGrid);
-//         gridCreator.CreateGrid(maxZ, backGrid);
-//         sg.SetFieldGridFront(frontGrid);
-//         sg.SetFieldGridMiddle(middleGrid);
-//         sg.SetFieldGridBack(backGrid);
-//         layout.AddStationGroup(sg);
-//      }
-//   }
-//
-//   std::cout << layout;
+   cout << "Getting MUCH layout for parallel version of tracking...\n";
+
+   // Read file with TProfile2D containing silicon equivalent of the material
+   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+   TString matBudgetFile = parDir + "/littrack/much_v12b.silicon.root";
+   TFile* oldFile = gFile;
+   TDirectory* oldDirectory = gDirectory;
+   TFile* file = new TFile(matBudgetFile, "READ");
+   CbmHistManager hm;
+   hm.ReadFromFile(file);
+
+   CbmLitFieldGridCreator gridCreator;
+
+   const TGeoNode* much = static_cast<const TGeoNode*>(fGeo->GetTopNode()->GetNodes()->FindObject("much_0"));
+   TObjArray* muchNodes = much->GetNodes();
+   Int_t currentStation = 0;
+   Int_t currentLayer = 0;
+   for (Int_t iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
+      const TGeoNode* muchNode = static_cast<const TGeoNode*>(muchNodes->At(iMuchNode));
+
+      if (TString(muchNode->GetName()).Contains("station")) {
+         TObjArray* layerNodes = muchNode->GetNodes();
+
+         for (Int_t iLayerNode = 0; iLayerNode < layerNodes->GetEntriesFast(); iLayerNode++) {
+            const TGeoNode* layer = static_cast<const TGeoNode*>(layerNodes->At(iLayerNode));
+
+            Double_t z = much->GetMatrix()->GetTranslation()[2]
+                       + muchNode->GetMatrix()->GetTranslation()[2]
+                       + layer->GetMatrix()->GetTranslation()[2];
+
+            // Convert material for this station
+            TProfile2D* profile = (iLayerNode == 0)
+                  ? hm.P2("hrl_ThicknessSilicon_MuchAbsorber_" + lit::ToString<Int_t>(currentStation) + "_P2")
+                  : hm.P2("hrl_ThicknessSilicon_Much_" + lit::ToString<Int_t>(currentLayer) + "_P2");
+            //profile->Rebin2D(200, 200);
+            lit::parallel::LitMaterialGrid material;
+            ConvertTProfile2DToLitMaterialGrid(profile, &material);
+
+            lit::parallel::LitVirtualStation<T> vs;
+            vs.SetMaterial(material);
+
+            lit::parallel::LitStation<T> station;
+            station.AddVirtualStation(vs);
+
+            layout.AddStation(station);
+
+
+            currentLayer++;
+         }
+         currentStation++;
+      }
+   }
+
+   gFile = oldFile;
+   gDirectory = oldDirectory;
+   file->Close();
+   delete file;
+
+   cout << layout;
+   cout << "Finish getting MUCH layout for parallel version of tracking\n";
 }
 
 void CbmLitTrackingGeometryConstructor::GetTrdLayoutVec(

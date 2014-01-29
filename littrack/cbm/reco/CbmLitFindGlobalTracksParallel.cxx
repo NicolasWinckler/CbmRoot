@@ -36,6 +36,8 @@ CbmLitFindGlobalTracksParallel::CbmLitFindGlobalTracksParallel() :
       fStsTracks(NULL),
       fTrdHits(NULL),
       fTrdTracks(NULL),
+      fMuchPixelHits(NULL),
+      fMuchTracks(NULL),
       fGlobalTracks(NULL),
       fTrackingType("nn"),
       fMergerType("neares_hit"),
@@ -68,6 +70,7 @@ void CbmLitFindGlobalTracksParallel::Exec(
    Option_t* opt)
 {
    if (fDet.GetDet(kTRD)) { fTrdTracks->Delete(); }
+   if (fDet.GetDet(kMUCH)) { fMuchTracks->Delete(); }
    fGlobalTracks->Delete();
 
    DoTracking();
@@ -84,16 +87,22 @@ void CbmLitFindGlobalTracksParallel::Finish()
 void CbmLitFindGlobalTracksParallel::ReadAndCreateDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
-   if (NULL == ioman) { Fatal("Init", "FairRootManager is not instantiated"); }
+   if (NULL == ioman) LOG(FATAL) << "CbmLitFindGlobalTracksParallel: FairRootManager is not instantiated" << FairLogger::endl;
 
    // STS
    fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
-   if (NULL == fStsTracks) { Fatal("Init","No StsTrack array!"); }
+   if (NULL == fStsTracks) LOG(FATAL) << "CbmLitFindGlobalTracksParallel: No StsTrack array!" << FairLogger::endl;
 
    // TRD
    if (fDet.GetDet(kTRD)) {
       fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
-      if (NULL == fTrdHits) { Fatal("Init", "No TRDHit array!"); }
+      if (NULL == fTrdHits) if (NULL == fTrdHits) LOG(FATAL) << "CbmLitFindGlobalTracksParallel: No TRDHit array!" << FairLogger::endl;
+   }
+
+   // MUCH
+   if (fDet.GetDet(kMUCH)) {
+      fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+      if (NULL == fMuchPixelHits) if (NULL == fMuchPixelHits) LOG(FATAL) << "CbmLitFindGlobalTracksParallel: No MuchPixelHit array!" << FairLogger::endl;
    }
 
    // Create and register track arrays
@@ -104,6 +113,11 @@ void CbmLitFindGlobalTracksParallel::ReadAndCreateDataBranches()
       fTrdTracks = new TClonesArray("CbmTrdTrack", 100);
       ioman->Register("TrdTrack", "Trd", fTrdTracks, kTRUE);
    }
+
+   if (fDet.GetDet(kMUCH)) {
+      fMuchTracks = new TClonesArray("CbmMuchTrack", 100);
+      ioman->Register("MuchTrack", "Much", fMuchTracks, kTRUE);
+   }
 }
 
 void CbmLitFindGlobalTracksParallel::DoTracking()
@@ -112,15 +126,28 @@ void CbmLitFindGlobalTracksParallel::DoTracking()
    static lit::parallel::LitDetectorLayoutScal layout;
    static lit::parallel::LitTrackFinderNN finder;
    if (firstTime) {
-      CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutScal(layout);
-      finder.SetDetectorLayout(layout);
-      finder.SetNofIterations(1);
-      finder.SetMaxNofMissingHits(list_of(4));
-      finder.SetPDG(list_of(211));
-      finder.SetChiSqStripHitCut(list_of(9.));
-      finder.SetChiSqPixelHitCut(list_of(25.));
-      finder.SetSigmaCoef(list_of(5.));
-      firstTime = false;
+      if (fDet.GetDet(kTRD)) {
+         CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutScal(layout);
+         finder.SetDetectorLayout(layout);
+         finder.SetNofIterations(1);
+         finder.SetMaxNofMissingHits(list_of(4));
+         finder.SetPDG(list_of(211));
+         finder.SetChiSqStripHitCut(list_of(9.));
+         finder.SetChiSqPixelHitCut(list_of(25.));
+         finder.SetSigmaCoef(list_of(5.));
+         firstTime = false;
+      }
+      if (fDet.GetDet(kMUCH)) {
+         CbmLitTrackingGeometryConstructor::Instance()->GetMuchLayoutScal(layout);
+         finder.SetDetectorLayout(layout);
+         finder.SetNofIterations(1);
+         finder.SetMaxNofMissingHits(list_of(4));
+         finder.SetPDG(list_of(211));
+         finder.SetChiSqStripHitCut(list_of(9.));
+         finder.SetChiSqPixelHitCut(list_of(25.));
+         finder.SetSigmaCoef(list_of(5.));
+         firstTime = false;
+      }
    }
 
    fTrackingWithIOWatch.Start(kFALSE);
@@ -129,7 +156,12 @@ void CbmLitFindGlobalTracksParallel::DoTracking()
    vector<lit::parallel::LitScalTrack*> lseeds;
    vector<lit::parallel::LitScalPixelHit*> lhits;
    vector<lit::parallel::LitScalTrack*> ltracks;
-   CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fTrdHits, lhits);
+   if (fDet.GetDet(kTRD)) {
+      CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fTrdHits, lhits);
+   }
+   if (fDet.GetDet(kMUCH)) {
+      CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fMuchPixelHits, lhits);
+   }
 
    // Convert track seeds
    Int_t nofSeeds = fStsTracks->GetEntriesFast();
@@ -148,7 +180,12 @@ void CbmLitFindGlobalTracksParallel::DoTracking()
    fTrackingWatch.Stop();
 
    // Convert to CBMROOT data and construct global tracks
-   CbmLitConverterParallel::LitScalTrackArrayToCbmTrdTrackArray(ltracks, fTrdTracks);
+   if (fDet.GetDet(kTRD)) {
+      CbmLitConverterParallel::LitScalTrackArrayToCbmTrdTrackArray(ltracks, fTrdTracks);
+   }
+   if (fDet.GetDet(kMUCH)) {
+      CbmLitConverterParallel::LitScalTrackArrayToCbmMuchTrackArray(ltracks, fMuchTracks);
+   }
    ConstructGlobalTracks();
 
    // Clear memory
@@ -166,12 +203,24 @@ void CbmLitFindGlobalTracksParallel::ConstructGlobalTracks()
 {
    set<Int_t> stsTracksSet;
    Int_t globalTrackNo = 0;
-   Int_t nofTrdTracks = fTrdTracks->GetEntriesFast();
-   for (Int_t iTrack = 0; iTrack < nofTrdTracks; iTrack++) {
-      const CbmTrack* trdTrack = static_cast<const CbmTrack*>(fTrdTracks->At(iTrack));
-      CbmGlobalTrack* globalTrack = new ((*fGlobalTracks)[globalTrackNo++]) CbmGlobalTrack();
-      globalTrack->SetStsTrackIndex(trdTrack->GetPreviousTrackId());
-      globalTrack->SetTrdTrackIndex(iTrack);
+   if (fDet.GetDet(kTRD)) {
+      Int_t nofTrdTracks = fTrdTracks->GetEntriesFast();
+      for (Int_t iTrack = 0; iTrack < nofTrdTracks; iTrack++) {
+         const CbmTrack* trdTrack = static_cast<const CbmTrack*>(fTrdTracks->At(iTrack));
+         CbmGlobalTrack* globalTrack = new ((*fGlobalTracks)[globalTrackNo++]) CbmGlobalTrack();
+         globalTrack->SetStsTrackIndex(trdTrack->GetPreviousTrackId());
+         globalTrack->SetTrdTrackIndex(iTrack);
+      }
+   }
+
+   if (fDet.GetDet(kMUCH)) {
+      Int_t nofMuchTracks = fMuchTracks->GetEntriesFast();
+      for (Int_t iTrack = 0; iTrack < nofMuchTracks; iTrack++) {
+         const CbmTrack* trdTrack = static_cast<const CbmTrack*>(fMuchTracks->At(iTrack));
+         CbmGlobalTrack* globalTrack = new ((*fGlobalTracks)[globalTrackNo++]) CbmGlobalTrack();
+         globalTrack->SetStsTrackIndex(trdTrack->GetPreviousTrackId());
+         globalTrack->SetMuchTrackIndex(iTrack);
+      }
    }
 
    // Loop over STS tracks in order to create additional CbmGlobalTrack,

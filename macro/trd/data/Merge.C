@@ -37,7 +37,7 @@ TFile *Target;
 
 void MergeHistos(TDirectory *target, TList *sourcelist);
 
-void Merge(TString outfilename = "result_0100Pi0.root") {
+void Merge(TString outfilename = "result.root") {
   // in an interactive ROOT session, edit the file names
   // Target and FileList, then
   // root > .L hadd.C
@@ -47,52 +47,53 @@ void Merge(TString outfilename = "result_0100Pi0.root") {
   FileList = new TList();
   for (Int_t iurqmd = 0; iurqmd < 200; iurqmd++){ 
     //if (iurqmd < 100) { //with 0100 pi0
-      //if (iurqmd >= 100) { //with 0000 pi0
-      /* 
-	 if (
-	 iurqmd != 31 &&
-	 iurqmd != 34 &&
-	 iurqmd != 35 &&
-	 iurqmd != 39 &&
-	 iurqmd != 43 &&
-	 iurqmd != 50 &&
-	 iurqmd != 61 &&
-	 iurqmd != 78 &&
-	 iurqmd != 83 &&
-	 iurqmd != 86 &&
-	 iurqmd != 93 &&
-	 iurqmd != 169 &&
-	 iurqmd != 173 &&
-	 iurqmd != 179 &&
-	 iurqmd != 185 &&
-	 iurqmd != 186 &&
-	 iurqmd != 189 &&
-	 iurqmd != 191 &&
-	 iurqmd != 192 &&
-	 iurqmd != 193 &&
-	 iurqmd != 195
-	 ){ //with 1000 pi0
-      */
-      /*if (
-	iurqmd == 31 ||
-	iurqmd == 34 ||
-	iurqmd == 39 ||
-	iurqmd == 43 ||
-	iurqmd == 50 ||
-	iurqmd == 61 ||
-	iurqmd == 78 ||
-	iurqmd == 83 ||
-	iurqmd == 86 ||
-	iurqmd == 93 ||
-	iurqmd == 185 ||
-	iurqmd == 186 ||
-	iurqmd == 191 ||
-	iurqmd == 192 ||
-	iurqmd == 193
-	){ //without pi0
-      */
-      if (iurqmd == 00) {
-      filename.Form("test.pa.trd_v12f.smearing.%04i.100events.root",iurqmd);
+    //if (iurqmd >= 100) { //with 0000 pi0
+    /* 
+       if (
+       iurqmd != 31 &&
+       iurqmd != 34 &&
+       iurqmd != 35 &&
+       iurqmd != 39 &&
+       iurqmd != 43 &&
+       iurqmd != 50 &&
+       iurqmd != 61 &&
+       iurqmd != 78 &&
+       iurqmd != 83 &&
+       iurqmd != 86 &&
+       iurqmd != 93 &&
+       iurqmd != 169 &&
+       iurqmd != 173 &&
+       iurqmd != 179 &&
+       iurqmd != 185 &&
+       iurqmd != 186 &&
+       iurqmd != 189 &&
+       iurqmd != 191 &&
+       iurqmd != 192 &&
+       iurqmd != 193 &&
+       iurqmd != 195
+       ){ //with 1000 pi0
+    */
+    /*if (
+      iurqmd == 31 ||
+      iurqmd == 34 ||
+      iurqmd == 39 ||
+      iurqmd == 43 ||
+      iurqmd == 50 ||
+      iurqmd == 61 ||
+      iurqmd == 78 ||
+      iurqmd == 83 ||
+      iurqmd == 86 ||
+      iurqmd == 93 ||
+      iurqmd == 185 ||
+      iurqmd == 186 ||
+      iurqmd == 191 ||
+      iurqmd == 192 ||
+      iurqmd == 193
+      ){ //without pi0
+    */
+    if (iurqmd == 00) {
+      //filename.Form("test.pa.trd_v12f.smearing.%04i.100events.root",iurqmd);
+      filename.Form("test.eds.%04i.root",iurqmd);
       cout << filename << endl;
       TFile test = TFile(filename,"READ");
       if (test.IsOpen()){

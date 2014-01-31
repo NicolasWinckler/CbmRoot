@@ -53,6 +53,12 @@ class CbmTrdHitDensityQa : public FairTask
 
  private:
 
+  std::ofstream myfile;
+
+  Double_t fBitPerHit;
+  TH1F* h1DataModule;
+  TH1F* h1OptLinksModule;
+
   Bool_t fNeighbourTrigger;
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/

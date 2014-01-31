@@ -52,13 +52,16 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    fGeoHandler(new CbmTrdGeoHandler()),
    fTriggerThreshold(1e-6),
    fEventRate(1e7),
+   fBitPerHit(1.),
    fNeighbourTrigger(true),
    fEventCounter(NULL),
    fStation(-1),
    fLayer(-1), 
    fModuleID(-1),
    fModuleHitMap(),
-   fUsedDigiMap()
+   fUsedDigiMap(),
+    h1DataModule(NULL),
+    h1OptLinksModule(NULL)
 {
 }
 
@@ -132,6 +135,7 @@ InitStatus CbmTrdHitDensityQa::Init()
   printf("\nCbmTrdHitDensityQa::Init: NeighbourTrigger %i\n\n",fNeighbourTrigger);
 
   fEventCounter = new TH1I("fEventCounter","fEventCounter",1,-0.5,0.5);
+
   return kSUCCESS;
   
 }
@@ -142,10 +146,20 @@ void CbmTrdHitDensityQa::SetNeighbourTrigger(Bool_t trigger){
 
 void CbmTrdHitDensityQa::Exec(Option_t * option)
 {
+ 
+
   printf("=================CbmTrdHitDensityQa====================\n");
   TString title;
   TStopwatch timer;
   timer.Start();
+
+
+
+  fBitPerHit = 112 * 1.5; // (112 + 4*16) * 10 / 8.;   // 6 time samples, 8b/10b encoding, CBMnet header 
+  //  fBitPerHit = 220; // (112 + 4*16) * 10 / 8.;   // 6 time samples, 8b/10b encoding, CBMnet header 
+  //  fBitPerHit = 112;  // 6 time samples 3 + (9 * 6 + 3) / 15 = 7 words = 7 * 16 bit = 112 bits 
+
+
   fEventCounter->Fill(0);
   printf("\n  Event: %i\n\n",(Int_t)fEventCounter->GetEntries());
   //fNeighbourTrigger = CbmTrdClusterFinderFast::GetTriggerThreshold();
@@ -252,7 +266,18 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 
   // ---- Finish --------------------------------------------------------
 void CbmTrdHitDensityQa::Finish()
-{
+{ 
+
+  Int_t nTotalAsics = 0;
+  Int_t nTotalOptLinks = 0;
+  Double_t trdTotalDataRate = 0.;
+  Double_t ratePerModule = 0;
+  myfile.open("hits_per_asic.txt",std::fstream::out);
+  myfile << "#" << endl;
+  myfile << "##   TRD data per ASIC" << endl;
+  myfile << "#" << endl;
+  myfile << "#" << endl;
+  myfile << "#--------------------------" << endl;
   Double_t min(1), max(/*(Double_t)fEventCounter->GetEntries()/10.*/fEventRate);
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
@@ -271,10 +296,15 @@ void CbmTrdHitDensityQa::Finish()
   if (!gDirectory->Cd("Module")) 
     gDirectory->mkdir("Module");
   gDirectory->Cd("Module");
+  Int_t moduleAddress = -1;
   for (fModuleHitMapIt = fModuleHitMap.begin();
        fModuleHitMapIt != fModuleHitMap.end(); ++fModuleHitMapIt) {
     fModuleHitMapIt->second->Write("", TObject::kOverwrite);
-    Int_t LayerId = CbmTrdAddress::GetLayerId(fModuleHitMapIt->first);
+    moduleAddress = fModuleHitMapIt->first;
+    printf("# ModuleAddress:     %8i",moduleAddress);
+    myfile << "# ModuleAddress: " <<  moduleAddress  << endl;
+    ratePerModule = 0.;
+    Int_t LayerId = CbmTrdAddress::GetLayerId(moduleAddress);
     if (LayerMap.find(LayerId) == LayerMap.end()){
       fStation =  LayerId / 4 + 1;  // OK for SIS100 and SIS300
       fLayer   =  LayerId % 4 + 1;  // 
@@ -305,6 +335,17 @@ void CbmTrdHitDensityQa::Finish()
     }
  
     fModuleInfo = fDigiPar->GetModule(fModuleHitMapIt->first);
+    gGeoManager->FindNode(fModuleInfo->GetX(), fModuleInfo->GetY(), fModuleInfo->GetZ());
+    std::vector<Int_t> AsicAddresses = fModuleInfo->GetAsicAddresses();
+    Int_t nofAsics = fModuleInfo->GetNofAsics();
+    printf("     NofAsics:     %3i\n",nofAsics);
+    myfile << "# NofAsics     : " << nofAsics << endl;
+    myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
+    nTotalAsics += nofAsics;
+    std::map<Int_t, Double_t> ratePerAsicMap;
+    for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
+      ratePerAsicMap[AsicAddresses[iAsic]] = 0.;
+    }
     const Int_t nSec = fModuleInfo->GetNofSectors();
     Int_t global_Row = 0;
     TVector3 padPos;
@@ -318,6 +359,9 @@ void CbmTrdHitDensityQa::Finish()
       for (Int_t r = 0; r < nRow; r++){
 	for (Int_t c = 0; c < nCol; c++){
 	  fModuleInfo->GetPosition(fModuleHitMapIt->first, s, c, r, padPos, padSize);// padPos local or global???
+	  Int_t channelAddress = CbmTrdAddress::GetAddress(CbmTrdAddress::GetLayerId(moduleAddress),
+							   CbmTrdAddress::GetModuleId(moduleAddress), 
+							   s, r, c);
 	  Double_t local_min[3] = {padPos[0]-0.5*padSize[0], padPos[1]-0.5*padSize[1], padPos[2]};
 	  Double_t local_max[3] = {padPos[0]+0.5*padSize[0], padPos[1]+0.5*padSize[1], padPos[2]};
 	  if (fModuleInfo->GetOrientation() == 1 || fModuleInfo->GetOrientation() == 3){ // Pad size is in local coordinate system where position is in global coordinate system
@@ -333,6 +377,7 @@ void CbmTrdHitDensityQa::Finish()
 	    local_max[i] *= 10.;
 	  }
 	  Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;
+	  ratePerModule += rate;
 	  pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
 	  //printf("    %i %i %i  (%f, %f)   (%f, %f)   %f\n",s,r,c,local_min[0],local_min[1],global_min[0],global_min[1],rate);
 	  pad->SetLineColor(0);
@@ -348,19 +393,53 @@ void CbmTrdHitDensityQa::Finish()
 	    pad->SetFillColor(12);
 	  LayerMap[LayerId]->cd();
 	  pad->Draw("same");
+
+	  Int_t AsicAddress = fModuleInfo->GetAsicAddress(channelAddress);
+	  if (AsicAddress < 0) 
+	    LOG(ERROR) << "CbmTrdHitRateFastQa::ScanModulePlane: Channel address:" << channelAddress << " is not initialized in module " << moduleAddress << "(s:" << s << ", r:" << r << ", c:" << c << ")" << FairLogger::endl;
+	  ratePerAsicMap[AsicAddress] += rate;
 	}
 	global_Row++;
       }
     }
-  module = new TBox(fModuleInfo->GetX()*10-fModuleInfo->GetSizeX()*10,
-			    fModuleInfo->GetY()*10-fModuleInfo->GetSizeY()*10,
-			    fModuleInfo->GetX()*10+fModuleInfo->GetSizeX()*10,
-			    fModuleInfo->GetY()*10+fModuleInfo->GetSizeY()*10);
+
+    module = new TBox(fModuleInfo->GetX()*10-fModuleInfo->GetSizeX()*10,
+		      fModuleInfo->GetY()*10-fModuleInfo->GetSizeY()*10,
+		      fModuleInfo->GetX()*10+fModuleInfo->GetSizeX()*10,
+		      fModuleInfo->GetY()*10+fModuleInfo->GetSizeY()*10);
     module->SetFillStyle(0);
     LayerMap[LayerId]->cd();
     module->Draw("same");
     delete fModuleHitMapIt->second;
+    for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
+      myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
+	     << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
+	     << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
+      Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]] /** 3*/ * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+      //HitAsic->Fill(dataPerAsic);
+    }
   }
+  Double_t dataPerModule = ratePerModule /** 3*/* 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+  Int_t    nOptLinks     = 1 + dataPerModule / 4000.; // 5000.; // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
+  //h1DataModule->Fill(dataPerModule);
+  //h1OptLinksModule->Fill(nOptLinks);
+
+  // global statistics
+  nTotalOptLinks += nOptLinks;
+  trdTotalDataRate += dataPerModule;
+
+  printf("     --------------------------\n");
+  printf("     total number of ASICs        : %d\n", nTotalAsics);
+  printf("     total number of optical links: %d\n", nTotalOptLinks);
+  printf("     total TRD data rate          : %.2f (Gbit/s)\n", trdTotalDataRate * 1e-3 );
+  printf("     --------------------------\n");
+  printf("     --------------------------\n");
+
+  myfile << "# total number of ASICs: " << nTotalAsics << endl;
+  myfile << "#--------------------------" << endl;
+  myfile << "#--------------------------" << endl;
+  myfile.close();
+
   fModuleHitMap.clear();
   gDirectory->Cd("..");
   for (LayerMapIt = LayerMap.begin();
@@ -374,6 +453,7 @@ void CbmTrdHitDensityQa::Finish()
     LayerMapIt->second->SaveAs(name);
   }
   gDirectory->Cd("..");
+ 
 }
 
   // -----   Public method EndOfEvent   --------------------------------------

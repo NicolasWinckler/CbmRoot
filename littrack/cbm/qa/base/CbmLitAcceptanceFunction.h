@@ -12,9 +12,10 @@
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
 #include "TClonesArray.h"
+#include "TMath.h"
 #include "TDatabasePDG.h"
-#include <cmath>
-using std::abs;
+//#include <cmath>
+//using std::abs;
 
 
 class CbmLitAcceptanceFunction
@@ -83,7 +84,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetMotherId() == -1);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetMotherId() == -1);
    }
 
    static Bool_t PrimaryMuonTrackAcceptanceFunction(
@@ -92,7 +93,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 13) && (mcTrack->GetMotherId() == -1);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 13) && (mcTrack->GetMotherId() == -1);
    }
 
    static Bool_t ElectronTrackAcceptanceFunction(
@@ -101,7 +102,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return std::abs(mcTrack->GetPdgCode()) == 11;
+      return TMath::Abs(mcTrack->GetPdgCode()) == 11;
    }
 
    static Bool_t MuonTrackAcceptanceFunction(
@@ -110,7 +111,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return std::abs(mcTrack->GetPdgCode()) == 13;
+      return TMath::Abs(mcTrack->GetPdgCode()) == 13;
    }
 
    static Bool_t ProtonTrackAcceptanceFunction(
@@ -119,7 +120,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 2212);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 2212);
    }
 
    static Bool_t AntiProtonTrackAcceptanceFunction(
@@ -137,7 +138,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 211);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 211);
    }
 
    static Bool_t PionPlusTrackAcceptanceFunction(
@@ -164,7 +165,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 321);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 321);
    }
 
    static Bool_t KaonPlusTrackAcceptanceFunction(
@@ -210,7 +211,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (mcTrack->GetMotherId() == -1) && (std::abs(mcTrack->GetPdgCode()) == 11);
+      return (mcTrack->GetMotherId() == -1) && (TMath::Abs(mcTrack->GetPdgCode()) == 11);
    }
 
    static Bool_t PrimaryElectronReferenceRingAcceptanceFunction(
@@ -220,7 +221,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (mcTrack->GetMotherId() == -1) && (std::abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
+      return (mcTrack->GetMotherId() == -1) && (TMath::Abs(mcTrack->GetPdgCode()) == 11) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
    }
 
    static Bool_t PionRingAcceptanceFunction(
@@ -230,7 +231,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 211);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 211);
    }
 
    static Bool_t PionReferenceRingAcceptanceFunction(
@@ -240,7 +241,7 @@ public:
    {
       if (index < 0) return false;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(mcTracks->At(index));
-      return (std::abs(mcTrack->GetPdgCode()) == 211) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
+      return (TMath::Abs(mcTrack->GetPdgCode()) == 211) && (mcTrack->GetP() > 1.) && (nofHitsInRing >= 15);
    }
 
    static Bool_t AllPiSuppAcceptanceFunction(

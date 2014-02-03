@@ -16,19 +16,28 @@ If(CMAKE_SYSTEM_NAME MATCHES Darwin)
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc/dabc
                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/copy_okay
                    )
-  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
                    COMMAND patch -p0 < roclib_macos.patch
-                   COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                   COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/unpack_okay
                    )
-Else(CMAKE_SYSTEM_NAME MATCHES Darwin)
-  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
-                   COMMAND patch -p0 < roclib_linux.patch
-                   COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
-                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/copy_okay
-                   )
+  Exec_Program("sw_vers -productVersion | cut -d . -f 1-2" OUTPUT_VARIABLE MAC_OS_VERSION)
+  String(COMPARE EQUAL "10.9" "${MAC_OS_VERSION}" MAC_OS_10_9)
+  If(MAC_OS_10_9)
+    Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                  COMMAND patch -p0 < roclib_macos_109.patch
+                  COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
+                  )
+  Else(MAC_OS_10_9)
+    Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                  COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
+                  )
+  EndIf(MAC_OS_10_9)
 EndIf(CMAKE_SYSTEM_NAME MATCHES Darwin)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRoc.so

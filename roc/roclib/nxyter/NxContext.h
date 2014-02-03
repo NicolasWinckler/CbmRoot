@@ -7,7 +7,12 @@
 #ifndef NXYTER_NXCONTEXT_H
 #define NXYTER_NXCONTEXT_H
 
+#ifdef __APPLE__
+#include <_types/_uint8_t.h>
+#else
 #include <stdint.h>
+#endif
+
 #include <stdio.h>
 #include <iostream>
 

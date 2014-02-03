@@ -90,7 +90,12 @@
 #define SC_BITFILE_BUFFER_SIZE 4194304
 
 
+#ifdef __APPLE__
+#include <_types/_uint8_t.h>
+#include <_types/_uint32_t.h>
+#else
 #include <stdint.h>
+#endif
 
 #pragma pack(push, 1)
 

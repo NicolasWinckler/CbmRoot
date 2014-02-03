@@ -3,7 +3,11 @@
 
 #include <vector>
 
+#ifdef __APPLE__
+#include <_types/_uint32_t.h>
+#else
 #include <stdint.h>
+#endif
 
 namespace roc {
 

@@ -14,6 +14,7 @@
 
 #include "TGeoManager.h"
 #include "TClonesArray.h"
+#include "TDirectory.h"
 #include "TArray.h"
 #include "TF1.h"
 #include "TH2F.h"
@@ -288,7 +289,16 @@ void CbmTrdHitDensityQa::Finish()
   TString title, name;
   std::map< Int_t, TCanvas*> LayerMap;
   std::map< Int_t, TCanvas*>::iterator LayerMapIt;
+  TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  newpath.ReplaceAll("eds","hd_qa");
+  newpath.ReplaceAll(":/","");
+  printf ("\n%s\n",newpath.Data());
+  TFile *tempFile = new TFile(newpath,"recreate");
+  gDirectory = tempFile->CurrentDirectory();
   gDirectory->pwd();
+  
   fEventCounter->Write("", TObject::kOverwrite);
   if (!gDirectory->Cd("TrdHitDensityQa")) 
     gDirectory->mkdir("TrdHitDensityQa");
@@ -296,6 +306,8 @@ void CbmTrdHitDensityQa::Finish()
   if (!gDirectory->Cd("Module")) 
     gDirectory->mkdir("Module");
   gDirectory->Cd("Module");
+
+  
   Int_t moduleAddress = -1;
   for (fModuleHitMapIt = fModuleHitMap.begin();
        fModuleHitMapIt != fModuleHitMap.end(); ++fModuleHitMapIt) {
@@ -415,11 +427,11 @@ void CbmTrdHitDensityQa::Finish()
       myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
 	     << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
 	     << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
-      Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]] /** 3*/ * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+      Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]]  * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
       //HitAsic->Fill(dataPerAsic);
     }
   }
-  Double_t dataPerModule = ratePerModule /** 3*/* 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+  Double_t dataPerModule = ratePerModule * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
   Int_t    nOptLinks     = 1 + dataPerModule / 4000.; // 5000.; // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
   //h1DataModule->Fill(dataPerModule);
   //h1OptLinksModule->Fill(nOptLinks);
@@ -452,8 +464,11 @@ void CbmTrdHitDensityQa::Finish()
     name.ReplaceAll("png","pdf");
     LayerMapIt->second->SaveAs(name);
   }
+  
   gDirectory->Cd("..");
- 
+  tempFile->Close();
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
 }
 
   // -----   Public method EndOfEvent   --------------------------------------

@@ -90,4 +90,9 @@
 #pragma link C++ class CbmTofTrack;
 #pragma link C++ class CbmVertex+;
 
+#pragma link C++ class CbmTbEvent;
+#pragma link C++ class CbmFiberHodoDigi;
+#pragma link C++ class CbmFiberHodoCluster;
+#pragma link C++ class CbmFiberHodoAddress;
+
 #endif

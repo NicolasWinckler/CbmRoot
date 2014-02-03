@@ -21,8 +21,10 @@ enum DetectorId {kREF,      // Reference plane
 		 kECAL,     // EM-Calorimeter
 		 kPSD,      // Projectile spectator detector
 		 kSTT,      // Straw Tube Tracker (obsolete)
+                 kFHODO,    // Fibre Hodoskope (for beam tests)
 		 kTutDet,   // Dummy for tutorials
 		 kNOFDETS}; // Number of elements (e.g. for loops)
+
 
 
 /**   Data type enumerator  **/

@@ -108,6 +108,11 @@ stt/CbmSttTrackMatch.cxx
 global/CbmGlobalTrack.cxx
 global/CbmVertex.cxx
 global/CbmTofTrack.cxx
+
+beamtime/CbmTbEvent.cxx
+beamtime/fhodo/CbmFiberHodoDigi.cxx
+beamtime/fhodo/CbmFiberHodoCluster.cxx
+beamtime/fhodo/CbmFiberHodoAddress.cxx
 )
 
 set(LINKDEF  DataLinkDef.h)

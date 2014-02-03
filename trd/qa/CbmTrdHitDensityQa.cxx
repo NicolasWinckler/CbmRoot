@@ -434,9 +434,10 @@ void CbmTrdHitDensityQa::Finish()
 	  pad->Draw("same");
 
 	  Int_t AsicAddress = fModuleInfo->GetAsicAddress(channelAddress);
+	  ratePerAsicMap[AsicAddress] += rate;
 	  if (AsicAddress < 0) 
 	    LOG(ERROR) << "CbmTrdHitRateFastQa::ScanModulePlane: Channel address:" << channelAddress << " is not initialized in module " << moduleAddress << "(s:" << s << ", r:" << r << ", c:" << c << ")" << FairLogger::endl;
-	  ratePerAsicMap[AsicAddress] += rate;
+
 	}
 	global_Row++;
       }
@@ -451,7 +452,7 @@ void CbmTrdHitDensityQa::Finish()
     module->Draw("same");
     delete fModuleHitMapIt->second;
     for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
-      fModuleHitASICMap[moduleAddress]->Fill(iAsic, ratePerAsicMap[AsicAddresses[iAsic]]);
+      fModuleHitASICMap[moduleAddress]->Fill(iAsic, ratePerAsicMap[AsicAddresses[iAsic]] * Double_t(fEventCounter->GetEntries()) / fEventRate);
       myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
 	     << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
 	     << ratePerAsicMap[AsicAddresses[iAsic]] << endl;

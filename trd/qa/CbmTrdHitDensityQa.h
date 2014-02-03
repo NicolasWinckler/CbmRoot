@@ -12,6 +12,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <fstream>
 
 class CbmTrdDigiPar;
 class CbmTrdModule;

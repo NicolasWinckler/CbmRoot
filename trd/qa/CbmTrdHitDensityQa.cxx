@@ -11,6 +11,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TGeoManager.h"
 #include "TClonesArray.h"
@@ -42,6 +43,11 @@
 
 using std::cout;
 using std::endl;
+using std::setfill;
+using std::setw;
+using std::ios;
+using std::setprecision;
+using std::setiosflags;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdHitDensityQa::CbmTrdHitDensityQa()

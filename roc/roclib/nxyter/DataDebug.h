@@ -1,13 +1,7 @@
 #ifndef NXYTER_DATADEBUG_H
 #define NXYTER_DATADEBUG_H
 
-#ifdef __APPLE__
-#include <_types/_uint32_t.h>
-#include <_types/_uint64_t.h>
-#else
 #include <stdint.h>
-#endif
-
 #include <iostream>
 
 namespace nxyter {

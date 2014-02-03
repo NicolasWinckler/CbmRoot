@@ -10,10 +10,6 @@
 
 #include <iostream>
 
-#ifdef __APPLE__
-#include <sys/_types/_int32_t.h>
-#endif
-
 #include "roc/Board.h"
 #include "nxyter/FebBase.h"
 #include "nxyter/NxContext.h"

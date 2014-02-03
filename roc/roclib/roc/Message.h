@@ -1,15 +1,7 @@
 #ifndef ROC_MESSAGE_H
 #define ROC_MESSAGE_H
 
-#ifdef __APPLE__
-#include <_types/_uint8_t.h>
-#include <_types/_uint16_t.h>
-#include <_types/_uint32_t.h>
-#include <_types/_uint64_t.h>
-#else
 #include <stdint.h>
-#endif
-
 #include <iostream>
 
 namespace roc {

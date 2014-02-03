@@ -19,6 +19,7 @@ class CbmTrdModule;
 class CbmTrdGeoHandler;
 class TH2I;
 class TH1I;
+class TH1D;
 class TClonesArray;
 
 typedef std::list<MyPoint*> MyPointList;
@@ -80,6 +81,8 @@ class CbmTrdHitDensityQa : public FairTask
   std::map<Int_t, Int_t> fUsedDigiMap;
   std::map<Int_t, TH2I*> fModuleHitMap;
   std::map<Int_t, TH2I*>::iterator fModuleHitMapIt;
+  std::map<Int_t, TH1D*> fModuleHitASICMap;
+  std::map<Int_t, TH1D*>::iterator fModuleHitASICMapIt;
   CbmTrdHitDensityQa(const CbmTrdHitDensityQa&);
   CbmTrdHitDensityQa& operator=(const CbmTrdHitDensityQa&);
 

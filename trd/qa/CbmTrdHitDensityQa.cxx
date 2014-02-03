@@ -66,6 +66,7 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    fLayer(-1), 
    fModuleID(-1),
    fModuleHitMap(),
+   fModuleHitASICMap(),
    fUsedDigiMap(),
     h1DataModule(NULL),
     h1OptLinksModule(NULL)
@@ -190,6 +191,16 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	  Int_t nRows = fModuleInfo->GetNofRows();
 	  Int_t nCols = fModuleInfo->GetNofColumns();
 	  fModuleHitMap[moduleAddress] = new TH2I(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	  fModuleHitMap[moduleAddress]->SetContour(99);
+	  fModuleHitMap[moduleAddress]->SetXTitle("Column Id");
+	  fModuleHitMap[moduleAddress]->SetYTitle("Row Id");
+	  fModuleHitMap[moduleAddress]->SetZTitle("Trigger counter");
+	}
+	if (fModuleHitASICMap.find(moduleAddress) == fModuleHitASICMap.end()){
+	  title.Form("hd_Module_%i_ASIC",moduleAddress);
+	  fModuleHitASICMap[moduleAddress] = new TH1D(title,title,fModuleInfo->GetNofAsics(),-0.5,fModuleInfo->GetNofAsics()-0.5);
+	  fModuleHitASICMap[moduleAddress]->SetXTitle("ASIC Address");
+	  fModuleHitASICMap[moduleAddress]->SetYTitle("Trigger counter");
 	}
 	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
 	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
@@ -214,6 +225,16 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	  Int_t nRows = fModuleInfo->GetNofRows();
 	  Int_t nCols = fModuleInfo->GetNofColumns();
 	  fModuleHitMap[moduleAddress] = new TH2I(title,title,nCols,-0.5,nCols-0.5,nRows,-0.5,nRows-0.5);
+	  fModuleHitMap[moduleAddress]->SetContour(99);
+	  fModuleHitMap[moduleAddress]->SetXTitle("Column Id");
+	  fModuleHitMap[moduleAddress]->SetYTitle("Row Id");
+	  fModuleHitMap[moduleAddress]->SetZTitle("Trigger counter");
+	}
+	if (fModuleHitASICMap.find(moduleAddress) == fModuleHitASICMap.end()){
+	  title.Form("hd_Module_%i_ASIC",moduleAddress);
+	  fModuleHitASICMap[moduleAddress] = new TH1D(title,title,fModuleInfo->GetNofAsics(),-0.5,fModuleInfo->GetNofAsics()-0.5);
+	  fModuleHitASICMap[moduleAddress]->SetXTitle("ASIC Address");
+	  fModuleHitASICMap[moduleAddress]->SetYTitle("Trigger counter");
 	}
 	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
 	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
@@ -430,12 +451,15 @@ void CbmTrdHitDensityQa::Finish()
     module->Draw("same");
     delete fModuleHitMapIt->second;
     for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
+      fModuleHitASICMap[moduleAddress]->Fill(iAsic, ratePerAsicMap[AsicAddresses[iAsic]]);
       myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
 	     << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
 	     << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
       Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]]  * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
       //HitAsic->Fill(dataPerAsic);
     }
+    fModuleHitASICMap[moduleAddress]->Write("", TObject::kOverwrite);
+    delete fModuleHitASICMap[moduleAddress];
   }
   Double_t dataPerModule = ratePerModule * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
   Int_t    nOptLinks     = 1 + dataPerModule / 4000.; // 5000.; // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
@@ -457,7 +481,7 @@ void CbmTrdHitDensityQa::Finish()
   myfile << "#--------------------------" << endl;
   myfile << "#--------------------------" << endl;
   myfile.close();
-
+  fModuleHitASICMap.clear();
   fModuleHitMap.clear();
   gDirectory->Cd("..");
   for (LayerMapIt = LayerMap.begin();

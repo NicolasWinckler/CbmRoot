@@ -11,7 +11,7 @@ Set(INCLUDE_DIRECTORIES
   ${CBMROOT_SOURCE_DIR}/cbmdata/much
   ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime
   ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime/fhodo
-  ${CBMROOT_SOURCE_DIR}/roc/roclib
+  ${CBMROOT_BINARY_DIR}/roc/roc/roclib
   ${CBMROOT_SOURCE_DIR}/beamtime
   ${CBMROOT_SOURCE_DIR}/beamtime/fhodo
 )

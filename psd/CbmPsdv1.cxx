@@ -13,6 +13,7 @@
 #include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TGeoBBox.h"
+#include "TGeoMatrix.h"
 
 #include <iostream>
 #include <fstream>

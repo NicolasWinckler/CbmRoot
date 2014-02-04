@@ -1,14 +1,13 @@
 # copy files from source directory to build directory
 
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/copy_okay
-                     COMMAND cmake -E copy_directory  ${CMAKE_CURRENT_SOURCE_DIR}                             
+  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/copy_okay
+                     COMMAND cmake -E copy_directory  
+                             ${CMAKE_CURRENT_SOURCE_DIR}
                              ${CMAKE_CURRENT_BINARY_DIR}/roc
                      COMMAND touch copy_okay
                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    )
 
-If(CMAKE_SYSTEM_NAME MATCHES Darwin)
-  Message(STATUS "Unpack DABC tarball on Mac System")
   # Unpack the dabc tarball and patch the needed files
   Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/unpack_okay
                    COMMAND tar -xzf dabcroc19.tar.gz
@@ -16,6 +15,10 @@ If(CMAKE_SYSTEM_NAME MATCHES Darwin)
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc/dabc
                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/copy_okay
                    )
+
+
+
+If(CMAKE_SYSTEM_NAME MATCHES Darwin)
   Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
                    COMMAND patch -p0 < roclib_macos.patch
                    COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
@@ -38,6 +41,13 @@ If(CMAKE_SYSTEM_NAME MATCHES Darwin)
                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/patch1_okay
                   )
   EndIf(MAC_OS_10_9)
+Else(CMAKE_SYSTEM_NAME MATCHES Darwin)
+  Add_Custom_Command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                   COMMAND patch -p0 < roclib_linux.patch
+                   COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/patch_okay
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/roc
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/unpack_okay
+                   )
 EndIf(CMAKE_SYSTEM_NAME MATCHES Darwin)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/roc/lib/libRoc.so

@@ -123,7 +123,7 @@ function set_default_mvd_geometry() {
     export LIT_CAVE_GEOM=cave.geo
     export LIT_PIPE_GEOM=pipe/pipe_v13a.geo.root
     export LIT_SHIELD_GEOM=
-    export LIT_MVD_GEOM=mvd/mvd_v07a.geo
+    export LIT_MVD_GEOM=mvd/mvd_v07a.geo.root
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
     export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
     export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root

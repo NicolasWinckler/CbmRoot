@@ -156,6 +156,7 @@ void global_sim(Int_t nEvents = 100)
 	if ( mvdGeom != "" ) {
 		FairDetector* mvd = new CbmMvd("MVD", kTRUE);
 		mvd->SetGeometryFileName(mvdGeom);
+                mvd->SetMotherVolume("pipevac1");
 		run->AddModule(mvd);
 	}
 

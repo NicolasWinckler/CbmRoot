@@ -227,6 +227,21 @@ void CbmMvd::ConstructGeometry(){
     LOG(INFO) << "Constructing MVD  geometry from ROOT  file "
 		<< fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
+    // Fill map of station numbers
+    Int_t iStation =  1;
+    Int_t volId    = -1;
+    do {
+      TString volName = Form("mvdstation%02i", iStation);
+      volId = gGeoManager->GetUID(volName);
+      if (volId > -1 ) {
+        fStationMap[volId] = iStation;
+        LOG(INFO) << GetName() << "::ConstructRootGeometry: "
+           << "Station No. " << iStation << ", volume ID " << volId 
+	   << ", volume name " << volName << FairLogger::endl;
+        iStation++;
+      }
+    } while ( volId > -1 );
+
   }
   else if ( fileName.EndsWith(".geo") ) {
     LOG(INFO) <<  "Constructing MVD  geometry from ASCII file "
@@ -315,7 +330,7 @@ CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t stationNr,
 Bool_t CbmMvd::CheckIfSensitive(std::string name)
 {
   TString tsname = name; 
-  if (tsname.Contains("MimosaActive")){
+  if (tsname.Contains("MimosaActive") || tsname.Contains("mvdstation") ){
     cout<<"*** Register "<<tsname<<" as active volume."<<endl;
     return kTRUE;
   }

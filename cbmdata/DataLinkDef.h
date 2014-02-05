@@ -47,6 +47,7 @@
 #pragma link C++ class CbmMuchPixelHit+;
 #pragma link C++ class CbmMuchPoint+;
 #pragma link C++ class CbmMuchDigi+;
+#pragma link C++ class CbmMuchBeamTimeDigi+;
 #pragma link C++ class CbmMuchDigiMatch+;
 #pragma link C++ class CbmMuchTrack+;
 #pragma link C++ class CbmMuchStrawHit+;

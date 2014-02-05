@@ -40,7 +40,7 @@ const Long64_t CbmStsDigiLight::fgkTimeMask = (1 << CbmStsDigiLight::fgkTimeBits
 CbmStsDigiLight::CbmStsDigiLight() 
   : CbmDigi(),
     CbmStsDetectorId(),
-    fData(0) 
+    fData(0) , fTime(0)
 {
 }
 // -------------------------------------------------------------------------
@@ -62,10 +62,10 @@ CbmStsDigiLight::CbmStsDigiLight()
 // }
 // -------------------------------------------------------------------------
 CbmStsDigiLight::CbmStsDigiLight(Int_t station, Int_t sector, Int_t side, 
-		       Int_t channel, Int_t adc, Int_t time) 
+		       Int_t channel, Int_t adc, ULong_t time)
   : CbmDigi(),
     CbmStsDetectorId(),
-    fData(0) 
+    fData(0) , fTime(time)
 {
 //   AddIndex(index,adc);
   fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )

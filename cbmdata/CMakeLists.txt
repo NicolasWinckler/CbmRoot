@@ -63,6 +63,7 @@ much/CbmMuchPixelHit.cxx
 much/CbmMuchPoint.cxx
 much/CbmMuchCluster.cxx 
 much/CbmMuchDigi.cxx
+much/CbmMuchBeamTimeDigi.cxx
 much/CbmMuchDigiMatch.cxx
 much/CbmMuchTrack.cxx 
 much/CbmMuchStrawHit.cxx

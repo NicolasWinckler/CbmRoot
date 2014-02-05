@@ -7,7 +7,7 @@
 
 #include "CbmSourceLmd.h"
 #include "CbmStsDigiLight.h"
-#include "CbmMuchDigi.h"
+#include "CbmMuchBeamTimeDigi.h"
 #include "CbmDaqMap.h"
 #include "CbmTbDaqBuffer.h"
 #include "CbmTbEvent.h"
@@ -53,7 +53,7 @@ CbmSourceLmd::CbmSourceLmd()
     fNofEpochs(0),
     fEvents(new TClonesArray("CbmTbEvent", 1)),
     fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
-    fMuchDigis(new TClonesArray("CbmMuchDigi", 10)),
+    fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
     fNofMessType(),
     fNofMessRoc()
@@ -90,7 +90,7 @@ CbmSourceLmd::CbmSourceLmd(const char * inFile)
     fNofEpochs(0),
     fEvents(new TClonesArray("CbmTbEvent", 1)),
     fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
-    fMuchDigis(new TClonesArray("CbmMuchDigi", 10)),
+    fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
     fNofMessType(),
     fNofMessRoc()
@@ -327,7 +327,7 @@ Int_t CbmSourceLmd::ReadEvent()
       } //? STS digi
       else if ( systemId == kMUCH ) {
         new( (*fMuchDigis)[fMuchDigis->GetEntriesFast()])
-          CbmMuchDigi(*(dynamic_cast<CbmMuchDigi*>(fCurrentDigi)));
+          CbmMuchBeamTimeDigi(*(dynamic_cast<CbmMuchBeamTimeDigi*>(fCurrentDigi)));
         fNofDigis[kMUCH]++;
         LOG(DEBUG) << "MUCH digis " << fNofDigis[kMUCH] << FairLogger::endl;
       } //? MUCH digi
@@ -454,7 +454,7 @@ void CbmSourceLmd::ProcessMuchMessage() {
 			                                        module, sector, channel);
 
 	// --- Create digi
-	CbmMuchDigi* digi = new CbmMuchDigi(address, charge, hitTime);
+	CbmMuchBeamTimeDigi* digi = new CbmMuchBeamTimeDigi(address, charge, hitTime);
 	LOG(DEBUG2) << "MUCH digi at " << digi->GetTime() << FairLogger::endl;
 	fBuffer->InsertData(digi);
 

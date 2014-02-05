@@ -52,7 +52,14 @@ class CbmStsDigiLight : public CbmDigi, public CbmStsDetectorId
 //   CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
 // 	     Int_t channel, Int_t adc, Int_t time);
   CbmStsDigiLight(Int_t station, Int_t sector, Int_t side, 
-	     Int_t channel, Int_t adc, Int_t time);
+	     Int_t channel, Int_t adc, ULong_t time);
+
+
+  /** Copy constructor **/
+  CbmStsDigiLight(const CbmStsDigiLight& digi) : CbmDigi(digi),
+  		                                           fData(digi.fData),
+  		                                           fTime(digi.fTime) {
+  }
 
 
   /**   Destructor   **/
@@ -93,7 +100,8 @@ class CbmStsDigiLight : public CbmDigi, public CbmStsDetectorId
 
 
   /**   Time   **/
-  Double_t GetTime() const { return Double_t( (fData >> fgkTimeShift) & fgkTimeMask ); }
+  //Double_t GetTime() const { return Double_t( (fData >> fgkTimeShift) & fgkTimeMask ); }
+  virtual Double_t GetTime() const { return Double_t(fTime); }
 
 
   /**   Unique detector ID   **/
@@ -108,6 +116,7 @@ class CbmStsDigiLight : public CbmDigi, public CbmStsDetectorId
 
   /**   Data members  **/
   Long64_t fData;
+  ULong_t fTime;
 
 
   /**   Modifiers   **/

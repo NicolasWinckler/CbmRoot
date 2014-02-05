@@ -22,22 +22,46 @@
 
 #include <iostream>
 
-// Name of output file with geometry
+// here come the definitions for the differnt geometry versions 
+// please uncomment the version for which you want to create the geo file
+// comment all other geometries
+
+/*
+// v07a
 const TString tagVersion   = "v07a";
+const Int_t nrOfStations = 2;
+
+const Double_t zPosStation[nrOfStations] = { 10., 20. };
+const Double_t rMin[nrOfStations] = { 0.55, 1.05 };
+const Double_t rMax[nrOfStations] = { 5., 10.};
+const Double_t thick[nrOfStations] = { 0.0150, 0.0150 };
+
+// v07b
+const TString tagVersion   = "v07b";
+const Int_t nrOfStations = 3;
+
+const Double_t zPosStation[nrOfStations] = { 5., 10., 20. };
+const Double_t rMin[nrOfStations] = { 0.55, 0.55, 1.05 };
+const Double_t rMax[nrOfStations] = { 2.5, 5., 10.};
+const Double_t thick[nrOfStations] = { 0.0150, 0.0150, 0.0150 };
+*/
+
+// v08a
+const TString tagVersion   = "v08a";
+const Int_t nrOfStations = 2;
+
+const Double_t zPosStation[nrOfStations] = { 5., 10. };
+const Double_t rMin[nrOfStations] = { 0.55, 0.55 };
+const Double_t rMax[nrOfStations] = { 2.5, 5.};
+const Double_t thick[nrOfStations] = { 0.0300, 0.0500 };
+
+
 const TString geoVersion   = "mvd_" + tagVersion;
-//
 const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
 
 //
-const Int_t nrOfStations = 2;
-
-const Double_t zPosStation[nrOfStations] = { 5., 10. };
-const Double_t rMin[nrOfStations] = { 0.55, 1.05 };
-const Double_t rMax[nrOfStations] = { 5., 10.};
-const Double_t thick[nrOfStations] = { 0.0150, 0.0150 };
-
 
 // Names of the different used materials which are used to build the modules
 // The materials are defined in the global media.geo file 
@@ -74,19 +98,14 @@ void Create_Simple_MVD_Geometry() {
   top->AddNode(mvd, 1);
 
   // Create target volume and add it as node to the mother volume
-
-  TGeoVolume* mvd1 = gGeoMan->MakeTube("mvdstation01", gGeoMan->GetMedium("silicon"), rMin[0],
-                                        rMax[0], thick[0]/2);
-
-  TGeoTranslation* mvd1_trans = new TGeoTranslation(0., 0., 10.);
-  mvd->AddNode(mvd1, 0, mvd1_trans);
-
-  TGeoVolume* mvd2 = gGeoMan->MakeTube("mvdstation02", gGeoMan->GetMedium("silicon"), rMin[1],
-                                        rMax[1], thick[1]/2);
-
-  TGeoTranslation* mvd2_trans = new TGeoTranslation(0., 0., 20.);
-  mvd->AddNode(mvd2, 0, mvd2_trans);
-  
+  for (Int_t iStation = 0; iStation < nrOfStations; ++iStation) {
+    TString name;
+    name.Form("mvdstation%02d", iStation+1);
+    TGeoVolume* mvd1 = gGeoMan->MakeTube(name, gGeoMan->GetMedium("silicon"), rMin[iStation],
+                                        rMax[iStation], thick[iStation]/2);
+    TGeoTranslation* mvd1_trans = new TGeoTranslation(0., 0., zPosStation[iStation]);
+    mvd->AddNode(mvd1, 0, mvd1_trans);
+  }
   
   gGeoMan->CloseGeometry();
 //  gGeoMan->CheckOverlaps(0.001);

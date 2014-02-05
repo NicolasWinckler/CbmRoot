@@ -12,37 +12,25 @@
 // -----   Default constructor   -------------------------------------------
 CbmDigi::CbmDigi() 
  : TObject(), 
-   fLinks(NULL) 
+   fMatch(NULL) 
 {
 }
 // -------------------------------------------------------------------------
 
-CbmDigi::CbmDigi(const CbmDigi& rhs) 
- : TObject(rhs), 
-   fLinks(NULL) 
-{
-  if (NULL != rhs.fLinks) {
-     fLinks = new FairMultiLinkedData(*(rhs.fLinks));
-   }
+
+
+// -----   Copy constructor   ----------------------------------------------
+CbmDigi::CbmDigi(const CbmDigi& digi) : fMatch(NULL) { } 
+// -------------------------------------------------------------------------
+
+
+
+// -----   Assignment operator   -------------------------------------------
+CbmDigi& CbmDigi::operator=(const CbmDigi& digi) {
+	fMatch = NULL;
+	return *this;
 }
-
-CbmDigi& CbmDigi::operator=(const CbmDigi& rhs) 
-{
-
-  if (this != &rhs) {
-    TObject::operator=(rhs);
-    if (NULL != rhs.fLinks) {
-      std::auto_ptr<FairMultiLinkedData> tmp(new FairMultiLinkedData(*rhs.fLinks));
-      delete fLinks;
-      fLinks = tmp.release();
-    } else {
-      fLinks = NULL;
-    } 
-
-  }
-  return *this;
-}
-
+// -------------------------------------------------------------------------
 
 
 

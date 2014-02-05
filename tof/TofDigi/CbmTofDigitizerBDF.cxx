@@ -17,7 +17,9 @@
 #include "CbmTofAddress.h"    // in cbmdata/tof
 
 // CBMroot classes and includes
+#include "CbmLink.h"
 #include "CbmMCTrack.h"
+#include "CbmMatch.h"
 
 // FAIR classes and includes
 #include "FairRootManager.h"
@@ -643,12 +645,14 @@ Bool_t   CbmTofDigitizerBDF::FillHistos()
       for( Int_t iDigInd = 0; iDigInd < nTofDigi; iDigInd++ )
       {
          pDigi = (CbmTofDigiExp*) fTofDigisColl->At( iDigInd );
+		  
+		 CbmTofPoint* point = (CbmTofPoint*)fTofPointsColl->At(pDigi->GetMatch()->GetMatchedLink().GetIndex()); 
 
          if( pDigi->GetTot() < 0 )
             cout<<iDigInd<<"/"<<nTofDigi<<" "<<pDigi->GetTot()<<endl;
          fhDigiTime->Fill( pDigi->GetTime() );
-         fhDigiTimeRes->Fill( pDigi->GetTime() - ((CbmTofPoint*)(pDigi->GetLinks()))->GetTime() );
-         fhDigiTimeResB->Fill( pDigi->GetTime() - ((CbmTofPoint*)(pDigi->GetLinks()))->GetTime(),
+         fhDigiTimeRes->Fill( pDigi->GetTime() - point->GetTime() );
+         fhDigiTimeResB->Fill( pDigi->GetTime() - point->GetTime(),
                pDigi->GetType() );
          fhToTDist->Fill( pDigi->GetTot() );
 
@@ -661,10 +665,11 @@ Bool_t   CbmTofDigitizerBDF::FillHistos()
          for( Int_t iDigInd = 0; iDigInd < nTofDigi; iDigInd++ )
          {
             pDigi = (CbmTofDigi*) fTofDigisColl->At( iDigInd );
+			CbmTofPoint* point = (CbmTofPoint*)fTofPointsColl->At(pDigi->GetMatch()->GetMatchedLink().GetIndex()); 
             if( pDigi->GetTot() < 0 )
                cout<<iDigInd<<"/"<<nTofDigi<<" "<<pDigi->GetTot()<<endl;
             fhDigiTime->Fill( pDigi->GetTime() );
-            fhDigiTimeRes->Fill( pDigi->GetTime() - ((CbmTofPoint*)(pDigi->GetLinks()))->GetTime() );
+            fhDigiTimeRes->Fill( pDigi->GetTime() - point->GetTime() );
             fhToTDist->Fill( pDigi->GetTot() );
 
             nTofFired += 1.0/( 2.0 - fDigiBdfPar->GetChanType( pDigi->GetType(), pDigi->GetRpc() ) );
@@ -1224,7 +1229,7 @@ Bool_t   CbmTofDigitizerBDF::DigitizeDirectClusterSize()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dTimeA,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1]/2.0,
                            1, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1].push_back( tofDigi );
 
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
@@ -1232,7 +1237,7 @@ Bool_t   CbmTofDigitizerBDF::DigitizeDirectClusterSize()
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dTimeA,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1]/2.0,
                            1, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                } // if Side A above threshold
@@ -1253,14 +1258,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeDirectClusterSize()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dTimeB,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel]/2.0,
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChannel].push_back( tofDigi );
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   else {
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dTimeB,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel]/2.0,
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChannel].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                } // if Side B above threshold
@@ -1325,14 +1330,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeDirectClusterSize()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iStripInd, dTimeA,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iStripInd+1]/2.0,
                            1, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iStripInd+1].push_back( tofDigi );
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   else {
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iStripInd, dTimeA,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iStripInd+1]/2.0,
                            1, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iStripInd+1].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                } // if Side A above threshold
@@ -1353,14 +1358,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeDirectClusterSize()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iStripInd, dTimeB,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iStripInd]/2.0,
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iStripInd].push_back( tofDigi );
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   else {
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iStripInd, dTimeB,
                            dStripCharge*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iStripInd]/2.0,
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iStripInd].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                } // if Side B above threshold
@@ -1645,7 +1650,7 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dTimeA,
                      dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1]/2.0,
                      1, iSmType );
-               tofDigi->SetLinks(pPoint);
+			   tofDigi->GetMatch()->AddLink(1., iPntInd);
                fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1].push_back( tofDigi );
             } // charge ok
             if( fDigiBdfPar->GetFeeThreshold() <=
@@ -1654,7 +1659,7 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dTimeB,
                      dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel]/2.0,
                      0, iSmType );
-               tofDigi->SetLinks(pPoint);
+			   tofDigi->GetMatch()->AddLink(1., iPntInd);
                fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChannel].push_back( tofDigi );
             } // charge ok
          } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
@@ -1665,7 +1670,7 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dTimeA,
                      dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1]/2.0,
                      1, iSmType );
-               tofDigi->SetLinks(pPoint);
+			   tofDigi->GetMatch()->AddLink(1., iPntInd);
                fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1].push_back( tofDigi );
             } // charge ok
             if( fDigiBdfPar->GetFeeThreshold() <=
@@ -1674,7 +1679,7 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dTimeB,
                      dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel]/2.0,
                      0, iSmType );
-               tofDigi->SetLinks(pPoint);
+			   tofDigi->GetMatch()->AddLink(1., iPntInd);
                fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChannel].push_back( tofDigi );
             } // charge ok
          } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
@@ -1739,14 +1744,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                   CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dPadTime,
                         dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChannel],
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iChannel].push_back( tofDigi );
                } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                else {
                   CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dPadTime,
                         dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChannel],
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][iChannel].push_back( tofDigi );
                } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
             } // charge ok
@@ -1890,14 +1895,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                   CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChanInd, dTimeA,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChanInd+1]/2.0,
                         1, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChanInd+1].push_back( tofDigi );
                } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                else {
                   CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChanInd, dTimeA,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChanInd+1]/2.0,
                         1, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChanInd+1].push_back( tofDigi );
                } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
             } // if( charge above threshold)
@@ -1910,14 +1915,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                   CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChanInd, dTimeB,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChanInd]/2.0,
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChanInd].push_back( tofDigi );
                } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                else {
                   CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChanInd, dTimeB,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChanInd]/2.0,
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChanInd].push_back( tofDigi );
                } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
             } // if( charge above threshold)
@@ -2060,14 +2065,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                   CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChanInd, dPadTime,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChanInd],
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iChanInd].push_back( tofDigi );
                } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                else {
                   CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChanInd, dPadTime,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChanInd],
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][iChanInd].push_back( tofDigi );
                } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
             } // for( Int_t iChanInd = iMinChanInd + 1; iChanInd < iMaxChanInd; iChanInd++ )
@@ -2114,14 +2119,14 @@ Bool_t   CbmTofDigitizerBDF::DigitizeFlatDisc()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChanInd, dPadTime,
                            dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChanInd],
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iChanInd].push_back( tofDigi );
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   else {
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChanInd, dPadTime,
                            dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChanInd],
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					 tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][iChanInd].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                } // for( Int_t iChanInd = iMinChanInd + 1; iChanInd < iMaxChanInd; iChanInd++ )
@@ -2381,24 +2386,24 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
             CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dTimeA,
                   dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1]/2.0,
                   1, iSmType );
-            tofDigi->SetLinks(pPoint);
+			tofDigi->GetMatch()->AddLink(1., iPntInd);
             fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1].push_back( tofDigi );
             tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dTimeB,
                   dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel]/2.0,
                   0, iSmType );
-            tofDigi->SetLinks(pPoint);
+			tofDigi->GetMatch()->AddLink(1., iPntInd);
             fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iChannel].push_back( tofDigi );
          } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
          else {
             CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dTimeA,
                   dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1]/2.0,
                   1, iSmType );
-            tofDigi->SetLinks(pPoint);
+			tofDigi->GetMatch()->AddLink(1., iPntInd);
             fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChannel+1].push_back( tofDigi );
             tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dTimeB,
                   dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iChannel]/2.0,
                   0, iSmType );
-            tofDigi->SetLinks(pPoint);
+			tofDigi->GetMatch()->AddLink(1., iPntInd);
             fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iChannel].push_back( tofDigi );
          } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
       } // if( 0 == iChType)
@@ -2460,14 +2465,14 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
                CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChannel, dPadTime,
                      dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChannel],
                      0, iSmType );
-               tofDigi->SetLinks(pPoint);
+			   tofDigi->GetMatch()->AddLink(1., iPntInd);
                fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iChannel].push_back( tofDigi );
             } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
             else {
                CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChannel, dPadTime,
                      dChargeCentral*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChannel],
                      0, iSmType );
-               tofDigi->SetLinks(pPoint);
+			   tofDigi->GetMatch()->AddLink(1., iPntInd);
                fStorDigi[iSmType][iSM*iNbRpc + iRpc][iChannel].push_back( tofDigi );
             } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
          } // else of if( 0 == iChType)
@@ -2545,24 +2550,24 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
                   CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iSideChInd, dTimeA,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1]/2.0,
                         1, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				   tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1].push_back( tofDigi );
                   tofDigi = new CbmTofDigiExp( iSM, iRpc, iSideChInd, dTimeB,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd]/2.0,
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd].push_back( tofDigi );
                } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                else {
                   CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iSideChInd, dTimeA,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1]/2.0,
                         1, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1].push_back( tofDigi );
                   tofDigi = new CbmTofDigi( iSM, iRpc, iSideChInd, dTimeB,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd]/2.0,
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				  tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd].push_back( tofDigi );
                } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
 
@@ -2655,24 +2660,24 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
                   CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iSideChInd, dTimeA,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1]/2.0,
                         1, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				   tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1].push_back( tofDigi );
                   tofDigi = new CbmTofDigiExp( iSM, iRpc, iSideChInd, dTimeB,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd]/2.0,
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				   tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd].push_back( tofDigi );
                } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                else {
                   CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iSideChInd, dTimeA,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1]/2.0,
                         1, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				   tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd+1].push_back( tofDigi );
                   tofDigi = new CbmTofDigi( iSM, iRpc, iSideChInd, dTimeB,
                         dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd]/2.0,
                         0, iSmType );
-                  tofDigi->SetLinks(pPoint);
+				   tofDigi->GetMatch()->AddLink(1., iPntInd);
                   fStorDigi[iSmType][iSM*iNbRpc + iRpc][2*iSideChInd].push_back( tofDigi );
                } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
 
@@ -2773,14 +2778,14 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iSideChInd, dPadTime,
                            dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iSideChInd],
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					  tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iSideChInd].push_back( tofDigi );
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   else {
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iSideChInd, dPadTime,
                            dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iSideChInd],
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					  tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][iSideChInd].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
 
@@ -2847,14 +2852,14 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
                      CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iSideChInd, dPadTime,
                            dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iSideChInd],
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					  tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iSideChInd].push_back( tofDigi );
                   } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   else {
                      CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iSideChInd, dPadTime,
                            dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iSideChInd],
                            0, iSmType );
-                     tofDigi->SetLinks(pPoint);
+					  tofDigi->GetMatch()->AddLink(1., iPntInd);
                      fStorDigi[iSmType][iSM*iNbRpc + iRpc][iSideChInd].push_back( tofDigi );
                   } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
 
@@ -2936,14 +2941,14 @@ Bool_t CbmTofDigitizerBDF::DigitizeGaussCharge()
                         CbmTofDigiExp * tofDigi = new CbmTofDigiExp( iSM, iRpc, iChanInd, dPadTime,
                               dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChanInd],
                               0, iSmType );
-                        tofDigi->SetLinks(pPoint);
+						 tofDigi->GetMatch()->AddLink(1., iPntInd);
                         fStorDigiExp[iSmType][iSM*iNbRpc + iRpc][iChanInd].push_back( tofDigi );
                      } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                      else {
                         CbmTofDigi * tofDigi = new CbmTofDigi( iSM, iRpc, iChanInd, dPadTime,
                               dChargeSideCh*fdChannelGain[iSmType][iSM*iNbRpc + iRpc][iChanInd],
                               0, iSmType );
-                        tofDigi->SetLinks(pPoint);
+						 tofDigi->GetMatch()->AddLink(1., iPntInd);
                         fStorDigi[iSmType][iSM*iNbRpc + iRpc][iChanInd].push_back( tofDigi );
                      } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
                   } // if( fDigiBdfPar->GetFeeThreshold() < dChargeSideCh  )

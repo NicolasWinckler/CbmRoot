@@ -44,7 +44,7 @@ CbmTofDigiExp::CbmTofDigiExp(const CbmTofDigiExp& digiIn):
    fuAddress = digiIn.GetAddress(); ///< Unique channel address
    fdTime    = digiIn.GetTime();    ///< Absolute time [ps]
    fdTot     = digiIn.GetTot();     ///< Tot [ps]
-   SetLinks( digiIn.GetLinks() );
+   SetMatch( digiIn.GetMatch() );
 }
 
 CbmTofDigiExp::~CbmTofDigiExp()

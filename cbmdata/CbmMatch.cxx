@@ -74,6 +74,12 @@ void CbmMatch::AddLink(const CbmLink& newLink)
    }
 }
 
+void CbmMatch::AddLink(Float_t weight, Int_t index, Int_t entry, Int_t file) {
+	CbmLink link(weight, index, entry, file);
+	AddLink(link);
+}
+
+
 void CbmMatch::Clear()
 {
    fLinks.clear();

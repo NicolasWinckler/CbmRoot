@@ -19,6 +19,7 @@
 
 // CBMroot classes and includes
 #include "CbmMCTrack.h"
+#include "CbmMatch.h"
 
 // FAIR classes and includes
 #include "FairRootManager.h"
@@ -718,6 +719,8 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
 
                            CbmTofDigiExp * xDigiA = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0];
                            CbmTofDigiExp * xDigiB = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1];
+						   CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
+						   CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
 
                            // The "Strip" time is the mean time between each end
                            dTime = xDigiA->GetTime() + xDigiB->GetTime();
@@ -775,25 +778,25 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                  if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                     {
-                                       if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() )
+                                       if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
                                           bFoundA = kTRUE;
-                                       if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                       if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
                                           bFoundB = kTRUE;
                                     } // for( Int
                                     else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                     {
-                                       if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiA->GetLinks() )
+                                       if( vPtsRef[iPtRef] == pointA )
                                           bFoundA = kTRUE;
-                                       if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiB->GetLinks() )
+                                       if( vPtsRef[iPtRef] == pointB )
                                           bFoundB = kTRUE;
                                     } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
 
                                  // CbmTofPoint pointer for 1st digi not found => save it
                                  if( kFALSE == bFoundA )
-                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                    vPtsRef.push_back( pointA );
                                  // CbmTofPoint pointer for 2nd digi not found => save it
                                  if( kFALSE == bFoundB )
-                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                    vPtsRef.push_back( pointB );
                               } // if current Digis compatible with last fired chan
                               else
                               {
@@ -844,20 +847,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                  dWeightsSum   = dTotS;
                                  iNbChanInHit  = 1;
                                  // Save pointer on CbmTofPoint
-                                 vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                 vPtsRef.push_back( pointA );
 
                                  if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                  {
-                                    if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                          ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                    if( pointA->GetTrackID() !=
+                                          pointB->GetTrackID() )
                                        // if other side come from a different Track,
                                        // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                       vPtsRef.push_back( pointB );
                                  } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                    else if( pointA != pointB )
                                        // if other side come from a different TofPoint,
                                        // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                       vPtsRef.push_back( pointB );
                               } // else of if current Digis compatible with last fired chan
                            } // if( 0 < iNbChanInHit)
                               else
@@ -870,20 +873,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                  dWeightsSum   = dTotS;
                                  iNbChanInHit  = 1;
                                  // Save pointer on CbmTofPoint
-                                 vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                 vPtsRef.push_back( pointA );
 
                                  if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                  {
-                                    if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                          ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                    if( pointA->GetTrackID() !=
+                                          pointB->GetTrackID() )
                                        // if other side come from a different Track,
                                        // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                       vPtsRef.push_back( pointB );
                                  } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                    else if( pointA != pointB )
                                        // if other side come from a different TofPoint,
                                        // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                       vPtsRef.push_back( pointB );
                               } // else of if( 0 < iNbChanInHit)
                            iLastChan = iCh;
                            dLastPosX = dPosX;
@@ -922,6 +925,8 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
 
                               CbmTofDigiExp * xDigiA = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0];
                               CbmTofDigiExp * xDigiB = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1];
+							  CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
+							  CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
 
                               // The "Strip" time is the mean time between each end
                               dTime = xDigiA->GetTime() + xDigiB->GetTime();
@@ -978,25 +983,25 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                        for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                        {
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() )
+                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
                                              bFoundA = kTRUE;
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
                                              bFoundB = kTRUE;
                                        } // for( Int
                                        else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                        {
-                                          if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiA->GetLinks() )
+                                          if( vPtsRef[iPtRef] == pointA )
                                              bFoundA = kTRUE;
-                                          if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiB->GetLinks() )
+                                          if( vPtsRef[iPtRef] == pointB )
                                              bFoundB = kTRUE;
                                        } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
 
                                     // CbmTofPoint pointer for 1st digi not found => save it
                                     if( kFALSE == bFoundA )
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                       vPtsRef.push_back( pointA );
                                     // CbmTofPoint pointer for 2nd digi not found => save it
                                     if( kFALSE == bFoundB )
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                       vPtsRef.push_back( pointB );
                                  } // if current Digis compatible with last fired chan
                                  else
                                  {
@@ -1045,20 +1050,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightsSum   = dTotS;
                                     iNbChanInHit  = 1;
                                     // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                    vPtsRef.push_back( pointA );
 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     {
-                                       if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                             ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                       if( pointA->GetTrackID() !=
+                                             pointB->GetTrackID() )
                                           // if other side come from a different Track,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                     } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                       else if( pointA != pointB )
                                           // if other side come from a different TofPoint,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                  } // else of if current Digis compatible with last fired chan
                               } // if( 0 < iNbChanInHit)
                                  else
@@ -1071,20 +1076,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightsSum   = dTotS;
                                     iNbChanInHit  = 1;
                                     // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                    vPtsRef.push_back( pointA );
 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     {
-                                       if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                             ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                       if( pointA->GetTrackID() !=
+                                             pointB->GetTrackID() )
                                           // if other side come from a different Track,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                     } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                       else if( pointA != pointB )
                                           // if other side come from a different TofPoint,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                  } // else of if( 0 < iNbChanInHit)
                               iLastChan = iCh;
                               dLastPosX = dPosX;
@@ -1246,8 +1251,9 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
 
                               CbmTofDigi * xDigiA = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][0];
                               CbmTofDigi * xDigiB = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][1];
-
-                              // The "Strip" time is the mean time between each end
+							  CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
+							  CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
+                             // The "Strip" time is the mean time between each end
                               dTime = xDigiA->GetTime() + xDigiB->GetTime();
                               dTime /= 2.0;
 
@@ -1301,25 +1307,25 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                        for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                        {
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() )
+                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
                                              bFoundA = kTRUE;
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
                                              bFoundB = kTRUE;
                                        } // for( Int
                                        else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                        {
-                                          if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiA->GetLinks() )
+                                          if( vPtsRef[iPtRef] == pointA )
                                              bFoundA = kTRUE;
-                                          if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiB->GetLinks() )
+                                          if( vPtsRef[iPtRef] == pointB )
                                              bFoundB = kTRUE;
                                        } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
 
                                     // CbmTofPoint pointer for 1st digi not found => save it
                                     if( kFALSE == bFoundA )
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                       vPtsRef.push_back( pointA );
                                     // CbmTofPoint pointer for 2nd digi not found => save it
                                     if( kFALSE == bFoundB )
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                       vPtsRef.push_back( pointB );
                                  } // if current Digis compatible with last fired chan
                                  else
                                  {
@@ -1369,20 +1375,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightsSum   = dTotS;
                                     iNbChanInHit  = 1;
                                     // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                    vPtsRef.push_back( pointA );
 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     {
-                                       if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                             ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                       if( pointA->GetTrackID() !=
+                                             pointB->GetTrackID() )
                                           // if other side come from a different Track,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                     } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                       else if( pointA != pointB )
                                           // if other side come from a different TofPoint,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                  } // else of if current Digis compatible with last fired chan
                               } // if( 0 < iNbChanInHit)
                                  else
@@ -1395,20 +1401,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightsSum   = dTotS;
                                     iNbChanInHit  = 1;
                                     // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                    vPtsRef.push_back( pointA );
 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     {
-                                       if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                             ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                       if( pointA->GetTrackID() !=
+                                             pointB->GetTrackID() )
                                           // if other side come from a different Track,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                     } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                       else if( pointA != pointB )
                                           // if other side come from a different TofPoint,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                  } // else of if( 0 < iNbChanInHit)
                               iLastChan = iCh;
                               dLastPosX = dPosX;
@@ -1447,6 +1453,8 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
 
                                  CbmTofDigi * xDigiA = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][0];
                                  CbmTofDigi * xDigiB = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][1];
+								 CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
+								 CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
 
                                  // The "Strip" time is the mean time between each end
                                  dTime = xDigiA->GetTime() + xDigiB->GetTime();
@@ -1502,25 +1510,25 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                        if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                           for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                           {
-                                             if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() )
+                                             if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
                                                 bFoundA = kTRUE;
-                                             if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                             if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
                                                 bFoundB = kTRUE;
                                           } // for( Int
                                           else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                           {
-                                             if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiA->GetLinks() )
+                                             if( vPtsRef[iPtRef] == pointA )
                                                 bFoundA = kTRUE;
-                                             if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiB->GetLinks() )
+                                             if( vPtsRef[iPtRef] == pointB )
                                                 bFoundB = kTRUE;
                                           } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
 
                                        // CbmTofPoint pointer for 1st digi not found => save it
                                        if( kFALSE == bFoundA )
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                          vPtsRef.push_back( pointA );
                                        // CbmTofPoint pointer for 2nd digi not found => save it
                                        if( kFALSE == bFoundB )
-                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                          vPtsRef.push_back( pointB );
                                     } // if current Digis compatible with last fired chan
                                     else
                                     {
@@ -1570,20 +1578,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                        dWeightsSum   = dTotS;
                                        iNbChanInHit  = 1;
                                        // Save pointer on CbmTofPoint
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                       vPtsRef.push_back( pointA );
 
                                        if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                        {
-                                          if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                                ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                          if( pointA->GetTrackID() !=
+                                                pointB->GetTrackID() )
                                              // if other side come from a different Track,
                                              // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                             vPtsRef.push_back( pointB );
                                        } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                          else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                          else if( pointA != pointB )
                                              // if other side come from a different TofPoint,
                                              // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                             vPtsRef.push_back( pointB );
                                     } // else of if current Digis compatible with last fired chan
                                  } // if( 0 < iNbChanInHit)
                                     else
@@ -1596,20 +1604,20 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                        dWeightsSum   = dTotS;
                                        iNbChanInHit  = 1;
                                        // Save pointer on CbmTofPoint
-                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                       vPtsRef.push_back( pointA );
 
                                        if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                        {
-                                          if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
-                                                ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
+                                          if( pointA->GetTrackID() !=
+                                                pointB->GetTrackID() )
                                              // if other side come from a different Track,
                                              // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                             vPtsRef.push_back( pointB );
                                        } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                          else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
+                                          else if( pointA != pointB )
                                              // if other side come from a different TofPoint,
                                              // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+                                             vPtsRef.push_back( pointB );
                                     } // else of if( 0 < iNbChanInHit)
                                  iLastChan = iCh;
                                  dLastPosX = dPosX;

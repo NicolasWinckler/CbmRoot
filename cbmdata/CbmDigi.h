@@ -11,7 +11,7 @@
 #include "TObject.h"
 
 
-class FairMultiLinkedData;
+class CbmMatch;
 
 
 
@@ -48,11 +48,20 @@ class CbmDigi : public TObject
   /** Default constructor  **/
   CbmDigi();
 
+	
+  /** Copy constructor  **/
+  CbmDigi(const CbmDigi&);
+
+
 
   /** Destructor  **/
   virtual ~CbmDigi() { };
 
+	
+  /** Assignment operator  **/	
+  CbmDigi& operator=(const CbmDigi&);
 
+	
   /** Unique channel address  **/
   virtual Int_t    GetAddress() const = 0;
 
@@ -61,8 +70,8 @@ class CbmDigi : public TObject
   virtual Double_t GetCharge()  const { return 0.; }
 
 
-  /** Get pointer to link collection **/
-  FairMultiLinkedData* GetLinks() const { return fLinks; }
+  /** Get pointer to MC match **/
+  CbmMatch* GetMatch() const { return fMatch; }
 
 
   /** System (enum DetectorId) **/
@@ -74,16 +83,14 @@ class CbmDigi : public TObject
 
 
   /** Set pointer to link collection **/
- void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
+  void SetMatch(CbmMatch* match) { fMatch = match; }
 
   
 
  protected:
 
-  FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
+  CbmMatch* fMatch; ///< Monte-Carlo match information
 
-  CbmDigi(const CbmDigi&);
-  CbmDigi& operator=(const CbmDigi&);
 
   ClassDef(CbmDigi,2);
 

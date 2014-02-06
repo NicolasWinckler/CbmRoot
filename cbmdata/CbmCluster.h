@@ -9,7 +9,7 @@
 #define CBMCLUSTER_H_
 
 #include "TObject.h"
-class FairMultiLinkedData;
+class CbmMatch;
 
 /**
  * \class CbmCluster
@@ -74,11 +74,11 @@ public:
 
    /** Accessors **/
    Int_t GetAddress() const { return fAddress; }
-   FairMultiLinkedData* GetLinks() const { return fLinks; }
+   CbmMatch* GetMatch() const { return fMatch; }
 
    /** Modifiers **/
    void SetAddress(Int_t address) { fAddress = address; }
-   void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
+   void SetMatch(CbmMatch* match) { fMatch = match; }
 
 private:
    CbmCluster(const CbmCluster&);
@@ -86,9 +86,9 @@ private:
 
 	std::vector<Int_t> fDigis; ///< Array of digi indices
 	Int_t fAddress; ///< Unique detector ID
-	FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
+	CbmMatch* fMatch; ///< link to Monte-Carlo information
         
-	ClassDef(CbmCluster, 1);
+	ClassDef(CbmCluster, 2);
 };
 
 #endif /* CBMCLUSTER_H_ */

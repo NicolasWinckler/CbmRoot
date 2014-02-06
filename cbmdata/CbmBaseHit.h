@@ -28,7 +28,7 @@ enum HitType {
 #include "TObject.h"
 #include <string>
 using std::string;
-class FairMultiLinkedData;
+class CbmMatch;
 
 class CbmBaseHit : public TObject
 {
@@ -49,14 +49,14 @@ public:
 	Double_t GetDz() const { return fDz; }
 	Int_t GetRefId() const { return fRefId; }
 	Int_t GetAddress() const { return fAddress; }
-	FairMultiLinkedData* GetLinks() const { return fLinks; }
+	CbmMatch* GetMatch() const { return fMatch; }
 
 	/* Setters */
 	void SetZ(Double_t z) { fZ = z; }
 	void SetDz(Double_t dz) { fDz = dz; }
 	void SetRefId(Int_t refId) { fRefId = refId; }
 	void SetAddress(Int_t address) { fAddress = address; }
-	 void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
+	 void SetMatch(CbmMatch* match) { fMatch = match; }
 
 	/**
 	 * Pure virtual function. Must be implemented in derived class.
@@ -88,10 +88,9 @@ private:
 	Double_t fDz; ///< Z position error [cm]
 	Int_t fRefId; ///< some reference id (usually to cluster, digi or MC point)
 	Int_t fAddress; ///< detector unique identifier
-	FairMultiLinkedData* fLinks; ///< Monte-Carlo link collection
+	CbmMatch* fMatch; ///< Monte-Carlo information
 
-  
-	ClassDef(CbmBaseHit, 1);
+	ClassDef(CbmBaseHit, 2);
 };
 
 #endif /* CBMBASEHIT_H_ */

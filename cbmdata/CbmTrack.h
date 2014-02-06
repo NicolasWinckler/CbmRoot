@@ -22,8 +22,7 @@
 #include "TObject.h"
 
 #include <vector>
-
-class FairMultiLinkedData;
+class CbmMatch;
 
 class CbmTrack : public TObject
 {
@@ -34,11 +33,11 @@ public:
 	/** Destructor **/
 	virtual ~CbmTrack();
 
-   /** Copy Constructor **/
-   CbmTrack(const CbmTrack&);
-
-   /** Assignment Operator **/
-   CbmTrack& operator=(const CbmTrack&);
+//   /** Copy Constructor **/
+//   CbmTrack(const CbmTrack&);
+//
+//   /** Assignment Operator **/
+//   CbmTrack& operator=(const CbmTrack&);
 
 	/** Add a hit to the list, using index and HitType
 	 * @param index Index of the hit in the array
@@ -59,7 +58,7 @@ public:
 	Int_t GetPreviousTrackId() const { return fPreviousTrackId; }
 	const FairTrackParam* GetParamFirst() const { return &fParamFirst; }
 	const FairTrackParam* GetParamLast() const { return &fParamLast; }
-   FairMultiLinkedData* GetLinks() const { return fLinks; }
+   CbmMatch* GetMatch() const { return fMatch; }
 
 	/** Modifiers  **/
 	void SetPidHypo(Int_t pid){ fPidHypo = pid; }
@@ -69,7 +68,7 @@ public:
 	void SetPreviousTrackId(Int_t previousTrackId) { fPreviousTrackId = previousTrackId; }
 	void SetParamFirst(const FairTrackParam* par) { fParamFirst = *par; }
 	void SetParamLast(const FairTrackParam* par){ fParamLast  = *par; }
-   void SetLinks(FairMultiLinkedData* links) { fLinks = links; }
+   void SetMatch(CbmMatch* match) { fMatch = match; }
 
 	virtual string ToString() const;
 
@@ -97,10 +96,10 @@ private:
 	/** Index of previous track segment **/
 	Int_t fPreviousTrackId;
 
-	/** Monte-Carlo link collection **/
-   FairMultiLinkedData* fLinks;
+	/** Monte-Carlo information **/
+   CbmMatch* fMatch;
 
-	ClassDef(CbmTrack, 2);
+	ClassDef(CbmTrack, 3);
 };
 
 #endif

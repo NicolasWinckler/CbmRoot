@@ -10,7 +10,7 @@ CbmCluster::CbmCluster()
  : TObject(),
    fDigis(),
    fAddress(0),
-   fLinks(NULL)
+   fMatch(NULL)
 {
 
 }

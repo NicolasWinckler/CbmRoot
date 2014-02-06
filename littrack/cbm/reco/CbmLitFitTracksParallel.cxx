@@ -87,10 +87,17 @@ void CbmLitFitTracksParallel::ReadDataBranches()
 
 void CbmLitFitTracksParallel::DoFit()
 {
+   static Bool_t isTrd = fTrdTracks != NULL;
+   static Bool_t isMuch = fMuchTracks != NULL;
+
    static Bool_t firstTime = true;
    static lit::parallel::LitDetectorLayoutScal layout;
    if (firstTime) {
-      CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutScal(layout);
+      if (isTrd) {
+         CbmLitTrackingGeometryConstructor::Instance()->GetTrdLayoutScal(layout);
+      } else if (isMuch) {
+         CbmLitTrackingGeometryConstructor::Instance()->GetMuchLayoutScal(layout);
+      }
       firstTime = false;
    }
 
@@ -99,8 +106,13 @@ void CbmLitFitTracksParallel::DoFit()
    // Convert input data
    vector<lit::parallel::LitScalTrack*> ltracks;
    vector<lit::parallel::LitScalPixelHit*> lhits;
-   CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fTrdHits, lhits);
-   CbmLitConverterParallel::CbmTrackArrayToLitScalTrackArray(fTrdTracks, lhits, ltracks);
+   if (isTrd) {
+      CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fTrdHits, lhits);
+      CbmLitConverterParallel::CbmTrackArrayToLitScalTrackArray(fTrdTracks, lhits, ltracks);
+   } else if (isMuch) {
+      CbmLitConverterParallel::CbmPixelHitArrayToLitScalPixelHitArray(fMuchPixelHits, lhits);
+      CbmLitConverterParallel::CbmTrackArrayToLitScalTrackArray(fMuchTracks, lhits, ltracks);
+   }
 
    // Replace first track parameter of the converted tracks with the last STS track parameter
    Int_t nofTracks = ltracks.size();
@@ -124,12 +136,14 @@ void CbmLitFitTracksParallel::DoFit()
    // Replace first and last track parameters for the fitted track
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
       lit::parallel::LitScalTrack& track = *ltracks[iTrack];
-      CbmTrack* trdTrack = static_cast<CbmTrack*>(fTrdTracks->At(iTrack));
+      CbmTrack* cbmTrack = (isTrd) ?
+               static_cast<CbmTrack*>(fTrdTracks->At(iTrack)) :
+               static_cast<CbmTrack*>(fMuchTracks->At(iTrack));
       FairTrackParam firstParam, lastParam;
       CbmLitConverterParallel::LitTrackParamScalToFairTrackParam(&track.GetParamFirst(), &firstParam);
       CbmLitConverterParallel::LitTrackParamScalToFairTrackParam(&track.GetParamLast(), &lastParam);
-      trdTrack->SetParamFirst(&firstParam);
-      trdTrack->SetParamLast(&lastParam);
+      cbmTrack->SetParamFirst(&firstParam);
+      cbmTrack->SetParamLast(&lastParam);
    }
 
    // Clear memory

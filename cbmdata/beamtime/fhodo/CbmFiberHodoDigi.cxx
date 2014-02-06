@@ -8,7 +8,7 @@ CbmFiberHodoDigi::CbmFiberHodoDigi()
   : CbmDigi(),
     fAddress(-1),
     fCharge(-1.),
-    fTime(-1.)
+    fTime(0)
 {
 }
 

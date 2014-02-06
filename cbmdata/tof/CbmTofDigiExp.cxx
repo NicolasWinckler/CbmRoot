@@ -33,17 +33,23 @@ CbmTofDigiExp::CbmTofDigiExp(
       Double_t time, Double_t tot, 
       UInt_t Side, UInt_t SmType )
   : CbmDigi(),
+    fuAddress(0),
     fdTime(time),
     fdTot(tot)
 {
    fuAddress = CbmTofAddress::GetUniqueAddress( Sm, Rpc, Channel, Side, SmType );
 }
-CbmTofDigiExp::CbmTofDigiExp(const CbmTofDigiExp& digiIn):
-      CbmDigi(digiIn)
+CbmTofDigiExp::CbmTofDigiExp(const CbmTofDigiExp& digiIn)
+  : CbmDigi(digiIn),
+    fuAddress(digiIn.fuAddress),
+    fdTime(digiIn.fdTime),
+    fdTot(digiIn.fdTot)  
 {
+  /*
    fuAddress = digiIn.GetAddress(); ///< Unique channel address
    fdTime    = digiIn.GetTime();    ///< Absolute time [ps]
    fdTot     = digiIn.GetTot();     ///< Tot [ps]
+  */
    SetMatch( digiIn.GetMatch() );
 }
 

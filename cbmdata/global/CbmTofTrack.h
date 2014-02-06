@@ -33,13 +33,16 @@ class CbmTofTrack : public TObject {
 	 ** @param pidHypo      PID hypothesis for track extrapolation
 	 **/
 	CbmTofTrack(Int_t trackIndex, Int_t hitIndex, Double_t trackLength,
-			    const FairTrackParam& trackPar, Int_t pidHypo) :
-			    	fGlbTrack(trackIndex),
-			    	fTofHit(hitIndex),
-			    	fTrackPar(trackPar),
-			    	fTrackLength(trackLength),
-			    	fPidHypo(pidHypo) {
-	}
+			    const FairTrackParam& trackPar, Int_t pidHypo) 
+	  : TObject(),
+	  fGlbTrack(trackIndex),
+	  fTofHit(hitIndex),
+	  fTrackPar(trackPar),
+	  fTrackLength(trackLength),
+	  fPidHypo(pidHypo),
+	  fDistance(0.) 
+	    {
+	    }
 
 
 	/**   Destructor   **/

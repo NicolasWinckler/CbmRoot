@@ -33,7 +33,8 @@ CbmTofDigi::CbmTofDigi(
       UInt_t address, 
       Double_t time, 
       Double_t tot)
-  : CbmDigi()
+  : CbmDigi(),
+    flData(0)
 {
    SetAddress( address );
    SetTime( time);
@@ -44,7 +45,8 @@ CbmTofDigi::CbmTofDigi(
       UInt_t Sm, UInt_t Rpc, UInt_t Channel, 
       Double_t time, Double_t tot, 
       UInt_t Side, UInt_t SmType )
-  : CbmDigi()
+  : CbmDigi(),
+    flData(0)
 {
    SetAddress( Sm, Rpc, Channel, Side, SmType );
    SetTime( time);
@@ -52,8 +54,10 @@ CbmTofDigi::CbmTofDigi(
 }
 
 CbmTofDigi::CbmTofDigi(const CbmTofDigi& digiIn)
+  : CbmDigi(digiIn),
+    flData(digiIn.flData)
 {
-   flData = digiIn.GetData(); ///< Fully compressed data
+  //   flData = digiIn.GetData(); ///< Fully compressed data
 }
 
 CbmTofDigi::~CbmTofDigi()

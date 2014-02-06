@@ -80,23 +80,18 @@ CbmRichProtHitProducer::CbmRichProtHitProducer():
    fMcTracks(NULL),
    fNHits(0),
    fNDoubleHits(0),
-   fNofCrossTalkHits(0),// = 0; // posF: 10.2% (20*10.2%=2.04hits), posH: 9,8% (20*9,8%=1.96hits) ==> in fCrossTalkHitProb
-   //fCrossTalkHitProb(0.02),
    fNRefrac(0.),
    fDetection(0),
    fNEvents(0),
-
    fDetX(0.),
    fDetY(0.),
    fDetZ(0.),
    fDetZ_org(0.),
    fDetWidthX(0.),
    fDetWidthY(0.),
-
    fSensNodes(NULL),
    fPassNodes(NULL),
    fPar(NULL),
-
    fPhotomulRadius(0.0),
    fPhotomulDist(0.),
    fDetType(4),
@@ -104,9 +99,11 @@ CbmRichProtHitProducer::CbmRichProtHitProducer():
    fNofNoiseHitsCounter(0),
    fCollectionEfficiency(1.),
    fSigmaMirror(0.06),
-
    fTheta(0.),
-   fPhi(0.)
+   fPhi(0.),
+   fCrossTalkHitProb(0.),
+   fNofCrossTalkHits(0)// = 0; // posF: 10.2% (20*10.2%=2.04hits), posH: 9,8% (20*9,8%=1.96hits) ==> in fCrossTalkHitProb
+   //fCrossTalkHitProb(0.02),
 {
 
 }

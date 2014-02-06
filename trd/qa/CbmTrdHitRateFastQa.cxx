@@ -44,6 +44,12 @@ using std::vector;
 // ---- Default constructor -------------------------------------------
 CbmTrdHitRateFastQa::CbmTrdHitRateFastQa()
   : FairTask("TrdCluster"),
+    myfile(),
+    nTotalAsics(0),
+    nTotalOptLinks(0),
+    trdTotalDataRate(0),
+    h1DataModule(NULL),
+    h1OptLinksModule(NULL),
     Digicounter(-1),
     tFile(NULL),
     fDraw(kFALSE),
@@ -105,13 +111,11 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa()
     fModuleInfo(NULL),
     //fRadiators(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
+    fColors(),
+    fZLevel(),
+    fBitPerHit(0),
     fDigiMap(),
-    fDigiMapIt(),
-    nTotalAsics(0.),
-    nTotalOptLinks(0.),
-    trdTotalDataRate(0.),
-    h1DataModule(NULL),
-    h1OptLinksModule(NULL)
+    fDigiMapIt()
 {
 }
 // --------------------------------------------------------------------
@@ -119,6 +123,12 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa()
 // ---- Constructor ----------------------------------------------------
 CbmTrdHitRateFastQa::CbmTrdHitRateFastQa(const char *name, const char *title)
   : FairTask(name),
+    myfile(),
+    nTotalAsics(0),
+    nTotalOptLinks(0),
+    trdTotalDataRate(0),
+    h1DataModule(NULL),
+    h1OptLinksModule(NULL),
     Digicounter(-1),
     tFile(NULL),
     fDraw(kFALSE),
@@ -178,15 +188,13 @@ CbmTrdHitRateFastQa::CbmTrdHitRateFastQa(const char *name, const char *title)
     fMCStacks(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
-  //fRadiators(radiator),
+    //fRadiators(NULL),
     fGeoHandler(new CbmTrdGeoHandler()),
+    fColors(),
+    fZLevel(),
+    fBitPerHit(0),
     fDigiMap(),
-    fDigiMapIt(),
-    nTotalAsics(0.),
-    nTotalOptLinks(0.),
-    trdTotalDataRate(0.),
-    h1DataModule(NULL),
-    h1OptLinksModule(NULL)
+    fDigiMapIt()
 {
 }
 // --------------------------------------------------------------------

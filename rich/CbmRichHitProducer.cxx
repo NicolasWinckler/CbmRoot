@@ -82,17 +82,15 @@ CbmRichHitProducer::CbmRichHitProducer():
    fMcTracks(NULL),
    fNHits(0),
    fNDoubleHits(0),
-
+   fGP(),
    fDetection(0),
    fNEvents(0),
-
    fPhotomulRadius(0.0),
    fPhotomulDist(0.),
    fDetType(4),
    fNofNoiseHits(220),
    fCollectionEfficiency(1.),
    fSigmaMirror(0.06),
-
    fCrossTalkHitProb(0.02),
    fNofCrossTalkHits(0)
 {

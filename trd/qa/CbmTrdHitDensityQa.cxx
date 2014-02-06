@@ -52,24 +52,27 @@ using std::setiosflags;
 // ---- Default constructor -------------------------------------------
 CbmTrdHitDensityQa::CbmTrdHitDensityQa()
   :FairTask("CbmTrdHitDensityQa",1),
+   myfile(),
+   fBitPerHit(1.),
+   h1DataModule(NULL),
+   h1OptLinksModule(NULL),
+   fNeighbourTrigger(true),
    fDigis(NULL),
    fClusters(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fGeoHandler(new CbmTrdGeoHandler()),
-   fTriggerThreshold(1e-6),
-   fEventRate(1e7),
-   fBitPerHit(1.),
-   fNeighbourTrigger(true),
-   fEventCounter(NULL),
    fStation(-1),
    fLayer(-1), 
    fModuleID(-1),
-   fModuleHitMap(),
-   fModuleHitASICMap(),
+   fEventCounter(NULL),
+   fTriggerThreshold(1e-6),
+   fEventRate(1e7),
    fUsedDigiMap(),
-    h1DataModule(NULL),
-    h1OptLinksModule(NULL)
+   fModuleHitMap(),
+   fModuleHitMapIt(),
+   fModuleHitASICMap(),
+   fModuleHitASICMapIt()
 {
 }
 

@@ -58,27 +58,22 @@ using boost::property_tree::ptree;
 
 CbmRichGeoTest::CbmRichGeoTest():
    FairTask("RichGeoTestQa"),
-
    fRichDetectorType("standard"),
-
    fOutputDir(""),
-
    fRichHits(NULL),
    fRichRings(NULL),
    fRichPoints(NULL),
    fMCTracks(NULL),
    fRichRingMatches(NULL),
-
+   fGP(),
    fCopFit(NULL),
    fTauFit(NULL),
    fCanvas(),
    fEventNum(0),
    fMinNofHits(0),
-
    fhHitsXY(NULL),
    fhPointsXY(NULL),
    fhNofPhotonsPerHit(NULL),
-
    fhNofHits(),
    fhAaxisVsMom(),
    fhBaxisVsMom(),
@@ -89,7 +84,6 @@ CbmRichGeoTest::CbmRichGeoTest():
    fhRadiusVsMom(),
    fhChi2CircleVsMom(),
    fhDRVsMom(),
-
    fhRadiusVsNofHits(NULL),
    fhAaxisVsNofHits(NULL),
    fhBaxisVsNofHits(NULL),
@@ -100,33 +94,27 @@ CbmRichGeoTest::CbmRichGeoTest():
    fhDiffXcCircle(NULL),
    fhDiffYcCircle(NULL),
    fhDiffRadius(NULL),
-
    fhDiffXhit(NULL),
    fhDiffYhit(NULL),
-
    fMinAaxis(0.),
    fMaxAaxis(0.),
    fMinBaxis(0.),
    fMaxBaxis(0.),
    fMinRadius(0.),
    fMaxRadius(0.),
-
    fhNofHitsAll(NULL),
    fhNofHitsCircleFit(NULL),
    fhNofHitsEllipseFit(NULL),
    fhNofHitsCircleFitEff(NULL),
    fhNofHitsEllipseFitEff(NULL),
-
    fh_mc_mom_el(NULL),
    fh_mc_pty_el(NULL),
    fh_acc_mom_el(NULL),
    fh_acc_pty_el(NULL),
-
    fh_mc_mom_pi(NULL),
    fh_mc_pty_pi(NULL),
    fh_acc_mom_pi(NULL),
    fh_acc_pty_pi(NULL),
-
    fhNofHitsXYZ(NULL),
    fhNofPointsXYZ(NULL),
    fhBoverAXYZ(NULL),
@@ -134,11 +122,8 @@ CbmRichGeoTest::CbmRichGeoTest():
    fhAaxisXYZ(NULL),
    fhRadiusXYZ(NULL),
    fhdRXYZ(NULL),
-
    fHists(),
-
    fNofDrawnRings(0)
-
 {
 	fEventNum = 0;
 	fNofDrawnRings = 0;

@@ -8,7 +8,7 @@
 #include "CbmTrdAddress.h"
 #include "TMath.h"
 #include "TCanvas.h"
-CbmTrdUtils::CbmTrdUtils(){}
+CbmTrdUtils::CbmTrdUtils() : fColors(), fZLevel() {}
 CbmTrdUtils::~CbmTrdUtils(){}
 
 void CbmTrdUtils::InitColorVector(Bool_t logScale, Double_t min, Double_t max){

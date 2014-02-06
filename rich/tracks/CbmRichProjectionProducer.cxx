@@ -33,9 +33,9 @@ CbmRichProjectionProducer::CbmRichProjectionProducer(
       Int_t zflag):
    CbmRichProjectionProducerBase(zflag),
    fListRICHImPlanePoint(NULL),
-
    fNHits(0),
-   fEvent(0)
+   fEvent(0),
+   fGP()
 {
 }
 

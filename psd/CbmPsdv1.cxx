@@ -23,9 +23,23 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmPsdv1::CbmPsdv1() {
-  fPsdCollection = new TClonesArray("CbmPsdPoint");
-  fPosIndex = 0;
+CbmPsdv1::CbmPsdv1() 
+  : CbmPsd(),
+    fTrackID(-3),       
+    fVolumeID(-3),    
+    fModuleID(-3),  
+    fPos(),           
+    fMom(),        
+    fTime(-1.),         
+    fLength(-1.),        
+    fEloss(-1.),        		 
+    fPosIndex(0),    
+    fPsdCollection(new TClonesArray("CbmPsdPoint")), 		 
+    fXshift(0.),             
+    fZposition(0.),        
+    fRotYAngle(0.),          
+    fGeoFile("")       
+{
 }
 // -------------------------------------------------------------------------
 
@@ -33,7 +47,22 @@ CbmPsdv1::CbmPsdv1() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmPsdv1::CbmPsdv1(const char* name, Bool_t active)
-  : CbmPsd(name, active) {
+  : CbmPsd(name, active),
+    fTrackID(-3),       
+    fVolumeID(-3),    
+    fModuleID(-3),  
+    fPos(),           
+    fMom(),        
+    fTime(-1.),         
+    fLength(-1.),        
+    fEloss(-1.),        		 
+    fPosIndex(0),    
+    fPsdCollection(new TClonesArray("CbmPsdPoint")),		 
+    fXshift(0.),             
+    fZposition(0.),        
+    fRotYAngle(0.),          
+    fGeoFile("")       
+{
 }
 
 // -------------------------------------------------------------------------

@@ -33,7 +33,24 @@ public:
    /**
     * \brief Default constructor.
     */
-   CbmRichRecGeoPar(){;}
+   CbmRichRecGeoPar()
+     : fPmtXOrig(0.),
+    fPmtYOrig(0.),
+    fPmtZOrig(0.),
+    fPmtTheta(0.),
+    fPmtPhi(0.),
+    fPmtX(0.),
+    fPmtY(0.),
+    fPmtZ(0.),
+    fPmtWidthX(0.),
+    fPmtWidthY(0.),
+    fNRefrac(0.),
+    fMirrorX(0.),
+    fMirrorY(0.),
+    fMirrorZ(0.),
+    fMirrorR(0.),
+    fMirrorTheta(0.)
+    {;}
 
    /**
     * \brief Destructor.

@@ -85,7 +85,7 @@ class CbmPsdv1 : public CbmPsd
   Float_t   fXshift;                 //  shift on X axis to have ion beam inside the hole
   Float_t   fZposition;              //  Z position PSD surface  
   Float_t   fRotYAngle;              //  PSD rotation around Y axis [deg.] //marina
-  TString fGeoFile;  
+  TString fGeoFile;               
 
   /** Private method ResetParameters
    **
@@ -93,7 +93,9 @@ class CbmPsdv1 : public CbmPsd
    **/
   void ResetParameters();
 
-
+  CbmPsdv1(const CbmPsdv1&);
+  CbmPsdv1 operator=(const CbmPsdv1&);
+  
   ClassDef(CbmPsdv1,4)
 
 };

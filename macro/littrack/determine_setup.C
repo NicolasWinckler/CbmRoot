@@ -15,53 +15,101 @@
  * \return True if detector presents in the TGeo.
  */
 Bool_t CheckDetectorPresence(
-		const TString& parFile,
-		const char* name)
+			     const TString& parFile,
+			     const char* name)
 {
-	TFile *currentfile = gFile;
-	TFile* f = new TFile(parFile);
+  cout << "In CheckDetectorPresence for detector " << name << endl; 
+  
+  TFile *currentfile = gFile;
+  TFile* f = new TFile(parFile);
+  
+  // In fairbase trunk the geometry is moved into a separate container, 
+  // so we have to check which version of paramtere file we have
+  
+  if (!gGeoManager) {
+    f->Get("FairBaseParSet"); 
+    TGeoManager *geoMan = gGeoManager;
+    if(!geoMan) {
+      f->Get("FairGeoParSet"); 
+      geoMan = gGeoManager;
+      if(!geoMan) {
+	std::cout<<"Could not find valid GeoManager. Abort now!"<<std::endl;
+	exit(1);
+      }
+    }
+  }
 
-        // In fairbase trunk the geometry is moved into a separate container, 
-        // so we have to check which version of paramtere file we have
-
-        if (!gGeoManager) {
-          f->Get("FairBaseParSet"); 
-          TGeoManager *geoMan = gGeoManager;
-          if(!geoMan) {
-	    f->Get("FairGeoParSet"); 
-            geoMan = gGeoManager;
-            if(!geoMan) {
-              std::cout<<"Could not find valid GeoManager. Abort now!"<<std::endl;
-              exit(1);
-            }
-          }
-        }
-
-	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
-	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-		if (TString(node->GetName()).Contains(name)) {
-			f->Close();
-			delete f;
-            gFile=currentfile;
-			return true;
-		}
+  cout << "After getting the geomanager " << name << endl; 
+  
+  TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+  for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+    TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+    cout << "Node: "<< node->GetName() <<endl;
+    if (TString(node->GetName()).Contains(name)) {
+      f->Close();
+      delete f;
+      gFile=currentfile;
+      return true;
+    }
+  }
+  
+  if (std::string(name) == "mvd") {
+    TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+    if (node1) { // old ascii geometry for pipe
+      nodes = node1->GetNodes();
+      for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+	TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+	cout << "Node: "<< node->GetName() <<endl;
+	if (TString(node->GetName()).Contains(name)) {
+	  f->Close();
+	  delete f;
+	  gFile=currentfile;
+	  return true;
 	}
-	if (std::string(name) == "mvd") {
-		TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
-		TGeoNode* node2 = NULL;
-		if (node1) node2 = node1->GetVolume()->FindNode("mvdstation01_0");
-		if (node2) {
-			f->Close();
-			delete f;
-			gFile=currentfile;
-			return true;
+      }
+    } else {
+      // Find Pipe top node
+      TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+      for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+	TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+	TString nodeName = node->GetName();
+	nodeName.ToLower();
+	if (nodeName.Contains("pipe")) {
+	  cout << "Found node: " << node->GetName() << endl;
+
+          // find pipevac1
+	  TObjArray* nodes2 = node->GetNodes();
+	  for (Int_t iiNode = 0; iiNode < nodes2->GetEntriesFast(); iiNode++) {
+	    TGeoNode* node2 = (TGeoNode*) nodes2->At(iiNode);
+	    TString nodeName2 = node2->GetName();
+	    nodeName2.ToLower();
+	    if (nodeName2.Contains("pipevac1")) {
+	      cout << "Node: "<< nodeName2 <<endl;
+              // check if there is a mvd in the pipevac
+	      TObjArray* nodes3 = node2->GetNodes();
+	      for (Int_t iiiNode = 0; iiiNode < nodes3->GetEntriesFast(); iiiNode++) {
+		TGeoNode* node3 = (TGeoNode*) nodes3->At(iiiNode);
+		TString nodeName3 = node3->GetName();
+		nodeName3.ToLower();
+		cout << "Node: "<< nodeName3 <<endl;
+		if (nodeName3.Contains("mvd")) {
+		  cout << "Node: "<< nodeName3 <<endl;
+		  f->Close();
+		  delete f;
+		  gFile=currentfile;
+		  return true;
 		}
+	      }
+	    }
+	  }
 	}
-	f->Close();
-   gFile=currentfile;
-	delete f;
-	return false;
+      }
+    }
+  }
+  f->Close();
+  gFile=currentfile;
+  delete f;
+  return false;
 }
 
 /**

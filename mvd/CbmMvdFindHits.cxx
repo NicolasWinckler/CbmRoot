@@ -536,7 +536,7 @@ Int_t CbmMvdFindHits::GetMvdGeometry() {
     TString volName  = Form("mvdstation%02i", iStation);
     volId = gGeoManager->GetUID(volName);
     if ( volId > -1 ) {
-
+      
       // Get shape parameters
       TGeoVolume* volume = gGeoManager->GetVolume(volName.Data());
       TGeoTube* tube = (TGeoTube*) volume->GetShape();
@@ -545,8 +545,74 @@ Int_t CbmMvdFindHits::GetMvdGeometry() {
       Double_t d    = 2. * tube->GetDz();
 
       // Full path to node 
-      TString nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
-
+      // Since there are now different pipe and mvd geomteries  it is more 
+      // difficult to get the full path
+      //TString nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
+      TString nodeName;
+      TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+      if (node1) { // old ascii geometry for pipe
+	TObjArray* nodes = node1->GetNodes();
+	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+	  TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+          TString tmpnodeName = node->GetName();
+	  if (tmpnodeName.Contains(volName)) {
+            nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
+            break;
+	  } else if (tmpnodeName.Contains("mvd_")) {
+            nodeName = "/cave_1/pipevac1_0/" + tmpnodeName 
+	      + "/" + volName + "_0";
+            break;
+	  }
+	}
+      } else {
+	// Find Pipe top node
+	nodeName = "/cave_1/";
+	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+	  TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+	  TString nodeName1 = node->GetName();
+	  cout << "Node: "<< nodeName1 <<endl;
+	  nodeName1.ToLower();
+	  if (nodeName1.Contains("pipe")) {
+            nodeName +=  node->GetName();
+            nodeName += "/";	  
+	    // find pipevac1
+	    TObjArray* nodes2 = node->GetNodes();
+	    for (Int_t iiNode = 0; iiNode < nodes2->GetEntriesFast(); iiNode++) {
+	      TGeoNode* node2 = (TGeoNode*) nodes2->At(iiNode);
+	      TString nodeName2 = node2->GetName();
+	      cout << "Node: "<< nodeName2 <<endl;
+	      nodeName2.ToLower();
+	      if (nodeName2.Contains("pipevac1")) {
+		nodeName +=  node2->GetName();
+		nodeName += "/";	  
+		cout << "I am here " <<endl;
+		// check if there is a volume with mvd in name in the pipevac
+		TObjArray* nodes3 = node2->GetNodes();
+		for (Int_t iiiNode = 0; iiiNode < nodes3->GetEntriesFast(); iiiNode++) {
+		  TGeoNode* node3 = (TGeoNode*) nodes3->At(iiiNode);
+		  TString nodeName3 = node3->GetName();
+		  cout << "Node: "<< nodeName3 <<endl;
+		  if (nodeName3.Contains(volName)) {
+		    nodeName += volName;
+		    nodeName +=  "_0";	  
+                    goto Node_found;
+		  } else if ( nodeName3.Contains("mvd") ) {
+		    nodeName +=  node3->GetName();
+		    nodeName += "/";	  
+		    nodeName += volName;
+		    nodeName +=  "_0";	  
+                    goto Node_found;
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+      
+      Node_found:
+      
       // Get z position of node
       Bool_t nodeFound = gGeoManager->cd(nodeName.Data());
       if ( ! nodeFound ) {

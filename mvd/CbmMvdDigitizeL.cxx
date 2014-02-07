@@ -34,6 +34,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 #include "CbmMCTrack.h"
 
 // Includes from ROOT
@@ -1001,7 +1002,7 @@ Int_t CbmMvdDigitizeL::GetMvdGeometry() {
     TString volName  = Form("mvdstation%02i", iStation);
     volId = gGeoManager->GetUID(volName);
     if ( volId > -1 ) {
-
+      
       // Get shape parameters
       TGeoVolume* volume = gGeoManager->GetVolume(volName.Data());
       TGeoTube* tube = (TGeoTube*) volume->GetShape();
@@ -1010,8 +1011,79 @@ Int_t CbmMvdDigitizeL::GetMvdGeometry() {
       Double_t d    = 2. * tube->GetDz();
 
       // Full path to node 
-      TString nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
+      // Since there are now different pipe and mvd geomteries  it is more 
+      // difficult to get the full path
+      //TString nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
+      TString nodeName = ""; 
+      TGeoNode* node1 = gGeoManager->GetTopVolume()->FindNode("pipevac1_0");
+      if (node1) { // old ascii geometry for pipe
+        LOG(DEBUG) << "NodeName: " << nodeName << FairLogger::endl;
+	TObjArray* nodes = node1->GetNodes();
+	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+	  TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+          TString tmpnodeName = node->GetName();
+	  LOG(DEBUG) << "TmpNodeName: " << tmpnodeName << FairLogger::endl;
+	  LOG(DEBUG) << "volName: " << volName << FairLogger::endl;
+	  if (tmpnodeName.Contains(volName)) {
+            nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
+	    LOG(DEBUG) << "NodeName: " << nodeName << FairLogger::endl;
+            goto Node_found;
+	  } else if (tmpnodeName.Contains("mvd_")) {
+            nodeName = "/cave_1/pipevac1_0/" + tmpnodeName 
+	      + "/" + volName + "_0";
+	    LOG(DEBUG) << "NodeName: " << nodeName << FairLogger::endl;
+            goto Node_found;
+	  }
+	}
+      } else {
+	// Find Pipe top node
+	nodeName = "/cave_1/";
+	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+	  TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+	  TString nodeName1 = node->GetName();
+	  LOG(DEBUG) << "Node: "<< nodeName1 <<FairLogger::endl;
+	  nodeName1.ToLower();
+	  if (nodeName1.Contains("pipe")) {
+            nodeName +=  node->GetName();
+            nodeName += "/";	  
+	    // find pipevac1
+	    TObjArray* nodes2 = node->GetNodes();
+	    for (Int_t iiNode = 0; iiNode < nodes2->GetEntriesFast(); iiNode++) {
+	      TGeoNode* node2 = (TGeoNode*) nodes2->At(iiNode);
+	      TString nodeName2 = node2->GetName();
+	      LOG(DEBUG) << "Node: "<< nodeName2 <<FairLogger::endl;
+	      nodeName2.ToLower();
+	      if (nodeName2.Contains("pipevac1")) {
+		nodeName +=  node2->GetName();
+		nodeName += "/";	  
+		LOG(DEBUG) << "I am here " <<FairLogger::endl;
+		// check if there is a volume with mvd in name in the pipevac
+		TObjArray* nodes3 = node2->GetNodes();
+		for (Int_t iiiNode = 0; iiiNode < nodes3->GetEntriesFast(); iiiNode++) {
+		  TGeoNode* node3 = (TGeoNode*) nodes3->At(iiiNode);
+		  TString nodeName3 = node3->GetName();
+		  LOG(DEBUG) << "Node: "<< nodeName3 <<FairLogger::endl;
+		  if (nodeName3.Contains(volName)) {
+		    nodeName += volName;
+		    nodeName +=  "_0";	  
+                    goto Node_found;
+		  } else if ( nodeName3.Contains("mvd") ) {
+		    nodeName +=  node3->GetName();
+		    nodeName += "/";	  
+		    nodeName += volName;
+		    nodeName +=  "_0";	  
+                    goto Node_found;
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
 
+      Node_found:
+    
       // Get z position of node
       Bool_t nodeFound = gGeoManager->cd(nodeName.Data());
       if ( ! nodeFound ) {
@@ -1023,8 +1095,8 @@ Int_t CbmMvdDigitizeL::GetMvdGeometry() {
       Double_t global[3];                // Global centre of volume
       gGeoManager->LocalToMaster(local, global);
       Double_t z = global[2];
-
-
+      
+      
       // Check for already existing station with the same ID
       // (Just in case, one never knows...)
       if ( fStationMap.find(iStation) != fStationMap.end() ) {
@@ -1032,18 +1104,18 @@ Int_t CbmMvdDigitizeL::GetMvdGeometry() {
 	     << "Volume ID " << iStation << " already in map!" << endl;
 	Fatal("GetMvdGeometry", "Double station number in TGeoManager!");
       }
-
+      
       // Create new CbmMvdStation and add it to the map
       fStationMap[iStation] = new CbmMvdStation(volName.Data(), iStation, volId,
-					     z, d, rmin, rmax);
+						z, d, rmin, rmax);
       fStationMap[iStation]->Print();
       
       iStation++;
-
+      
     }     // Volume found
-
+    
   } while ( volId > -1 );
-
+  
    
   return iStation - 1;
 }

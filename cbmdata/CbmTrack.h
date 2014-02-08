@@ -33,11 +33,11 @@ public:
 	/** Destructor **/
 	virtual ~CbmTrack();
 
-//   /** Copy Constructor **/
-//   CbmTrack(const CbmTrack&);
-//
-//   /** Assignment Operator **/
-//   CbmTrack& operator=(const CbmTrack&);
+	/** Copy Constructor **/
+	CbmTrack(const CbmTrack&);
+	
+	/** Assignment Operator **/
+	CbmTrack& operator=(const CbmTrack&);
 
 	/** Add a hit to the list, using index and HitType
 	 * @param index Index of the hit in the array

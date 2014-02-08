@@ -16,6 +16,34 @@ CbmBaseHit::CbmBaseHit():
 {
 }
 
+// Only shallow copy needed
+CbmBaseHit::CbmBaseHit(const CbmBaseHit& rhs)
+ : TObject(rhs),
+   fType(rhs.fType),
+   fZ(rhs.fZ),
+   fDz(rhs.fDz),
+   fRefId(rhs.fRefId),
+   fAddress(rhs.fAddress),
+   fMatch(NULL)
+{
+}
+
+// Only shallow copy needed
+CbmBaseHit& CbmBaseHit::operator=(const CbmBaseHit& rhs)
+{
+
+  if (this != &rhs) {
+    TObject::operator=(rhs);
+    fType = rhs.fType;
+    fZ = rhs.fZ;
+    fDz = rhs.fDz;
+    fRefId = rhs.fRefId;
+    fAddress = rhs.fAddress;
+    fMatch = rhs.fMatch;
+  }
+  return *this;
+}
+
 CbmBaseHit::~CbmBaseHit()
 {
 }

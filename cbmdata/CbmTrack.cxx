@@ -25,6 +25,42 @@ CbmTrack::CbmTrack() :
 {
 }
 
+// Only shallow copy needed
+CbmTrack::CbmTrack(const CbmTrack& rhs)
+ : TObject(rhs),
+   fHitIndex(rhs.fHitIndex),
+   fHitType(rhs.fHitType),
+   fPidHypo(rhs.fPidHypo),
+   fParamFirst(rhs.fParamFirst),
+   fParamLast(rhs.fParamLast),
+   fFlag(rhs.fFlag),
+   fChiSq(rhs.fChiSq),
+   fNDF(rhs.fNDF),
+   fPreviousTrackId(rhs.fPreviousTrackId),
+   fMatch(NULL)
+{
+}
+
+// Only shallow copy needed
+CbmTrack& CbmTrack::operator=(const CbmTrack& rhs)
+{
+
+  if (this != &rhs) {
+    TObject::operator=(rhs);
+    fHitIndex = rhs.fHitIndex;
+    fHitType = rhs.fHitType;
+    fPidHypo = rhs.fPidHypo;
+    fParamFirst = rhs.fParamFirst;
+    fParamLast = rhs.fParamLast;
+    fFlag = rhs.fFlag;
+    fChiSq = rhs.fChiSq;
+    fNDF = rhs.fNDF;
+    fPreviousTrackId = rhs.fPreviousTrackId;
+    fMatch = rhs.fMatch;
+  }
+  return *this;
+}
+
 CbmTrack::~CbmTrack()
 {
 }

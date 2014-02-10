@@ -9,7 +9,6 @@
 #define CBMLITFINDMVDTRACKS_H_
 
 #include "base/CbmLitPtrTypes.h"
-#include "base/CbmLitDetectorSetup.h"
 #include "data/CbmLitHit.h"
 #include "FairTask.h"
 
@@ -82,8 +81,6 @@ private:
     * \brief Clear arrays and free memory.
     */
    void ClearArrays();
-
-   CbmLitDetectorSetup fDet; // For detector presence
 
    // Pointers to data arrays
    TClonesArray* fStsTracks; // CbmStsTrack array

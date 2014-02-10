@@ -19,6 +19,7 @@
 #include "FairHit.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 
@@ -26,7 +27,6 @@
 #include <algorithm>
 
 CbmLitFindMvdTracks::CbmLitFindMvdTracks():
-   fDet(),
    fStsTracks(NULL),
    fMvdHits(NULL),
    fLitStsTracks(),
@@ -45,9 +45,6 @@ CbmLitFindMvdTracks::~CbmLitFindMvdTracks()
 
 InitStatus CbmLitFindMvdTracks::Init()
 {
-   fDet.DetermineSetup();
-   std::cout << fDet.ToString();
-
    ReadAndCreateDataBranches();
 
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
@@ -59,11 +56,15 @@ InitStatus CbmLitFindMvdTracks::Init()
 void CbmLitFindMvdTracks::Exec(
    Option_t* opt)
 {
-   ConvertInputData();
-   RunTrackReconstruction();
-   ConvertOutputData();
-   ClearArrays();
-   std::cout << "-I- Event: " << fEventNo++ << std::endl;
+   if (fStsTracks != NULL && fMvdHits != NULL) {
+      ConvertInputData();
+      RunTrackReconstruction();
+      ConvertOutputData();
+      ClearArrays();
+   } else {
+      LOG(WARNING) << "CbmLitFindMvdTracks::Exec: MVD tracking is not executed NO StsTrack or MvdHit arrays." << FairLogger::endl;
+   }
+   LOG(INFO) << "-I- Event: " << fEventNo++ << FairLogger::endl;
 }
 
 void CbmLitFindMvdTracks::SetParContainers()
@@ -81,19 +82,11 @@ void CbmLitFindMvdTracks::Finish()
 void CbmLitFindMvdTracks::ReadAndCreateDataBranches()
 {
    FairRootManager* ioman = FairRootManager::Instance();
-   if (NULL == ioman) { Fatal("Init","CbmRootManager is not instantiated"); }
-
-   // MVD data
-   if (fDet.GetDet(kMVD)) {
-      fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
-      if (NULL == fMvdHits) { Fatal("Init", "No MvdHit array!"); }
+   if (NULL == ioman) {
+      LOG(FATAL) << "CbmLitFindMvdTracks::ReadAndCreateDataBranches FairRootManager is not instantiated" << FairLogger::endl;
    }
-
-   //STS data
-   if (fDet.GetDet(kSTS)) {
-      fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
-      if (NULL == fStsTracks) { Fatal("Init","No StsTrack array!"); }
-   }
+   fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
+   fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
 }
 
 void CbmLitFindMvdTracks::ConvertInputData()
@@ -105,7 +98,7 @@ void CbmLitFindMvdTracks::ConvertInputData()
       const CbmLitTrackParam* parFirst = track->GetParamFirst();
       track->SetParamLast(parFirst);
    }
-   std::cout << "-I- Number of STS tracks: " << fLitStsTracks.size() << std::endl;
+   LOG(INFO) << "-I- Number of STS tracks: " << fLitStsTracks.size() << FairLogger::endl;
 
    CbmLitConverter::MvdHitArrayToHitVector(fMvdHits, fLitMvdHits);
    // Make reverse order of the hits
@@ -114,7 +107,7 @@ void CbmLitFindMvdTracks::ConvertInputData()
       CbmLitHit* hit = fLitMvdHits[iHit];
       hit->SetDetectorId(kLITMVD, nofStations - hit->GetStation() - 1);
    }
-   std::cout << "-I- Number of MVD hits: " << fLitMvdHits.size() << std::endl;
+   LOG(INFO) << "-I- Number of MVD hits: " << fLitMvdHits.size() << FairLogger::endl;
 }
 
 void CbmLitFindMvdTracks::ConvertOutputData()

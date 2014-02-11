@@ -386,14 +386,12 @@ Int_t CbmLitTrackingGeometryConstructor::GetNofMvdStations()
             }
          }
       } else {
-         // Find Pipe top node
          TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
          for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
             TGeoNode* node = (TGeoNode*) nodes->At(iNode);
             TString nodeName = node->GetName();
             nodeName.ToLower();
             if (nodeName.Contains("pipe")) {
-               // find pipevac1
                TObjArray* nodes2 = node->GetNodes();
                for (Int_t iiNode = 0; iiNode < nodes2->GetEntriesFast(); iiNode++) {
                   TGeoNode* node2 = (TGeoNode*) nodes2->At(iiNode);
@@ -407,11 +405,14 @@ Int_t CbmLitTrackingGeometryConstructor::GetNofMvdStations()
                         TString nodeName3 = node3->GetName();
                         nodeName3.ToLower();
                         if (nodeName3.Contains("mvd")) {
-                           fNofMvdStations++;
+                           fNofMvdStations = node3->GetNodes()->GetEntriesFast();
+                           break;
                         }
                      }
+                     break;
                   }
                }
+               break;
             }
          }
       }

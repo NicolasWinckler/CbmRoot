@@ -7,16 +7,16 @@ void radlength_sim(Int_t nEvents = 1210000)
 {
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
 
-   TString dir  = "events/radlength_rich_v08a/";
+   TString dir  = "events/radlength_much_v12b/";
    TString mcFile = dir + "radlength.mc.0000.root";
    TString parFile = dir + "radlength.param.0000.root";
 
    TString caveGeom = "cave.geo";
    TString mvdGeom = "";//"mvd/mvd_v07a.geo";
    TString stsGeom = "";//"sts/sts_v12b.geo.root";
-   TString richGeom = "rich/rich_v08a.geo";
+   TString richGeom = "";//"rich/rich_v08a.geo";
    TString trdGeom = "";//"trd/trd_v13p_3e.geo.root";
-   TString muchGeom = "";//"much/much_v12b.geo";
+   TString muchGeom = "much/much_v12b.geo";
    TString tofGeom = "";//"tof/tof_v13b.geo.root";
 
    if (script == "yes") {

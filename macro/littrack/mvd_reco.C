@@ -14,14 +14,15 @@ void mvd_reco(Int_t nEvents = 100)
    TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString dir = "mvd/"; // Output directory
+   TString dir = "events/mvd/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString mvdDeltaFile = dir + "mc.delta.0000.root"; // Delta files for MVD
    TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
 
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // Digi scheme for STS
+   TObjString stsDigiFile = parDir + "/sts/sts_v13c_std.digi.par"; // Digi scheme for STS
+   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13c.root";
 
    TString resultDir = "./test/"; // Directory for output results
 
@@ -36,6 +37,7 @@ void mvd_reco(Int_t nEvents = 100)
 		mvdRecoFile = TString(gSystem->Getenv("LIT_MVD_RECO_FILE"));
 		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 		stsDigiFile = TString(gSystem->Getenv("LIT_STS_DIGI"));
+		stsMatBudgetFile = TString(gSystem->Getenv("LIT_STS_MAT_BUDGET_FILE"));
 		normStsPoints = TString(gSystem->Getenv("LIT_NORM_STS_POINTS")).Atoi();
 		nofMvdDeltaEvents = TString(gSystem->Getenv("LIT_NOF_MVD_DELTA_EVENTS")).Atoi();
 	}
@@ -148,10 +150,6 @@ void mvd_reco(Int_t nEvents = 100)
    fitQa->SetStsMinNofHits(normStsPoints);
 	fitQa->SetOutputDir(std::string(resultDir));
    run->AddTask(fitQa);
-
-//   CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
-//   clusteringQa->SetOutputDir(std::string(resultDir));
-//   run->AddTask(clusteringQa);
    // ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

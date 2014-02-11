@@ -65,6 +65,6 @@ elif [ "$1" = "local" ] ; then
     
     copy_results_to_web "./littrack*"
 else
-    echo 'Error! Option $1 does not supported!'
+    echo 'Error! Option $1 is not supported!'
     exit 2
 fi

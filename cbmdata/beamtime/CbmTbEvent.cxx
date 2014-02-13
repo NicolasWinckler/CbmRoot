@@ -26,7 +26,8 @@ CbmTbEvent::CbmTbEvent()
   fEpochTime(0.),          
   fNofData(0),            
   fTimeBc(),
-  fNofDigis(), 
+  fNofDigis(),
+  fNofAux(0),
   fTimeSum(0.)
 {
   Clear();
@@ -62,7 +63,8 @@ void CbmTbEvent::AddDigi(CbmDigi* digi) {
 	fTime = fTimeSum / Double_t(fNofData);
 
 	// --- Increase digi counter
-	fNofDigis[digi->GetSystemId()]++;
+	if ( digi->GetSystemId() == 999 ) fNofAux++;
+	else fNofDigis[digi->GetSystemId()]++;
 
 }
 // --------------------------------------------------------------------------
@@ -81,6 +83,7 @@ void CbmTbEvent::Clear() {
   fTimeStop      = 0.;
   fEpochTime     = 0.;
   fNofData       = 0;
+  fNofAux        = 0;
   for (Int_t iSys = 0; iSys < kNOFDETS; iSys++) fNofDigis[iSys] = 0;
   fTimeBc.clear();
   fTimeSum       = 0.;
@@ -103,7 +106,7 @@ void CbmTbEvent::Print(Option_t* opt) {
   		cout << ", " << systemName << " " << fNofDigis[iSys];
   	}
   }
-  cout << endl;
+  cout << ", AUX " << fNofAux << endl;
 }
 // ---------------------------------------------------------------------------
 

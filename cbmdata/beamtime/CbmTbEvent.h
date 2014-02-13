@@ -41,6 +41,7 @@ class CbmTbEvent : public TObject
   Double_t GetTimeStop()     const { return fTimeStop; }
   Double_t GetDuration()     const { return fTimeStop - fTimeStart; }
   Double_t GetEpochTime()    const { return fEpochTime; }
+  Int_t    GetNofAux()       const { return fNofAux; }
   Int_t    GetNofData    ()  const { return fNofData; }
   Int_t    GetNofDigis(Int_t systemId)     const { return fNofDigis[systemId]; }
   Int_t    GetNofBeam()      const { return fTimeBc.size(); }
@@ -84,6 +85,7 @@ class CbmTbEvent : public TObject
   Int_t    fNofData;              ///< Total number of digis in event
   std::vector<Double_t> fTimeBc;  /** Time Of Beam Counter messages **/
   Int_t    fNofDigis[kNOFDETS];   ///< Number of digis per detector system
+  Int_t    fNofAux;               ///< Number of AUX signals in event
 
   Double_t fTimeSum;              //! Transient. For calculation of tmean.
 

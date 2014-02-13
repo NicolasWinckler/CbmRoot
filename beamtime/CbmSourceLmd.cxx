@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------
 
 #include "CbmSourceLmd.h"
+#include "CbmAuxDigi.h"
 #include "CbmStsDigiLight.h"
 #include "CbmMuchBeamTimeDigi.h"
 #include "CbmDaqMap.h"
@@ -55,6 +56,7 @@ CbmSourceLmd::CbmSourceLmd()
     fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
+    fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
     fNofMessType(),
     fNofMessRoc()
 {
@@ -92,6 +94,7 @@ CbmSourceLmd::CbmSourceLmd(const char * inFile)
     fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
+    fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
     fNofMessType(),
     fNofMessRoc()
 {
@@ -140,6 +143,33 @@ Bool_t CbmSourceLmd::FillBuffer(ULong_t time) {
 
 		// --- Treat epoch markers
 		if ( fCurrentMessage->isEpochMsg() ) ProcessEpochMarker();
+
+
+		// --- Treat AUX messages
+		if ( fCurrentMessage->isAuxMsg() ) {
+
+			// --- ROC Id and channel number
+			Int_t rocId = fCurrentMessage->getRocNumber();
+			Int_t channel = fCurrentMessage->getAuxChNum();
+			fNofAux++;
+
+			// --- Check for epoch marker for this ROC
+			if ( fCurrentEpoch.find(rocId) == fCurrentEpoch.end() )
+				LOG(FATAL) << GetName()
+	    			       << ": Hit message without previous epoch marker for ROC "
+	    			    	 << rocId << FairLogger::endl;
+
+			// --- Get absolute time
+			ULong_t auxTime = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
+
+			// --- Jump out of loop of hit time is after time limit
+			if (auxTime > time) break;
+
+			// --- Create AuxDigi and send it to the buffer
+			CbmAuxDigi* digi = new CbmAuxDigi(rocId, channel, auxTime);
+			fBuffer->InsertData(digi);
+
+		} //? AUX message
 
 
 		// --- Treat hit messages
@@ -244,6 +274,7 @@ Bool_t CbmSourceLmd::Init()
   ioman->Register("StsDigi", "STS raw data", fStsDigis, fPersistence);
   ioman->Register("MuchDigi", "MUCH raw data", fMuchDigis, fPersistence);
   ioman->Register("HodoDigi", "HODO raw data", fHodoDigis, fPersistence);
+  ioman->Register("AuxDigi", "AUX data", fAuxDigis, fPersistence);
 
   // --- Open input file and get first message
   LOG(INFO) << GetName() << ": Opening file " << fInputFileName
@@ -303,6 +334,7 @@ Int_t CbmSourceLmd::ReadEvent()
   fStsDigis->Clear();
   fHodoDigis->Clear();
   fMuchDigis->Clear();
+  fAuxDigis->Clear();
 
   // --- Create new, empty event
   fCurrentEvent = new((*fEvents)[0]) CbmTbEvent();
@@ -337,6 +369,11 @@ Int_t CbmSourceLmd::ReadEvent()
         fNofDigis[kFHODO]++;
         LOG(DEBUG) << "HODO digis " << fNofDigis[kMUCH] << FairLogger::endl;
       } //? HODO digi
+      else if ( systemId == 999) { // I know I should not hardcode numbers....
+      	new( (*fAuxDigis)[fAuxDigis->GetEntriesFast()])
+      	  CbmAuxDigi(*(dynamic_cast<CbmAuxDigi*>(fCurrentDigi)));
+
+      }
 
       // --- Delete current digi from memory and get next one
       delete fCurrentDigi;
@@ -533,6 +570,8 @@ void CbmSourceLmd::Close()
   	LOG(INFO) << setw(5) << sysName << ": Messages " << fNofHitMsg[iSys]
   	          << ", Digis " << fNofDigis[iSys] << FairLogger::endl;
   }
+  LOG(INFO) << "AUX  : Messages " << fNofMessType[roc::MSG_AUX] << ", Digis "
+  		      << fNofAux << FairLogger::endl;
 
 
   delete fRocIter;

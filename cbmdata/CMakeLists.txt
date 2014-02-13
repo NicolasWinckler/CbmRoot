@@ -110,6 +110,7 @@ global/CbmGlobalTrack.cxx
 global/CbmVertex.cxx
 global/CbmTofTrack.cxx
 
+beamtime/CbmAuxDigi.cxx
 beamtime/CbmTbEvent.cxx
 beamtime/fhodo/CbmFiberHodoDigi.cxx
 beamtime/fhodo/CbmFiberHodoCluster.cxx

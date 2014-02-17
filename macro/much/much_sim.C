@@ -55,7 +55,7 @@ void much_sim(TString inputSignal = "",
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
   CbmTarget* target = new CbmTarget("Gold", 0.025);
-  TString magnetGeom = "magnet/magnet_v12b.geo";
+  TString magnetGeom = "magnet/magnet_v12b.geo.root";
   TString stsGeom    = "sts/sts_v12b.geo.root";
 
   // -----   Magnetic field   -----------------------------------------------
@@ -157,7 +157,7 @@ void much_sim(TString inputSignal = "",
   // ------------------------------------------------------------------------
 
   // -----   Create magnetic field   ----------------------------------------
-  CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

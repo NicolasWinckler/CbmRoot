@@ -41,12 +41,12 @@ Int_t runProduceFile(Int_t nEvents=2)
 
   // Magnet geometry and field map
   TString magnetGeom  = "magnet/magnet_v09e.geo";
-  TString fieldMap    = "field_v10e";
+  TString fieldMap    = "field_v12b";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
   // STS geometry
-  TString stsGeom     = "sts/sts_v11a.geo";
+  TString stsGeom     = "sts/sts_v13c.geo.root";
   //TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
 
 
@@ -82,7 +82,7 @@ Int_t runProduceFile(Int_t nEvents=2)
   FairModule* magnet = new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
 
-  FairDetector* sts  = new CbmSts("STS", kTRUE);
+  FairDetector* sts  = new CbmStsMC(kTRUE);
   sts->SetGeometryFileName(stsGeom);
   // ------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ Int_t runProduceFile(Int_t nEvents=2)
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
   else if (fieldMap == "field_v10e" )
     CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
-  else if (fieldMap == "FieldMuonMagnet" )
+  else if (fieldMap == "field_v12b" )
     CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   else {
     cout << "===> ERROR: Unknown field map " << fieldMap << endl;

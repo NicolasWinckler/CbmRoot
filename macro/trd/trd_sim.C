@@ -122,7 +122,7 @@ void trd_sim(Int_t nEvents = 1, Int_t CbmSetup = 4)
   }
 
   if ( stsGeom != "" ) {
-    FairDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmStsMC(kTRUE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
   }

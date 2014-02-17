@@ -55,11 +55,11 @@ void much_sim(TString inputSignal = "",
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
   CbmTarget* target = new CbmTarget("Gold", 0.025);
-  TString magnetGeom = "magnet/magnet_v12a.geo";
+  TString magnetGeom = "magnet/magnet_v12b.geo";
   TString stsGeom    = "sts/sts_v12b.geo.root";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap   = "field_v12a";   // name of field map
+  TString  fieldMap   = "field_v12b";   // name of field map
   Double_t fieldZ     = 50.;                 // field center z position
   Double_t fieldScale =  1.;                 // field scaling factor
 
@@ -142,7 +142,7 @@ void much_sim(TString inputSignal = "",
   }
 
   if ( stsGeom != "" ) {
-    FairDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmStsMC(kTRUE);
     sts->SetGeometryFileName(stsGeom);
     cout << "    --- " << stsGeom << endl;
     fRun->AddModule(sts);

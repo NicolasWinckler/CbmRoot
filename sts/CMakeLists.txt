@@ -1,40 +1,14 @@
-# Create a library called "libBase" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# CMakeList file for library libSts.
+# Last update: V. Friese, 17.02.2014
 
-set(INCLUDE_DIRECTORIES
-${BASE_INCLUDE_DIRECTORIES} 
-${CBMROOT_SOURCE_DIR}/sts
 
-# needed by MatchHits???
-${CBMROOT_SOURCE_DIR}/passive 
+# -----   Specify library name   --------------------------
+Set(LIBRARY_NAME Sts)
+# ---------------------------------------------------------
 
-${CBMROOT_SOURCE_DIR}/cbmbase 
 
-${CBMROOT_SOURCE_DIR}/run 
-
-${CBMROOT_SOURCE_DIR}/cbmdata 
-${CBMROOT_SOURCE_DIR}/cbmdata/sts 
-
-# needed by run/FairMCBuffer.h
-${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
-${CBMROOT_SOURCE_DIR}/cbmdata/rich 
-${CBMROOT_SOURCE_DIR}/cbmdata/much 
-${CBMROOT_SOURCE_DIR}/cbmdata/trd 
-${CBMROOT_SOURCE_DIR}/cbmdata/tof 
-${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
-${CBMROOT_SOURCE_DIR}/cbmdata/psd 
-)
-
-include_directories( ${INCLUDE_DIRECTORIES})
-
-set(LINK_DIRECTORIES
-${ROOT_LIBRARY_DIR}
-${FAIRROOT_LIBRARY_DIR}
-)
- 
-link_directories( ${LINK_DIRECTORIES})
-
+# -----  Specify sources for compilation   ----------------
+# --- Sources in setup
 set(SRCS_SETUP
 setup/CbmStsAddress.cxx
 setup/CbmStsElement.cxx
@@ -45,13 +19,16 @@ setup/CbmStsSensorType.cxx
 setup/CbmStsSensorTypeDssd.cxx
 setup/CbmStsSetup.cxx
 )
-
-
+# --- Sources in mc
+set(SRCS_MC
+mc/CbmStsMC.cxx
+)
+# --- All sources
 set(SRCS
 ${SRCS_SETUP}
+${SRCS_MC}
 CbmGeoSts.cxx 
 CbmGeoStsPar.cxx 
-CbmSts.cxx 
 CbmStsContFact.cxx 
 CbmStsDigiPar.cxx 
 CbmStsDigiScheme.cxx 
@@ -83,11 +60,61 @@ CbmStsSimulationQa.cxx
 CbmStsFindHitsQa.cxx
 CbmStsReconstructionQa.cxx
 )
+# -----  End of sources   ---------------------------------
 
-set(LINKDEF StsLinkDef.h)
-Set(LIBRARY_NAME Sts)
+
+
+# ----  Specify include directories -----------------------
+set(INCLUDE_DIRECTORIES
+${BASE_INCLUDE_DIRECTORIES} 
+${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/sts/setup
+${CBMROOT_SOURCE_DIR}/sts/mc
+
+# needed by MatchHits???
+${CBMROOT_SOURCE_DIR}/passive 
+
+${CBMROOT_SOURCE_DIR}/cbmbase 
+
+${CBMROOT_SOURCE_DIR}/run 
+
+${CBMROOT_SOURCE_DIR}/cbmdata 
+${CBMROOT_SOURCE_DIR}/cbmdata/sts 
+
+# needed by run/CbmMCBuffer.h
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
+${CBMROOT_SOURCE_DIR}/cbmdata/rich 
+${CBMROOT_SOURCE_DIR}/cbmdata/much 
+${CBMROOT_SOURCE_DIR}/cbmdata/trd 
+${CBMROOT_SOURCE_DIR}/cbmdata/tof 
+${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
+${CBMROOT_SOURCE_DIR}/cbmdata/psd 
+)
+# ----  End of include directories ------------------------
+
+
+# ----  Specify link directories --------------------------
+set(LINK_DIRECTORIES
+${ROOT_LIBRARY_DIR}
+${FAIRROOT_LIBRARY_DIR}
+)
+# -----  End of link directories   ------------------------
+
+
+# -----   Specify library dependences   -------------------
 Set(DEPENDENCIES
     Passive Run CbmBase CbmData Base 
 )
+# ---------------------------------------------------------
 
+
+# -----  Specify LinkDef file   ---------------------------
+set(LINKDEF ${LIBRARY_NAME}LinkDef.h)
+# ---------------------------------------------------------
+
+
+# -----  Let cmake do the job   ---------------------------
+include_directories( ${INCLUDE_DIRECTORIES})
+link_directories( ${LINK_DIRECTORIES})
 GENERATE_LIBRARY()
+# ---------------------------------------------------------

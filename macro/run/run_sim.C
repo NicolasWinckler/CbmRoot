@@ -101,7 +101,7 @@ void run_sim(Int_t nEvents = 2, const char* setup = "sis300_electron")
   }
 
   if ( stsGeom != "" ) {
-    FairDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmStsMC(kTRUE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
   }

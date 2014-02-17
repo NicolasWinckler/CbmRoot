@@ -7,13 +7,10 @@
 #define CBMSTSELEMENT_H 1
 
 
-#include <vector>
 #include "TNamed.h"
-#include "CbmStsAddress.h"
+#include "setup/CbmStsAddress.h"
 
 class TGeoPhysicalNode;
-
-using namespace std;
 
 
 
@@ -39,8 +36,8 @@ class CbmStsElement : public TNamed
 
     /** Standard constructor
      ** @param name     Element name
-     ** @param title    Level name
-     ** @param level    Element level
+     ** @param title    Volume name (type)
+     ** @param level    Element level (enum)
      ** @param node     Pointer to physical node in geometry
      **/
     CbmStsElement(const char* name, const char* title,
@@ -79,15 +76,26 @@ class CbmStsElement : public TNamed
 
 
     /** Get the element level
-     ** @return Element level (type enum StsElementLevel)
+     ** @return Element level (type enum EStsElementLevel)
      **/
-    StsElementLevel GetLevel() const { return fLevel; }
+    EStsElementLevel GetLevel() const { return fLevel; }
 
 
     /** Get number of daughter elements
      ** @return Number of daughters
      **/
     Int_t GetNofDaughters() const { return fDaughters.size(); }
+
+
+    /** Get number of elements at given level
+     ** @param level  Element level (see enum EStsElementLevel)
+     ** @return Number of elements at given level with this
+     **         element as ancestor
+     */
+    Int_t GetNofElements(Int_t level) const;
+
+
+    TGeoPhysicalNode* GetPnode() { return fNode; }
 
 
     /** Initialise daughters from geometry **/
@@ -98,13 +106,10 @@ class CbmStsElement : public TNamed
     virtual void Print(Option_t* opt = "") const;
 
 
-
-
-
   protected:
 
     UInt_t fAddress;                       ///< Unique address
-    StsElementLevel fLevel;                ///< Level in hierarchy
+    EStsElementLevel fLevel;               ///< Level in hierarchy
     TGeoPhysicalNode* fNode;               ///< Pointer to geometry
     vector<CbmStsElement*> fDaughters;     ///< Array of daughters
 

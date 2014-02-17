@@ -12,11 +12,12 @@
 #include "CbmAddress.h"
 
 
-/** Enumerator for STS element levels
+/** @enum EStsElementLevel
+ ** Enumerator for STS element levels
  ** If this is changed, the initialisation of the static members
  ** of CbmStsAddress must be changed accordingly!
  **/
-enum StsElementLevel {
+enum EStsElementLevel {
   kStsSystem,     //!< System = STS
   kStsStation,    //!< Station
   kStsLadder,     //!< Ladder
@@ -75,24 +76,11 @@ class CbmStsAddress : public CbmAddress
                              Int_t channel = 0);
 
 
+    /** Construct address
+     ** @param elementIds   Array of element indices in their mother volumes
+     ** @return Unique element address
+     **/
     static UInt_t GetAddress(Int_t* elementIds);
-
-
-    /** Get the number of hierarchy levels
-     ** For use in macros which do not include this header file.
-     ** @return       Number of hierarchy levels
-     **/
-    static Int_t GetNofLevels() { return kStsNofLevels; }
-
-
-    /** Get the number of bits for a given hierarchy level
-     ** @param level  Requested element level
-     ** @return       Number of bits in address field
-     **/
-    static Int_t GetNofBits(Int_t level) {
-      if ( level < 0 || level >= kStsNofLevels ) return 0;
-      return fgkBits[level];
-    }
 
 
     /** Get the index of an element
@@ -105,6 +93,23 @@ class CbmStsAddress : public CbmAddress
       return ( address & ( fgkMask[level] << fgkShift[level] ) )
                >> fgkShift[level];
     }
+
+
+    /** Get the number of bits for a given hierarchy level
+     ** @param level  Requested element level
+     ** @return       Number of bits in address field
+     **/
+    static Int_t GetNofBits(Int_t level) {
+      if ( level < 0 || level >= kStsNofLevels ) return 0;
+      return fgkBits[level];
+    }
+
+
+    /** Get the number of hierarchy levels
+     ** For use in macros which do not include this header file.
+     ** @return       Number of hierarchy levels
+     **/
+    static Int_t GetNofLevels() { return kStsNofLevels; }
 
 
     /** Print information on the bit field **/

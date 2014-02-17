@@ -4,9 +4,18 @@
  **/
 
 
+#include <iostream>
+#include <string>
 #include "TGeoManager.h"
 #include "TGeoPhysicalNode.h"
+#include "FairLogger.h"
+#include "CbmDetectorList.h"
 #include "setup/CbmStsSetup.h"
+
+using std::cout;
+using std::endl;
+using std::setw;
+using std::right;
 
 
 // -----   Initialisation of static singleton pointer   ----------------------
@@ -33,26 +42,65 @@ CbmStsSetup::CbmStsSetup() : CbmStsElement("STS Setup",
                                            "system",
                                            kStsSystem)
 {
+	if ( gGeoManager) Init(gGeoManager);
 }
 // ---------------------------------------------------------------------------
 
 
 
-// -----   Intialisation from TGeoManager   ----------------------------------
+// -----   Get an element from the STS setup   ------------------------------
+CbmStsElement* CbmStsSetup::GetElement(UInt_t address, Int_t level) {
+
+	// --- Check for initialisation
+	if ( ! fAddress ) LOG(FATAL) << fName << ": not intialised!"
+			                         << FairLogger::endl;
+
+	// --- Catch non-STS addresses
+	if ( CbmStsAddress::GetSystemId(address) != kSTS ) {
+		LOG(WARNING) << fName << ": No STS address " << address
+				     << FairLogger::endl;
+		return NULL;
+	}
+
+	// --- Catch illegal level numbers
+	if ( level < 0 || level >= kStsNofLevels ) {
+		LOG(WARNING) << fName << ": Illegal level " << level
+				   << FairLogger::endl;
+		return NULL;
+	}
+
+	CbmStsElement* element = this;
+	for (Int_t iLevel = 1; iLevel <= level; iLevel++)
+		element =
+				element->GetDaughter(CbmStsAddress::GetElementId(address, iLevel));
+
+	return element;
+}
+// ---------------------------------------------------------------------------
+
+
+
+
+// -----   Initialisation from TGeoManager   ----------------------------------
 Bool_t CbmStsSetup::Init(TGeoManager* geo) {
+
+  cout << endl;
+  LOG(INFO) << "============================================================="
+		    << FairLogger::endl;
+  LOG(INFO) << "Initialising STS Setup" << FairLogger::endl;
+
 
   // --- Catch non-existence of GeoManager
   if ( ! geo ) {
-    LOG(FATAL) << "fName: no TGeoManager!" << FairLogger::endl;
+    LOG(FATAL) << fName << ": no TGeoManager!" << FairLogger::endl;
     return kFALSE;
   }
 
   // --- Get cave (top node)
-  LOG(INFO) << fName << ": " << " Reading geometry from TGeoManager "
+  LOG(INFO) << fName << ": Reading geometry from TGeoManager "
             << geo->GetName() << FairLogger::endl;
   geo->CdTop();
   TGeoNode* cave = geo->GetCurrentNode();
-  LOG(INFO) << "Top node: " << cave->GetName() << FairLogger::endl;
 
   // --- Get top STS node
   TGeoNode* sts = NULL;
@@ -61,7 +109,7 @@ Bool_t CbmStsSetup::Init(TGeoManager* geo) {
      if ( name.Contains("STS", TString::kIgnoreCase) ) {
       sts = cave->GetDaughter(iNode);
       geo->CdDown(iNode);
-      LOG(INFO) << fName << ": found STS node " << sts->GetName()
+      LOG(INFO) << fName << ": STS top node is " << sts->GetName()
                 << FairLogger::endl;
       break;
     }
@@ -75,13 +123,24 @@ Bool_t CbmStsSetup::Init(TGeoManager* geo) {
   // --- Create physical node for sts
   TString path = cave->GetName();
   path = path + "/" + sts->GetName();
-  LOG(INFO) << "Path to STS is " << path << FairLogger::endl;
   fNode = new TGeoPhysicalNode(path);
-  LOG(INFO) << "PN name " << fNode->GetName() << FairLogger::endl;
 
-  // --- Initialise daughter elements
+  // --- Set system address
+  fAddress = kSTS;
+
+  // --- Recursively initialise daughter elements
   InitDaughters();
 
+  // --- Statistics
+  for (Int_t iLevel = 1; iLevel <= kStsSensor; iLevel++) {
+	  TString name = fgkLevelName[iLevel];
+	  name += "s";
+	  LOG(INFO) << setw(12) << name
+	            << setw(5) << right << GetNofElements(iLevel) << FairLogger::endl;
+  }
+  LOG(INFO) << "============================================================="
+		    << FairLogger::endl;
+  cout << endl;
 
   return kTRUE;
 }
@@ -96,6 +155,7 @@ CbmStsSetup* CbmStsSetup::Instance() {
   return fgInstance;
 }
 // ---------------------------------------------------------------------------
+
 
 ClassImp(CbmStsSetup)
 

@@ -10,6 +10,8 @@
 #include "setup/CbmStsElement.h"
 #include "setup/CbmStsSetup.h"
 
+using namespace std;
+
 
 // -----   Default constructor   -------------------------------------------
 CbmStsElement::CbmStsElement() : TNamed(),
@@ -68,9 +70,24 @@ CbmStsElement* CbmStsElement::GetDaughter(Int_t index) const {
 
 
 
+// -----   Get number of elements at lower hierarchy levels   --------------
+Int_t CbmStsElement::GetNofElements(Int_t level) const {
+
+	Int_t nElements = 0;
+	if ( level <= fLevel ) nElements = 0;
+	else if ( level == fLevel + 1) nElements = GetNofDaughters();
+	else
+		for (Int_t iDaughter = 0; iDaughter < GetNofDaughters(); iDaughter++)
+			nElements += GetDaughter(iDaughter)->GetNofElements(level);
+
+	return nElements;
+}
+// -------------------------------------------------------------------------
+
+
+
 // -----   Recursively read daughters from geometry   ----------------------
 void CbmStsElement::InitDaughters() {
-
 
   // --- Catch absence of TGeoManager
   if ( ! gGeoManager ) {
@@ -89,8 +106,9 @@ void CbmStsElement::InitDaughters() {
     return;
   }
 
-  TGeoNode* mNode = fNode->GetNode();        // This node
-  TString mPath = fNode->GetName();          // Path to this node
+  TGeoNode* mNode = fNode->GetNode();   // This node
+  TString   mPath = fNode->GetName();   // Full path to this node
+  Int_t nDaughters = 0;
   for (Int_t iNode = 0; iNode < mNode->GetNdaughters(); iNode++) {
 
     // Check name of daughter node for level name
@@ -99,14 +117,15 @@ void CbmStsElement::InitDaughters() {
                         TString::kIgnoreCase ) ) {
 
       // Create physical node
-      const char* name = "";
-      const char* title = CbmStsSetup::GetLevelName(fLevel+1);
       TString dPath = mPath + "/" + dName;
-      TGeoPhysicalNode* pnNode = new TGeoPhysicalNode(dPath.Data());
+      TGeoPhysicalNode* pNode = new TGeoPhysicalNode(dPath.Data());
 
       // Create element and add it as daughter
+      TString name = CbmStsSetup::GetLevelName(fLevel+1);
+      name += Form("%02i", nDaughters++);
+      const char* title = mNode->GetDaughter(iNode)->GetVolume()->GetName();
       CbmStsElement* dElement = new CbmStsElement(name, title,
-                                                  fLevel + 1, pnNode);
+                                                  fLevel + 1, pNode);
       AddDaughter(dElement);
 
       // Call method recursively for the daughter elements
@@ -123,9 +142,15 @@ void CbmStsElement::InitDaughters() {
 
 // -----   Print   ---------------------------------------------------------
 void CbmStsElement::Print(Option_t* opt) const {
-  LOG(INFO) << fName << ": " << fTitle << ", address " << fAddress
-            << ", index " << GetIndex() << ", level " << fLevel
-            << FairLogger::endl;
+  LOG(INFO) << setw(10) << right << fAddress << "  "
+		    << setw(12) << left << fName
+		    << "  type " << setw(22) << fTitle << "  path "
+		    << fNode->GetName() << "  " << fNode->GetTitle()
+		    << FairLogger::endl;
+  if ( opt[0] == 'R' ) {
+	  for (Int_t iDaughter = 0; iDaughter < GetNofDaughters(); iDaughter++)
+		  GetDaughter(iDaughter)->Print("R");
+  }
 }
 // -------------------------------------------------------------------------
 

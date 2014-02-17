@@ -26,7 +26,7 @@ void run_radlength(Int_t nEvents = 10000)
   TString pipeGeom   = "";
   TString magnetGeom = "";
   TString mvdGeom    = "";
-  TString stsGeom    = "sts/sts_v11a.geo";
+  TString stsGeom    = "sts/sts_v13c.geo.root";
   TString richGeom   = "";
   TString trdGeom    = "";
   TString tofGeom    = "";
@@ -99,7 +99,7 @@ void run_radlength(Int_t nEvents = 10000)
   }
 
   if ( stsGeom != "" ) {
-    FairDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmStsMC(kTRUE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
   }

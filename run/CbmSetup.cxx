@@ -23,7 +23,7 @@
 #include "CbmFieldMapSym3.h"
 
 #include "CbmMvd.h"
-#include "CbmSts.h"
+#include "CbmStsMC.h"
 #include "CbmRich.h"
 #include "CbmMuch.h"
 #include "CbmTrd.h"
@@ -44,7 +44,7 @@ FairModule* CbmSetup::CreateModule(Int_t moduleId, Bool_t active) {
 
     // --- Detector systems
     case kMvd:  return new CbmMvd( "MVD",  active); break;
-    case kSts:  return new CbmSts( "STS",  active); break;
+    case kSts:  return new CbmStsMC(active); break;
     case kRich: return new CbmRich("RICH", active); break;
     case kMuch: return new CbmMuch("MUCH", active); break;
     case kTrd:  return new CbmTrd( "TRD",  active); break;

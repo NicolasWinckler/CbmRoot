@@ -3,10 +3,27 @@
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
- 
+
+// Setup
+#pragma link C++ class CbmStsAddress;
+#pragma link C++ class CbmStsElement;
+#pragma link C++ class CbmStsModule;
+#pragma link C++ class CbmStsSenzor;
+#pragma link C++ class CbmStsSensorPoint;
+#pragma link C++ class CbmStsSensorType;
+#pragma link C++ class CbmStsSensorTypeDssd;
+#pragma link C++ class CbmStsSetup;
+
+// Monte-Carlo
+#pragma link C++ class CbmStsMC;
+#pragma link C++ class CbmStsTrackStatus;
+
+// Enumerators
+#pragma link C++ enum EStsElementLevel;
+
+// Others
 #pragma link C++ class CbmGeoSts+;
 #pragma link C++ class CbmGeoStsPar;
-#pragma link C++ class CbmSts+;
 #pragma link C++ class CbmStsContFact;
 #pragma link C++ class CbmStsDigiPar;
 #pragma link C++ class CbmStsDigiScheme+;
@@ -38,17 +55,6 @@
 #pragma link C++ class CbmStsFindHitsQa+;
 #pragma link C++ class CbmStsReconstructionQa+;
 
-// Setup
-#pragma link C++ class CbmStsAddress;
-#pragma link C++ class CbmStsElement;
-#pragma link C++ class CbmStsModule;
-#pragma link C++ class CbmStsSenzor;
-#pragma link C++ class CbmStsSensorPoint;
-#pragma link C++ class CbmStsSensorType;
-#pragma link C++ class CbmStsSensorTypeDssd;
-#pragma link C++ class CbmStsSetup;
 
-
-
-#endif
+#endif /* __CINT__ */
 

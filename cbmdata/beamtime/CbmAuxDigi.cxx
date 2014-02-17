@@ -7,7 +7,8 @@
 
 
 // --- Default constructor   ------------------------------------------------
-CbmAuxDigi::CbmAuxDigi() {
+CbmAuxDigi::CbmAuxDigi()
+	: CbmDigi(), fRocId(0), fChannel(0), fTime(0) {
 }
 // --------------------------------------------------------------------------
 

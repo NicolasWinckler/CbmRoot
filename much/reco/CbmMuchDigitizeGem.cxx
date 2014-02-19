@@ -385,8 +385,11 @@ Double_t CbmMuchDigitizeGem::GetNPrimaryElectronsPerCm(const CbmMuchPoint* point
   Int_t eventId = point->GetEventID();
   if (trackId < 0) return -1;
 
+
+  /* Commented out on request of A. Senger from 22.01.2014
   if (fDaq && eventId!=FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetReadEntry())
       FairRootManager::Instance()->GetInTree()->GetBranch("MCTrack")->GetEntry(eventId);
+  */
   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(trackId);
   
   if (!mcTrack) return -1;

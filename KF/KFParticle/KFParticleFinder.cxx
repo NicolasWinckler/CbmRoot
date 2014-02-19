@@ -317,11 +317,11 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   //Find Xi*0
   float cutXiStar0[3] = {-100.,3.,3.};
   FindTrackV0Decay(3324, Particles, vXiPrim, vRTracks, vField, pdgPos[5], idPosPrim[5],
-                   PrimVtx, cutXiStar0, 1, 0, &vXiStarPrim);
+                   PrimVtx, cutXiStar0, 1, 0, &vXiStarPrim, 100, 100);
   //Find Xi*0 bar
   float cutXiBarStar0[3] = {-100.,3.,3.};
   FindTrackV0Decay(-3324, Particles, vXiBarPrim, vRTracks, vField, pdgNeg[5], idNegPrim[5],
-                   PrimVtx, cutXiBarStar0, 1, 0, &vXiStarBarPrim);
+                   PrimVtx, cutXiBarStar0, 1, 0, &vXiStarBarPrim, 100, 100);
 
   //Xi*- -> Xi- pi0
   float cutXiStarMinusXiPi[3] = {-100.,3.,3.};
@@ -335,6 +335,7 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   for(unsigned int iPart=0; iPart<vXiStarPrim.size(); iPart++)
     CombineTrackPart(vRTracks, vField, Particles, vXiStarPrim[iPart], pdgNeg[3], 
                      1003334, idNegPrim[3], cutOmegaStar, 0);
+		   
   //Find Omega*+
   for(unsigned int iPart=0; iPart<vXiStarBarPrim.size(); iPart++)
     CombineTrackPart(vRTracks, vField, Particles, vXiStarBarPrim[iPart], pdgPos[3],

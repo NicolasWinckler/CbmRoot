@@ -58,7 +58,7 @@
 #define defValStructureSeparator    "TABULATOR"
 #define defValBlockSeparator        "NEWLINE"
 #define defValContent               "Start & Stop"
-#define defValFormat                "[Radix]x[Number]"defValStructureSeparator"[Radix]x[Number]"defValBlockSeparator
+#define defValFormat                "[Radix]x[Number]" defValStructureSeparator "[Radix]x[Number]" defValBlockSeparator
 
 
 /*

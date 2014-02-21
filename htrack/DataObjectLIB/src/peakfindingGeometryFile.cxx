@@ -53,7 +53,7 @@
 #define defValStructureSeparator    "TABULATOR"
 #define defValBlockSeparator        "NEWLINE"
 #define defValContent               "Position of the peakfinding geometry element & frequency of occurence during automatic generation"
-#define defValFormat                "[Radix]x[Number]"defValStructureSeparator"[Radix]x[Number]"defValStructureSeparator"[Radix]x[Number]"defValStructureSeparator"[Radix]x[Number]"defValBlockSeparator
+#define defValFormat                "[Radix]x[Number]" defValStructureSeparator "[Radix]x[Number]" defValStructureSeparator "[Radix]x[Number]" defValStructureSeparator "[Radix]x[Number]" defValBlockSeparator
 
 
 /*

@@ -60,9 +60,9 @@
 #define defValStructureSeparator    "TABULATOR"
 #define defValBlockSeparator        "NEWLINE"
 #define defValContentSoftware       "(pos1, pos2) ... (pos1, pos2)"
-#define defValFormatSoftware        "([Radix]x[Number],[Radix]x[Number])"defValStructureSeparator"..."defValStructureSeparator"([Radix]x[Number],[Radix]x[Number])"defValBlockSeparator
+#define defValFormatSoftware        "([Radix]x[Number],[Radix]x[Number])" defValStructureSeparator "..." defValStructureSeparator "([Radix]x[Number],[Radix]x[Number])" defValBlockSeparator
 #define defValContentHardware       "startPos & Command"
-#define defValFormatHardware        "[Radix]x[Number]"defValStructureSeparator"[Radix]x[Number]"defValBlockSeparator
+#define defValFormatHardware        "[Radix]x[Number]" defValStructureSeparator "[Radix]x[Number]" defValBlockSeparator
 
 
 /*

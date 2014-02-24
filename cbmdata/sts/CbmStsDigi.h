@@ -169,7 +169,7 @@ class CbmStsDigi : public CbmDigi
  **/
 
 
-  ClassDef(CbmStsDigi,2);
+  ClassDef(CbmStsDigi,3);
 
 };
 

@@ -147,6 +147,8 @@ private:
 
 	TH1* fh_vertex_z;
 	TH2* fh_vertex_xy;
+	TH2* fh_vertex_xy_z150;
+	TH2* fh_vertex_xy_z180;
 	TH1* fh_nof_rings_1hit;
 	TH1* fh_nof_rings_7hits;
    TH1* fh_nof_rings_prim_1hit;

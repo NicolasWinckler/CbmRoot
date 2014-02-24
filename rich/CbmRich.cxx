@@ -109,7 +109,7 @@ void CbmRich::Initialize()
 Bool_t CbmRich::CheckIfSensitive(std::string name)
 {
    TString volName = name;
-   if ( volName.Contains("rich1d")){
+   if ( volName.Contains("rich1d") || volName.Contains("Sens_plane")){
       return kTRUE;
    }
    return kFALSE;
@@ -160,7 +160,8 @@ Bool_t CbmRich::ProcessHits(
    }
 
    // Treat imaginary plane in front of the mirrors: Only charged particles at entrance
-   if (volName == "rich1gas2") {
+   if (volName == "rich1gas2" || volName.Contains("Sens_plane")) {
+	   //  cout << volName << endl;
       // Collecting points of tracks and imaginary plane intersection
       if ( gMC->IsTrackEntering() ) {
          TParticle* part    = gMC->GetStack()->GetCurrentTrack();

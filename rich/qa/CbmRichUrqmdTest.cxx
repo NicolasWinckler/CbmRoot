@@ -45,6 +45,8 @@ CbmRichUrqmdTest::CbmRichUrqmdTest()
     fNofHitsInRingMap(),
     fh_vertex_z(NULL),
     fh_vertex_xy(NULL),
+    fh_vertex_xy_z150(NULL),
+    fh_vertex_xy_z180(NULL),
     fh_nof_rings_1hit(NULL),		      
     fh_nof_rings_7hits(NULL),		    
     fh_nof_rings_prim_1hit(NULL),		    
@@ -123,8 +125,10 @@ void CbmRichUrqmdTest::InitHistograms()
 {
    fh_vertex_z = new TH1D("fh_vertex_z", "fh_vertex_z;z [cm];Number of vertices per event", 350, -1., 350);
    fh_vertex_xy = new TH2D("fh_vertex_xy", "fh_vertex_xy;x [cm];y [cm];Number of vertices per event", 300, -150., 150., 300, -150., 150.);
-   fh_nof_rings_1hit = new TH1D("fh_nof_rings_1hit", "fh_nof_rings_1hit;Number of detected particles/event;Yield", 100, -.5, 99.5);
-   fh_nof_rings_7hits = new TH1D("fh_nof_rings_7hits", "fh_nof_rings_7hits;Number of detected particles/event;Yield", 100, -.5, 99.5 );
+   fh_vertex_xy_z150 = new TH2D("fh_vertex_xy_z150", "fh_vertex_xy_z150;x [cm];y [cm];Number of vertices per event", 300, -150., 150., 300, -150., 150.);
+   fh_vertex_xy_z180 = new TH2D("fh_vertex_xy_z180", "fh_vertex_xy_z180;x [cm];y [cm];Number of vertices per event", 300, -150., 150., 300, -150., 150.);
+   fh_nof_rings_1hit = new TH1D("fh_nof_rings_1hit", "fh_nof_rings_1hit;Number of detected particles/event;Yield", 200, -.5, 199.5);
+   fh_nof_rings_7hits = new TH1D("fh_nof_rings_7hits", "fh_nof_rings_7hits;Number of detected particles/event;Yield", 200, -.5, 199.5 );
    fh_nof_rings_prim_1hit = new TH1D("fh_nof_rings_prim_1hit", "fh_nof_rings_prim_1hit;Number of detected particles/event;Yield", 50, -.5, 49.5);
    fh_nof_rings_prim_7hits = new TH1D("fh_nof_rings_prim_7hits", "fh_nof_rings_prim_7hits;Number of detected particles/event;Yield", 50, -.5, 49.5 );
    fh_nof_rings_target_1hit = new TH1D("fh_nof_rings_target_1hit", "fh_nof_rings_target_1hit;Number of detected particles/event;Yield", 60, -.5, 59.5);
@@ -137,7 +141,7 @@ void CbmRichUrqmdTest::InitHistograms()
    fh_kaon_mom = new TH1D("fh_pi_mom", "fh_pi_mom;p [GeV/c];Number per event", 100, 0., 20);
    fh_mu_mom = new TH1D("fh_mu_mom", "fh_mu_mom;p [GeV/c];Number per event", 100, 0., 20);
 
-   fh_nof_hits_per_event = new TH1D("fh_nof_hits_per_event", "fh_nof_hits_per_event;Number of hits per event;Yield", 50, 0, 1500);
+   fh_nof_hits_per_event = new TH1D("fh_nof_hits_per_event", "fh_nof_hits_per_event;Number of hits per event;Yield", 100, 0, 2000);
    fh_hits_xy_u = new TH2D("fh_hits_xy_u", "fh_hits_xy_u;x [cm];y [cm];Number of hits/cm^{2}/event", 110, -110, 110, 45, 90, 180);
    fh_hits_xy_d = new TH2D("fh_hits_xy_d", "fh_hits_xy_d;x [cm];y [cm];Number of hits/cm^{2}/event", 110, -110, 110, 45, -180, -90);
 
@@ -328,6 +332,14 @@ void CbmRichUrqmdTest::Vertex()
       mctrack->GetStartVertex(v);
       fh_vertex_z->Fill(v.Z());
       fh_vertex_xy->Fill(v.X(), v.Y());
+      if (v.Z() > 150){
+    	  //cout << v.X() << " " << v.Y() << " " << v.Z() << endl;
+    	  fh_vertex_xy_z150->Fill(v.X(), v.Y());
+      }
+      if (v.Z() > 178 && v.Z() < 182){
+    	  //cout << v.X() << " " << v.Y() << " " << v.Z() << endl;
+    	  fh_vertex_xy_z180->Fill(v.X(), v.Y());
+      }
    } // nMcTracks
 }
 
@@ -344,7 +356,14 @@ void CbmRichUrqmdTest::DrawHist()
    fh_vertex_xy->Scale(1./fEventNum);
    TCanvas* cVertexXY = CreateCanvas("rich_urqmd_vertex_xy", "rich_urqmd_vertex_xy", 800, 800);
    DrawH2(fh_vertex_xy);
-   gPad->SetLogy(true);
+
+   fh_vertex_xy_z150->Scale(1./fEventNum);
+   TCanvas* cVertexXYZ150 = CreateCanvas("rich_urqmd_vertex_xy_z150", "rich_urqmd_vertex_xy_z150", 800, 800);
+   DrawH2(fh_vertex_xy_z150);
+
+   fh_vertex_xy_z180->Scale(1./fEventNum);
+   TCanvas* cVertexXYZ180 = CreateCanvas("rich_urqmd_vertex_xy_z180", "rich_urqmd_vertex_xy_z180", 800, 800);
+   DrawH2(fh_vertex_xy_z180);
 
    TCanvas* c2 = CreateCanvas("rich_urqmd_nof_rings", "rich_urqmd_nof_rings", 800, 800);
    fh_nof_rings_1hit->Scale(1./fh_nof_rings_1hit->Integral());

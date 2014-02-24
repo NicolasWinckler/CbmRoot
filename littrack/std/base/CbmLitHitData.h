@@ -150,7 +150,7 @@ public:
    virtual string ToString() const;
 
 private:
-   static const litfloat EPSILON = 0.005;
+   static const litfloat EPSILON;
    vector<HitPtrVector> fHits; // Array of hits for each station
    vector<litfloat> fMaxErrX; // Array of maximum X position errors for each station
    vector<litfloat> fMaxErrY; // Array of maximum Y position errors for each station
@@ -160,5 +160,7 @@ private:
    //vector<vector<litfloat> > fZPos; // Array of Z positions of hits in each station
    vector<vector<Int_t> > fZPosBins; // Array of Z positions bin number of hits in each station
 };
+
+const litfloat EPSILON = 0.005;
 
 #endif /*CBMLITHITDATA_H_*/

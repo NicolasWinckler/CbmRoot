@@ -63,7 +63,8 @@ InitStatus CbmLitFieldQa::Init()
       fYSlicePosition[i] = fZSlicePosition[i] * tanYangle;
    }
 
-   fAlongZAngles = list_of(0.)(10.)(20.)(30.);
+   vector<Double_t> tmp = list_of(0.)(10.)(20.)(30.);
+   fAlongZAngles = tmp;
 
    fAlongZXY.push_back(std::make_pair(0., 0.));
    fAlongZXY.push_back(std::make_pair(100., 0.));

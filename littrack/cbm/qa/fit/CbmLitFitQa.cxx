@@ -416,7 +416,8 @@ void CbmLitFitQa::CreateResidualAndPullHistograms(
    vector<Int_t> bins(15, 200);
    vector<pair<Float_t, Float_t> > bounds;
    if (fIsFixedBounds) {
-      bounds = boost::assign::list_of
+      vector<pair<Float_t, Float_t> > tmp =
+       boost::assign::list_of
             (make_pair(-1., 1.)) // X residual
             (make_pair(-1., 1.)) // Y residual
             (make_pair(-.01, .01)) // Tx residual
@@ -432,6 +433,7 @@ void CbmLitFitQa::CreateResidualAndPullHistograms(
             (make_pair(0., 200.)) // Tx wrong covariance
             (make_pair(0., 200.)) // Ty wrong covariance
             (make_pair(0., 200.)); // Qp wrong covariance
+       bounds = tmp;
    } else {
       bounds.assign(15, make_pair(0.,0.));
    }
@@ -468,7 +470,8 @@ void CbmLitFitQa::CreateTrackParamHistograms(
    vector<Int_t> bins(8, 200);
    vector<pair<Float_t, Float_t> > bounds;
    if (fIsFixedBounds) {
-      bounds = boost::assign::list_of
+      vector<pair<Float_t, Float_t> > tmp =
+      boost::assign::list_of
             (make_pair(-500., 500.)) // X
             (make_pair(-500., 500.)) // Y
             (make_pair(-500., 500.)) // Z
@@ -477,6 +480,7 @@ void CbmLitFitQa::CreateTrackParamHistograms(
             (make_pair(-2., 2.)) // Qp
             (make_pair(0., 25.)) // Momentum
             (make_pair(0., 5.)); // Pt
+      bounds = tmp;
    } else {
       bounds.assign(8, make_pair(0.,0.));
    }

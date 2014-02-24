@@ -199,34 +199,39 @@ void CbmLitTrackingQa::ReadDataBranches()
 
 void CbmLitTrackingQa::FillDefaultTrackCategories()
 {
-   fTrackCategories = list_of("All")("Primary")("Secondary")("Reference")
+   vector<string> tmp = list_of("All")("Primary")("Secondary")("Reference")
          (fDet.GetElectronSetup() ? "Electron" : "Muon")("Proton")("PionPlus")
          ("PionMinus")("KaonPlus")("KaonMinus");
+   fTrackCategories = tmp;
 }
 
 void CbmLitTrackingQa::FillDefaultRingCategories()
 {
-   fRingCategories = list_of("All")("AllReference")("Electron")("ElectronReference")("Pion")("PionReference");
+    vector<string> tmp = list_of("All")("AllReference")("Electron")("ElectronReference")("Pion")("PionReference");
+    fRingCategories = tmp;
 }
 
 void CbmLitTrackingQa::FillDefaultTrackPIDCategories()
 {
    if (fDet.GetElectronSetup()) {
-      fTrackCategoriesPID = list_of("Electron");
+      vector<string> tmp = list_of("Electron");
+      fTrackCategoriesPID = tmp;
    }
 }
 
 void CbmLitTrackingQa::FillDefaultRingPIDCategories()
 {
    if (fDet.GetElectronSetup()) {
-      fRingCategoriesPID = list_of("Electron");
+      vector<string> tmp = list_of("Electron");
+      fRingCategoriesPID = tmp;
    }
 }
 
 void CbmLitTrackingQa::FillDefaultPiSuppCategories()
 {
    if (fDet.GetElectronSetup()) {
-      fPiSuppCategories = list_of("All")("TrueMatch")("WrongMatch");
+      vector<string> tmp = list_of("All")("TrueMatch")("WrongMatch");
+      fPiSuppCategories = tmp;
    }
 }
 
@@ -783,7 +788,8 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
         Bool_t rich = (name.find("Rich") != string::npos) ? isRichOk && stsMCId == richMCId : true;
 
         if (sts && trd && much && tof && rich) {
-           mcRecoMap.insert(make_pair<Int_t, Int_t>(stsMCId, iTrack));
+           pair<Int_t, Int_t> tmp = make_pair(stsMCId, iTrack);
+           mcRecoMap.insert(tmp);
         }
       }
    }
@@ -798,7 +804,8 @@ void CbmLitTrackingQa::ProcessRichRings()
      Bool_t isRichOk = CheckTrackQuality(richRingMatch, kRICH);
      Int_t richMCId = (isRichOk) ? richRingMatch->GetMCTrackId() : -1;
      if (isRichOk && -1 != richMCId) {
-         fMcToRecoMap["Rich"].insert(make_pair<Int_t, Int_t>(richMCId, iRing));
+         pair<Int_t, Int_t> tmp = make_pair(richMCId, iRing);
+         fMcToRecoMap["Rich"].insert(tmp);
      }
    }
 }
@@ -920,17 +927,35 @@ void CbmLitTrackingQa::ProcessMcTracks()
 
       // Fill parameter name to value map
       map<string, vector<Double_t> > parMap;
-      parMap["p"] = list_of(mcP);
-      parMap["y"] = list_of(mcY);
-      parMap["pt"] = list_of(mcPt);
-      parMap["Angle"] = list_of(angle);
-      parMap["Np"] = list_of(0); // FIXME : correct to number of points in concrete detector!
+
+      vector<Double_t> tmp = list_of(mcP);
+      parMap["p"] = tmp;
+
+      vector<Double_t> tmp1 = list_of(mcY);
+      parMap["y"] = tmp1;
+
+      vector<Double_t> tmp2 = list_of(mcPt);
+      parMap["pt"] = tmp2;
+
+      vector<Double_t> tmp3 = list_of(angle);
+      parMap["Angle"] = tmp3;
+
+      vector<Double_t> tmp4 = list_of(0);
+      parMap["Np"] = tmp4; // FIXME : correct to number of points in concrete detector!
                         // Currently as a  temporary solution it is reassigned later
-      parMap["BoA"] = list_of(boa);
-      parMap["RingXcYc"] = list_of(ringX)(ringY);
-      parMap["RingNh"] = list_of(nofHitsRich);
+
+      vector<Double_t> tmp5 = list_of(boa);
+      parMap["BoA"] = tmp5;
+
+      vector<Double_t> tmp6 = list_of(ringX)(ringY);
+      parMap["RingXcYc"] = tmp6;
+
+      vector<Double_t> tmp7 = list_of(nofHitsRich);
+      parMap["RingNh"] = tmp7;
+
+      vector<Double_t> tmp8 = list_of(mcY)(mcPt);
       //parMap["RadPos"] = list_of(1);
-      parMap["YPt"] = list_of(mcY)(mcPt);
+      parMap["YPt"] = tmp8;
 
       for (Int_t iHist = 0; iHist < nofEffHistos; iHist++) {
          TH1* hist = effHistos[iHist];
@@ -945,7 +970,8 @@ void CbmLitTrackingQa::ProcessMcTracks()
 
          vector<Double_t> par = list_of(0);
          if (parName == "Np") {
-            par = list_of((effName == "Sts") ? nofPointsSts : (effName == "Trd") ? nofPointsTrd : (effName == "Much") ? nofPointsMuch : (effName == "Tof") ? nofPointsTof : 0);
+            vector<Double_t> tmp = list_of((effName == "Sts") ? nofPointsSts : (effName == "Trd") ? nofPointsTrd : (effName == "Much") ? nofPointsMuch : (effName == "Tof") ? nofPointsTof : 0);
+            par = tmp;
          } else {
             par = parMap[parName];
          }

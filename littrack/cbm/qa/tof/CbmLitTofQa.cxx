@@ -103,7 +103,8 @@ void CbmLitTofQa::ReadDataBranches()
 
 void CbmLitTofQa::FillTrackCategoriesAndAcceptanceFunctions()
 {
-   fTrackCategories = list_of("All")("Positive")("Negative")("Primary")("Secondary")("Electron")("Muon")("Proton")("AntiProton")("Pion")("PionPlus")("PionMinus")("Kaon")("KaonPlus")("KaonMinus");
+   vector<string> tmp = list_of("All")("Positive")("Negative")("Primary")("Secondary")("Electron")("Muon")("Proton")("AntiProton")("Pion")("PionPlus")("PionMinus")("Kaon")("KaonPlus")("KaonMinus");
+   fTrackCategories =  tmp;
    // List of all supported track categories
    fTrackAcceptanceFunctions["All"] = CbmLitAcceptanceFunction::AllTrackAcceptanceFunction;
    fTrackAcceptanceFunctions["Positive"] = CbmLitAcceptanceFunction::PositiveTrackAcceptanceFunction;

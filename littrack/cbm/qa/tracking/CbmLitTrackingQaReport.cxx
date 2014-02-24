@@ -147,7 +147,8 @@ string CbmLitTrackingQaReport::PrintTrackingEfficiency(
   	map<string, Int_t> catToCell;
   	for (Int_t iHist = 0; iHist < nofHistos; iHist++) {
   	   string effName = histos[iHist]->GetName();
-  	   catToCell.insert(make_pair<string, Int_t>(Split(effName, '_')[3], catToCell.size()));
+           pair<string, Int_t> tmp = make_pair(Split(effName, '_')[3], catToCell.size());
+  	   catToCell.insert(tmp);
   	}
   	Int_t nofCats = catToCell.size();
 	Int_t nofRows = nofHistos / nofCats;

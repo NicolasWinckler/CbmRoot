@@ -136,7 +136,7 @@ private:
     //static const Double_t SILICON_DENSITY = 2.33; // g*cm^-3
     //static const Double_t SILICON_A = 28.08855; // silicon atomic weight
     //static const Double_t SILICON_Z = 14.0; // silicon atomic number
-    static const Double_t SILICON_RAD_LENGTH = 9.365; // cm
+    static const Double_t SILICON_RAD_LENGTH; // cm
 
     CbmHistManager* fHM; // Histogram manager
     string fOutputDir; // Output directory for results
@@ -151,5 +151,7 @@ private:
     
     ClassDef(CbmLitRadLengthQa, 1);
 };
+
+const Double_t SILICON_RAD_LENGTH = 9.365; // cm
 
 #endif /* CBMLITRADLENGTHQA_H_ */

@@ -232,7 +232,7 @@ public:
    }
 
 private:
-   static const fscal EPSILON = 0.005;
+   static const fscal EPSILON;
    vector<vector<LitScalPixelHit*> > fHits; // Array of hits
    vector<fscal> fMaxErrX; // Array of maximum X error for each station
    vector<fscal> fMaxErrY; // Array of maximum Y error for each station
@@ -244,4 +244,7 @@ private:
 
 } // namespace parallel
 } // namespace lit
+
+const fscal EPSILON = 0.005;
+
 #endif /* LITHITDATA_H_ */

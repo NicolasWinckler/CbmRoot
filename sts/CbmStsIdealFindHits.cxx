@@ -8,6 +8,7 @@
 #include "CbmStsIdealFindHits.h"
 
 #include "CbmGeoStsPar.h"
+#include "CbmStsAddress.h"
 #include "CbmStsDigi.h"
 #include "CbmStsDigiPar.h"
 #include "CbmStsDigiScheme.h"
@@ -346,9 +347,13 @@ void CbmStsIdealFindHits::SortDigis() {
   Int_t nDigis = fDigis->GetEntriesFast();
   for (Int_t iDigi=0; iDigi<nDigis; iDigi++) {
     digi = (CbmStsDigi*) fDigis->At(iDigi);
-    stationNr = digi->GetStationNr();
-    sectorNr  = digi->GetSectorNr();
-    iSide     = digi->GetSide();
+    stationNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsStation);
+    //sectorNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsModule);
+    sectorNr = digi->GetSectorNr();
+    iSide = CbmStsAddress::GetElementId(digi->GetAddress(), kStsSide);
+    //stationNr = digi->GetStationNr();
+    //sectorNr  = digi->GetSectorNr();
+    //iSide     = digi->GetSide();
     sector = fDigiScheme->GetSector(stationNr, sectorNr);
     if (iSide == 0 ) {
       if ( fDigiMapF.find(sector) == fDigiMapF.end() ) {
@@ -480,7 +485,8 @@ Int_t CbmStsIdealFindHits::FindHits(CbmStsStation* station,
 	     << station->GetStationNr() << endl;
 	continue;
       }
-      iChanF = digiF->GetChannelNr();
+      //iChanF = digiF->GetChannelNr();
+      iChanF = CbmStsAddress::GetElementId(digiF->GetAddress(), kStsChannel);
       for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
 	iDigiB = (*it2);
 	digiB = (CbmStsDigi*) fDigis->At(iDigiB);
@@ -491,7 +497,8 @@ Int_t CbmStsIdealFindHits::FindHits(CbmStsStation* station,
 	       << station->GetStationNr() << endl;
 	  continue;
 	}
-	iChanB = digiB->GetChannelNr();
+	//iChanB = digiB->GetChannelNr();
+  iChanB = CbmStsAddress::GetElementId(digiB->GetAddress(), kStsChannel);
 
 	Int_t sensorDetId = sector->Intersect(iChanF,iChanB,xHit,yHit,zHit);
 

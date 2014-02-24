@@ -23,10 +23,15 @@ setup/CbmStsSetup.cxx
 set(SRCS_MC
 mc/CbmStsMC.cxx
 )
+# --- Sources in digitize
+set (SRCS_DIGITIZE
+digitize/CbmStsDigitizeIdeal.cxx
+)
 # --- All sources
 set(SRCS
 ${SRCS_SETUP}
 ${SRCS_MC}
+${SRCS_DIGITIZE}
 CbmGeoSts.cxx 
 CbmGeoStsPar.cxx 
 CbmStsContFact.cxx 
@@ -70,6 +75,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 ${CBMROOT_SOURCE_DIR}/sts
 ${CBMROOT_SOURCE_DIR}/sts/setup
 ${CBMROOT_SOURCE_DIR}/sts/mc
+${CBMROOT_SOURCE_DIR}/sts/digitize
 
 # needed by MatchHits???
 ${CBMROOT_SOURCE_DIR}/passive 

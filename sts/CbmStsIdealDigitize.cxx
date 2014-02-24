@@ -9,6 +9,7 @@
 #include "CbmStsIdealDigitize.h"
 
 #include "CbmGeoStsPar.h"
+#include "CbmStsAddress.h"
 #include "CbmStsDigi.h"
 #include "CbmStsDigiMatch.h"
 #include "CbmStsDigiPar.h"
@@ -209,8 +210,8 @@ void CbmStsIdealDigitize::Exec(Option_t* opt) {
     pair<Int_t, Int_t> a(sectorDetId, channelF);
     if ( fChannelMap.find(a) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
-      new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-					  0, channelF, 0, 0);
+    	UInt_t address = CbmStsAddress::GetAddress(stationNr, 0, 0, 0, 0, channelF);
+      new ((*fDigis)[fNDigis]) CbmStsDigi(address, 0, 0, sectorNr);
       new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
       fChannelMap[a] = fNDigis;
       fNDigis++;
@@ -242,8 +243,8 @@ void CbmStsIdealDigitize::Exec(Option_t* opt) {
     pair<Int_t, Int_t> b(sectorDetId, channelB);
     if ( fChannelMap.find(b) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
-      new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-					  1, channelB, 0, 0);
+    	UInt_t address = CbmStsAddress::GetAddress(stationNr, 0, 0, 0, 1, channelB);
+      new ((*fDigis)[fNDigis]) CbmStsDigi(address, 0, 0, sectorNr);
       new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
       fChannelMap[b] = fNDigis;
       fNDigis++;

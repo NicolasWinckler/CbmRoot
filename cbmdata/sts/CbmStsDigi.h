@@ -22,6 +22,8 @@
 #ifndef CBMSTSDIGI_H
 #define CBMSTSDIGI_H 1
 
+#include "CbmDigi.h"
+
 
 #include "CbmDetectorList.h"
 #include "CbmStsDetectorId.h"
@@ -29,7 +31,7 @@
 
 #include <vector>
 
-class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
+class CbmStsDigi : public CbmDigi
 {
 
  public:
@@ -38,27 +40,63 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
   CbmStsDigi();
 
 
-  /**  Constructor from station number, sector number, 
-   **  front/back side and channel number
-   **@param station  station number (1 -   15)
-   **@param sector   sector number  (1 - 1023)
-   **@param side     0=front side; 1=back side
-   **@param channel  channel number (1 -  1023)
-   **@param adc      Charge ADC channel (0 - 4095)
-   **@param time     Time within event [ns]
+  /**   Standard constructor
+   ** @param  address  Unique element address
+   ** @param  time     Measurement time [ns]
+   ** @param  charge   Charge [ADC units]
    **/
-//   CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
-// 	     Int_t channel, Int_t adc, Int_t time);
-  CbmStsDigi(Int_t station, Int_t sector, Int_t side, 
-	     Int_t channel, Int_t adc, Int_t time);
+  CbmStsDigi(UInt_t address, ULong64_t time, UShort_t charge);
+
+
+  /**@brief Constructor with additional sectorNr
+   **
+   ** @param  address  Unique element address
+   ** @param  time     Measurement time [ns]
+   ** @param  charge   Charge [ADC units]
+   ** @param  sectorNr Number of sector within station
+   **
+   ** TODO: Temporarily kept for backward compatibility with classes using
+   ** CbmStsDigiScheme. SectorNr will be stored in a separate variable,
+   ** since it does not fit into the CbmAddress scheme. In the address
+   ** variable, it is set to zero.
+   **
+   **/
+  CbmStsDigi(UInt_t address, ULong64_t time, UShort_t charge,
+  		       Int_t sectorNr);
 
 
   /**   Destructor   **/
   virtual ~CbmStsDigi();
 
 
+  /**  Unique detector element address  (see CbmStsAddress) **/
+  virtual Int_t GetAddress() const { return fAddress; }
+
+
+  /**  Charge [ADC units]  **/
+  virtual Double_t GetCharge() const { return Double_t(fCharge); }
+
+
+  /**   Sector number
+   **    Kept for bacjwrad compatibility
+   **/
+  Int_t GetSectorNr() const { return fSectorNr; }
+
+
+  /**  System ID (type DetectorId)  **/
+  virtual Int_t GetSystemId() const { return kSTS; }
+
+
+  /**  Time of measurement [ns]  **/
+  virtual Double_t GetTime() const { return Double_t(fTime); }
+
+
+
+
+
+
   /**   Add charge   **/
-  void AddAdc(Int_t adc);
+//  void AddAdc(Int_t adc);
 //   void AddIndex(int index, int adc){
 // 			AddLink(FairLink(kStsPoint, index, adc));
 // 		}
@@ -68,55 +106,57 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 
 
   /**   Maximal number of ADC bits   **/
-  static Int_t GetNofAdcBits() { return fgkCharBits; }
+ // static Int_t GetNofAdcBits() { return fgkCharBits; }
 
 
-  /**   Station number   **/
-  Int_t GetStationNr() const { return StationNr(GetDetectorId()); }
+  /**   Station number
+   **   Kept for backward compatibility   **/
+  //Int_t GetStationNr() const { return CbmStsAddress:;GetElementId(fAddress, kStsStation); }
 
-  /**   Sector number   **/
-  Int_t GetSectorNr() const { return SectorNr(GetDetectorId()); }
 
 
   /**   Side ( 0 = front, 1 = back )   **/
-  Int_t GetSide() const { return Side(GetDetectorId()); }
+  //Int_t GetSide() const { return Side(GetDetectorId()); }
 
 
   /**   Channel number   **/
-  Int_t GetChannelNr() const { return ChannelNr(GetDetectorId()); }
+  //Int_t GetChannelNr() const { return ChannelNr(GetDetectorId()); }
 
 
   /**   Charge   **/
-  Int_t GetAdc() const { return ( (fData >> fgkCharShift) & fgkCharMask ); }
+//  Int_t GetAdc() const { return ( (fData >> fgkCharShift) & fgkCharMask ); }
 
 
   /**   Maximum ADC   **/
-  static Int_t GetMaxAdc() { return ( (1 << fgkCharBits) - 1 ); }
+ // static Int_t GetMaxAdc() { return ( (1 << fgkCharBits) - 1 ); }
 
-
-  /**   Time   **/
-  Int_t GetTime() const { return ( (fData >> fgkTimeShift) & fgkTimeMask ); }
 
 
   /**   Unique detector ID   **/
-  Int_t GetDetectorId() const { 
-    return ( kSTS | ( (fData & fgkAddrMask) << 4) );
-  }
+//  Int_t GetDetectorId() const {
+//    return ( kSTS | ( (fData & fgkAddrMask) << 4) );
+//  }
 
 
 
  private:
 
 
-  /**   Data members  **/
-  Long64_t fData;
+  UInt_t fAddress;     ///< Unique detector address
+  ULong64_t fTime;     ///< Time [ns]
+  UShort_t fCharge;    ///< Charge [ADC units]
+
+
+  // TODO: fSectorNr is here for backward compatibility with classes
+  // using CbmStsDigiScheme. Should be eventually removed.
+  Int_t fSectorNr;      ///< Number of sector within station
 
 
   /**   Modifiers   **/
   void SetAdc(Int_t charge);
 
 
-  /**   Static members for bit operations   **/
+  /**   Static members for bit operations
   static const Int_t fgkAddrBits;
   static const Int_t fgkCharBits;
   static const Int_t fgkTimeBits;
@@ -126,7 +166,7 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
   static const Long64_t fgkCharMask;
   static const Long64_t fgkTimeMask;
 
-
+ **/
 
 
   ClassDef(CbmStsDigi,2);

@@ -25,6 +25,7 @@
 
 // Includes from STS
 #include "CbmGeoStsPar.h"
+#include "CbmStsAddress.h"
 #include "CbmStsDigi.h"
 #include "CbmStsDigiMatch.h"
 #include "CbmStsDigiPar.h"
@@ -240,6 +241,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     cout << "- " << fName << endl;
     return;
   }
+  /*
   if (fFNofBits>CbmStsDigi::GetNofAdcBits()||fBNofBits>CbmStsDigi::GetNofAdcBits()) {
     cerr << "-W- " << fName << "::Exec: Number of AdcBits("<<fFNofBits<<") during digitization exceeds ADC range("<<CbmStsDigi::GetNofAdcBits()<<") defined in data class "
 	 << endl;
@@ -258,6 +260,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     cout << "- " << fName << endl;
     return;
   }
+  */
   map<CbmStsSensor*, set<Int_t> >::iterator mapIt;
   for (mapIt=fPointMap.begin(); mapIt!=fPointMap.end(); mapIt++)
     ((*mapIt).second).clear();
@@ -335,9 +338,13 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	
 	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr])/fFNofElPerAdc);
 	if ( digiFSignal >= fFNofSteps ) digiFSignal = fFNofSteps-1;
+	/*
 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
 						  0, ifstr, 
 						  digiFSignal, 0);
+						  */
+	UInt_t address = CbmStsAddress::GetAddress(stationNr, 0, 0, 0, 0, 0, ifstr);
+	new ( (*fDigis)[fNDigis] ) CbmStsDigi(address, 0, digiFSignal, sectorNr);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fFChannelPointsMap[ifstr];
 	Int_t pnt;
@@ -371,9 +378,14 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	
 	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr])/fBNofElPerAdc);
 	if ( digiBSignal >= fBNofSteps ) digiBSignal = fBNofSteps-1;
+	/*
 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
 						  1, ibstr, 
 						  digiBSignal, 0);
+						  */
+	// Use here the backward-compatibel constructor of CbmStsDigi.
+	UInt_t address = CbmStsAddress::GetAddress(stationNr, 0, 0, 0, 0, 1, ibstr);
+	new ( (*fDigis)[fNDigis] ) CbmStsDigi(address, 0, digiBSignal, sectorNr);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fBChannelPointsMap[ibstr];
 	Int_t pnt;

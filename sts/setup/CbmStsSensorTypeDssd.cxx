@@ -298,7 +298,7 @@ void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
   }
 
   // --- Flag parameters to be set if test is ok
-  fIsSet = SelfTest();
+  //fIsSet = SelfTest();
 
 }
 // -------------------------------------------------------------------------

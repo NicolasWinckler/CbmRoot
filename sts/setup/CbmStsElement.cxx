@@ -7,8 +7,10 @@
 #include "TGeoManager.h"
 #include "TGeoPhysicalNode.h"
 
-#include "setup/CbmStsElement.h"
-#include "setup/CbmStsSetup.h"
+#include "CbmStsElement.h"
+#include "CbmStsModule.h"
+#include "CbmStsSenzor.h"
+#include "CbmStsSetup.h"
 
 using namespace std;
 
@@ -124,8 +126,15 @@ void CbmStsElement::InitDaughters() {
       TString name = CbmStsSetup::GetLevelName(fLevel+1);
       name += Form("%02i", nDaughters++);
       const char* title = mNode->GetDaughter(iNode)->GetVolume()->GetName();
-      CbmStsElement* dElement = new CbmStsElement(name, title,
-                                                  fLevel + 1, pNode);
+      CbmStsElement* dElement = NULL;
+      switch ( fLevel) {
+      	case kStsHalfLadder:
+      		dElement = new CbmStsModule(name, title, pNode); break;
+      	case kStsModule:
+      		dElement = new CbmStsSenzor(name, title, pNode); break;
+      	default:
+      		dElement = new CbmStsElement(name, title, fLevel+1, pNode); break;
+      }
       AddDaughter(dElement);
 
       // Call method recursively for the daughter elements

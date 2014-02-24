@@ -18,6 +18,9 @@
 #pragma link C++ class CbmStsMC;
 #pragma link C++ class CbmStsTrackStatus;
 
+// Digitization
+#pragma link C++ class CbmStsDigitizeIdeal;
+
 // Enumerators
 #pragma link C++ enum EStsElementLevel;
 

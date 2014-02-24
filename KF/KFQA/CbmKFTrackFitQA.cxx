@@ -24,6 +24,8 @@
 #include "CbmMCTrack.h"
 #include "FairMCPoint.h"
 
+#include "CbmMatch.h"
+
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TTree.h"
@@ -578,9 +580,11 @@ void CbmKFTrackFitQA::StsHitMatch()
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
           FairLink link2 = stsCluster->GetLink(iL2);
           CbmStsDigi *stsDigi = dynamic_cast<CbmStsDigi*>( listStsDigi->At( link2.GetIndex() ) );
-          const int NLinks3 = stsDigi->GetNLinks();
-          for ( int iL3 = 0; iL3 < NLinks3; iL3++){
-            FairLink link3 = stsDigi->GetLink(iL3);
+//          const int NLinks3 = stsDigi->GetNLinks();
+          const int NLinks3 = stsDigi->GetMatch()->GetNofLinks();
+         for ( int iL3 = 0; iL3 < NLinks3; iL3++){
+        	  CbmLink link3 = stsDigi->GetMatch()->GetLink(iL3);
+//            FairLink link3 = stsDigi->GetLink(iL3);
             int stsPointId = link3.GetIndex();
             stsPointIds.push_back( stsPointId );
           } // for mcPoint
@@ -593,9 +597,11 @@ void CbmKFTrackFitQA::StsHitMatch()
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
           FairLink link2 = stsCluster->GetLink(iL2);
           CbmStsDigi *stsDigi = dynamic_cast<CbmStsDigi*>( listStsDigi->At( link2.GetIndex() ) );
-          const int NLinks3 = stsDigi->GetNLinks();
+//          const int NLinks3 = stsDigi->GetNLinks();
+          const int NLinks3 = stsDigi->GetMatch()->GetNofLinks();
           for ( int iL3 = 0; iL3 < NLinks3; iL3++){
-            FairLink link3 = stsDigi->GetLink(iL3);
+//            FairLink link3 = stsDigi->GetLink(iL3);
+            CbmLink link3 = stsDigi->GetMatch()->GetLink(iL3);
             int stsPointId = link3.GetIndex();
             
             if ( !find(&(stsPointIds[0]), &(stsPointIds[stsPointIds.size()]), stsPointId) ) continue; // check if first cluster matched with same mc-point

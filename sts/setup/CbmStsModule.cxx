@@ -63,7 +63,6 @@ void CbmStsModule::AddSensor(CbmStsSenzor* sensor) {
   UInt_t address = CbmStsAddress::SetElementId(fAddress, kStsSensor,
                                                sensorId);
   sensor->SetAddress(address);
-  sensor->SetModule(this);
 
   return;
 }

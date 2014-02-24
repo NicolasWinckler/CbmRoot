@@ -13,6 +13,7 @@
 #include "FairRuntimeDb.h"
 
 #include "CbmGeoStsPar.h"
+#include "CbmStsAddress.h"
 #include "CbmStsCluster.h"
 #include "CbmStsDigi.h"
 #include "CbmStsDigiPar.h"
@@ -400,9 +401,12 @@ void CbmStsClusterFinder::SortDigis() {
   for (Int_t iDigi=0; iDigi<nDigis; iDigi++) {
     digi = (CbmStsDigi*) fDigis->At(iDigi);
 
-    stationNr = digi->GetStationNr();
+//    stationNr = digi->GetStationNr();
+//    sectorNr  = digi->GetSectorNr();
+//    iSide     = digi->GetSide();
+    stationNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsStation);
     sectorNr  = digi->GetSectorNr();
-    iSide     = digi->GetSide();
+    iSide     = CbmStsAddress::GetElementId(digi->GetAddress(), kStsSide);
     sector = fDigiScheme->GetSector(stationNr, sectorNr);
     
     if (iSide == 0 ) {
@@ -456,8 +460,10 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
     iDigi = (*it1);
     digi  = (CbmStsDigi*) fDigis->At(iDigi);
 
-    digiPos = digi->GetChannelNr();
-    digiSig = digi->GetAdc();
+    //digiPos = digi->GetChannelNr();
+    //digiSig = digi->GetAdc();
+    digiPos = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
+    digiSig = digi->GetCharge();
 
     if ( lastDigiPos == -1 ) {
       clusterCand = new ((*fClustersCand)[fNofClustersCand++]) CbmStsCluster(digiSig, stationNr,sectorNr,iSide);
@@ -585,8 +591,9 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
   for (it1=digiSet.begin(); it1!=digiSet.end(); it1++) {
     iDigi = (*it1);
     digi  = (CbmStsDigi*) fDigis->At(iDigi);
-    cout << digi->GetChannelNr() << " " << flush;
-    channelSorted[digi->GetChannelNr()] = iDigi+1;
+    Int_t channelNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
+    cout << channelNr << " " << flush;
+    channelSorted[channelNr] = iDigi+1;
   }
   cout << endl;
   // print channels/signals
@@ -639,8 +646,8 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
   Double_t maxDigiSig = 0.;
   CbmStsDigi* digi = NULL;
   digi = (CbmStsDigi*)fDigis->At(maxDigiNr);
-  Int_t maxDigiPos = digi->GetChannelNr();
-  maxDigiSig = digi->GetAdc();
+  Int_t maxDigiPos = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
+  maxDigiSig = digi->GetCharge();
 
   //  cout << "Cluster " << iCluster+1 << " has " << cluster->GetNDigis() << " digis, max at " << maxDigiNr << endl;
   Double_t chanNr  = 0;
@@ -651,8 +658,8 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
   Double_t error   = 0;
   for ( Int_t itemp = 0 ; itemp < clusterCand->GetNDigis() ; itemp++ ) {
     digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(itemp));
-    chanNr  = (Double_t)digi->GetChannelNr();
-    chanADC = digi->GetAdc();
+    chanNr  = (Double_t)(CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel));
+    chanADC = digi->GetCharge();
     sumW  +=        chanADC;
     sumWX += chanNr*chanADC;
     sumCh += chanNr;
@@ -666,7 +673,11 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
   
       digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(itemp));
       if (itemp==0) {
-        cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(digi->GetAdc(), digi->GetStationNr(), digi->GetSectorNr(), digi->GetSide());
+      	Int_t iStation = CbmStsAddress::GetElementId(digi->GetAddress(), kStsStation);
+      	Int_t iSector  = digi->GetSectorNr();
+      	Int_t iSide    = CbmStsAddress::GetElementId(digi->GetAddress(), kStsSide);
+        cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(digi->GetCharge(),
+        		iStation, iSector, iSide);
         cluster->AddDigi(itemp);
       }
       else if (itemp>0) {
@@ -680,7 +691,8 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
       cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
       for ( Int_t itemp = 0 ; itemp < clusterCand->GetNDigis() ; itemp++ ) {
         digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(itemp));
-        cout << "digi ADC = " << digi->GetAdc() << " at channel# " << digi->GetChannelNr() << endl;
+        Int_t iChannel = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
+        cout << "digi ADC = " << digi->GetCharge() << " at channel# " << iChannel << endl;
       }
     }
  }

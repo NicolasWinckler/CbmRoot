@@ -7,6 +7,7 @@
 // Includes from sts
 #include "CbmStsReconstructionQa.h"
 
+#include "CbmStsAddress.h"
 #include "CbmStsHit.h"
 #include "CbmStsDigi.h"
 #include "CbmStsPoint.h"
@@ -670,9 +671,14 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
   Int_t nofStsDigis = fStsDigis->GetEntriesFast();
   for ( Int_t idigi = 0 ; idigi < nofStsDigis ; idigi++ ) {
     CbmStsDigi *stsDigi     = (CbmStsDigi*)fStsDigis->At(idigi);
-    fNofFiredDigis[stsDigi->GetStationNr()-1][stsDigi->GetSectorNr()][stsDigi->GetSide()] += 1;
+    Int_t iStation = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsStation);
+    //Int_t iSector  = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsModule);
+    Int_t iSector = stsDigi->GetSectorNr();
+    Int_t iSide    = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsSide);
+    Int_t iChannel = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsChannel);
+    fNofFiredDigis[iStation-1][iSector][iSide] += 1;
 
-    fNofDigisPChip[stsDigi->GetStationNr()-1][stsDigi->GetSectorNr()][stsDigi->GetSide()][(Int_t)(stsDigi->GetChannelNr()/125)] += 1;
+    fNofDigisPChip[iStation-1][iSector][iSide][(Int_t)(iChannel/125)] += 1;
   }
 
 

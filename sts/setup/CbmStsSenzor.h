@@ -14,9 +14,12 @@
 #include "TNamed.h"
 
 #include "CbmStsAddress.h"
-
+#include "CbmStsElement.h"
+#include "CbmStsSetup.h"
 
 class CbmStsModule;
+
+
 class CbmStsPoint;
 class CbmStsSensorType;
 
@@ -30,7 +33,7 @@ class CbmStsSensorType;
 
 
 
-class CbmStsSenzor : public TNamed
+class CbmStsSenzor : public CbmStsElement
 {
 
   public:
@@ -39,16 +42,21 @@ class CbmStsSenzor : public TNamed
     CbmStsSenzor();
 
 
+    /** Standard constructor
+     ** @param name   Name
+     ** @param title  Title
+     ** @param node   Pointer to relevant TGeoPhysicalNode
+     */
+    CbmStsSenzor(const char* name, const char* title,
+                 TGeoPhysicalNode* node = NULL);
+
+
     /** Destructor  **/
     virtual ~CbmStsSenzor() { };
 
 
-    /** Get sensor address  **/
-    UInt_t GetAddress() const { return fAddress; }
-
-
     /** Get mother module **/
-    CbmStsModule* GetModule() const { return fModule; }
+    CbmStsModule* GetModule() const;
 
 
     /** Get the sensor Id within the module  **/
@@ -78,15 +86,13 @@ class CbmStsSenzor : public TNamed
     /** Set a pointer to the mother module
      ** @param  module   Pointer to mother module
      **/
-    void SetModule(CbmStsModule* module) { fModule = module; }
+    //void SetModule(CbmStsModule* module) { fModule = module; }
 
 
   private:
 
-    UInt_t fAddress;            ///< Unique identifier
-    TGeoPhysicalNode*  fNode;   ///< Pointer to node in the geometry
     CbmStsSensorType* fType;    ///< Pointer to sensor type
-    CbmStsModule* fModule;      ///< Pointer to mother module
+    //CbmStsModule* fModule;      ///< Pointer to mother module
 
 
     CbmStsSenzor(const CbmStsSenzor&);

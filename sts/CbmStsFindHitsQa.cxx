@@ -8,6 +8,7 @@
 #include "CbmStsFindHitsQa.h"
 
 #include "CbmGeoStsPar.h"
+#include "CbmStsAddress.h"
 #include "CbmStsDigi.h"
 #include "CbmStsCluster.h"
 #include "CbmStsDigiPar.h"
@@ -209,7 +210,12 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     CbmStsDigi *stsDigi     = (CbmStsDigi*)fStsDigis->At(idigi);
     //  cout << "digi side = " << stsDigi->GetSide() << endl;
 //    fNofFiredDigis[stsDigi->GetStationNr()-1][stsDigi->GetSectorNr()-1][stsDigi->GetSide()] += 1;
-    fNofDigisPChip[stsDigi->GetStationNr()-1][stsDigi->GetSectorNr()-1][stsDigi->GetSide()][(Int_t)(stsDigi->GetChannelNr()/128)] += 1;
+    Int_t iStation = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsStation);
+    //Int_t iSector = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsModule);
+    Int_t iSector = stsDigi->GetSectorNr();
+    Int_t iSide = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsSide);
+    Int_t iChannel = CbmStsAddress::GetElementId(stsDigi->GetAddress(), kStsChannel);
+    fNofDigisPChip[iStation-1][iSector-1][iSide][(Int_t)(iChannel/128)] += 1;
   }
   Int_t nofStsHits = fStsHits->GetEntriesFast();
   Int_t nofStsPoints = fStsPoints->GetEntriesFast();

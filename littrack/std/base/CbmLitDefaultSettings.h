@@ -26,9 +26,5 @@ public:
 
 
 }
-const litfloat LINE_EXTRAPOLATION_START_Z = 450.; // z coordinate [cm] a
-const litfloat ENERGY_LOSS_CONST = 0.00354; // energy lost constant [GeV
-const litfloat MINIMUM_PROPAGATION_DISTANCE = 1e-6; // minimum propagati
-const litfloat MAXIMUM_TGEO_NAVIGATION_DISTANCE = 25.; // maximum distan
                                 
 #endif /*CBMLITDEFAULTSETTINGS_H_*/

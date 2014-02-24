@@ -21,6 +21,8 @@ using std::cout;
 using std::endl;
 using std::numeric_limits;
 
+const fscal lit::parallel::LitHitData::EPSILON = 0.005;
+
 lit::parallel::LitTrackFinderNN::LitTrackFinderNN() :
    fTracks(),
    fLayout(),

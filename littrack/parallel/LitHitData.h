@@ -245,6 +245,4 @@ private:
 } // namespace parallel
 } // namespace lit
 
-const fscal EPSILON = 0.005;
-
 #endif /* LITHITDATA_H_ */

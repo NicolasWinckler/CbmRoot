@@ -13,6 +13,12 @@
 #include "utils/CbmLitMath.h"
 #include "utils/CbmLitMatrixMath.h"
 
+const litfloat lit::CbmLitDefaultSettings::LINE_EXTRAPOLATION_START_Z = 450.; // z coordinate [cm] a
+const litfloat lit::CbmLitDefaultSettings::ENERGY_LOSS_CONST = 0.00354; // energy lost constant [GeV
+const litfloat lit::CbmLitDefaultSettings::MINIMUM_PROPAGATION_DISTANCE = 1e-6; // minimum propagati
+const litfloat lit::CbmLitDefaultSettings::MAXIMUM_TGEO_NAVIGATION_DISTANCE = 25.; // maximum distan
+
+
 CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator()
 {
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();

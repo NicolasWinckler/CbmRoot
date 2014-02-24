@@ -36,6 +36,8 @@ using std::string;
 using boost::assign::list_of;
 using lit::ToString;
 
+const Double_t CbmLitRadLengthQa::SILICON_RAD_LENGTH = 9.365; // cm
+
 CbmLitRadLengthQa::CbmLitRadLengthQa():
    fHM(NULL),
    fOutputDir(""),

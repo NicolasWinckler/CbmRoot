@@ -161,6 +161,4 @@ private:
    vector<vector<Int_t> > fZPosBins; // Array of Z positions bin number of hits in each station
 };
 
-const litfloat EPSILON = 0.005;
-
 #endif /*CBMLITHITDATA_H_*/

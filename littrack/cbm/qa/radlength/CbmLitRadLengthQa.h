@@ -152,6 +152,4 @@ private:
     ClassDef(CbmLitRadLengthQa, 1);
 };
 
-const Double_t SILICON_RAD_LENGTH = 9.365; // cm
-
 #endif /* CBMLITRADLENGTHQA_H_ */

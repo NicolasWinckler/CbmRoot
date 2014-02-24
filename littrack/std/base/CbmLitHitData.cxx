@@ -18,6 +18,8 @@
 using std::endl;
 using std::max;
 
+const litfloat CbmLitHitData::EPSILON = 0.005;
+
 CbmLitHitData::CbmLitHitData():
    fHits(),
    fMaxErrX(),

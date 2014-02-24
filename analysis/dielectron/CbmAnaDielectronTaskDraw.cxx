@@ -1120,13 +1120,13 @@ void CbmAnaDielectronTaskDraw::DrawBgSourceTracks()
    TCanvas *c4 = CreateCanvas("fh_nof_topology_pairs_gamma", "fh_nof_topology_pairs_gamma", 600, 600);
    TH1D* htopologyGamma = (TH1D*)H1("fh_nof_topology_pairs_gamma")->Clone();
    htopologyGamma->Scale(1. / htopologyGamma->Integral());
-   DrawH1( htopologyGamma, kLinear, kLinear, "hist text0");
+   DrawH1( htopologyGamma, kLinear, kLinear);
    htopologyGamma->SetMarkerSize(1.);
 
    TCanvas *c5 = CreateCanvas("fh_nof_topology_pairs_pi0", "fh_nof_topology_pairs_pi0", 600, 600);
    TH1D* htopologyPi0 = (TH1D*)H1("fh_nof_topology_pairs_pi0")->Clone();
    htopologyPi0->Scale(1. / htopologyPi0->Integral());
-   DrawH1( htopologyPi0, kLinear, kLinear, "hist text0");
+   DrawH1( htopologyPi0, kLinear, kLinear);
    htopologyPi0->SetMarkerSize(1.);
 }
 

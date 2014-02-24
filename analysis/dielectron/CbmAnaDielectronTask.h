@@ -18,7 +18,7 @@
 #include "CbmGlobalTrack.h"
 #include "CbmRichElectronIdAnn.h"
 #include "CbmKFVertex.h"
-//#include "CbmL1PFFitter.h"
+#include "cbm/qa/mc/CbmLitMCTrackCreator.h"
 
 #include <map>
 #include <fstream>
@@ -379,6 +379,8 @@ private:
     CbmVertex *fPrimVertex;
     CbmKFVertex fKFVertex;
     CbmStsKFTrackFitter fKFFitter;
+
+    CbmLitMCTrackCreator* fMCTrackCreator; // MC track creator tool
 
     Bool_t fUseMvd;
     Bool_t fUseRich;

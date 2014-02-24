@@ -228,6 +228,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask()
     fPrimVertex(NULL),
     fKFVertex(),
     fKFFitter(),
+    fMCTrackCreator(NULL),
     fUseMvd(kFALSE),
     fUseRich(kTRUE),
     fUseTrd(kTRUE),
@@ -419,10 +420,10 @@ void CbmAnaDielectronTask::InitHists()
    fh_source_tracks = new TH2D("fh_source_tracks","fh_source_tracks;Analysis steps;Particle", CbmAnaLmvmNames::fNofAnaSteps, 0., CbmAnaLmvmNames::fNofAnaSteps, 7, 0., 7.);
    fHistoList.push_back(fh_source_tracks);
 
-   fh_nof_topology_pairs_gamma = new TH1D("fh_nof_topology_pairs_gamma","fh_nof_topology_pairs_gamma;Pair type;Pairs/event", 5, 0., 5);
+   fh_nof_topology_pairs_gamma = new TH1D("fh_nof_topology_pairs_gamma","fh_nof_topology_pairs_gamma;Pair type;Pairs/event", 7, 0., 7);
    fHistoList.push_back(fh_nof_topology_pairs_gamma);
 
-   fh_nof_topology_pairs_pi0 = new TH1D("fh_nof_topology_pairs_pi0","fh_nof_topology_pairs_pi0;Pair type;Pairs/event", 5, 0., 5);
+   fh_nof_topology_pairs_pi0 = new TH1D("fh_nof_topology_pairs_pi0","fh_nof_topology_pairs_pi0;Pair type;Pairs/event", 7, 0., 7);
    fHistoList.push_back(fh_nof_topology_pairs_pi0);
 
    //Number of mismatches and ghosts after each cut
@@ -674,6 +675,8 @@ InitStatus CbmAnaDielectronTask::Init()
 
    fKFFitter.Init();
 
+   fMCTrackCreator = CbmLitMCTrackCreator::Instance();
+
    if (fUseRichAnn){
       fElIdAnn = new CbmRichElectronIdAnn();
       fElIdAnn->Init();
@@ -714,6 +717,8 @@ void CbmAnaDielectronTask::Exec(
     } else {
        Fatal("CbmAnaDielectronTask::Exec","No PrimaryVertex array!");
     }
+
+    fMCTrackCreator->Create();
 
     FillRichRingNofHits();
     MCPairs();   
@@ -1744,7 +1749,7 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
 
       for (Int_t iM = 0; iM < fSTCandidates.size(); iM++){
          if (fSTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
-            h_nof_pairs->Fill(1.5);
+            h_nof_pairs->Fill(3.5);
             isAdded[iP] = true;
             break;
          }
@@ -1753,7 +1758,7 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
 
       for (Int_t iM = 0; iM < fRTCandidates.size(); iM++){
          if (fRTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
-            h_nof_pairs->Fill(2.5);
+            h_nof_pairs->Fill(4.5);
             isAdded[iP] = true;
             break;
          }
@@ -1762,7 +1767,7 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
 
       for (Int_t iM = 0; iM < fTTCandidates.size(); iM++){
          if (fTTCandidates[iM].McMotherId == fCandidates[iP].McMotherId){
-            h_nof_pairs->Fill(3.5);
+            h_nof_pairs->Fill(5.5);
             isAdded[iP] = true;
             break;
          }
@@ -1771,7 +1776,7 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
 
       for (Int_t iM = 0; iM < fCandidates.size(); iM++){
          if (iM != iP && fCandidates[iM].McMotherId == fCandidates[iP].McMotherId && fCandidates[iM].chi2Prim < fChiPrimCut && fCandidates[iM].isElectron) {
-            h_nof_pairs->Fill(4.5);
+            h_nof_pairs->Fill(6.5);
             isAdded[iP] = true;
             isAdded[iM] = true;
             break;
@@ -1779,7 +1784,22 @@ void CbmAnaDielectronTask::CalculateNofTopologyPairs(
       }
 
       if (isAdded[iP]) continue;
-      h_nof_pairs->Fill(0.5);
+      Int_t nofPointsSts = 0;
+      Int_t nofMcTracks = fMCTracks->GetEntriesFast();
+      for (Int_t iMCTrack = 0; iMCTrack < nofMcTracks; iMCTrack++) {
+    	  const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(iMCTrack));
+    	  if (mcTrack->GetMotherId() != fCandidates[iP].McMotherId) continue;
+    	  if (iMCTrack == fCandidates[iP].stsMcTrackId) continue;
+
+		  if (!fMCTrackCreator->TrackExists(iMCTrack)) continue;
+		  const CbmLitMCTrack& litMCTrack = fMCTrackCreator->GetTrack(iMCTrack);
+		  nofPointsSts = litMCTrack.GetNofPointsInDifferentStations(kSTS);
+		  break;
+      }
+      if (nofPointsSts == 0) h_nof_pairs->Fill(0.5);
+      if (nofPointsSts >= 1 && nofPointsSts <=3) h_nof_pairs->Fill(1.5);
+      if (nofPointsSts >= 4) h_nof_pairs->Fill(2.5);
+
    }
 }
 

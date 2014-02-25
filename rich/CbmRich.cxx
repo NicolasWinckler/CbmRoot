@@ -166,9 +166,8 @@ Bool_t CbmRich::ProcessHits(
       if ( gMC->IsTrackEntering() ) {
          TParticle* part    = gMC->GetStack()->GetCurrentTrack();
          Double_t charge = part->GetPDG()->Charge() / 3. ;
-         if (charge == 0.) {
-            return kFALSE; // no neutrals
-         } else {
+
+         if (charge != 0.) { //if ( pdgCode == 50000050)
             Int_t trackID = gMC->GetStack()->GetCurrentTrackNumber();
             Double_t time = gMC->TrackTime() * 1.0e09;
             Double_t length = gMC->TrackLength();
@@ -184,6 +183,8 @@ Bool_t CbmRich::ProcessHits(
             CbmStack* stack = (CbmStack*) gMC->GetStack();
             stack->AddPoint(kREF);
             return kTRUE;
+         } else {
+        	 return kFALSE;
          }
       }
    }

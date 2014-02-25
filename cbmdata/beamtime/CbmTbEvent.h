@@ -14,7 +14,7 @@
 
 #include "CbmDetectorList.h"
 
-#include "TObject.h"
+#include "FairEventHeader.h"
 
 #include <vector>
 
@@ -22,7 +22,7 @@
 class CbmDigi;
 
 
-class CbmTbEvent : public TObject
+class CbmTbEvent : public FairEventHeader
 {
 
  public:
@@ -36,7 +36,7 @@ class CbmTbEvent : public TObject
 
 
   /** Accessors **/
-  Double_t GetTime()         const { return fTime; }
+  Double_t GetTime()         const { return fEventTime; }
   Double_t GetTimeStart()    const { return fTimeStart; }
   Double_t GetTimeStop()     const { return fTimeStop; }
   Double_t GetDuration()     const { return fTimeStop - fTimeStart; }
@@ -78,7 +78,7 @@ class CbmTbEvent : public TObject
 
  private:
 
-  Double_t fTime;                 /** Absolute event time [ns] **/
+  //Double_t fTime;                 /** Absolute event time [ns] **/
   Double_t fTimeStart;            /** Time of first digi in event [ns] **/
   Double_t fTimeStop;             /** Time of last digi in event [ns] **/
   Double_t fEpochTime;            /** Time of epoch marker [ns] **/

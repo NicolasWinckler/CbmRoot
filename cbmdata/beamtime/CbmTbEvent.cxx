@@ -19,8 +19,7 @@ using namespace std;
 
 // -----   Constructor  ------------------------------------------------------ 
 CbmTbEvent::CbmTbEvent()
-  : TObject(),
-  fTime(0.),               
+  : FairEventHeader(),
   fTimeStart(0.),          
   fTimeStop(0.),           
   fEpochTime(0.),          
@@ -60,7 +59,7 @@ void CbmTbEvent::AddDigi(CbmDigi* digi) {
 	// --- Calculate average event time
 	fNofData++;
 	fTimeSum += digi->GetTime();
-	fTime = fTimeSum / Double_t(fNofData);
+	fEventTime = fTimeSum / Double_t(fNofData);
 
 	// --- Increase digi counter
 	if ( digi->GetSystemId() == 999 ) fNofAux++;
@@ -78,7 +77,7 @@ void CbmTbEvent::AddDigi(CbmDigi* digi) {
 
 // -----   Reset event   -----------------------------------------------------
 void CbmTbEvent::Clear() {
-  fTime          = 0.;
+  fEventTime          = 0.;
   fTimeStart     = 0.;
   fTimeStop      = 0.;
   fEpochTime     = 0.;
@@ -96,7 +95,7 @@ void CbmTbEvent::Clear() {
 void CbmTbEvent::Print(Option_t* opt) { 
   cout.setf(ios::fixed, ios::floatfield);
   cout << "-I- Cbm Testbeam Event: " << setprecision(9) << fixed << "Event time " 
-       << fTime << " s, duration " << setprecision(0) << GetDuration()
+       << fEventTime << " s, duration " << setprecision(0) << GetDuration()
        << " ns, Beam " << fTimeBc.size();
   for (Int_t iSys = 0; iSys < kNOFDETS; iSys++) {
   	if ( fNofDigis[iSys] ) {

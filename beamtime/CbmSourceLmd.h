@@ -84,13 +84,10 @@ class CbmSourceLmd : public FairSource
 
 
     // --- Output arrays
-    TClonesArray* fEvents;          ///< Output array of CbmTbEvent
     TClonesArray* fHodoDigis;       ///< Output array of CbmHodoDigi
     TClonesArray* fStsDigis;        ///< Output array of CbmStsDigiLight
     TClonesArray* fMuchDigis;       ///< Output array of CbmMuchDigi
     TClonesArray* fAuxDigis;        ///< Output array of CbmAuxDigi
-
-
 
 
 

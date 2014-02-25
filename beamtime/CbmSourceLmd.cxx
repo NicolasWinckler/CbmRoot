@@ -50,9 +50,9 @@ CbmSourceLmd::CbmSourceLmd()
     fCurrentEvent(NULL),
     fCurrentDigi(NULL),
     fNofEvents(0),
+    fNofAux(0),
     fNofMessages(0),
     fNofEpochs(0),
-    fEvents(new TClonesArray("CbmTbEvent", 1)),
     fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
@@ -88,9 +88,9 @@ CbmSourceLmd::CbmSourceLmd(const char * inFile)
     fCurrentEvent(NULL),
     fCurrentDigi(NULL),
     fNofEvents(0),
+    fNofAux(0),
     fNofMessages(0),
     fNofEpochs(0),
-    fEvents(new TClonesArray("CbmTbEvent", 1)),
     fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
@@ -270,11 +270,19 @@ Bool_t CbmSourceLmd::Init()
 
   // --- Register output branches
   FairRootManager* ioman = FairRootManager::Instance();
-  ioman->Register("TBEvent", "Testbeam event", fEvents, fPersistence);
   ioman->Register("StsDigi", "STS raw data", fStsDigis, fPersistence);
   ioman->Register("MuchDigi", "MUCH raw data", fMuchDigis, fPersistence);
   ioman->Register("HodoDigi", "HODO raw data", fHodoDigis, fPersistence);
   ioman->Register("AuxDigi", "AUX data", fAuxDigis, fPersistence);
+
+  // --- Get event header from Run
+  fCurrentEvent = dynamic_cast<CbmTbEvent*> (FairRunOnline::Instance()->GetEventHeader());
+  if ( ! fCurrentEvent ) {
+  	LOG(FATAL) << "No event header in run!" << FairLogger::endl;
+  	return kFALSE;
+  }
+  LOG(INFO) << "Init : event header at " << fCurrentEvent << FairLogger::endl;
+  ioman->Register("TbEvent.", "Event", fCurrentEvent, kTRUE);
 
   // --- Open input file and get first message
   LOG(INFO) << GetName() << ": Opening file " << fInputFileName
@@ -329,15 +337,18 @@ Bool_t CbmSourceLmd::Init()
 Int_t CbmSourceLmd::ReadEvent()
 {
 
+	if ( ! fCurrentEvent ) {
+		LOG(FATAL) << "No pointer to event header! " << fCurrentEvent << FairLogger::endl;
+	}
+
   // --- Clear output arrays
-  fEvents->Clear();
   fStsDigis->Clear();
   fHodoDigis->Clear();
   fMuchDigis->Clear();
   fAuxDigis->Clear();
 
-  // --- Create new, empty event
-  fCurrentEvent = new((*fEvents)[0]) CbmTbEvent();
+  // --- Clrear event header
+  fCurrentEvent->Clear();
 
   // Loop over digis
   while ( kTRUE ) {
@@ -387,12 +398,7 @@ Int_t CbmSourceLmd::ReadEvent()
     // --- If digi does not belong to current event: stop event loop.
     else {
       if ( FairLogger::GetLogger()->IsLogNeeded(DEBUG1) ) fCurrentEvent->Print();
-      // Get Event Header to set the time
-      FairRunOnline* ana = FairRunOnline::Instance();
-      FairEventHeader* evtHead = ana->GetEventHeader();
-      evtHead->SetEventTime(fCurrentEvent->GetTime());
       fNofEvents++;
-      if (FairLogger::GetLogger()->IsLogNeeded(DEBUG)) fCurrentEvent->Print();
       return 0;
     }
 

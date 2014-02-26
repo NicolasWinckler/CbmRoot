@@ -9,9 +9,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include "FairLogger.h"
 #include "CbmDigi.h"
-#include "much/CbmMuchDigi.h"
-#include "sts/CbmStsDigiLight.h"
 
 
 using namespace std;

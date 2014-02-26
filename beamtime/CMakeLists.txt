@@ -14,6 +14,7 @@ Set(INCLUDE_DIRECTORIES
   ${CBMROOT_BINARY_DIR}/roc/roc/roclib
   ${CBMROOT_SOURCE_DIR}/beamtime
   ${CBMROOT_SOURCE_DIR}/beamtime/fhodo
+  ${CBMROOT_SOURCE_DIR}/sts/setup
 )
 
 Include_Directories( 
@@ -31,8 +32,7 @@ Link_Directories(
 
 Set(SRCS
   CbmDaqMap.cxx
-  CbmRocSource.cxx
-  CbmStsDigiTb.cxx
+# CbmRocSource.cxx
   CbmMuchDigiTb.cxx
   CbmSourceLmd.cxx
   CbmTbDaqBuffer.cxx

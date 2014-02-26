@@ -4,8 +4,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class CbmRocSource;
-#pragma link C++ class CbmStsDigiTb;
+//#pragma link C++ class CbmRocSource;
 #pragma link C++ class CbmMuchDigiTb;
 #pragma link C++ class CbmDaqMap;
 #pragma link C++ class CbmSourceLmd;

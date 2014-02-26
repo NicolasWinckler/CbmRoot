@@ -104,7 +104,7 @@ void CbmTimeSlice::InsertData(CbmDigi* data) {
   switch ( iDet ) {
 
     case kSTS: {
-      CbmStsDigiLight* digi = static_cast<CbmStsDigiLight*>(data);
+      CbmStsDigi* digi = static_cast<CbmStsDigi*>(data);
       fStsData.push_back(*digi);
       break;
     }

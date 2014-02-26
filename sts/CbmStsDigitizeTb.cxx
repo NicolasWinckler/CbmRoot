@@ -24,8 +24,9 @@
 #include "CbmDaqBuffer.h"
 
 // Includes from STS
+#include "CbmStsAddress.h"
 #include "CbmGeoStsPar.h"
-#include "CbmStsDigiLight.h"
+#include "CbmStsDigi.h"
 #include "CbmStsDigiMatch.h"
 #include "CbmStsDigiPar.h"
 #include "CbmStsDigiScheme.h"
@@ -188,13 +189,16 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     Int_t iAdc = -1;
     if ( (*it).second >= fQMax ) iAdc = fNAdcChannels - 1;
     else iAdc = Int_t( (*it).second / fQMax ) * fNAdcChannels;
-    CbmStsDigiLight* digi =
-        new CbmStsDigiLight(sensor->GetStationNr(),  // station number
-                            sensor->GetSectorNr(),   // sector number
-                            0,                       // front side
-                            (*it).first,             // channel number
-                            iAdc,                    // ADC channel
-                            point->GetTime());                      // time
+    UInt_t address = CbmStsAddress::GetAddress(sensor->GetStationNr(),
+    		                           0,               // ladder
+    		                           0,               // halfladder
+    		                           0,               // module
+    		                           0,               // front side
+    		                           (*it).first);    // channel
+    CbmStsDigi* digi =  new CbmStsDigi(address,
+    		                              ULong64_t(point->GetTime()),
+    		                              iAdc,
+    		                              sensor->GetSectorNr() );
     CbmDaqBuffer::Instance()->InsertData(digi);
     nFront++;
   }
@@ -206,13 +210,16 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     Int_t iAdc = -1;
     if ( (*it).second >= fQMax ) iAdc = fNAdcChannels - 1;
     else iAdc = Int_t( (*it).second / fQMax ) * fNAdcChannels;
-    CbmStsDigiLight* digi =
-        new CbmStsDigiLight(sensor->GetStationNr(),  // station number
-                            sensor->GetSectorNr(),   // sector number
-                            1,                       // back side
-                            (*it).first,             // channel number
-                            iAdc,                    // ADC channel
-                            point->GetTime());                      // time
+    UInt_t address = CbmStsAddress::GetAddress(sensor->GetStationNr(),
+    		                           0,               // ladder
+    		                           0,               // halfladder
+    		                           0,               // module
+    		                           1,               // back side
+    		                           (*it).first);    // channel
+    CbmStsDigi* digi =  new CbmStsDigi(address,
+    		                              ULong64_t(point->GetTime()),
+    		                              iAdc,
+    		                              sensor->GetSectorNr() );
     CbmDaqBuffer::Instance()->InsertData(digi);
     nBack++;
   }

@@ -7,7 +7,8 @@
 
 #include "CbmSourceLmd.h"
 #include "CbmAuxDigi.h"
-#include "CbmStsDigiLight.h"
+#include "CbmStsDigi.h"
+#include "CbmStsAddress.h"
 #include "CbmMuchBeamTimeDigi.h"
 #include "CbmDaqMap.h"
 #include "CbmTbDaqBuffer.h"
@@ -53,7 +54,7 @@ CbmSourceLmd::CbmSourceLmd()
     fNofAux(0),
     fNofMessages(0),
     fNofEpochs(0),
-    fStsDigis(new TClonesArray("CbmStsDigiLight", 10)),
+    fStsDigis(new TClonesArray("CbmStsDigi", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
     fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
@@ -364,7 +365,7 @@ Int_t CbmSourceLmd::ReadEvent()
       Int_t systemId = fCurrentDigi->GetSystemId();
       if ( systemId == kSTS ) {
         new( (*fStsDigis)[fStsDigis->GetEntriesFast()])
-          CbmStsDigiLight(*(dynamic_cast<CbmStsDigiLight*>(fCurrentDigi)));
+          CbmStsDigi(*(dynamic_cast<CbmStsDigi*>(fCurrentDigi)));
         fNofDigis[kSTS]++;
         LOG(DEBUG) << "STS digis " << fNofDigis[kMUCH] << FairLogger::endl;
       } //? STS digi
@@ -513,11 +514,11 @@ void CbmSourceLmd::ProcessStsMessage() {
 	fNofHitMsg[kSTS]++;
 
 	// --- Get absolute time, NXYTER and channel number
-	Int_t rocId      = fCurrentMessage->getRocNumber();
-	ULong_t hitTime  = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
-	Int_t nxyterId   = fCurrentMessage->getNxNumber();
-	Int_t nxChannel  = fCurrentMessage->getNxChNum();
-	Int_t charge     = fCurrentMessage->getNxAdcValue();
+	Int_t rocId        = fCurrentMessage->getRocNumber();
+	ULong64_t hitTime  = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
+	Int_t nxyterId     = fCurrentMessage->getNxNumber();
+	Int_t nxChannel    = fCurrentMessage->getNxChNum();
+	Int_t charge       = fCurrentMessage->getNxAdcValue();
 
 	// --- Get detector element from DaqMap
 	Int_t station = fDaqMap->GetStsStation(rocId);
@@ -526,8 +527,14 @@ void CbmSourceLmd::ProcessStsMessage() {
 	Int_t channel = fDaqMap->GetStsChannel(rocId, nxyterId, nxChannel);
 
 	// --- Create a STS digi and send it to the buffer
-	CbmStsDigiLight* digi = new CbmStsDigiLight(station, sector, side, channel,
-			                                  charge, hitTime);
+	UInt_t address = CbmStsAddress::GetAddress(station,
+			                                       0,   // ladder
+			                                       0,   // halfladder
+			                                       0,   // module
+			                                       0,   // sensor
+			                                       side,
+			                                       channel);
+	CbmStsDigi* digi = new CbmStsDigi(address, hitTime, charge);
 	fBuffer->InsertData(digi);
 
 }

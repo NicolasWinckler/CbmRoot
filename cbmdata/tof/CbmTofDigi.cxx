@@ -11,6 +11,10 @@
 
 // It seems C++ standard force the initialization to be in cxx/cpp file (outside of class definition)
 // When not trivial constant values => To check if it should apply also to simple values maybe?     
+
+const Double_t CbmTofDigi::fgkdTimeBinSize =  10.0; // [ps] => 41 943.40 ns ( > GET4 e
+const Double_t CbmTofDigi::fgkdTotBinSize  =  50.0; // [ps] => 0-51.200 range
+
 // -----   Bit masks -----------------------------------------------------------
 const Long64_t CbmTofDigi::fgklAddrMask = ((Long64_t)1 << CbmTofDigi::fgkiAddressSize) - 1;
 const Long64_t CbmTofDigi::fgklTimeMask = ((Long64_t)1 << CbmTofDigi::fgkiTimeSize)    - 1;

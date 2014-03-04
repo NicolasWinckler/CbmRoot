@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <utility>
+#include <functional>
 
 class TFile;
 class TNamed;
@@ -57,7 +59,8 @@ public:
    void Add(
          const string& name,
          TNamed* object) {
-      fMap.insert(make_pair<string, TNamed*>(name, object));
+         std::pair<string, TNamed*> newpair = std::make_pair(name, object);
+      fMap.insert(newpair);
    }
 
    /**

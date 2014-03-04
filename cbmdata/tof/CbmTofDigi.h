@@ -154,8 +154,8 @@ class CbmTofDigi : public CbmDigi
       static const Int_t    fgkiTotOffs;
 // -----------------------------------------------------------------------------
       
-      static const Double_t fgkdTimeBinSize =  10.0; // [ps] => 41 943.40 ns ( > GET4 epoch, > trigger window)
-      static const Double_t fgkdTotBinSize  =  50.0; // [ps] => 0-51.200 range
+      static const Double_t fgkdTimeBinSize; // [ps] => 41 943.40 ns ( > GET4 epoch, > trigger window)
+      static const Double_t fgkdTotBinSize; // [ps] => 0-51.200 range
       
    ClassDef(CbmTofDigi, 1);
 };

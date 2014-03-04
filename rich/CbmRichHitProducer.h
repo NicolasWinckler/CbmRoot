@@ -234,9 +234,9 @@ private:
    Int_t fNHits; // Number of hits
    Int_t fNDoubleHits; // Number of double hits
 
-   static const Double_t c = 2.998E8; // speed of light
-   static const Double_t h = 6.626E-34; // Planck constant
-   static const Double_t e = 1.6022E-19; // elementary charge
+   static const Double_t c; // speed of light
+   static const Double_t h; // Planck constant
+   static const Double_t e; // elementary charge
 
    CbmRichRecGeoPar fGP; // RICH geometry parameters
 

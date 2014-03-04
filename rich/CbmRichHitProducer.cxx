@@ -75,6 +75,10 @@
 using std::cout;
 using std::endl;
 
+const Double_t CbmRichHitProducer::c = 2.998E8; // speed of light
+const Double_t CbmRichHitProducer::h = 6.626E-34; // Planck constant
+const Double_t CbmRichHitProducer::e = 1.6022E-19; // elementary charge
+
 CbmRichHitProducer::CbmRichHitProducer():
    FairTask("CbmRichHitProducer"),
    fRichPoints(NULL),

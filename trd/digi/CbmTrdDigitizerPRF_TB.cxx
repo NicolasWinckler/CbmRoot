@@ -31,6 +31,9 @@ using std::make_pair;
 using std::max;
 using std::fabs;
 
+const Double_t CbmTrdDigitizerPRF_TB::fDetectorDeadTime = 230.;
+
+
 CbmTrdDigitizerPRF_TB::CbmTrdDigitizerPRF_TB(CbmTrdRadiator *radiator)
   :FairTask("CbmTrdDigitizerPRF_TB"),
    fTime(-1.),

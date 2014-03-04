@@ -67,7 +67,7 @@ private:
 	Bool_t fDebug;
 	Bool_t fTrianglePads;
 
-	static const Double_t fDetectorDeadTime = 230; //[ns] taken from GARFIELD for 3.5 x 3.5 x 5 mm at 100V/mm drift voltage
+ 	static const Double_t fDetectorDeadTime; //[ns] taken from GARFIELD for 3.5 x 3.5 x 5 mm at 100V/mm drift voltage
 	Double_t fTime;
 	Int_t fnRow;
 	Int_t fnCol;
@@ -92,4 +92,5 @@ private:
 
 	ClassDef(CbmTrdDigitizerPRF_TB, 2);
 };
+
 #endif // CBMTRDDIGITIZER_PRF_H

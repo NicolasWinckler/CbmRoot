@@ -52,7 +52,9 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(
       fUseDigiPar(true)
 {
    // Default resolution for each TRD layer
-   fSigmaX = list_of(0.03)(0.03)(0.03)(0.03)(0.04)(0.04)(0.04)(0.04)(0.05)(0.05)(0.05)(0.05); // Resolution in x [cm]
+   // the following construct is needed with c++11
+   vector<Double_t> tmp = list_of(0.03)(0.03)(0.03)(0.03)(0.04)(0.04)(0.04)(0.04)(0.05)(0.05)(0.05)(0.05); // Resolution in x [cm]
+   fSigmaX = tmp;
    // Hit resolution in y - layer and angle dependent [cm]
    fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3)); // 1
    fSigmaY.push_back(list_of(0.27)(0.37)(1.5)(2.76)(3.3)(3.3)(3.3)); // 2

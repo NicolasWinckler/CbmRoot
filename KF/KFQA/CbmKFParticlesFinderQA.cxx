@@ -1153,12 +1153,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     }
   }
 
-  float dRPVr[3] = {vtx.GetRefX()-mcPVx[0],
-                    vtx.GetRefY()-mcPVx[1],
-                    vtx.GetRefZ()-mcPVx[2]};
-  float dRPVp[3] = {dRPVr[0]/sqrt(vtx.GetCovMatrix()[0]),
-                    dRPVr[1]/sqrt(vtx.GetCovMatrix()[2]),
-                    dRPVr[2]/sqrt(vtx.GetCovMatrix()[5])};
+  float dRPVr[3] = {static_cast<float>(vtx.GetRefX()-mcPVx[0]),
+                    static_cast<float>(vtx.GetRefY()-mcPVx[1]),
+                    static_cast<float>(vtx.GetRefZ()-mcPVx[2])};
+  float dRPVp[3] = {static_cast<float>(dRPVr[0]/sqrt(vtx.GetCovMatrix()[0])),
+                    static_cast<float>(dRPVr[1]/sqrt(vtx.GetCovMatrix()[2])),
+                    static_cast<float>(dRPVr[2]/sqrt(vtx.GetCovMatrix()[5]))};
   for(unsigned int iHPV=0; iHPV<3; ++iHPV)
     hPVFitQa[iHPV]->Fill(dRPVr[iHPV]);
   for(unsigned int iHPV=3; iHPV<6; ++iHPV)

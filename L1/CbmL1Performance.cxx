@@ -1043,12 +1043,12 @@ void CbmL1::PartHistoPerformance()
       break;
     }
   }
-  float dRPVr[3] = {PF->GetPV()->GetRefX()-mcPVx[0],
-                    PF->GetPV()->GetRefY()-mcPVx[1],
-                    PF->GetPV()->GetRefZ()-mcPVx[2]};
-  float dRPVp[3] = {dRPVr[0]/sqrt(PF->GetPV()->GetCovMatrix()[0]),
-                    dRPVr[1]/sqrt(PF->GetPV()->GetCovMatrix()[2]),
-                    dRPVr[2]/sqrt(PF->GetPV()->GetCovMatrix()[5])};
+  float dRPVr[3] = {static_cast<float>(PF->GetPV()->GetRefX()-mcPVx[0]),
+                    static_cast<float>(PF->GetPV()->GetRefY()-mcPVx[1]),
+		    static_cast<float>(PF->GetPV()->GetRefZ()-mcPVx[2])};
+  float dRPVp[3] = {static_cast<float>(dRPVr[0]/sqrt(PF->GetPV()->GetCovMatrix()[0])),
+                    static_cast<float>(dRPVr[1]/sqrt(PF->GetPV()->GetCovMatrix()[2])),
+                    static_cast<float>(dRPVr[2]/sqrt(PF->GetPV()->GetCovMatrix()[5]))};
   for(unsigned int iHPV=0; iHPV<3; ++iHPV)
     hPVFitQa[iHPV]->Fill(dRPVr[iHPV]);
   for(unsigned int iHPV=3; iHPV<6; ++iHPV)

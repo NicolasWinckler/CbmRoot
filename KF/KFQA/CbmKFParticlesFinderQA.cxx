@@ -607,9 +607,9 @@ void CbmKFParticlesFinderQA::StsHitMatch()
         int iL = 0;
         FairLink link = stsHit->GetLink(iL);
         CbmStsCluster *stsCluster = dynamic_cast<CbmStsCluster*>( flistStsClusters->At( link.GetIndex() ) );
-        int NLinks2 = stsCluster->GetNLinks();
+        int NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
-          FairLink link2 = stsCluster->GetLink(iL2);
+          const CbmLink& link2 = stsCluster->GetMatch()->GetLink(iL2);
           CbmStsDigi *stsDigi = dynamic_cast<CbmStsDigi*>( flistStsDigi->At( link2.GetIndex() ) );
 //          const int NLinks3 = stsDigi->GetNLinks();
           const int NLinks3 = stsDigi->GetMatch()->GetNofLinks();
@@ -624,9 +624,9 @@ void CbmKFParticlesFinderQA::StsHitMatch()
         iL = 1;
         link = stsHit->GetLink(iL);
         stsCluster = dynamic_cast<CbmStsCluster*>( flistStsClusters->At( link.GetIndex() ) );
-        NLinks2 = stsCluster->GetNLinks();
+        NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
-          FairLink link2 = stsCluster->GetLink(iL2);
+          const CbmLink& link2 = stsCluster->GetMatch()->GetLink(iL2);
           CbmStsDigi *stsDigi = dynamic_cast<CbmStsDigi*>( flistStsDigi->At( link2.GetIndex() ) );
 //          const int NLinks3 = stsDigi->GetNLinks();
           const int NLinks3 = stsDigi->GetMatch()->GetNofLinks();
@@ -634,7 +634,7 @@ void CbmKFParticlesFinderQA::StsHitMatch()
 //            FairLink link3 = stsDigi->GetLink(iL3);
             CbmLink link3 = stsDigi->GetMatch()->GetLink(iL3);
             int stsPointId = link3.GetIndex();
-            
+
             if ( !find(&(stsPointIds[0]), &(stsPointIds[stsPointIds.size()]), stsPointId) ) continue; // check if first cluster matched with same mc-point
 //            CbmStsPoint *pt = dynamic_cast<CbmStsPoint*>( listStsPts->At(stsPointId) );
 //            if(!pt) continue;

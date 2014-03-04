@@ -1,33 +1,21 @@
-//* $Id: */
-
-// -------------------------------------------------------------------------
-// -----                     CbmStsFindHits header file            -----
-// -----                  Created 26/06/2008  by R. Karabowicz         -----
-// -------------------------------------------------------------------------
-
-
-/** CbmStsFindHits
- *@author Volker Friese <v.friese@gsi.de>
- *@since 11.09.06
- *@version 1.0
- **
- ** CBM task class for finding hits in the STS
- ** Task level RECO
- ** Produces objects of type CbmStsHits out of CbmStsDigi.
+/**
+ * \file CbmStsFindHits.h
+ * \author Volker Friese <v.friese@gsi.de>
+ * \since 11.09.06
+ * \brief CBM task class for finding clusters in the STS
+ *
+ * Updated 26/06/2008 by R. Karabowicz.
+ * Updated 03/03.2014 by A. Lebedev <andrey.lebedev@gsi.de>
+ *
  **/
-
 
 #ifndef CBMSTSFINDHITS_H
 #define CBMSTSFINDHITS_H 1
 
-
 #include "FairTask.h"
-
-#include "TStopwatch.h"
 
 #include <map>
 #include <set>
-
 
 class TClonesArray;
 class CbmGeoStsPar;
@@ -36,80 +24,68 @@ class CbmStsDigiScheme;
 class CbmStsSector;
 class CbmStsStation;
 
-
-
+/**
+ * \class CbmStsFindHits
+ * \brief CBM task class for finding hits in the STS
+ **/
 class CbmStsFindHits : public FairTask
 {
 
+public:
+    /**
+     * \brief Default constructor
+     **/
+    CbmStsFindHits();
 
- public :
+    /**
+     * \brief Destructor
+     **/
+    virtual ~CbmStsFindHits();
 
-  /** Default constructor **/
-  CbmStsFindHits();
+    /**
+     * \brief Execution
+     **/
+    virtual void Exec(Option_t* opt);
 
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual void Finish();
 
-  /** Standard constructor **/
-  CbmStsFindHits(Int_t iVerbose);
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual void SetParContainers();
 
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual InitStatus Init();
 
-  /** Constructor with task name **/
-  CbmStsFindHits(const char* name, Int_t iVerbose);
+private:
 
+    void MakeSets();
 
-  /** Destructor **/
-  virtual ~CbmStsFindHits();
+    void SortClusters();
 
+    void FindHits(CbmStsStation* station, CbmStsSector* sector, const std::set<Int_t>& fSet, const std::set<Int_t>& bSet);
 
-  /** Execution **/
-  virtual void Exec(Option_t* opt);
+    CbmStsFindHits(const CbmStsFindHits&);
+    CbmStsFindHits operator=(const CbmStsFindHits&);
 
-  /** Virtual method Finish **/
-  virtual void Finish();
+    CbmGeoStsPar* fGeoPar;         ///> Geometry parameters
+    CbmStsDigiPar* fDigiPar;       ///> Digitisation parameters
+    CbmStsDigiScheme* fDigiScheme; ///> Digitisation scheme
 
+    TClonesArray* fClusters; ///< Input array of CbmStsCluster
+    TClonesArray* fHits;     ///< Output array of CbmStsHit
 
- private:
+    /// FIXME: Same problem as in CbmStsClusterFinder.
+    /// FIXME: Pointer maps to set.
+    std::map<const CbmStsSector*, std::set<Int_t> > fClusterMapF; ///> sector clusters (front)
+    std::map<const CbmStsSector*, std::set<Int_t> > fClusterMapB; ///> sector clusters (back)
 
-  CbmGeoStsPar*     fGeoPar;      /** Geometry parameters **/
-  CbmStsDigiPar*    fDigiPar;     /** Digitisation parameters **/
-  CbmStsDigiScheme* fDigiScheme;  /** Digitisation scheme **/
-  TClonesArray*     fClusters;    /** Input array of CbmStsCluster **/
-  TClonesArray*     fHits;        /** Output array of CbmStsHit **/
-  std::map<CbmStsSector*, std::set<Int_t> > fClusterMapF;  /** sector clusters (front) **/
-  std::map<CbmStsSector*, std::set<Int_t> > fClusterMapB;  /** sector clusters (back)  **/
-  TStopwatch fTimer;
-
-  Int_t fNHits;
-
-  /** Get parameter containers **/
-  virtual void SetParContainers();
-
-
-  /** Intialisation **/
-  virtual InitStatus Init();
-
-
-  /** Reinitialisation **/
-  virtual InitStatus ReInit();
-
-
-  /** Make sectorwise sets for sigis  **/
-  void MakeSets();
-
-
-  /** Sort digis sectorwise  **/
-  void SortClusters();
-
-
-  /** Find hits in one sector **/
-  Int_t FindHits(CbmStsStation* station, CbmStsSector* sector,
-		 std::set<Int_t>& fSet, std::set<Int_t>& bSet);
-
-  CbmStsFindHits(const CbmStsFindHits&);
-  CbmStsFindHits operator=(const CbmStsFindHits&);
-
-
-  ClassDef(CbmStsFindHits,1);
-
+    ClassDef(CbmStsFindHits, 1);
 };
 
 #endif

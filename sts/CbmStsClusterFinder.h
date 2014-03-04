@@ -1,126 +1,94 @@
-//* $Id: */
-
-// -------------------------------------------------------------------------
-// -----                     CbmStsClusterFinder header file       -----
-// -----                  Created 26/06/2008  by R. Karabowicz         -----
-// -------------------------------------------------------------------------
-
-
-/** CbmStsClusterFinder
- *@author Volker Friese <v.friese@gsi.de>
- *@since 11.09.06
- *@version 1.0
- **
- ** CBM task class for finding hits in the STS
- ** Task level RECO
- ** Produces objects of type CbmStsHits out of CbmStsDigi.
+/**
+ * \file CbmStsClusterFinder.h
+ * \author Volker Friese <v.friese@gsi.de>
+ * \since 11.09.06
+ * \brief CBM task class for finding clusters in the STS
+ *
+ * Updated 26/06/2008 by R. Karabowicz.
+ * Updated 03/03.2014 by A. Lebedev <andrey.lebedev@gsi.de>
+ *
  **/
-
 
 #ifndef CBMSTSCLUSTERFINDER_H
 #define CBMSTSCLUSTERFINDER_H 1
 
+#include "FairTask.h"
 
 #include <map>
 #include <set>
-#include "TStopwatch.h"
-#include "FairTask.h"
-
-using std::set;
-using std::map;
-using std::pair;
 
 class TClonesArray;
 class CbmGeoStsPar;
 class CbmStsDigiPar;
 class CbmStsDigiScheme;
-class CbmStsSector;
-class CbmStsStation;
 
-
-
+/**
+ * \class CbmStsClusterFinder
+ * \brief CBM task class for finding clusters in the STS
+ **/
 class CbmStsClusterFinder : public FairTask
 {
+public:
+    /**
+     * \brief Default constructor.
+     **/
+    CbmStsClusterFinder();
 
+    /**
+     * \brief Destructor.
+     **/
+    virtual ~CbmStsClusterFinder();
 
- public :
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual InitStatus Init();
 
-  /** Default constructor **/
-  CbmStsClusterFinder();
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual void Exec(Option_t* opt);
 
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual void Finish();
 
-  /** Standard constructor **/
-  CbmStsClusterFinder(Int_t iVerbose);
+    /**
+     * \brief Inherited from FairTask.
+     **/
+    virtual void SetParContainers();
 
+private:
+    void MakeSets();
 
-  /** Constructor with task name **/
-  CbmStsClusterFinder(const char* name, Int_t iVerbose);
+    void AnalyzeClusters();
 
+    void AnalyzeCluster(Int_t clusterId);
 
-  /** Destructor **/
-  virtual ~CbmStsClusterFinder();
+    void SortDigis();
 
+    void FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, const set<Int_t>& digiSet);
 
-  /** Execution **/
-  virtual void Exec(Option_t* opt);
+    CbmStsClusterFinder(const CbmStsClusterFinder&);
+    CbmStsClusterFinder operator=(const CbmStsClusterFinder&);
 
-  /** Virtual method Finish **/
-  virtual void Finish();
+    TClonesArray* fDigis;             ///> Input array of CbmStsDigi
+    /// FIXME: Why do we need a second array with cluster candidates which is written to file?
+    /// FIXME: This array is not used anywhere outside this class.
+    TClonesArray* fClusterCandidates; ///> Input array of CbmStsCluster
+    TClonesArray* fClusters;          ///> Input array of CbmStsCluster
 
- private:
+    CbmGeoStsPar* fGeoPar;         ///> Geometry parameters
+    CbmStsDigiPar* fDigiPar;       ///> Digitisation parameters
+    CbmStsDigiScheme* fDigiScheme; ///> Digitisation scheme
 
-  CbmGeoStsPar*     fGeoPar;      /** Geometry parameters **/
-  CbmStsDigiPar*    fDigiPar;     /** Digitisation parameters **/
-  CbmStsDigiScheme* fDigiScheme;  /** Digitisation scheme **/
-  TClonesArray*     fDigis;       /** Input array of CbmStsDigi **/
-  TClonesArray*     fClustersCand;    /** Input array of CbmStsCluster **/
-  TClonesArray*     fClusters;    /** Input array of CbmStsCluster **/
-  Int_t fNofDigis;
-  map<CbmStsSector*, set<Int_t> > fDigiMapF;  /** sector digis (front) **/
-  map<CbmStsSector*, set<Int_t> > fDigiMapB;  /** sector digis (back)  **/
-  TStopwatch fTimer;
+    /// FIXME: I was not able to understand why the pointer address maps to set?
+    /// FIXME: Much better to use ID of the sector or something similar.
+    std::map<const CbmStsSector*, std::set<Int_t> > fDigiMapF; ///> sector digis (front)
+    std::map<const CbmStsSector*, std::set<Int_t> > fDigiMapB; ///> sector digis (back)
 
-  Int_t fNofClustersCand;
-  Int_t fNofClusters;
-  Int_t fNofClustersGood;
-  Int_t fNofClustersWP;
-  Int_t fNofClustersWM;
-  Int_t fLongestCluster;
-  Int_t fLongestGoodCluster;
-
-  /** Get parameter containers **/
-  virtual void SetParContainers();
-
-
-  /** Intialisation **/
-  virtual InitStatus Init();
-
-
-  /** Reinitialisation **/
-  virtual InitStatus ReInit();
-
-
-  /** Make sectorwise sets for sigis  **/
-  void MakeSets();
-
-  void AnalyzeClusters();
-  void AnalyzeCluster(Int_t iclus);
-
-  /** Sort digis sectorwise  **/
-  void SortDigis();
-
-  /** Find hits in one sector **/
-/*   Int_t FindClusters(CbmStsStation* station, CbmStsSector* sector, */
-/* 		     set<Int_t>& fSet, set<Int_t>& bSet); */
-
-//  void FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, set<Int_t>& digiSet);
-  Int_t FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, set<Int_t>& digiSet);
-
-  CbmStsClusterFinder(const CbmStsClusterFinder&);
-  CbmStsClusterFinder operator=(const CbmStsClusterFinder&);
-
-  ClassDef(CbmStsClusterFinder,1);
-
+    ClassDef(CbmStsClusterFinder, 1);
 };
 
 #endif

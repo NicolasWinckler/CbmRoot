@@ -1,10 +1,6 @@
-//* $Id: */
-
-// -------------------------------------------------------------------------
-// -----                    CbmStsClusterFinder source fil         -----
-// -----                  Created 26/06/2008  by R. Karabowicz         -----
-// -------------------------------------------------------------------------
-// -------------------------------------------------------------------------
+/**
+ * \file CbmStsClusterFinder.cxx
+ **/
 #include "TClonesArray.h"
 #include "TH1S.h"
 
@@ -24,733 +20,301 @@
 #include "CbmStsStation.h"
 #include "TMath.h"
 
-#include <iomanip>
+using namespace std;
 
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::flush;
-using std::fixed;
-using std::right;
-using std::left;
-using std::setw;
-using std::setprecision;
-using std::set;
-using std::map;
+CbmStsClusterFinder::CbmStsClusterFinder()
+    : FairTask("CbmStsClusterFinder", 1)
+    , fGeoPar(NULL)
+    , fDigiPar(NULL)
+    , fDigis(NULL)
+    , fClusterCandidates(NULL)
+    , fClusters(NULL)
+    , fDigiScheme(NULL)
+    , fDigiMapF()
+    , fDigiMapB()
+{
+}
 
+CbmStsClusterFinder::~CbmStsClusterFinder()
+{
+    if (fClusterCandidates)
+    {
+        fClusterCandidates->Delete();
+        delete fClusterCandidates;
+    }
+    if (fClusters)
+    {
+        fClusters->Delete();
+        delete fClusters;
+    }
+}
 
-
-// -----   Default constructor   ------------------------------------------
-CbmStsClusterFinder::CbmStsClusterFinder() 
-  : FairTask("STS Cluster Finder", 1), 
-  fGeoPar(NULL),
-  fDigiPar(NULL),
-  fDigis(NULL),
-  fClustersCand(NULL),
-  fClusters(NULL),
-  fDigiScheme(new CbmStsDigiScheme()),
-  fNofDigis(0),
-  fNofClustersCand(0),
-  fNofClusters(0),
-  fNofClustersGood(0),
-  fNofClustersWP(0),
-  fNofClustersWM(0),
-  fLongestCluster(0),
-  fLongestGoodCluster(0),
-  fDigiMapF(),
-  fDigiMapB(),
-  fTimer()
-{}
-// -------------------------------------------------------------------------
-
-
-
-// -----   Standard constructor   ------------------------------------------
-CbmStsClusterFinder::CbmStsClusterFinder(Int_t iVerbose) 
-  : FairTask("STSClusterFinder", iVerbose), 
-  fGeoPar(NULL),
-  fDigiPar(NULL),
-  fDigis(NULL),
-  fClustersCand(NULL),
-  fClusters(NULL),
-  fDigiScheme(new CbmStsDigiScheme()),
-  fNofDigis(0),
-  fNofClustersCand(0),
-  fNofClusters(0),
-  fNofClustersGood(0),
-  fNofClustersWP(0),
-  fNofClustersWM(0),
-  fLongestCluster(0),
-  fLongestGoodCluster(0),
-  fDigiMapF(),
-  fDigiMapB(),
-  fTimer()
-{}
-// -------------------------------------------------------------------------
-
-
-
-// -----   Constructor with name   -----------------------------------------
-CbmStsClusterFinder::CbmStsClusterFinder(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose), 
-  fGeoPar(NULL),
-  fDigiPar(NULL),
-  fDigis(NULL),
-  fClustersCand(NULL),
-  fClusters(NULL),
-  fDigiScheme(new CbmStsDigiScheme()),
-  fNofDigis(0),
-  fNofClustersCand(0),
-  fNofClusters(0),
-  fNofClustersGood(0),
-  fNofClustersWP(0),
-  fNofClustersWM(0),
-  fLongestCluster(0),
-  fLongestGoodCluster(0),
-  fDigiMapF(),
-  fDigiMapB(),
-  fTimer()
-{}
-// -------------------------------------------------------------------------
-
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmStsClusterFinder::~CbmStsClusterFinder() {
-  if ( fClustersCand ) { 
-    fClustersCand->Delete();
-    delete fClustersCand;
-  }
-  if ( fClusters ) { 
+void CbmStsClusterFinder::Exec(Option_t* opt)
+{
+    // Clear output arrays
     fClusters->Delete();
-    delete fClusters;
-  }
+    fClusterCandidates->Delete();
+
+    SortDigis();
+
+    // Find hits in sectors
+    Int_t nofStations = fDigiScheme->GetNStations();
+    for (Int_t iStation = 0; iStation < nofStations; iStation++)
+    {
+        CbmStsStation* station = fDigiScheme->GetStation(iStation);
+        Int_t nofSectors = station->GetNSectors();
+        for (Int_t iSector = 0; iSector < nofSectors; iSector++)
+        {
+            CbmStsSector* sector = station->GetSector(iSector);
+            if (fDigiMapF.find(sector) == fDigiMapF.end())
+            {
+                continue;
+            }
+            const set<Int_t>& frontSet = fDigiMapF[sector];
+            FindClusters(iStation + 1, iSector + 1, 0, frontSet);
+            if (sector->GetType() == 2 || sector->GetType() == 3)
+            {
+                if (fDigiMapB.find(sector) == fDigiMapB.end())
+                {
+                    continue;
+                }
+            }
+            const set<Int_t>& backSet = fDigiMapB[sector];
+            FindClusters(iStation + 1, iSector + 1, 1, backSet);
+        } // Sector loop
+    } // Station loop
+
+    AnalyzeClusters();
 }
-// -------------------------------------------------------------------------
 
-
-
-// -----   Public method Exec   --------------------------------------------
-void CbmStsClusterFinder::Exec(Option_t* opt) {
-
-  fTimer.Start();
-  Bool_t warn = kFALSE;
-
-  if ( fVerbose ) {
-    cout << endl << "-I- " << fName << ": executing event with " << fDigis->GetEntriesFast() << " digis." << endl;
-    cout << "----------------------------------------------" << endl;
-  }
-
-  // Check for digi scheme
-  if ( ! fDigiScheme ) {
-    cerr << "-E- " << fName << "::Exec: No digi scheme!" << endl;
-    return;
-  }
-
-  // Clear output array
-  //  cout << "before clear: " << fClusters->GetEntriesFast() << endl;
-  fNofClustersCand = 0;
-  fNofClusters = 0;
-//   fClustersCand->Clear();
-//  fClusters->Clear();
-  fClusters->Delete();
-  fClustersCand->Delete();
-  //  cout << " after clear: " << fClusters->GetEntriesFast() << endl;
-
-  // Sort STS digis with respect to sectors
-  SortDigis();
-
-  // Find hits in sectors
-  Int_t nDigisF = 0;
-  Int_t nDigisB = 0;
-  Int_t nStations = fDigiScheme->GetNStations();
-  CbmStsStation* station = NULL;
-  for (Int_t iStation=0; iStation<nStations; iStation++) {
-    station = fDigiScheme->GetStation(iStation);
-    Int_t nDigisFInStation = 0;
-    Int_t nDigisBInStation = 0;
-    Int_t nSectors = station->GetNSectors();
-
-    for (Int_t iSector=0; iSector<nSectors; iSector++) {
-      CbmStsSector* sector = station->GetSector(iSector);
-      //      cout << "=============================================================================" << endl;
-      //      cout << "station " << iStation+1 << " sector " << iSector+1 << "  " << endl;
-      set <Int_t> fSet, bSet;
-      if ( fDigiMapF.find(sector) == fDigiMapF.end() ) {
-	cout << "-E- " << fName << "::Exec: sector " 
-	     << sector->GetSectorNr() << " of station " 
-	     << station->GetStationNr() << "not found in front map!" 
-	     << endl;
-	warn = kTRUE;
-	continue;
-      }
-      fSet = fDigiMapF[sector];
-      FindClusters(iStation+1,iSector+1,0, fSet);
-      if ( sector->GetType() == 2 || sector->GetType() == 3 ) {
-	if ( fDigiMapB.find(sector) == fDigiMapB.end() ) {
-	  cout << "-E- " << fName << "::Exec: sector " 
-	       << sector->GetSectorNr() << " of station " 
-	       << station->GetStationNr() << "not found in back map!" 
-	       << endl;
-	  warn = kTRUE;
-	  continue;
-	}
-      }
-      bSet = fDigiMapB[sector];
-      FindClusters(iStation+1,iSector+1,1, bSet);
-      Int_t nDigisFInSector = fSet.size();
-      Int_t nDigisBInSector = bSet.size();
-      nDigisFInStation += nDigisFInSector;
-      nDigisBInStation += nDigisBInSector;      
-    }      // Sector loop
-    
-    nDigisF += nDigisFInStation;
-    nDigisB += nDigisBInStation;
-    
-  }       // Station loop
-
-  // analyze clusters...
-  AnalyzeClusters();
-
-  fTimer.Stop();  
-  if ( fVerbose ) {
-    cout << endl;
-    cout << "-I- " << fName << ":Event summary" << endl;
-    cout << "    Active channels front side: " << nDigisF << endl;
-    cout << "    Active channels back side : " << nDigisB << endl;
-    cout << "    Real time                 : " << fTimer.RealTime() 
-	 << endl;
-  }
-  else {
-    if ( warn ) cout << "- ";
-    else        cout << "+ ";
-    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
-	 << fixed << right << fTimer.RealTime() 
-	 << " s, " << fNofClustersCand 
-	 << "("    << fNofClustersGood
-	 << "+"    << fNofClustersWP 
-	 << ") clusters, longest till now " << fLongestCluster << endl;
-    //    cout << fDigis->GetEntriesFast() << " vs " << fClusters->GetEntriesFast() << endl;
-  }
-  
-
+void CbmStsClusterFinder::SetParContainers()
+{
+    FairRuntimeDb* db = FairRunAna::Instance()->GetRuntimeDb();
+    if (NULL == db)
+        LOG(FATAL) << "CbmStsClusterFinder::SetParContainers: No runtime database" << FairLogger::endl;
+    fGeoPar = (CbmGeoStsPar*)db->getContainer("CbmGeoStsPar");
+    fDigiPar = (CbmStsDigiPar*)db->getContainer("CbmStsDigiPar");
 }
-// -------------------------------------------------------------------------
 
-    
+InitStatus CbmStsClusterFinder::Init()
+{
+    // Get input array
+    FairRootManager* ioman = FairRootManager::Instance();
+    if (NULL == ioman)
+        LOG(FATAL) << "CbmStsClusterFinder::Init: No FairRootManager" << FairLogger::endl;
 
+    fDigis = (TClonesArray*)ioman->GetObject("StsDigi");
+    if (NULL == fDigis)
+        LOG(FATAL) << "CbmStsClusterFinder::Init: No StsDigi array" << FairLogger::endl;
 
-// -----   Private method SetParContainers   -------------------------------
-void CbmStsClusterFinder::SetParContainers() {
+    fClusterCandidates = new TClonesArray("CbmStsCluster", 30000);
+    ioman->Register("StsClusterCand", "Cluster in STS", fClusterCandidates, kTRUE);
 
-  // Get run and runtime database
-  FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+    fClusters = new TClonesArray("CbmStsCluster", 30000);
+    ioman->Register("StsCluster", "Cluster in STS", fClusters, kTRUE);
 
-  FairRuntimeDb* db = run->GetRuntimeDb();
-  if ( ! db ) Fatal("SetParContainers", "No runtime database");
+    // Build digitisation scheme
+    fDigiScheme = new CbmStsDigiScheme();
+    if (!fDigiScheme->Init(fGeoPar, fDigiPar))
+        return kERROR;
 
-  // Get STS geometry parameter container
-  fGeoPar = (CbmGeoStsPar*) db->getContainer("CbmGeoStsPar");
+    // Create sectorwise digi sets
+    MakeSets();
 
-  // Get STS digitisation parameter container
-  fDigiPar = (CbmStsDigiPar*) db->getContainer("CbmStsDigiPar");
-
+    return kSUCCESS;
 }
-// -------------------------------------------------------------------------
 
-
-
-
-// -----   Private method Init   -------------------------------------------
-InitStatus CbmStsClusterFinder::Init() {
-
-  // Get input array
-  FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fDigis = (TClonesArray*) ioman->GetObject("StsDigi");
-
-  fClustersCand = new TClonesArray("CbmStsCluster", 30000);
-  ioman->Register("StsClusterCand", "Cluster in STS", fClustersCand, kTRUE);
-
-  fClusters = new TClonesArray("CbmStsCluster", 30000);
-  ioman->Register("StsCluster", "Cluster in STS", fClusters, kTRUE);
-
-  // Build digitisation scheme
-  Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);
-  if ( ! success ) return kERROR;
-
-  // Create sectorwise digi sets
-  MakeSets();
-
-  // Control output
-  if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
-  else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
-  cout << "-I- " << fName << "::Init: "
-       << "STS digitisation scheme succesfully initialised" << endl;
-  cout << "    Stations: " << fDigiScheme->GetNStations() 
-       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
-       << fDigiScheme->GetNChannels() << endl;
-  
-  fNofClustersCand   = 0;
-  fNofClusters       = 0;
-  fNofClustersGood   = 0;
-  fNofClustersWP = 0;
-  fNofClustersWM = 0;
-
-  fLongestCluster = 0;
-  fLongestGoodCluster = 0;
-
-  return kSUCCESS;
+void CbmStsClusterFinder::MakeSets()
+{
+    fDigiMapF.clear();
+    fDigiMapB.clear();
+    Int_t nofStations = fDigiScheme->GetNStations();
+    for (Int_t iStation = 0; iStation < nofStations; iStation++)
+    {
+        CbmStsStation* station = fDigiScheme->GetStation(iStation);
+        Int_t nofSectors = station->GetNSectors();
+        for (Int_t iSector = 0; iSector < nofSectors; iSector++)
+        {
+            CbmStsSector* sector = station->GetSector(iSector);
+            fDigiMapF[sector] = set<Int_t>();
+            if (sector->GetType() == 2 || sector->GetType() == 3)
+            {
+                fDigiMapB[sector] = set<Int_t>();
+            }
+        }
+    }
 }
-// -------------------------------------------------------------------------
 
+void CbmStsClusterFinder::SortDigis()
+{
+    MakeSets();
 
+    const Int_t nofDigis = fDigis->GetEntriesFast();
+    for (Int_t iDigi = 0; iDigi < nofDigis; iDigi++)
+    {
+        const CbmStsDigi* digi = static_cast<const CbmStsDigi*>(fDigis->At(iDigi));
+        const Int_t stationNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsStation);
+        const Int_t sectorNr = digi->GetSectorNr();
+        const Int_t iSide = CbmStsAddress::GetElementId(digi->GetAddress(), kStsSide);
+        CbmStsSector* sector = fDigiScheme->GetSector(stationNr, sectorNr);
 
-
-// -----   Private method ReInit   -----------------------------------------
-InitStatus CbmStsClusterFinder::ReInit() {
-
-  // Clear digitisation scheme
-  fDigiScheme->Clear();
-
-  // Build new digitisation scheme
-  Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);
-  if ( ! success ) return kERROR;
-
-  // Create sectorwise digi sets
-  MakeSets();
-
-  // Control output
-  if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
-  else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
-  cout << "-I- " << fName << "::Init: "
-       << "STS digitisation scheme succesfully reinitialised" << endl;
-  cout << "    Stations: " << fDigiScheme->GetNStations() 
-       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
-       << fDigiScheme->GetNChannels() << endl;
-  
-  fNofClustersCand   = 0;
-  fNofClusters       = 0;
-  fNofClustersGood   = 0;
-  fNofClustersWP = 0;
-  fNofClustersWM = 0;
-
-  fLongestCluster = 0;
-  fLongestGoodCluster = 0;
-
-  return kSUCCESS;
+        if (iSide == 0)
+        {
+            if (fDigiMapF.find(sector) == fDigiMapF.end())
+            {
+                continue;
+            }
+            fDigiMapF[sector].insert(iDigi);
+        }
+        else if (iSide == 1)
+        {
+            if (fDigiMapB.find(sector) == fDigiMapB.end())
+            {
+                continue;
+            }
+            fDigiMapB[sector].insert(iDigi);
+        }
+    }
 }
-// -------------------------------------------------------------------------
 
+void CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, const set<Int_t>& digiSet)
+{
+    CbmStsCluster* clusterCand = NULL;
 
+    Int_t lastDigiNr = -1;
+    Int_t lastChannelId = -1;
+    Double_t lastDigiSig = 100000.;
+    Int_t clusterMaxNr = -1;
+    Int_t clusterMaxPos = -1;
+    Double_t clusterMaxSig = -1.;
+    Int_t startChannelId = 0;
 
+    set<Int_t>::const_iterator it = digiSet.begin();
+    set<Int_t>::const_iterator it_end = digiSet.end();
+    for (; it != it_end; ++it)
+    {
+        Int_t digiIndex = (*it);
+        const CbmStsDigi* digi = static_cast<const CbmStsDigi*>(fDigis->At(digiIndex));
 
-// -----   Private method MakeSets   ---------------------------------------
-void CbmStsClusterFinder::MakeSets() {
+        Int_t channelId = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
+        Double_t digiSig = digi->GetCharge();
 
-  fDigiMapF.clear();
-  fDigiMapB.clear();
-  Int_t nStations = fDigiScheme->GetNStations();
-  for (Int_t iStation=0; iStation<nStations; iStation++) {
-    CbmStsStation* station = fDigiScheme->GetStation(iStation);
-    Int_t nSectors = station->GetNSectors();
-    for (Int_t iSector=0; iSector<nSectors; iSector++) {
-      CbmStsSector* sector = station->GetSector(iSector);
-      set<Int_t> a;
-      fDigiMapF[sector] = a;
-      if ( sector->GetType() == 2 || sector->GetType() ==3 ) {
-	set<Int_t> b;
-	fDigiMapB[sector] = b;
-      }
+        if (lastChannelId == -1)
+        {
+            Int_t size = fClusterCandidates->GetEntriesFast();
+            clusterCand = new ((*fClusterCandidates)[size]) CbmStsCluster();
+            clusterCand->SetAddress(digi->GetAddress());
+            startChannelId = channelId;
+        }
+
+        if (channelId == lastChannelId + 1)
+        {
+            // if the signal is larger that last one and the previous one is smaller than maximum
+            if (digiSig > lastDigiSig && lastDigiSig < clusterMaxSig && digiSig != clusterMaxSig)
+            {
+                Int_t size = fClusterCandidates->GetEntriesFast();
+                clusterCand = new ((*fClusterCandidates)[size]) CbmStsCluster();
+                clusterCand->SetAddress(digi->GetAddress());
+                clusterCand->AddDigi(lastDigiNr);
+
+                clusterMaxPos = -1;
+                clusterMaxSig = -1.;
+                startChannelId = channelId;
+            }
+        }
+        else if (lastChannelId >= 0)
+        {
+            Int_t size = fClusterCandidates->GetEntriesFast();
+            clusterCand = new ((*fClusterCandidates)[size]) CbmStsCluster();
+            clusterCand->SetAddress(digi->GetAddress());
+
+            clusterMaxPos = -1;
+            clusterMaxSig = -1.;
+            startChannelId = channelId;
+        }
+
+        if (digiSig > clusterMaxSig)
+        {
+            clusterMaxNr = digiIndex;
+            clusterMaxPos = channelId;
+            clusterMaxSig = digiSig;
+        }
+
+        Int_t clusterWidth = lastChannelId - startChannelId + 1;
+        if (clusterWidth < 90)
+        {
+            clusterCand->AddDigi(digiIndex);
+        }
+        else
+        {
+            Int_t size = fClusterCandidates->GetEntriesFast();
+            clusterCand = new ((*fClusterCandidates)[size]) CbmStsCluster();
+            clusterCand->SetAddress(digi->GetAddress());
+            clusterCand->AddDigi(digiIndex);
+            clusterWidth = lastChannelId - startChannelId + 1;
+
+            clusterMaxPos = -1;
+            clusterMaxSig = -1.;
+            startChannelId = channelId;
+        }
+
+        lastDigiNr = digiIndex;
+        lastChannelId = channelId;
+        lastDigiSig = digiSig;
     }
-  }
-
 }
-// -------------------------------------------------------------------------
 
-
-
-
-// -----   Private method SortDigis   --------------------------------------
-void CbmStsClusterFinder::SortDigis() {
-
-  // Check input array
-  if ( ! fDigis ) {
-    cout << "-E- " << fName << "::SortDigis: No input array!" << endl;
-    return;
-  }
-
-  CbmStsDigi* digi = NULL;
-  const Int_t nDigis = fDigis->GetEntriesFast();
-
-  // Clear sector digi sets
-  map<CbmStsSector*, set<Int_t> >::iterator mapIt;
-  for (mapIt=fDigiMapF.begin(); mapIt!=fDigiMapF.end(); mapIt++)
-    ((*mapIt).second).clear();
-  for (mapIt=fDigiMapB.begin(); mapIt!=fDigiMapB.end(); mapIt++)
-    ((*mapIt).second).clear();
-
-  // Fill digis into sets
-  CbmStsSector* sector = NULL;
-  Int_t stationNr = -1;
-  Int_t sectorNr  = -1;
-  Int_t iSide     = -1;
-  Int_t channelNr = -1;
-
-  for (Int_t iDigi=0; iDigi<nDigis; iDigi++) {
-    digi = (CbmStsDigi*) fDigis->At(iDigi);
-
-//    stationNr = digi->GetStationNr();
-//    sectorNr  = digi->GetSectorNr();
-//    iSide     = digi->GetSide();
-    stationNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsStation);
-    sectorNr  = digi->GetSectorNr();
-    iSide     = CbmStsAddress::GetElementId(digi->GetAddress(), kStsSide);
-    sector = fDigiScheme->GetSector(stationNr, sectorNr);
-    
-    if (iSide == 0 ) {
-      if ( fDigiMapF.find(sector) == fDigiMapF.end() ) {
-	cerr << "-E- " << fName << "::SortDigits:: sector " << sectorNr
-	     << " of station " << stationNr 
-	     << " not found in digi scheme (F)!" << endl;
-	continue;
-      }
-      fDigiMapF[sector].insert(iDigi);      
+void CbmStsClusterFinder::AnalyzeClusters()
+{
+    Int_t nofClusterCandidates = fClusterCandidates->GetEntriesFast();
+    for (Int_t iclus = 0; iclus < nofClusterCandidates; iclus++)
+    {
+        AnalyzeCluster(iclus);
     }
-    else if (iSide == 1 ) {
-      if ( fDigiMapB.find(sector) == fDigiMapB.end() ) {
-	cerr << "-E- " << fName << "::SortDigits:: sector " << sectorNr
-	     << " of station " << stationNr 
-	     << " not found in digi scheme (B)!" << endl;
-	continue;
-      }
-      fDigiMapB[sector].insert(iDigi);      
-    }
-  }
 }
-// -------------------------------------------------------------------------
 
-// -----   Private method RealisticResponse   ------------------------------
-Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, set<Int_t>& digiSet) {
+void CbmStsClusterFinder::AnalyzeCluster(Int_t clusterId)
+{
+    const CbmStsCluster* clusterCand = static_cast<const CbmStsCluster*>(fClusterCandidates->At(clusterId));
 
-  set<Int_t>::iterator it1;
-
-  Int_t      iDigi = -1;
-  CbmStsDigi* digi = NULL;
-  CbmStsCluster* clusterCand = NULL;
-  CbmStsCluster* cluster = NULL;
-
-  Int_t    digiPos       = -1;
-  Double_t digiSig       = -1.;
-  Int_t    lastDigiNr    = -1;
-  Int_t    lastDigiPos   = -1;
-  Double_t lastDigiSig   = 100000.;
-  Int_t    clusterMaxNr  = -1;
-  Int_t    clusterMaxPos = -1;
-  Double_t clusterMaxSig = -1.;
-  Bool_t clusterHasMinimum = kFALSE;
-  Bool_t clusterHasPlateau = kFALSE;
-  Int_t clusterBeginPos = 0;
-  Int_t clusterWidth = 0;
-  //cout << "====================================================================" << digiSet.size() << endl;
-  //cout << "   cluster   " << flush;
-  //  if ( fNofClusters != fNofClustersGood+fNofClustersWP ) cout << fNofClusters-(fNofClustersGood+fNofClustersWP) << " -> " <<  fNofClusters <<"!="<< fNofClustersGood<<"+"<<fNofClustersWP<<endl;
-  for (it1=digiSet.begin(); it1!=digiSet.end(); it1++) {
-    iDigi = (*it1);
-    digi  = (CbmStsDigi*) fDigis->At(iDigi);
-
-    //digiPos = digi->GetChannelNr();
-    //digiSig = digi->GetAdc();
-    digiPos = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
-    digiSig = digi->GetCharge();
-
-    if ( lastDigiPos == -1 ) {
-      clusterCand = new ((*fClustersCand)[fNofClustersCand++]) CbmStsCluster(digiSig, stationNr,sectorNr,iSide);
-       //   cout << "first cluster ADC        "  << digiSig << endl;
-      clusterBeginPos = digiPos;
+    Double_t chanNr = 0;
+    Double_t chanADC = 0.;
+    Double_t sumW = 0;
+    Double_t sumWX = 0;
+    Double_t error = 0;
+    Int_t nofDigis = clusterCand->GetNofDigis();
+    for (Int_t i = 0; i < nofDigis; ++i)
+    {
+        CbmStsDigi* digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(i));
+        chanNr = (Double_t)(CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel));
+        chanADC = digi->GetCharge();
+        sumW += chanADC;
+        sumWX += chanNr * chanADC;
+        error += (chanADC * chanADC);
     }
 
-    if ( digiPos == lastDigiPos+1 ) {
+    if (sumW > 50.)
+    {
+        Int_t size = fClusters->GetEntriesFast();
+        CbmStsCluster* cluster = new ((*fClusters)[size]) CbmStsCluster();
 
-      if ( digiSig == lastDigiSig ) {
-	clusterCand->SetMeanError(digiSig);
-	clusterHasPlateau = kTRUE;
-      }
-
-      // if the signal is larger that last one and the previous one is smaller than maximum
-      if ( digiSig > lastDigiSig && lastDigiSig < clusterMaxSig &&  digiSig != clusterMaxSig) {
-	clusterCand->SetMean(clusterMaxNr);
-      //      cluster->SetMeanError(clusterMaxSig);
-	clusterCand = new ((*fClustersCand)[fNofClustersCand++]) CbmStsCluster(digiSig, stationNr,sectorNr,iSide);
-	clusterCand->AddDigi(lastDigiNr);
-	//	cout << "         +end cluster " << lastDigiPos << endl;
-
-	//	cout << "+new cluster          " << digiPos << endl;
-	clusterWidth = lastDigiPos - clusterBeginPos + 1;
-	if ( clusterWidth > fLongestCluster ) 
-	  fLongestCluster = clusterWidth;
-	if ( clusterHasPlateau ) {
-	  fNofClustersWP++;
-	}
-	if ( !clusterHasMinimum && !clusterHasPlateau ) {
-	  fNofClustersGood++; 
-	  if ( clusterWidth > fLongestGoodCluster ) 
-	    fLongestGoodCluster = clusterWidth;
-	}
-	
-	clusterHasPlateau = kFALSE;
-	clusterMaxPos = -1;
-	clusterMaxSig = -1.;
-	clusterBeginPos = digiPos;
-      }
+        for (Int_t i = 0; i < nofDigis; ++i)
+        {
+            const CbmStsDigi* digi = static_cast<const CbmStsDigi*>(fDigis->At(clusterCand->GetDigi(i)));
+            if (i == 0)
+            {
+                cluster->SetAddress(digi->GetAddress());
+                cluster->SetSectorNr(digi->GetSectorNr());
+            }
+            cluster->AddDigi(i);
+        }
+        cluster->SetMean(sumWX / sumW);
+        cluster->SetMeanError((1. / (sumW)) * TMath::Sqrt(error));
     }
-    else if ( lastDigiPos>=0 ) {
-      clusterCand->SetMean(clusterMaxNr);
-      //      cluster->SetMeanError(clusterMaxSig);
-      clusterCand = new ((*fClustersCand)[fNofClustersCand++]) CbmStsCluster(digiSig, stationNr,sectorNr,iSide);
-      //    cout << "          end cluster " << lastDigiPos << endl;
-      //    cout << "new cluster           " << digiPos << endl;
-      clusterWidth = lastDigiPos - clusterBeginPos + 1;
-      if ( clusterWidth > fLongestCluster ) 
-	fLongestCluster = clusterWidth;
-      if ( clusterHasPlateau ) {
-	fNofClustersWP++;
-      }
-      if ( !clusterHasMinimum && !clusterHasPlateau ) {
-	fNofClustersGood++; 
-	if ( clusterWidth > fLongestGoodCluster ) 
-	  fLongestGoodCluster = clusterWidth;
-      }
-      
-      clusterHasPlateau = kFALSE;
-      clusterMaxPos = -1;
-      clusterMaxSig = -1.;
-      clusterBeginPos = digiPos;
-    }
-    if ( digiSig > clusterMaxSig ) {
-      clusterMaxNr  = iDigi;
-      clusterMaxPos = digiPos;
-      clusterMaxSig = digiSig;
-    }
-    
-    clusterWidth = lastDigiPos - clusterBeginPos + 1;
-    if ( clusterWidth < 90 ) {
-      clusterCand->AddDigi(iDigi);}
-//       clusterCand->AddIndex(iDigi,digiSig);}
-    else {
-      //      return 1;
-      clusterCand->SetMean(clusterMaxNr);
-      //      cluster->SetMeanError(clusterMaxSig);
-
-      clusterCand = new ((*fClustersCand)[fNofClustersCand++]) CbmStsCluster(digiSig, stationNr,sectorNr,iSide);
-      clusterCand->AddDigi(iDigi);
-      clusterWidth = lastDigiPos - clusterBeginPos + 1;
-      if ( clusterWidth > fLongestCluster ) 
-	fLongestCluster = clusterWidth;
-      if ( clusterHasPlateau ) {
-	fNofClustersWP++;
-      }
-      if ( !clusterHasMinimum && !clusterHasPlateau ) {
-	fNofClustersGood++; 
-	if ( clusterWidth > fLongestGoodCluster ) 
-	  fLongestGoodCluster = clusterWidth;
-      }
-      
-      clusterHasPlateau = kFALSE;
-      clusterMaxPos = -1;
-      clusterMaxSig = -1.;
-      clusterBeginPos = digiPos;
-    }
-
-    lastDigiNr  = iDigi;
-    lastDigiPos = digiPos;
-    lastDigiSig = digiSig;
-  }
-  if ( digiSig > 0. ) {
-    clusterCand->SetMean(clusterMaxNr);
-
-    //  cout << "         last cluster " << lastDigiPos << endl;
-    clusterWidth = lastDigiPos - clusterBeginPos + 1;
-    if ( clusterWidth > fLongestCluster ) 
-      fLongestCluster = clusterWidth;
-    if ( clusterHasPlateau ) {
-      fNofClustersWP++;
-    }
-    if ( lastDigiPos && !clusterHasPlateau ) {
-      fNofClustersGood++;
-      if ( clusterWidth > fLongestGoodCluster ) 
-	fLongestGoodCluster = clusterWidth;
-    }
-  }
-  //  delete clusterCand;
-  
-  return 1;
-
-  map<Int_t , Int_t> channelSorted;
-  for (it1=digiSet.begin(); it1!=digiSet.end(); it1++) {
-    iDigi = (*it1);
-    digi  = (CbmStsDigi*) fDigis->At(iDigi);
-    Int_t channelNr = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
-    cout << channelNr << " " << flush;
-    channelSorted[channelNr] = iDigi+1;
-  }
-  cout << endl;
-  // print channels/signals
-  Int_t iFS = 0;
-  for (Int_t iter=0; iter<1100; iter++) {
-    iDigi = channelSorted[iter];
-    if ( iDigi == 0 ) continue;
-    iFS++;
-    digi  = (CbmStsDigi*) fDigis->At(iDigi-1);
-    if ( iFS >= channelSorted.size() ) break;
-  }
-  //  cout << endl;
-
-  //  cout << "size = " << channelSorted.size() << endl;
-  /*  Int_t iFS = 0;
-  Float_t lastSignal = 0.;
-  for (Int_t iter=0; iter<1100; iter++) {
-    iDigi = channelSorted[iter];
-    if ( iDigi == 0 ) {lastSignal=0.;continue;}
-    iFS++;
-    digi  = (CbmStsDigi*) fDigis->At(iDigi-1);
-    Float_t signal = digi->GetADC();
-    if ( signal <= lastSignal ) { lastSignal = signal; continue; }
-
-    if ( iFS >= channelSorted.size() ) break;
-
-
-    }*/
-  //  cout << endl << "=============================================" << endl;
-
 }
-// -------------------------------------------------------------------------
 
-// -----   Method AnalyzeClusters   ----------------------------------------
-void CbmStsClusterFinder::AnalyzeClusters() {
-  for ( Int_t iclus = 0 ; iclus < fNofClustersCand ; iclus++ ) {
-    AnalyzeCluster(iclus);
-  }
+void CbmStsClusterFinder::Finish()
+{
 }
-// -------------------------------------------------------------------------
-
-// -----   Method AnalyzeClusters   ----------------------------------------
-void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
-
-  CbmStsCluster* clusterCand  = (CbmStsCluster*) fClustersCand->At(iCluster);
-  CbmStsCluster* cluster      = (CbmStsCluster*) fClusters->At(iCluster);
-//   CbmStsSector* sector = NULL;
-  Int_t maxDigiNr = (Int_t)clusterCand->GetMean();
-  Double_t plateau = clusterCand->GetMeanError();
-  Double_t maxDigiSig = 0.;
-  CbmStsDigi* digi = NULL;
-  digi = (CbmStsDigi*)fDigis->At(maxDigiNr);
-  Int_t maxDigiPos = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
-  maxDigiSig = digi->GetCharge();
-
-  //  cout << "Cluster " << iCluster+1 << " has " << cluster->GetNDigis() << " digis, max at " << maxDigiNr << endl;
-  Double_t chanNr  = 0;
-  Double_t chanADC = 0.;
-  Double_t sumW    = 0;
-  Double_t sumWX   = 0;
-  Double_t sumCh   = 0;
-  Double_t error   = 0;
-  for ( Int_t itemp = 0 ; itemp < clusterCand->GetNDigis() ; itemp++ ) {
-    digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(itemp));
-    chanNr  = (Double_t)(CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel));
-    chanADC = digi->GetCharge();
-    sumW  +=        chanADC;
-    sumWX += chanNr*chanADC;
-    sumCh += chanNr;
-    error += ( chanADC*chanADC );
-    //    cout << chanADC << " + " << flush;
-    //    cout << "channel " << digi->GetChannelNr() << " with signal = " << digi->GetADC() << " (" << sumWX << "/" << sumW << ") - plateau = " << plateau << endl;
-  }
-
- if (sumW>50.) {
-    for ( Int_t itemp = 0 ; itemp < clusterCand->GetNDigis() ; itemp++ ) {
-  
-      digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(itemp));
-      if (itemp==0) {
-      	Int_t iStation = CbmStsAddress::GetElementId(digi->GetAddress(), kStsStation);
-      	Int_t iSector  = digi->GetSectorNr();
-      	Int_t iSide    = CbmStsAddress::GetElementId(digi->GetAddress(), kStsSide);
-        cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(digi->GetCharge(),
-        		iStation, iSector, iSide);
-        cluster->AddDigi(itemp);
-      }
-      else if (itemp>0) {
-        cluster->AddDigi(itemp);
-      }
-    }
-    //  cout << " mean at = " << sumWX/sumW << endl;
-    cluster->SetMean(sumWX/sumW);
-    cluster->SetMeanError(  (1./(sumW)) * TMath::Sqrt(error)   );
-    if ( sumW < maxDigiSig ) {
-      cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
-      for ( Int_t itemp = 0 ; itemp < clusterCand->GetNDigis() ; itemp++ ) {
-        digi = (CbmStsDigi*)fDigis->At(clusterCand->GetDigi(itemp));
-        Int_t iChannel = CbmStsAddress::GetElementId(digi->GetAddress(), kStsChannel);
-        cout << "digi ADC = " << digi->GetCharge() << " at channel# " << iChannel << endl;
-      }
-    }
- }
-  //   cout << sumWE/sumW << " mean at " << endl;
-  //  cout << "error = " << sumW/maxDigiSig << endl;
-}
-// -------------------------------------------------------------------------
-
-// -----   Virtual method Finish   -----------------------------------------
-void CbmStsClusterFinder::Finish() {
-  fNofClustersCand = fNofClustersGood+fNofClustersWP;
-  cout << endl;
-  cout << "============================================================"
-       << endl;
-  cout << "===== " << fName << ": Run summary " << endl;
-  cout << "===== " << endl;
-  cout << "===== Number of clusters              : " 
-       << setw(8) << setprecision(2) 
-       << fNofClustersCand << endl;
-  cout << "===== Number of good clusters         : " 
-       << setw(8) << setprecision(2) 
-       << fNofClustersGood << " (" 
-       << setw(8) << setprecision(2) 
-       << 100.*fNofClustersGood/fNofClustersCand << "%)" << endl;
-  cout << "===== Number of plateau clusters      : " 
-       << setw(8) << setprecision(2) 
-       << fNofClustersWP << " (" 
-       << setw(8) << setprecision(2) 
-       << 100.*fNofClustersWP/fNofClustersCand << "%)" << endl;
-  cout << "===== Number of minimum clusters      : " 
-       << setw(8) << setprecision(2) 
-       << fNofClustersWM << " (" 
-       << setw(8) << setprecision(2) 
-       << 100.*fNofClustersWM/fNofClustersCand << "%)" << endl;
-  cout << "===== Longest cluster                 : "
-       << setw(8) << setprecision(2) 
-       << fLongestCluster << endl;
-  cout << "===== Longest good cluster            : "
-       << setw(8) << setprecision(2) 
-       << fLongestGoodCluster << endl;
-  cout << "============================================================"
-       << endl;
-	
-}					       
-// -------------------------------------------------------------------------
-    
 
 ClassImp(CbmStsClusterFinder)
-
-
-	
-	
-	
-  
-		      
-
-
-
-
-
- 

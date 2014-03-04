@@ -683,9 +683,9 @@ void CbmL1::HitMatch()
         int iL = 0;
         FairLink link = stsHit->GetLink(iL);
         CbmStsCluster *stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
-        int NLinks2 = stsCluster->GetNLinks();
+        int NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
-          FairLink link2 = stsCluster->GetLink(iL2);
+          CbmLink link2 = stsCluster->GetMatch()->GetLink(iL2);
           CbmStsDigi *stsDigi = L1_DYNAMIC_CAST<CbmStsDigi*>( listStsDigi->At( link2.GetIndex() ) );
           const int NLinks3 = stsDigi->GetMatch()->GetNofLinks();
           for ( int iL3 = 0; iL3 < NLinks3; iL3++){
@@ -698,9 +698,9 @@ void CbmL1::HitMatch()
         iL = 1;
         link = stsHit->GetLink(iL);
         stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
-        NLinks2 = stsCluster->GetNLinks();
+        NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
-          FairLink link2 = stsCluster->GetLink(iL2);
+          CbmLink link2 = stsCluster->GetMatch()->GetLink(iL2);
           CbmStsDigi *stsDigi = L1_DYNAMIC_CAST<CbmStsDigi*>( listStsDigi->At( link2.GetIndex() ) );
           const int NLinks3 = stsDigi->GetMatch()->GetNofLinks();
           for ( int iL3 = 0; iL3 < NLinks3; iL3++){

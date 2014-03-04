@@ -70,7 +70,7 @@ public:
 	/**
 	 * \brief Remove all digis.
 	 */
-	void Clear() { fDigis.clear(); }
+	void ClearDigis() { fDigis.clear(); }
 
    /** Accessors **/
    Int_t GetAddress() const { return fAddress; }

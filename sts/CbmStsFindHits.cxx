@@ -1,9 +1,6 @@
-//* $Id: */
-
-// -------------------------------------------------------------------------
-// -----                    CbmStsFindHits source file             -----
-// -----                  Created 26/06/2008 by R. Karabowicz          -----
-// -------------------------------------------------------------------------
+/**
+ * \file CbmStsFindHits.cxx
+ **/
 
 #include "CbmStsFindHits.h"
 
@@ -14,632 +11,311 @@
 #include "CbmStsHit.h"
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
+#include "CbmStsAddress.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
 
-#include <iomanip>
+using namespace std;
 
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::flush;
-using std::fixed;
-using std::right;
-using std::left;
-using std::setw;
-using std::setprecision;
-using std::set;
-using std::map;
+CbmStsFindHits::CbmStsFindHits()
+    : FairTask("CbmStsFindHits", 1)
+    , fGeoPar(NULL)
+    , fDigiPar(NULL)
+    , fClusters(NULL)
+    , fHits(NULL)
+    , fDigiScheme(NULL)
+    , fClusterMapF()
+    , fClusterMapB()
+{
+}
 
-// -----   Default constructor   ------------------------------------------
-CbmStsFindHits::CbmStsFindHits() 
-  : FairTask("STS Hit Finder", 1), 
-  fGeoPar(NULL),
-  fDigiPar(NULL),
-  fClusters(NULL),
-  fHits(NULL),
-  fNHits(0),
-  fDigiScheme(new CbmStsDigiScheme()),
-  fClusterMapF(),
-  fClusterMapB(),
-  fTimer()
-{}
-// -------------------------------------------------------------------------
+CbmStsFindHits::~CbmStsFindHits()
+{
+    if (fHits)
+    {
+        fHits->Delete();
+        delete fHits;
+    }
+}
 
-
-
-// -----   Standard constructor   ------------------------------------------
-CbmStsFindHits::CbmStsFindHits(Int_t iVerbose) 
-  : FairTask("STSRealFindHits", iVerbose), 
-  fGeoPar(NULL),
-  fDigiPar(NULL),
-  fClusters(NULL),
-  fHits(NULL),
-  fNHits(0),
-  fDigiScheme(new CbmStsDigiScheme()),
-  fClusterMapF(),
-  fClusterMapB(),
-  fTimer()
-{}
-// -------------------------------------------------------------------------
-
-
-
-// -----   Constructor with name   -----------------------------------------
-CbmStsFindHits::CbmStsFindHits(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose), 
-  fGeoPar(NULL),
-  fDigiPar(NULL),
-  fClusters(NULL),
-  fHits(NULL),
-  fNHits(0),
-  fDigiScheme(new CbmStsDigiScheme()),
-  fClusterMapF(),
-  fClusterMapB(),
-  fTimer()
-{}
-// -------------------------------------------------------------------------
-
-
-
-// -----   Destructor   ----------------------------------------------------
-CbmStsFindHits::~CbmStsFindHits() {
-  if ( fHits ) {
+void CbmStsFindHits::Exec(Option_t* opt)
+{
+    // Clear output array
     fHits->Delete();
-    delete fHits;
-  }
+
+    SortClusters();
+
+    // Find hits in sectors
+    Int_t nofStations = fDigiScheme->GetNStations();
+    for (Int_t iStation = 0; iStation < nofStations; iStation++)
+    {
+        CbmStsStation* station = fDigiScheme->GetStation(iStation);
+
+        Int_t nofSectors = station->GetNSectors();
+        for (Int_t iSector = 0; iSector < nofSectors; iSector++)
+        {
+            CbmStsSector* sector = station->GetSector(iSector);
+            if (fClusterMapF.find(sector) == fClusterMapF.end())
+            {
+                continue;
+            }
+            const set<Int_t>& frontSet = fClusterMapF[sector];
+
+            if ((sector->GetType() == 2 || sector->GetType() == 3) && (fClusterMapB.find(sector) == fClusterMapB.end()))
+            {
+                continue;
+            }
+            const set<Int_t>& backSet = fClusterMapB[sector];
+
+            FindHits(station, sector, frontSet, backSet);
+        } // Sector loop
+    }     // Station loop
 }
-// -------------------------------------------------------------------------
 
+void CbmStsFindHits::SetParContainers()
+{
+    FairRuntimeDb* db = FairRunAna::Instance()->GetRuntimeDb();
+    if (db == NULL)
+        LOG(FATAL) << "CbmStsFindHits::SetParContainers: No runtime database" << FairLogger::endl;
 
+    // Get STS geometry parameter container
+    fGeoPar = (CbmGeoStsPar*)db->getContainer("CbmGeoStsPar");
 
-// -----   Public method Exec   --------------------------------------------
-void CbmStsFindHits::Exec(Option_t* opt) {
-
-  fTimer.Start();
-  Bool_t warn = kFALSE;
-
-  // Check for digi scheme
-  if ( ! fDigiScheme ) {
-    cerr << "-E- " << fName << "::Exec: No digi scheme!" << endl;
-    return;
-  }
-
-  // Clear output array
-  //  fHits->Clear();
-  fHits->Delete();
-
-  // Sort STS digis with respect to sectors
-  SortClusters();
-
-  // Find hits in sectors
-  Int_t nClustersF = 0;
-  Int_t nClustersB = 0;
-  Int_t nHits   = 0;
-  Int_t nStations = fDigiScheme->GetNStations();
-  CbmStsStation* station = NULL;
-  for (Int_t iStation=0; iStation<nStations; iStation++) {
-    station = fDigiScheme->GetStation(iStation);
-
-    Int_t nClustersFInStation = 0;
-    Int_t nClustersBInStation = 0;
-    Int_t nHitsInStation   = 0;
-    Int_t nSectors = station->GetNSectors();
-    for (Int_t iSector=0; iSector<nSectors; iSector++) {
-      CbmStsSector* sector = station->GetSector(iSector);
-      set <Int_t> fSet, bSet;
-      if ( fClusterMapF.find(sector) == fClusterMapF.end() ) {
-	cout << "-E- " << fName << "::Exec: sector " 
-	     << sector->GetSectorNr() << " of station " 
-	     << station->GetStationNr() << "not found in front map!" 
-	     << endl;
-	warn = kTRUE;
-	continue;
-      }
-      fSet = fClusterMapF[sector];
-      if ( sector->GetType() == 2 || sector->GetType() == 3 ) {
-	if ( fClusterMapB.find(sector) == fClusterMapB.end() ) {
-	  cout << "-E- " << fName << "::Exec: sector " 
-	       << sector->GetSectorNr() << " of station " 
-	       << station->GetStationNr() << "not found in back map!" 
-	       << endl;
-	  warn = kTRUE;
-	  continue;
-	}
-      }
-      bSet = fClusterMapB[sector];
-      Int_t nClustersFInSector = fSet.size();
-      Int_t nClustersBInSector = bSet.size();
-      Int_t nHitsInSector   = FindHits(station, sector, fSet, bSet);
-      if ( fVerbose > 2 ) 
-	cout << "Sector " << sector->GetSectorNr() 
-	     << ", Clusters front " << nClustersFInSector 
-	     << ", Clusters Back " << nClustersBInSector
-	     << ", Hits " << nHitsInSector << endl;
-      nHitsInStation   += nHitsInSector;
-      nClustersFInStation += nClustersFInSector;
-      nClustersBInStation += nClustersBInSector;      
-    }      // Sector loop
-
-    if ( fVerbose > 1 ) cout << "Total for station " 
-			     << station->GetStationNr() << ": Clusters front "
-			     << nClustersFInStation << ", clusters back "
-			     << nClustersBInStation << ", hits "
-			     << nHitsInStation << endl;
-    nClustersB += nClustersBInStation;
-    nClustersF += nClustersFInStation;
-    nHits   += nHitsInStation;
-    
-  }       // Station loop
-
-  fTimer.Stop();  
-  if ( fVerbose  ) {
-    cout << endl;
-    cout << "-I- " << fName << ":Event summary" << endl;
-    cout << "    Clusters front side       : " << nClustersF << endl;
-    cout << "    Clusters back side        : " << nClustersB << endl;
-    cout << "    Hits created              : " << nHits   << endl;
-    cout << "    Real time                 : " << fTimer.RealTime() 
-	 << endl;
-  }
-  else {
-    if ( warn ) cout << "- ";
-    else        cout << "+ ";
-    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
-	 << fixed << right << fTimer.RealTime() 
-	 << " s, clusters " << nClustersF << " / " << nClustersB << ", hits: " 
-	 << nHits << endl;
-  }
-
-  fNHits += nHits;
+    // Get STS digitisation parameter container
+    fDigiPar = (CbmStsDigiPar*)db->getContainer("CbmStsDigiPar");
 }
-// -------------------------------------------------------------------------
 
-    
+InitStatus CbmStsFindHits::Init()
+{
+    // Get input array
+    FairRootManager* ioman = FairRootManager::Instance();
+    if (ioman == NULL)
+        LOG(FATAL) << "CbmStsFindHits::Init: No FairRootManager" << FairLogger::endl;
 
+    fClusters = (TClonesArray*)ioman->GetObject("StsCluster");
+    if (fClusters == NULL)
+        LOG(FATAL) << "CbmStsFindHits::Init: No StsCluster" << FairLogger::endl;
 
-// -----   Private method SetParContainers   -------------------------------
-void CbmStsFindHits::SetParContainers() {
+    // Register output array
+    fHits = new TClonesArray("CbmStsHit", 1000);
+    ioman->Register("StsHit", "Hit in STS", fHits, kTRUE);
 
-  // Get run and runtime database
-  FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+    // Build digitisation scheme
+    fDigiScheme = new CbmStsDigiScheme();
+    if (!fDigiScheme->Init(fGeoPar, fDigiPar))
+        return kERROR;
 
-  FairRuntimeDb* db = run->GetRuntimeDb();
-  if ( ! db ) Fatal("SetParContainers", "No runtime database");
+    // Create sectorwise cluster sets
+    MakeSets();
 
-  // Get STS geometry parameter container
-  fGeoPar = (CbmGeoStsPar*) db->getContainer("CbmGeoStsPar");
-
-  // Get STS digitisation parameter container
-  fDigiPar = (CbmStsDigiPar*) db->getContainer("CbmStsDigiPar");
-
+    return kSUCCESS;
 }
-// -------------------------------------------------------------------------
 
-
-
-
-// -----   Private method Init   -------------------------------------------
-InitStatus CbmStsFindHits::Init() {
-
-  // Get input array
-  FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fClusters = (TClonesArray*) ioman->GetObject("StsCluster");
-
-  // Register output array
-  fHits = new TClonesArray("CbmStsHit", 1000);
-  ioman->Register("StsHit", "Hit in STS", fHits, kTRUE);
-
-  // Build digitisation scheme
-  Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);
-  if ( ! success ) return kERROR;
-
-  // Create sectorwise cluster sets
-  MakeSets();
-
-  // Control output
-
-  if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
-  else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
-  cout << "-I- " << fName << "::Init: "
-       << "STS digitisation scheme succesfully initialised" << endl;
-  cout << "    Stations: " << fDigiScheme->GetNStations() 
-       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
-       << fDigiScheme->GetNChannels() << endl;
-  
-  return kSUCCESS;
-}
-// -------------------------------------------------------------------------
-
-
-
-
-// -----   Private method ReInit   -----------------------------------------
-InitStatus CbmStsFindHits::ReInit() {
-
-  // Clear digitisation scheme
-  fDigiScheme->Clear();
-
-  // Build new digitisation scheme
-  Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);
-  if ( ! success ) return kERROR;
-
-  // Create sectorwise digi sets
-  MakeSets();
-
-  // Control output
-  if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
-  else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
-  cout << "-I- " << fName << "::Init: "
-       << "STS digitisation scheme succesfully reinitialised" << endl;
-  cout << "    Stations: " << fDigiScheme->GetNStations() 
-       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
-       << fDigiScheme->GetNChannels() << endl;
-  
-  return kSUCCESS;
-}
-// -------------------------------------------------------------------------
-
-
-
-
-// -----   Private method MakeSets   ---------------------------------------
-void CbmStsFindHits::MakeSets() {
-
-  fClusterMapF.clear();
-  fClusterMapB.clear();
-  Int_t nStations = fDigiScheme->GetNStations();
-  for (Int_t iStation=0; iStation<nStations; iStation++) {
-    CbmStsStation* station = fDigiScheme->GetStation(iStation);
-    Int_t nSectors = station->GetNSectors();
-    for (Int_t iSector=0; iSector<nSectors; iSector++) {
-      CbmStsSector* sector = station->GetSector(iSector);
-      set<Int_t> a;
-      fClusterMapF[sector] = a;
-      if ( sector->GetType() == 2 || sector->GetType() ==3 ) {
-	set<Int_t> b;
-	fClusterMapB[sector] = b;
-      }
+void CbmStsFindHits::MakeSets()
+{
+    fClusterMapF.clear();
+    fClusterMapB.clear();
+    Int_t nofStations = fDigiScheme->GetNStations();
+    for (Int_t iStation = 0; iStation < nofStations; iStation++)
+    {
+        CbmStsStation* station = fDigiScheme->GetStation(iStation);
+        Int_t nofSectors = station->GetNSectors();
+        for (Int_t iSector = 0; iSector < nofSectors; iSector++)
+        {
+            CbmStsSector* sector = station->GetSector(iSector);
+            fClusterMapF[sector] = set<Int_t>();
+            if (sector->GetType() == 2 || sector->GetType() == 3)
+            {
+                fClusterMapB[sector] = set<Int_t>();
+            }
+        }
     }
-  }
-
 }
-// -------------------------------------------------------------------------
 
+void CbmStsFindHits::SortClusters()
+{
+    MakeSets();
 
-
-
-// -----   Private method SortClusters   --------------------------------------
-void CbmStsFindHits::SortClusters() {
-
-  // Check input array
-  if ( ! fClusters ) {
-    cout << "-E- " << fName << "::SortClusters: No input array!" << endl;
-    return;
-  }
-
-  // Clear sector cluster sets
-  map<CbmStsSector*, set<Int_t> >::iterator mapIt;
-  for (mapIt=fClusterMapF.begin(); mapIt!=fClusterMapF.end(); mapIt++)
-    ((*mapIt).second).clear();
-  for (mapIt=fClusterMapB.begin(); mapIt!=fClusterMapB.end(); mapIt++)
-    ((*mapIt).second).clear();
-
-  // Fill clusters into sets
-  CbmStsCluster* cluster = NULL;
-  CbmStsSector* sector = NULL;
-  Int_t stationNr = -1;
-  Int_t sectorNr  = -1;
-  Int_t iSide     = -1;
-  Int_t nClusters = fClusters->GetEntriesFast();
-  for (Int_t iClus=0; iClus<nClusters ; iClus++) {
-    cluster = (CbmStsCluster*) fClusters->At(iClus);
-    stationNr = cluster->GetStationNr();
-    sectorNr  = cluster->GetSectorNr();
-    iSide     = cluster->GetSide();
-    sector = fDigiScheme->GetSector(stationNr, sectorNr);
-    if (iSide == 0 ) {
-      if ( fClusterMapF.find(sector) == fClusterMapF.end() ) {
-	cerr << "-E- " << fName << "::SortClusters:: sector " << sectorNr
-	     << " of station " << stationNr 
-	     << " not found in digi scheme (F)!" << endl;
-	continue;
-      }
-      fClusterMapF[sector].insert(iClus);      
+    Int_t nofClusters = fClusters->GetEntriesFast();
+    for (Int_t iCluster = 0; iCluster < nofClusters; ++iCluster)
+    {
+        const CbmStsCluster* cluster = (CbmStsCluster*)fClusters->At(iCluster);
+        Int_t stationNr = CbmStsAddress::GetElementId(cluster->GetAddress(), kStsStation);
+        Int_t sectorNr = cluster->GetSectorNr();
+        Int_t side = CbmStsAddress::GetElementId(cluster->GetAddress(), kStsSide);
+        const CbmStsSector* sector = fDigiScheme->GetSector(stationNr, sectorNr);
+        if (side == 0)
+        {
+            if (fClusterMapF.find(sector) == fClusterMapF.end())
+            {
+                continue;
+            }
+            fClusterMapF[sector].insert(iCluster);
+        }
+        else if (side == 1)
+        {
+            if (fClusterMapB.find(sector) == fClusterMapB.end())
+            {
+                continue;
+            }
+            fClusterMapB[sector].insert(iCluster);
+        }
     }
-    else if (iSide == 1 ) {
-      if ( fClusterMapB.find(sector) == fClusterMapB.end() ) {
-	cerr << "-E- " << fName << "::SortClusters:: sector " << sectorNr
-	     << " of station " << stationNr 
-	     << " not found in digi scheme (B)!" << endl;
-	continue;
-      }
-      fClusterMapB[sector].insert(iClus);      
-    }
-  }
-
 }
-// -------------------------------------------------------------------------
 
+void CbmStsFindHits::FindHits(CbmStsStation* station, CbmStsSector* sector, const set<Int_t>& frontSet, const set<Int_t>& backSet)
+{
+    Int_t sectorType = sector->GetType();
 
-    
+    // ----- Type 1 : Pixel sector   ---------------------------------------
+    if (sectorType == 1)
+    {
+        Fatal("FindHits", "Sorry, not implemented yet");
+    } // Pixel sensor
+    // ---------------------------------------------------------------------
 
-// -----   Private method FindHits   ---------------------------------------
-Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
-				   CbmStsSector* sector, 
-				   set<Int_t>& fSet, set<Int_t>& bSet) {
+    // -----  Type 2: Strip sector OSU   -----------------------------------
+    else if (sectorType == 2)
+    {
+        Fatal("FindHits", "Sorry, not implemented yet");
+    } // Strip OSU
+    // ---------------------------------------------------------------------
 
-  // Counter
-  Int_t nNew = 0;
-  
-  // Get sector parameters
-  Int_t    detId  = sector->GetDetectorId();
-  Int_t    iType  = sector->GetType();
+    // -----  Type 3: Strip sector GSI   -----------------------------------
+    else if (sectorType == 3)
+    {
+        static const Double_t SQRT12 = TMath::Sqrt(12.);
+        static const Double_t SQRT6 = TMath::Sqrt(12.);
 
-  Double_t rot    = sector->GetRotation();
-  Double_t dx     = sector->GetDx();
-  Double_t dy     = sector->GetDy();
-  Double_t stereoB = sector->GetStereoB();
-  Double_t stereoF = sector->GetStereoF();
+        const Double_t rotation = sector->GetRotation();
+        const Double_t dx = sector->GetDx();
+        const Double_t dy = sector->GetDy();
+        const Double_t stereoB = sector->GetStereoB();
+        const Double_t stereoF = sector->GetStereoF();
 
-  //  Double_t z      = station->GetZ();
-  Int_t stationNr = station->GetStationNr();
-  Int_t sectorNr  = sector->GetSectorNr();
+        const Double_t sinRotation = TMath::Sin(rotation);
+        const Double_t cosRotation = TMath::Cos(rotation);
+        const Double_t tanStereoB = TMath::Tan(stereoB);
 
-  // Some auxiliary values
-  Double_t sinrot = TMath::Sin(rot);
-  Double_t cosrot = TMath::Cos(rot);
-  Double_t tanstr = TMath::Tan(stereoB);
+        Double_t vX = 0, vY = 0, vXY = 0;
+        if (stereoF == 0. && stereoB * 180 / TMath::Pi() < 80)
+        {
+            vX = dx / SQRT12;
+            vY = dx / SQRT6 / TMath::Abs(tanStereoB);
+            vXY = -1. * dx * dx / 12. / tanStereoB;
+        }
+        else if (stereoF == 0. && stereoB * 180 / TMath::Pi() > 80)
+        {
+            vX = dx / SQRT12;
+            vY = dx / SQRT12;
+            vXY = 0.;
+        }
+        else
+        {
+            vX = dx / SQRT12;
+            vY = dx / SQRT12 / TMath::Abs(tanStereoB);
+            vXY = 0.;
+        }
 
-  // Calculate error matrix in sector system
-//   Double_t vX, vY, vXY;
-//   if ( iType == 1 ) {
-//     vX  = dx / TMath::Sqrt(12.);
-//     vY  = dy / TMath::Sqrt(12.);
-//     vXY = 0.;
-//   }
-//   else if ( iType == 2 || iType == 3 ) {
-// 
-//     if (stereoF==0.&&stereoB*180/TMath::Pi()<80) {
-//       vX  = dx / TMath::Sqrt(12.);
-//       vY  = dx / TMath::Sqrt(6.) / TMath::Abs(TMath::Tan(stereoB));
-//       vXY = -1. * dx * dx / 12. / TMath::Tan(stereoB);
-//     }
-//     else if (stereoF==0.&&stereoB*180/TMath::Pi()>80) {
-//       vX  = dx / TMath::Sqrt(12.);
-//       vY  = dx / TMath::Sqrt(12.);
-//       vXY = 0.;
-//     }
-//     else {
-//       vX  = dx / TMath::Sqrt(24.);
-//       vY  = dx / TMath::Sqrt(24.) / TMath::Abs(TMath::Tan(stereoB));
-//       vXY = 0.;
-//     }
-//   }
-//   else {
-//     cerr << "-E- " << fName << "::FindHits: Illegal sector type "
-// 	 << iType << endl;
-//     return 0;
-//   }
-    
-  // Transform variances into global c.s.
-//   Double_t wX  = vX * vX  * cosrot * cosrot 
-//                - 2. * vXY * cosrot * sinrot
-//                + vY * vY  * sinrot * sinrot;
-//   Double_t wY  = vX * vX  * sinrot * sinrot
-//                + 2. * vXY * cosrot * sinrot
-// 	       + vY * vY  * cosrot * cosrot; 
-//   Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
-//                + vXY * ( cosrot*cosrot - sinrot*sinrot );
-//   Double_t sigmaX = TMath::Sqrt(wX);
-//   Double_t sigmaY = TMath::Sqrt(wY);
+        set<Int_t>::const_iterator itf = frontSet.begin();
+        set<Int_t>::const_iterator itf_end = frontSet.end();
+        for (; itf != itf_end; itf++)
+        {
+            Int_t frontClusterId = (*itf);
+            const CbmStsCluster* frontCluster = static_cast<const CbmStsCluster*>(fClusters->At(frontClusterId));
+            Double_t frontChannel = frontCluster->GetMean();
 
-  // Now perform the loop over active channels
-  set<Int_t>::iterator it1;
-  set<Int_t>::iterator it2;
+            set<Int_t>::const_iterator itb = backSet.begin();
+            set<Int_t>::const_iterator itb_end = backSet.end();
+            for (; itb != itb_end; itb++)
+            {
+                Int_t backClusterId = (*itb);
+                const CbmStsCluster* backCluster = static_cast<const CbmStsCluster*>(fClusters->At(backClusterId));
+                Double_t backChannel = backCluster->GetMean();
 
-  // ----- Type 1 : Pixel sector   ---------------------------------------
-  if ( iType == 1 ) {
-    Fatal("FindHits","Sorry, not implemented yet");
-  }     // Pixel sensor
-  // ---------------------------------------------------------------------
+                Double_t xHit = 0., yHit = 0, zHit = 0;
+                Int_t sensorDetId = sector->IntersectClusters(frontChannel, backChannel, xHit, yHit, zHit);
 
-  // -----  Type 2: Strip sector OSU   -----------------------------------
-  else if ( iType == 2 ) {
-    Fatal("FindHits","Sorry, not implemented yet");
-  }         // Strip OSU
-  // ---------------------------------------------------------------------
-      
-  // -----  Type 3: Strip sector GSI   -----------------------------------
-  else if (iType == 3 ) {
-    Int_t iClusF = -1;
-    Int_t iClusB = -1;
-    Double_t chanF = -1;
-    Double_t chanB = -1;
-    Int_t nHits = fHits->GetEntriesFast();
-    Double_t xHit;
-    Double_t yHit;
-    Double_t zHit;
-    TVector3 pos, dpos;
-    CbmStsCluster* clusterF = NULL;
-    CbmStsCluster* clusterB = NULL;
+                if (sensorDetId == -1)
+                    continue;
 
-    Double_t vX, vY, vXY;
-    if (stereoF==0.&&stereoB*180/TMath::Pi()<80) {
-      vX  = dx / TMath::Sqrt(12.);
-      vY  = dx / TMath::Sqrt(6.) / TMath::Abs(TMath::Tan(stereoB));
-      vXY = -1. * dx * dx / 12. / TMath::Tan(stereoB);
-    }
-    else if (stereoF==0.&&stereoB*180/TMath::Pi()>80) {
-      vX  = dx / TMath::Sqrt(12.);
-      vY  = dx / TMath::Sqrt(12.);
-      vXY = 0.;
-    }
-    else {
-      vX  = dx / TMath::Sqrt(12.);
-      vY  = dx / TMath::Sqrt(12.) / TMath::Abs(TMath::Tan(stereoB));
-      vXY = 0.;
-    }
-    
-    for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
-      iClusF = (*it1);
-      clusterF  = (CbmStsCluster*) fClusters->At(iClusF);
-      if ( ! clusterF ) {
-	cout << "-W- " << GetName() << "::FindHits: Invalid cluster index " 
-	     << iClusF << " in front set of sector " 
-	     << sector->GetSectorNr() << ", station " 
-	     << station->GetStationNr() << endl;
-	continue;
-      }
-      chanF = clusterF->GetMean();
-      for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
-	iClusB = (*it2);
-	clusterB = (CbmStsCluster*) fClusters->At(iClusB);
-	if ( ! clusterB ) {
-	  cout << "-W- " << GetName() << "::FindHits: Invalid cluster index " 
-	       << iClusB << " in back set of sector " 
-	       << sector->GetSectorNr() << ", station " 
-	       << station->GetStationNr() << endl;
-	  continue;
-	}
-	chanB = clusterB->GetMean();
-	
-	Int_t sensorDetId = sector->IntersectClusters(chanF,chanB,xHit,yHit,zHit);
+                TVector3 pos(xHit, yHit, zHit);
 
-	if ( sensorDetId == -1 ) continue;
+                Double_t vXTemp, vYTemp, vXYTemp;
 
-	pos.SetXYZ(xHit, yHit, zHit);
+                Double_t wX = vX * vX * cosRotation * cosRotation - 2. * vXY * cosRotation * sinRotation + vY * vY * sinRotation * sinRotation;
+                Double_t wY = vX * vX * sinRotation * sinRotation + 2. * vXY * cosRotation * sinRotation + vY * vY * cosRotation * cosRotation;
+                Double_t wXY = (vX * vX - vY * vY) * cosRotation * sinRotation + vXY * (cosRotation * cosRotation - sinRotation * sinRotation);
+                Double_t sigmaX = TMath::Sqrt(wX);
+                Double_t sigmaY = TMath::Sqrt(wY);
+                TVector3 dpos;
 
-	Double_t vXTemp, vYTemp, vXYTemp;
+                if (stereoF == 0. && stereoB * 180 / TMath::Pi() < 80)
+                { // 0&15 case
 
-        Double_t wX  = vX * vX  * cosrot * cosrot 
-                 - 2. * vXY * cosrot * sinrot
-                 + vY * vY  * sinrot * sinrot;
-        Double_t wY  = vX * vX  * sinrot * sinrot
-                 + 2. * vXY * cosrot * sinrot
-	         + vY * vY  * cosrot * cosrot; 
-        Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
-                 + vXY * ( cosrot*cosrot - sinrot*sinrot );
-        Double_t sigmaX = TMath::Sqrt(wX);
-        Double_t sigmaY = TMath::Sqrt(wY);
+                    vXTemp = vX * frontCluster->GetMeanError();
+                    vYTemp = (vX / (TMath::Tan(stereoB))) * TMath::Sqrt(frontCluster->GetMeanError() * frontCluster->GetMeanError() +
+                                                                        backCluster->GetMeanError() * backCluster->GetMeanError());
+                    vXYTemp = -vXTemp * vXTemp / (TMath::Tan(stereoB));
 
-	if (stereoF==0.&&stereoB*180/TMath::Pi()<80) {		//0&15 case
+                    wX = vXTemp * vXTemp * cosRotation * cosRotation - 2. * vXYTemp * cosRotation * sinRotation + vYTemp * vYTemp * sinRotation * sinRotation;
+                    wY = vXTemp * vXTemp * sinRotation * sinRotation + 2. * vXYTemp * cosRotation * sinRotation + vYTemp * vYTemp * cosRotation * cosRotation;
+                    wXY = (vXTemp * vXTemp - vYTemp * vYTemp) * cosRotation * sinRotation + vXYTemp * (cosRotation * cosRotation - sinRotation * sinRotation);
+                    dpos.SetXYZ(TMath::Sqrt(wX), TMath::Sqrt(wY), 0.);
+                }
+                else if (stereoF == 0. && stereoB * 180 / TMath::Pi() > 80)
+                { // 0&90 case
 
-          vXTemp = vX * clusterF->GetMeanError();
-	  vYTemp = (vX/(TMath::Tan(stereoB))) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
-	  vXYTemp = - vXTemp * vXTemp / (TMath::Tan(stereoB));
-	
-	  wX = vXTemp * vXTemp  * cosrot * cosrot 
-                 - 2. * vXYTemp * cosrot * sinrot
-                 + vYTemp * vYTemp  * sinrot * sinrot;
-	  wY = vXTemp * vXTemp  * sinrot * sinrot
-                 + 2. * vXYTemp * cosrot * sinrot
-	         + vYTemp * vYTemp  * cosrot * cosrot; 
-	  wXY = (vXTemp*vXTemp - vYTemp*vYTemp) * cosrot * sinrot
-                 + vXYTemp * ( cosrot*cosrot - sinrot*sinrot );
-	  dpos.SetXYZ(TMath::Sqrt(wX),TMath::Sqrt(wY), 0.);
-	}
-	else if (stereoF==0.&&stereoB*180/TMath::Pi()>80) {	//0&90 case
+                    vXTemp = vX * frontCluster->GetMeanError();
+                    vYTemp = vX * backCluster->GetMeanError();
+                    vXYTemp = 0.;
 
-	  vXTemp = vX * clusterF->GetMeanError();
-	  vYTemp = vX * clusterB->GetMeanError();
-	  vXYTemp = 0.;
+                    wX = vXTemp * vXTemp * cosRotation * cosRotation - 2. * vXYTemp * cosRotation * sinRotation + vYTemp * vYTemp * sinRotation * sinRotation;
+                    wY = vXTemp * vXTemp * sinRotation * sinRotation + 2. * vXYTemp * cosRotation * sinRotation + vYTemp * vYTemp * cosRotation * cosRotation;
+                    wXY = (vXTemp * vXTemp - vYTemp * vYTemp) * cosRotation * sinRotation + vXYTemp * (cosRotation * cosRotation - sinRotation * sinRotation);
+                    dpos.SetXYZ(TMath::Sqrt(wX), TMath::Sqrt(wY), 0.);
+                }
+                else
+                { // 7.5&-7.5 case
 
-          wX = vXTemp * vXTemp  * cosrot * cosrot 
-                 - 2. * vXYTemp * cosrot * sinrot
-                 + vYTemp * vYTemp  * sinrot * sinrot;
-	  wY = vXTemp * vXTemp  * sinrot * sinrot
-                 + 2. * vXYTemp * cosrot * sinrot
-	         + vYTemp * vYTemp  * cosrot * cosrot; 
-	  wXY = (vXTemp*vXTemp - vYTemp*vYTemp) * cosrot * sinrot
-                 + vXYTemp * ( cosrot*cosrot - sinrot*sinrot );
-	  dpos.SetXYZ(TMath::Sqrt(wX),TMath::Sqrt(wY), 0.);
-	}
+                    vXTemp = (vX / 2.) * TMath::Sqrt(frontCluster->GetMeanError() * frontCluster->GetMeanError() +
+                                                     backCluster->GetMeanError() * backCluster->GetMeanError());
+                    vYTemp = (vX / (2. * (TMath::Tan(stereoB)))) * TMath::Sqrt(frontCluster->GetMeanError() * frontCluster->GetMeanError() +
+                                                                               backCluster->GetMeanError() * backCluster->GetMeanError());
+                    vXYTemp = (vX * vX / (4. * (TMath::Tan(stereoB)))) *
+                              (backCluster->GetMeanError() * backCluster->GetMeanError() - frontCluster->GetMeanError() * frontCluster->GetMeanError());
 
-	else {							//7.5&-7.5 case
+                    wX = vXTemp * vXTemp * cosRotation * cosRotation - 2. * vXYTemp * cosRotation * sinRotation + vYTemp * vYTemp * sinRotation * sinRotation;
+                    wY = vXTemp * vXTemp * sinRotation * sinRotation + 2. * vXYTemp * cosRotation * sinRotation + vYTemp * vYTemp * cosRotation * cosRotation;
+                    wXY = (vXTemp * vXTemp - vYTemp * vYTemp) * cosRotation * sinRotation + vXYTemp * (cosRotation * cosRotation - sinRotation * sinRotation);
+                    dpos.SetXYZ(TMath::Sqrt(wX), TMath::Sqrt(wY), 0.);
+                }
 
-	  vXTemp = (vX/2.) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
-	  vYTemp = (vX/(2.*(TMath::Tan(stereoB)))) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
-	  vXYTemp = (vX*vX/(4.*(TMath::Tan(stereoB)))) * (clusterB->GetMeanError()*clusterB->GetMeanError() - clusterF->GetMeanError()*clusterF->GetMeanError());
-	
-	  wX = vXTemp * vXTemp  * cosrot * cosrot 
-                 - 2. * vXYTemp * cosrot * sinrot
-                 + vYTemp * vYTemp  * sinrot * sinrot;
-	  wY = vXTemp * vXTemp  * sinrot * sinrot
-                 + 2. * vXYTemp * cosrot * sinrot
-	         + vYTemp * vYTemp  * cosrot * cosrot; 
-	  wXY = (vXTemp*vXTemp - vYTemp*vYTemp) * cosrot * sinrot
-                 + vXYTemp * ( cosrot*cosrot - sinrot*sinrot );
-	  dpos.SetXYZ(TMath::Sqrt(wX),TMath::Sqrt(wY), 0.);
+                Int_t statLayer = -1;
+                for (Int_t istatL = station->GetNofZ(); istatL > 0; istatL--)
+                {
+                    if (TMath::Abs(zHit - station->GetZ(istatL - 1)) < 0.00001)
+                    {
+                        statLayer = istatL - 1;
+                        break;
+                    }
+                }
 
-	}
-	
-	Int_t statLayer = -1;
-	for ( Int_t istatL = station->GetNofZ() ; istatL > 0 ; istatL-- ) 
-	  if ( TMath::Abs(zHit-station->GetZ(istatL-1)) < 0.00001 ) {
-	    statLayer = istatL-1;
-	    break;
-	  }
-	
-	if ( statLayer == -1 ) 
-	  cout << "unknown layer for hit at z = " << zHit << endl;
-
-	new ((*fHits)[nHits++]) CbmStsHit(sensorDetId, pos, dpos, wXY, 
-					  iClusF, iClusB, (Int_t)chanF, (Int_t)chanB, statLayer);
-
-	nNew++;
-	if ( fVerbose > 3 ) cout << "New StsHit at (" << xHit << ", " << yHit
-				 << ", " << zHit << "), station " 
-				 << stationNr << ", sector " << sectorNr 
-				 << ", channel " << chanF << " / " 
-				 << chanB 
-				 << endl;
-	
-      }      // back side strip loop
-    }        // front side strip loop
-    
-  }          // strip GSI
-  // ---------------------------------------------------------------------
-  
-  
-  return nNew;
+                Int_t size = fHits->GetEntriesFast();
+                new ((*fHits)[size]) CbmStsHit(sensorDetId, pos, dpos, wXY, frontClusterId, backClusterId, (Int_t)frontChannel, (Int_t)backChannel, statLayer);
+            } // back side strip loop
+        }     // front side strip loop
+    }         // strip GSI
 }
-// -------------------------------------------------------------------------
 
-// -----   Virtual method Finish   -----------------------------------------
-void CbmStsFindHits::Finish() {
-  cout << endl;
-  cout << "============================================================"
-       << endl;
-  cout << "===== " << fName << ": Run summary " << endl;
-  cout << "===== " << endl;
-  cout << "===== Number of hits                 : " 
-       << setw(8) << setprecision(2) 
-       << fNHits << endl;
-  cout << "============================================================"
-       << endl;
-	
-}					       
-// -------------------------------------------------------------------------
+void CbmStsFindHits::Finish()
+{
+}
 
 ClassImp(CbmStsFindHits)
-
-
-	
-	
-	
-  
-		      
-
-
-
-
-
- 

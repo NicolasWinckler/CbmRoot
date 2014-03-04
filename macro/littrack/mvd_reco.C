@@ -88,10 +88,10 @@ void mvd_reco(Int_t nEvents = 100)
       stsDigitize->SetStripDeadTime(StripDeadTime);
       run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder();
       run->AddTask(stsClusterFinder);
 
-      FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
+      FairTask* stsFindHits = new CbmStsFindHits();
       run->AddTask(stsFindHits);
 
       FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
@@ -103,7 +103,7 @@ void mvd_reco(Int_t nEvents = 100)
       FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
       run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder();
       run->AddTask(stsClusterFinder);
 
       FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);

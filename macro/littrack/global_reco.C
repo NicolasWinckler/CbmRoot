@@ -23,7 +23,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
    // Input and output data
-	TString dir = "events/much_v12b/"; // Output directory
+	TString dir = "events/sts_v13c/"; // Output directory
    TString mcFile = dir + "mc.0000.root"; // MC transport file
    TString parFile = dir + "param.0000.root"; // Parameters file
    TString globalRecoFile = dir + "global.reco.0000.root"; // Output file with reconstructed tracks and hits
@@ -123,10 +123,10 @@ void global_reco(Int_t nEvents = 100, // number of events
          stsDigitize->SetStripDeadTime(StripDeadTime);
          run->AddTask(stsDigitize);
 
-         FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+         FairTask* stsClusterFinder = new CbmStsClusterFinder();
          run->AddTask(stsClusterFinder);
 
-         FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
+         FairTask* stsFindHits = new CbmStsFindHits();
          run->AddTask(stsFindHits);
 
          FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
@@ -138,7 +138,7 @@ void global_reco(Int_t nEvents = 100, // number of events
          FairTask* stsDigitize =	new CbmStsIdealDigitize("STSDigitize", iVerbose);
          run->AddTask(stsDigitize);
 
-         FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+         FairTask* stsClusterFinder = new CbmStsClusterFinder();
          run->AddTask(stsClusterFinder);
 
          FairTask* stsFindHits =	new CbmStsIdealFindHits("STSFindHits", iVerbose);

@@ -92,14 +92,13 @@ Int_t runHoughStsTrackFinder(Int_t nEvents=2)
 
 
   // -----   STS Cluster Finder   --------------------------------------------
-  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
-						       iVerbose);
+  FairTask* stsClusterFinder = new CbmStsClusterFinder();
   fRun->AddTask(stsClusterFinder);
   // -------------------------------------------------------------------------
 
 
   // ---  STS hit finding   -------------------------------------------------
-  CbmStsFindHits* findHits            = new CbmStsFindHits("STS Hit Finder", iVerbose);
+  CbmStsFindHits* findHits            = new CbmStsFindHits();
   fRun->AddTask(findHits);
   // ------------------------------------------------------------------------
 

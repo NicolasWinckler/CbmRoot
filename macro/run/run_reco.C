@@ -137,13 +137,13 @@ void run_reco(Int_t nEvents = 2) {
 
 
   // -----   STS Cluster Finder   --------------------------------------------
-  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+  FairTask* stsClusterFinder = new CbmStsClusterFinder();
   run->AddTask(stsClusterFinder);
   // -------------------------------------------------------------------------
 
 
   // -----   STS hit finder   ------------------------------------------------
-  FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
+  FairTask* stsFindHits = new CbmStsFindHits();
   run->AddTask(stsFindHits);
   // -------------------------------------------------------------------------
 

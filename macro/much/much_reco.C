@@ -39,10 +39,10 @@ void much_reco(
    CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
    run->AddTask(stsDigitize);
 
-   FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
+   FairTask* stsClusterFinder = new CbmStsClusterFinder();
    run->AddTask(stsClusterFinder);
 
-   FairTask* stsFindHits = new CbmStsFindHits("STS Hit Finder", iVerbose);
+   FairTask* stsFindHits = new CbmStsFindHits();
    run->AddTask(stsFindHits);
 
    FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);

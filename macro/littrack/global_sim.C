@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-void global_sim(Int_t nEvents = 10)
+void global_sim(Int_t nEvents = 100)
 {
    TTree::SetMaxTreeSize(90000000000);
 	TString script = TString(gSystem->Getenv("LIT_SCRIPT"));
@@ -34,7 +34,7 @@ void global_sim(Int_t nEvents = 10)
 
 	// Files
 	TString urqmdFile  = "/Users/andrey/Development/cbm/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir = "events/mvd/"; // Directory for output simulation files
+	TString dir = "events/sts_v13c/"; // Directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 	TString plutoFile = "/Users/andrey/Development/cbm/d/pluto/omega.25gev.1M.root";
@@ -59,8 +59,8 @@ void global_sim(Int_t nEvents = 10)
 	} else if (setup == "electron") {
 		caveGeom   = "cave.geo";
 		//targetGeom = "target/target_au_250mu.geo";
-		pipeGeom   = "pipe/pipe_v13b.geo.root";
-		mvdGeom    = "mvd/mvd_v07a.geo.root";
+		pipeGeom   = "pipe/pipe_v13a.geo.root";
+		mvdGeom    = "";//"mvd/mvd_v07a.geo.root";
 		stsGeom    = "sts/sts_v13c.geo.root";
 		richGeom   = "";//"rich/rich_v08a.geo";
 		trdGeom    = "";//"trd/trd_v13p_3e.geo.root";

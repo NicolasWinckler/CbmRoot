@@ -11,11 +11,15 @@
 #include "FairSource.h"
 #include "CbmDetectorList.h"
 
+#include "TList.h"
+#include "TString.h"
+#include "TObjString.h"
+
 #include "roc/Message.h"
 #include "roc/Iterator.h"
 
 #include <map>
-#include "TString.h"
+#include <set>
 
 class CbmDigi;
 class CbmDaqMap;
@@ -40,12 +44,16 @@ class CbmSourceLmd : public FairSource
     void SetReadInTimeStep(ULong_t step) { fReadInTimeStep = step;  }
     void SetPersistence(Bool_t persistence = kTRUE) { fPersistence = persistence; }
 
-    void AddFile(const char * fname) { fInputFileName = fname;}
+    void AddFile(const char * fname) {       
+      fInputFileList.Add(new TObjString(fname));
+    }
 
  private:
 
     // --- Settings
     TString  fInputFileName;    ///< Name of lmd input file
+    TList    fInputFileList;    ///< List of input files
+    Int_t    fFileCounter;      ///< Counter the actual file in list
     ULong_t  fReadInTimeStep;   ///< Time step in which data from input are read
     Bool_t   fPersistence;      ///< Flag for file storage of output arrays
     Double_t fEventTimeWindow;  ///< Time window for association of digi to event
@@ -86,11 +94,14 @@ class CbmSourceLmd : public FairSource
     // --- Output arrays
     TClonesArray* fHodoDigis;       ///< Output array of CbmHodoDigi
     TClonesArray* fStsDigis;        ///< Output array of CbmStsDigiLight
+    TClonesArray* fStsBaselineDigis;  ///< Output array for baseline calib
     TClonesArray* fMuchDigis;       ///< Output array of CbmMuchDigi
     TClonesArray* fAuxDigis;        ///< Output array of CbmAuxDigi
 
+    Bool_t fBaselineData;   ///< Flag if the data is for baseline calibration
+    std::set<Int_t> fBaselineRoc; ///< List of RocIds which already signaled changin of readout status
 
-
+    void ProcessSystemMessage();
     void ProcessEpochMarker();
     void ProcessHodoMessage();
     void ProcessMuchMessage();
@@ -109,7 +120,7 @@ class CbmSourceLmd : public FairSource
      **/
     CbmDigi* GetNextData();
 
-
+    void FillBaselineDataContainer();
 
     ClassDef(CbmSourceLmd, 0)
 };

@@ -55,8 +55,8 @@ Set(DEPENDENCIES
     ${LIBRARY_OUTPUT_PATH}/libDabcMbs.so 
     ${LIBRARY_OUTPUT_PATH}/libDabcBase.so 
     ${LIBRARY_OUTPUT_PATH}/libRoc.so 
+    Sts
     CbmData CbmBase
-#    ${LIBRARY_OUTPUT_PATH}/libRocDict.so 
     Base 
 )
 

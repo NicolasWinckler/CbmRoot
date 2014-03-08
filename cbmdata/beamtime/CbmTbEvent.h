@@ -49,7 +49,9 @@ class CbmTbEvent : public FairEventHeader
     return (fTimeBc.empty() ? 0. : fTimeBc[0]); }
   Double_t GetTimeBc(Int_t iBc) const { 
     return (fTimeBc.size() > iBc ? fTimeBc[iBc] : 0.); }
+  Int_t    GetEventType()    const { return fEventType; }
 
+  void     SetEventType(Int_t type) { fEventType = type; }
 
   /** Add a digi to the event  **/
   void AddDigi(CbmDigi* digi);
@@ -86,6 +88,7 @@ class CbmTbEvent : public FairEventHeader
   std::vector<Double_t> fTimeBc;  /** Time Of Beam Counter messages **/
   Int_t    fNofDigis[kNOFDETS];   ///< Number of digis per detector system
   Int_t    fNofAux;               ///< Number of AUX signals in event
+  Int_t    fEventType;            ///< Type of event 0=normal event,1=baseline
 
   Double_t fTimeSum;              //! Transient. For calculation of tmean.
 

@@ -20,16 +20,17 @@ void CbmDetectorList::GetSystemName(DetectorId det, TString& name) {
 
   switch(det) {
 
-  case kREF:  name = "ref";  break;
-  case kMVD:  name = "mvd";  break;
-  case kSTS:  name = "sts";  break;
-  case kRICH: name = "rich"; break;
-  case kMUCH: name = "much"; break;
-  case kTRD:  name = "trd";  break;
-  case kTOF:  name = "tof";  break;
-  case kECAL: name = "ecal"; break;
-  case kPSD:  name = "psd";  break;
-  default:    name = "unknown"; break;
+  case kREF:    name = "ref";  break;
+  case kMVD:    name = "mvd";  break;
+  case kSTS:    name = "sts";  break;
+  case kRICH:   name = "rich"; break;
+  case kMUCH:   name = "much"; break;
+  case kTRD:    name = "trd";  break;
+  case kTOF:    name = "tof";  break;
+  case kECAL:   name = "ecal"; break;
+  case kFHODO:  name = "fhodo";  break;
+  case kTutDet: name = "tutdet";  break;
+  default:      name = "unknown"; break;
 
   }
 
@@ -54,16 +55,18 @@ void CbmDetectorList::GetSystemNameCaps(DetectorId det, TString& name) {
 
   switch(det) {
 
-  case kREF:  name = "REF";  break;
-  case kMVD:  name = "MVD";  break;
-  case kSTS:  name = "STS";  break;
-  case kRICH: name = "RICH"; break;
-  case kMUCH: name = "MUCH"; break;
-  case kTRD:  name = "TRD";  break;
-  case kTOF:  name = "TOF";  break;
-  case kECAL: name = "ECAL"; break;
-  case kPSD:  name = "PSD";  break;
-  default:    name = "UNKNOWN"; break;
+  case kREF:    name = "REF";  break;
+  case kMVD:    name = "MVD";  break;
+  case kSTS:    name = "STS";  break;
+  case kRICH:   name = "RICH"; break;
+  case kMUCH:   name = "MUCH"; break;
+  case kTRD:    name = "TRD";  break;
+  case kTOF:    name = "TOF";  break;
+  case kECAL:   name = "ECAL"; break;
+  case kPSD:    name = "PSD";  break;
+  case kFHODO:  name = "FHODO";  break;
+  case kTutDet: name = "TUTDET";  break;
+  default:      name = "UNKNOWN"; break;
 
   }
 

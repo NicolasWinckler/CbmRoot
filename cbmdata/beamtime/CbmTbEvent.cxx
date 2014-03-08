@@ -26,7 +26,8 @@ CbmTbEvent::CbmTbEvent()
   fTimeBc(),
   fNofDigis(),
   fNofAux(0),
-  fTimeSum(0.)
+  fTimeSum(0.),
+  fEventType(0) 
 {
   Clear();
 }
@@ -84,7 +85,9 @@ void CbmTbEvent::Clear() {
   fNofAux        = 0;
   for (Int_t iSys = 0; iSys < kNOFDETS; iSys++) fNofDigis[iSys] = 0;
   fTimeBc.clear();
+  fEventType     = 0;
   fTimeSum       = 0.;
+ 
 }
 // ---------------------------------------------------------------------------
 

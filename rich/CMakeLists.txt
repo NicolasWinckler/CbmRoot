@@ -86,6 +86,7 @@ tracks/CbmRichTrackExtrapolationMirrorIdeal.cxx
 qa/CbmRichTestSim.cxx  
 qa/CbmRichTestHits.cxx 
 qa/CbmRichRingFitterQa.cxx
+qa/CbmRichGeoOpt.cxx
 #qa/CbmRichParallelQa.cxx 
 selection/CbmRichRingSelectAnn.cxx
 prototype/CbmRichProt.cxx
@@ -131,6 +132,7 @@ prototype/CbmRichProtProjectionProducer.h
 prototype/CbmRichPrototypeQa.h
 qa/CbmRichGeoTest.h 
 qa/CbmRichUrqmdTest.h
+qa/CbmRichGeoOpt.h
 )
 
 If(TBB_FOUND)

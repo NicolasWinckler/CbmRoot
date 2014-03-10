@@ -65,24 +65,24 @@ void CbmTrdDigitizerPRF::SetParContainers()
 
 InitStatus CbmTrdDigitizerPRF::Init()
 {
-   FairRootManager* ioman = FairRootManager::Instance();
-   if (ioman == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF::Init: No FairRootManager" << FairLogger::endl;
+  FairRootManager* ioman = FairRootManager::Instance();
+  if (ioman == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF::Init: No FairRootManager" << FairLogger::endl;
 
-   fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
-   if (fPoints == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF::Init: No TrdPoint array" << FairLogger::endl;
+  fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
+  if (fPoints == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF::Init: No TrdPoint array" << FairLogger::endl;
 
-   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-   if (fMCTracks == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF::Init: No MCTrack array" << FairLogger::endl;
+  fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+  if (fMCTracks == NULL) LOG(FATAL) << "CbmTrdDigitizerPRF::Init: No MCTrack array" << FairLogger::endl;
 
-   fDigis = new TClonesArray("CbmTrdDigi", 100);
-   ioman->Register("TrdDigi", "TRD Digis", fDigis, kTRUE);
+  fDigis = new TClonesArray("CbmTrdDigi", 100);
+  ioman->Register("TrdDigi", "TRD Digis", fDigis, kTRUE);
 
-   fDigiMatches = new TClonesArray("CbmMatch", 100);
-   ioman->Register("TrdDigiMatch", "TRD Digis", fDigiMatches, kTRUE);
+  fDigiMatches = new TClonesArray("CbmMatch", 100);
+  ioman->Register("TrdDigiMatch", "TRD Digis", fDigiMatches, kTRUE);
+  if (fRadiator != NULL)
+    fRadiator->Init();
 
-   fRadiator->Init();
-
-   return kSUCCESS;
+  return kSUCCESS;
 }
 
 void CbmTrdDigitizerPRF::SetTriangularPads(Bool_t triangles)
@@ -92,93 +92,94 @@ void CbmTrdDigitizerPRF::SetTriangularPads(Bool_t triangles)
 
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
 {
-   fDigis->Delete();
-   fDigiMatches->Delete();
+  fDigis->Delete();
+  fDigiMatches->Delete();
 
-   fDebug = false;
-   TStopwatch timer;
-   timer.Start();
+  fDebug = false;
+  TStopwatch timer;
+  timer.Start();
 
-   Int_t nofLatticeHits = 0;
-   Int_t nofElectrons = 0;
-   Int_t nofBackwardTracks = 0;
-   Int_t nofPoints = fPoints->GetEntries();
-   for (Int_t iPoint = 0; iPoint < nofPoints ; iPoint++) {
-      fMCPointId = iPoint;
-      CbmTrdPoint* point = static_cast<CbmTrdPoint*>(fPoints->At(iPoint));
-      if(NULL == point) continue;
-      const CbmMCTrack* track = static_cast<const CbmMCTrack*>(fMCTracks->At(point->GetTrackID()));
-      if(NULL == track) continue;
+  Int_t nofLatticeHits = 0;
+  Int_t nofElectrons = 0;
+  Int_t nofBackwardTracks = 0;
+  Int_t nofPoints = fPoints->GetEntries();
+  for (Int_t iPoint = 0; iPoint < nofPoints ; iPoint++) {
+    fMCPointId = iPoint;
+    CbmTrdPoint* point = static_cast<CbmTrdPoint*>(fPoints->At(iPoint));
+    if(NULL == point) continue;
+    const CbmMCTrack* track = static_cast<const CbmMCTrack*>(fMCTracks->At(point->GetTrackID()));
+    if(NULL == track) continue;
 
-      Double_t dz = point->GetZOut() - point->GetZIn();
-      if (dz < 0) {
-         LOG(DEBUG2) << "CbmTrdDigitizerPRF::Exec: MC-track points towards target!" << FairLogger::endl;
-         nofBackwardTracks++;
-      }
+    Double_t dz = point->GetZOut() - point->GetZIn();
+    if (dz < 0) {
+      LOG(DEBUG2) << "CbmTrdDigitizerPRF::Exec: MC-track points towards target!" << FairLogger::endl;
+      nofBackwardTracks++;
+    }
 
-      TVector3 mom;
-      point->Momentum(mom);
+    TVector3 mom;
+    point->Momentum(mom);
 
-      Double_t ELoss = 0.0;
-      Double_t ELossTR = 0.0;
-      Double_t ELossdEdX = 0.0;
+    Double_t ELoss = 0.0;
+    Double_t ELossTR = 0.0;
+    Double_t ELossdEdX = 0.0;
+    if (fRadiator != NULL)
       if (TMath::Abs(track->GetPdgCode()) == 11){
-         nofElectrons++;
-         if (fRadiator->LatticeHit(point)){  // electron has passed lattice grid (or frame material) befor reaching the gas volume -> TR-photons have been absorbed by the lattice grid
-            nofLatticeHits++;
-            ELossTR = 0.0;
-         } else if (dz < 0){ //electron has not passed the radiator
-            ELossTR = 0.0;
-         } else {
-            ELossTR = fRadiator->GetTR(mom);
-         }
+	nofElectrons++;
+	if (fRadiator->LatticeHit(point)){  // electron has passed lattice grid (or frame material) befor reaching the gas volume -> TR-photons have been absorbed by the lattice grid
+	  nofLatticeHits++;
+	  ELossTR = 0.0;
+	} else if (dz < 0){ //electron has not passed the radiator
+	  ELossTR = 0.0;
+	} else {
+	  ELossTR = fRadiator->GetTR(mom);
+	}
       }
-      ELossdEdX = point->GetEnergyLoss();
-      ELoss = ELossTR + ELossdEdX;
+    ELossdEdX = point->GetEnergyLoss();
+    ELoss = ELossTR + ELossdEdX;
 
-      fTime = point->GetTime();
+    fTime = point->GetTime();
 
-      // Find node corresponding to the point in the center between entrance and exit MC-point coordinates
-      Double_t meanX = (point->GetXOut() + point->GetXIn()) / 2.;
-      Double_t meanY = (point->GetYOut() + point->GetYIn()) / 2.;
-      Double_t meanZ = (point->GetZOut() + point->GetZIn()) / 2.;
-      gGeoManager->FindNode(meanX, meanY, meanZ);
+    // Find node corresponding to the point in the center between entrance and exit MC-point coordinates
+    Double_t meanX = (point->GetXOut() + point->GetXIn()) / 2.;
+    Double_t meanY = (point->GetYOut() + point->GetYIn()) / 2.;
+    Double_t meanZ = (point->GetZOut() + point->GetZIn()) / 2.;
+    gGeoManager->FindNode(meanX, meanY, meanZ);
 
-      if (!TString(gGeoManager->GetPath()).Contains("gas")){
-         LOG(ERROR) << "CbmTrdDigitizerPRF::Exec: MC-track not in TRD! Node:" << TString(gGeoManager->GetPath()).Data() << " gGeoManager->MasterToLocal() failed!" << FairLogger::endl;
-         continue;
-      }
+    if (!TString(gGeoManager->GetPath()).Contains("gas")){
+      LOG(ERROR) << "CbmTrdDigitizerPRF::Exec: MC-track not in TRD! Node:" << TString(gGeoManager->GetPath()).Data() << " gGeoManager->MasterToLocal() failed!" << FairLogger::endl;
+      continue;
+    }
 
-      fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
-      fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
+    fLayerId = CbmTrdAddress::GetLayerId(point->GetDetectorID());
+    fModuleId = CbmTrdAddress::GetModuleId(point->GetDetectorID());
 
-      fModuleInfo = fDigiPar->GetModule(point->GetDetectorID());
-      fnCol = fModuleInfo->GetNofColumns();
-      fnRow = fModuleInfo->GetNofRows();
+    fModuleInfo = fDigiPar->GetModule(point->GetDetectorID());
+    fnCol = fModuleInfo->GetNofColumns();
+    fnRow = fModuleInfo->GetNofRows();
 
-      SplitTrackPath(point, ELoss);
-   }
+    SplitTrackPath(point, ELoss);
+  }
 
-   // Fill data from internally used stl map into output TClonesArray
-   Int_t iDigi = 0;
-   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
-   for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
-      new ((*fDigis)[iDigi]) CbmTrdDigi(*(it->second.first));
-      new ((*fDigiMatches)[iDigi]) CbmMatch(*(it->second.second));
-      delete it->second.first;
-      delete it->second.second;
-      iDigi++;
-   }
-   fDigiMap.clear();
+  // Fill data from internally used stl map into output TClonesArray
+  Int_t iDigi = 0;
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it;
+  for (it = fDigiMap.begin() ; it != fDigiMap.end(); it++) {
+    new ((*fDigis)[iDigi]) CbmTrdDigi(*(it->second.first));
+    new ((*fDigiMatches)[iDigi]) CbmMatch(*(it->second.second));
+    delete it->second.first;
+    delete it->second.second;
+    iDigi++;
+  }
+  fDigiMap.clear();
 
-   Double_t digisOverPoints = (nofPoints > 0) ? fDigis->GetEntriesFast() / nofPoints : 0;
-   Double_t latticeHitsOverElectrons = (nofElectrons > 0) ? (Double_t) nofLatticeHits / (Double_t) nofElectrons : 0;
-   LOG(INFO) << "CbmTrdDigitizerPRF::Exec nofPoints=" << nofPoints << " nofDigis=" << fDigis->GetEntriesFast()
+  Double_t digisOverPoints = (nofPoints > 0) ? fDigis->GetEntriesFast() / nofPoints : 0;
+  Double_t latticeHitsOverElectrons = (nofElectrons > 0) ? (Double_t) nofLatticeHits / (Double_t) nofElectrons : 0;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec nofPoints=" << nofPoints << " nofDigis=" << fDigis->GetEntriesFast()
             << " digis/points=" << digisOverPoints << " nofBackwardTracks=" << nofBackwardTracks
             << " nofLatticeHits=" << nofLatticeHits << " nofElectrons=" << nofElectrons
             << " latticeHits/electrons=" << latticeHitsOverElectrons << FairLogger::endl;
-   timer.Stop();
-   LOG(INFO) << "CbmTrdDigitizerPRF::Exec real time=" << timer.RealTime()
+  timer.Stop();
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec real time=" << timer.RealTime()
             << " CPU time=" << timer.CpuTime() << FairLogger::endl;
 }
 

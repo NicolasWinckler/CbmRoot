@@ -85,20 +85,20 @@ void CbmTrdHitProducerSmearing::SetParContainers()
 
 InitStatus CbmTrdHitProducerSmearing::Init()
 {
-   FairRootManager* ioman = FairRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
 
-   fTrdPoints = (TClonesArray *) ioman->GetObject("TrdPoint");
-   if (NULL == fTrdPoints) Fatal("CbmTrdHitProducerSmearing", "No TrdPoint array!");
+  fTrdPoints = (TClonesArray *) ioman->GetObject("TrdPoint");
+  if (NULL == fTrdPoints) Fatal("CbmTrdHitProducerSmearing", "No TrdPoint array!");
 
-   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-   if (NULL == fMCTracks) Fatal("CbmTrdHitProducerSmearing", "No MCTrack array!");
+  fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+  if (NULL == fMCTracks) Fatal("CbmTrdHitProducerSmearing", "No MCTrack array!");
 
-   fTrdHits = new TClonesArray("CbmTrdHit", 100);
-   ioman->Register("TrdHit", "TRD", fTrdHits, kTRUE);
+  fTrdHits = new TClonesArray("CbmTrdHit", 100);
+  ioman->Register("TrdHit", "TRD", fTrdHits, kTRUE);
+  if (fRadiator != NULL)
+    fRadiator->Init();
 
-   fRadiator->Init();
-
-   return kSUCCESS;
+  return kSUCCESS;
 }
 
 void CbmTrdHitProducerSmearing::Exec(Option_t * option)
@@ -141,86 +141,87 @@ void CbmTrdHitProducerSmearing::Finish()
 
 CbmTrdHit* CbmTrdHitProducerSmearing::CreateHit(Int_t pointId)
 {
-   CbmTrdPoint* trdPoint = static_cast<CbmTrdPoint*>(fTrdPoints->At(pointId));
-   const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(trdPoint->GetTrackID()));
+  CbmTrdPoint* trdPoint = static_cast<CbmTrdPoint*>(fTrdPoints->At(pointId));
+  const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(trdPoint->GetTrackID()));
 
-   Int_t address = trdPoint->GetDetectorID();
-   Int_t layerId = CbmTrdAddress::GetLayerId(address);
+  Int_t address = trdPoint->GetDetectorID();
+  Int_t layerId = CbmTrdAddress::GetLayerId(address);
 
-   Double_t ELossTR = 0.0; // TR energy loss for e- and e+
-   Double_t ELossdEdX = trdPoint->GetEnergyLoss(); // Ionization energy loss
-   Double_t ELoss = ELossdEdX; // Total energy loss
+  Double_t ELossTR = 0.0; // TR energy loss for e- and e+
+  Double_t ELossdEdX = trdPoint->GetEnergyLoss(); // Ionization energy loss
+  Double_t ELoss = ELossdEdX; // Total energy loss
 
-   TVector3 mcPos, mcMom;
-   trdPoint->PositionOut(mcPos);
-   trdPoint->Momentum(mcMom);
+  TVector3 mcPos, mcMom;
+  trdPoint->PositionOut(mcPos);
+  trdPoint->Momentum(mcMom);
 
-   // TR: Sorry, electrons and positrons only
-   if (TMath::Abs(mcTrack->GetPdgCode()) == 11) {
+  // TR: Sorry, electrons and positrons only
+  if (fRadiator != NULL)
+    if (TMath::Abs(mcTrack->GetPdgCode()) == 11) {
       ELossTR = fRadiator->GetTR(mcMom);
       ELoss += ELossTR;
-   }
+    }
 
-   Int_t rotation = layerId % 2; // Rotation of the TRD planes. Even layers are rotated.
+  Int_t rotation = layerId % 2; // Rotation of the TRD planes. Even layers are rotated.
 
-   Double_t sigmaX = 0.;
-   Double_t sigmaY = 0.;
-   if (rotation == 1) { // rotated x->Y  y->X
-      Double_t teta = TMath::ATan(TMath::Abs(mcPos.X() / mcPos.Z())) * 1000; // mrad
-      sigmaY = GetSigmaX(layerId);
-      sigmaX = GetSigmaY(teta, layerId);
-   } else if (rotation == 0) { // not rotated x->X  y->Y
-      Double_t phi = TMath::ATan(TMath::Abs(mcPos.Y() / mcPos.Z())) * 1000; // mrad
-      sigmaX = GetSigmaX(layerId);
-      sigmaY = GetSigmaY(phi, layerId);
-   }
+  Double_t sigmaX = 0.;
+  Double_t sigmaY = 0.;
+  if (rotation == 1) { // rotated x->Y  y->X
+    Double_t teta = TMath::ATan(TMath::Abs(mcPos.X() / mcPos.Z())) * 1000; // mrad
+    sigmaY = GetSigmaX(layerId);
+    sigmaX = GetSigmaY(teta, layerId);
+  } else if (rotation == 0) { // not rotated x->X  y->Y
+    Double_t phi = TMath::ATan(TMath::Abs(mcPos.Y() / mcPos.Z())) * 1000; // mrad
+    sigmaX = GetSigmaX(layerId);
+    sigmaY = GetSigmaY(phi, layerId);
+  }
 
-   TVector3 hitPos;
-   if (!fUseDigiPar) {
+  TVector3 hitPos;
+  if (!fUseDigiPar) {
+    Double_t errX = GetHitErr(sigmaX);
+    Double_t errY = GetHitErr(sigmaY);
+    hitPos.SetX(mcPos.X() + errX);
+    hitPos.SetY(mcPos.Y() + errY);
+    hitPos.SetZ(mcPos.Z());
+  } else {
+    Bool_t isOutside = true;
+    Bool_t hitPosSet = false;
+    Int_t counter = 0;
+    do {
       Double_t errX = GetHitErr(sigmaX);
       Double_t errY = GetHitErr(sigmaY);
-      hitPos.SetX(mcPos.X() + errX);
-      hitPos.SetY(mcPos.Y() + errY);
-      hitPos.SetZ(mcPos.Z());
-   } else {
-      Bool_t isOutside = true;
-      Bool_t hitPosSet = false;
-      Int_t counter = 0;
-      do {
-         Double_t errX = GetHitErr(sigmaX);
-         Double_t errY = GetHitErr(sigmaY);
-         Double_t hitPosX = mcPos.X() + errX;
-         Double_t hitPosY = mcPos.Y() + errY;
-         Double_t hitPosZ = mcPos.Z();
+      Double_t hitPosX = mcPos.X() + errX;
+      Double_t hitPosY = mcPos.Y() + errY;
+      Double_t hitPosZ = mcPos.Z();
 
-         // If digitization scheme is provided than check if hit position is inside the detector
-         assert(fDigiPar != NULL);
-         fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(address));
-         Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizeX();
-         Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizeX();
-         Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizeY();
-         Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizeY();
-         isOutside = (hitPosX > moduleXmax || hitPosX < moduleXmin)
-                            || (hitPosX > moduleXmax || hitPosX < moduleXmin);
-         counter++;
-         if (!isOutside) { // If hit position is inside active volume
-            hitPos.SetX(hitPosX);
-            hitPos.SetY(hitPosY);
-            hitPos.SetZ(hitPosZ);
-            hitPosSet = true;
-            break;
-         }
-      } while (isOutside && counter < 10);
-      if (!hitPosSet) { // If hit position was not set than use Mc position
-         hitPos.SetX(mcPos.X());
-         hitPos.SetY(mcPos.Y());
-         hitPos.SetZ(mcPos.Z());
+      // If digitization scheme is provided than check if hit position is inside the detector
+      assert(fDigiPar != NULL);
+      fModuleInfo = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(address));
+      Double_t moduleXmax = fModuleInfo->GetX() + fModuleInfo->GetSizeX();
+      Double_t moduleXmin = fModuleInfo->GetX() - fModuleInfo->GetSizeX();
+      Double_t moduleYmax = fModuleInfo->GetY() + fModuleInfo->GetSizeY();
+      Double_t moduleYmin = fModuleInfo->GetY() - fModuleInfo->GetSizeY();
+      isOutside = (hitPosX > moduleXmax || hitPosX < moduleXmin)
+	|| (hitPosX > moduleXmax || hitPosX < moduleXmin);
+      counter++;
+      if (!isOutside) { // If hit position is inside active volume
+	hitPos.SetX(hitPosX);
+	hitPos.SetY(hitPosY);
+	hitPos.SetZ(hitPosZ);
+	hitPosSet = true;
+	break;
       }
-   }
+    } while (isOutside && counter < 10);
+    if (!hitPosSet) { // If hit position was not set than use Mc position
+      hitPos.SetX(mcPos.X());
+      hitPos.SetY(mcPos.Y());
+      hitPos.SetZ(mcPos.Z());
+    }
+  }
 
-   TVector3 hitErr(sigmaX, sigmaY, 0.);
+  TVector3 hitErr(sigmaX, sigmaY, 0.);
 
-   return new CbmTrdHit(address, hitPos, hitErr, 0., pointId, ELossTR, ELossdEdX, ELoss);
+  return new CbmTrdHit(address, hitPos, hitErr, 0., pointId, ELossTR, ELossdEdX, ELoss);
 }
 
 

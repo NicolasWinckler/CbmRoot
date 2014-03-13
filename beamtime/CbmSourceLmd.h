@@ -92,11 +92,13 @@ class CbmSourceLmd : public FairSource
 
 
     // --- Output arrays
-    TClonesArray* fHodoDigis;       ///< Output array of CbmHodoDigi
-    TClonesArray* fStsDigis;        ///< Output array of CbmStsDigiLight
-    TClonesArray* fStsBaselineDigis;  ///< Output array for baseline calib
-    TClonesArray* fMuchDigis;       ///< Output array of CbmMuchDigi
-    TClonesArray* fAuxDigis;        ///< Output array of CbmAuxDigi
+    TClonesArray* fHodoDigis;         ///< Output array of CbmHodoDigi
+    TClonesArray* fHodoBaselineDigis; ///< Output array for baseline calib.
+    TClonesArray* fStsDigis;          ///< Output array of CbmStsDigi
+    TClonesArray* fStsBaselineDigis;  ///< Output array for baseline calib.
+    TClonesArray* fMuchDigis;         ///< Output array of CbmMuchDigi
+    TClonesArray* fMuchBaselineDigis; ///< Output array for baseline calib.
+    TClonesArray* fAuxDigis;          ///< Output array of CbmAuxDigi
 
     Bool_t fBaselineData;   ///< Flag if the data is for baseline calibration
     std::set<Int_t> fBaselineRoc; ///< List of RocIds which already signaled changin of readout status

@@ -61,9 +61,11 @@ CbmSourceLmd::CbmSourceLmd()
     fNofDigis(),
     fNofAux(0),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
+    fHodoBaselineDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
     fStsDigis(new TClonesArray("CbmStsDigi", 10)),
     fStsBaselineDigis(new TClonesArray("CbmStsDigi", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
+    fMuchBaselineDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
     fBaselineData(kFALSE),
     fBaselineRoc()
@@ -107,9 +109,11 @@ CbmSourceLmd::CbmSourceLmd(const char* inFile)
     fNofDigis(),
     fNofAux(0),
     fHodoDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
+    fHodoBaselineDigis(new TClonesArray("CbmFiberHodoDigi", 10)),
     fStsDigis(new TClonesArray("CbmStsDigi", 10)),
     fStsBaselineDigis(new TClonesArray("CbmStsDigi", 10)),
     fMuchDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
+    fMuchBaselineDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
     fBaselineData(kFALSE),
     fBaselineRoc()
@@ -320,11 +324,15 @@ Bool_t CbmSourceLmd::Init()
 
   // --- Register output branches
   FairRootManager* ioman = FairRootManager::Instance();
+  ioman->Register("HodoDigi", "HODO raw data", fHodoDigis, fPersistence);
+  ioman->Register("HodoBaselineDigi", "HODO baseline data", 
+		  fHodoBaselineDigis, fPersistence);
   ioman->Register("StsDigi", "STS raw data", fStsDigis, fPersistence);
   ioman->Register("StsBaselineDigi", "STS baseline data",
                   fStsBaselineDigis, fPersistence);
   ioman->Register("MuchDigi", "MUCH raw data", fMuchDigis, fPersistence);
-  ioman->Register("HodoDigi", "HODO raw data", fHodoDigis, fPersistence);
+  ioman->Register("MuchBaselineDigi", "MUCH baseline data", 
+		  fMuchBaselineDigis, fPersistence);
   ioman->Register("AuxDigi", "AUX data", fAuxDigis, fPersistence);
 
   // --- Get event header from Run
@@ -396,8 +404,6 @@ Int_t CbmSourceLmd::ReadEvent()
                 LOG(FATAL) << "No pointer to event header! " << fCurrentEvent << FairLogger::endl;
         }
 
-  // --- Clear output arrays
-  fStsDigis->Clear();
   // The next block is needed do to the problem that the TClonesArray is
   // very large after usage (2.5 M entries). This somehow slows down
   // the Clear of the container even if no entries are inside by 2-3 orders
@@ -407,15 +413,25 @@ Int_t CbmSourceLmd::ReadEvent()
   // It has to be checked if this is a bug in Root by producing a small
   // example program to demonstarete the issue
   if (fStsBaselineDigis->GetEntriesFast() > 1000) {
-    LOG(INFO) << "Length of StsBaselineDigis " 
-	      << fStsBaselineDigis->GetEntriesFast()
-              << FairLogger::endl;
     fStsBaselineDigis->Delete();
     fStsBaselineDigis->Expand(10);
   } 
-  fStsBaselineDigis->Clear();
+  if (fHodoBaselineDigis->GetEntriesFast() > 1000) {
+    fHodoBaselineDigis->Delete();
+    fHodoBaselineDigis->Expand(10);
+  } 
+  if (fMuchBaselineDigis->GetEntriesFast() > 1000) {
+    fMuchBaselineDigis->Delete();
+    fMuchBaselineDigis->Expand(10);
+  } 
+
+  // --- Clear output arrays
   fHodoDigis->Clear();
+  fHodoBaselineDigis->Clear();
+  fStsDigis->Clear();
+  fStsBaselineDigis->Clear();
   fMuchDigis->Clear();
+  fMuchBaselineDigis->Clear();
   fAuxDigis->Clear();
 
   // --- Clrear event header
@@ -561,30 +577,38 @@ void CbmSourceLmd::ProcessEpochMarker()
 void CbmSourceLmd::ProcessHodoMessage()
 {
 
+  // --- Increment message counter
+  fNofHitMsg[kFHODO]++;
+  
+  // --- Get absolute time, NXYTER and channel number
+  Int_t rocId      = fCurrentMessage->getRocNumber();
+  ULong_t hitTime  = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
+  Int_t nxyterId   = fCurrentMessage->getNxNumber();
+  Int_t nxChannel  = fCurrentMessage->getNxChNum();
+  Int_t charge     = fCurrentMessage->getNxAdcValue();
+  
+  Int_t iStation;
+  Int_t iSector;
+  Int_t iPlane;
+  Int_t iFiber;
+  
+  fDaqMap->Map(rocId, nxyterId, nxChannel, iStation, iSector, iPlane, iFiber);
+  Int_t address = CbmFiberHodoAddress::GetAddress(iStation, iPlane, iFiber);
+  
+  // --- Create a HODO digi and send it to the buffer
+  CbmFiberHodoDigi* digi = new CbmFiberHodoDigi(address, charge, hitTime);
+  
+  // In case of normal data insert the digi into the buffer.
+  // In case of baseline data insert the digi only if the roc 
+  // is already in baseline mode.  
   if (!fBaselineData) {
-    // --- Increment message counter
-    fNofHitMsg[kFHODO]++;
-
-    // --- Get absolute time, NXYTER and channel number
-    Int_t rocId      = fCurrentMessage->getRocNumber();
-    ULong_t hitTime  = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
-    Int_t nxyterId   = fCurrentMessage->getNxNumber();
-    Int_t nxChannel  = fCurrentMessage->getNxChNum();
-    Int_t charge     = fCurrentMessage->getNxAdcValue();
-
-    Int_t iStation;
-    Int_t iSector;
-    Int_t iPlane;
-    Int_t iFiber;
-
-    fDaqMap->Map(rocId, nxyterId, nxChannel, iStation, iSector, iPlane, iFiber);
-    Int_t address = CbmFiberHodoAddress::GetAddress(iStation, iPlane, iFiber);
-
-    // --- Create a HODO digi and send it to the buffer
-    CbmFiberHodoDigi* digi = new CbmFiberHodoDigi(address, charge, hitTime);
     fBuffer->InsertData(digi);
+  } else {
+    std::set<Int_t>::iterator it;
+    it = fBaselineRoc.find(rocId);
+    if (it != fBaselineRoc.end() ) { fBuffer->InsertData(digi); }
   }
-
+  
 }
 // --------------------------------------------------------------------------
 
@@ -594,37 +618,45 @@ void CbmSourceLmd::ProcessHodoMessage()
 void CbmSourceLmd::ProcessMuchMessage()
 {
 
+  // --- Increment message counter
+  fNofHitMsg[kMUCH]++;
+  
+  // --- Get absolute time, NXYTER and channel number
+  Int_t rocId      = fCurrentMessage->getRocNumber();
+  ULong_t hitTime  = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
+  Int_t nxyterId   = fCurrentMessage->getNxNumber();
+  Int_t nxChannel  = fCurrentMessage->getNxChNum();
+  Int_t charge     = fCurrentMessage->getNxAdcValue();
+  
+  LOG(DEBUG2) << "MUCH mssage at " << hitTime << FairLogger::endl;
+  
+  // --- Get detector element from DaqMap
+  Int_t station = fDaqMap->GetMuchStation(rocId);
+  Int_t layer   = 0;
+  Int_t side    = 0;
+  Int_t module  = 0;
+  Int_t sector  = nxyterId;
+  Int_t channel = nxChannel;
+
+  // --- Construct unique address
+  UInt_t address = CbmMuchAddress::GetAddress(station, layer, side,
+					      module, sector, channel);
+  
+  // --- Create digi
+  CbmMuchBeamTimeDigi* digi = new CbmMuchBeamTimeDigi(address, charge, hitTime);
+  LOG(DEBUG2) << "MUCH digi at " << digi->GetTime() << FairLogger::endl;
+  
+  // In case of normal data insert the digi into the buffer.
+  // In case of baseline data insert the digi only if the roc 
+  // is already in baseline mode.  
   if (!fBaselineData) {
-    // --- Increment message counter
-    fNofHitMsg[kMUCH]++;
-
-    // --- Get absolute time, NXYTER and channel number
-    Int_t rocId      = fCurrentMessage->getRocNumber();
-    ULong_t hitTime  = fCurrentMessage->getMsgFullTime(fCurrentEpoch[rocId]);
-    Int_t nxyterId   = fCurrentMessage->getNxNumber();
-    Int_t nxChannel  = fCurrentMessage->getNxChNum();
-    Int_t charge     = fCurrentMessage->getNxAdcValue();
-
-    LOG(DEBUG2) << "MUCH mssage at " << hitTime << FairLogger::endl;
-
-    // --- Get detector element from DaqMap
-    Int_t station = fDaqMap->GetMuchStation(rocId);
-    Int_t layer   = 0;
-    Int_t side    = 0;
-    Int_t module  = 0;
-    Int_t sector  = nxyterId;
-    Int_t channel = nxChannel;
-
-    // --- Construct unique address
-    UInt_t address = CbmMuchAddress::GetAddress(station, layer, side,
-                     module, sector, channel);
-
-    // --- Create digi
-    CbmMuchBeamTimeDigi* digi = new CbmMuchBeamTimeDigi(address, charge, hitTime);
-    LOG(DEBUG2) << "MUCH digi at " << digi->GetTime() << FairLogger::endl;
-
     fBuffer->InsertData(digi);
+  } else {
+    std::set<Int_t>::iterator it;
+    it = fBaselineRoc.find(rocId);
+    if (it != fBaselineRoc.end() ) { fBuffer->InsertData(digi); }
   }
+
 }
 // --------------------------------------------------------------------------
 
@@ -733,13 +765,18 @@ void CbmSourceLmd::Reset()
 
 void CbmSourceLmd::FillBaselineDataContainer()
 {
+
   // --- Clear output arrays
-  fCurrentEvent->Clear();
+  fHodoDigis->Clear();
+  fHodoBaselineDigis->Clear();
   fStsDigis->Clear();
   fStsBaselineDigis->Clear();
-  fHodoDigis->Clear();
   fMuchDigis->Clear();
+  fMuchBaselineDigis->Clear();
   fAuxDigis->Clear();
+
+  // --- Clrear event header
+  fCurrentEvent->Clear();
 
   LOG(INFO) << "Event type is now: " << fCurrentEvent->GetEventType() << FairLogger::endl;
   fCurrentEvent->SetEventType(1);
@@ -756,6 +793,14 @@ void CbmSourceLmd::FillBaselineDataContainer()
       CbmStsDigi(*(dynamic_cast<CbmStsDigi*>(fCurrentDigi)));
       fCurrentEvent->AddDigi(fCurrentDigi);
       fNofDigis[kTutDet]++;
+    } else if ( systemId == kMUCH ) {
+      new( (*fMuchBaselineDigis)[fMuchBaselineDigis->GetEntriesFast()])
+	CbmMuchBeamTimeDigi(*(dynamic_cast<CbmMuchBeamTimeDigi*>(fCurrentDigi)));
+      fNofDigis[kTutDet]++;
+    } else if ( systemId == kFHODO ) {
+      new( (*fHodoBaselineDigis)[fHodoBaselineDigis->GetEntriesFast()])
+	CbmFiberHodoDigi(*(dynamic_cast<CbmFiberHodoDigi*>(fCurrentDigi)));
+      fNofDigis[kTutDet]++;
     } else if ( systemId == 999) { // I know I should not hardcode numbers....
       // check if this is a misused auxmessage to set/unset basline
       // calibration
@@ -771,7 +816,7 @@ void CbmSourceLmd::FillBaselineDataContainer()
     } else {
       //     LOG(ERROR) << "Between baseline start and end marker there should be only sts data" <<FairLogger::endl;
     }
-
+    
     delete fCurrentDigi;
     fCurrentDigi = GetNextData();
     if ( ! fCurrentDigi ) {

@@ -11,10 +11,11 @@ Set(INCLUDE_DIRECTORIES
   ${CBMROOT_SOURCE_DIR}/cbmdata/much
   ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime
   ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime/fhodo
+  ${CBMROOT_SOURCE_DIR}/sts/setup
   ${CBMROOT_BINARY_DIR}/roc/roc/roclib
   ${CBMROOT_SOURCE_DIR}/beamtime
   ${CBMROOT_SOURCE_DIR}/beamtime/fhodo
-  ${CBMROOT_SOURCE_DIR}/sts/setup
+  ${CBMROOT_SOURCE_DIR}/beamtime/reco
 )
 
 Include_Directories( 
@@ -32,12 +33,13 @@ Link_Directories(
 
 Set(SRCS
   CbmDaqMap.cxx
-# CbmRocSource.cxx
   CbmMuchDigiTb.cxx
   CbmSourceLmd.cxx
   CbmTbDaqBuffer.cxx
 
   fhodo/CbmFiberHodoClusterFinder.cxx
+
+  reco/CbmStsBLCalibrator.cxx
 )
 
 # Add artificial dependency which delays the compilation of the defined file

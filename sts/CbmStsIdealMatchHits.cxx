@@ -25,7 +25,7 @@
 #include "CbmStsPoint.h"
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 #include "TMath.h"
 

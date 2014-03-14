@@ -10,7 +10,7 @@ Set(LIBRARY_NAME Sts)
 # -----  Specify sources for compilation   ----------------
 # --- Sources in setup
 set(SRCS_SETUP
-setup/CbmStsAddress.cxx
+#setup/CbmStsAddress.cxx
 setup/CbmStsElement.cxx
 setup/CbmStsModule.cxx
 setup/CbmStsSenzor.cxx

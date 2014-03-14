@@ -7,7 +7,7 @@
 
 #include "CbmStsHit.h"
 #include "CbmMvdHit.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 //#include <ios.h>
 using std::vector;
 using std::ios;

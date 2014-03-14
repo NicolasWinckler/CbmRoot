@@ -5,7 +5,7 @@
 
 
 #include "CbmDetectorList.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 
 // -----    Definition of the address field   -------------------------------

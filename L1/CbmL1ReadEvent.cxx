@@ -18,7 +18,7 @@
 #include "L1Algo/L1Algo.h"
 #include "CbmKF.h"
 #include "CbmMatch.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 #include "TDatabasePDG.h"
 

@@ -54,7 +54,7 @@
 		#include "CbmMvdPoint.h"
 		#include "CbmStsHit.h"
 		#include "CbmMvdHit.h"
-      #include "setup/CbmStsAddress.h"
+      #include "CbmStsAddress.h"
 	#endif
 #endif
 #include "TGeoManager.h"

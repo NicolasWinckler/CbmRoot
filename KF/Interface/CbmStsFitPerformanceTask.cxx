@@ -28,7 +28,7 @@
 #include "CbmStsTrack.h"
 #include "CbmVertex.h"
 #include "CbmMvdHit.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 #include "TVector3.h"
 #include "TF1.h"

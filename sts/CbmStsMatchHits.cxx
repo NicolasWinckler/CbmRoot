@@ -27,7 +27,7 @@
 #include "CbmStsStation.h"
 #include "FairGeoVector.h"
 #include "FairGeoNode.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 #include "TMath.h"
 

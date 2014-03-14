@@ -17,7 +17,7 @@
 #include "CbmKF.h"
 #include "CbmMCTrack.h"
 #include <algorithm>
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 ClassImp(CbmKFTrErrMCPoints)
 

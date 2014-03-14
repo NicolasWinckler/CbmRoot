@@ -5,7 +5,7 @@
 #pragma link off all functions;
 
 // Setup
-#pragma link C++ class CbmStsAddress;
+//#pragma link C++ class CbmStsAddress;
 #pragma link C++ class CbmStsElement;
 #pragma link C++ class CbmStsModule;
 #pragma link C++ class CbmStsSenzor;

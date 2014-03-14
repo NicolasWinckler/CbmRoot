@@ -5,7 +5,7 @@
 
 
 #include "FairLogger.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 #include "setup/CbmStsModule.h"
 #include "setup/CbmStsSensorType.h"
 

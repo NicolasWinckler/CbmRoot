@@ -8,7 +8,7 @@
 
 
 #include "TNamed.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 class TGeoPhysicalNode;
 

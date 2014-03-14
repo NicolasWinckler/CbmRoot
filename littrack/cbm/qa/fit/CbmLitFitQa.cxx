@@ -14,7 +14,7 @@
 #include "CbmTrack.h"
 #include "CbmMvdHit.h"
 #include "CbmStsHit.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 #include "CbmMCTrack.h"
 #include "CbmTrdAddress.h"
 #include "CbmMuchGeoScheme.h"

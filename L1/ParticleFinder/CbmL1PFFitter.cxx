@@ -18,7 +18,7 @@
 #include "CbmL1.h"
 #include "TClonesArray.h"
 #include "CbmStsTrack.h"
-#include "setup/CbmStsAddress.h"
+#include "CbmStsAddress.h"
 
 //L1Algo tools
 #include "L1Algo.h"

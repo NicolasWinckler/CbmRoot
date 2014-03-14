@@ -150,7 +150,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
   for (Int_t iHit = 0; iHit<nHits; iHit++) {
     pHit = (CbmStsHit*) fStsHits->At(iHit);
     if ( ! pHit ) continue;
-    ptIndex = pHit->GetRefIndex();
+    ptIndex = pHit->GetRefId();
     if (ptIndex < 0) continue;           // fake or background hit
     pMCpt = (FairMCPoint*) (fMCPointArray->At(ptIndex));
     if ( ! pMCpt ) continue;
@@ -191,7 +191,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
       success = kFALSE;
       continue;
     }
-    ptIndex = pHit->GetRefIndex();
+    ptIndex = pHit->GetRefId();
     if (ptIndex < 0) continue;           // fake or background hit
     pMCpt = (FairMCPoint*) (fMCPointArray->At(ptIndex));
     if ( ! pMCpt ) {

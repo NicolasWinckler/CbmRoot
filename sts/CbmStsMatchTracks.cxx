@@ -147,7 +147,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
 	warn = kTRUE;
 	continue;
       }
-      iPoint = hit->GetRefIndex();
+      iPoint = hit->GetRefId();
       if ( iPoint < 0 ) {        // Fake or background hit
 	nFake++;
 	continue;

@@ -7,6 +7,7 @@
 
 #include "CbmStsHit.h"
 #include "CbmMvdHit.h"
+#include "setup/CbmStsAddress.h"
 //#include <ios.h>
 using std::vector;
 using std::ios;
@@ -18,7 +19,7 @@ static CbmKFTube st_tube;
 void CbmKFStsHit::Create( CbmStsHit *h ){
 
   CbmKF *KF = CbmKF::Instance();
-  int id = 1000+h->GetStationNr();
+  int id = 1000+CbmStsAddress::GetElementId(h->GetAddress(), kStsStation);//h->GetStationNr();
   MaterialIndex =  KF->GetMaterialIndex( id );
 
   if(  MaterialIndex>=0 ) tube = (CbmKFTube*)KF->vMaterial[MaterialIndex];
@@ -35,7 +36,7 @@ void CbmKFStsHit::Create( CbmStsHit *h ){
   FitPoint.z = pos.Z();
 #if 1
   FitPoint.V[0] = err.X() * err.X();
-  FitPoint.V[1] = h->GetCovXY();
+  FitPoint.V[1] = h->GetDxy();
   FitPoint.V[2] = err.Y() * err.Y();
 #else
   FitPoint.V[0] = 3.000e-06;

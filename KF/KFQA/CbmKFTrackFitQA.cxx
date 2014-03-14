@@ -574,7 +574,7 @@ void CbmKFTrackFitQA::StsHitMatch()
         vector<int> stsPointIds; // save here all mc-points matched with first cluster
         vector<int> stsPointIds_hit;
         int iL = 0;
-        FairLink link = stsHit->GetLink(iL);
+        CbmLink link = stsHit->GetMatch()->GetLink(iL);
         CbmStsCluster *stsCluster = dynamic_cast<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
         int NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
@@ -591,7 +591,7 @@ void CbmKFTrackFitQA::StsHitMatch()
         } // for digi
           // 2-nd cluster
         iL = 1;
-        link = stsHit->GetLink(iL);
+        link = stsHit->GetMatch()->GetLink(iL);
         stsCluster = dynamic_cast<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
         NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){

@@ -2140,8 +2140,8 @@ void CbmL1::InputPerformance()
       if (h.extIndex < 0) continue; // mvd hit
       const CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(h.extIndex) );
               // strip - MC correspondence
-      int iStripF = sh->GetDigi(0);
-      int iStripB = sh->GetDigi(1);
+      int iStripF = sh->GetFrontDigiId();
+      int iStripB = sh->GetBackDigiId();
       if ( iStripF >= 0 ) stripFToNHitMap[iStripF]++;
       if ( iStripB >= 0 ) stripBToNHitMap[iStripB]++;
       

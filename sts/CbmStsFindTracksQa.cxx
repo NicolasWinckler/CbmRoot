@@ -776,7 +776,7 @@ void CbmStsFindTracksQa::FillHitMap() {
   Int_t nHits = fStsHits->GetEntriesFast();
   for (Int_t iHit=0; iHit<nHits; iHit++) {
     CbmStsHit* hit = (CbmStsHit*) fStsHits->At(iHit);
-    Int_t iMc = hit->GetRefIndex();
+    Int_t iMc = hit->GetRefId();
     if ( iMc < 0 ) continue;
     CbmStsPoint* stsPoint = (CbmStsPoint*) fStsPoints->At(iMc);
     Int_t iTrack = stsPoint->GetTrackID();

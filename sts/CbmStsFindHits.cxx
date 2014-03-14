@@ -297,18 +297,8 @@ void CbmStsFindHits::FindHits(CbmStsStation* station, CbmStsSector* sector, cons
                     dpos.SetXYZ(TMath::Sqrt(wX), TMath::Sqrt(wY), 0.);
                 }
 
-                Int_t statLayer = -1;
-                for (Int_t istatL = station->GetNofZ(); istatL > 0; istatL--)
-                {
-                    if (TMath::Abs(zHit - station->GetZ(istatL - 1)) < 0.00001)
-                    {
-                        statLayer = istatL - 1;
-                        break;
-                    }
-                }
-
                 Int_t size = fHits->GetEntriesFast();
-                new ((*fHits)[size]) CbmStsHit(sensorDetId, pos, dpos, wXY, frontClusterId, backClusterId, (Int_t)frontChannel, (Int_t)backChannel, statLayer);
+                new ((*fHits)[size]) CbmStsHit(frontCluster->GetAddress(), pos, dpos, wXY, -1, frontClusterId, backClusterId, sector->GetSectorNr());
             } // back side strip loop
         }     // front side strip loop
     }         // strip GSI

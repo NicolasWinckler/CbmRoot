@@ -101,8 +101,7 @@ void CbmStsHitProducerIdeal::Exec(Option_t* opt) {
     // Create new hit
     pos.SetXYZ(x,y,z);
     dpos.SetXYZ(dx, dx, 0.);
-    new ((*fHitArray)[iPoint]) CbmStsHit(detID, pos, dpos, 0., iPoint, -1);
-
+    new ((*fHitArray)[iPoint]) CbmStsHit(detID, pos, dpos, 0., iPoint, -1, -1, -1);
   }   // Loop over MCPoints
 
   // Event summary

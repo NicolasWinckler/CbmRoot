@@ -38,7 +38,7 @@
 	#include "../../RootFrameworkLIB/include/FairHit.h"
 	#include "../../RootFrameworkLIB/include/FairMCPoint.h"
 #elif (ARCHITECTURE == CBMROOT)
-	#include "FairHit.h"
+	#include "CbmPixelHit.h"
 	#include "FairMCPoint.h"
 #endif
 #include "trackfinderInputTrack.h"
@@ -57,7 +57,7 @@ class trackfinderInputHit : public TObject {
 
 protected:
 
-	FairHit*                  hit;			/**< Pointer to the original hit object coming from the framework. */
+	CbmPixelHit*                  hit;			/**< Pointer to the original hit object coming from the framework. */
 	FairMCPoint*              point;			/**< Pointer to the original point object belonging to this hit coming from the framework. */
 	trackfinderInputTrack*   track;			/**< Pointer to the original track for this hit object coming from the framework. */
 	trackfinderInputStation* station;		/**< Pointer to the station of the detector which the hit hits. */
@@ -86,7 +86,7 @@ public:
 
 	trackfinderInputHit(const trackfinderInputHit& value);
 	trackfinderInputHit(const trackfinderInputHit& value, unsigned int order);
-	trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order);
+	trackfinderInputHit(CbmPixelHit* hitPointer, int index, unsigned int order);
 	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid);
 	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex);
 
@@ -108,7 +108,7 @@ public:
  */
 
 	void initDefault();
-	void init(FairHit* hitPointer, int index, unsigned int order);
+	void init(CbmPixelHit* hitPointer, int index, unsigned int order);
 	void init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid);
 	void init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex);
 
@@ -140,7 +140,7 @@ public:
  * method gets the original hit-object
  */
 
-	FairHit* getHit();
+	CbmPixelHit* getHit();
 
 /**
  * method gets the original point-object from hit

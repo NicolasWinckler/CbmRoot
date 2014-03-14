@@ -25,6 +25,7 @@
 #include "CbmStsPoint.h"
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
+#include "setup/CbmStsAddress.h"
 
 #include "TMath.h"
 
@@ -153,7 +154,7 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
     }
 
     // Determine sector type and channel numbers
-    Int_t iStation = hit->GetStationNr();
+    Int_t iStation = CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation) + 1;//hit->GetStationNr();
     Int_t iSector  = hit->GetSectorNr();
     CbmStsStation* station = fDigiScheme->GetStationByNr(iStation);
     CbmStsSector*  sector = fDigiScheme->GetSector(iStation, iSector);
@@ -169,13 +170,13 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
     Double_t dY = hit->GetDy();
 
     // Get front side DigiMatch corresponding to hit
-    Int_t  iMatchF  = hit->GetDigi(0);
+    Int_t  iMatchF  = hit->GetFrontDigiId();
     if ( iMatchF >= 0 ) 
       dMatchF = (CbmStsDigiMatch*) fDigiMatches->At(iMatchF);
     if ( ! dMatchF ) {
       cout << "-E- " << GetName() << "::Exec: "
 	   << "No DigiMatchF for hit " << iHit << endl;
-      hit->SetRefIndex(-1);
+      hit->SetRefId(-1);
       nNoDigi++;
       warn = kTRUE;
       continue;
@@ -183,13 +184,13 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
 
     // Get back side DigiMatch of hit (for strip sensors only)
     if ( iType != 1 ) {
-      Int_t  iMatchB  = hit->GetDigi(1);    
+      Int_t  iMatchB  = hit->GetBackDigiId();
       if ( iMatchB >= 0 ) 
 	dMatchB = (CbmStsDigiMatch*) fDigiMatches->At(iMatchB);
       if ( ! dMatchB ) {
 	cout << "-E- " << GetName() << "::Exec: "
 	     << "No DigiMatchB for hit " << iHit << endl;
-	hit->SetRefIndex(-1);
+	hit->SetRefId(-1);
 	nNoDigi++;
 	warn = kTRUE;
 	continue;
@@ -273,7 +274,7 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
     // This can happen for noise digis or for fake combinations
     // of strip digis.
     if ( fCandMap.empty() ) {
-      hit->SetRefIndex(-1);
+      hit->SetRefId(-1);
       if (fVerbose>1) cout << ", background " << endl;
       nBackgrd++;
       continue;
@@ -305,7 +306,7 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
     Double_t yP = point->GetY(station->GetZ());
     if ( TMath::Abs(xP-xH) > 5. * dX || 
 	 TMath::Abs(yP-yH) > 5. * dY ) {
-      hit->SetRefIndex(-2);
+      hit->SetRefId(-2);
       nDistant++;
       if (fVerbose>1) cout << ", distant" << endl;
       if ( iType == 1 || iType == 2) {
@@ -324,7 +325,7 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
     }
 
     // Match closest StsPoint to hit
-    hit->SetRefIndex(iPoint);
+    hit->SetRefId(iPoint);
     nMatched++;
     if (fVerbose>1) cout << ", good match" << endl;
 

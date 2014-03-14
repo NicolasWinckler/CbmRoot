@@ -54,6 +54,7 @@
 		#include "CbmMvdPoint.h"
 		#include "CbmStsHit.h"
 		#include "CbmMvdHit.h"
+      #include "setup/CbmStsAddress.h"
 	#endif
 #endif
 #include "TGeoManager.h"
@@ -1756,7 +1757,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 	FairHitProducer*          hitProducer;
 	CbmMCTrack*              inputTrack;
 	CbmStsPoint*             inputStsPoint;
-	FairHit*                  inputHit;
+	CbmPixelHit*                  inputHit;
 	bool                     avoidPdgCode;
 
 #ifdef TRACKINFO
@@ -1919,25 +1920,25 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 		for (i = 0; i < inputMapsHits->GetEntries(); i++) {
 
-			inputHit = (FairHit*)inputMapsHits->At(i);
+			inputHit = (CbmPixelHit*)inputMapsHits->At(i);
 			if (inputHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
-			if ((inputHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+			if ((inputHit->GetRefId() < 0) || (inputStsPoints == NULL))
 				inputStsPoint = NULL;
 			else
-				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefId());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID()) != NULL)
-				data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID())->setMapsType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetAddress()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputHit->GetAddress())->setMapsType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
-			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isMapsType()) {
+			if (data.getDetector().getStationById(inputHit->GetAddress()).isMapsType()) {
 
-				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
+				if (!data.getDetector().getStationById(inputHit->GetAddress()).isMasked()) {
 
-					data.addHit(inputHit->GetDetectorID(), inputHit, (FairMCPoint*)inputStsPoint, i);
+					data.addHit(inputHit->GetAddress(), inputHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 
@@ -1960,25 +1961,25 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 		for (i = 0; i < inputHybridHits->GetEntries(); i++) {
 
-			inputHit = (FairHit*)inputHybridHits->At(i);
+			inputHit = (CbmPixelHit*)inputHybridHits->At(i);
 			if (inputHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
-			if ((inputHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+			if ((inputHit->GetRefId() < 0) || (inputStsPoints == NULL))
 				inputStsPoint = NULL;
 			else
-				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefId());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID()) != NULL)
-				data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID())->setHybridType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetAddress()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputHit->GetAddress())->setHybridType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
-			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isHybridType()) {
+			if (data.getDetector().getStationById(inputHit->GetAddress()).isHybridType()) {
 
-				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
+				if (!data.getDetector().getStationById(inputHit->GetAddress()).isMasked()) {
 
-					data.addHit(inputHit->GetDetectorID(), inputHit, (FairMCPoint*)inputStsPoint, i);
+					data.addHit(inputHit->GetAddress(), inputHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 
@@ -2000,25 +2001,25 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 		for (i = 0; i < inputStripHits->GetEntries(); i++) {
 
-			inputHit = (FairHit*)inputStripHits->At(i);
+			inputHit = (CbmPixelHit*)inputStripHits->At(i);
 			if (inputHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
-			if ((inputHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+			if ((inputHit->GetRefId() < 0) || (inputStsPoints == NULL))
 				inputStsPoint = NULL;
 			else
-				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefId());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID()) != NULL)
-				data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID())->setStripType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetAddress()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputHit->GetAddress())->setStripType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
-			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isStripType()) {
+			if (data.getDetector().getStationById(inputHit->GetAddress()).isStripType()) {
 
-				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
+				if (!data.getDetector().getStationById(inputHit->GetAddress()).isMasked()) {
 
-					data.addHit(inputHit->GetDetectorID(), inputHit, (FairMCPoint*)inputStsPoint, i);
+					data.addHit(inputHit->GetAddress(), inputHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 
@@ -2307,7 +2308,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 
 				if (!data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMasked()) {
 
-					data.addHit(inputMvdHit->GetStationNr(), (FairHit*)inputMvdHit, (FairMCPoint*)inputMvdPoint, i);
+					data.addHit(inputMvdHit->GetStationNr(), (CbmPixelHit*)inputMvdHit, (FairMCPoint*)inputMvdPoint, i);
 
 				}
 
@@ -2335,21 +2336,21 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 			if (inputStsHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
-			if ((inputStsHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+			if ((inputStsHit->GetRefId() < 0) || (inputStsPoints == NULL))
 				inputStsPoint = NULL;
 			else
-				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputStsHit->GetRefIndex());
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputStsHit->GetRefId());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointerById(inputStsHit->GetStationNr()) != NULL)
-				data.getDetectorPointer()->getStationPointerById(inputStsHit->GetStationNr())->setHybridType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputStsHit->GetAddress()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputStsHit->GetAddress())->setHybridType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
-			if (data.getDetector().getStationById(inputStsHit->GetStationNr()).isHybridType() || data.getDetector().getStationById(inputStsHit->GetStationNr()).isStripType()) {
+			if (data.getDetector().getStationById(CbmStsAddress::GetElementId(inputStsHit->GetAddress(), kStsStation)).isHybridType() || data.getDetector().getStationById(CbmStsAddress::GetElementId(inputStsHit->GetAddress(), kStsStation)).isStripType()) {
 
-				if (!data.getDetector().getStationById(inputStsHit->GetStationNr()).isMasked()) {
+				if (!data.getDetector().getStationById(CbmStsAddress::GetElementId(inputStsHit->GetAddress(), kStsStation)).isMasked()) {
 					
-					data.addHit(inputStsHit->GetStationNr(), (FairHit*)inputStsHit, (FairMCPoint*)inputStsPoint, i);
+					data.addHit(CbmStsAddress::GetElementId(inputStsHit->GetAddress(), kStsStation), (CbmPixelHit*)inputStsHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 

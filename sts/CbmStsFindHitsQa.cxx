@@ -230,13 +230,13 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
   
   for ( Int_t ihit = 0 ; ihit < nofStsHits ; ihit++ ) {
     CbmStsHit *stsHit     = (CbmStsHit*)fStsHits->At(ihit);
-    fNofHits[stsHit->GetStationNr()-1][stsHit->GetSectorNr()-1][stsHit->GetSensorNr()-1] += 1; // count hits per sensor
-    if ( hitStationLimits[0][stsHit->GetStationNr()-1] == -1 ) {
-      hitStationLimits[0][stsHit->GetStationNr()-1] = ihit;
+    fNofHits[CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsStation)][stsHit->GetSectorNr()-1][CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsSensor)] += 1; // count hits per sensor
+    if ( hitStationLimits[0][CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsStation)] == -1 ) {
+      hitStationLimits[0][CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsStation)] = ihit;
     }
     CbmStsHit *stsHitBack = (CbmStsHit*)fStsHits->At(nofStsHits-ihit-1);
-    if ( hitStationLimits[1][stsHitBack->GetStationNr()-1] == -1 ) {
-      hitStationLimits[1][stsHitBack->GetStationNr()-1] = nofStsHits-ihit;
+    if ( hitStationLimits[1][CbmStsAddress::GetElementId(stsHitBack->GetAddress(), kStsStation)] == -1 ) {
+      hitStationLimits[1][CbmStsAddress::GetElementId(stsHitBack->GetAddress(), kStsStation)] = nofStsHits-ihit;
     }
   }
   for ( Int_t istat = 0 ; istat < fDigiScheme->GetNStations() ; istat++ ) {

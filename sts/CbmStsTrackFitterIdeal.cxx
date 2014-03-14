@@ -94,7 +94,7 @@ Int_t CbmStsTrackFitterIdeal::DoFit(CbmStsTrack* pTrack, Int_t pidHypo)
 	if(hitIndex < 0) return 0;
 	hit = (CbmStsHit*) fArrayStsHit->At(hitIndex);
 	if(NULL == hit) return 0;
-        pointIndex = hit->GetRefIndex();
+        pointIndex = hit->GetRefId();
     }
     if(pointIndex < 0) return 0;
     CbmStsPoint* point = (CbmStsPoint*) fArrayStsPoint->At(pointIndex);
@@ -109,7 +109,7 @@ Int_t CbmStsTrackFitterIdeal::DoFit(CbmStsTrack* pTrack, Int_t pidHypo)
 	if(hitIndex < 0) return 0;
 	hit = (CbmStsHit*) fArrayStsHit->At(hitIndex);
 	if(NULL == hit) return 0;
-        pointIndex = hit->GetRefIndex();
+        pointIndex = hit->GetRefId();
     }
     if(pointIndex < 0) return 0;
     point = (CbmStsPoint*) fArrayStsPoint->At(pointIndex);

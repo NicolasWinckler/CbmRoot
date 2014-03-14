@@ -140,7 +140,7 @@ void global_reco_qa(Int_t nEvents = 100,
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetMuchDigiFileName(muchDigiFile.Data());
    clusteringQa->SetOutputDir(std::string(resultDir));
-  // run->AddTask(clusteringQa);
+   run->AddTask(clusteringQa);
 
    CbmLitTofQa* tofQa = new CbmLitTofQa();
    tofQa->SetOutputDir(std::string(resultDir));

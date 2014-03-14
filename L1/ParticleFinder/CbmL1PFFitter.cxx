@@ -18,6 +18,7 @@
 #include "CbmL1.h"
 #include "TClonesArray.h"
 #include "CbmStsTrack.h"
+#include "setup/CbmStsAddress.h"
 
 //L1Algo tools
 #include "L1Algo.h"
@@ -294,7 +295,7 @@ void CbmL1PFFitter::Fit(vector<CbmL1Track> &Tracks, fvec mass)
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr() - 1 + NMvdStations;
+          ista = CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation) - 1 + NMvdStations;//hit->GetStationNr() - 1 + NMvdStations;
         }
 //std::cout << ista << std::endl;
         w[ista][iVec] = 1.f;
@@ -597,7 +598,7 @@ void CbmL1PFFitter::CalculateFieldRegion(vector<CbmL1Track> &Tracks, vector<L1Fi
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr() - 1 + NMvdStations;
+          ista = CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation) - 1 + NMvdStations;//hit->GetStationNr() - 1 + NMvdStations;
         }
         sta[ista].fieldSlice.GetFieldValue( posx, posy, fB_temp );
         fB[iH+1].x[iVec] = fB_temp.x[iVec];
@@ -727,7 +728,7 @@ void CbmL1PFFitter::Fit(vector<CbmStsTrack> &Tracks, int pidHypo)
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr() - 1 + NMvdStations;
+          ista = CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation) - 1 + NMvdStations;//hit->GetStationNr() - 1 + NMvdStations;
         }
 
         w[ista][iVec] = 1.f;
@@ -990,7 +991,7 @@ void CbmL1PFFitter::GetChiToVertex(vector<CbmStsTrack> &Tracks, vector<L1FieldRe
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr()-1+NMvdStations;
+          ista = CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation) - 1 + NMvdStations;//hit->GetStationNr()-1+NMvdStations;
         }
 
         sta[ista].fieldSlice.GetFieldValue( posx, posy, fB_temp );
@@ -1132,7 +1133,7 @@ void CbmL1PFFitter::CalculateFieldRegion(vector<CbmStsTrack> &Tracks, vector<L1F
           posx = hit->GetX();
           posy = hit->GetY();
           posz = hit->GetZ();
-          ista = hit->GetStationNr()-1+NMvdStations;
+          ista = CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation) - 1 + NMvdStations;//hit->GetStationNr()-1+NMvdStations;
         }
 
         sta[ista].fieldSlice.GetFieldValue( posx, posy, fB_temp );

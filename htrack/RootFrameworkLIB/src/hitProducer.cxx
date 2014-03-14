@@ -263,7 +263,7 @@ void FairHitProducer::produceNew(TClonesArray* mvdHits, TClonesArray* stsHits, T
 
 #ifndef HITCOMPATIBILITY
 
-		new(stsHitsReference[stsHits->GetEntries()]) CbmStsHit(stsPoint->GetDetectorID(), position, positionError, -1, -1, -1);
+		new(stsHitsReference[stsHits->GetEntries()]) CbmStsHit(stsPoint->GetDetectorID(), position, positionError, -1, -1, -1, -1, -1);
 
 #else
 

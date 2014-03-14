@@ -168,7 +168,7 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsig
 	this->hitOrder  = order;
 	*/
 }
-trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order) 
+trackfinderInputHit::trackfinderInputHit(CbmPixelHit* hitPointer, int index, unsigned int order)
   : TObject(),
     hit(hitPointer),
     point(NULL),
@@ -262,9 +262,8 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	TVector3 positionError(xError, yError, 0);
 
 #ifndef HITCOMPATIBILITY
-
-	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1);
-	hit->SetRefIndex(pointIndex);
+	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1, -1, -1);
+	hit->SetRefId(pointIndex);
 
 #else
 
@@ -349,7 +348,7 @@ void trackfinderInputHit::initDefault() {
 	init(-1, 0, 0, 0, 0, 0, -1, 0, -1);
 
 }
-void trackfinderInputHit::init(FairHit* hitPointer, int index, unsigned int order) {
+void trackfinderInputHit::init(CbmPixelHit* hitPointer, int index, unsigned int order) {
 
 	if (!isPointer)
 		if (hit != NULL)
@@ -428,8 +427,8 @@ void trackfinderInputHit::init(int detectorId, double posX, double posY, double 
 
 #ifndef HITCOMPATIBILITY
 
-	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1);
-	hit->SetRefIndex(pointIndex);
+	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1, -1, -1);
+	hit->SetRefId(pointIndex);
 
 #else
 
@@ -521,9 +520,9 @@ double trackfinderInputHit::getPosZ() {
  * method gets the original hit-object							*
  ****************************************************************/
 
-FairHit* trackfinderInputHit::getHit() {
+CbmPixelHit* trackfinderInputHit::getHit() {
 
-	FairHit* returnValue = NULL;
+	CbmPixelHit* returnValue = NULL;
 	
 	if (hit != NULL)
 		returnValue = hit;

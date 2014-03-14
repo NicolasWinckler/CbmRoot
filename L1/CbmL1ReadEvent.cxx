@@ -18,6 +18,7 @@
 #include "L1Algo/L1Algo.h"
 #include "CbmKF.h"
 #include "CbmMatch.h"
+#include "setup/CbmStsAddress.h"
 
 #include "TDatabasePDG.h"
 
@@ -193,11 +194,11 @@ void CbmL1::ReadEvent()
       {
         CbmStsHit *mh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(j) );
         th.ExtIndex = j;
-        th.iStation = NMvdStations + mh->GetStationNr() - 1;
+        th.iStation = NMvdStations + CbmStsAddress::GetElementId(mh->GetAddress(), kStsStation) - 1;//mh->GetStationNr() - 1;
         th.iSector  = mh->GetSectorNr();
         th.isStrip  = 0;
-        th.iStripF = mh->GetDigi(0);
-        th.iStripB = mh->GetDigi(1);
+        th.iStripF = mh->GetFrontDigiId();
+        th.iStripB = mh->GetBackDigiId();
         if( th.iStripF<0 ){ negF++; continue;}
         if( th.iStripF>=0 && th.iStripB>=0 ) th.isStrip  = 1;
         if( th.iStripB <0 ) th.iStripB = th.iStripF;
@@ -218,7 +219,7 @@ void CbmL1::ReadEvent()
       }
       th.iMC=-1;
 
-      int iMC = sh->GetRefIndex(); // TODO1: don't need this with FairLinks
+      int iMC = sh->GetRefId(); // TODO1: don't need this with FairLinks
       if( listStsPts && iMC>=0 && iMC<nMC){
         CbmL1MCPoint MC;
         if( ! ReadMCPoint( &MC, iMC, 0 ) ){
@@ -676,12 +677,12 @@ void CbmL1::HitMatch()
     if (useLinks && !isMvd){
       if (listStsClusters){
         CbmStsHit *stsHit = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(hit.extIndex) );
-        const int NLinks = stsHit->GetNLinks();
+        const int NLinks = stsHit->GetMatch()->GetNofLinks();
         if ( NLinks != 2 ) cout << "HitMatch: Error. Hit wasn't matched with 2 clusters." << endl;
           // see at 1-st cluster
         vector<int> stsPointIds; // save here all mc-points matched with first cluster
         int iL = 0;
-        FairLink link = stsHit->GetLink(iL);
+        CbmLink link = stsHit->GetMatch()->GetLink(iL);
         CbmStsCluster *stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
         int NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
@@ -696,7 +697,7 @@ void CbmL1::HitMatch()
         } // for digi
           // see at 2-nd cluster
         iL = 1;
-        link = stsHit->GetLink(iL);
+        link = stsHit->GetMatch()->GetLink(iL);
         stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
         NLinks2 = stsCluster->GetMatch()->GetNofLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){

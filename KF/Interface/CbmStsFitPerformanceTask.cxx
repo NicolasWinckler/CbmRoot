@@ -28,6 +28,7 @@
 #include "CbmStsTrack.h"
 #include "CbmVertex.h"
 #include "CbmMvdHit.h"
+#include "setup/CbmStsAddress.h"
 
 #include "TVector3.h"
 #include "TF1.h"
@@ -418,7 +419,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       if( ih%1000 ==0 ) cout<<ih<<endl;
       CbmStsHit* h1 = (CbmStsHit*) fStsHitArray->At(ih);
       if( !h1 ) continue;
-      double V[3] = { 2*h1->GetDx()*h1->GetDx(), 2*h1->GetCovXY(), 2*h1->GetDy()*h1->GetDy()};
+      double V[3] = { 2*h1->GetDx()*h1->GetDx(), 2*h1->GetDxy(), 2*h1->GetDy()*h1->GetDy()};
       Double_t v = 1./(V[0]*V[2] - V[1]*V[1]) ;
       V[0]*=v;
       V[1]*=v;
@@ -428,17 +429,17 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	if( ih==jh ) continue;
 	CbmStsHit* h2 = (CbmStsHit*) fStsHitArray->At(jh);
 	if( !h2 ) continue;
-	if( h1->GetStationNr() != h2->GetStationNr() ) continue;
-	if( h1->GetDigi(1)>=0 ){
-	  if( h1->GetDigi(0)!=h2->GetDigi(0) &&
-	      h1->GetDigi(1)!=h2->GetDigi(1)     ) continue;
+	if( CbmStsAddress::GetElementId(h1->GetAddress(), kStsStation) != CbmStsAddress::GetElementId(h2->GetAddress(), kStsStation) ) continue;//h1->GetStationNr() != h2->GetStationNr() ) continue;
+	if( h1->GetBackDigiId()>=0 ){
+	  if( h1->GetFrontDigiId()!=h2->GetFrontDigiId() &&
+	      h1->GetBackDigiId()!=h2->GetBackDigiId()     ) continue;
 	}
 	Double_t dx = h1->GetX() - h2->GetX();
 	Double_t dy = h1->GetY() - h2->GetY();
 	Double_t d2 = fabs(dx*dx*V[0]-2*dx*dy*V[1]+dy*dy*V[2]);
 	if( d2<D2 ) D2 = d2;
       }
-      fhHitDensity[CbmKF::Instance()->MvdStationIDMap.size()+h1->GetStationNr()-1]->Fill(sqrt(D2/2));
+      fhHitDensity[CbmKF::Instance()->MvdStationIDMap.size()+CbmStsAddress::GetElementId(h1->GetAddress(), kStsStation)-1]->Fill(sqrt(D2/2));
     }
   }
 
@@ -525,7 +526,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	if( hitID<0 ) continue;
 	CbmStsHit* hit = (CbmStsHit*) fStsHitArray->At(hitID);
 	if( !hit ) continue;
-	Int_t pointID = hit->GetRefIndex();
+	Int_t pointID = hit->GetRefId();
 	if( pointID<0 ) continue;
 	CbmStsPoint *point = (CbmStsPoint*) fStsPointArray->At(pointID);
 	if( !point ) continue;
@@ -925,7 +926,7 @@ Bool_t CbmStsFitPerformanceTask::IsLong(CbmStsTrack* track){
   Int_t st,iHit,hitID;
   for (iHit=0;iHit<nHits; iHit++){
     hitID=track->GetHitIndex(iHit);
-    st=((CbmStsHit*) fStsHitArray->At(hitID))->GetDetectorID();
+    st=((CbmStsHit*) fStsHitArray->At(hitID))->GetAddress();
     if (st<stmin) stmin=st;
     if (st>stmax) stmax=st;
   }

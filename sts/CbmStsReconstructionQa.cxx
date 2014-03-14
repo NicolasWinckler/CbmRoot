@@ -685,12 +685,12 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
   // check for limits of hit indices on different stations...
   for ( Int_t ihit = 0 ; ihit < nofStsHits ; ihit++ ) {
     CbmStsHit *stsHit     = (CbmStsHit*)fStsHits->At(ihit);
-    fNofHits[stsHit->GetStationNr()-1][stsHit->GetSectorNr()] += 1; // count hits per sector
-    if ( hitStationLimits[0][stsHit->GetStationNr()-1] == -1 )
-      hitStationLimits[0][stsHit->GetStationNr()-1] = ihit;
+    fNofHits[CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsStation)][stsHit->GetSectorNr()] += 1; // count hits per sector
+    if ( hitStationLimits[0][CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsStation)] == -1 )
+      hitStationLimits[0][CbmStsAddress::GetElementId(stsHit->GetAddress(), kStsStation)] = ihit;
     CbmStsHit *stsHitBack = (CbmStsHit*)fStsHits->At(nofStsHits-ihit-1);
-    if ( hitStationLimits[1][stsHitBack->GetStationNr()-1] == -1 ) {
-      hitStationLimits[1][stsHitBack->GetStationNr()-1] = nofStsHits-ihit;
+    if ( hitStationLimits[1][CbmStsAddress::GetElementId(stsHitBack->GetAddress(), kStsStation)] == -1 ) {
+      hitStationLimits[1][CbmStsAddress::GetElementId(stsHitBack->GetAddress(), kStsStation)] = nofStsHits-ihit;
     }
   }
 
@@ -1507,11 +1507,11 @@ void CbmStsReconstructionQa::FillHitMap() {
   Int_t nHits = fStsHits->GetEntriesFast();
   for (Int_t iHit=0; iHit<nHits; iHit++) {
     CbmStsHit* hit = (CbmStsHit*) fStsHits->At(iHit);
-    Int_t iMc = hit->GetRefIndex();
+    Int_t iMc = hit->GetRefId();
     if ( iMc < 0 ) continue;
     CbmStsPoint* stsPoint = (CbmStsPoint*) fStsPoints->At(iMc);
     Int_t iTrack = stsPoint->GetTrackID();
-    HitSt [iTrack][hit->GetStationNr()]++;
+    HitSt [iTrack][CbmStsAddress::GetElementId(hit->GetAddress(), kStsStation)]++;
     fHitMap[iTrack]++;
   }
 }

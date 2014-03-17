@@ -116,21 +116,25 @@ Bool_t  CbmTof::ProcessHits(FairVolume* vol)
        gMC->IsTrackDisappeared()) 
        ) {
 
-    fTrackID       = gMC->GetStack()->GetCurrentTrackNumber();
+    fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
 
     fVolumeID = fGeoHandler->GetUniqueDetectorId();
 
-    LOG(DEBUG2)<<"Det System: "<<fGeoHandler->GetDetSystemId(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"SMtype: "<<fGeoHandler->GetSMType(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"SModule: "<<fGeoHandler->GetSModule(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"Counter: "<<fGeoHandler->GetCounter(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"Gap: "<<fGeoHandler->GetGap(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"Cell: "<<fGeoHandler->GetCell(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"Region: "<<fGeoHandler->GetRegion(fVolumeID)<<FairLogger::endl;
-    LOG(DEBUG2)<<"*************"<<FairLogger::endl;
+    LOG(DEBUG2)<<"CbmTof::TID: "<<fTrackID;
+    LOG(DEBUG2)<<" TofVol: "<<fVolumeID;
+    LOG(DEBUG2)<<" DetSys: "<<fGeoHandler->GetDetSystemId(fVolumeID);
+    LOG(DEBUG2)<<" SMtype: "<<fGeoHandler->GetSMType(fVolumeID);
+    LOG(DEBUG2)<<" SModule: "<<fGeoHandler->GetSModule(fVolumeID);
+    LOG(DEBUG2)<<" Counter: "<<fGeoHandler->GetCounter(fVolumeID);
+    LOG(DEBUG2)<<" Gap: "<<fGeoHandler->GetGap(fVolumeID);
+    LOG(DEBUG2)<<" Cell: "<<fGeoHandler->GetCell(fVolumeID);
+    LOG(DEBUG2)<<Form(" x: %6.2f",fPos.X());
+    LOG(DEBUG2)<<Form(" y: %6.2f",fPos.Y());
+    LOG(DEBUG2)<<Form(" z: %6.2f",fPos.Z())<<FairLogger::endl;
+    //   LOG(DEBUG2)<<"Region: "<<fGeoHandler->GetRegion(fVolumeID)<<FairLogger::endl;
+    //   LOG(DEBUG2)<<"*************"<<FairLogger::endl;
 
-
-   //fVolumeID = ((region-1)<<24) + ((module-1)<<14) + ((cell-1)<<4) + (gap-1);
+    //fVolumeID = ((region-1)<<24) + ((module-1)<<14) + ((cell-1)<<4) + (gap-1);
 
     AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
 	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength, 

@@ -41,12 +41,14 @@ class CbmTofHitProducer : public FairTask {
 	      Int_t ref, Double_t tHit, Int_t flag);
 
   void SetSigmaT(Double_t sigma);
+  void SetSigmaEl(Double_t sigma);
   void SetSigmaXY(Double_t sigma);
   void SetSigmaY(Double_t sigma);
   void SetSigmaZ(Double_t sigma);
   void SetInitFromAscii(Bool_t ascii) {fParInitFromAscii=ascii;}
 
   Double_t GetSigmaT();
+  Double_t GetSigmaEl();
   Double_t GetSigmaXY();
   Double_t GetSigmaY();
   Double_t GetSigmaZ();
@@ -88,6 +90,7 @@ private:
   //End of storing data members
 
   Double_t fSigmaT;       //Resolution in time in ns 
+  Double_t fSigmaEl;      //Electronics time   in ns 
   Double_t fSigmaXY;      //Resolution in x/y  in cm
   Double_t fSigmaY;       //Resolution in y    in cm
   Double_t fSigmaZ;       //Resolution in z    in cm

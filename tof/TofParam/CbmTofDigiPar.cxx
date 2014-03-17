@@ -28,14 +28,14 @@ CbmTofDigiPar::CbmTofDigiPar(const char* name,
 
 CbmTofDigiPar::~CbmTofDigiPar(void)
 {
-	  LOG(DEBUG4)<<"Enter CbmTrdDigiPar destructor"<< FairLogger::endl;
+	  LOG(DEBUG4)<<"Enter CbmTofDigiPar destructor"<< FairLogger::endl;
 	  for (fCellMapIt = fCellMap.begin(); fCellMapIt != fCellMap.end();
 	       ++fCellMapIt) {
 	    delete fCellMapIt->second;
 	  }
 	  fCellMap.clear();
 	  clear();
-	  LOG(DEBUG4)<<"Leave CbmTrdDigiPar destructor"<< FairLogger::endl;
+	  LOG(DEBUG4)<<"Leave CbmTofDigiPar destructor"<< FairLogger::endl;
 }
 
 void CbmTofDigiPar::clear(void)

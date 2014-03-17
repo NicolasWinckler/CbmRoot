@@ -385,16 +385,22 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
   Double_t xHit, yHit, zHit, tHit, xHitErr, yHitErr, zHitErr;
   Double_t tl_new, tr_new;
   Double_t Dz=2.04;  //FIXME: Introduce also Dz and Z as (constant) parameters 
-  Float_t sigma_T=0.098, sigma_Y=0.7, sigma_t_gap, t_o, T_smearing = 0, sigma_el=0.04, 
+  Double_t sigma_T=0.098, sigma_Y=0.7, sigma_t_gap, t_o, T_smearing = 0, sigma_el=0.04, 
     vprop = 15., Pgap = 0.75;
   //time[ns], position[cm], velocity[cm/ns]
   //FIXME: these parameters must be provided externally
 
   Int_t trackID, smtype, smodule, module, cell, gap, flag, ref;
   
+  if  (fSigmaT>0.) sigma_T=fSigmaT;   // single gap resolution 
+  else fSigmaT=sigma_T;               // take default 
+
+  if  (fSigmaEl>0.) sigma_el=fSigmaEl;   // electronics channel resolution 
+  else fSigmaEl=sigma_el;                // take default
+
   //Here check for the validity of the parameters
-  if(fSigmaY>1) cout<<"IRREALISTIC TOF POSITION RESOLUTION!! (HitProducer may crash)"<<endl;
-  if((fSigmaT<0.07 && fSigmaT>0)||fSigmaT>0.2) cout<<"IRREALISTIC TOF RESOLUTION!! (HitProducer may crash)"<<endl;
+  if(fSigmaY>1) cout<<"UNREALISTIC TOF POSITION RESOLUTION!! (HitProducer may crash)"<<endl;
+  if((fSigmaT<0.01 && fSigmaT>0)||fSigmaT>0.2) cout<<"UNREALISTIC TOF RESOLUTION!! (HitProducer may crash)"<<endl;
 
   //Parameterizations. Now they depend on the geometry/algorithm. FIXME
 
@@ -477,7 +483,7 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
     }
 
 //    T_smearing      = gRandom->Gaus(t_o, sigma_t_gap);
-    T_smearing      = gRandom->Gaus(1.23*sigma_T, sigma_T);
+    T_smearing      = gRandom->Gaus(1.21*sigma_T, sigma_T);
 
     Float_t X_local = pos.X()-X[smtype][smodule][module][cell];
     Float_t Y_local = pos.Y()-Y[smtype][smodule][module][cell];
@@ -550,7 +556,7 @@ void CbmTofHitProducerNew::Exec(Option_t * option)
                + Y[t][i][j][k];
        
     //Reference to the point that contributes to the left side.
-       yHitErr = sigma_T*vprop;
+       yHitErr = sigma_el*vprop;
        tHit    = 0.5*(tl[t][i][j][k] + tr[t][i][j][k]);
        ref     = point_left[t][i][j][k];
        pt      = (CbmTofPoint*) fTofPoints->At(ref);
@@ -621,6 +627,13 @@ void CbmTofHitProducerNew::SetSigmaT(Double_t sigma)
 }
 
 
+// ---- SetSigmaEl -----------------------------------------------------
+
+void CbmTofHitProducerNew::SetSigmaEl(Double_t sigma)
+{
+    fSigmaEl = sigma;
+}
+
 // ---- SetSigmaXY -----------------------------------------------------
 
 void CbmTofHitProducerNew::SetSigmaXY(Double_t sigma)
@@ -644,13 +657,20 @@ void CbmTofHitProducerNew::SetSigmaZ(Double_t sigma)
 }
 
 
-// ---- GetSigmaXY -----------------------------------------------------
+// ---- GetSigmaT -----------------------------------------------------
 
 Double_t CbmTofHitProducerNew::GetSigmaT()
 {  
     return  fSigmaT;
 }
 
+
+// ---- GetSigmaEl -----------------------------------------------------
+
+Double_t CbmTofHitProducerNew::GetSigmaEl()
+{  
+    return  fSigmaEl;
+}
 
 // ---- GetSigmaXY -----------------------------------------------------
 

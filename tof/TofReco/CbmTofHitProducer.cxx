@@ -166,7 +166,7 @@ InitStatus CbmTofHitProducer::Init() {
    fTofHits = new TClonesArray("CbmTofHit");
    ioman->Register("TofHit", "Tof", fTofHits, kTRUE);
 
-   LOG(INFO) << "-I- CbmTofHitProducer: Intialization successfull" << FairLogger::endl;
+   LOG(INFO) << "-I- CbmTofHitProducer: Intialization successfull!" << FairLogger::endl;
 
    return kSUCCESS;
 }
@@ -250,13 +250,13 @@ void CbmTofHitProducer::Exec(Option_t * option) {
 
       //Get relevant information from the point
       Int_t trackID = mcPoint->GetTrackID();
-      Int_t detID = mcPoint->GetDetectorID();
-      Int_t cell = fGeoHandler->GetCell(detID)-1;
-      Int_t module = fGeoHandler->GetCounter(detID)-1;
-      Int_t region = fGeoHandler->GetRegion(detID)-1;
+      Int_t detID   = mcPoint->GetDetectorID();
+      Int_t cell    = fGeoHandler->GetCell(detID)-1;
+      Int_t module  = fGeoHandler->GetCounter(detID)-1;
+      Int_t region  = fGeoHandler->GetRegion(detID)-1;
 
       // Reject particles produced in the last 4 cm. Better job must be done here. For example:
-      // it could better to go up to the parent particle and get its trackID, then the
+      // it could be better to go up to the parent particle and get its trackID, then the
       // secondary is processed. FIXME.
       //if ((mcTrack->GetStartZ()) > 996) continue;
       if ((mcTrack->GetStartZ()) > (Z[region][module][cell] - 4.)) continue;

@@ -7,7 +7,7 @@ Set(INCLUDE_DIRECTORIES
   ${Boost_INCLUDE_DIR}
   ${CBMROOT_SOURCE_DIR}/cbmbase
   ${CBMROOT_SOURCE_DIR}/cbmdata
-  ${CBMROOT_SOURCE_DIR}/trd/param
+#  ${CBMROOT_SOURCE_DIR}/trd/param
   ${CBMROOT_SOURCE_DIR}/cbmdata/sts
   ${CBMROOT_SOURCE_DIR}/cbmdata/much
   ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime
@@ -43,9 +43,9 @@ Set(SRCS
 
   fhodo/CbmFiberHodoClusterFinder.cxx
 
-  reco_tasks/CbmBeamTimeExampleTask.cxx
-  reco_tasks/CbmBeamTimeExampleTask2.cxx
-  reco_tasks/CbmBeamTimeExampleTask3.cxx
+#  reco_tasks/CbmBeamTimeExampleTask.cxx
+#  reco_tasks/CbmBeamTimeExampleTask2.cxx
+#  reco_tasks/CbmBeamTimeExampleTask3.cxx
 
   param/CbmBeamTimeContFact.cxx
   param/CbmBeamTimeFirstPar.cxx
@@ -70,7 +70,8 @@ Set(DEPENDENCIES
     ${LIBRARY_OUTPUT_PATH}/libRoc.so 
     Sts
     CbmData CbmBase
-    Base Trd
+#    Base Trd
+    Base 
 )
 
 GENERATE_LIBRARY()

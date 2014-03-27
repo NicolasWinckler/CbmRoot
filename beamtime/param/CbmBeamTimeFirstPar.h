@@ -18,6 +18,7 @@ class CbmBeamTimeFirstPar : public FairParGenericSet
     Bool_t getParams(FairParamList*);
 
     Int_t GetDigiCut() { return fDigiCut; }
+    void SetDigiCut(Int_t);
 
   private:
     Int_t fDigiCut;

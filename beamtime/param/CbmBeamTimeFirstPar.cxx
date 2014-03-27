@@ -38,3 +38,10 @@ Bool_t CbmBeamTimeFirstPar::getParams(FairParamList* l)
   if ( ! l->fill("DigiCut", &fDigiCut) ) return kFALSE;
   return kTRUE;
 }
+
+void CbmBeamTimeFirstPar::SetDigiCut(Int_t val) 
+{
+  LOG(INFO) << "Setting DigiCut to value: " << val << FairLogger::endl;  
+  fDigiCut = val;
+  LOG(INFO) << "DigiCut was set to: " << fDigiCut << FairLogger::endl;  
+}

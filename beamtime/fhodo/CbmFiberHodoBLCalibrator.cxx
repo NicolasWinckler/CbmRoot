@@ -68,9 +68,9 @@ InitStatus CbmFiberHodoBLCalibrator::Init()
 
   // Get a pointer to the previous already existing data level
 
-  fBaselineDigis = (TClonesArray*) ioman->GetObject("StsBaselineDigi");
+  fBaselineDigis = (TClonesArray*) ioman->GetObject("HodoBaselineDigi");
   if ( ! fBaselineDigis ) {
-    LOG(ERROR) << "No input data object StsBaselineDigi found!" << FairLogger::endl;
+    LOG(ERROR) << "No input data object HodoBaselineDigi found!" << FairLogger::endl;
     LOG(ERROR) << " Task CbmFiberHodoBLCalibrator will be inactive" << FairLogger::endl;
     return kERROR;
   }
@@ -90,7 +90,7 @@ InitStatus CbmFiberHodoBLCalibrator::Init()
     for( Int_t iSide = 0; iSide < fBaselines.at( iStation ).size(); iSide++ ) {
       fBaselines.at( iStation ).at( iSide ).resize( kNStrips );
       for( Int_t iStrip = 0; iStrip < fBaselines.at( iStation ).at( iSide ).size(); iStrip++ ) {
-        const char * nametitle = Form( "blhist_sta%d_side%d_str%d", iStation, iSide, iStrip );
+        const char * nametitle = Form( "fh_blhist_sta%d_side%d_str%d", iStation, iSide, iStrip );
         fBaselines.at( iStation ).at( iSide ).at( iStrip ) = new TH1F( nametitle, nametitle, kBaselineNBins, kBaselineMinAdc, kBaselineMaxAdc );
       }
     }
@@ -112,8 +112,10 @@ InitStatus CbmFiberHodoBLCalibrator::ReInit()
 void CbmFiberHodoBLCalibrator::Exec(Option_t* option)
 {
 
+
   Int_t nBaselineEntries = fBaselineDigis->GetEntriesFast();
   if( nBaselineEntries ) { // TODO: Check here in a proper way if the event is a baseline event
+
 
     /* Baseline data should be taken from only one iteration of the baseline measurement
      * (i.e. data from several different iterations of baseline calibration should not be mixed up)
@@ -128,11 +130,14 @@ void CbmFiberHodoBLCalibrator::Exec(Option_t* option)
     }
     
     for( Int_t iDigi = 0; iDigi < nBaselineEntries; ++iDigi ) {
-      CbmFiberHodoDigi * digi = static_cast< CbmFiberHodoDigi * >( fBaselineDigis->At( iDigi ) );
-      Int_t station = CbmFiberHodoAddress::GetStationId( digi->GetAddress() );
-      Int_t side = CbmFiberHodoAddress::GetSideId( digi->GetAddress() );
-      Int_t strip = CbmFiberHodoAddress::GetStripId( digi->GetAddress() );
+      CbmFiberHodoDigi* digi = static_cast< CbmFiberHodoDigi * >( fBaselineDigis->At( iDigi ) );
+   
+      Int_t address = digi->GetAddress();
+      Int_t station = CbmFiberHodoAddress::GetStationId(address);
+      Int_t side = CbmFiberHodoAddress::GetSideId(address);
+      Int_t strip = CbmFiberHodoAddress::GetStripId(address);
       Double_t adc = digi->GetCharge();
+
       fBaselines.at( station ).at( side ).at( strip )->Fill( adc );
     }
     

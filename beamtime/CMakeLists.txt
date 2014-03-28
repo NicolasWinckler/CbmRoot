@@ -42,6 +42,7 @@ Set(SRCS
   CbmTbDaqBuffer.cxx
 
   fhodo/CbmFiberHodoClusterFinder.cxx
+  fhodo/CbmFiberHodoBLCalibrator.cxx
 
 #  reco_tasks/CbmBeamTimeExampleTask.cxx
 #  reco_tasks/CbmBeamTimeExampleTask2.cxx

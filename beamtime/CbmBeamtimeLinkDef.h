@@ -10,7 +10,7 @@
 #pragma link C++ class CbmTbDaqBuffer;
 
 #pragma link C++ class CbmFiberHodoClusterFinder;
-
+#pragma link C++ class CbmFiberHodoBLCalibrator;
 //#pragma link C++ class CbmBeamTimeExampleTask;
 //#pragma link C++ class CbmBeamTimeExampleTask2;
 //#pragma link C++ class CbmBeamTimeExampleTask3;

@@ -70,22 +70,7 @@ void mvd_reco(Int_t nEvents = 100)
 
    if (stsHitProducerType == "real") {
    // ----- STS REAL reconstruction -----------------------------------------------
-      Double_t threshold = 4;
-      Double_t noiseWidth = 0.01;
-      Int_t nofBits = 12;
-      Double_t ElectronsPerAdc = 10.;
-      Double_t StripDeadTime = 0.1;
-      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
-      stsDigitize->SetRealisticResponse();
-      stsDigitize->SetFrontThreshold(threshold);
-      stsDigitize->SetBackThreshold(threshold);
-      stsDigitize->SetFrontNoiseWidth(noiseWidth);
-      stsDigitize->SetBackNoiseWidth(noiseWidth);
-      stsDigitize->SetFrontNofBits(nofBits);
-      stsDigitize->SetBackNofBits(nofBits);
-      stsDigitize->SetFrontNofElPerAdc(ElectronsPerAdc);
-      stsDigitize->SetBackNofElPerAdc(ElectronsPerAdc);
-      stsDigitize->SetStripDeadTime(StripDeadTime);
+      CbmStsDigitize* stsDigitize = new CbmStsDigitize();
       run->AddTask(stsDigitize);
 
       FairTask* stsClusterFinder = new CbmStsClusterFinder();
@@ -94,19 +79,18 @@ void mvd_reco(Int_t nEvents = 100)
       FairTask* stsFindHits = new CbmStsFindHits();
       run->AddTask(stsFindHits);
 
-      FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+      FairTask* stsMatchHits = new CbmStsMatchHits();
       run->AddTask(stsMatchHits);
 
    } else if (stsHitProducerType == "ideal") {
-
       // ----- STS IDEAL reconstruction   ---------------------------------------------
-      FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
+      FairTask* stsDigitize = new CbmStsIdealDigitize();
       run->AddTask(stsDigitize);
 
       FairTask* stsClusterFinder = new CbmStsClusterFinder();
       run->AddTask(stsClusterFinder);
 
-      FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
+      FairTask* stsFindHits = new CbmStsIdealFindHits();
       run->AddTask(stsFindHits);
 
       FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);

@@ -104,23 +104,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 
 		if (stsHitProducerType == "real") {
 		// ----- STS REAL reconstruction -----------------------------------------------
-         // -----   STS digitizer   -------------------------------------------------
-         Double_t threshold = 4;
-         Double_t noiseWidth = 0.01;
-         Int_t nofBits = 12;
-         Double_t ElectronsPerAdc =  10.;
-         Double_t StripDeadTime = 0.1;
          CbmStsDigitize* stsDigitize = new CbmStsDigitize();
-         stsDigitize->SetRealisticResponse();
-         stsDigitize->SetFrontThreshold(threshold);
-         stsDigitize->SetBackThreshold(threshold);
-         stsDigitize->SetFrontNoiseWidth(noiseWidth);
-         stsDigitize->SetBackNoiseWidth(noiseWidth);
-         stsDigitize->SetFrontNofBits(nofBits);
-         stsDigitize->SetBackNofBits(nofBits);
-         stsDigitize->SetFrontNofElPerAdc(ElectronsPerAdc);
-         stsDigitize->SetBackNofElPerAdc(ElectronsPerAdc);
-         stsDigitize->SetStripDeadTime(StripDeadTime);
          run->AddTask(stsDigitize);
 
          FairTask* stsClusterFinder = new CbmStsClusterFinder();

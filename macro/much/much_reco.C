@@ -36,7 +36,7 @@ void much_reco(
 	run->SetOutputFile(globalRecoFile);
 
 	// --- STS Digitization -----------------------------------------------------
-   CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+   CbmStsDigitize* stsDigitize = new CbmStsDigitize();
    run->AddTask(stsDigitize);
 
    FairTask* stsClusterFinder = new CbmStsClusterFinder();
@@ -45,7 +45,7 @@ void much_reco(
    FairTask* stsFindHits = new CbmStsFindHits();
    run->AddTask(stsFindHits);
 
-   FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+   FairTask* stsMatchHits = new CbmStsMatchHits();
    run->AddTask(stsMatchHits);
 	// --------------------------------------------------------------------------
 

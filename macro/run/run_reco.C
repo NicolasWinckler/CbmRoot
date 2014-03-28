@@ -98,7 +98,7 @@ void run_reco(Int_t nEvents = 2) {
   Int_t    nofBits    = 12;
   Double_t electronsPerAdc    =  10;
   Double_t StripDeadTime = 0.1;
-  CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+  CbmStsDigitize* stsDigitize = new CbmStsDigitize();
   stsDigitize->SetRealisticResponse();
   stsDigitize->SetFrontThreshold (threshold);
   stsDigitize->SetBackThreshold  (threshold);
@@ -149,7 +149,7 @@ void run_reco(Int_t nEvents = 2) {
 
 
   // -----  STS hit matching   -----------------------------------------------
-  FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+  FairTask* stsMatchHits = new CbmStsMatchHits();
   run->AddTask(stsMatchHits);
   // -------------------------------------------------------------------------
 

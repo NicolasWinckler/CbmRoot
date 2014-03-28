@@ -86,7 +86,7 @@ Int_t runHoughStsTrackFinder(Int_t nEvents=2)
   // ------------------------------------------------------------------------
 
   // -----   STS digitizer   ------------------------------------------------
-  CbmStsDigitize* stsDigitize         = new CbmStsDigitize("STSDigitize", iVerbose);
+  CbmStsDigitize* stsDigitize         = new CbmStsDigitize();
   fRun->AddTask(stsDigitize);
   // ------------------------------------------------------------------------
 
@@ -103,7 +103,7 @@ Int_t runHoughStsTrackFinder(Int_t nEvents=2)
   // ------------------------------------------------------------------------
 
   // ---  STS hit matching   ------------------------------------------------
-  CbmStsMatchHits* matchHits          = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+  CbmStsMatchHits* matchHits          = new CbmStsMatchHits();
   fRun->AddTask(matchHits);
   // ------------------------------------------------------------------------
 

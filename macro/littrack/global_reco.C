@@ -110,7 +110,7 @@ void global_reco(Int_t nEvents = 100, // number of events
          Int_t nofBits = 12;
          Double_t ElectronsPerAdc =  10.;
          Double_t StripDeadTime = 0.1;
-         CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
+         CbmStsDigitize* stsDigitize = new CbmStsDigitize();
          stsDigitize->SetRealisticResponse();
          stsDigitize->SetFrontThreshold(threshold);
          stsDigitize->SetBackThreshold(threshold);
@@ -129,19 +129,19 @@ void global_reco(Int_t nEvents = 100, // number of events
          FairTask* stsFindHits = new CbmStsFindHits();
          run->AddTask(stsFindHits);
 
-         FairTask* stsMatchHits = new CbmStsMatchHits("STS Hit Matcher", iVerbose);
+         FairTask* stsMatchHits = new CbmStsMatchHits();
          run->AddTask(stsMatchHits);
 
 		} else if (stsHitProducerType == "ideal") {
 
          // ----- STS IDEAL reconstruction   ---------------------------------------------
-         FairTask* stsDigitize =	new CbmStsIdealDigitize("STSDigitize", iVerbose);
+         FairTask* stsDigitize =	new CbmStsIdealDigitize();
          run->AddTask(stsDigitize);
 
          FairTask* stsClusterFinder = new CbmStsClusterFinder();
          run->AddTask(stsClusterFinder);
 
-         FairTask* stsFindHits =	new CbmStsIdealFindHits("STSFindHits", iVerbose);
+         FairTask* stsFindHits =	new CbmStsIdealFindHits();
          run->AddTask(stsFindHits);
 
          FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
@@ -256,6 +256,7 @@ void global_reco(Int_t nEvents = 100, // number of events
 		  run->AddTask(matchRings);
 	   }
     }
+
 
     if (opt == "all" || opt == "tracking") {
       if (opt == "tracking") {

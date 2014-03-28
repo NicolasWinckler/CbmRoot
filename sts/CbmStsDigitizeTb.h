@@ -65,7 +65,7 @@ class CbmStsDigitizeTb : public FairTask
   CbmStsDigiScheme* fDigiScheme;   /** Digitisation scheme **/
   TClonesArray*     fPoints;       /** Input array of CbmStsPoint **/
   TClonesArray*     fDigis;        /** Output array of CbmStsDigi **/
-  TClonesArray*     fDigiMatches;  /** Output array of CbmStsDigiMatches**/
+  TClonesArray*     fDigiMatches;  /** Output array of CbmMatch**/
 
   // statistics
   Int_t             fNDigis;

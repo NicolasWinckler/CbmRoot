@@ -5,7 +5,6 @@
 // -----                  Created 01/07/2008  by R. Karabowicz         -----
 // -------------------------------------------------------------------------
 
-
 /** CbmStsDigitise
  *@author Volker Friese <v.friese@gsi.de>
  *@since 30.08.06
@@ -16,17 +15,12 @@
  ** Produces objects of type CbmStsDigi out of CbmStsPoint.
  **/
 
-
 #ifndef CBMSTSDIGITIZE_H
 #define CBMSTSDIGITIZE_H 1
 
 #include <set>
 #include "TStopwatch.h"
 #include "FairTask.h"
-
-using std::set;
-using std::map;
-using std::pair;
 
 class TClonesArray;
 class CbmGeostsPar;
@@ -35,130 +29,140 @@ class CbmStsStation;
 
 class CbmStsPoint;
 
-
 class CbmStsDigitize : public FairTask
 {
 
- public:
+public:
+    /** Default constructor **/
+    CbmStsDigitize();
 
-  /** Default constructor **/
-  CbmStsDigitize();
+    /** Destructor **/
+    virtual ~CbmStsDigitize();
 
+    /** Execution **/
+    virtual void Exec(Option_t* opt);
 
-  /** Standard constructor **/
-  CbmStsDigitize(Int_t iVerbose);
+    /** Virtual method Finish **/
+    virtual void Finish();
 
+    virtual void SetRealisticResponse(Bool_t real = kTRUE)
+    {
+        fRealistic = real;
+    }
 
-  /** Constructor with name **/
-  CbmStsDigitize(const char* name, Int_t iVerbose);
+    void SetStep(Double_t tStep)
+    {
+        fStep = tStep;
+    }
 
+    void FindFiredStrips(CbmStsPoint* pnt, Int_t& nofStr, Int_t*& strips, Double_t*& signals, Int_t side);
+    void ProduceHitResponse(CbmStsSensor* sensor);
 
-  /** Destructor **/
-  virtual ~CbmStsDigitize();
+    void SetFrontThreshold(Double_t frontThr = 0.)
+    {
+        fFThreshold = frontThr;
+    }
+    void SetBackThreshold(Double_t backThr = 0.)
+    {
+        fBThreshold = backThr;
+    }
+    void SetFrontNoiseWidth(Double_t frontNoW = 0.)
+    {
+        fFNoiseWidth = frontNoW;
+    }
+    void SetBackNoiseWidth(Double_t backNoW = 0.)
+    {
+        fBNoiseWidth = backNoW;
+    }
 
-  void SetStep(Double_t tStep) {fStep = tStep;}
+    void SetFrontNofBits(Int_t frontNB = 0)
+    {
+        fFNofBits = frontNB;
+    }
+    void SetBackNofBits(Int_t backNB = 0)
+    {
+        fBNofBits = backNB;
+    }
+    void SetFrontNofElPerAdc(Double_t frontMS = 0.)
+    {
+        fFNofElPerAdc = frontMS;
+    }
+    void SetBackNofElPerAdc(Double_t backMS = 0.)
+    {
+        fBNofElPerAdc = backMS;
+    }
 
-  /** Execution **/
-  virtual void Exec(Option_t* opt);
+    void SetStripDeadTime(Double_t StripDeadTime = 0.)
+    {
+        fStripDeadTime = StripDeadTime;
+    }
 
-  /** Virtual method Finish **/
-  virtual void Finish();
+private:
+    CbmGeoStsPar* fGeoPar;         /** Geometry parameter container **/
+    CbmStsDigiPar* fDigiPar;       /** Digitisation parameter container **/
+    CbmStsDigiScheme* fDigiScheme; /** Digitisation scheme **/
+    TClonesArray* fPoints;         /** Input array of CbmStsPoint **/
+    TClonesArray* fDigis;          /** Output array of CbmStsDigi **/
+    TClonesArray* fDigiMatches;    /** Output array of CbmMatch**/
 
-  virtual void SetRealisticResponse(Bool_t real=kTRUE) {fRealistic = real;}
+    Double_t fNEvents;
+    Double_t fNPoints;
+    Double_t fNDigisFront;
+    Double_t fNDigisBack;
+    Double_t fTime;
 
-  void FindFiredStrips(CbmStsPoint* pnt,Int_t& nofStr,Int_t*& strips,Double_t*& signals,Int_t side);
-  void ProduceHitResponse(CbmStsSensor* sensor);
+    // settings
+    Double_t fStep;
 
-  void SetFrontThreshold (Double_t  frontThr=0.)      {fFThreshold    =  frontThr;}
-  void SetBackThreshold  (Double_t  backThr=0.)       {fBThreshold    =  backThr;}
-  void SetFrontNoiseWidth(Double_t  frontNoW=0.)      {fFNoiseWidth   =  frontNoW;}
-  void SetBackNoiseWidth (Double_t  backNoW=0.)       {fBNoiseWidth   =  backNoW;}
-  
-  void SetFrontNofBits   (Int_t     frontNB=0 ) {fFNofBits    =  frontNB;}
-  void SetBackNofBits    (Int_t      backNB=0 ) {fBNofBits    =   backNB;}
-  void SetFrontNofElPerAdc   (Double_t  frontMS=0.) {fFNofElPerAdc    =  frontMS;}
-  void SetBackNofElPerAdc    (Double_t   backMS=0.) {fBNofElPerAdc    =   backMS;}
-  
-  void SetStripDeadTime  (Double_t  StripDeadTime=0.) {fStripDeadTime =  StripDeadTime;}
+    TStopwatch fTimer;
 
+    Bool_t fRealistic;
+    Double_t fEnergyLossToSignal;
 
- private:
+    Double_t fFThreshold;
+    Double_t fBThreshold;
+    Double_t fFNoiseWidth;
+    Double_t fBNoiseWidth;
 
-  CbmGeoStsPar*     fGeoPar;       /** Geometry parameter container **/
-  CbmStsDigiPar*    fDigiPar;      /** Digitisation parameter container **/
-  CbmStsDigiScheme* fDigiScheme;   /** Digitisation scheme **/
-  TClonesArray*     fPoints;       /** Input array of CbmStsPoint **/
-  TClonesArray*     fDigis;        /** Output array of CbmStsDigi **/
-  TClonesArray*     fDigiMatches;  /** Output array of CbmStsDigiMatches**/
+    Double_t fStripDeadTime;
 
-  // statistics
-  Int_t             fNDigis;
-  Int_t             fNMulti;
+    Int_t fFNofBits;
+    Int_t fBNofBits;
+    Double_t fFNofElPerAdc;
+    Double_t fBNofElPerAdc;
+    Int_t fFNofSteps;
+    Int_t fBNofSteps;
 
-  Double_t          fNEvents;
-  Double_t          fNPoints;     
-  Double_t          fNDigisFront;
-  Double_t          fNDigisBack;
-  Double_t          fTime;
+    Double_t* fStripSignalF;
+    Double_t* fStripSignalB;
 
-  // settings
-  Double_t          fStep;
+    // map of the point indices contributing to a fired strip
+    std::map<Int_t, set<Int_t> > fFChannelPointsMap;
+    std::map<Int_t, set<Int_t> > fBChannelPointsMap;
 
-  TStopwatch        fTimer;
+    std::map<CbmStsSensor*, set<Int_t> > fPointMap; /** sensor points **/
+    Float_t occupancy[10][1000][20];
 
-  Bool_t    fRealistic;
-  Double_t  fEnergyLossToSignal;
+    /** Make sensorwise set for points **/
+    void MakeSets();
+    void MakeSets1();
 
-  Double_t  fFThreshold;
-  Double_t  fBThreshold;
-  Double_t  fFNoiseWidth;
-  Double_t  fBNoiseWidth;
+    /** Get parameter containers **/
+    virtual void SetParContainers();
 
-  Double_t  fStripDeadTime;
-  
-  Int_t     fFNofBits;
-  Int_t     fBNofBits;
-  Double_t  fFNofElPerAdc;
-  Double_t  fBNofElPerAdc;
-  Int_t     fFNofSteps;
-  Int_t     fBNofSteps;
+    /** Intialisation **/
+    virtual InitStatus Init();
 
-  Double_t* fStripSignalF;
-  Double_t* fStripSignalB;
+    /** Reinitialisation **/
+    virtual InitStatus ReInit();
 
-  // map of the point indices contributing to a fired strip
-  map<Int_t, set<Int_t> > fFChannelPointsMap;
-  map<Int_t, set<Int_t> > fBChannelPointsMap;
- 
-  map<CbmStsSensor*, set<Int_t> > fPointMap;  /** sensor points **/
-  Float_t occupancy [10][1000][20] ;
+    /** Reset eventwise counters **/
+    void Reset();
 
-  /** Make sensorwise set for points **/
-  void MakeSets();
-  void MakeSets1();
+    CbmStsDigitize(const CbmStsDigitize&);
+    CbmStsDigitize operator=(const CbmStsDigitize&);
 
-  /** Get parameter containers **/
-  virtual void SetParContainers();
-
-
-  /** Intialisation **/
-  virtual InitStatus Init();
-
-
-  /** Reinitialisation **/
-  virtual InitStatus ReInit();
-
-
-  /** Reset eventwise counters **/
-  void Reset();
-
-  CbmStsDigitize(const CbmStsDigitize&);
-  CbmStsDigitize operator=(const CbmStsDigitize&);
-
-  ClassDef(CbmStsDigitize,1);
-
+    ClassDef(CbmStsDigitize, 1);
 };
 
 #endif
-
-

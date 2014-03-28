@@ -31,7 +31,6 @@ class CbmGeoPassivePar;
 class CbmGeoStsPar;
 class CbmStsDigiPar;
 class CbmStsDigiScheme;
-class CbmStsDigiMatch;
 class CbmStsHit;
 
 class CbmStsMatchHits : public FairTask
@@ -40,12 +39,6 @@ class CbmStsMatchHits : public FairTask
 public:
     /** Default constructor **/
     CbmStsMatchHits();
-
-    /** Standard constructor **/
-    CbmStsMatchHits(Int_t iVerbose);
-
-    /** Constructor with name **/
-    CbmStsMatchHits(const char* name, Int_t iVerbose);
 
     /** Destructor **/
     virtual ~CbmStsMatchHits();
@@ -81,7 +74,7 @@ private:
     CbmStsDigiScheme* fDigiScheme; /** Digitisation scheme **/
     TClonesArray* fPoints;         /** Array of CbmStsPoint **/
     TClonesArray* fDigis;          /** Array of CbmStsDigi **/
-    TClonesArray* fDigiMatches;    /** Array of CbmStsDigiMatch **/
+    TClonesArray* fDigiMatches;    /** Array of CbmMatch **/
     TClonesArray* fHits;           /** Array of CbmStsHit **/
     TStopwatch fTimer;             /** Timer **/
     Int_t fNEvents;                /** Number of events with success **/

@@ -32,7 +32,6 @@
 #include "CbmTrdAddress.h"
 #include "CbmCluster.h"
 #include "CbmStsDigi.h"
-#include "CbmStsDigiMatch.h"
 #include "CbmMatch.h"
 
 #include "TSystem.h"

@@ -76,6 +76,9 @@ void CbmStsFindHits::Exec(Option_t* opt)
             FindHits(station, sector, frontSet, backSet);
         } // Sector loop
     }     // Station loop
+
+    static Int_t eventNo = 0;
+    LOG(INFO) << "CbmStsFindHits::Exec: eventNo=" << eventNo++ << std::endl;
 }
 
 void CbmStsFindHits::SetParContainers()

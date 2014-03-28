@@ -85,6 +85,9 @@ void CbmStsClusterFinder::Exec(Option_t* opt)
     } // Station loop
 
     AnalyzeClusters();
+
+    static Int_t eventNo = 0;
+    LOG(INFO) << "CbmStsClusterFinder::Exec: eventNo=" << eventNo++ << std::endl;
 }
 
 void CbmStsClusterFinder::SetParContainers()

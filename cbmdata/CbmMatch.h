@@ -42,8 +42,8 @@ public:
    /* Modifiers */
    void AddLink(const CbmMatch& match);
    void AddLink(const CbmLink& newLink);
-   void AddLink(Float_t weight, Int_t index, Int_t entry = -1, Int_t file = -1);	
-   void Clear();
+   void AddLink(Double_t weight, Int_t index, Int_t entry = -1, Int_t file = -1);
+   void ClearLinks();
 
    /**
     * \brief Return string representation of the object.

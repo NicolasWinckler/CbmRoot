@@ -33,7 +33,6 @@
 #pragma link C++ class CbmStsAddress;
 #pragma link C++ class CbmStsCluster+;
 #pragma link C++ class CbmStsDigi+;
-#pragma link C++ class CbmStsDigiMatch+;
 #pragma link C++ class CbmStsHit+;
 #pragma link C++ class CbmStsPoint+;
 #pragma link C++ class CbmStsTrack+;

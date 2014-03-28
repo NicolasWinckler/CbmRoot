@@ -5,7 +5,6 @@
 // -----                  Created 30/08/06  by V. Friese               -----
 // -------------------------------------------------------------------------
 
-
 /** CbmStsDigitise
  *@author Volker Friese <v.friese@gsi.de>
  *@since 30.08.06
@@ -15,7 +14,6 @@
  ** Task level SIM
  ** Produces objects of type CbmStsDigi out of CbmStsPoint.
  **/
-
 
 #ifndef CBMSTSIDEALDIGITIZE_H
 #define CBMSTSIDEALDIGITIZE_H 1
@@ -33,77 +31,51 @@ class CbmStsDigiPar;
 class CbmStsDigiScheme;
 class CbmStsStation;
 
-
-
 class CbmStsIdealDigitize : public FairTask
 {
 
- public:
+public:
+    /** Default constructor **/
+    CbmStsIdealDigitize();
 
-  /** Default constructor **/
-  CbmStsIdealDigitize();
+    /** Destructor **/
+    virtual ~CbmStsIdealDigitize();
 
+    /** Execution **/
+    virtual void Exec(Option_t* opt);
 
-  /** Standard constructor **/
-  CbmStsIdealDigitize(Int_t iVerbose);
+private:
+    CbmGeoStsPar* fGeoPar;         /** Geometry parameter container **/
+    CbmStsDigiPar* fDigiPar;       /** Digitisation parameter container **/
+    CbmStsDigiScheme* fDigiScheme; /** Digitisation scheme **/
+    TClonesArray* fPoints;         /** Input array of CbmStsPoint **/
+    TClonesArray* fDigis;          /** Output array of CbmStsDigi **/
+    TClonesArray* fDigiMatches;    /** Output array of CbmMatch**/
+    Int_t fNPoints;
+    Int_t fNFailed;
+    Int_t fNOutside;
+    TStopwatch fTimer;
 
+    /** Map of active channels (pair detectorId, channel number)
+     ** to index of StsDigi **/
+    std::map<std::pair<Int_t, Int_t>, Int_t> fChannelMap; //!
 
-  /** Constructor with name **/
-  CbmStsIdealDigitize(const char* name, Int_t iVerbose);
+    /** Get parameter containers **/
+    virtual void SetParContainers();
 
+    /** Intialisation **/
+    virtual InitStatus Init();
 
-  /** Destructor **/
-  virtual ~CbmStsIdealDigitize();
+    /** Reinitialisation **/
+    virtual InitStatus ReInit();
 
+    /** Reset eventwise counters **/
+    void Reset();
 
-  /** Execution **/
-  virtual void Exec(Option_t* opt);
+    CbmStsIdealDigitize(const CbmStsIdealDigitize&);
+    CbmStsIdealDigitize operator=(const CbmStsIdealDigitize&);
 
-
-
- private:
-
-  CbmGeoStsPar*     fGeoPar;       /** Geometry parameter container **/
-  CbmStsDigiPar*    fDigiPar;      /** Digitisation parameter container **/
-  CbmStsDigiScheme* fDigiScheme;   /** Digitisation scheme **/
-  TClonesArray*     fPoints;       /** Input array of CbmStsPoint **/
-  TClonesArray*     fDigis;        /** Output array of CbmStsDigi **/
-  TClonesArray*     fDigiMatches;  /** Output array of CbmStsDigiMatches**/
-  Int_t             fNPoints;     
-  Int_t             fNFailed;
-  Int_t             fNOutside;
-  Int_t             fNMulti;
-  Int_t             fNDigis;
-  TStopwatch        fTimer;
-
-  /** Map of active channels (pair detectorId, channel number) 
-   ** to index of StsDigi **/
-  std::map<std::pair<Int_t, Int_t>, Int_t> fChannelMap; //!
- 
-
-  /** Get parameter containers **/
-  virtual void SetParContainers();
-
-
-  /** Intialisation **/
-  virtual InitStatus Init();
-
-
-  /** Reinitialisation **/
-  virtual InitStatus ReInit();
-
-
-  /** Reset eventwise counters **/
-  void Reset();
-
-  CbmStsIdealDigitize(const CbmStsIdealDigitize&);
-  CbmStsIdealDigitize operator=(const CbmStsIdealDigitize&);
-
-
-  ClassDef(CbmStsIdealDigitize,1);
-
+    ClassDef(CbmStsIdealDigitize, 1);
 };
 
 #endif
-
-

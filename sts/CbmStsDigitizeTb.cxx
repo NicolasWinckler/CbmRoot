@@ -27,7 +27,6 @@
 #include "CbmStsAddress.h"
 #include "CbmGeoStsPar.h"
 #include "CbmStsDigi.h"
-#include "CbmStsDigiMatch.h"
 #include "CbmStsDigiPar.h"
 #include "CbmStsDigiScheme.h"
 #include "CbmStsDigitizeTb.h"

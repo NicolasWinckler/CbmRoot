@@ -5,7 +5,6 @@
 // -----                  Created 31/08/06  by V. Friese               -----
 // -------------------------------------------------------------------------
 #include "CbmStsDigiScheme.h"
-#include "CbmStsDetectorId.h"
 
 #include "CbmGeoStsPar.h"
 #include "CbmStsDigiPar.h"

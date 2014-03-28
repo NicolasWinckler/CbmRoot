@@ -11,7 +11,6 @@
 #include "FairMCPoint.h"
 #include "CbmMvdPoint.h"
 #include "CbmGeoStsPar.h"
-#include "CbmStsDetectorId.h"
 #include "CbmStsSensor.h"
 #include "CbmStsDigiScheme.h"
 #include "CbmGeoStsPar.h"

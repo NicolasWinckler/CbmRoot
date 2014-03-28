@@ -32,7 +32,6 @@
 
 #pragma link C++ class CbmStsAddress;
 #pragma link C++ class CbmStsCluster+;
-#pragma link C++ class CbmStsDetectorId+;
 #pragma link C++ class CbmStsDigi+;
 #pragma link C++ class CbmStsDigiMatch+;
 #pragma link C++ class CbmStsHit+;

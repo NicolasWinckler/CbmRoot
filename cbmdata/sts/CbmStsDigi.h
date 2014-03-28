@@ -24,12 +24,7 @@
 
 #include "CbmDigi.h"
 
-
 #include "CbmDetectorList.h"
-#include "CbmStsDetectorId.h"
-#include "FairMultiLinkedData.h"
-
-#include <vector>
 
 class CbmStsDigi : public CbmDigi
 {

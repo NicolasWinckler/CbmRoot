@@ -9,7 +9,7 @@ XXXXX=$(printf "%05d" "$SGE_TASK_ID")
 XXXX=$(printf "%04d" "$SGE_TASK_ID")
 
 # specify input and output directories
-outdir=/hera/cbm/users/slebedev/mc/dielectron/nov13/${coll_energy}/${trd}/${field_scale}field/${mvd}/${pluto_particle}/
+outdir=/hera/cbm/users/slebedev/mc/dielectron/apr14/${coll_energy}/${trd}/${tof}/${field_scale}field/${mvd}/${pluto_particle}/
 cbmroot_config_path=/hera/cbm/users/slebedev/trunk/build/config.sh
 macro_dir=/hera/cbm/users/slebedev/trunk/cbmroot/macro/analysis/dielectron/
 
@@ -55,11 +55,6 @@ export URQMD=yes
 export PLUTO=yes
 #Collision energy: 25gev or 8gev -> set proper weight into analysis
 export ENERGY=${coll_energy}
-#if [ ${coll_energy} = "8gev" ] ; then
-#   export ENERGY=10gev
-#elif [ ${coll_energy} = "25gev" ]; then
-#   export ENERGY=25gev 
-#fi
 
 #Geometries
 export CAVE_GEOM=cave.geo
@@ -77,7 +72,9 @@ export STS_MATERIAL_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.
 export RICH_GEOM=rich/rich_v08a.geo
 
 #Set TRD geometry
-if [ ${trd} = "trd" ] ; then
+# digi or smearing or clustering
+TRD_HIT_PRODUCER_TYPE=clustering
+if [ ${trd} = "trd10" ] ; then
     export TRD_GEOM=trd/trd_v13p_3e.geo.root
     export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13p_3e.digi.par
     export TRD_ANN_CUT=0.85
@@ -87,16 +84,6 @@ elif [ ${trd} = "notrd" ] ; then
     export TRD_DIGI=
     export TRD_ANN_CUT=0.0
     export MIN_NOF_POINTS_TRD=0
-elif [ ${trd} = "trd2" ] ; then
-    export TRD_GEOM=trd/trd_v13i.geo.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13i.digi.par
-    export TRD_ANN_CUT=-0.3
-    export MIN_NOF_POINTS_TRD=2
-elif [ ${trd} = "trd3" ] ; then
-    export TRD_GEOM=trd/trd_v13j.geo.root
-    export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13j.digi.par
-    export TRD_ANN_CUT=-0.2
-    export MIN_NOF_POINTS_TRD=2
 elif [ ${trd} = "trd4" ] ; then
     export TRD_GEOM=trd/trd_v13p_1e.geo.root
     export TRD_DIGI=${VMCWORKDIR}/parameters/trd/trd_v13p_1e.digi.par
@@ -104,8 +91,17 @@ elif [ ${trd} = "trd4" ] ; then
     export MIN_NOF_POINTS_TRD=2
 fi
 
-export TOF_GEOM=tof/tof_v13b.geo.root
-export TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
+
+if [ ${tof} = "tofv13" ] ; then
+   export TOF_GEOM=tof/tof_v13b.geo.root
+   export TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
+   export TOF_HIT_PRODUCER_TYPE=v13
+elif [ ${tof} = "tofv07" ] ; then
+   export TOF_GEOM=tof/tof_v07a.geo
+   export TOF_DIGI=
+   export TOF_HIT_PRODUCER_TYPE=v07
+fi
+
 
 export FIELD_MAP=field_v12a
 export MAGNET_GEOM=magnet/magnet_v12a.geo

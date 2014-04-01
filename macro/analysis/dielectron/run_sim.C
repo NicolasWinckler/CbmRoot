@@ -100,7 +100,7 @@ void run_sim(Int_t nEvents = 1000)
 	}
 
 	if ( stsGeom != "" ) {
-		FairDetector* sts = new CbmSts("STS", kTRUE);
+		FairDetector* sts = new CbmStsMC(kTRUE);
 		sts->SetGeometryFileName(stsGeom);
 		fRun->AddModule(sts);
 	}

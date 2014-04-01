@@ -23,13 +23,15 @@ void run_reco(Int_t nEvents = 1000)
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v13c_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13p_3e.digi.par"; // TRD digi file
-   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par"; // TRD digi file
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par"; // TOF digi file
 
    TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v13c.root"; // Material budget file for L1 STS tracking
 
    TString resultDir = "recqa/";
    Double_t trdAnnCut = 0.85;
    Int_t minNofPointsTrd = 6;
+   TString tofHitProducerType = "v13"; //v07 or v13
+   TString trdHitProducerType = "clustering"; //"digi" or "smearing" or "clustering"
 
 	if (script == "yes") {
 		mcFile = TString(gSystem->Getenv("MC_FILE"));
@@ -40,9 +42,12 @@ void run_reco(Int_t nEvents = 1000)
 
 		stsDigiFile = TString(gSystem->Getenv("STS_DIGI"));
 		trdDigiFile = TString(gSystem->Getenv("TRD_DIGI"));
-      tofDigiFile = TString(gSystem->Getenv("TOF_DIGI"));
+		tofDigiFile = TString(gSystem->Getenv("TOF_DIGI"));
 
-      resultDir = TString(gSystem->Getenv("RESULT_DIR"));
+		tofHitProducerType = TString(gSystem->Getenv("TOF_HIT_PRODUCER_TYPE"));
+		trdHitProducerType = TString(gSystem->Getenv("TRD_HIT_PRODUCER_TYPE"));
+
+		resultDir = TString(gSystem->Getenv("RESULT_DIR"));
 
 		stsMatBudgetFileName = TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE"));
 		trdAnnCut = TString(gSystem->Getenv("TRD_ANN_CUT")).Atof();
@@ -117,7 +122,7 @@ void run_reco(Int_t nEvents = 1000)
       Int_t    nofBits    = 12;
       Double_t electronsPerAdc    =  10;
       Double_t StripDeadTime = 0.1;
-      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", 1);
+      CbmStsDigitize* stsDigitize = new CbmStsDigitize();
       stsDigitize->SetRealisticResponse();
       stsDigitize->SetFrontThreshold (threshold);
       stsDigitize->SetBackThreshold  (threshold);
@@ -130,26 +135,26 @@ void run_reco(Int_t nEvents = 1000)
       stsDigitize->SetStripDeadTime  (StripDeadTime);
       run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",1);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder();
       run->AddTask(stsClusterFinder);
 
-      FairTask* stsFindHits = new CbmStsFindHits(1);
+      FairTask* stsFindHits = new CbmStsFindHits();
       run->AddTask(stsFindHits);
 
-      CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(1);
+      CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits();
       run->AddTask(stsMatchHits);
 
     } else { // STS IDEAL RESPONSE
-      FairTask* stsDigitize = new CbmStsIdealDigitize("CbmStsIdealDigitize", 1);
+      FairTask* stsDigitize = new CbmStsIdealDigitize();
       run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",1);
+      FairTask* stsClusterFinder = new CbmStsClusterFinder();
       run->AddTask(stsClusterFinder);
 
-      FairTask* stsFindHits = new CbmStsIdealFindHits(1);
+      FairTask* stsFindHits = new CbmStsIdealFindHits();
       run->AddTask(stsFindHits);
 
-      FairTask* stsMatchHits = new CbmStsIdealMatchHits(1);
+      FairTask* stsMatchHits = new CbmStsIdealMatchHits();
       run->AddTask(stsMatchHits);
    }
 
@@ -185,7 +190,7 @@ void run_reco(Int_t nEvents = 1000)
     // CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, trdDFoils, trdDGap);
       CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , "H++");
 
-    /*  if (trdHitProducerType == "smearing") {
+      if (trdHitProducerType == "smearing") {
          CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
          trdHitProd->SetUseDigiPar(false);
          run->AddTask(trdHitProd);
@@ -195,7 +200,7 @@ void run_reco(Int_t nEvents = 1000)
 
          CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi();
          run->AddTask(trdHitProd);
-      } else if (trdHitProducerType == "clustering") {*/
+      } else if (trdHitProducerType == "clustering") {
          CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
          run->AddTask(trdDigiPrf);
 
@@ -204,17 +209,21 @@ void run_reco(Int_t nEvents = 1000)
 
          CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
          run->AddTask(trdHit);
-      //}
+      }
 	}// isTRD
 
 	// =========================================================================
 	// ===                     TOF local reconstruction                      ===
 	// =========================================================================
 	if (IsTof(parFile)) {
-		// ------   TOF hit producer   ---------------------------------------------
-	    CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("CbmTofHitProducer", 1);
-            tofHitProd->SetInitFromAscii(kFALSE);
-	    run->AddTask(tofHitProd);
+		if (tofHitProducerType == "v07") {
+			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", 1);
+			run->AddTask(tofHitProd);
+		} else if (tofHitProducerType == "v13"){
+			CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("CbmTofHitProducer", 1);
+			tofHitProd->SetInitFromAscii(kFALSE);
+			run->AddTask(tofHitProd);
+		}
 	} //isTof
 
 	// =========================================================================

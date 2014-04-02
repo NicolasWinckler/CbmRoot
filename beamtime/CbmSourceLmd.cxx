@@ -342,7 +342,7 @@ Bool_t CbmSourceLmd::Init()
     return kFALSE;
   }
   LOG(INFO) << "Init : event header at " << fCurrentEvent << FairLogger::endl;
-  ioman->Register("TbEvent.", "Event", fCurrentEvent, kTRUE);
+  ioman->Register("EventHeader.", "Event", fCurrentEvent, kTRUE);
 
   // --- Open input file and get first message
   TObjString* tmp =

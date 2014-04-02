@@ -44,6 +44,8 @@ class CbmSourceLmd : public FairSource
     void SetReadInTimeStep(ULong_t step) { fReadInTimeStep = step;  }
     void SetPersistence(Bool_t persistence = kTRUE) { fPersistence = persistence; }
 
+    void SetEventTimeWindow(Double_t window) { fEventTimeWindow = window; }
+
     void AddFile(const char * fname) {       
       fInputFileList.Add(new TObjString(fname));
     }

@@ -402,7 +402,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->SetContour(99);
       Layer->SetXTitle("x-Coordinate [mm]");
       Layer->SetYTitle("y-Coordinate [mm]");
-      Layer->SetZTitle("Trigger/Channel [Hz]");
+      Layer->SetZTitle("Trigger/Channel [kHz]");
       Layer->SetStats(kFALSE);
       Layer->GetXaxis()->SetLabelSize(0.02);
       Layer->GetYaxis()->SetLabelSize(0.02);
@@ -413,7 +413,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->GetYaxis()->SetTitleOffset(2);
       Layer->GetZaxis()->SetTitleSize(0.02);
       Layer->GetZaxis()->SetTitleOffset(-2);
-      Layer->GetZaxis()->SetRangeUser(min,max);
+      Layer->GetZaxis()->SetRangeUser(min/1000,max/1000);
       LayerMap[LayerId]->cd()->SetLogz(logScale);
       Layer->Fill(0.,0.,0);
       Layer->Draw("colz");

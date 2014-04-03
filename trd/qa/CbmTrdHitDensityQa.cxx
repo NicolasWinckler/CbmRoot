@@ -136,12 +136,15 @@ InitStatus CbmTrdHitDensityQa::Init()
   TString origpath = gDirectory->GetPath();
   printf ("\n%s\n",origpath.Data());
   TString newpath = origpath;
-  TFile *results = new TFile("data/result.root","read");
-  if (NULL != results){
-    gDirectory = results->CurrentDirectory();
+  TFile results;
+  results.Open("data/result.root","read");
+  if (results.IsOpen()){
+    gDirectory = results.CurrentDirectory();
     gDirectory->pwd();
     fPlotResults = true;
-    results->Close();
+    results.Close();
+  } else {
+    fPlotResults = false;
   }
   gDirectory->Cd(origpath);
   gDirectory->pwd();
@@ -315,7 +318,7 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
   // ---- Finish --------------------------------------------------------
 void CbmTrdHitDensityQa::Finish()
 { 
-
+  Bool_t logScale = false;
   Int_t nTotalAsics = 0;
   Int_t nTotalOptLinks = 0;
   Double_t trdTotalDataRate = 0.;
@@ -327,12 +330,15 @@ void CbmTrdHitDensityQa::Finish()
   myfile << "#" << endl;
   myfile << "#--------------------------" << endl;
   Double_t min(1), max(/*(Double_t)fEventCounter->GetEntries()/10.*/fEventRate);
-  if (fPlotResults) max = 1E6;
+  if (fPlotResults) {min = 1E3; max = 6E5;}
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
     fColors.push_back(TColor::GetColorPalette(i));
-    fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max) / TColor::GetNumberOfColors() * i));
+    if (logScale)
+      fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max-min) / Double_t(TColor::GetNumberOfColors()) * i));
+    else
+      fZLevel.push_back(min + ((max-min) / Double_t(TColor::GetNumberOfColors()) * i));
   }
   TString title, name;
   std::map< Int_t, TCanvas*> LayerMap;
@@ -340,9 +346,13 @@ void CbmTrdHitDensityQa::Finish()
   TString origpath = gDirectory->GetPath();
   printf ("\n%s\n",origpath.Data());
   TString newpath = origpath;
-  newpath.ReplaceAll("eds","hd_qa");
-  newpath.ReplaceAll(":/","");
-  if (fPlotResults) newpath = "data/result.root","read";
+  printf("fPlotResults: %i\n",(Int_t)fPlotResults);
+  if (fPlotResults) {
+    newpath = "data/result.root";
+  } else {
+    newpath.ReplaceAll("eds","hd_qa");
+    newpath.ReplaceAll(":/","");
+  }
   printf ("\n%s\n",newpath.Data());
   TFile *tempFile = NULL;
   if (fPlotResults) 
@@ -368,7 +378,7 @@ void CbmTrdHitDensityQa::Finish()
   for (fModuleHitMapIt = fModuleHitMap.begin();
        fModuleHitMapIt != fModuleHitMap.end(); ++fModuleHitMapIt) {
     TString histName = fModuleHitMapIt->second->GetName();
-    cout << histName << endl;
+    //cout << histName << endl;
     if (fPlotResults)
       fModuleHitMapIt->second = (TH2I*)tempFile->Get("TrdHitDensityQa/Module/" + histName);
     else
@@ -402,7 +412,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->GetZaxis()->SetTitleSize(0.02);
       Layer->GetZaxis()->SetTitleOffset(-2);
       Layer->GetZaxis()->SetRangeUser(min,max);
-      LayerMap[LayerId]->cd()->SetLogz(1);
+      LayerMap[LayerId]->cd()->SetLogz(logScale);
       Layer->Fill(0.,0.,0);
       Layer->Draw("colz");
     }
@@ -456,14 +466,18 @@ void CbmTrdHitDensityQa::Finish()
 	  pad->SetLineColor(0);
 	  pad->SetLineWidth(0);	
 	  Int_t color(0), j(0);
+	  //if (rate > min && rate <= max){
 	  while ((rate > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
 	    //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
 	    j++;
 	  }
 	  //printf ("%i<%i %i    %E <= %E\n\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
 	  pad->SetFillColor(fColors[j]);
-	  if (j >= fZLevel.size() || rate > max)
+	  if (j == (Int_t)fZLevel.size())
 	    pad->SetFillColor(12);
+	  if (rate < min)
+	    pad->SetFillColor(17);
+	 
 	  LayerMap[LayerId]->cd();
 	  pad->Draw("same");
 

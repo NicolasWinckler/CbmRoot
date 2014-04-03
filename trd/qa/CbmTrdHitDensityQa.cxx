@@ -132,22 +132,24 @@ InitStatus CbmTrdHitDensityQa::Init()
     cout << "-W CbmTrdHitDensityQa::Init: No TrdCluster array!" << endl;
     cout << "                             Task will be inactive" << endl;
     //return kERROR;
-  }  
+  } 
+  /* 
   TString origpath = gDirectory->GetPath();
   printf ("\n%s\n",origpath.Data());
   TString newpath = origpath;
-  TFile results;
-  results.Open("data/result.root","read");
-  if (results.IsOpen()){
-    gDirectory = results.CurrentDirectory();
-    gDirectory->pwd();
+  TFile *results = NULL;
+  results->Open("data/result.root","read");
+  */
+  if (gSystem->AccessPathName("/data/result.root")){//results->IsOpen()){
+    //gDirectory = results.CurrentDirectory();
+    //gDirectory->pwd();
     fPlotResults = true;
-    results.Close();
+    //results.Close();
   } else {
     fPlotResults = false;
   }
-  gDirectory->Cd(origpath);
-  gDirectory->pwd();
+  //gDirectory->Cd(origpath);
+  //gDirectory->pwd();
   // Extract information about the number of TRD stations and
   // the number of layers per TRD station from the geomanager.
   // Store the information about the number of layers at the entrance

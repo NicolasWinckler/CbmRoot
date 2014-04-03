@@ -10,7 +10,7 @@ do
 done <temp
 rm temp  
  maxThreads=3
-for urqmd in {7..199}
+for urqmd in {0..199}
 do
 	nThreads=$(($nThreads+1))
 	echo "${nThreads} root -l -b -q run_sim.C'('$nEvents,$urqmd')'"

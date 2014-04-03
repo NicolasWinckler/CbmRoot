@@ -62,6 +62,7 @@ class CbmTrdHitDensityQa : public FairTask
   TH1F* h1OptLinksModule;
 
   Bool_t fNeighbourTrigger;
+  Bool_t fPlotResults;
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters; 

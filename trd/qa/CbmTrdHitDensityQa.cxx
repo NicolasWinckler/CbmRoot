@@ -57,6 +57,7 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    h1DataModule(NULL),
    h1OptLinksModule(NULL),
    fNeighbourTrigger(true),
+   fPlotResults(false),
    fDigis(NULL),
    fClusters(NULL),
    fDigiPar(NULL),
@@ -131,7 +132,19 @@ InitStatus CbmTrdHitDensityQa::Init()
     cout << "-W CbmTrdHitDensityQa::Init: No TrdCluster array!" << endl;
     cout << "                             Task will be inactive" << endl;
     //return kERROR;
-  }   
+  }  
+  TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  TFile *results = new TFile("data/result.root","read");
+  if (NULL != results){
+    gDirectory = results->CurrentDirectory();
+    gDirectory->pwd();
+    fPlotResults = true;
+    results->Close();
+  }
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
   // Extract information about the number of TRD stations and
   // the number of layers per TRD station from the geomanager.
   // Store the information about the number of layers at the entrance
@@ -205,12 +218,14 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	  fModuleHitASICMap[moduleAddress]->SetXTitle("ASIC Address");
 	  fModuleHitASICMap[moduleAddress]->SetYTitle("Trigger counter");
 	}
-	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
-	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
-	if (fUsedDigiMap.find(digiAddress) == fUsedDigiMap.end()){ // Cluster include already neighbour trigger read-out. Two clusters can share associated neighbour digis, therefore test if digi is already used
-	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
-	  fUsedDigiMap[digiAddress] = iDigi;
-	} 
+	if (!fPlotResults){
+	  Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
+	  Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
+	  if (fUsedDigiMap.find(digiAddress) == fUsedDigiMap.end()){ // Cluster include already neighbour trigger read-out. Two clusters can share associated neighbour digis, therefore test if digi is already used
+	    fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
+	    fUsedDigiMap[digiAddress] = iDigi;
+	  } 
+	}
       }
     }  
   } else {
@@ -239,12 +254,14 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
 	  fModuleHitASICMap[moduleAddress]->SetXTitle("ASIC Address");
 	  fModuleHitASICMap[moduleAddress]->SetYTitle("Trigger counter");
 	}
-	Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
-	Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
-	if (fUsedDigiMap.find(digiAddress) == fUsedDigiMap.end()){
-	  fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
-	  fUsedDigiMap[digiAddress] = iDigi;
-	} 
+	if (!fPlotResults){
+	  Int_t iCol(CbmTrdAddress::GetColumnId(digiAddress)), local_Row(CbmTrdAddress::GetRowId(digiAddress)), iSec(CbmTrdAddress::GetSectorId(digiAddress));
+	  Int_t iRow = fModuleInfo->GetModuleRow(iSec, local_Row);
+	  if (fUsedDigiMap.find(digiAddress) == fUsedDigiMap.end()){
+	    fModuleHitMap[moduleAddress]->Fill(iCol, iRow);
+	    fUsedDigiMap[digiAddress] = iDigi;
+	  } 
+	}
 	/*
 	  Int_t neighbourAddress = 0;
 	  if (iRow > 0){
@@ -310,6 +327,7 @@ void CbmTrdHitDensityQa::Finish()
   myfile << "#" << endl;
   myfile << "#--------------------------" << endl;
   Double_t min(1), max(/*(Double_t)fEventCounter->GetEntries()/10.*/fEventRate);
+  if (fPlotResults) max = 1E6;
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
@@ -324,12 +342,20 @@ void CbmTrdHitDensityQa::Finish()
   TString newpath = origpath;
   newpath.ReplaceAll("eds","hd_qa");
   newpath.ReplaceAll(":/","");
+  if (fPlotResults) newpath = "data/result.root","read";
   printf ("\n%s\n",newpath.Data());
-  TFile *tempFile = new TFile(newpath,"recreate");
+  TFile *tempFile = NULL;
+  if (fPlotResults) 
+    tempFile = new TFile(newpath,"update");
+  else
+    tempFile = new TFile(newpath,"recreate");
   gDirectory = tempFile->CurrentDirectory();
   gDirectory->pwd();
   
-  fEventCounter->Write("", TObject::kOverwrite);
+  if (fPlotResults)
+    fEventCounter = (TH1I*)tempFile->Get("fEventCounter");
+  else
+    fEventCounter->Write("", TObject::kOverwrite);
   if (!gDirectory->Cd("TrdHitDensityQa")) 
     gDirectory->mkdir("TrdHitDensityQa");
   gDirectory->Cd("TrdHitDensityQa");
@@ -341,9 +367,14 @@ void CbmTrdHitDensityQa::Finish()
   Int_t moduleAddress = -1;
   for (fModuleHitMapIt = fModuleHitMap.begin();
        fModuleHitMapIt != fModuleHitMap.end(); ++fModuleHitMapIt) {
-    fModuleHitMapIt->second->Write("", TObject::kOverwrite);
+    TString histName = fModuleHitMapIt->second->GetName();
+    cout << histName << endl;
+    if (fPlotResults)
+      fModuleHitMapIt->second = (TH2I*)tempFile->Get("TrdHitDensityQa/Module/" + histName);
+    else
+      fModuleHitMapIt->second->Write("", TObject::kOverwrite);
     moduleAddress = fModuleHitMapIt->first;
-    printf("# ModuleAddress:     %8i",moduleAddress);
+    //printf("# ModuleAddress:     %8i",moduleAddress);
     myfile << "# ModuleAddress: " <<  moduleAddress  << endl;
     ratePerModule = 0.;
     Int_t LayerId = CbmTrdAddress::GetLayerId(moduleAddress);
@@ -380,7 +411,7 @@ void CbmTrdHitDensityQa::Finish()
     gGeoManager->FindNode(fModuleInfo->GetX(), fModuleInfo->GetY(), fModuleInfo->GetZ());
     std::vector<Int_t> AsicAddresses = fModuleInfo->GetAsicAddresses();
     Int_t nofAsics = fModuleInfo->GetNofAsics();
-    printf("     NofAsics:     %3i\n",nofAsics);
+    //printf("     NofAsics:     %3i\n",nofAsics);
     myfile << "# NofAsics     : " << nofAsics << endl;
     myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
     nTotalAsics += nofAsics;
@@ -462,7 +493,8 @@ void CbmTrdHitDensityQa::Finish()
       Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]]  * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
       //HitAsic->Fill(dataPerAsic);
     }
-    fModuleHitASICMap[moduleAddress]->Write("", TObject::kOverwrite);
+    if (!fPlotResults)
+      fModuleHitASICMap[moduleAddress]->Write("", TObject::kOverwrite);
     delete fModuleHitASICMap[moduleAddress];
   }
   Double_t dataPerModule = ratePerModule * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor

@@ -91,13 +91,18 @@ void Merge(TString outfilename = "result.root") {
       iurqmd == 193
       ){ //without pi0
     */
-    if (iurqmd == 00) {
+    //if (iurqmd == 00) 
+      {
       //filename.Form("test.pa.trd_v12f.smearing.%04i.100events.root",iurqmd);
-      filename.Form("test.eds.%04i.root",iurqmd);
-      cout << filename << endl;
+      filename.Form("reco/test.hd_qa.%04i.root",iurqmd);
+      //cout << "       " << filename;
       TFile test = TFile(filename,"READ");
       if (test.IsOpen()){
+	cout << "                         file " << filename << ": added to TList" << endl;
 	FileList->Add( TFile::Open(filename) );
+	test.Close();
+      } else {
+	//cout << ": not found!" << endl;
       }
     }
   }

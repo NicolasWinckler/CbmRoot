@@ -13,8 +13,8 @@ rm temp
 for urqmd in {0..199}
 do
 	nThreads=$(($nThreads+1))
-	echo "${nThreads} root -l -b -q run_sim.C'('$nEvents,$urqmd')'"
-	echo "nice root -l -b -q run_sim.C'('$nEvents,$urqmd')' &"  > mysim
+	echo "${nThreads} root -l -b -q run_sim_maf.C'('$nEvents,$urqmd')'"
+	echo "nice root -l -b -q run_sim_maf.C'('$nEvents,$urqmd')' &"  > mysim
 	. mysim  &> /dev/null
 #&>> logsimfile.txt
 	sleep 10

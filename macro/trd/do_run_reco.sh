@@ -13,8 +13,8 @@ rm temp
 for urqmd in {0..199}
 do
 	nThreads=$(($nThreads+1))
-	echo "${nThreads} root -l -b -q run_sim.C'('$nEvents,$urqmd')'"
-	echo "nice root -l -b -q run_reco.C'('$nEvents,$urqmd')' &"  > myreco
+	echo "${nThreads} root -l -b -q run_reco_maf.C'('$nEvents,$urqmd')'"
+	echo "nice root -l -b -q run_reco_maf.C'('$nEvents,$urqmd')' &"  > myreco
 	. myreco   &> /dev/null
 #&>> logrecofile.txt
 	sleep 10

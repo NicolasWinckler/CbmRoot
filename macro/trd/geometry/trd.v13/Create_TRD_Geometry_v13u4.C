@@ -243,12 +243,14 @@ const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 
 // GBTx ROB definitions
-const Int_t RobsPerModule[NofModuleTypes] = {  2,  2,  2,  2,  2,  2,  2,  1 }; // number of GBTx ROBs on module
+const Int_t RobsPerModule[NofModuleTypes] = {  2,  2,  1,  1,  2,  1,  1,  1 }; // number of GBTx ROBs on module
 const Int_t GbtxPerRob[NofModuleTypes]    = {107,105,105,103,107,107,105,103 }; // number of GBTx ASICs on ROB
 
 // ultimate density - 540 mm
-const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  6,  3,  4,  3 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  6,  4, 12,  6,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,105,105,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+//const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  6,  3,  4,  3 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //
 ////// super density - 540 mm

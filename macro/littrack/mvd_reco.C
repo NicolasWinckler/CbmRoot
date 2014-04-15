@@ -79,8 +79,8 @@ void mvd_reco(Int_t nEvents = 100)
       FairTask* stsFindHits = new CbmStsFindHits();
       run->AddTask(stsFindHits);
 
-      FairTask* stsMatchHits = new CbmStsMatchHits();
-      run->AddTask(stsMatchHits);
+   //   FairTask* stsMatchHits = new CbmStsMatchHits();
+   //   run->AddTask(stsMatchHits);
 
    } else if (stsHitProducerType == "ideal") {
       // ----- STS IDEAL reconstruction   ---------------------------------------------
@@ -93,8 +93,8 @@ void mvd_reco(Int_t nEvents = 100)
       FairTask* stsFindHits = new CbmStsIdealFindHits();
       run->AddTask(stsFindHits);
 
-      FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
-      run->AddTask(stsMatchHits);
+   //   FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
+   //   run->AddTask(stsMatchHits);
    }
 
 	FairTask* kalman = new CbmKF();
@@ -106,8 +106,8 @@ void mvd_reco(Int_t nEvents = 100)
 	FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder, false);
 	run->AddTask(findTracks);
 
-	FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
-	run->AddTask(stsMatchTracks);
+//	FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
+//	run->AddTask(stsMatchTracks);
 
 	CbmLitFindMvdTracks* mvdFinder = new CbmLitFindMvdTracks();
 	run->AddTask(mvdFinder);

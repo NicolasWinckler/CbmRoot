@@ -262,7 +262,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	TVector3 positionError(xError, yError, 0);
 
 #ifndef HITCOMPATIBILITY
-	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1, -1, -1);
+	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1, -1, -1, -1);
 	hit->SetRefId(pointIndex);
 
 #else
@@ -427,7 +427,7 @@ void trackfinderInputHit::init(int detectorId, double posX, double posY, double 
 
 #ifndef HITCOMPATIBILITY
 
-	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1, -1, -1);
+	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1, -1, -1, -1);
 	hit->SetRefId(pointIndex);
 
 #else

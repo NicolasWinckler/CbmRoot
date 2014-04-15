@@ -8,7 +8,6 @@
 #include "../mc/CbmLitMCTrackCreator.h"
 #include "CbmHistManager.h"
 #include "CbmGlobalTrack.h"
-#include "CbmTrackMatch.h"
 #include "CbmTrackMatchNew.h"
 #include "CbmStsTrack.h"
 #include "CbmTrack.h"
@@ -132,13 +131,12 @@ void CbmLitFitQa::ProcessStsTrack(
 {
    if (NULL == fStsTracks || NULL == fStsTrackMatches || trackId < 0) return;
 
-   CbmTrackMatch* match = static_cast<CbmTrackMatch*>(fStsTrackMatches->At(trackId));
-   Int_t mcId = match->GetMCTrackId();
+   CbmTrackMatchNew* match = static_cast<CbmTrackMatchNew*>(fStsTrackMatches->At(trackId));
+   Int_t mcId = match->GetMatchedLink().GetIndex();
    if (mcId < 0) return; // Ghost or fake track
 
    // Check correctness of reconstructed track
-   Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
-   if ((match->GetNofTrueHits() / allHits) < fQuota) return;
+   if (match->GetTrueOverAllHitsRatio() < fQuota) return;
 
    CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(trackId));
    Int_t nofStsHits = track->GetNofHits();
@@ -351,17 +349,17 @@ void CbmLitFitQa::ProcessTrackParamsAtVertex()
    Int_t nofTracks = fStsTracks->GetEntriesFast();
    for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
       CbmStsTrack* track = static_cast<CbmStsTrack*>(fStsTracks->At(iTrack));
-      const CbmTrackMatch* match = static_cast<const CbmTrackMatch*>(fStsTrackMatches->At(iTrack));
-      Int_t mcId = match->GetMCTrackId();
 
-      if (mcId < 0) continue; // ghost or fake track
+      CbmTrackMatchNew* match = static_cast<CbmTrackMatchNew*>(fStsTrackMatches->At(iTrack));
+      Int_t mcId = match->GetMatchedLink().GetIndex();
+      if (mcId < 0) return; // Ghost or fake track
+
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcId));
       if (mcTrack->GetMotherId() != -1) continue; // only for primaries
       //if (mcTrack->GetP() < 1.) continue; // only for momentum large 1 GeV/c
 
       // Check correctness of reconstructed track
-      Int_t allHits = match->GetNofTrueHits() + match->GetNofWrongHits() + match->GetNofFakeHits();
-      if ((match->GetNofTrueHits() / allHits) < fQuota) continue;
+      if (match->GetTrueOverAllHitsRatio() < fQuota) return;
 
       fKFFitter.DoFit(track, 211);
       Double_t chiPrimary = fKFFitter.GetChiToVertex(track, fPrimVertex);

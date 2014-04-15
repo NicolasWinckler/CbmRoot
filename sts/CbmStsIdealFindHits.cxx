@@ -474,7 +474,7 @@ Int_t CbmStsIdealFindHits::FindHits(CbmStsStation* station, CbmStsSector* sector
                 if (statLayer == -1)
                     cout << "unknown layer for hit at z = " << zHit << endl;
 
-                new ((*fHits)[nHits++]) CbmStsHit(digiF->GetAddress(), pos, dpos, wXY, -1, iDigiF, iDigiB, sector->GetSectorNr());
+                new ((*fHits)[nHits++]) CbmStsHit(digiF->GetAddress(), pos, dpos, wXY, -1, -1, iDigiF, iDigiB, sector->GetSectorNr());
 
                 nNew++;
                 if (fVerbose > 3)

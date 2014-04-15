@@ -33,6 +33,7 @@
 #include "CbmCluster.h"
 #include "CbmStsDigi.h"
 #include "CbmMatch.h"
+#include "CbmStsAddress.h"
 
 #include "TSystem.h"
 #include "TClonesArray.h"
@@ -67,6 +68,8 @@ CbmLitClusteringQa::CbmLitClusteringQa():
    fStsClusters(NULL),
    fStsHits(NULL),
    fStsDigiMatches(NULL),
+   fStsClusterMatches(NULL),
+   fStsHitMatches(NULL),
    fRichHits(NULL),
    fRichPoints(NULL),
    fMuchPoints(NULL),
@@ -116,21 +119,27 @@ void CbmLitClusteringQa::Exec(
 {
    FillEventCounterHistograms();
 
+   ProcessPoints(fStsPoints, "Sts", kSTS);
    ProcessPoints(fTrdPoints, "Trd", kTRD);
    ProcessPoints(fMuchPoints, "Much", kMUCH);
 
+   ProcessDigis(fStsDigis, fStsDigiMatches, "Sts", kSTS);
    ProcessDigis(fTrdDigis, fTrdDigiMatches, "Trd", kTRD);
    ProcessDigis(fMuchDigis, fMuchDigiMatches, "Much", kMUCH);
 
+   ProcessClusters(fStsClusters, fStsClusterMatches, "Sts", kSTS);
    ProcessClusters(fTrdClusters, fTrdClusterMatches, "Trd", kTRD);
    ProcessClusters(fMuchClusters, fMuchClusterMatches, "Much", kMUCH);
 
+   ProcessHits(fStsHits, fStsHitMatches,"Sts", kSTS);
    ProcessHits(fTrdHits, fTrdHitMatches,"Trd", kTRD);
    ProcessHits(fMuchPixelHits, fMuchPixelHitMatches, "Much", kMUCH);
 
+   FillResidualAndPullHistograms(fStsPoints, fStsHits, fStsHitMatches, "Sts", kSTS);
    FillResidualAndPullHistograms(fTrdPoints, fTrdHits, fTrdHitMatches, "Trd", kTRD);
    FillResidualAndPullHistograms(fMuchPoints, fMuchPixelHits, fMuchPixelHitMatches, "Much", kMUCH);
 
+   FillHitEfficiencyHistograms(fStsPoints, fStsHits, fStsHitMatches, "Sts", kSTS);
    FillHitEfficiencyHistograms(fTrdPoints, fTrdHits, fTrdHitMatches, "Trd", kTRD);
    FillHitEfficiencyHistograms(fMuchPoints, fMuchPixelHits, fMuchPixelHitMatches, "Much", kMUCH);
 
@@ -176,6 +185,8 @@ void CbmLitClusteringQa::ReadDataBranches()
    fStsClusters = (TClonesArray*) ioman->GetObject("StsCluster");
    fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
    fStsDigiMatches = (TClonesArray*) ioman->GetObject("StsDigiMatch");
+   fStsClusterMatches = (TClonesArray*) ioman->GetObject("StsClusterMatch");
+   fStsHitMatches = (TClonesArray*) ioman->GetObject("StsHitMatch");
 
    fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
    fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
@@ -206,8 +217,9 @@ Int_t CbmLitClusteringQa::GetStationId(
       Int_t address,
       DetectorId detId)
 {
-   assert(detId == kTRD || detId == kMUCH);
-   if (detId == kTRD) return CbmTrdAddress::GetLayerId(address);
+   assert(detId == kSTS || detId == kTRD || detId == kMUCH);
+   if (detId == kSTS) return CbmStsAddress::GetElementId(address, kStsStation);
+   else if (detId == kTRD) return CbmTrdAddress::GetLayerId(address);
    else if (detId == kMUCH) return (CbmMuchGeoScheme::Instance()->GetLayerSideNr(address) - 1) / 2;
    return 0;
 }
@@ -393,9 +405,11 @@ void CbmLitClusteringQa::CreateHistograms()
    CreateNofObjectsHistograms(kTOF, "Tof");
    CreateNofObjectsHistograms(kRICH, "Rich");
 
+   CreateClusterParametersHistograms(kSTS, "Sts");
    CreateClusterParametersHistograms(kTRD, "Trd");
    CreateClusterParametersHistograms(kMUCH, "Much");
 
+   CreateHitEfficiencyHistograms(kSTS, "Sts", "Station", "Station number", 100, -0.5, 99.5);
    CreateHitEfficiencyHistograms(kMUCH, "Much", "Station", "Station number", 100, -0.5, 99.5);
    CreateHitEfficiencyHistograms(kTRD, "Trd", "Station", "Station number", 100, -0.5, 99.5);
 

@@ -689,12 +689,13 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
       Bool_t isRichOk = richId > -1 && fDet.GetDet(kRICH);
 
       // check the quality of track segments
-      const CbmTrackMatch* stsTrackMatch;
+      const CbmTrackMatchNew* stsTrackMatch;
       if (isStsOk) {
-         stsTrackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsId));
-         isStsOk = CheckTrackQuality(stsTrackMatch, kSTS);
+         stsTrackMatch = static_cast<const CbmTrackMatchNew*>(fStsMatches->At(stsId));
+         isStsOk = stsTrackMatch->GetTrueOverAllHitsRatio() >= fQuota;//CheckTrackQuality(stsTrackMatch, kSTS);
+         FillTrackQualityHistograms(stsTrackMatch, kSTS);
          if (!isStsOk) { // ghost track
-            Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
+            Int_t nofHits = stsTrackMatch->GetNofHits();//stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
             fHM->H1("hng_NofGhosts_Sts_Nh")->Fill(nofHits);
 
             // calculate number of ghost after RICH matching
@@ -756,7 +757,7 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
 
                Double_t momentumMc = 0.;
                if (stsTrackMatch != NULL) {
-                  const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(stsTrackMatch->GetMCTrackId()));
+                  const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(stsTrackMatch->GetMatchedLink().GetIndex()));
                   if (mcTrack != NULL) momentumMc = mcTrack->GetP();
                 }
                 if (ring->GetDistance() < 1. && fElectronId->IsRichElectron(iTrack, momentumMc))
@@ -767,7 +768,7 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
 
       // Get MC indices of track segments
       Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1, richMCId = -1;
-      if (isStsOk) { stsMCId = stsTrackMatch->GetMCTrackId(); }
+      if (isStsOk) { stsMCId = stsTrackMatch->GetMatchedLink().GetIndex(); }
       if (isTrdOk) { trdMCId = trdTrackMatch->GetMatchedLink().GetIndex(); }
       if (isMuchOk) { muchMCId = muchTrackMatch->GetMatchedLink().GetIndex(); }
       if (isTofOk) {

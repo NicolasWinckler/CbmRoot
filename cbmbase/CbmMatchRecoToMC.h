@@ -56,6 +56,11 @@ private:
           const TClonesArray* hits,
           TClonesArray* hitMatches);
 
+    void MatchHitsSts(
+          const TClonesArray* matches,
+          const TClonesArray* hits,
+          TClonesArray* hitMatches);
+
     void MatchHitsToPoints(
           const TClonesArray* points,
           const TClonesArray* hits,
@@ -69,6 +74,17 @@ private:
 
     // Pointers to data arrays
     TClonesArray* fMCTracks;
+
+    // STS
+    TClonesArray* fStsPoints; // CbmStsPoint array
+    TClonesArray* fStsDigis; // CbmStsDigi array
+    TClonesArray* fStsClusters; // CbmStsCluster array
+    TClonesArray* fStsHits; // CbmStsHit array
+    TClonesArray* fStsTracks; // CbmStsTrack array
+    TClonesArray* fStsDigiMatches; // Output CbmMatch array
+    TClonesArray* fStsClusterMatches; // Output CbmMatch array
+    TClonesArray* fStsHitMatches; // Output CbmMatch array
+    TClonesArray* fStsTrackMatches; // Output CbmTrackMatchNew array
 
     // TRD
     TClonesArray* fTrdPoints; // CbmTrdPoint array

@@ -20,11 +20,9 @@ class CbmStsHit : public CbmPixelHit
 public:
     CbmStsHit();
 
-    CbmStsHit(Int_t address, const TVector3& pos, const TVector3& dpos, Double_t dxy, Int_t refId, Int_t frontDigiId, Int_t backDigiId, Int_t sectorNr);
+    CbmStsHit(Int_t address, const TVector3& pos, const TVector3& dpos, Double_t dxy, Int_t frontClusterId, Int_t backClusterId, Int_t frontDigiId, Int_t backDigiId, Int_t sectorNr);
 
     virtual ~CbmStsHit();
-
-    //Int_t GetDigi(Int_t iSide) const; // front side = 0; back side = 1
 
     Int_t GetFrontDigiId() const
     {
@@ -42,6 +40,16 @@ public:
         return fSectorNr;
     }
 
+    Int_t GetFrontClusterId() const
+    {
+       return fFrontClusterId;
+    }
+
+    Int_t GetBackClusterId() const
+    {
+       return fBackClusterId;
+    }
+
 private:
     // FIXME: In principle we should keep references to clusters and not digis, since hits are created from clusters.
     // FIXME: However for the moment this digi indices are used in L1 so we keep it for backward compatibility.
@@ -49,6 +57,9 @@ private:
     Int_t fBackDigiId;  // Channel number back side
     // FIXME: Kept for backward compatibility only !!!
     Int_t fSectorNr;
+
+    Int_t fFrontClusterId; // Cluster number front side
+    Int_t fBackClusterId;  // Cluster number back side
 
     ClassDef(CbmStsHit, 2);
 };

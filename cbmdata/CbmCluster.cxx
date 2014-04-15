@@ -5,6 +5,9 @@
  */
 
 #include "CbmCluster.h"
+#include <sstream>
+
+using namespace std;
 
 CbmCluster::CbmCluster()
  : TObject(),
@@ -18,6 +21,19 @@ CbmCluster::CbmCluster()
 CbmCluster::~CbmCluster()
 {
 
+}
+
+string CbmCluster::ToString() const
+{
+   stringstream ss;
+   ss << "CbmCluster: ";
+   Int_t nofDigis = GetNofDigis();
+   ss << "nofDigis=" << nofDigis << " | ";
+   for (Int_t i = 0; i < nofDigis; i++) {
+      ss << fDigis[i] << " ";
+   }
+   ss << " | address=" << fAddress << endl;
+   return ss.str();
 }
 
 ClassImp(CbmCluster);

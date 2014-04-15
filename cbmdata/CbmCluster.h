@@ -9,6 +9,7 @@
 #define CBMCLUSTER_H_
 
 #include "TObject.h"
+#include <string>
 class CbmMatch;
 
 /**
@@ -79,6 +80,12 @@ public:
    /** Modifiers **/
    void SetAddress(Int_t address) { fAddress = address; }
    void SetMatch(CbmMatch* match) { fMatch = match; }
+
+   /**
+    * \brief Return string representation of the object.
+    * \return String representation of the object.
+    **/
+   virtual std::string ToString() const;
 
 private:
    CbmCluster(const CbmCluster&);

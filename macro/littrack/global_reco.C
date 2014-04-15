@@ -113,8 +113,8 @@ void global_reco(Int_t nEvents = 100, // number of events
          FairTask* stsFindHits = new CbmStsFindHits();
          run->AddTask(stsFindHits);
 
-         FairTask* stsMatchHits = new CbmStsMatchHits();
-         run->AddTask(stsMatchHits);
+        // FairTask* stsMatchHits = new CbmStsMatchHits();
+        // run->AddTask(stsMatchHits);
 
 		} else if (stsHitProducerType == "ideal") {
 
@@ -128,8 +128,8 @@ void global_reco(Int_t nEvents = 100, // number of events
          FairTask* stsFindHits =	new CbmStsIdealFindHits();
          run->AddTask(stsFindHits);
 
-         FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
-         run->AddTask(stsMatchHits);
+       //  FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
+       //  run->AddTask(stsMatchHits);
 		}
 
 		FairTask* kalman = new CbmKF();
@@ -142,8 +142,8 @@ void global_reco(Int_t nEvents = 100, // number of events
 		FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
 		run->AddTask(findTracks);
 
-		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
-		run->AddTask(stsMatchTracks);
+	//	FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
+	//	run->AddTask(stsMatchTracks);
 		// ------------------------------------------------------------------------
 
 		if (IsMuch(parFile)) {

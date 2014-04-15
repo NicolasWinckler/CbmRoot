@@ -303,13 +303,14 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t clusterId)
 
         for (Int_t i = 0; i < nofDigis; ++i)
         {
-            const CbmStsDigi* digi = static_cast<const CbmStsDigi*>(fDigis->At(clusterCand->GetDigi(i)));
+           Int_t digiIndex = clusterCand->GetDigi(i);
+            const CbmStsDigi* digi = static_cast<const CbmStsDigi*>(fDigis->At(digiIndex));
             if (i == 0)
             {
                 cluster->SetAddress(digi->GetAddress());
                 cluster->SetSectorNr(digi->GetSectorNr());
             }
-            cluster->AddDigi(i);
+            cluster->AddDigi(digiIndex);
         }
         cluster->SetMean(sumWX / sumW);
         cluster->SetMeanError((1. / (sumW)) * TMath::Sqrt(error));

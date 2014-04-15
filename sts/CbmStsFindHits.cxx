@@ -301,7 +301,7 @@ void CbmStsFindHits::FindHits(CbmStsStation* station, CbmStsSector* sector, cons
                 }
 
                 Int_t size = fHits->GetEntriesFast();
-                new ((*fHits)[size]) CbmStsHit(frontCluster->GetAddress(), pos, dpos, wXY, -1, frontClusterId, backClusterId, sector->GetSectorNr());
+                new ((*fHits)[size]) CbmStsHit(frontCluster->GetAddress(), pos, dpos, wXY, frontClusterId, backClusterId, frontClusterId, backClusterId, sector->GetSectorNr());
             } // back side strip loop
         }     // front side strip loop
     }         // strip GSI

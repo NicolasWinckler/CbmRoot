@@ -157,7 +157,9 @@ private:
     TClonesArray* fStsDigis; // CbmStsDigi array
     TClonesArray* fStsClusters; // CbmStsCluster array
     TClonesArray* fStsHits; // CbmStsHit array
-    TClonesArray* fStsDigiMatches; // CbmStsDigiMatch
+    TClonesArray* fStsDigiMatches; // CbmMatch array
+    TClonesArray* fStsClusterMatches; // CbmMatch array
+    TClonesArray* fStsHitMatches; // CbmMatch array
 
     TClonesArray* fRichPoints; // CbmRichPoint array
     TClonesArray* fRichHits; // CbmRichHits array

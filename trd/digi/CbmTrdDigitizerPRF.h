@@ -2,7 +2,7 @@
 #define CBMTRDDIGITIZERPRF_H
 
 #include "FairTask.h"
-
+#include "TRandom3.h"
 #include <map>
 using std::map;
 using std::pair;
@@ -16,75 +16,80 @@ class CbmMatch;
 class TClonesArray;
 
 class CbmTrdDigitizerPRF : public FairTask {
-public:
+ public:
 
-	/**
-	 * \brief Standard constructor.
-	 **/
-	CbmTrdDigitizerPRF(CbmTrdRadiator* radiator);
+  /**
+   * \brief Standard constructor.
+   **/
+  CbmTrdDigitizerPRF(CbmTrdRadiator* radiator);
 
-	/**
-	 * \brief Destructor.
-	 **/
-	virtual ~CbmTrdDigitizerPRF();
+  /**
+   * \brief Destructor.
+   **/
+  virtual ~CbmTrdDigitizerPRF();
 
-	/**
-	 * \brief Inherited from FairTask.
-	 **/
-	virtual InitStatus Init();
+  /**
+   * \brief Inherited from FairTask.
+   **/
+  virtual InitStatus Init();
 
-   /**
-    * \brief Inherited from FairTask.
-    **/
-	virtual void SetParContainers();
+  /**
+   * \brief Inherited from FairTask.
+   **/
+  virtual void SetParContainers();
 
-   /**
-    * \brief Inherited from FairTask.
-    **/
-	virtual void Exec(Option_t * option);
+  /**
+   * \brief Inherited from FairTask.
+   **/
+  virtual void Exec(Option_t * option);
 
-	void SetTriangularPads(Bool_t triangles);
+  void SetTriangularPads(Bool_t triangles);
 
-private:
+  void SetNoiseLevel(Double_t sigma_keV);
 
-	CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
-	CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
+ private:
 
-	Double_t CalcPRF(Double_t x, Double_t W, Double_t h);
+  CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
+  CbmTrdDigitizerPRF(const CbmTrdDigitizerPRF&);
 
-	void ScanPadPlane(const Double_t* local_point, Double_t clusterELoss);
+  Double_t CalcPRF(Double_t x, Double_t W, Double_t h);
 
-	void ScanPadPlaneTriangle(const Double_t* local_point, Double_t clusterELoss);
+  void ScanPadPlane(const Double_t* local_point, Double_t clusterELoss);
 
-	Double_t TriangleIntegration(Bool_t even, Double_t displacement_x, Double_t W, Double_t displacement_y, Double_t H, Double_t h);
+  void ScanPadPlaneTriangle(const Double_t* local_point, Double_t clusterELoss);
 
-	Double_t TriangleIteration(Bool_t even, Int_t step, Double_t displacement_x, Double_t W, Double_t displacement_y, Double_t H, Double_t h);
+  Double_t TriangleIntegration(Bool_t even, Double_t displacement_x, Double_t W, Double_t displacement_y, Double_t H, Double_t h);
 
-	void SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss);
+  Double_t TriangleIteration(Bool_t even, Int_t step, Double_t displacement_x, Double_t W, Double_t displacement_y, Double_t H, Double_t h);
 
-	void AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time);
+  void SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss);
 
-	Bool_t fDebug;
-	Bool_t fTrianglePads;
+  void AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time);
 
-	Double_t fTime;
-	Int_t fnRow;
-	Int_t fnCol;
-	Int_t fLayerId;
-	Int_t fModuleId;
-	Int_t fMCPointId;
+  Bool_t fDebug;
+  Bool_t fTrianglePads;
 
-	TClonesArray* fPoints; //! Trd MC points
-	TClonesArray* fDigis; //! TRD digis
-	TClonesArray* fDigiMatches; //! Corresponding MCPoints to TRD digis
-	TClonesArray* fMCTracks;  //! MC Track information
+  Double_t fSigma_noise_keV;
+  TRandom3 *fNoise;
 
-	CbmTrdDigiPar* fDigiPar;    //!
-	CbmTrdModule* fModuleInfo; //!
-	CbmTrdRadiator* fRadiator;  //!
+  Double_t fTime;
+  Int_t fnRow;
+  Int_t fnCol;
+  Int_t fLayerId;
+  Int_t fModuleId;
+  Int_t fMCPointId;
 
-	std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap; // Temporary storage for digis.
+  TClonesArray* fPoints; //! Trd MC points
+  TClonesArray* fDigis; //! TRD digis
+  TClonesArray* fDigiMatches; //! Corresponding MCPoints to TRD digis
+  TClonesArray* fMCTracks;  //! MC Track information
 
-	ClassDef(CbmTrdDigitizerPRF, 2);
+  CbmTrdDigiPar* fDigiPar;    //!
+  CbmTrdModule* fModuleInfo; //!
+  CbmTrdRadiator* fRadiator;  //!
+
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> > fDigiMap; // Temporary storage for digis.
+
+  ClassDef(CbmTrdDigitizerPRF, 2);
 };
 #endif // CBMTRDDIGITIZER_PRF_H

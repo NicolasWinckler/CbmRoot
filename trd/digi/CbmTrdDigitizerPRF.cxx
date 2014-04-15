@@ -34,6 +34,8 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(CbmTrdRadiator *radiator)
    fTime(-1.),
    fDebug(false),
    fTrianglePads(false),
+   fSigma_noise_keV(0.0),
+   fNoise(NULL),
    fMCPointId(-1),
    fnRow(-1),
    fnCol(-1),
@@ -82,12 +84,21 @@ InitStatus CbmTrdDigitizerPRF::Init()
   if (fRadiator != NULL)
     fRadiator->Init();
 
+  if (fSigma_noise_keV > 0.0){
+    fNoise = new TRandom3();
+  }
+
   return kSUCCESS;
 }
 
 void CbmTrdDigitizerPRF::SetTriangularPads(Bool_t triangles)
 {
 	fTrianglePads = triangles;
+}
+
+void CbmTrdDigitizerPRF::SetNoiseLevel(Double_t sigma_keV)
+{
+	fSigma_noise_keV = sigma_keV;
 }
 
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
@@ -584,16 +595,18 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
 
 void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
-   const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId));
-   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
-   if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-      CbmMatch* digiMatch = new CbmMatch();
-      digiMatch->AddLink(CbmLink(charge, pointId));
-      fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
-   } else { // Pixel already in map -> Add charge
-      it->second.first->AddCharge(charge);
-      it->second.first->SetTime(max(time, it->second.first->GetTime()));
-      it->second.second->AddLink(CbmLink(charge, pointId));
-   }
+  const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId));
+  std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
+  if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
+    if (fSigma_noise_keV > 0.0)
+      charge += fNoise->Gaus(0, fSigma_noise_keV * 1.E-6);// keV->GeV // add only once per digi and event noise !!!
+    CbmMatch* digiMatch = new CbmMatch();
+    digiMatch->AddLink(CbmLink(charge, pointId));
+    fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);
+  } else { // Pixel already in map -> Add charge
+    it->second.first->AddCharge(charge);
+    it->second.first->SetTime(max(time, it->second.first->GetTime()));
+    it->second.second->AddLink(CbmLink(charge, pointId));
+  }
 }
   ClassImp(CbmTrdDigitizerPRF)

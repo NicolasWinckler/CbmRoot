@@ -80,6 +80,7 @@ const TString FileNameInfo = geoVersion + ".geo.info";
 const Bool_t IncludeRadiator    = true;  // false;  // true, if radiator is included in geometry
 const Bool_t IncludeLattice     = true;  // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeFebs        = true;  // false;  // true, if FEBs are included in geometry
+const Bool_t IncludeRobs        = true;  // false;  // true, if ROBs are included in geometry
 const Bool_t IncludeAsics       = true;  // false;  // true, if ASICs are included in geometry
 const Bool_t IncludeSupports    = true;  // false;  // true, if support structure is included in geometry
 const Bool_t IncludeLabels      = true;  // false;  // true, if TRD (I, II, III) labels are plotted in (VisLevel 5)
@@ -1339,90 +1340,93 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 
       }
 
-      // GBTx ROBs
-      Double_t rob_size_x =  9.0; //  4.5; //  45 mm
-      Double_t rob_size_y = 20.0; // 13.0; // 130 mm
-      Double_t rob_thickness = feb_thickness;
-
-      TGeoVolumeAssembly* trd_rob_box = new TGeoVolumeAssembly("robbox");  // volume for inclined FEBs, then shifted along y
-      TGeoBBox* trd_rob = new TGeoBBox("", rob_size_x/2., rob_size_y/2., rob_thickness/2.);   // the ROB itself
-      TGeoVolume* trdmod1_rob = new TGeoVolume("rob", trd_rob, febVolMed);  // the ROB made of a certain medium
-      trdmod1_rob->SetLineColor(kRed);    // set color
-
-      //      TGeoHMatrix *incline_rob = new TGeoHMatrix("");
-      trd_rob_box->AddNode(trdmod1_rob, 1);//, "" ); // incline_feb);  
-
-
-
-      // GBTXs
-      Double_t gbtx_pos;
-      Double_t gbtx_pos_x;
-      Double_t gbtx_pos_y;
-      TGeoTranslation *trd_gbtx_trans1;     // center to corner
-
-      // GBTX parameters
-      const Double_t gbtx_thickness = 0.25; // 2.5 mm
-      const Double_t gbtx_width     = 3.0;  // 2.0;  1.0;   // 1 cm
-
-      // put many GBTXs on each inclined FEB
-      TGeoBBox* trd_gbtx = new TGeoBBox("", gbtx_width/2., gbtx_width/2., gbtx_thickness/2.); // GBTX dimensions
-      TGeoVolume* trdmod1_gbtx = new TGeoVolume("gbtx", trd_gbtx, asicVolMed);   // the GBTX made of a certain medium
-      trdmod1_gbtx->SetLineColor(kGreen);  // set color for GBTXs
-
-      Int_t nofGbtxs   = GbtxPerRob[ moduleType - 1 ] % 100;
-      Int_t groupGbtxs = GbtxPerRob[ moduleType - 1 ] / 100;   // usually 1
-
-//      nofGbtxs   = 7;
-//      groupGbtxs = 1;
-
-      Int_t nofGbtxX = 2;
-      Int_t nofGbtxY = (nofGbtxs - 1) / 2. + 1; // +1 is for GBTx master
-
-      Double_t gbtx_distance = 0.4;
-      Int_t iGbtx = 1;
-
-      for (Int_t iGbtxY = 0; iGbtxY < nofGbtxY; iGbtxY++) 
+      if (IncludeRobs) 
       {
+        // GBTx ROBs
+        Double_t rob_size_x =  9.0; //  4.5; //  45 mm
+        Double_t rob_size_y = 20.0; // 13.0; // 130 mm
+        Double_t rob_thickness = feb_thickness;
+  
+        TGeoVolumeAssembly* trd_rob_box = new TGeoVolumeAssembly("robbox");  // volume for inclined FEBs, then shifted along y
+        TGeoBBox* trd_rob = new TGeoBBox("", rob_size_x/2., rob_size_y/2., rob_thickness/2.);   // the ROB itself
+        TGeoVolume* trdmod1_rob = new TGeoVolume("rob", trd_rob, febVolMed);  // the ROB made of a certain medium
+        trdmod1_rob->SetLineColor(kRed);    // set color
+  
+        //      TGeoHMatrix *incline_rob = new TGeoHMatrix("");
+        trd_rob_box->AddNode(trdmod1_rob, 1);//, "" ); // incline_feb);  
+  
+  
+  
+        // GBTXs
+        Double_t gbtx_pos;
+        Double_t gbtx_pos_x;
+        Double_t gbtx_pos_y;
+        TGeoTranslation *trd_gbtx_trans1;     // center to corner
+  
+        // GBTX parameters
+        const Double_t gbtx_thickness = 0.25; // 2.5 mm
+        const Double_t gbtx_width     = 3.0;  // 2.0;  1.0;   // 1 cm
+  
+        // put many GBTXs on each inclined FEB
+        TGeoBBox* trd_gbtx = new TGeoBBox("", gbtx_width/2., gbtx_width/2., gbtx_thickness/2.); // GBTX dimensions
+        TGeoVolume* trdmod1_gbtx = new TGeoVolume("gbtx", trd_gbtx, asicVolMed);   // the GBTX made of a certain medium
+        trdmod1_gbtx->SetLineColor(kGreen);  // set color for GBTXs
+  
+        Int_t nofGbtxs   = GbtxPerRob[ moduleType - 1 ] % 100;
+        Int_t groupGbtxs = GbtxPerRob[ moduleType - 1 ] / 100;   // usually 1
+  
+  //      nofGbtxs   = 7;
+  //      groupGbtxs = 1;
+  
+        Int_t nofGbtxX = 2;
+        Int_t nofGbtxY = (nofGbtxs - 1) / 2. + 1; // +1 is for GBTx master
+  
+        Double_t gbtx_distance = 0.4;
+        Int_t iGbtx = 1;
+  
+        for (Int_t iGbtxY = 0; iGbtxY < nofGbtxY; iGbtxY++) 
+        {
+  
+          gbtx_pos   = (iGbtxY + 0.5) / nofGbtxY - 0.5;   // equal spacing of GBTXs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
+          gbtx_pos_y = -gbtx_pos * rob_size_y;
+  
+          if (iGbtxY > 0)
+            for (Int_t iGbtxX = 0; iGbtxX < nofGbtxX; iGbtxX++) 
+            {
+              gbtx_pos   = (iGbtxX + 0.5) / nofGbtxX - 0.5;   // equal spacing of GBTXs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
+              gbtx_pos_x = gbtx_pos * rob_size_x;
+  
+              trd_gbtx_trans1     = new TGeoTranslation("", gbtx_pos_x, gbtx_pos_y, rob_thickness/2.+gbtx_thickness/2.);  // move gbtx on top of ROB
+              trd_rob_box->AddNode(trdmod1_gbtx, iGbtx++, trd_gbtx_trans1);  // now we have GBTXs on the ROB
+            }
+          else
+            {
+              gbtx_pos_x = 0;
+     
+              trd_gbtx_trans1     = new TGeoTranslation("", gbtx_pos_x, gbtx_pos_y, rob_thickness/2.+gbtx_thickness/2.);  // move gbtx on top of ROB
+              trd_rob_box->AddNode(trdmod1_gbtx, iGbtx++, trd_gbtx_trans1);  // now we have GBTXs on the ROB
+            }
+  
+        }
 
-        gbtx_pos   = (iGbtxY + 0.5) / nofGbtxY - 0.5;   // equal spacing of GBTXs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
-        gbtx_pos_y = -gbtx_pos * rob_size_y;
+        // now go on with ROB placement
+        Double_t rob_pos;
+        Double_t rob_pos_y;
+        TGeoTranslation *trd_rob_y_position; // shift to y position on TRD
+  
+        Int_t nofRobs = RobsPerModule[ moduleType - 1 ];
+        for (Int_t iRob = 0; iRob < nofRobs; iRob++) 
+        {
+          rob_pos   = (iRob + 0.5) / nofRobs - 0.5;   // equal spacing of ROBs on the backpanel
+          rob_pos_y = rob_pos * activeAreaY;
+  
+          // shift inclined ROB in y to its final position
+          trd_rob_y_position = new TGeoTranslation("", 0., rob_pos_y, febvol_thickness/2. - rob_thickness);  // approximate pos at end of feb volume
+          trd_feb_vol->AddNode(trd_rob_box, iRob+1, trd_rob_y_position);  // position FEB in y
+  
+        }
 
-        if (iGbtxY > 0)
-          for (Int_t iGbtxX = 0; iGbtxX < nofGbtxX; iGbtxX++) 
-          {
-            gbtx_pos   = (iGbtxX + 0.5) / nofGbtxX - 0.5;   // equal spacing of GBTXs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
-            gbtx_pos_x = gbtx_pos * rob_size_x;
-
-            trd_gbtx_trans1     = new TGeoTranslation("", gbtx_pos_x, gbtx_pos_y, rob_thickness/2.+gbtx_thickness/2.);  // move gbtx on top of ROB
-            trd_rob_box->AddNode(trdmod1_gbtx, iGbtx++, trd_gbtx_trans1);  // now we have GBTXs on the ROB
-          }
-        else
-          {
-            gbtx_pos_x = 0;
-   
-            trd_gbtx_trans1     = new TGeoTranslation("", gbtx_pos_x, gbtx_pos_y, rob_thickness/2.+gbtx_thickness/2.);  // move gbtx on top of ROB
-            trd_rob_box->AddNode(trdmod1_gbtx, iGbtx++, trd_gbtx_trans1);  // now we have GBTXs on the ROB
-          }
-
-      }
-
-
-      // now go on with ROB placement
-      Double_t rob_pos;
-      Double_t rob_pos_y;
-      TGeoTranslation *trd_rob_y_position; // shift to y position on TRD
-
-      Int_t nofRobs = RobsPerModule[ moduleType - 1 ];
-      for (Int_t iRob = 0; iRob < nofRobs; iRob++) 
-      {
-        rob_pos   = (iRob + 0.5) / nofRobs - 0.5;   // equal spacing of ROBs on the backpanel
-        rob_pos_y = rob_pos * activeAreaY;
-
-        // shift inclined ROB in y to its final position
-        trd_rob_y_position = new TGeoTranslation("", 0., rob_pos_y, febvol_thickness/2. - rob_thickness);  // approximate pos at end of feb volume
-        trd_feb_vol->AddNode(trd_rob_box, iRob+1, trd_rob_y_position);  // position FEB in y
-
-      }
+      }  // IncludeGbtx
 
       // put FEB box on module
       TGeoTranslation* trd_febvol_trans = new TGeoTranslation("", 0., 0., febvol_position);

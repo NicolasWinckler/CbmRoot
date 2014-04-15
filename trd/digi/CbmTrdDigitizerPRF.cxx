@@ -598,8 +598,12 @@ void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, 
   const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId));
   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
   if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel
-    if (fSigma_noise_keV > 0.0)
-      charge += fNoise->Gaus(0, fSigma_noise_keV * 1.E-6);// keV->GeV // add only once per digi and event noise !!!
+    
+    if (fSigma_noise_keV > 0.0){
+      Double_t noise = fNoise->Gaus(0, fSigma_noise_keV * 1.E-6);// keV->GeV // add only once per digi and event noise !!!
+      charge += noise; // resulting charge can be < 0 -> possible  problems with position reconstruction
+    }
+
     CbmMatch* digiMatch = new CbmMatch();
     digiMatch->AddLink(CbmLink(charge, pointId));
     fDigiMap[address] = make_pair(new CbmTrdDigi(address, charge, time), digiMatch);

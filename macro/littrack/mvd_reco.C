@@ -121,6 +121,9 @@ void mvd_reco(Int_t nEvents = 100)
    run->AddTask(findVertex);
    // ------------------------------------------------------------------------
 
+   CbmMatchRecoToMC* matchTask = new CbmMatchRecoToMC();
+   run->AddTask(matchTask);
+
 	// -----   Reconstruction QA tasks   ------------------------------------
 	CbmLitTrackingQa* trackingQa = new CbmLitTrackingQa();
 	trackingQa->SetMinNofPointsSts(normStsPoints);

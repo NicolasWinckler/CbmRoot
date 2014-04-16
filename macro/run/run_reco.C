@@ -187,18 +187,32 @@ void run_reco(Int_t nEvents = 2) {
   // ===                     TRD local reconstruction                      ===
   // =========================================================================
 
-  // Update of the values for the radiator F.U. 17.08.07
-  Int_t trdNFoils = 130; // number of polyetylene foils
-  Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
-  Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
-  Bool_t simpleTR = kTRUE; // use fast and simple version for TR
-  // production
+  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR,"K++");
+  //"K++" : micro structured POKALON
+  //"H++" : PE foam foils
+  //"G30" : ALICE fibers 30 layers
 
-  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils,
-  		trdDFoils, trdDGap);
+  Bool_t triangularPads = false;// Bucharest triangular pad-plane layout
+  //Double_t triggerThreshold = 0.5e-6;//SIS100
+  Double_t triggerThreshold = 1.0e-6;//SIS300
+  Double_t trdNoiseSigma_keV = 0.1; //default best matching to test beam PRF
 
-  CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing(radiator);
-  run->AddTask(trdHitProd);
+  CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
+  trdDigiPrf->SetTriangularPads(triangularPads);
+  trdDigiPrf->SetNoiseLevel(trdNoiseSigma_keV);
+  run->AddTask(trdDigiPrf);
+
+  CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
+  trdCluster->SetNeighbourTrigger(true);
+  trdCluster->SetTriggerThreshold(triggerThreshold);
+  trdCluster->SetNeighbourRowTrigger(false);
+  trdCluster->SetPrimaryClusterRowMerger(true);
+  trdCluster->SetTriangularPads(triangularPads);
+  run->AddTask(trdCluster);
+
+  CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
+  trdHit->SetTriangularPads(triangularPads);
+  run->AddTask(trdHit);
 
   // -------------------------------------------------------------------------
   // ===                 End of TRD local reconstruction                   ===

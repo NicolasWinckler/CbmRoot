@@ -17,7 +17,7 @@
 #include "CbmRichHit.h"
 #include "FairMCPoint.h"
 #include "CbmDrawHist.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 
@@ -71,7 +71,16 @@ void CbmRichGeoOpt::Exec(
 
    cout << "CbmRichGeoOpt, event No. " <<  fEventNum << endl;
 
+ /*  Int_t nofPoints = fRichPoints->GetEntriesFast();
+   for (int i = 0; i < nofPoints; i++) {
+	   CbmRichPoint* point = fRichPoints->At(i);
+	   if (point == NULL) continue;
+
+   }*/
+
 }
+
+
 
 void CbmRichGeoOpt::InitHistograms()
 {
@@ -83,6 +92,7 @@ void CbmRichGeoOpt::InitHistograms()
 
 void CbmRichGeoOpt::Finish()
 {
+
 
 }
 

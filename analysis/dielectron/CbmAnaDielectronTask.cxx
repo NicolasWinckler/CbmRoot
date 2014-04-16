@@ -18,13 +18,12 @@
 
 #include "CbmStsTrack.h"
 #include "CbmRichRing.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdHit.h"
 #include "CbmTofHit.h"
 
 #include "FairTrackParam.h"
-#include "CbmTrackMatch.h"
 #include "CbmKF.h"
 
 
@@ -946,9 +945,9 @@ void CbmAnaDielectronTask::FillElPiMomHist()
        if (stsInd < 0) continue;
        CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsInd);
        if (stsTrack == NULL) continue;
-       CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+       CbmTrackMatchNew* stsMatch  = (CbmTrackMatchNew*) fStsTrackMatches->At(stsInd);
        if (stsMatch == NULL) continue;
-       int stsMcTrackId = stsMatch->GetMCTrackId();
+       int stsMcTrackId = stsMatch->GetMatchedLink().GetIndex();
        if (stsMcTrackId < 0) continue;
        CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);
        if (mcTrack1 == NULL) continue;
@@ -1122,9 +1121,9 @@ void CbmAnaDielectronTask::FillCandidates()
 
       // Add all pions from STS for pion misidentification level study
       if (fPionMisidLevel >= 0.0){
-         CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(cand.stsInd);
+    	  CbmTrackMatchNew* stsMatch  = (CbmTrackMatchNew*) fStsTrackMatches->At(cand.stsInd);
          if (stsMatch == NULL) continue;
-         cand.stsMcTrackId = stsMatch->GetMCTrackId();
+         cand.stsMcTrackId = stsMatch->GetMatchedLink().GetIndex();
          if (cand.stsMcTrackId < 0) continue;
          CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMcTrackId);
          if (mcTrack1 == NULL) continue;
@@ -1200,9 +1199,9 @@ void CbmAnaDielectronTask::AssignMcToCandidates()
       //STS
       //MCTrackId of the candidate is defined by STS track
       int stsInd = fCandidates[i].stsInd;
-      CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+      CbmTrackMatchNew* stsMatch  = (CbmTrackMatchNew*) fStsTrackMatches->At(stsInd);
       if (stsMatch == NULL) continue;
-      fCandidates[i].stsMcTrackId = stsMatch->GetMCTrackId();
+      fCandidates[i].stsMcTrackId = stsMatch->GetMatchedLink().GetIndex();
       if (fCandidates[i].stsMcTrackId < 0) continue;
       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(fCandidates[i].stsMcTrackId);
       if (mcTrack1 == NULL) continue;
@@ -1215,9 +1214,9 @@ void CbmAnaDielectronTask::AssignMcToCandidates()
 
       // RICH
       int richInd = fCandidates[i].richInd;
-      CbmTrackMatch* richMatch  = (CbmTrackMatch*) fRichRingMatches->At(richInd);
+      CbmTrackMatchNew* richMatch  = (CbmTrackMatchNew*) fRichRingMatches->At(richInd);
       if (richMatch == NULL) continue;
-      fCandidates[i].richMcTrackId = richMatch->GetMCTrackId();
+      fCandidates[i].richMcTrackId = richMatch->GetMatchedLink().GetIndex();
       //if (fCandidates[i].richMcTrackId < 0) continue;
       //CbmMCTrack* mcTrack2 = (CbmMCTrack*) fMCTracks->At(fCandidates[i].richMcTrackId);
       //if (mcTrack2 == NULL) continue;
@@ -1242,9 +1241,9 @@ void CbmAnaDielectronTask::AssignMcToCandidates()
       CbmTrdTrack* trdTrack = NULL;
       if (fUseTrd == true) {
          int trdInd = fCandidates[i].trdInd;
-         CbmTrackMatch* trdMatch = (CbmTrackMatch*) fTrdTrackMatches->At(trdInd);
+         CbmTrackMatchNew* trdMatch = (CbmTrackMatchNew*) fTrdTrackMatches->At(trdInd);
          if (trdMatch == NULL) continue;
-         fCandidates[i].trdMcTrackId = trdMatch->GetMCTrackId();
+         fCandidates[i].trdMcTrackId = trdMatch->GetMatchedLink().GetIndex();
          //if (fCandidates[i].trdMcTrackId < 0) continue;
          //CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(fCandidates[i].trdMcTrackId);
          //if (mcTrack3 == NULL) continue;
@@ -1283,9 +1282,9 @@ void CbmAnaDielectronTask::AssignMcToTopologyCandidates(
 
       int stsInd = cutCandidates[i].stsInd;
       if (stsInd < 0) continue;
-      CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(stsInd);
+      CbmTrackMatchNew* stsMatch  = (CbmTrackMatchNew*) fStsTrackMatches->At(stsInd);
       if (stsMatch == NULL) continue;
-      int stsMcTrackId = stsMatch->GetMCTrackId();
+      int stsMcTrackId = stsMatch->GetMatchedLink().GetIndex();
       cutCandidates[i].stsMcTrackId = stsMcTrackId;
       if (stsMcTrackId < 0) continue;
       CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(stsMcTrackId);

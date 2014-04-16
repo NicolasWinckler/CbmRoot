@@ -9,7 +9,7 @@
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
@@ -61,7 +61,7 @@ InitStatus CbmRichMatchRings::Init()
    if (NULL == fTracks ) {Fatal("CbmRichMatchRings::Init", "No MCTrack array!");}
 
    // Create and register RichRingMatch array
-   fMatches = new TClonesArray("CbmTrackMatch",100);
+   fMatches = new TClonesArray("CbmTrackMatchNew",100);
    ioman->Register("RichRingMatch", "RICH", fMatches, kTRUE);
 
    return kSUCCESS;
@@ -103,6 +103,8 @@ void CbmRichMatchRings::Exec(
       CbmRichRing* ring = (CbmRichRing*) fRings->At(iRing);
       if (NULL == ring) continue;
 
+      CbmTrackMatchNew* ringMatch = new ((*fMatches)[iRing]) CbmTrackMatchNew();//(iMCTrack, nTrue, nWrong, nFake, nMCTracks);
+
       Int_t nHits = ring->GetNofHits();
       Int_t nAll = 0;
       Int_t nTrue = 0; //number of true hits in ring
@@ -132,6 +134,8 @@ void CbmRichMatchRings::Exec(
          CbmMCTrack* track   = (CbmMCTrack*)fTracks->At(iMCTrack);
          Int_t iMother = track->GetMotherId();
          fMatchMap[iMother]++;
+
+         ringMatch->AddLink(1., iMother);
       }// Hit loop
 
       // Search for best matching MCTrack
@@ -148,8 +152,11 @@ void CbmRichMatchRings::Exec(
 //      Int_t nMCHits = fMatchMCMap[iMCTrack]; //number of hits in MC ring
       nWrong = nAll - nTrue;
 
+      ringMatch->SetNofTrueHits(nTrue);
+      ringMatch->SetNofWrongHits(nWrong);
+
       // Create RichRingMatch
-      new ((*fMatches)[iRing]) CbmTrackMatch(iMCTrack, nTrue, nWrong, nFake, nMCTracks);
+     // new ((*fMatches)[iRing]) CbmTrackMatchNew(iMCTrack, nTrue, nWrong, nFake, nMCTracks);
    }// Ring loop
 }
 

@@ -13,7 +13,6 @@
 #include "cbm/base/CbmLitDetectorSetup.h"
 
 class CbmHistManager;
-class CbmTrackMatch;
 class CbmTrackMatchNew;
 class CbmLitMCTrackCreator;
 class CbmLitGlobalElectronId;
@@ -212,16 +211,6 @@ private:
    void ProcessMvd(
       Int_t stsId);
 
-   /**
-    * \brief Check track quality based on fQuota value.
-    * \param[in] trackMatch Track match.
-    * \param[in] detId Detector identifier for this track match.
-    * \return True if track is correctly reconstructed.
-    */
-   Bool_t CheckTrackQuality(
-      const CbmTrackMatch* trackMatch,
-      DetectorId detId);
-
    void FillTrackQualityHistograms(
       const CbmTrackMatchNew* trackMatch,
       DetectorId detId);
@@ -335,8 +324,8 @@ private:
    TClonesArray* fRichRings; // CbmRichRing array
    TClonesArray* fRichProjections; // CbmRichProjection array
    TClonesArray* fRichRingMatches; // CbmRichMatchesn array
-   TClonesArray* fMuchMatches; // CbmTrackMatch array
-   TClonesArray* fTrdMatches; // CbmTrackMatch array
+   TClonesArray* fMuchMatches; // CbmTrackMatchNew array
+   TClonesArray* fTrdMatches; // CbmTrackMatchNew array
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofHits; // CbmTofHit array
 

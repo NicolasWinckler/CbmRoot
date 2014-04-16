@@ -10,8 +10,7 @@
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmRichRing.h"
-#include "CbmTrackMatch.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "FairRootManager.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
@@ -197,17 +196,17 @@ void CbmRichTrainAnnElectrons::DiffElandPi()
       if (stsIndex == -1) continue;
       CbmStsTrack* stsTrack = (CbmStsTrack*)fStsTracks->At(stsIndex);
       if (NULL == stsTrack) continue;
-      CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
+      CbmTrackMatchNew* stsTrackMatch = (CbmTrackMatchNew*)fStsTrackMatches->At(stsIndex);
       if (NULL == stsTrackMatch) continue;
-      Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
+      Int_t mcIdSts = stsTrackMatch->GetMatchedLink().GetIndex();
 
       Int_t richIndex = gTrack->GetRichRingIndex();
       if (richIndex == -1) continue;
       CbmRichRing* ring = (CbmRichRing*)fRichRings->At(richIndex);
       if (NULL == ring) continue;
-      CbmTrackMatch* richRingMatch = (CbmTrackMatch*)fRichRingMatches->At(richIndex);
+      CbmTrackMatchNew* richRingMatch = (CbmTrackMatchNew*)fRichRingMatches->At(richIndex);
       if (NULL == richRingMatch) continue;
-      Int_t mcIdRich = richRingMatch->GetMCTrackId();
+      Int_t mcIdRich = richRingMatch->GetMatchedLink().GetIndex();
 
       CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(mcIdSts);
       if (NULL == track) continue;
@@ -218,8 +217,7 @@ void CbmRichTrainAnnElectrons::DiffElandPi()
       Double_t axisACor = ring->GetAaxisCor();
       Double_t axisBCor= ring->GetBaxisCor();
 
-      Int_t lFoundHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits()
-            + richRingMatch->GetNofFakeHits();
+      Int_t lFoundHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits();
       Double_t lPercTrue = 0;
       if (lFoundHits >= 3){
          lPercTrue = (Double_t)richRingMatch->GetNofTrueHits() / (Double_t)lFoundHits;

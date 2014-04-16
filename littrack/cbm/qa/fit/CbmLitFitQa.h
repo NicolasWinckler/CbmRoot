@@ -134,14 +134,14 @@ private:
    // Data branches
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
    TClonesArray* fStsTracks; // CbmStsTrack array
-   TClonesArray* fStsTrackMatches; // CbmTrackMatch array
+   TClonesArray* fStsTrackMatches; // CbmTrackMatchNew array
    TClonesArray* fStsHits; // CbmStsHit
    TClonesArray* fMvdHits; // CbmMvdHit
    TClonesArray* fTrdTracks; // CbmTrdTrack array
-   TClonesArray* fTrdTrackMatches; // CbmTrackMatch array
+   TClonesArray* fTrdTrackMatches; // CbmTrackMatchNew array
    TClonesArray* fTrdHits; // CbmTrdHit array
    TClonesArray* fMuchTracks; // CbmStsTrack array
-   TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
+   TClonesArray* fMuchTrackMatches; // CbmTrackMatchNew array
    TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
    TClonesArray* fMuchStripHits; // CbmMuchStripHit array
    TClonesArray* fMCTracks; // CbmMCTrack array

@@ -114,7 +114,7 @@ private:
    // Data branches
    TClonesArray* fGlobalTracks; // CbmGlobalTrack array
    TClonesArray* fStsTracks; // CbmStsTrack array
-   TClonesArray* fStsTrackMatches; // CbmTrackMatch array
+   TClonesArray* fStsTrackMatches; // CbmTrackMatchNew array
    TClonesArray* fTofHits; // CbmTofHit array
    TClonesArray* fTofPoints; // CbmTofPoint array
    TClonesArray* fTofTracks; // CbmTofTrack array

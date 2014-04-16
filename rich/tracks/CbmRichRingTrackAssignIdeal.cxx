@@ -15,8 +15,7 @@
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
-#include "CbmTrackMatch.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 
 #include <iostream>
 
@@ -66,9 +65,9 @@ void CbmRichRingTrackAssignIdeal::DoAssign(
       if (NULL == pRing) continue;
       if (pRing->GetNofHits() < fMinNofHitsInRing) continue;
 
-      CbmTrackMatch* pRingMatch = (CbmTrackMatch*) fRingMatches->At(iRing);
+      CbmTrackMatchNew* pRingMatch = (CbmTrackMatchNew*) fRingMatches->At(iRing);
       if (NULL == pRingMatch) continue;
-      Int_t ringID = pRingMatch->GetMCTrackId();
+      Int_t ringID = pRingMatch->GetMatchedLink().GetIndex();
       Double_t xRing = pRing->GetCenterX();
       Double_t yRing = pRing->GetCenterY();
 
@@ -84,10 +83,10 @@ void CbmRichRingTrackAssignIdeal::DoAssign(
          CbmGlobalTrack* gTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
          if (NULL == gTrack) continue;
          if (gTrack->GetStsTrackIndex() == -1) continue;
-         CbmTrackMatch* pTrackMatch = (CbmTrackMatch*) fStsTrackMatches->At(gTrack->GetStsTrackIndex());
+         CbmTrackMatchNew* pTrackMatch = (CbmTrackMatchNew*) fStsTrackMatches->At(gTrack->GetStsTrackIndex());
          if (NULL == pTrackMatch) continue;
 
-         if (pTrackMatch->GetMCTrackId() == ringID){
+         if (pTrackMatch->GetMatchedLink().GetIndex() == ringID){
             gTrack -> SetRichRingIndex(iRing);
             pRing -> SetTrackID(iTrack);
             Double_t dist = TMath::Sqrt( (xRing-xTrack)*(xRing-xTrack)+(yRing-yTrack)*(yRing-yTrack) );

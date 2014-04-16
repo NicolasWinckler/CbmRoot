@@ -1,4 +1,4 @@
-void run_sim(Int_t nEvents = 10)
+void run_sim(Int_t nEvents = 2)
 {
    TTree::SetMaxTreeSize(90000000000);
 	Int_t iVerbose = 0;
@@ -8,16 +8,16 @@ void run_sim(Int_t nEvents = 10)
 
 	//gRandom->SetSeed(10);
 
-	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
-	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.param.root";
-	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.mc.root";
+	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.00001.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/param.0001.root";
+	TString outFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/mc.0001.root";
 
 	TString caveGeom = "cave.geo";
 	TString pipeGeom = "pipe/pipe_standard.geo";
 	TString magnetGeom = "magnet/magnet_v12a.geo";
 	TString mvdGeom = "";
-	TString stsGeom = "sts/sts_v12b.geo.root";
-	TString richGeom= "rich/rich_v13b_0deg.root";//"rich/rich_v08a.geo";//
+	TString stsGeom = "sts/sts_v13d.geo.root";
+	TString richGeom= "rich/rich_v13c_pipe_1_al_1.root";
 	TString trdGeom = "trd/trd_v13g.geo.root";
 	TString tofGeom = "tof/tof_v13b.geo.root";
 	TString ecalGeom = "";
@@ -102,7 +102,7 @@ void run_sim(Int_t nEvents = 10)
 	}
 
 	if ( stsGeom != "" ) {
-		FairDetector* sts = new CbmSts("STS", kTRUE);
+		FairDetector* sts = new CbmStsMC(kTRUE);
 		sts->SetGeometryFileName(stsGeom);
 		fRun->AddModule(sts);
 	}
@@ -136,7 +136,9 @@ void run_sim(Int_t nEvents = 10)
 	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	if (urqmd == "yes"){
-		FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(inFile);
+		//CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+	    CbmUnigenGenerator*  urqmdGen = new CbmUnigenGenerator(inFile);
+		urqmdGen->SetEventPlane(0. , 360.);
 		primGen->AddGenerator(urqmdGen);
 	}
 

@@ -1,4 +1,4 @@
-void run_sim_geotest(Int_t nEvents = 20)
+void run_sim_geotest(Int_t nEvents = 1000)
 {
    TTree::SetMaxTreeSize(90000000000);
 
@@ -12,7 +12,7 @@ void run_sim_geotest(Int_t nEvents = 20)
    TString pipeGeom   = "pipe/pipe_standard.geo";
    TString magnetGeom = "magnet/magnet_v12a.geo";
    TString stsGeom = "sts/sts_v12b.geo.root";
-   TString richGeom= /*"rich/rich_v08a.geo"*/"rich/rich_v13c.root";
+   TString richGeom= "rich/rich_pmtreduced_30_u.geo";/*"rich/rich_v08a.geo"*/"//rich/rich_v13c.root";
    TString fieldMap = "field_v12a";
    TString richDetectorType = "standard"; // "standard" or "prototype"
    Double_t fieldZ = 50.; // field center z position
@@ -67,7 +67,7 @@ void run_sim_geotest(Int_t nEvents = 20)
    }
 
    if ( stsGeom != "" && richDetectorType == "standard") {
-      FairDetector* sts = new CbmSts("STS", kTRUE);
+      FairDetector* sts = new CbmStsMC(kTRUE);
       sts->SetGeometryFileName(stsGeom);
       fRun->AddModule(sts);
    }

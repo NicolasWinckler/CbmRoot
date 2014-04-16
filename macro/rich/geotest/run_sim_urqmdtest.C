@@ -1,25 +1,37 @@
-void run_sim_urqmdtest(Int_t nEvents = 50)
+void run_sim_urqmdtest(Int_t nEvents = 200)
 {
-   TTree::SetMaxTreeSize(90000000000);
+	TTree::SetMaxTreeSize(90000000000);
 
-   TString script = TString(gSystem->Getenv("SCRIPT"));
-   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
-   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/urqmdtest/";
-   TString parFile =  outDir + "25gev.centr.param.0000.root";
-   TString outFile = outDir + "25gev.centr.mc.0000.root";
+	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-   TString caveGeom = "cave.geo";
-   TString pipeGeom   = "pipe/pipe_standard.geo";
-   TString magnetGeom = "magnet/magnet_v12a.geo";
-   TString stsGeom = "sts/sts_v12b.geo.root";
-   TString richGeom= //"rich/rich_v08a.geo";
-		   "rich/rich_v13c.root";
-   	   	   //"rich/rich_gdml_identical_to_geo.root";
-   TString fieldMap = "field_v12a";
-   Double_t fieldZ = 50.; // field center z position
-   Double_t fieldScale =  1.0; // field scaling factor
+	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.00001.root";
+	TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/urqmdtest/al/";
+	TString parFile =  outDir + "25gev.centr.param.al_1.root";
+	TString outFile = outDir + "25gev.centr.mc.al_1.root";
+
+	TString caveGeom = "cave.geo";
+	TString pipeGeom   = "pipe/pipe_standard.geo";
+	TString magnetGeom = "magnet/magnet_v12a.geo";
+	TString stsGeom = "sts/sts_v12b.geo.root";
+	TString richGeom= "rich/rich_v13c.root";
+	TString fieldMap = "field_v12a";
+	Double_t fieldZ = 50.; // field center z position
+	Double_t fieldScale =  1.0; // field scaling factor
+
+	if (script == "yes") {
+		outFile = TString(gSystem->Getenv("MC_FILE"));
+		parFile = TString(gSystem->Getenv("PAR_FILE"));
+		caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
+		pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
+		stsGeom = TString(gSystem->Getenv("STS_GEOM"));
+		richGeom = TString(gSystem->Getenv("RICH_GEOM"));
+		fieldMap = TString(gSystem->Getenv("FIELD_MAP"));
+		magnetGeom = TString(gSystem->Getenv("MAGNET_GEOM"));
+		fieldScale = TString(gSystem->Getenv("FIELD_MAP_SCALE")).Atof();
+	}
+
 
    gDebug = 0;
    TStopwatch timer;
@@ -57,7 +69,7 @@ void run_sim_urqmdtest(Int_t nEvents = 50)
    }
 
    if ( stsGeom != "") {
-      FairDetector* sts = new CbmSts("STS", kTRUE);
+      FairDetector* sts = new CbmStsMC(kTRUE);
       sts->SetGeometryFileName(stsGeom);
       fRun->AddModule(sts);
    }
@@ -74,7 +86,10 @@ void run_sim_urqmdtest(Int_t nEvents = 50)
    fRun->SetField(magField);
 
    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-   FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(inFile);
+
+   CbmUnigenGenerator*  urqmdGen = new CbmUnigenGenerator(inFile);
+   urqmdGen->SetEventPlane(0. , 360.);
+   //FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(inFile);
    primGen->AddGenerator(urqmdGen);
 
    fRun->SetGenerator(primGen);

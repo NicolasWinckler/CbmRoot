@@ -141,8 +141,8 @@ void run_reco(Int_t nEvents = 1000)
       FairTask* stsFindHits = new CbmStsFindHits();
       run->AddTask(stsFindHits);
 
-      CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits();
-      run->AddTask(stsMatchHits);
+     // CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits();
+     // run->AddTask(stsMatchHits);
 
     } else { // STS IDEAL RESPONSE
       FairTask* stsDigitize = new CbmStsIdealDigitize();
@@ -153,9 +153,6 @@ void run_reco(Int_t nEvents = 1000)
 
       FairTask* stsFindHits = new CbmStsIdealFindHits();
       run->AddTask(stsFindHits);
-
-      FairTask* stsMatchHits = new CbmStsIdealMatchHits();
-      run->AddTask(stsMatchHits);
    }
 
 	CbmKF* kalman = new CbmKF();
@@ -169,13 +166,6 @@ void run_reco(Int_t nEvents = 1000)
 	//Bool_t useMvdInTracking = kTRUE;
 	FairTask* stsFindTracks = new CbmStsFindTracks(1, stsTrackFinder, useMvdInTracking);
 	run->AddTask(stsFindTracks);
-
-	FairTask* stsMatchTracks = new CbmStsMatchTracks(1);
-	run->AddTask(stsMatchTracks);
-
-	CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-	FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, 1);
-	run->AddTask(stsFitTracks);
 
 	// =========================================================================
 	// ===                     TRD local reconstruction                      ===

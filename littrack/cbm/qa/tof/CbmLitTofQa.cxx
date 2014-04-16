@@ -8,7 +8,7 @@
 #include "CbmLitTofQaReport.h"
 #include "CbmHistManager.h"
 #include "CbmGlobalTrack.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmStsTrack.h"
 #include "CbmTofHit.h"
 #include "CbmTofTrack.h"
@@ -194,8 +194,8 @@ void CbmLitTofQa::ProcessGlobalTracks()
       if (stsId < 0 || tofId < 0) continue; // We need both STS track and TOF hit
 
       CbmStsTrack* stsTrack = static_cast<CbmStsTrack*>(fStsTracks->At(stsId));
-      const CbmTrackMatch* stsMatch = static_cast<const CbmTrackMatch*>(fStsTrackMatches->At(stsId));
-      Int_t stsMCTrackId = stsMatch->GetMCTrackId();
+      const CbmTrackMatchNew* stsMatch = static_cast<const CbmTrackMatchNew*>(fStsTrackMatches->At(stsId));
+      Int_t stsMCTrackId = stsMatch->GetMatchedLink().GetIndex();
 
       const CbmTofHit* tofHit = static_cast<const CbmTofHit*>(fTofHits->At(tofId));
       Int_t tofMCPointId = tofHit->GetRefId();

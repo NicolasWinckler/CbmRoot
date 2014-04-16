@@ -9,7 +9,6 @@
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmTrackMatch.h"
 #include "CbmRichPoint.h"
 #include "CbmDrawHist.h"
 #include "FairTrackParam.h"

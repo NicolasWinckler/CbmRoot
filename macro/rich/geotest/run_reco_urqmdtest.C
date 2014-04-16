@@ -1,20 +1,49 @@
 
-void run_reco_urqmdtest(Int_t nEvents = 50)
+void run_reco_urqmdtest(Int_t nEvents = 200)
 {
-   TTree::SetMaxTreeSize(90000000000);
-   TString script = TString(gSystem->Getenv("SCRIPT"));
-   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-   TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
-   gRandom->SetSeed(10);
+    TTree::SetMaxTreeSize(90000000000);
 
-   TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/urqmdtest/";
-   TString inFile = outDir + "25gev.centr.mc.0000.root";
-   TString parFile = outDir + "25gev.centr.param.0000.root";
-   TString outFile = outDir + "25gev.centr.reco.0000.root";
-   std::string resultDir = "results_urqmd_25gev_centr/";
-   TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+
+	TString inFile = "/Users/slebedev/Development/cbm/data/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.00001.root";
+	TString outDir = "/Users/slebedev/Development/cbm/data/simulations/rich/urqmdtest/al/";
+	TString parFile =  outDir + "25gev.centr.param.al_1.root";
+	TString mcFile = outDir + "25gev.centr.mc.al_1.root";
+	TString recoFile = outDir + "25gev.centr.reco.al_1.root";
+
+	TString caveGeom = "cave.geo";
+	TString pipeGeom   = "pipe/pipe_standard.geo";
+	TString magnetGeom = "magnet/magnet_v12a.geo";
+	TString stsGeom = "sts/sts_v12b.geo.root";
+	TString richGeom= "rich/rich_v13c.root";
+	TString fieldMap = "field_v12a";
+	Double_t fieldZ = 50.; // field center z position
+	Double_t fieldScale =  1.0; // field scaling factor
+
+	TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+	TString stsMatBudgetFileName = parDir + "/sts/sts_matbudget_v12b.root"; // Material budget file for L1 STS tracking
+	std::string resultDir = "results_urqmd_25gev_centr_al_1/";
+
+	if (script == "yes") {
+		mcFile = TString(gSystem->Getenv("MC_FILE"));
+		parFile = TString(gSystem->Getenv("PAR_FILE"));
+		recoFile = TString(gSystem->Getenv("RECO_FILE"));
+		caveGeom = TString(gSystem->Getenv("CAVE_GEOM"));
+		pipeGeom = TString(gSystem->Getenv("PIPE_GEOM"));
+		stsGeom = TString(gSystem->Getenv("STS_GEOM"));
+		richGeom = TString(gSystem->Getenv("RICH_GEOM"));
+		fieldMap = TString(gSystem->Getenv("FIELD_MAP"));
+		magnetGeom = TString(gSystem->Getenv("MAGNET_GEOM"));
+		fieldScale = TString(gSystem->Getenv("FIELD_MAP_SCALE")).Atof();
+		stsMatBudgetFileName =  parDir + TString(gSystem->Getenv("STS_MATERIAL_BUDGET_FILE_NAME"));
+		stsDigiFile =  parDir + TString(gSystem->Getenv("STS_DIGI_FILE"));
+		resultDir = std::string(gSystem->Getenv("RESULT_DIR"));
+	}
+
+	gRandom->SetSeed(10);
+
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
    parFileList->Add(&stsDigiFile);
 
    gDebug = 0;
@@ -25,15 +54,15 @@ void run_reco_urqmdtest(Int_t nEvents = 50)
    loadlibs();
 
    FairRunAna *run= new FairRunAna();
-   run->SetInputFile(inFile);
-   run->SetOutputFile(outFile);
+   run->SetInputFile(mcFile);
+   run->SetOutputFile(recoFile);
 
    Double_t threshold  =  4;
    Double_t noiseWidth =  0.01;
    Int_t    nofBits    = 12;
    Double_t electronsPerAdc    =  10;
    Double_t StripDeadTime = 0.1;
-   CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", 0);
+   CbmStsDigitize* stsDigitize = new CbmStsDigitize();
    stsDigitize->SetRealisticResponse();
    stsDigitize->SetFrontThreshold (threshold);
    stsDigitize->SetBackThreshold  (threshold);
@@ -46,14 +75,14 @@ void run_reco_urqmdtest(Int_t nEvents = 50)
    stsDigitize->SetStripDeadTime  (StripDeadTime);
    run->AddTask(stsDigitize);
 
-   FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder", 0);
+   FairTask* stsClusterFinder = new CbmStsClusterFinder();
    run->AddTask(stsClusterFinder);
 
-   FairTask* stsFindHits = new CbmStsFindHits(0);
+   FairTask* stsFindHits = new CbmStsFindHits();
    run->AddTask(stsFindHits);
 
-   CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(0);
-   run->AddTask(stsMatchHits);
+   //CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits();
+   //run->AddTask(stsMatchHits);
 
    CbmKF* kalman = new CbmKF();
    run->AddTask(kalman);
@@ -95,6 +124,9 @@ void run_reco_urqmdtest(Int_t nEvents = 50)
    CbmRichMatchRings* matchRings = new CbmRichMatchRings();
    run->AddTask(matchRings);
 
+	CbmMatchRecoToMC* match = new CbmMatchRecoToMC();
+	run->AddTask(match);
+
    CbmRichUrqmdTest* urqmdTest = new CbmRichUrqmdTest();
    urqmdTest->SetOutputDir(resultDir);
    run->AddTask(urqmdTest);
@@ -121,7 +153,7 @@ void run_reco_urqmdtest(Int_t nEvents = 50)
    Double_t ctime = timer.CpuTime();
    cout << endl << endl;
    cout << "Macro finished successfully." << endl;
-   cout << "Output file is "    << outFile << endl;
+   cout << "Output file is "    << recoFile << endl;
    cout << "Parameter file is " << parFile << endl;
    cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
    cout << endl;

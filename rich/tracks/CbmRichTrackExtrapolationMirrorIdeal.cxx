@@ -12,7 +12,7 @@
 #include "FairTrackParam.h"
 #include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
 
@@ -90,9 +90,9 @@ void CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolation(
       if ( NULL == pSTStr ) continue;
       Int_t Nsts = pSTStr->GetNofHits() + pSTStr->GetNofMvdHits();
       if ( Nsts >= minNofStsHits) {
-         CbmTrackMatch* pTrackMatch = (CbmTrackMatch*)fTrackMatchArray->At(idSTS);
+         CbmTrackMatchNew* pTrackMatch = (CbmTrackMatchNew*)fTrackMatchArray->At(idSTS);
          if (NULL == pTrackMatch) continue;
-         Int_t iMCmatch = pTrackMatch->GetMCTrackId();
+         Int_t iMCmatch = pTrackMatch->GetMatchedLink().GetIndex();
          for (Int_t ii=0; ii < fRichMirrorPoints->GetEntriesFast(); ii++){
             CbmRichPoint* pMirror = (CbmRichPoint*) fRichMirrorPoints->At(ii);
             if (pMirror->GetTrackID() == iMCmatch){

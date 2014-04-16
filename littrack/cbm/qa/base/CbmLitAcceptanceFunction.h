@@ -10,7 +10,7 @@
 
 #include "CbmMCTrack.h"
 #include "CbmGlobalTrack.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "TClonesArray.h"
 #include "TMath.h"
 #include "TDatabasePDG.h"
@@ -263,11 +263,11 @@ public:
       Int_t stsInd = gTrack->GetStsTrackIndex();
       Int_t richInd = gTrack->GetRichRingIndex();
       if (stsInd == -1 || richInd == -1) return false;
-      const CbmTrackMatch* stsMatch = static_cast<const CbmTrackMatch*>(stsMatches->At(stsInd));
-      const CbmTrackMatch* richMatch = static_cast<const CbmTrackMatch*>(richMatches->At(richInd));
+      const CbmTrackMatchNew* stsMatch = static_cast<const CbmTrackMatchNew*>(stsMatches->At(stsInd));
+      const CbmTrackMatchNew* richMatch = static_cast<const CbmTrackMatchNew*>(richMatches->At(richInd));
       if (NULL == stsMatch || NULL == richMatch) return false;
 
-      if (stsMatch->GetMCTrackId() == richMatch->GetMCTrackId()) return true;
+      if (stsMatch->GetMatchedLink().GetIndex() == richMatch->GetMatchedLink().GetIndex()) return true;
       return false;
    }
 

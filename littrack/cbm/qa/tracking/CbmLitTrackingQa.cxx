@@ -13,7 +13,6 @@
 #include "qa/base/CbmLitAcceptanceFunction.h"
 #include "elid/CbmLitGlobalElectronId.h"
 #include "CbmGlobalTrack.h"
-#include "CbmTrackMatch.h"
 #include "CbmRichRing.h"
 #include "CbmMCTrack.h"
 #include "CbmBaseHit.h"
@@ -737,12 +736,12 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
             isMuchOk = false;
          }
       }
-      const CbmTrackMatch* richRingMatch;
+      const CbmTrackMatchNew* richRingMatch;
       if (isRichOk) {
-         richRingMatch = static_cast<const CbmTrackMatch*>(fRichRingMatches->At(richId));
-         if (richRingMatch == NULL) { continue; }
-         Int_t nofHits = richRingMatch->GetNofTrueHits() + richRingMatch->GetNofWrongHits() + richRingMatch->GetNofFakeHits();
-         isRichOk = CheckTrackQuality(richRingMatch, kRICH);
+         richRingMatch = static_cast<const CbmTrackMatchNew*>(fRichRingMatches->At(richId));
+         Int_t nofHits = richRingMatch->GetNofHits();
+         isRichOk = richRingMatch->GetTrueOverAllHitsRatio() >= fQuotaRich;
+         FillTrackQualityHistograms(richRingMatch, kRICH);
          if (!isRichOk) { // ghost ring
             fHM->H1("hng_NofGhosts_Rich_Nh")->Fill(nofHits);
 
@@ -776,7 +775,7 @@ void CbmLitTrackingQa::ProcessGlobalTracks()
          const FairMCPoint* tofPoint = static_cast<const FairMCPoint*>(fTofPoints->At(tofHit->GetRefId()));
          if (tofPoint != NULL) tofMCId = tofPoint->GetTrackID();
       }
-      if (isRichOk) { richMCId = richRingMatch->GetMCTrackId(); }
+      if (isRichOk) { richMCId = richRingMatch->GetMatchedLink().GetIndex(); }
 
       map<string, multimap<Int_t, Int_t> >::iterator it;
       for (it = fMcToRecoMap.begin(); it != fMcToRecoMap.end(); it++) {
@@ -801,9 +800,9 @@ void CbmLitTrackingQa::ProcessRichRings()
    if (!fDet.GetDet(kRICH)) return;
    Int_t nofRings = fRichRings->GetEntriesFast();
    for(Int_t iRing = 0; iRing < nofRings; iRing++) {
-     const CbmTrackMatch* richRingMatch = static_cast<const CbmTrackMatch*>(fRichRingMatches->At(iRing));
-     Bool_t isRichOk = CheckTrackQuality(richRingMatch, kRICH);
-     Int_t richMCId = (isRichOk) ? richRingMatch->GetMCTrackId() : -1;
+     const CbmTrackMatchNew* richRingMatch = static_cast<const CbmTrackMatchNew*>(fRichRingMatches->At(iRing));
+     Bool_t isRichOk = richRingMatch->GetTrueOverAllHitsRatio() >= fQuotaRich;
+     Int_t richMCId = (isRichOk) ? richRingMatch->GetMatchedLink().GetIndex() : -1;//GetMCTrackId() : -1;
      if (isRichOk && -1 != richMCId) {
          pair<Int_t, Int_t> tmp = make_pair(richMCId, iRing);
          fMcToRecoMap["Rich"].insert(tmp);
@@ -819,8 +818,8 @@ void CbmLitTrackingQa::ProcessMvd(
    Int_t nofHits = track->GetNofMvdHits();
    fHM->H1("hth_Mvd_TrackHits_All")->Fill(nofHits);
 
-   const CbmTrackMatch* stsTrackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsId));
-   Int_t stsMcTrackId = stsTrackMatch->GetMCTrackId();
+   const CbmTrackMatchNew* stsTrackMatch = static_cast<const CbmTrackMatchNew*>(fStsMatches->At(stsId));
+   Int_t stsMcTrackId = stsTrackMatch->GetMatchedLink().GetIndex();
 
    Int_t nofTrueHits = 0, nofFakeHits = 0;
    for (Int_t iHit = 0; iHit < nofHits; iHit++) {
@@ -843,34 +842,6 @@ void CbmLitTrackingQa::ProcessMvd(
       fHM->H1("hth_Mvd_TrackHits_TrueOverAll")->Fill(Double_t(nofTrueHits) / Double_t(nofHits));
       fHM->H1("hth_Mvd_TrackHits_FakeOverAll")->Fill(Double_t(nofFakeHits) / Double_t(nofHits));
    }
-}
-
-Bool_t CbmLitTrackingQa::CheckTrackQuality(
-   const CbmTrackMatch* trackMatch,
-   DetectorId detId)
-{
-   Int_t mcId = trackMatch->GetMCTrackId();
-   if (mcId < 0) { return false; }
-
-   Int_t nofTrue = trackMatch->GetNofTrueHits();
-   Int_t nofWrong = trackMatch->GetNofWrongHits();
-   Int_t nofFake = trackMatch->GetNofFakeHits();
-   Int_t nofHits = nofTrue + nofWrong + nofFake;
-   Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
-   Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
-
-   string detName = (detId == kSTS) ? "Sts" : (detId == kTRD) ? "Trd" : (detId == kMUCH) ? "Much" : (detId == kRICH) ? "Rich" : "";
-   assert(detName != "");
-
-   if (detName != "") {
-     string histName = "hth_" + detName + "_TrackHits";
-      fHM->H1(histName + "_All")->Fill(nofHits);
-      fHM->H1(histName + "_True")->Fill(nofTrue);
-      fHM->H1(histName + "_Fake")->Fill(nofFake + nofWrong);
-      fHM->H1(histName + "_TrueOverAll")->Fill(quali);
-      fHM->H1(histName + "_FakeOverAll")->Fill(fakequali);
-   }
-   return (detId == kRICH) ? quali >= fQuotaRich : quali >= fQuota;
 }
 
 void CbmLitTrackingQa::FillTrackQualityHistograms(
@@ -1083,10 +1054,10 @@ void CbmLitTrackingQa::PionSuppression()
       const CbmGlobalTrack* globalTrack = static_cast<const CbmGlobalTrack*>(fGlobalTracks->At(iGT));
       Int_t stsIndex = globalTrack->GetStsTrackIndex();
       if (stsIndex < 0) continue;
-      const CbmTrackMatch* trackMatch = static_cast<const CbmTrackMatch*>(fStsMatches->At(stsIndex));
+      const CbmTrackMatchNew* trackMatch = static_cast<const CbmTrackMatchNew*>(fStsMatches->At(stsIndex));
       const FairTrackParam* richProjection = static_cast<const FairTrackParam*>(fRichProjections->At(iGT));
       if (richProjection == NULL || richProjection->GetX() == 0 || richProjection->GetY() == 0) continue;
-      Int_t mcIdSts = trackMatch->GetMCTrackId();
+      Int_t mcIdSts = trackMatch->GetMatchedLink().GetIndex();
       if (mcIdSts < 0) continue;
       const CbmMCTrack* mcTrack = static_cast<const CbmMCTrack*>(fMCTracks->At(mcIdSts));
       TVector3 mom;

@@ -4,7 +4,7 @@
  * \date 2009
  */
 #include "CbmLitFindGlobalTracksIdeal.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 #include "CbmGlobalTrack.h"
@@ -113,9 +113,9 @@ void CbmLitFindGlobalTracksIdeal::FillTrackMap(
    mcMap.clear();
    Int_t nofTracks = matches->GetEntriesFast();
    for(Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
-      CbmTrackMatch* trackMatch = (CbmTrackMatch*) matches->At(iTrack);
+      CbmTrackMatchNew* trackMatch = (CbmTrackMatchNew*) matches->At(iTrack);
       if (trackMatch == NULL) { continue; }
-      Int_t mcId = trackMatch->GetMCTrackId();
+      Int_t mcId = trackMatch->GetMatchedLink().GetIndex();
       if(mcId == -1) { continue; }
       mcMap.insert(std::pair<Int_t, Int_t>(mcId, iTrack));
    }

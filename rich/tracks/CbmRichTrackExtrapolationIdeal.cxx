@@ -11,7 +11,7 @@
 #include "FairTrackParam.h"
 #include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
 
@@ -89,9 +89,9 @@ void CbmRichTrackExtrapolationIdeal::DoExtrapolation(
 
       Int_t Nsts = pSTStr->GetNofHits() + pSTStr->GetNofMvdHits();
       if ( Nsts >= minNofStsHits) {
-         CbmTrackMatch* pTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(idSTS);
+         CbmTrackMatchNew* pTrackMatch = (CbmTrackMatchNew*)fStsTrackMatches->At(idSTS);
          if ( NULL == pTrackMatch) continue;
-         Int_t iMCmatch = pTrackMatch->GetMCTrackId();
+         Int_t iMCmatch = pTrackMatch->GetMatchedLink().GetIndex();
          for (Int_t ii=0; ii < fRefPlanePoints->GetEntriesFast(); ii++){
             CbmRichPoint* pRefPlane = (CbmRichPoint*)fRefPlanePoints->At(ii);
             if (pRefPlane->GetTrackID() == iMCmatch){

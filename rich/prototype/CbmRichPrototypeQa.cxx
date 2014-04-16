@@ -9,7 +9,7 @@
 #include "FairRootManager.h"
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmTrackMatch.h"
+#include "CbmTrackMatchNew.h"
 #include "CbmMCTrack.h"
 #include "CbmRichPoint.h"
 #include "CbmRichRingFitterCOP.h"
@@ -212,10 +212,10 @@ void CbmRichPrototypeQa::RingParameters()
 	for (Int_t iR = 0; iR < nofRings; iR++){
 		CbmRichRing *ring = (CbmRichRing*) fRichRings->At(iR);
 		if (NULL == ring) continue;
-		CbmTrackMatch* ringMatch = (CbmTrackMatch*) fRichRingMatches->At(iR);
+		CbmTrackMatchNew* ringMatch = (CbmTrackMatchNew*) fRichRingMatches->At(iR);
 		if (NULL == ringMatch) continue;
 
-		Int_t mcTrackId = ringMatch->GetMCTrackId();
+		Int_t mcTrackId = ringMatch->GetMatchedLink().GetIndex();
 		if (mcTrackId < 0) continue;
 		CbmMCTrack* mcTrack = (CbmMCTrack*)fMCTracks->At(mcTrackId);
 		if (!mcTrack) continue;

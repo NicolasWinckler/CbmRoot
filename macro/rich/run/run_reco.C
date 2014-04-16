@@ -1,4 +1,4 @@
-void run_reco(Int_t nEvents = 1)
+void run_reco(Int_t nEvents = 2)
 {
    TTree::SetMaxTreeSize(90000000000);
 
@@ -10,31 +10,34 @@ void run_reco(Int_t nEvents = 1)
 
 	gRandom->SetSeed(10);
 
-	TString inFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.mc.root";
-	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.param.root";
-	TString outFile ="/Users/slebedev/Development/cbm/data/simulations/rich/richreco/test.reco.root";
-	std::string resultDir = "recqa/";
+	TString mcFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/mc.0001.root";
+	TString parFile = "/Users/slebedev/Development/cbm/data/simulations/rich/richreco/param.0001.root";
+	TString recoFile ="/Users/slebedev/Development/cbm/data/simulations/rich/richreco/reco.0001.root";
+	std::string resultDir = "recqa_0001/";
 	int nofNoiseHitsInRich = 220;
 	double collectionEff = 1.0;
 	double sigmaErrorRich = 0.06;
 	double crosstalkRich = 0.02;
 	if (script == "yes") {
-		inFile = TString(gSystem->Getenv("MC_FILE"));
-		outFile = TString(gSystem->Getenv("RECO_FILE"));
+		mcFile = TString(gSystem->Getenv("MC_FILE"));
+		recoFile = TString(gSystem->Getenv("RECO_FILE"));
 		parFile = TString(gSystem->Getenv("PAR_FILE"));
 		resultDir = TString(gSystem->Getenv("LIT_RESULT_DIR"));
 		nofNoiseHitsInRich = TString(gSystem->Getenv("NOF_NOISE_HITS_IN_RICH")).Atoi();
 		collectionEff = TString(gSystem->Getenv("RICH_COLLECTION_EFF")).Atof();
-      sigmaErrorRich = TString(gSystem->Getenv("SIGMA_ERROR_RICH")).Atof();
-      crosstalkRich = TString(gSystem->Getenv("CROSSTALK_RICH")).Atof();
+        sigmaErrorRich = TString(gSystem->Getenv("SIGMA_ERROR_RICH")).Atof();
+        crosstalkRich = TString(gSystem->Getenv("CROSSTALK_RICH")).Atof();
 	}
 
    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v12b_std.digi.par"; // STS digi file
+   TObjString stsDigiFile = parDir + "/sts/sts_v13d_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13g.digi.par"; // TRD digi file
+   TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par"; // TOF digi file
+
    parFileList->Add(&stsDigiFile);
    parFileList->Add(&trdDigiFile);
+   parFileList->Add(&tofDigiFile);
    gDebug = 0;
 
     TStopwatch timer;
@@ -47,8 +50,8 @@ void run_reco(Int_t nEvents = 1)
 
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
-	if (inFile != "") run->SetInputFile(inFile);
-	if (outFile != "") run->SetOutputFile(outFile);
+	if (mcFile != "") run->SetInputFile(mcFile);
+	if (recoFile != "") run->SetOutputFile(recoFile);
 
 
     // =========================================================================
@@ -72,51 +75,30 @@ void run_reco(Int_t nEvents = 1)
 	// ===                      STS local reconstruction                     ===
 	// =========================================================================
 
-    { // STS REAL
-      Double_t threshold  =  4;
-      Double_t noiseWidth =  0.01;
-      Int_t    nofBits    = 12;
-      Double_t electronsPerAdc    =  10;
-      Double_t StripDeadTime = 0.1;
-      CbmStsDigitize* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
-      stsDigitize->SetRealisticResponse();
-      stsDigitize->SetFrontThreshold (threshold);
-      stsDigitize->SetBackThreshold  (threshold);
-      stsDigitize->SetFrontNoiseWidth(noiseWidth);
-      stsDigitize->SetBackNoiseWidth (noiseWidth);
-      stsDigitize->SetFrontNofBits   (nofBits);
-      stsDigitize->SetBackNofBits    (nofBits);
-      stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
-      stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
-      stsDigitize->SetStripDeadTime  (StripDeadTime);
-      run->AddTask(stsDigitize);
+	Double_t threshold  =  4;
+	Double_t noiseWidth =  0.01;
+	Int_t    nofBits    = 12;
+	Double_t electronsPerAdc    =  10;
+	Double_t StripDeadTime = 0.1;
+	CbmStsDigitize* stsDigitize = new CbmStsDigitize();
+	stsDigitize->SetRealisticResponse();
+	stsDigitize->SetFrontThreshold (threshold);
+	stsDigitize->SetBackThreshold  (threshold);
+	stsDigitize->SetFrontNoiseWidth(noiseWidth);
+	stsDigitize->SetBackNoiseWidth (noiseWidth);
+	stsDigitize->SetFrontNofBits   (nofBits);
+	stsDigitize->SetBackNofBits    (nofBits);
+	stsDigitize->SetFrontNofElPerAdc(electronsPerAdc);
+	stsDigitize->SetBackNofElPerAdc(electronsPerAdc);
+	stsDigitize->SetStripDeadTime  (StripDeadTime);
+	run->AddTask(stsDigitize);
 
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("CbmStsClusterFinder",iVerbose);
-    run->AddTask(stsClusterFinder);
+	FairTask* stsClusterFinder = new CbmStsClusterFinder();
+	run->AddTask(stsClusterFinder);
 
-    FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
-    run->AddTask(stsFindHits);
+	FairTask* stsFindHits = new CbmStsFindHits();
+	run->AddTask(stsFindHits);
 
-    CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
-    run->AddTask(stsMatchHits);
-    } // STS REAL
-
-/*
-    // STS IDEAL RESPONSE
-    {
-      FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
-      run->AddTask(stsDigitize);
-
-      FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",iVerbose);
-      run->AddTask(stsClusterFinder);
-
-      FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
-      run->AddTask(stsFindHits);
-
-      FairTask* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
-      run->AddTask(stsMatchHits);
-    }
-*/
 
 	CbmKF* kalman = new CbmKF();
 	run->AddTask(kalman);
@@ -128,13 +110,6 @@ void run_reco(Int_t nEvents = 1)
 	Bool_t useMvd = kTRUE;
 	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, useMvd);
 	run->AddTask(stsFindTracks);
-
-	FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
-	run->AddTask(stsMatchTracks);
-
-	CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-	FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
-	run->AddTask(stsFitTracks);
 
 	// =========================================================================
 	// ===                     TRD local reconstruction                      ===
@@ -157,7 +132,9 @@ void run_reco(Int_t nEvents = 1)
 	// =========================================================================
 	if (IsTof(parFile)) {
 		// ------   TOF hit producer   ---------------------------------------------
-		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", iVerbose);
+		//CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("CbmTofHitProducer", iVerbose);
+		CbmTofHitProducerNew* tofHitProd = new CbmTofHitProducerNew("TOF HitProducerNew",iVerbose);
+		tofHitProd->SetInitFromAscii(kFALSE);
 		run->AddTask(tofHitProd);
 	} //isTof
 
@@ -222,18 +199,15 @@ void run_reco(Int_t nEvents = 1)
    trackingQa->SetMinNofHitsRich(7);
    trackingQa->SetQuotaRich(0.6);
    trackingQa->SetOutputDir(resultDir);
-   trackingQa->SetPRange(15, 0., 3.);
+   trackingQa->SetPRange(20, 0., 10.);
 
    std::vector<std::string> trackCat, richCat;
    trackCat.push_back("All");
    trackCat.push_back("Electron");
-//   richCat.push_back("All");
    richCat.push_back("Electron");
    richCat.push_back("ElectronReference");
    trackingQa->SetTrackCategories(trackCat);
    trackingQa->SetRingCategories(richCat);
-  // richCat.push_back("Pion");
-  // richCat.push_back("PionReference");
    run->AddTask(trackingQa);
 
    CbmLitFitQa* fitQa = new CbmLitFitQa();
@@ -242,11 +216,11 @@ void run_reco(Int_t nEvents = 1)
    fitQa->SetMuchMinNofHits(10);
    fitQa->SetTrdMinNofHits(6);
    fitQa->SetOutputDir(resultDir);
-   run->AddTask(fitQa);
+  // run->AddTask(fitQa);
 
    CbmLitClusteringQa* clusteringQa = new CbmLitClusteringQa();
    clusteringQa->SetOutputDir(resultDir);
-   run->AddTask(clusteringQa);
+  // run->AddTask(clusteringQa);
 
 
     // =========================================================================

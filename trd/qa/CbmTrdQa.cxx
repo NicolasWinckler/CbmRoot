@@ -33,6 +33,7 @@
 #include "CbmTrdClusterFinderFast.h"
 #include "CbmTrdHitProducerCluster.h"
 #include "CbmTrdUtils.h"
+#include "CbmTrdRadiator.h"
 
 using std::cout;
 using std::cin;
@@ -40,7 +41,7 @@ using std::endl;
 using std::pair;
 using std::fabs;
 
-CbmTrdQa::CbmTrdQa() 
+CbmTrdQa::CbmTrdQa(CbmTrdRadiator *radiator) 
   : FairTask("TrdQa"),
     fMCTracks(NULL),
     fPoints(NULL),
@@ -49,6 +50,7 @@ CbmTrdQa::CbmTrdQa()
     fHits(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
+    fRadiator(radiator),
     fGeoHandler(new CbmTrdGeoHandler()),
     fLayerMap(),
     fLayerMapIt(),
@@ -97,6 +99,10 @@ CbmTrdQa::CbmTrdQa()
     fLayerDummy(NULL),
     fStsTrdPoints(NULL),
     fStsTrdPointsTrackable(NULL),
+    fTrdPointsPerMcTrack_PID(NULL),
+    fTrdPointsPerMcTrack_PT(NULL),
+    fTrdPointsPerMcTrack_P(NULL),
+    fTrdTrackCrossedRadiator(NULL),
     fMultiHitSamePadPerMcTrack(NULL),
     fMultiHitSamePadPerMcTrack_angle(NULL),
     fMultiHitSamePadPerMcTrack_zBirth(NULL),
@@ -142,7 +148,7 @@ CbmTrdQa::CbmTrdQa()
 {
 }
 
-CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_t triggerThreshold) 
+CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_t triggerThreshold, CbmTrdRadiator *radiator) 
   : FairTask("TrdQa"),
     fMCTracks(NULL),
     fPoints(NULL),
@@ -151,6 +157,7 @@ CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_
     fHits(NULL),
     fDigiPar(NULL),
     fModuleInfo(NULL),
+    fRadiator(radiator),
     fGeoHandler(new CbmTrdGeoHandler()),
     fLayerMap(),
     fLayerMapIt(),
@@ -199,6 +206,10 @@ CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_
     fLayerDummy(NULL),
     fStsTrdPoints(NULL),
     fStsTrdPointsTrackable(NULL),
+    fTrdPointsPerMcTrack_PID(NULL),
+    fTrdPointsPerMcTrack_PT(NULL),
+    fTrdPointsPerMcTrack_P(NULL),
+    fTrdTrackCrossedRadiator(NULL),
     fMultiHitSamePadPerMcTrack(NULL),
     fMultiHitSamePadPerMcTrack_angle(NULL),
     fMultiHitSamePadPerMcTrack_zBirth(NULL),
@@ -357,6 +368,11 @@ CbmTrdQa::~CbmTrdQa()
   fModuleClusterSizeMap.clear();
 
 
+  delete fTrdPointsPerMcTrack_PID;
+  delete fTrdPointsPerMcTrack_PT;
+  delete fTrdPointsPerMcTrack_P;
+  delete fTrdTrackCrossedRadiator;
+
   delete fMultiHitSamePadPerMcTrack;
   delete fMultiHitSamePadPerMcTrack_angle;
   delete fMultiHitSamePadPerMcTrack_zBirth;
@@ -482,6 +498,30 @@ InitStatus CbmTrdQa::Init()
   fStsTrdPointsTrackable->SetXTitle("TRD points / track");
   fStsTrdPointsTrackable->SetYTitle("STS points / track");
   fStsTrdPointsTrackable->SetContour(99);
+
+
+  fTrdPointsPerMcTrack_PID = new TH2F("fTrdPointsPerMcTrack_PID","fTrdPointsPerMcTrack_PID",12,-0.5,11.5,49,0.5,49.5);
+  fTrdPointsPerMcTrack_PID->SetContour(99);
+  fTrdPointsPerMcTrack_PID->SetXTitle("n TRD Points");
+  fTrdPointsPerMcTrack_PID->SetYTitle("");
+  for (Int_t bin = 1; bin <= 49; bin++) {
+    fTrdPointsPerMcTrack_PID->GetYaxis()->SetBinLabel(bin,CbmTrdUtils::GetGeantName(bin));
+  }
+  fTrdPointsPerMcTrack_PT = new TH2F("fTrdPointsPerMcTrack_PT","fTrdPointsPerMcTrack_PT",12,-0.5,11.5,30,0,3);
+  fTrdPointsPerMcTrack_PT->SetContour(99);
+  fTrdPointsPerMcTrack_PT->SetXTitle("n TRD Points");
+  fTrdPointsPerMcTrack_PT->SetYTitle("p_{T} (GeV/c)");
+
+  fTrdPointsPerMcTrack_P = new TH2F("fTrdPointsPerMcTrack_P","fTrdPointsPerMcTrack_P",12,-0.5,11.5,100,0,10);
+  fTrdPointsPerMcTrack_P->SetContour(99);
+  fTrdPointsPerMcTrack_P->SetXTitle("n TRD Points");
+  fTrdPointsPerMcTrack_P->SetYTitle("p (GeV/c)");
+
+  fTrdTrackCrossedRadiator = new TH2F("fTrdTrackCrossedRadiator","fTrdTrackCrossedRadiator",12,-0.5,11.5,15,-3.5,11.5);
+  fTrdTrackCrossedRadiator->SetContour(99);
+  fTrdTrackCrossedRadiator->SetXTitle("n TRD Points");
+  fTrdTrackCrossedRadiator->SetYTitle("n Radiator crossings");
+
   fDistanceMcToHit = new TH1I("DistanceMcToHit", "DistanceMcToHit", 1500, 0, 150);
   fDistanceMcToHit->SetStats(kFALSE);
   fDistanceMcToHit->SetXTitle("#Delta r (MC-Hit) pairs [cm]");
@@ -768,6 +808,7 @@ void CbmTrdQa::Exec(Option_t * option)
     nEntries = fPoints->GetEntries();
     printf("%i Points\n",nEntries);
    
+    std::map<Int_t, Int_t> hasBeenUsedTrack;
     for (Int_t iPoint=0; iPoint < nEntries; iPoint++ ) {
       point = (CbmTrdPoint*) fPoints->At(iPoint);
       fdEdxPoint->Fill(point->GetEnergyLoss());
@@ -843,6 +884,23 @@ void CbmTrdQa::Exec(Option_t * option)
 	cout << gGeoManager->GetPath() << endl;
 	continue;
       }
+      iTrack = point->GetTrackID();
+      track = (CbmMCTrack*) fMCTracks->At(iTrack);
+
+      Int_t Pdg_code = track->GetPdgCode();
+      if (hasBeenUsedTrack.find(iTrack) != hasBeenUsedTrack.end()) {
+	//hasBeenUsedTrack[iTrack] += 1;//continue;
+	if (NULL != fRadiator)
+	  if (fRadiator->LatticeHit(point))
+	    hasBeenUsedTrack[iTrack] -= 1;
+      } else {
+	hasBeenUsedTrack[iTrack] = track->GetNPoints(kTRD);
+	fTrdPointsPerMcTrack_PID->Fill(track->GetNPoints(kTRD), CbmTrdUtils::PdgToGeant(Pdg_code));
+	fTrdPointsPerMcTrack_PT->Fill(track->GetNPoints(kTRD), track->GetPt());
+	fTrdPointsPerMcTrack_P->Fill(track->GetNPoints(kTRD), track->GetP());
+      }
+
+
       Double_t trackLength = GetTrackLength(point);
       /*
 	TMath::Sqrt(
@@ -927,7 +985,15 @@ void CbmTrdQa::Exec(Option_t * option)
 	fLayerDummy->Draw("colz");
       }
     }
+    for (std::map<Int_t,Int_t>::iterator it = hasBeenUsedTrack.begin(); it != hasBeenUsedTrack.end(); it++){
+      track = (CbmMCTrack*) fMCTracks->At(it->first);
+      fTrdTrackCrossedRadiator->Fill(track->GetNPoints(kTRD),it->second);
+    }
   }
+
+ 
+
+
   // Digis
   if (fD) {
     nEntries = fDigis->GetEntries();
@@ -1050,6 +1116,8 @@ void CbmTrdQa::Exec(Option_t * option)
 	//hasBeenUsed[fModulePointMapIt->second[iPoint]] = 0;
 	point = (CbmTrdPoint*) fPoints->At(fModulePointMapIt->second[iPoint]);
 	iTrack = point->GetTrackID();
+
+
 	track = (CbmMCTrack*) fMCTracks->At(iTrack);
 	mother_iTrack = track->GetMotherId();
 	if (mother_iTrack >= 0)
@@ -1465,6 +1533,23 @@ void CbmTrdQa::SaveHistos()
   c->SaveAs("pics/TrdQaStsTrdPointsTrackable"+title+".pdf");
   c->SaveAs("pics/TrdQaStsTrdPointsTrackable"+title+".png");
   fStsTrdPointsTrackable->Write("", TObject::kOverwrite);
+
+  fTrdPointsPerMcTrack_PID->Write("", TObject::kOverwrite);
+  fTrdPointsPerMcTrack_PID->DrawCopy("colz");
+  c->SaveAs("pics/TrdQaPointsPerMcTrack_PID"+title+".pdf");
+  c->SaveAs("pics/TrdQaPointsPerMcTrack_PID"+title+".png");
+  fTrdPointsPerMcTrack_PT->Write("", TObject::kOverwrite);
+  fTrdPointsPerMcTrack_PT->DrawCopy("colz");
+  c->SaveAs("pics/TrdQaPointsPerMcTrack_PT"+title+".pdf");
+  c->SaveAs("pics/TrdQaPointsPerMcTrack_PT"+title+".png");
+  fTrdPointsPerMcTrack_P->Write("", TObject::kOverwrite);
+  fTrdPointsPerMcTrack_P->DrawCopy("colz");
+  c->SaveAs("pics/TrdQaPointsPerMcTrack_P"+title+".pdf");
+  c->SaveAs("pics/TrdQaPointsPerMcTrack_P"+title+".png");
+  fTrdTrackCrossedRadiator->Write("", TObject::kOverwrite);
+  fTrdTrackCrossedRadiator->DrawCopy("colz");
+  c->SaveAs("pics/TrdQaTrackCrossedRadiator"+title+".pdf");
+  c->SaveAs("pics/TrdQaTrackCrossedRadiator"+title+".png");
   c->SetLogz(0);
   delete l;
   gDirectory->Cd("..");
@@ -2171,6 +2256,7 @@ void CbmTrdQa::CreateLayerView()
       title.Form("%.1f#pm%.1f",value,valueE);
       text->AddText(title);
       text->Draw("same");
+      //printf("ModuleAddress:%8i  cluster size: %5.2f+-%5.2f\n",fModuleClusterSizeMapIt->first,value,valueE);
     }
   }
 

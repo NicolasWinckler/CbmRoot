@@ -1,27 +1,31 @@
-/** @file CbmTofSimpClusterizer.h
+/** @file CbmTofTestBeamClusterizer.h
+ ** @author nh adopted from
  ** @author Pierre-Alain Loizeau <loizeau@physi.uni-heidelberg.de>
  ** @date 23.08.2013
  **/
-
 /** @class CbmTofSimpClusterizer
  ** @brief Simple Cluster building and hit producing for CBM ToF using Digis as input
  ** @author Pierre-Alain Loizeau <loizeau@physi.uni-heidelberg.de>
  ** @version 1.0
  **/
-#ifndef CBMTOFSIMPCLUSTERIZER_H
-#define CBMTOFSIMPCLUSTERIZER_H  1
+#ifndef CBMTOFTESTBEAMCLUSTERIZER_H
+#define CBMTOFTESTBEAMCLUSTERIZER_H  1
 
 // TOF Classes and includes
    // Input/Output
 //class CbmTofPoint;
 class CbmTofDigi;
 class CbmTofDigiExp;
+class CbmMatch;
    // Geometry
 class CbmTofGeoHandler;
 class CbmTofDetectorId;
 class CbmTofDigiPar;
 class CbmTofDigiBdfPar;
 class CbmTofCell;
+
+class TMbsMappingTofPar;
+class TTofCalibData;
 
 // FAIR classes and includes
 #include "FairTask.h"
@@ -30,28 +34,29 @@ class CbmTofCell;
 class TClonesArray;
 class TH1;
 class TH2;
+class TString;
 #include "TTimeStamp.h"
 
 // C++ Classes and includes
 #include <vector>
 
-class CbmTofSimpClusterizer : public FairTask
+class CbmTofTestBeamClusterizer : public FairTask
 {
    public:
 
       /**
        ** @brief Constructor.
        **/
-      CbmTofSimpClusterizer();
+      CbmTofTestBeamClusterizer();
 
       /**
        ** @brief Constructor.
        **/
-      CbmTofSimpClusterizer(const char *name, Int_t verbose = 1, Bool_t writeDataInOut = kTRUE);
+      CbmTofTestBeamClusterizer(const char *name, Int_t verbose = 1, Bool_t writeDataInOut = kTRUE);
       /**
        ** @brief Destructor.
        **/
-      virtual ~CbmTofSimpClusterizer();
+      virtual ~CbmTofTestBeamClusterizer();
 
       /**
        ** @brief Inherited from FairTask.
@@ -73,17 +78,25 @@ class CbmTofSimpClusterizer : public FairTask
        **/
       virtual void Finish();
 
+      inline void SetCalMode    (Int_t iMode)           { fCalMode     = iMode;}
+      inline void SetTRefDetId  (Int_t Id)              { fTRefMode    = Id;}
+      inline void SetTRefDifMax (Double_t TRefMax)      { fTRefDifMax  = TRefMax;}
+      inline void PosYMaxScal   (Double_t PosYmaxScal)  { fPosYMaxScal = PosYmaxScal;}
+      inline void TotMax        (Double_t TOTMax)       { fTotMax      = TOTMax;}
+
+      inline void SetCalParFileName(TString CalParFileName) { fCalParFileName = CalParFileName; }
+
    protected:
 
    private:
       /**
        ** @brief Copy constructor.
        **/
-      CbmTofSimpClusterizer(const CbmTofSimpClusterizer&);
+      CbmTofTestBeamClusterizer(const CbmTofTestBeamClusterizer&);
       /**
        ** @brief Copy operator.
        **/
-      CbmTofSimpClusterizer& operator=(const CbmTofSimpClusterizer&);
+      CbmTofTestBeamClusterizer& operator=(const CbmTofTestBeamClusterizer&);
 
       // Functions common for all clusters approximations
       /**
@@ -98,6 +111,10 @@ class CbmTofSimpClusterizer : public FairTask
        ** @brief Initialize other parameters not included in parameter classes.
        **/
       Bool_t   InitParameters();
+      /**
+       ** @brief Initialize other parameters not included in parameter classes.
+       **/
+      Bool_t   InitCalibParameter();
       /**
        ** @brief Load the geometry: for now just resizing the Digis temporary vectors
        **/
@@ -125,15 +142,18 @@ class CbmTofSimpClusterizer : public FairTask
       CbmTofCell            * fChannelInfo;
       CbmTofDigiBdfPar      * fDigiBdfPar;
 
-      // Input variables
+      TMbsMappingTofPar     *fMbsMappingPar;
+
+      // Input variables 
       TClonesArray          * fTofPointsColl; // TOF MC points
       TClonesArray          * fMcTracksColl;  // MC tracks
       TClonesArray          * fTofDigisColl;  // TOF Digis
 
       // Output variables
       Bool_t                  fbWriteHitsInOut;
-      TClonesArray          * fTofHitsColl; // TOF hits
-      Int_t  fiNbHits;                       // Index of the CbmTofHit TClonesArray
+      TClonesArray          * fTofHitsColl;       // TOF hits
+      TClonesArray          * fTofDigiMatchColl;  // TOF Digis
+      Int_t  fiNbHits;                            // Index of the CbmTofHit TClonesArray
 
       // Generic
       Int_t fVerbose;
@@ -143,12 +163,15 @@ class CbmTofSimpClusterizer : public FairTask
                fStorDigi; //[nbType][nbSm*nbRpc][nbCh][nDigis]
       std::vector< std::vector< std::vector< std::vector< CbmTofDigiExp* > > > >
                fStorDigiExp; //[nbType][nbSm*nbRpc][nbCh][nDigis]
+      std::vector< std::vector< std::vector< std::vector< Int_t > > > >
+               fStorDigiInd; //[nbType][nbSm*nbRpc][nbCh][nDigis]
       /*
       std::vector< std::vector< std::vector< std::vector< std::vector< CbmTofDigi* > > > > >
                fStorDigi; //[nbType][nbSm][nbRpc][nbCh][nDigis]
       std::vector< std::vector< std::vector< std::vector< std::vector< CbmTofDigiExp* > > > > >
                fStorDigiExp; //[nbType][nbSm][nbRpc][nbCh][nDigis]
       */
+      std::vector< std::vector< std::vector< Int_t > > > fviClusterMul; //[nbType][nbSm][nbRpc]
       std::vector< std::vector< std::vector< Int_t > > > fviClusterSize; //[nbType][nbRpc][nClusters]
       std::vector< std::vector< std::vector< Int_t > > > fviTrkMul; //[nbType][nbRpc][nClusters]
       std::vector< std::vector< std::vector< Double_t > > > fvdX; //[nbType][nbRpc][nClusters]
@@ -180,7 +203,29 @@ class CbmTofSimpClusterizer : public FairTask
       TH2* fhChDifDifX;
       TH2* fhChDifDifY;
 
-         // Digis quality
+      std::vector< TH2* > fhRpcDigiCor;     //[nbDet]
+      std::vector< TH1* > fhRpcCluMul;      //[nbDet]
+      std::vector< TH2* > fhRpcCluPosition; //[nbDet]
+      std::vector< TH2* > fhRpcCluTOff;     //[nbDet] 
+      std::vector< TH2* > fhRpcCluTot;      // [nbDet]
+      std::vector< TH2* > fhRpcCluSize;     // [nbDet]
+      std::vector< TH2* > fhRpcCluAvWalk;   // [nbDet]
+      std::vector< std::vector<TH2 *> > fhRpcCluWalk; // [nbDet][nbCh]
+
+      std::vector< std::vector< TH1* > > fhTRpcCluMul;      //[nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluPosition; //[nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluTOff;     //[nbDet] [nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluTot;      // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluSize;     // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluAvWalk;   // [nbDet][nbTrg]
+      std::vector< std::vector< std::vector<TH2 *> > > fhTRpcCluWalk; // [nbDet][nbTrg][nbCh]
+
+
+      std::vector< std::vector< std::vector< std::vector< Double_t > > > > fvCPTOff;     //[nSMT][nRpc][nCh][nbSide]
+      std::vector< std::vector< std::vector< std::vector< Double_t > > > > fvCPTotGain;  //[nSMT][nRpc][nCh][nbSide]
+      std::vector< std::vector< std::vector< std::vector< std::vector< Double_t > > > > > fvCPWalk; //[nSMT][nRpc][nCh][nbSide][nbWalkBins]
+
+      // Digis quality
       Int_t fiNbSameSide;
       TH1* fhNbSameSide;
       TH1* fhNbDigiPerChan;
@@ -189,7 +234,19 @@ class CbmTofSimpClusterizer : public FairTask
       TTimeStamp fStart;
       TTimeStamp fStop;
 
-   ClassDef(CbmTofSimpClusterizer, 1);
+      // Calib
+      Double_t dTRef;
+      Int_t    fCalMode;
+      Int_t    fTRefMode;
+      Int_t    fTRefHits;
+      Double_t fPosYMaxScal;
+      Double_t fTRefDifMax;
+      Double_t fTotMax;
+
+      TString       fCalParFileName;      // name of the file name with Calibration Parameters
+      TFile*        fCalParFile;          // pointer to Calibration Parameter file 
+
+   ClassDef(CbmTofTestBeamClusterizer, 1);
 };
 
-#endif // CBMTOFSIMPCLUSTERIZER_H
+#endif // CBMTOFTESTBEAMCLUSTERIZER_H

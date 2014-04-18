@@ -1393,6 +1393,12 @@ Bool_t   CbmTofTestBeamClusterizer::BuildClusters()
                      [pDigi->GetChannel()].push_back(iDigInd);
 
 	 // apply calibration vectors 
+	 pDigi->SetTime(pDigi->GetTime()- // calibrate Digi Time 
+			fvCPTOff[pDigi->GetType()]
+		       [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		       [pDigi->GetChannel()]
+		       [pDigi->GetSide()]);
+
 	 pDigi->SetTot(pDigi->GetTot() *  // calibrate Digi ToT 
 		fvCPTotGain[pDigi->GetType()]
 		       [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
@@ -1619,21 +1625,19 @@ Bool_t   CbmTofTestBeamClusterizer::BuildClusters()
 
                               // Y position form strip ends time difference
                               dPosY = fChannelInfo->GetY();
+			      
                               if( 1 == xDigiA->GetSide() )
+			     
                                  // 0 is the top side, 1 is the bottom side
                                  dPosY += fDigiBdfPar->GetSignalSpeed() *
-				   //     ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
-                                          ( xDigiA->GetTime()-fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][0] 
-					  - xDigiB->GetTime()+fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][1]
-					  )/2.0;
+				        ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
+
                               else
+			      
                                  // 0 is the bottom side, 1 is the top side
                                  dPosY += fDigiBdfPar->GetSignalSpeed() *
-				   //( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
-                                         ( xDigiB->GetTime()-fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][1] 
-					 - xDigiA->GetTime()+fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][0]
-					 )/2.0;
- 
+				       ( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
+
                               // For Z always just take the one of the channel itself( in fact its gap one)
                               dPosZ = fChannelInfo->GetZ();
 

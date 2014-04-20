@@ -116,6 +116,10 @@ InitStatus CbmTofCreateDigiPar::Init(){
   if ( ! ioman ) LOG(FATAL)<<"No FairRootManager found"<<FairLogger::endl;
   
 
+  if (k14a == geoVersion) {
+    LOG(INFO)<<"Will now create digitization parameters for root geometry."<<FairLogger::endl;
+    FillCellMapRootGeometry();
+  }
   if (k12b == geoVersion) {
     LOG(INFO)<<"Will now create digitization parameters for root geometry."<<FairLogger::endl;
     FillCellMapRootGeometry();
@@ -416,7 +420,7 @@ void CbmTofCreateDigiPar::FillCellInfoFromGeoHandler(TString FullPath)
   fCell=fGeoHandler->GetCell(fCellID);
   fRegion=fGeoHandler->GetRegion(fCellID);
 
-  LOG(DEBUG2)<<"FCI: Cell ID: "<< fCellID << " detId "<< fDetID;
+  LOG(DEBUG2)<<"FCI: Cell ID: "<< Form("0x%08x",fCellID) << " detId "<< Form("0x%08x",fDetID);
   LOG(DEBUG2)<<" Region:  "<< fGeoHandler->GetRegion(fCellID); 
   LOG(DEBUG2)<<" SMTYP:   "<< fGeoHandler->GetSMType(fCellID);
   LOG(DEBUG2)<<" SModule: "<< fGeoHandler->GetSModule(fCellID);

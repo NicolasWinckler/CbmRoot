@@ -16,7 +16,8 @@
 
 enum TofGeometryVersions {k07a,
                           k12a,
-                          k12b };
+                          k12b,
+                          k14a};
 
 #include "CbmTofDetectorId.h"
 

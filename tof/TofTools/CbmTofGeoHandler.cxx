@@ -8,6 +8,7 @@
 #include "CbmDetectorList.h"
 #include "CbmTofDetectorId_v07a.h"
 #include "CbmTofDetectorId_v12b.h"
+#include "CbmTofDetectorId_v14a.h"
 
 #include "FairLogger.h"
 
@@ -62,6 +63,8 @@ Int_t CbmTofGeoHandler::CheckGeometryVersion()
   // v12b:
   //     New version of the tof geometrie developed by Norbert Herrmann
   //     including also a support structure
+  // v14a:
+  //     test beam tof geometrie developed by Norbert Herrmann
 
   TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
   for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
@@ -88,6 +91,12 @@ Int_t CbmTofGeoHandler::CheckGeometryVersion()
                  <<", treat as Id 12b   "<< FairLogger::endl;
 	    fTofId = new CbmTofDetectorId_v12b();
 	    fGeoVersion = k12b;
+        return fGeoVersion;
+      } else if (TString(node->GetName()).Contains("v14")){
+    	LOG(INFO)<< "CbmTofGeoHandler::CheckGeometryVersion: Found TOF geometry "<<TString(node->GetName())
+                 <<", treat as Id 14a   "<< FairLogger::endl;
+	    fTofId = new CbmTofDetectorId_v14a();
+	    fGeoVersion = k14a;
         return fGeoVersion;
       } else {
     	LOG(FATAL)<< "Found an unknown TOF geometry." << FairLogger::endl;
@@ -131,21 +140,31 @@ Int_t CbmTofGeoHandler::GetUniqueDetectorId()
     CurrentVolOffID(2, counter);
     CurrentVolOffID(1, gap);
     CurrentVolID(cell);
+  } else if (fGeoVersion == k14a) { // test beam  
+    Volname = CurrentVolOffName(4);
+    smtype = Volname[7]-'0';
+    CurrentVolOffID(4, smodule);
+    CurrentVolOffID(2, counter);
+    CurrentVolOffID(1, gap);
+    CurrentVolID(cell);
+    //    counter=smodule;  // necessary for plastics 
+    //    smodule=smtype;   // for test beam setup
+    gap=0;
+    cell--;
   }
 
-  LOG(DEBUG2)<<"GeoHand: ";
-  LOG(DEBUG2)<<" Volname: "<<Volname<<", "<<CurrentVolOffName(3)<<", "<<CurrentVolOffName(2)<<", "<<CurrentVolOffName(1)<<", "<<CurrentVolOffName(0);
-  LOG(DEBUG2)<<" SMtype: "<<smtype;
-  LOG(DEBUG2)<<" SModule: "<<smodule;
-  LOG(DEBUG2)<<" Counter: "<<counter;
-  LOG(DEBUG2)<<" Gap: "<<gap;
-  LOG(DEBUG2)<<" Cell: "<<cell;
+  LOG(DEBUG1)<<"GeoHand: ";
+  LOG(DEBUG1)<<" Volname: "<<Volname<<", "<<CurrentVolOffName(3)<<", "<<CurrentVolOffName(2)<<", "<<CurrentVolOffName(1)<<", "<<CurrentVolOffName(0);
+  LOG(DEBUG1)<<" SMtype: "<<smtype;
+  LOG(DEBUG1)<<" SModule: "<<smodule;
+  LOG(DEBUG1)<<" Counter: "<<counter;
+  LOG(DEBUG1)<<" Gap: "<<gap;
+  LOG(DEBUG1)<<" Cell: "<<cell;
 
-  CbmTofDetectorInfo detInfo(kTOF, smtype, smodule, counter, 
-			     gap, cell);
+  CbmTofDetectorInfo detInfo(kTOF, smtype, smodule, counter, gap, cell);
 
   Int_t result=fTofId->SetDetectorInfo(detInfo);
-  LOG(DEBUG2)<<" Unique ID: "<< result << FairLogger::endl;
+  LOG(DEBUG1)<<" Unique ID: "<< Form("0x%08x",result) << FairLogger::endl;
 //  return fTofId->SetDetectorInfo(detInfo);
   return result;
 

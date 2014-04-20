@@ -872,7 +872,7 @@ Bool_t   CbmTofTestBeamClusterizer::FillHistos()
  if(0<iNbTofHits){
   CbmTofHit  *pHit;
   Bool_t BTrg[iNTrg];
-  if(0<iNTrg){
+  if(0<iNTrg){                  // check software triggers
    LOG(DEBUG)<<"CbmTofTestBeamClusterizer::FillHistos() for "<<iNTrg<<" triggers "
              <<FairLogger::endl;
    for (Int_t iTrg=0; iTrg<iNTrg; iTrg++){
@@ -1213,6 +1213,7 @@ Bool_t   CbmTofTestBeamClusterizer::WriteHistos()
 		   <<FairLogger::endl;
      }
    }
+
    fhDigSpacDifClust->Write();
    fhDigTimeDifClust->Write();
    fhDigDistClust->Write();

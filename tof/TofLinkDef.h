@@ -22,8 +22,10 @@
 #pragma link C++ class CbmTofDigitizerBDF+;
 
 #pragma link C++ class CbmTofSimpClusterizer+;
+#pragma link C++ class CbmTofTestBeamClusterizer+;
 
 #pragma link C++ class CbmTofTests+;
+#pragma link C++ class CbmTofAnaTestbeam+;
 
 #endif
 

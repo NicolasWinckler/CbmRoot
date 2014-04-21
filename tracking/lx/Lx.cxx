@@ -326,20 +326,57 @@ void LxFinder::Exec(Option_t* opt)
     MCTracks.push_back(mcTrack);
   }
 
+  nEnt = listStsPts->GetEntries();
+  cout << "There are: " << nEnt << " of STS MC points" << endl;
+
+  for (int i = 0; i < nEnt; ++i)
+  {
+    TVector3 xyzI, PI, xyzO, PO;
+    CbmStsPoint* stsPt = LX_DYNAMIC_CAST<CbmStsPoint*> (listStsPts->At(i));
+
+    if (0 == stsPt)
+      continue;
+
+    LxStsMCPoint stsMCPoint;
+    stsPt->Position(xyzI);
+    stsPt->Momentum(PI);
+    stsPt->PositionOut(xyzO);
+    stsPt->MomentumOut(PO);
+    TVector3 xyz = .5 * (xyzI + xyzO);
+    TVector3 P = .5 * (PI + PO);
+    stsMCPoint.x  = xyz.X();
+    stsMCPoint.y  = xyz.Y();
+    stsMCPoint.z  = xyz.Z();
+    stsMCPoint.px = P.X();
+    stsMCPoint.py = P.Y();
+    stsMCPoint.pz = P.Z();
+    stsMCPoint.p = sqrt(fabs(stsMCPoint.px * stsMCPoint.px + stsMCPoint.py * stsMCPoint.py + stsMCPoint.pz * stsMCPoint.pz));
+    stsMCPoint.stationNumber = (stsMCPoint.z - 28) / 10;
+    Int_t trackId = root2lxmctrackmap[stsPt->GetTrackID()];
+
+    if (-1 != trackId)
+    {
+      stsMCPoint.mcTrack = &MCTracks[trackId];
+      MCStsPoints.push_back(stsMCPoint);
+      MCTracks[trackId].stsPoints[stsMCPoint.stationNumber].push_back(&MCStsPoints.back());
+      MCStsPointsByStations[stsMCPoint.stationNumber].push_back(&MCStsPoints.back());
+    }
+  }
 
   nEnt = listMuchPts->GetEntries();
-  cout << "There are: " << nEnt << " of MC points" << endl;
+  cout << "There are: " << nEnt << " of MUCH MC points" << endl;
   LxMCPoint mcPoint;
 
   MCPoints.reserve(nEnt);
   Int_t* root2lxmcpointmap = new Int_t[nEnt];// Unfortunately we have to use this map because in the loop
                                              // below some iterations can not to produce a point.
   mapCnt = 0;
+  Int_t mcPtsCount = nEnt;
 
   for (int i = 0; i < nEnt; ++i)
   {
     TVector3 xyzI, PI, xyzO, PO;
-    CbmStsPoint* stsPt = LX_DYNAMIC_CAST<CbmStsPoint*> (listStsPts->At(i));
+    /*CbmStsPoint* stsPt = LX_DYNAMIC_CAST<CbmStsPoint*> (listStsPts->At(i));
 
     if (stsPt)
     {
@@ -367,7 +404,7 @@ void LxFinder::Exec(Option_t* opt)
         MCTracks[trackId].stsPoints[stsMCPoint.stationNumber].push_back(&MCStsPoints.back());
         MCStsPointsByStations[stsMCPoint.stationNumber].push_back(&MCStsPoints.back());
       }
-    }
+    }*/
 
     CbmMuchPoint* pt = LX_DYNAMIC_CAST<CbmMuchPoint*> (listMuchPts->At(i));
 
@@ -592,12 +629,20 @@ void LxFinder::Exec(Option_t* opt)
       //Migration CbmMuchDigiMatch* digiMatch = LX_DYNAMIC_CAST<CbmMuchDigiMatch*> (listMuchPixelDigiMatches->At(cluster->GetDigiIndex(j)));
       CbmMuchDigiMatch* digiMatch = LX_DYNAMIC_CAST<CbmMuchDigiMatch*> (listMuchPixelDigiMatches->At(cluster->GetDigi(j)));
       //Migration Int_t nMCs = digiMatch->GetNPoints();
-      Int_t nMCs = digiMatch->GetNoPrimaryElectrons();
+      //Int_t nMCs = digiMatch->GetNoPrimaryElectrons();
+      Int_t nMCs = digiMatch->GetNofLinks();
 
       for (int k = 0; k < nMCs; ++k)
       {
         //Migration Int_t mcIndex = digiMatch->GetRefIndex(k);
-        Int_t mcIndex = digiMatch->GetRefIndexPerPrimaryElectron(k);
+        //Int_t mcIndex = digiMatch->GetRefIndexPerPrimaryElectron(k);
+        //Int_t mcIndex = digiMatch->GetLink(k).GetIndex();
+        const CbmLink& lnk = digiMatch->GetLink(k);
+        Int_t mcIndex = lnk.GetIndex();
+
+        if (mcIndex >= mcPtsCount)
+          continue;
+
         Int_t mcIndexMapped = root2lxmcpointmap[mcIndex];
 
         if (-1 == mcIndexMapped)
@@ -702,7 +747,7 @@ void LxFinder::Exec(Option_t* opt)
   caSpace.JoinExtTracks();
 
   // Measure a reconstruction effectivity.
-  Double_t eff = effCounter.CalcRecoEff(false);// Parameter instructs whether join with external tracks or not.
+  Double_t eff = effCounter.CalcRecoEff(true);// Parameter instructs whether join with external tracks or not.
 #ifdef CALC_LINK_WITH_STS_EFF
   eff = effCounter.CalcLinkEff();
 #endif//CALC_LINK_WITH_STS_EFF

@@ -8,7 +8,7 @@
 #include "CbmDetectorList.h"
 #include "CbmTofDetectorId_v07a.h"
 #include "CbmTofDetectorId_v12b.h"
-#include "CbmTofDetectorId_v14a.h"
+//#include "CbmTofDetectorId_v14a.h"
 
 #include "FairLogger.h"
 
@@ -93,13 +93,16 @@ Int_t CbmTofGeoHandler::CheckGeometryVersion()
 	    fGeoVersion = k12b;
         return fGeoVersion;
       } else if (TString(node->GetName()).Contains("v14")){
-    	LOG(INFO)<< "CbmTofGeoHandler::CheckGeometryVersion: Found TOF geometry "<<TString(node->GetName())
+     	LOG(FATAL)<< "Found an unknown TOF geometry v14a. Was removed by F. Uhlig." << FairLogger::endl;
+
+/*    	LOG(INFO)<< "CbmTofGeoHandler::CheckGeometryVersion: Found TOF geometry "<<TString(node->GetName())
                  <<", treat as Id 14a   "<< FairLogger::endl;
 	    fTofId = new CbmTofDetectorId_v14a();
 	    fGeoVersion = k14a;
         return fGeoVersion;
+*/
       } else {
-    	LOG(FATAL)<< "Found an unknown TOF geometry." << FairLogger::endl;
+     	LOG(FATAL)<< "Found an unknown TOF geometry." << FairLogger::endl;
     	fGeoVersion = -1;
     	return fGeoVersion;
       }

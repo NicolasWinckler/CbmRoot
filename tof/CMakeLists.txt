@@ -54,10 +54,10 @@ TofDigi/CbmTofDigitizerBDF.cxx
 
 TofReco/CbmTofSimpClusterizer.cxx 
 
-TofReco/CbmTofTestBeamClusterizer.cxx 
+#TofReco/CbmTofTestBeamClusterizer.cxx 
 
 TofTests/CbmTofTests.cxx 
-TofTests/CbmTofAnaTestbeam.cxx 
+#TofTests/CbmTofAnaTestbeam.cxx 
 )
 
 set(LINKDEF TofLinkDef.h)

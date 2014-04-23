@@ -20,6 +20,7 @@
 #include "TBox.h"
 #include "TPaveText.h"
 #include "TColor.h"
+#include "TFile.h"
 #include <iostream>
 #include <cmath>
 
@@ -450,6 +451,15 @@ void CbmTrdOccupancyQa::CopyEvent2MemoryMap()
 
 void CbmTrdOccupancyQa::CreateLayerView()
 {
+  TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  newpath.ReplaceAll("eds","oc_qa");
+  newpath.ReplaceAll(":/","");
+
+  TFile *tempFile = new TFile(newpath,"recreate");
+  gDirectory = tempFile->CurrentDirectory();
+  gDirectory->pwd();
   cout << "CreateLayerView" << endl;
   Bool_t debug = false;
   TString title;
@@ -616,11 +626,25 @@ void CbmTrdOccupancyQa::CreateLayerView()
   c->SaveAs(title);
   gDirectory->Cd("..");
   c->Close();
+
+  tempFile->Close();
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
 }
 void CbmTrdOccupancyQa::SetNeighbourReadout(Bool_t neighbourReadout){fNeigbourReadout=neighbourReadout;}
 void CbmTrdOccupancyQa::SetTriggerThreshold(Double_t triggerthreshold){fTriggerThreshold=triggerthreshold;}
 void CbmTrdOccupancyQa::SaveHistos2File()
 {
+  TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  newpath.ReplaceAll("eds","oc_qa");
+  newpath.ReplaceAll(":/","");
+
+  TFile *tempFile = new TFile(newpath,"recreate");
+  gDirectory = tempFile->CurrentDirectory();
+  gDirectory->pwd();
+
   cout << "SaveHistos2File" << endl;
   TString title;
   /*
@@ -661,5 +685,9 @@ void CbmTrdOccupancyQa::SaveHistos2File()
   gDirectory->Cd("..");
   gDirectory->Cd("..");
   //outFile->Close();
+
+  tempFile->Close();
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
 }
 ClassImp(CbmTrdOccupancyQa)

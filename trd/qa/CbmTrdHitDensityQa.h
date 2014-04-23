@@ -52,6 +52,8 @@ class CbmTrdHitDensityQa : public FairTask
   void Register();
   void SetTriggerThreshold(Double_t triggerthreshold);
   void SetNeighbourTrigger(Bool_t trigger);
+  void SetPlotResults(Bool_t plotResults);
+  void SetScaleCentral2mBias(Double_t scaling);
 
  private:
 
@@ -79,6 +81,8 @@ class CbmTrdHitDensityQa : public FairTask
 
   Double_t fTriggerThreshold;
   Double_t fEventRate;
+  Double_t fScaleCentral2mBias;
+
   std::map<Int_t, Int_t> fUsedDigiMap;
   std::map<Int_t, TH2I*> fModuleHitMap;
   std::map<Int_t, TH2I*>::iterator fModuleHitMapIt;

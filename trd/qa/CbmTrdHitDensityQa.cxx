@@ -69,6 +69,7 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    fEventCounter(NULL),
    fTriggerThreshold(1e-6),
    fEventRate(1e7),
+   fScaleCentral2mBias(1./4.),
    fUsedDigiMap(),
    fModuleHitMap(),
    fModuleHitMapIt(),
@@ -139,7 +140,7 @@ InitStatus CbmTrdHitDensityQa::Init()
   TString newpath = origpath;
   TFile *results = NULL;
   results->Open("data/result.root","read");
-  */
+  *//*
   if (gSystem->AccessPathName("/data/result.root")){//results->IsOpen()){
     //gDirectory = results.CurrentDirectory();
     //gDirectory->pwd();
@@ -148,6 +149,7 @@ InitStatus CbmTrdHitDensityQa::Init()
   } else {
     fPlotResults = false;
   }
+    */
   //gDirectory->Cd(origpath);
   //gDirectory->pwd();
   // Extract information about the number of TRD stations and
@@ -168,7 +170,12 @@ InitStatus CbmTrdHitDensityQa::Init()
   return kSUCCESS;
   
 }
-
+void CbmTrdHitDensityQa::SetScaleCentral2mBias(Double_t scaling){
+  fScaleCentral2mBias = scaling;
+}
+void CbmTrdHitDensityQa::SetPlotResults(Bool_t plotResults){
+  fPlotResults = plotResults;
+}
 void CbmTrdHitDensityQa::SetNeighbourTrigger(Bool_t trigger){
   fNeighbourTrigger = trigger;
 }
@@ -331,7 +338,7 @@ void CbmTrdHitDensityQa::Finish()
   myfile << "#" << endl;
   myfile << "#" << endl;
   myfile << "#--------------------------" << endl;
-  Double_t min(1), max(/*(Double_t)fEventCounter->GetEntries()/10.*/fEventRate);
+  Double_t min(1E3), max(max = 6E5);
   if (fPlotResults) {min = 1E3; max = 6E5;}
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
@@ -461,13 +468,19 @@ void CbmTrdHitDensityQa::Finish()
 	    local_min[i] *= 10.;
 	    local_max[i] *= 10.;
 	  }
-	  Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;
+	  Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;// * 
 	  ratePerModule += rate;
+	  Int_t AsicAddress = fModuleInfo->GetAsicAddress(channelAddress);
+	  ratePerAsicMap[AsicAddress] += rate;
+	  if (AsicAddress < 0) 
+	    LOG(ERROR) << "CbmTrdHitRateFastQa::ScanModulePlane: Channel address:" << channelAddress << " is not initialized in module " << moduleAddress << "(s:" << s << ", r:" << r << ", c:" << c << ")" << FairLogger::endl;
+
 	  pad = new TBox(local_min[0], local_min[1], local_max[0], local_max[1]);
 	  //printf("    %i %i %i  (%f, %f)   (%f, %f)   %f\n",s,r,c,local_min[0],local_min[1],global_min[0],global_min[1],rate);
 	  pad->SetLineColor(0);
 	  pad->SetLineWidth(0);	
 	  Int_t color(0), j(0);
+	  rate *= fScaleCentral2mBias;
 	  //if (rate > min && rate <= max){
 	  while ((rate > fZLevel[j]) && (j < (Int_t)fZLevel.size())){
 	    //printf ("              %i<%i %i    %E <= %E\n",j,(Int_t)fZLevel.size(),fColors[j], rate, fZLevel[j]);
@@ -483,11 +496,7 @@ void CbmTrdHitDensityQa::Finish()
 	  LayerMap[LayerId]->cd();
 	  pad->Draw("same");
 
-	  Int_t AsicAddress = fModuleInfo->GetAsicAddress(channelAddress);
-	  ratePerAsicMap[AsicAddress] += rate;
-	  if (AsicAddress < 0) 
-	    LOG(ERROR) << "CbmTrdHitRateFastQa::ScanModulePlane: Channel address:" << channelAddress << " is not initialized in module " << moduleAddress << "(s:" << s << ", r:" << r << ", c:" << c << ")" << FairLogger::endl;
-
+	 
 	}
 	global_Row++;
       }

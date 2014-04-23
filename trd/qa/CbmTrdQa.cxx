@@ -25,6 +25,7 @@
 #include "TPaveText.h"
 #include "TColor.h"
 #include "TPolyLine.h"
+#include "TFile.h"
 #include <iostream>
 #include <cmath>
 
@@ -1359,6 +1360,15 @@ void CbmTrdQa::SetTriangularPads(Bool_t triangles)
 
 void CbmTrdQa::SaveHistos()
 {
+  TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  newpath.ReplaceAll("eds","trd_qa");
+  newpath.ReplaceAll(":/","");
+  TFile *tempFile = new TFile(newpath,"recreate");
+  gDirectory = tempFile->CurrentDirectory();
+  gDirectory->pwd();
+
   TString title;
   title.Form("_TH_%.2EGeV_",fTriggerThreshold);
   gDirectory->pwd();
@@ -1553,6 +1563,9 @@ void CbmTrdQa::SaveHistos()
   c->SetLogz(0);
   delete l;
   gDirectory->Cd("..");
+  tempFile->Close();
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
 }
 void CbmTrdQa::FinishEvent()
 { 
@@ -1636,6 +1649,14 @@ void CbmTrdQa::FinishEvent()
     }
   }
 void CbmTrdQa::CreateLayerView(std::map<Int_t, TH1*>& Map, TString folder, TString pics, TString zAxisTitle, Double_t fmax, Double_t fmin, Bool_t logScale){
+TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  newpath.ReplaceAll("eds","trd_qa");
+  newpath.ReplaceAll(":/","");
+  TFile *tempFile = new TFile(newpath,"recreate");
+  gDirectory = tempFile->CurrentDirectory();
+  gDirectory->pwd();
   TString title(""), name("");
   name.Form("_TH_%.2EGeV_",fTriggerThreshold);
   TPaveText *text=NULL;
@@ -1702,10 +1723,22 @@ void CbmTrdQa::CreateLayerView(std::map<Int_t, TH1*>& Map, TString folder, TStri
     MapIt->second->Write("", TObject::kOverwrite);
   }
   gDirectory->Cd("..");
+
+  tempFile->Close();
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
 }
 
 void CbmTrdQa::CreateLayerView()
 {
+  TString origpath = gDirectory->GetPath();
+  printf ("\n%s\n",origpath.Data());
+  TString newpath = origpath;
+  newpath.ReplaceAll("eds","trd_qa");
+  newpath.ReplaceAll(":/","");
+  TFile *tempFile = new TFile(newpath,"recreate");
+  gDirectory = tempFile->CurrentDirectory();
+  gDirectory->pwd();
   TString title(""), name("");
   TPaveText *text =NULL;
   {
@@ -2492,6 +2525,10 @@ void CbmTrdQa::CreateLayerView()
   }
   gDirectory->Cd("..");
   gDirectory->Cd("..");
+
+  tempFile->Close();
+  gDirectory->Cd(origpath);
+  gDirectory->pwd();
 
 }
 Double_t CbmTrdQa::CalcAngle(const CbmTrdPoint* pointA, const CbmTrdPoint* pointB){

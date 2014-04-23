@@ -34,6 +34,8 @@ private:
 
    CbmTrdDigiPar* fDigiPar;
 
+   Int_t fRecoTriangular;
+
    CbmTrdHitProducerCluster(const CbmTrdHitProducerCluster&);
    CbmTrdHitProducerCluster& operator=(const CbmTrdHitProducerCluster&);
 

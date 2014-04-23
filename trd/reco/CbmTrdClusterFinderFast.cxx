@@ -442,36 +442,19 @@ void CbmTrdClusterFinderFast::addNeighbourDigisTriangular(Int_t nCol, ClusterLis
       activeCombiId = (*i)->combiId;
       activeRow = (*i)->rowId;
       activeCol = (*i)->colId;
-      firstCol = activeCol-1;
-      lastCol = activeCol+1;
+      
       if (activeRow%2 == 0){
 	firstRow = activeRow;
-	lastRow = activeRow+1;
+	lastRow  = activeRow+1;
+	firstCol = activeCol-1;
+	lastCol  = activeCol+2;
       } else {
 	firstRow = activeRow-1;
-	lastRow = activeRow;
+	lastRow  = activeRow;
+	firstCol = activeCol-2;
+	lastCol  = activeCol+1;
       }
-      /*
-	if(fNeighbourRowTrigger){
-	lastRow = activeRow+1;
-	if (activeCol > 0)
-	firstCol = activeCol-1;
-	else 
-	firstCol = 0;
-	if (activeRow > 0)
-	firstRow = activeRow-1;
-	else
-	firstRow = 0;
-	} else {
-	firstRow = activeRow;
-	lastRow = activeRow;
-	if (activeCol > 0)
-	firstCol = activeCol-1;
-	else 
-	firstCol = 0;
-	}
-      */
-    
+   
       /*
        * walk around the active digi and test if neigbours are already included in second list. second list is used to avoid neighbours of neighbours to be included
        */

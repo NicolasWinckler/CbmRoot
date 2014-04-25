@@ -102,7 +102,7 @@ void run_reco_maf(Int_t nEvents = 1, Int_t urqmd = 0000)
   // =========================================================================
   // ===                     TRD local reconstruction                      ===
   // =========================================================================
-
+  /*
   // Update of the values for the radiator F.U. 17.08.07
   Int_t   trdNFoils = 130;    // number of polyethylene foils
   Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
@@ -132,10 +132,10 @@ void run_reco_maf(Int_t nEvents = 1, Int_t urqmd = 0000)
   //Double_t triggerThreshold = 3.0e-7;//0.5cm homogeniuse pad height
   //CbmTrdDigitizer* trdDigi = new CbmTrdDigitizer(radiator);
   //run->AddTask(trdDigi);
-  /*
-    CbmTrdHitProducerDigi* trdHit = new CbmTrdHitProducerDigi();
-    run->AddTask(trdHit);
-  */
+  
+  CbmTrdHitProducerDigi* trdHit = new CbmTrdHitProducerDigi();
+  run->AddTask(trdHit);
+  
   CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
   trdDigiPrf->SetTriangularPads(triangularPads);
   run->AddTask(trdDigiPrf);
@@ -152,27 +152,84 @@ void run_reco_maf(Int_t nEvents = 1, Int_t urqmd = 0000)
   trdHit->SetTriangularPads(triangularPads);
   run->AddTask(trdHit);
   if (false && nEvents == 1){
+  CbmTrdHitRateFastQa* hitrate = new CbmTrdHitRateFastQa();
+  run->AddTask(hitrate);
+  } else if (nEvents == 1){
+  CbmTrdRecoQa* trdrecoqa = new CbmTrdRecoQa("CbmTrdRecoQa","CbmTrdRecoQa");
+  trdrecoqa->SetTriangularPads(triangularPads);
+  trdrecoqa->SetTriggerThreshold(triggerThreshold);//1e-6
+  run->AddTask(trdrecoqa);
+  } else {    
+    
+  CbmTrdQa* trdqa = new CbmTrdQa();
+  trdqa->SetTriggerThreshold(triggerThreshold);
+  run->AddTask(trdqa);
+    
+  CbmTrdOccupancyQa* trdocc = new CbmTrdOccupancyQa();
+  trdocc->SetNeighbourTrigger(true);
+  trdocc->SetTriggerThreshold(triggerThreshold);
+  trdocc->SetNeighbourReadout(true);
+  run->AddTask(trdocc);
+      
+  CbmTrdHitDensityQa* trdhitdens = new CbmTrdHitDensityQa();
+  trdhitdens->SetNeighbourTrigger(false);
+  run->AddTask(trdhitdens);
+      
+  }
+  */
+
+  Bool_t  simpleTR  = kTRUE; 
+  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR,"K++");
+  // -----   TRD hit producer   ----------------------------------------------
+
+  Bool_t triangularPads = false;// Bucharest triangular pad-plane layout
+  //Double_t triggerThreshold = 0.5e-6;//SIS100
+  Double_t triggerThreshold = 1.0e-6;//SIS300
+  //Double_t triggerThreshold = 3.0e-7;//0.5cm homogeniuse pad height
+  Double_t trdNoiseSigma_keV = 0.1;
+
+  CbmTrdDigitizerPRF* trdDigiPrf = new CbmTrdDigitizerPRF(radiator);
+  trdDigiPrf->SetTriangularPads(triangularPads);
+  trdDigiPrf->SetNoiseLevel(trdNoiseSigma_keV);
+  run->AddTask(trdDigiPrf);
+  
+  CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
+  trdCluster->SetNeighbourTrigger(true);
+  trdCluster->SetTriggerThreshold(triggerThreshold);
+  trdCluster->SetNeighbourRowTrigger(false);
+  trdCluster->SetPrimaryClusterRowMerger(true);
+  trdCluster->SetTriangularPads(triangularPads);
+  run->AddTask(trdCluster);
+  
+  CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
+  trdHit->SetTriangularPads(triangularPads);
+  run->AddTask(trdHit);
+  /*
+    if (false && nEvents == 1){
     CbmTrdHitRateFastQa* hitrate = new CbmTrdHitRateFastQa();
     run->AddTask(hitrate);
-  } else if (nEvents == 1){
+    } else if (nEvents == 1){
     CbmTrdRecoQa* trdrecoqa = new CbmTrdRecoQa("CbmTrdRecoQa","CbmTrdRecoQa");
     trdrecoqa->SetTriangularPads(triangularPads);
     trdrecoqa->SetTriggerThreshold(triggerThreshold);//1e-6
     run->AddTask(trdrecoqa);
-  } else {    
+    } else*/
+  {    
     /*
-      CbmTrdQa* trdqa = new CbmTrdQa();
-      trdqa->SetTriggerThreshold(triggerThreshold);
-      run->AddTask(trdqa);
-    *//*
-	CbmTrdOccupancyQa* trdocc = new CbmTrdOccupancyQa();
-	trdocc->SetNeighbourTrigger(true);
-	trdocc->SetTriggerThreshold(triggerThreshold);
-	trdocc->SetNeighbourReadout(true);
-	run->AddTask(trdocc);
-      */
+    CbmTrdQa* trdqa = new CbmTrdQa(radiator);
+    trdqa->SetTriggerThreshold(triggerThreshold);
+    run->AddTask(trdqa);
+    */
+    CbmTrdOccupancyQa* trdocc = new CbmTrdOccupancyQa();
+    trdocc->SetNeighbourTrigger(true);
+    trdocc->SetTriggerThreshold(triggerThreshold);
+    trdocc->SetNeighbourReadout(true);
+    run->AddTask(trdocc);
+    
     CbmTrdHitDensityQa* trdhitdens = new CbmTrdHitDensityQa();
     trdhitdens->SetNeighbourTrigger(false);
+    trdhitdens->SetPlotResults(false);
+    trdhitdens->SetScaleCentral2mBias(1.0);
     run->AddTask(trdhitdens);
       
   }

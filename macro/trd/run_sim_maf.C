@@ -8,7 +8,7 @@
 // 20130605 - checked by DE
 // --------------------------------------------------------------------------
 
-void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000)
+void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mbias")
 {
 
   // ========================================================================
@@ -32,7 +32,7 @@ void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000)
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   //  TString inFile  = inDir + "/input/urqmd.ftn14";
   TString fileName;
-  fileName.Form("urqmd.auau.25gev.centr.%04i.ftn14",urqmd);
+  fileName.Form("urqmd.auau.25gev.%s.%04i.ftn14",centrality.Data(),urqmd);
   TString inFile  = inDir + "/input/urqmd/" + fileName;//"/input/urqmd/urqmd.auau.25gev.centr.0000.ftn14";
   TString outDir  = "data/sim/";
   fileName.Form("test.mc.%04i.root",urqmd);

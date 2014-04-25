@@ -1,7 +1,7 @@
 #!/bin/bash
 nThreads=0
 maxThreads=0
-nEvents=500
+nEvents=1000
 cat /proc/cpuinfo | grep processor | tail -n1 | cut -c 13- > temp
 while read line 
 do
@@ -10,7 +10,7 @@ do
 done <temp
 rm temp  
  maxThreads=3
-for urqmd in {0..199}
+for urqmd in {0..399}
 do
 	nThreads=$(($nThreads+1))
 	echo "${nThreads} root -l -b -q run_reco_maf.C'('$nEvents,$urqmd')'"

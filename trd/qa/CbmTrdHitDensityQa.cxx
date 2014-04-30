@@ -338,8 +338,8 @@ void CbmTrdHitDensityQa::Finish()
   myfile << "#" << endl;
   myfile << "#" << endl;
   myfile << "#--------------------------" << endl;
-  Double_t min(1E3), max(max = 6E5);
-  if (fPlotResults) {min = 1E3; max = 6E5;}
+  Double_t min(1E3), max(max = 6E5); // Is not scaled from central to minbias
+  if (fPlotResults) {min = 1E3; max = 2.5E5;} // scaling parameter is applied
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){

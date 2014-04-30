@@ -550,7 +550,10 @@ void CbmTrdHitDensityQa::Finish()
     LayerMapIt->second->Write("", TObject::kOverwrite);
     fStation =  LayerMapIt->first / 4 + 1;  // OK for SIS100 and SIS300
     fLayer   =  LayerMapIt->first % 4 + 1;  // 
-    name.Form("pics/CbmTrdHitDensityQa_S%i_L%i.png",fStation,fLayer);
+    if (fPlotResults)
+      name.Form("pics/CbmTrdHitDensityQaFinal_S%i_L%i.png",fStation,fLayer);
+    else
+      name.Form("pics/CbmTrdHitDensityQa_S%i_L%i.png",fStation,fLayer);
     LayerMapIt->second->SaveAs(name);
     name.ReplaceAll("png","pdf");
     LayerMapIt->second->SaveAs(name);

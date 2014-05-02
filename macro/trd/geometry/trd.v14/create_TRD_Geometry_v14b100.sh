@@ -1,9 +1,9 @@
 #
 # create TRD geometry from patch file
 #
-SOURCE=Create_TRD_Geometry_v14a300.C
-TARGET=Create_TRD_Geometry_v14a100.C
-PATCH=a3toa1.patch
+SOURCE=Create_TRD_Geometry_v14b300.C
+TARGET=Create_TRD_Geometry_v14b100.C
+PATCH=b3tob1.patch
 #
 echo
 echo cp $SOURCE $TARGET

@@ -1,10 +1,10 @@
-*** Create_TRD_Geometry_v14a300.C	2013-12-09 14:40:51.923076768 +0100
---- Create_TRD_Geometry_v14a100.C	2013-12-09 14:43:07.703925258 +0100
+*** Create_TRD_Geometry_v14b300.C	2013-12-09 14:40:51.923076768 +0100
+--- Create_TRD_Geometry_v14b100.C	2013-12-09 14:43:07.703925258 +0100
 ***************
 *** 74,81 ****
   
   // Name of output file with geometry
-  const TString tagVersion   = "v14a";
+  const TString tagVersion   = "v14b";
 ! //const TString geoVersion   = "trd_" + tagVersion + "100";
 ! const TString geoVersion   = "trd_" + tagVersion + "300";
   //
@@ -13,7 +13,7 @@
 --- 74,81 ----
   
   // Name of output file with geometry
-  const TString tagVersion   = "v14a";
+  const TString tagVersion   = "v14b";
 ! const TString geoVersion   = "trd_" + tagVersion + "100";
 ! //const TString geoVersion   = "trd_" + tagVersion + "300";
   //
@@ -45,7 +45,7 @@
   void dump_digi_file();
   
   
-! void Create_TRD_Geometry_v14a300() {
+! void Create_TRD_Geometry_v14b300() {
     // Load the necessary FairRoot libraries 
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
     basiclibs();
@@ -53,7 +53,7 @@
   void dump_digi_file();
   
   
-! void Create_TRD_Geometry_v14a100() {
+! void Create_TRD_Geometry_v14b100() {
     // Load the necessary FairRoot libraries 
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
     basiclibs();

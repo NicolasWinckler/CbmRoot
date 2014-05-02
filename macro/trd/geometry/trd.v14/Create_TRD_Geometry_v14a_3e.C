@@ -3,6 +3,10 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
+// 2014-05-02 - DE - v14a_3e - redesign inner part of station 3, now with 16x module type 2 instead of 8x module type 5
+// 2014-05-02 - DE - v14a_3e - include optional GBTX readout boards on each module
+// 2014-05-02 - DE - v14a_3e - introduce 3x5=15 Spadic FEBs for ultimate density on module type 1
+//
 // 2013-11-04 - DE - v13p4 - adapt the number of front-end boards to the pad layout of the 540 mm modules
 // 2013-11-04 - DE - v13p4 - use 8 module types (4x S + 4x L) to better match the occupancy
 // 2013-10-31 - DE - v13p4 - modify the support structure of station 1 to match with the MUCH/RICH platform
@@ -71,7 +75,7 @@
 #include <iostream>
 
 // Name of output file with geometry
-const TString geoVersion   = "trd_v13u4";
+const TString geoVersion   = "trd_v14a_3e";
 const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
@@ -80,7 +84,7 @@ const TString FileNameInfo = geoVersion + ".geo.info";
 const Bool_t IncludeRadiator    = true;  // false;  // true, if radiator is included in geometry
 const Bool_t IncludeLattice     = true;  // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeFebs        = true;  // false;  // true, if FEBs are included in geometry
-const Bool_t IncludeRobs        = true;  // false;  // true, if ROBs are included in geometry
+const Bool_t IncludeRobs        = false; // false;  // true, if ROBs are included in geometry
 const Bool_t IncludeAsics       = true;  // false;  // true, if ASICs are included in geometry
 const Bool_t IncludeSupports    = true;  // false;  // true, if support structure is included in geometry
 const Bool_t IncludeLabels      = true;  // false;  // true, if TRD (I, II, III) labels are plotted in (VisLevel 5)
@@ -214,6 +218,35 @@ const Int_t layer2o[9][11]= { {   0,    0,    0,    0,    0,    0,    0,    0,  
 
 // ### Layer Type 3
 // v12x - module types in the inner sector of layer2 - looking upstream
+//const Int_t layer3i[5][5] = { { 223,  223,  221,  221,  221 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+//                              { 223,    0,    0,    0,  221 },
+//                              { 203,    0,    0,    0,  201 },
+//                              { 203,    0,    0,    0,  201 },
+//                              { 203,  203,  201,  201,  201 } };
+const Int_t layer3i[5][5] = { { 223,  223,  221,  221,  221 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+                              { 223,  123,  121,  121,  221 },
+                              { 203,  103,    0,  101,  201 },
+                              { 203,  103,  101,  101,  201 },
+                              { 203,  203,  201,  201,  201 } };
+// number of modules 25x0 
+// needed only for convenience in the function
+
+// v12x - module types in the outer sector of layer3 - looking upstream
+const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821,  821,  821,  821 },
+                               { 823,  823,  823,  723,  723,  721,  721,  721,  821,  821,  821 },
+                               { 823,  823,  723,  723,  623,  621,  621,  721,  721,  821,  821 },
+                               { 823,  823,  723,  623,    0,    0,    0,  621,  721,  821,  821 },
+                               { 803,  803,  703,  603,    0,    0,    0,  601,  701,  801,  801 },
+                               { 803,  803,  703,  603,    0,    0,    0,  601,  701,  801,  801 },
+                               { 803,  803,  703,  703,  603,  601,  601,  701,  701,  801,  801 },
+                               { 803,  803,  803,  703,  703,  701,  701,  701,  801,  801,  801 },
+                               { 803,  803,  803,  803,  803,  801,  801,  801,  801,  801,  801 } };
+// number of modules 1x0, 8x5, 12x6, 24x7, 54x8
+// Layer3 = 98;   // v12x
+
+/* only L type modules
+// ### Layer Type 3
+// v12x - module types in the inner sector of layer2 - looking upstream
 const Int_t layer3i[5][5] = { {  0,  0,  0,  0,  0 },     // abc: a module type - b orientation (x90 deg) in odd - c even layers
                               {  0,  0,  0,  0,  0 },
                               {  0,  0,  0,  0,  0 },
@@ -234,6 +267,7 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
                                { 803,  803,  803,  803,  803,  801,  801,  801,  801,  801,  801 } };
 // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
 // Layer3 = 98;   // v12x
+*/
 
 // ### Layer Type 31 is Layer Type 3 with detector modules rotated by 90
 // In the subroutine creating the layers this is recognized automatically 
@@ -376,7 +410,7 @@ void create_mag_field_vector();
 void dump_info_file();
 
 
-void Create_TRD_Geometry_v13u4() {
+void Create_TRD_Geometry_v14a_3e() {
   // Load the necessary FairRoot libraries 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -683,6 +717,11 @@ void dump_info_file()
     if ((AsicsPerFeb[iModule] %100) == 16)
     {
       channels_per_feb[iModule] =  80 * 6;   // rows  // 84, if 63 of 64 ch used
+      channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
+    }
+    if ((AsicsPerFeb[iModule] %100) == 15)
+    {
+      channels_per_feb[iModule] =  80 * 6;   // rows
       channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
     }
     if ((AsicsPerFeb[iModule] %100) == 10)
@@ -1489,10 +1528,10 @@ void create_detector_layers(Int_t layerId)
   TGeoVolume* layer = new TGeoVolumeAssembly(layername);
 
   // compute layer copy number
-  Int_t i = LayerType[layerId] / 10   * 10000   // 1 digit 
+  Int_t i = LayerType[layerId] / 10   * 10000   // 1 digit  // fStation
           + LayerType[layerId] % 10   *  1000   // 1 digit  // isRotated
-          + LayerNrInStation[layerId] *   100   // 1 digit
-          + PlaneId[layerId];                   // 2 digits // layer type as leading digit in copy number of layer
+          + LayerNrInStation[layerId] *   100   // 1 digit  // fLayer
+          + PlaneId[layerId];                   // 2 digits // fPlane   // layer type as leading digit in copy number of layer
   gGeoMan->GetVolume(geoVersion)->AddNode(layer, i);
 
 //  Int_t i = 100 + PlaneId[layerId];
@@ -1547,8 +1586,8 @@ void create_detector_layers(Int_t layerId)
 	  }
           else  // layer 2,4 ...
 	  {
-   	    module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
             copy = copy_nr(stationNr, copyNrIn[type - 1], module_id %10    , PlaneId[layerId], modId);
+   	    module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
 	  }
 
           // rotation

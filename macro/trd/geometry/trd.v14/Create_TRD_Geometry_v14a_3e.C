@@ -516,6 +516,10 @@ void dump_info_file()
   Int_t    total_asics[NofModuleTypes+1]         = { 0 };   // total number of asics
   Int_t    total_channels[NofModuleTypes+1]      = { 0 };   // total number of channels
 
+  Int_t    total_channels_u = 0;  // total number of ultimate channels
+  Int_t    total_channels_s = 0;  // total number of super    channels
+  Int_t    total_channels_r = 0;  // total number of regular  channels
+
   printf("writing info file: %s\n", FileNameInfo.Data());
 
   FILE *ifile;
@@ -606,6 +610,10 @@ void dump_info_file()
   // flags
   fprintf(ifile,"# flags\n");
 
+  fprintf(ifile,"support structure is    : ");
+  if (!IncludeSupports) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
   fprintf(ifile,"radiator is             : ");
   if (!IncludeRadiator) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
@@ -614,16 +622,16 @@ void dump_info_file()
   if (!IncludeLattice ) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
 
-  fprintf(ifile,"front-end boards are    : ");
-  if (!IncludeFebs    ) fprintf(ifile,"NOT ");
-  fprintf(ifile,"included\n");
-
   fprintf(ifile,"asics are               : ");
   if (!IncludeAsics   ) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
 
-  fprintf(ifile,"support structure is    : ");
-  if (!IncludeSupports) fprintf(ifile,"NOT ");
+  fprintf(ifile,"front-end boards are    : ");
+  if (!IncludeFebs    ) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"GBTX readout boards are : ");
+  if (!IncludeRobs    ) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
 
   fprintf(ifile,"\n");
@@ -635,48 +643,107 @@ void dump_info_file()
   fprintf(ifile,"# modules\n");
 
   for (Int_t iModule = 1; iModule <= NofModuleTypes; iModule++)
-    fprintf(ifile,"   mod%1d", iModule);
-  fprintf(ifile,"  total");
+    fprintf(ifile,"     mod%1d", iModule);
+  fprintf(ifile,"    total");
 
-  fprintf(ifile,"\n---------------------------------------------------------------\n");
+  fprintf(ifile,"\n---------------------------------------------------------------------------------\n");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
     {
       for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
       {
-        fprintf(ifile," %6d", ModuleStats[iLayer][iModule]);
+        fprintf(ifile," %8d", ModuleStats[iLayer][iModule]);
         total_modules[iModule] += ModuleStats[iLayer][iModule];  // sum up modules across layers
       }
-      fprintf(ifile,"          layer %2d\n", PlaneId[iLayer]);
+      fprintf(ifile,"            layer %2d\n", PlaneId[iLayer]);
     }
-  fprintf(ifile,"---------------------------------------------------------------\n");
+  fprintf(ifile,"\n---------------------------------------------------------------------------------\n");
 
   // total statistics
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", total_modules[iModule]);
+    fprintf(ifile," %8d", total_modules[iModule]);
     total_modules[NofModuleTypes] += total_modules[iModule];
   }
-  fprintf(ifile," %6d", total_modules[NofModuleTypes]);
+  fprintf(ifile," %8d", total_modules[NofModuleTypes]);
   fprintf(ifile,"   number of modules\n");
 
   // number of FEBs
   //  fprintf(ifile,"\n#\n##   febs\n#\n\n");
   fprintf(ifile,"# febs\n");
 
+  fprintf(ifile," ");
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", FebsPerModule[iModule]);
+    if ((AsicsPerFeb[iModule] / 100) == 3)
+      fprintf(ifile,"%8du", FebsPerModule[iModule]);
+    else if ((AsicsPerFeb[iModule] / 100) == 2)
+      fprintf(ifile,"%8ds", FebsPerModule[iModule]);
+    else 
+      fprintf(ifile,"%8d ", FebsPerModule[iModule]);
   }
-  fprintf(ifile,"          FEBs per module\n");
+  fprintf(ifile,"           FEBs per module\n");
 
+  // FEB total per type
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
+  fprintf(ifile," ");
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] / 100) == 3)
+    {
+      total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+      fprintf(ifile,"%8du", total_febs[iModule]);
+      total_febs[NofModuleTypes] += total_febs[iModule];
+    }
+    else
+      fprintf(ifile,"         ");
+  }
+  fprintf(ifile,"%8d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   ultimate  FEBs\n");
+
+  // FEB total per type
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
+  fprintf(ifile," ");
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] / 100) == 2)
+    {
+      total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+      fprintf(ifile,"%8ds", total_febs[iModule]);
+      total_febs[NofModuleTypes] += total_febs[iModule];
+    }
+    else
+      fprintf(ifile,"         ");
+  }
+  fprintf(ifile,"%8d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   super     FEBs\n");
+
+  // FEB total per type
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
+  fprintf(ifile," ");
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] / 100) == 1)
+    {
+      total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+      fprintf(ifile,"%8d ", total_febs[iModule]);
+      total_febs[NofModuleTypes] += total_febs[iModule];
+    }
+    else
+      fprintf(ifile,"         ");
+  }
+  fprintf(ifile,"%8d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   regular   FEBs\n");
+
+  // FEB total over all types
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
-    fprintf(ifile," %6d", total_febs[iModule]);
+    fprintf(ifile," %8d", total_febs[iModule]);
     total_febs[NofModuleTypes] += total_febs[iModule];
   }
-  fprintf(ifile," %6d", total_febs[NofModuleTypes]);
+  fprintf(ifile," %8d", total_febs[NofModuleTypes]);
   fprintf(ifile,"   number of FEBs\n");
 
 
@@ -686,26 +753,26 @@ void dump_info_file()
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", AsicsPerFeb[iModule] %100);
+    fprintf(ifile," %8d", AsicsPerFeb[iModule] %100);
   }
-  fprintf(ifile,"          ASICs per FEB\n");
+  fprintf(ifile,"            ASICs per FEB\n");
 
   // ASICs per module
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     asics_per_module[iModule] = FebsPerModule[iModule] * (AsicsPerFeb[iModule] %100);
-    fprintf(ifile," %6d", asics_per_module[iModule]);
+    fprintf(ifile," %8d", asics_per_module[iModule]);
   }
-  fprintf(ifile,"          ASICs per module\n");
+  fprintf(ifile,"            ASICs per module\n");
 
   // ASICs per module type
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_asics[iModule] = total_febs[iModule] * (AsicsPerFeb[iModule] %100);
-    fprintf(ifile," %6d", total_asics[iModule]);
+    fprintf(ifile," %8d", total_asics[iModule]);
     total_asics[NofModuleTypes] += total_asics[iModule];
   }
-  fprintf(ifile," %6d", total_asics[NofModuleTypes]);
+  fprintf(ifile," %8d", total_asics[NofModuleTypes]);
   fprintf(ifile,"   number of ASICs\n");
 
   // number of channels
@@ -743,34 +810,55 @@ void dump_info_file()
   }
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
-    fprintf(ifile," %6d", channels_per_module[iModule]);
-  fprintf(ifile,"          channels per module\n");
+    fprintf(ifile," %8d", channels_per_module[iModule]);
+  fprintf(ifile,"            channels per module\n");
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
-    fprintf(ifile," %6d", channels_per_feb[iModule]);
-  fprintf(ifile,"          channels per feb\n");
+    fprintf(ifile," %8d", channels_per_feb[iModule]);
+  fprintf(ifile,"            channels per feb\n");
 
   // channels used
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_channels[iModule] = channels_per_module[iModule] * total_modules[iModule]; 
-    fprintf(ifile," %6d", total_channels[iModule]);
+    fprintf(ifile," %8d", total_channels[iModule]);
     total_channels[NofModuleTypes] += total_channels[iModule];
   }
-  fprintf(ifile," %6d", total_channels[NofModuleTypes]);
+  fprintf(ifile," %8d", total_channels[NofModuleTypes]);
   fprintf(ifile,"   channels used\n");
 
   // channels available
+  fprintf(ifile," ");
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", total_asics[iModule] * 32);
+    if ((AsicsPerFeb[iModule] / 100) == 3)
+    {
+      fprintf(ifile,"%8du", total_asics[iModule] * 32);
+      total_channels_u += total_asics[iModule] * 32;
+    }
+    else if ((AsicsPerFeb[iModule] / 100) == 2)
+    {
+      fprintf(ifile,"%8ds", total_asics[iModule] * 32);
+      total_channels_s += total_asics[iModule] * 32;
+    }
+    else 
+    {
+      fprintf(ifile,"%8d ", total_asics[iModule] * 32);
+      total_channels_r += total_asics[iModule] * 32;
+    }
   }
-  fprintf(ifile," %6d", total_asics[NofModuleTypes] * 32);
+  fprintf(ifile,"%8d", total_asics[NofModuleTypes] * 32);
   fprintf(ifile,"   channels available\n");
-  fprintf(ifile,"\n");
 
-  // channel efficiency
-  fprintf(ifile,"%6.1f%%   channel efficiency\n", 1. * total_channels[NofModuleTypes] / (total_asics[NofModuleTypes] * 32) * 100);
+  // channel ratio for u,s,r density
+  fprintf(ifile," ");
+  fprintf(ifile,"%7.1f%%u", (float)total_channels_u / (total_asics[NofModuleTypes] * 32) * 100);
+  fprintf(ifile,"%7.1f%%s", (float)total_channels_s / (total_asics[NofModuleTypes] * 32) * 100);
+  fprintf(ifile,"%7.1f%%r", (float)total_channels_r / (total_asics[NofModuleTypes] * 32) * 100);
+  fprintf(ifile,"                                                        channel ratio\n");
+
+  fprintf(ifile,"\n");
+  fprintf(ifile,"%8.1f%%   channel efficiency\n", 1. * total_channels[NofModuleTypes] / (total_asics[NofModuleTypes] * 32) * 100);
 
   // total surface of TRD
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
@@ -789,6 +877,7 @@ void dump_info_file()
   // summary
   fprintf(ifile,"%7.2f m2      total surface    \n", total_surface);
   fprintf(ifile,"%7.2f m2      total active area\n", total_actarea);
+  fprintf(ifile,"%7.2f m3      total gas volume \n", total_actarea * gas_thickness / 100);  // convert cm to m for thickness
 
   fprintf(ifile,"%7.2f cm2/ch  average channel size\n", 100. * 100 * total_actarea / total_channels[NofModuleTypes]);
   fprintf(ifile,"%7.2f ch/m2   channels per m2 active area\n", 1. * total_channels[NofModuleTypes] / total_actarea);

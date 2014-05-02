@@ -54,46 +54,53 @@
   415 cm   z-position of layer 10
 
 # flags
+support structure is    : included
 radiator is             : included
 lattice grid is         : included
-front-end boards are    : included
 asics are               : included
-support structure is    : included
+front-end boards are    : included
+GBTX readout boards are : NOT included
 
 # modules
-   mod1   mod2   mod3   mod4   mod5   mod6   mod7   mod8  total
----------------------------------------------------------------
-      8      2      6      8      0      2     10     14          layer  1
-      8      2      6      8      0      2     10     14          layer  2
-      8      2      6      8      0      2     10     14          layer  3
-      8      2      6      8      0      2     10     14          layer  4
-      4      6      6      8      0     12      0     42          layer  5
-      4      6      6      8      0     12      0     42          layer  6
-      4      6      6      8      0     12      0     42          layer  7
-      4      6      6      8      0     12      0     42          layer  8
-      0      0      0      0      8     12     24     54          layer  9
-      0      0      0      0      8     12     24     54          layer 10
----------------------------------------------------------------
-     48     32     48     64     16     80     88    332    708   number of modules
+     mod1     mod2     mod3     mod4     mod5     mod6     mod7     mod8    total
+---------------------------------------------------------------------------------
+        8        2        6        8        0        2       10       14            layer  1
+        8        2        6        8        0        2       10       14            layer  2
+        8        2        6        8        0        2       10       14            layer  3
+        8        2        6        8        0        2       10       14            layer  4
+        4        6        6        8        0       12        0       42            layer  5
+        4        6        6        8        0       12        0       42            layer  6
+        4        6        6        8        0       12        0       42            layer  7
+        4        6        6        8        0       12        0       42            layer  8
+        8       16        0        0        0       12       24       54            layer  9
+        8       16        0        0        0       12       24       54            layer 10
+
+---------------------------------------------------------------------------------
+       64       64       48       64        0       80       88      332      740   number of modules
 # febs
-      9      5      6      4     12      6      4      3          FEBs per module
-    432    160    288    256    192    480    352    996   3156   number of FEBs
+        6u       5s       6        4       12        6        4        3            FEBs per module
+      384u                                                                    384   ultimate  FEBs
+               320s                                                           320   super     FEBs
+                        288      256        0      480      352      996     2372   regular   FEBs
+      384      320      288      256        0      480      352      996     3076   number of FEBs
 # asics
-     10     10      5      5      8      8      8      8          ASICs per FEB
-     90     50     30     20     96     48     32     24          ASICs per module
-   4320   1600   1440   1280   1536   3840   2816   7968  24800   number of ASICs
+       15       10        5        5        8        8        8        8            ASICs per FEB
+       90       50       30       20       96       48       32       24            ASICs per module
+     5760     3200     1440     1280        0     3840     2816     7968    26304   number of ASICs
 # channels
-   2880   1600    960    640   3072   1536   1024    768          channels per module
-    320    320    160    160    256    256    256    256          channels per feb
- 138240  51200  46080  40960  49152 122880  90112 254976 793600   channels used
- 138240  51200  46080  40960  49152 122880  90112 254976 793600   channels available
+     2880     1600      960      640     3072     1536     1024      768            channels per module
+      480      320      160      160      256      256      256      256            channels per feb
+   184320   102400    46080    40960        0   122880    90112   254976   841728   channels used
+   184320u  102400s   46080    40960        0   122880    90112   254976   841728   channels available
+    21.9%u   12.2%s   65.9%r                                                        channel ratio
 
- 100.0%   channel efficiency
+   100.0%   channel efficiency
 
- 528.07 m2      total surface    
- 505.43 m2      total active area
-   6.37 cm2/ch  average channel size
-1570.15 ch/m2   channels per m2 active area
+ 529.23 m2      total surface    
+ 506.38 m2      total active area
+   6.08 m3      total gas volume 
+   6.02 cm2/ch  average channel size
+1662.26 ch/m2   channels per m2 active area
 
 # gas volume position
    31.6000 cm   position of gas volume - layer  1

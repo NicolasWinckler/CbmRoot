@@ -3,8 +3,14 @@
 /// \brief Generates TRD geometry in Root format.
 ///                                             
 
-// 2013-12-06 - DE - v14b300 - build trd in local coordinate system with front face at z=0.0mm
-// 2013-11-14 - DE - v13q4 - include information about pad plane layout of all module types in this macro
+// 2014-05-02 - DE - v14b300 - build trd in local coordinate system with front face at z=0.0mm
+//
+// 2014-05-02 - DE - v14a_3e - redesign inner part of station 3, now with 16x module type 2 instead of 8x module type 5
+// 2014-05-02 - DE - v14a_3e - include optional GBTX readout boards on each module
+// 2014-05-02 - DE - v14a_3e - introduce 3x5=15 Spadic FEBs for ultimate density on module type 1
+//
+// 2013-11-14 - DE - v13q_3e - generate information about pad plane layout (CbmTrdPads_v14a.h) for all module types in this macro
+//
 // 2013-11-04 - DE - v13p4 - adapt the number of front-end boards to the pad layout of the 540 mm modules
 // 2013-11-04 - DE - v13p4 - use 8 module types (4x S + 4x L) to better match the occupancy
 // 2013-10-31 - DE - v13p4 - modify the support structure of station 1 to match with the MUCH/RICH platform
@@ -74,14 +80,14 @@
 
 // Name of output file with geometry
 const TString tagVersion   = "v14b";
-//const TString geoVersion   = "trd_" + tagVersion + "100";
-const TString geoVersion   = "trd_" + tagVersion + "300";
-//
-//const TString geoVersion   = "trd_" + tagVersion + "_1h";
-//const TString geoVersion   = "trd_" + tagVersion + "_1e";
-//const TString geoVersion   = "trd_" + tagVersion + "_1m";
-//const TString geoVersion   = "trd_" + tagVersion + "_3e";
-//const TString geoVersion   = "trd_" + tagVersion + "_3m";
+//const TString subVersion   = "100";
+const TString subVersion   = "300";
+//const TString subVersion   = "_1h";
+//const TString subVersion   = "_1e";
+//const TString subVersion   = "_1m";
+//const TString subVersion   = "_3e";
+//const TString subVersion   = "_3m";
+const TString geoVersion   = "trd_" + tagVersion + subVersion;
 const TString FileNameSim  = geoVersion + ".geo.root";
 const TString FileNameGeo  = geoVersion + "_geo.root";
 const TString FileNameInfo = geoVersion + ".geo.info";
@@ -91,6 +97,7 @@ const TString FileNamePads = "CbmTrdPads_" + tagVersion + ".h";
 const Bool_t IncludeRadiator    = true;  // false;  // true, if radiator is included in geometry
 const Bool_t IncludeLattice     = true;  // false;  // true, if lattice grid is included in geometry
 const Bool_t IncludeFebs        = true;  // false;  // true, if FEBs are included in geometry
+const Bool_t IncludeRobs        = false; // false;  // true, if ROBs are included in geometry
 const Bool_t IncludeAsics       = true;  // false;  // true, if ASICs are included in geometry
 const Bool_t IncludeSupports    = true;  // false;  // true, if support structure is included in geometry
 const Bool_t IncludeLabels      = true;  // false;  // true, if TRD (I, II, III) labels are plotted in (VisLevel 5)
@@ -226,6 +233,35 @@ const Int_t layer2o[9][11]= { {   0,    0,    0,    0,    0,    0,    0,    0,  
 
 // ### Layer Type 3
 // v12x - module types in the inner sector of layer2 - looking upstream
+//const Int_t layer3i[5][5] = { { 223,  223,  221,  221,  221 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+//                              { 223,    0,    0,    0,  221 },
+//                              { 203,    0,    0,    0,  201 },
+//                              { 203,    0,    0,    0,  201 },
+//                              { 203,  203,  201,  201,  201 } };
+const Int_t layer3i[5][5] = { { 223,  223,  221,  221,  221 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+                              { 223,  123,  121,  121,  221 },
+                              { 203,  103,    0,  101,  201 },
+                              { 203,  103,  101,  101,  201 },
+                              { 203,  203,  201,  201,  201 } };
+// number of modules 25x0 
+// needed only for convenience in the function
+
+// v12x - module types in the outer sector of layer3 - looking upstream
+const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821,  821,  821,  821 },
+                               { 823,  823,  823,  723,  723,  721,  721,  721,  821,  821,  821 },
+                               { 823,  823,  723,  723,  623,  621,  621,  721,  721,  821,  821 },
+                               { 823,  823,  723,  623,    0,    0,    0,  621,  721,  821,  821 },
+                               { 803,  803,  703,  603,    0,    0,    0,  601,  701,  801,  801 },
+                               { 803,  803,  703,  603,    0,    0,    0,  601,  701,  801,  801 },
+                               { 803,  803,  703,  703,  603,  601,  601,  701,  701,  801,  801 },
+                               { 803,  803,  803,  703,  703,  701,  701,  701,  801,  801,  801 },
+                               { 803,  803,  803,  803,  803,  801,  801,  801,  801,  801,  801 } };
+// number of modules 1x0, 8x5, 12x6, 24x7, 54x8
+// Layer3 = 98;   // v12x
+
+/* only L type modules
+// ### Layer Type 3
+// v12x - module types in the inner sector of layer2 - looking upstream
 const Int_t layer3i[5][5] = { {  0,  0,  0,  0,  0 },     // abc: a module type - b orientation (x90 deg) in odd - c even layers
                               {  0,  0,  0,  0,  0 },
                               {  0,  0,  0,  0,  0 },
@@ -246,6 +282,7 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
                                { 803,  803,  803,  803,  803,  801,  801,  801,  801,  801,  801 } };
 // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
 // Layer3 = 98;   // v12x
+*/
 
 // ### Layer Type 31 is Layer Type 3 with detector modules rotated by 90
 // In the subroutine creating the layers this is recognized automatically 
@@ -255,13 +292,20 @@ const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821, 
 const Int_t NofModuleTypes = 8;
 const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; // 0 = small module, 1 = large module
 
+// GBTx ROB definitions
+const Int_t RobsPerModule[NofModuleTypes] = {  2,  2,  1,  1,  2,  1,  1,  1 }; // number of GBTx ROBs on module
+const Int_t GbtxPerRob[NofModuleTypes]    = {107,105,105,103,107,107,105,103 }; // number of GBTx ASICs on ROB
+
 // ultimate density - 540 mm
+const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  6,  4, 12,  6,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,105,105,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  6,  3,  4,  3 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //
-//// super density - 540 mm
-const Int_t FebsPerModule[NofModuleTypes] = {  9,  5,  6,  4, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
+////// super density - 540 mm
+//const Int_t FebsPerModule[NofModuleTypes] = {  9,  5,  6,  4, 12,  6,  4,  3 }; // light // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
 //
 //// normal density - 540 mm
 //const Int_t FebsPerModule[NofModuleTypes] = { 18, 10,  6,  4, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
@@ -281,10 +325,11 @@ const Int_t AsicsPerFeb[NofModuleTypes]   = {210,210,105,105,108,108,108,108 }; 
 //const Int_t FebsPerModule[NofModuleTypes] = { 19, 10,  5,  5, 12,  6,  4,  3 }; // number of FEBs on backside (linked to pad layout) - mod4 = mod3, therefore same
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {105,105,105,105,108,108,108,108 }; // %100 gives number of ASICs on FEB, /100 gives grouping
 
+
 /* TODO: activate connector grouping info below
 // ultimate - grouping of pads to connectors
 const Int_t RowsPerConnector[NofModuleTypes]  = {  6,  4,  2,  2,  2,  2,  2,  2 };
-const Int_t ColsPerConnector[NofModuleTypes]  = { 10, 16, 16, 16, 16, 16, 16, 16 };
+const Int_t ColsPerConnector[NofModuleTypes]  = { 16, 16, 16, 16, 16, 16, 16, 16 };
 // super    - grouping of pads to connectors
 const Int_t RowsPerConnector[NofModuleTypes]  = {  4,  4,  2,  2,  2,  2,  2,  2 };
 const Int_t ColsPerConnector[NofModuleTypes]  = { 16, 16, 16, 16, 16, 16, 16, 16 };
@@ -292,6 +337,7 @@ const Int_t ColsPerConnector[NofModuleTypes]  = { 16, 16, 16, 16, 16, 16, 16, 16
 const Int_t RowsPerConnector[NofModuleTypes]  = {  2,  2,  2,  2,  2,  2,  2,  2 };
 const Int_t ColsPerConnector[NofModuleTypes]  = { 16, 16, 16, 16, 16, 16, 16, 16 };
 */
+
 
 const Double_t feb_z_offset = 0.1;  // 1 mm - offset in z of FEBs to backpanel
 const Double_t asic_offset  = 0.2;  // 2 mm - offset of ASICs to FEBs to avoid overlaps
@@ -480,7 +526,7 @@ void Create_TRD_Geometry_v14b300() {
 }
 
 
-//=BB=============================================================
+//==============================================================
 void dump_digi_file()
 {
   TDatime  datetime;   // used to get timestamp
@@ -488,9 +534,9 @@ void dump_digi_file()
   const Double_t ActiveAreaX[2] = { DetectorSizeX[0] - 2 * FrameWidth[0],
                                     DetectorSizeX[1] - 2 * FrameWidth[1] };
   const Int_t NofSectors = 3;
-  const Int_t NofPadsInRow[2]  = { 80, 128 };
+  const Int_t NofPadsInRow[2]  = { 80, 128 };  // numer of pads in rows
 
-  const Double_t PadHeightInSector[NofModuleTypes][NofSectors] =
+  const Double_t PadHeightInSector[NofModuleTypes][NofSectors] =  // pad height
         { {  1.50,  1.50,  1.50 },   // module type 1
           {  2.75,  2.50,  2.75 },   // module type 2
           {  4.50,  4.50,  4.50 },   // module type 3
@@ -500,7 +546,7 @@ void dump_digi_file()
           { 11.25, 11.50, 11.25 },   // module type 7
           { 15.00, 15.50, 15.00 } }; // module type 8
 
-  const Int_t NofRowsInSector[NofModuleTypes][NofSectors] = 
+  const Int_t NofRowsInSector[NofModuleTypes][NofSectors] =   // number of rows per sector
         { {  12,  12,  12 },         // module type 1
           {   8,   4,   8 },         // module type 2
           {   1,  10,   1 },         // module type 3
@@ -547,7 +593,7 @@ void dump_digi_file()
   fprintf(ifile,"//\n");
   fprintf(ifile,"//   TRD pad layout for geometry %s\n", tagVersion.Data());
   fprintf(ifile,"//\n");
-  fprintf(ifile,"// automatically generated by Create_TRD_Geometry_%sX00.C\n", tagVersion.Data());
+  fprintf(ifile,"// automatically generated by Create_TRD_Geometry_%s%s.C\n", tagVersion.Data(), subVersion.Data());
   fprintf(ifile,"// created %d\n", datetime.GetDate());
   fprintf(ifile,"//\n");
 
@@ -636,6 +682,10 @@ void dump_info_file()
   Int_t    total_febs[NofModuleTypes+1]          = { 0 };   // total number of febs
   Int_t    total_asics[NofModuleTypes+1]         = { 0 };   // total number of asics
   Int_t    total_channels[NofModuleTypes+1]      = { 0 };   // total number of channels
+
+  Int_t    total_channels_u = 0;  // total number of ultimate channels
+  Int_t    total_channels_s = 0;  // total number of super    channels
+  Int_t    total_channels_r = 0;  // total number of regular  channels
 
   printf("writing summary information file: %s\n", FileNameInfo.Data());
 
@@ -727,6 +777,10 @@ void dump_info_file()
   // flags
   fprintf(ifile,"# flags\n");
 
+  fprintf(ifile,"support structure is    : ");
+  if (!IncludeSupports) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
   fprintf(ifile,"radiator is             : ");
   if (!IncludeRadiator) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
@@ -735,16 +789,16 @@ void dump_info_file()
   if (!IncludeLattice ) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
 
-  fprintf(ifile,"front-end boards are    : ");
-  if (!IncludeFebs    ) fprintf(ifile,"NOT ");
-  fprintf(ifile,"included\n");
-
   fprintf(ifile,"asics are               : ");
   if (!IncludeAsics   ) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
 
-  fprintf(ifile,"support structure is    : ");
-  if (!IncludeSupports) fprintf(ifile,"NOT ");
+  fprintf(ifile,"front-end boards are    : ");
+  if (!IncludeFebs    ) fprintf(ifile,"NOT ");
+  fprintf(ifile,"included\n");
+
+  fprintf(ifile,"GBTX readout boards are : ");
+  if (!IncludeRobs    ) fprintf(ifile,"NOT ");
   fprintf(ifile,"included\n");
 
   fprintf(ifile,"\n");
@@ -756,48 +810,107 @@ void dump_info_file()
   fprintf(ifile,"# modules\n");
 
   for (Int_t iModule = 1; iModule <= NofModuleTypes; iModule++)
-    fprintf(ifile,"   mod%1d", iModule);
-  fprintf(ifile,"  total");
+    fprintf(ifile,"     mod%1d", iModule);
+  fprintf(ifile,"    total");
 
-  fprintf(ifile,"\n---------------------------------------------------------------\n");
+  fprintf(ifile,"\n---------------------------------------------------------------------------------\n");
   for (Int_t iLayer = 0; iLayer < MaxLayers; iLayer++)
     if (ShowLayer[iLayer])
     {
       for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
       {
-        fprintf(ifile," %6d", ModuleStats[iLayer][iModule]);
+        fprintf(ifile," %8d", ModuleStats[iLayer][iModule]);
         total_modules[iModule] += ModuleStats[iLayer][iModule];  // sum up modules across layers
       }
-      fprintf(ifile,"          layer %2d\n", PlaneId[iLayer]);
+      fprintf(ifile,"            layer %2d\n", PlaneId[iLayer]);
     }
-  fprintf(ifile,"---------------------------------------------------------------\n");
+  fprintf(ifile,"\n---------------------------------------------------------------------------------\n");
 
   // total statistics
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", total_modules[iModule]);
+    fprintf(ifile," %8d", total_modules[iModule]);
     total_modules[NofModuleTypes] += total_modules[iModule];
   }
-  fprintf(ifile," %6d", total_modules[NofModuleTypes]);
+  fprintf(ifile," %8d", total_modules[NofModuleTypes]);
   fprintf(ifile,"   number of modules\n");
 
   // number of FEBs
   //  fprintf(ifile,"\n#\n##   febs\n#\n\n");
   fprintf(ifile,"# febs\n");
 
+  fprintf(ifile," ");
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", FebsPerModule[iModule]);
+    if ((AsicsPerFeb[iModule] / 100) == 3)
+      fprintf(ifile,"%8du", FebsPerModule[iModule]);
+    else if ((AsicsPerFeb[iModule] / 100) == 2)
+      fprintf(ifile,"%8ds", FebsPerModule[iModule]);
+    else 
+      fprintf(ifile,"%8d ", FebsPerModule[iModule]);
   }
-  fprintf(ifile,"          FEBs per module\n");
+  fprintf(ifile,"           FEBs per module\n");
 
+  // FEB total per type
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
+  fprintf(ifile," ");
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] / 100) == 3)
+    {
+      total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+      fprintf(ifile,"%8du", total_febs[iModule]);
+      total_febs[NofModuleTypes] += total_febs[iModule];
+    }
+    else
+      fprintf(ifile,"         ");
+  }
+  fprintf(ifile,"%8d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   ultimate  FEBs\n");
+
+  // FEB total per type
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
+  fprintf(ifile," ");
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] / 100) == 2)
+    {
+      total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+      fprintf(ifile,"%8ds", total_febs[iModule]);
+      total_febs[NofModuleTypes] += total_febs[iModule];
+    }
+    else
+      fprintf(ifile,"         ");
+  }
+  fprintf(ifile,"%8d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   super     FEBs\n");
+
+  // FEB total per type
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
+  fprintf(ifile," ");
+  for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
+  {
+    if ((AsicsPerFeb[iModule] / 100) == 1)
+    {
+      total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
+      fprintf(ifile,"%8d ", total_febs[iModule]);
+      total_febs[NofModuleTypes] += total_febs[iModule];
+    }
+    else
+      fprintf(ifile,"         ");
+  }
+  fprintf(ifile,"%8d", total_febs[NofModuleTypes]);
+  fprintf(ifile,"   regular   FEBs\n");
+
+  // FEB total over all types
+  total_febs[NofModuleTypes] = 0; // reset sum to 0
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_febs[iModule] = total_modules[iModule] * FebsPerModule[iModule];
-    fprintf(ifile," %6d", total_febs[iModule]);
+    fprintf(ifile," %8d", total_febs[iModule]);
     total_febs[NofModuleTypes] += total_febs[iModule];
   }
-  fprintf(ifile," %6d", total_febs[NofModuleTypes]);
+  fprintf(ifile," %8d", total_febs[NofModuleTypes]);
   fprintf(ifile,"   number of FEBs\n");
 
 
@@ -807,26 +920,26 @@ void dump_info_file()
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", AsicsPerFeb[iModule] %100);
+    fprintf(ifile," %8d", AsicsPerFeb[iModule] %100);
   }
-  fprintf(ifile,"          ASICs per FEB\n");
+  fprintf(ifile,"            ASICs per FEB\n");
 
   // ASICs per module
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     asics_per_module[iModule] = FebsPerModule[iModule] * (AsicsPerFeb[iModule] %100);
-    fprintf(ifile," %6d", asics_per_module[iModule]);
+    fprintf(ifile," %8d", asics_per_module[iModule]);
   }
-  fprintf(ifile,"          ASICs per module\n");
+  fprintf(ifile,"            ASICs per module\n");
 
   // ASICs per module type
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_asics[iModule] = total_febs[iModule] * (AsicsPerFeb[iModule] %100);
-    fprintf(ifile," %6d", total_asics[iModule]);
+    fprintf(ifile," %8d", total_asics[iModule]);
     total_asics[NofModuleTypes] += total_asics[iModule];
   }
-  fprintf(ifile," %6d", total_asics[NofModuleTypes]);
+  fprintf(ifile," %8d", total_asics[NofModuleTypes]);
   fprintf(ifile,"   number of ASICs\n");
 
   // number of channels
@@ -838,6 +951,11 @@ void dump_info_file()
     if ((AsicsPerFeb[iModule] %100) == 16)
     {
       channels_per_feb[iModule] =  80 * 6;   // rows  // 84, if 63 of 64 ch used
+      channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
+    }
+    if ((AsicsPerFeb[iModule] %100) == 15)
+    {
+      channels_per_feb[iModule] =  80 * 6;   // rows
       channels_per_module[iModule] = channels_per_feb[iModule] * FebsPerModule[iModule];
     }
     if ((AsicsPerFeb[iModule] %100) == 10)
@@ -859,34 +977,55 @@ void dump_info_file()
   }
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
-    fprintf(ifile," %6d", channels_per_module[iModule]);
-  fprintf(ifile,"          channels per module\n");
+    fprintf(ifile," %8d", channels_per_module[iModule]);
+  fprintf(ifile,"            channels per module\n");
 
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
-    fprintf(ifile," %6d", channels_per_feb[iModule]);
-  fprintf(ifile,"          channels per feb\n");
+    fprintf(ifile," %8d", channels_per_feb[iModule]);
+  fprintf(ifile,"            channels per feb\n");
 
   // channels used
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
     total_channels[iModule] = channels_per_module[iModule] * total_modules[iModule]; 
-    fprintf(ifile," %6d", total_channels[iModule]);
+    fprintf(ifile," %8d", total_channels[iModule]);
     total_channels[NofModuleTypes] += total_channels[iModule];
   }
-  fprintf(ifile," %6d", total_channels[NofModuleTypes]);
+  fprintf(ifile," %8d", total_channels[NofModuleTypes]);
   fprintf(ifile,"   channels used\n");
 
   // channels available
+  fprintf(ifile," ");
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
   {
-    fprintf(ifile," %6d", total_asics[iModule] * 32);
+    if ((AsicsPerFeb[iModule] / 100) == 3)
+    {
+      fprintf(ifile,"%8du", total_asics[iModule] * 32);
+      total_channels_u += total_asics[iModule] * 32;
+    }
+    else if ((AsicsPerFeb[iModule] / 100) == 2)
+    {
+      fprintf(ifile,"%8ds", total_asics[iModule] * 32);
+      total_channels_s += total_asics[iModule] * 32;
+    }
+    else 
+    {
+      fprintf(ifile,"%8d ", total_asics[iModule] * 32);
+      total_channels_r += total_asics[iModule] * 32;
+    }
   }
-  fprintf(ifile," %6d", total_asics[NofModuleTypes] * 32);
+  fprintf(ifile,"%8d", total_asics[NofModuleTypes] * 32);
   fprintf(ifile,"   channels available\n");
-  fprintf(ifile,"\n");
 
-  // channel efficiency
-  fprintf(ifile,"%6.1f%%   channel efficiency\n", 1. * total_channels[NofModuleTypes] / (total_asics[NofModuleTypes] * 32) * 100);
+  // channel ratio for u,s,r density
+  fprintf(ifile," ");
+  fprintf(ifile,"%7.1f%%u", (float)total_channels_u / (total_asics[NofModuleTypes] * 32) * 100);
+  fprintf(ifile,"%7.1f%%s", (float)total_channels_s / (total_asics[NofModuleTypes] * 32) * 100);
+  fprintf(ifile,"%7.1f%%r", (float)total_channels_r / (total_asics[NofModuleTypes] * 32) * 100);
+  fprintf(ifile,"                                                        channel ratio\n");
+
+  fprintf(ifile,"\n");
+  fprintf(ifile,"%8.1f%%   channel efficiency\n", 1. * total_channels[NofModuleTypes] / (total_asics[NofModuleTypes] * 32) * 100);
 
   // total surface of TRD
   for (Int_t iModule = 0; iModule < NofModuleTypes; iModule++)
@@ -905,6 +1044,7 @@ void dump_info_file()
   // summary
   fprintf(ifile,"%7.2f m2      total surface    \n", total_surface);
   fprintf(ifile,"%7.2f m2      total active area\n", total_actarea);
+  fprintf(ifile,"%7.2f m3      total gas volume \n", total_actarea * gas_thickness / 100);  // convert cm to m for thickness
 
   fprintf(ifile,"%7.2f cm2/ch  average channel size\n", 100. * 100 * total_actarea / total_channels[NofModuleTypes]);
   fprintf(ifile,"%7.2f ch/m2   channels per m2 active area\n", 1. * total_channels[NofModuleTypes] / total_actarea);
@@ -1334,15 +1474,15 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 
 
    // FEBs
-   if (IncludeFebs) {
-
+   if (IncludeFebs) 
+   {
       // assemblies
       TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly("febvol");  // the mother volume of all FEBs
-      TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly("febbox"); // volume for inclined FEBs, then shifted along y
+      TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly("febbox");  // volume for inclined FEBs, then shifted along y
       //TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly(Form("module%d_febvol", moduleType));  // the mother volume of all FEBs
-      //TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("module%d_febbox", moduleType)); // volume for inclined FEBs, then shifted along y
+      //TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("module%d_febbox", moduleType));  // volume for inclined FEBs, then shifted along y
       //TGeoVolumeAssembly* trd_feb_vol = new TGeoVolumeAssembly(Form("trd1mod%dfebvol", moduleType));  // the mother volume of all FEBs
-      //TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType)); // volume for inclined FEBs, then shifted along y
+      //TGeoVolumeAssembly* trd_feb_box = new TGeoVolumeAssembly(Form("trd1mod%dfebbox", moduleType));  // volume for inclined FEBs, then shifted along y
 
       // translations + rotations
       TGeoTranslation *trd_feb_trans1;     // center to corner
@@ -1350,9 +1490,6 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
       TGeoTranslation *trd_feb_trans2;     // corner back
       TGeoTranslation *trd_feb_y_position; // shift to y position on TRD
 //      TGeoTranslation *trd_feb_null;       // no displacement
-
-      Double_t feb_pos;
-      Double_t feb_pos_y;
 
 // replaced by matrix operation (see below)
 //  //      Double_t yback, zback;
@@ -1394,9 +1531,10 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
       // ASICs
       Double_t asic_pos;
       Double_t asic_pos_x;
+      TGeoTranslation *trd_asic_trans1;     // center to corner
 
-      if (IncludeAsics) {
-
+      if (IncludeAsics) 
+      {
         // put many ASICs on each inclined FEB
         TGeoBBox* trd_asic = new TGeoBBox("", asic_width/2., asic_thickness/2., asic_width/2.);              // ASIC dimensions
         // TODO: use Silicon as ASICs material
@@ -1406,18 +1544,20 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
         trdmod1_asic->SetLineColor(kBlue);                                                                   // set blue color for ASICs
   
         Int_t nofAsics   = AsicsPerFeb[ moduleType - 1 ] % 100;
-        Int_t groupAsics = AsicsPerFeb[ moduleType - 1 ] / 100;   // either 1 or 2
+        Int_t groupAsics = AsicsPerFeb[ moduleType - 1 ] / 100;   // either 1 or 2 or 3 (new ultimate)
 
         if ((nofAsics == 16) && (activeAreaX < 60))
           asic_distance = 0.0;  // for 57 cm  // 0.1;  // for 60 cm
         else
           asic_distance = 0.4;
 
-        for (Int_t iAsic = 0; iAsic < (nofAsics / groupAsics); iAsic++) {
-
+        for (Int_t iAsic = 0; iAsic < (nofAsics / groupAsics); iAsic++) 
+        {
           if (groupAsics == 1)   // single ASICs 
 	  {
             asic_pos   = (iAsic + 0.5) / nofAsics - 0.5;   // equal spacing of ASICs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
+
+            // ASIC 1
             asic_pos_x = asic_pos * activeAreaX;
 	    //            trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2., 0.);  // move asic on top of FEB
             trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2.+asic_offset, 0.);  // move asic on top of FEB
@@ -1430,6 +1570,7 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 	  {
             asic_pos   = (iAsic + 0.5) / (nofAsics / groupAsics) - 0.5;   // equal spacing of ASICs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
 
+            // ASIC 1
             asic_pos_x = asic_pos * activeAreaX + (0.5 + asic_distance/2.) * asic_width;
 	    //            trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2., 0.);  // move asic on top of FEB
             trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2.+asic_offset, 0.);  // move asic on top of FEB);
@@ -1437,12 +1578,39 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
             (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);
             trd_feb_box->AddNode(trdmod1_asic, 2*iAsic+1, incline_asic);  // now we have ASICs on the inclined FEB
 
+            // ASIC 2
             asic_pos_x = asic_pos * activeAreaX - (0.5 + asic_distance/2.) * asic_width;
 	    //            trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2., 0.);  // move asic on top of FEB
             trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2.+asic_offset, 0.);  // move asic on top of FEB
             TGeoHMatrix *incline_asic = new TGeoHMatrix("");
             (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);
             trd_feb_box->AddNode(trdmod1_asic, 2*iAsic+2, incline_asic);  // now we have ASICs on the inclined FEB
+          }
+
+          if (groupAsics == 3)   // triplets of ASICs
+	  {
+            asic_pos   = (iAsic + 0.5) / (nofAsics / groupAsics) - 0.5;   // equal spacing of ASICs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
+
+            // ASIC 1
+            asic_pos_x = asic_pos * activeAreaX + 1.1 * asic_width; // (0.5 + asic_distance/2.) * asic_width;
+            trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2.+asic_offset, 0.);  // move asic on top of FEB);
+            TGeoHMatrix *incline_asic = new TGeoHMatrix("");
+            (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);
+            trd_feb_box->AddNode(trdmod1_asic, 3*iAsic+1, incline_asic);  // now we have ASICs on the inclined FEB
+
+            // ASIC 2
+            asic_pos_x = asic_pos * activeAreaX;
+            trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2.+asic_offset, 0.);  // move asic on top of FEB
+            TGeoHMatrix *incline_asic = new TGeoHMatrix("");
+            (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);
+            trd_feb_box->AddNode(trdmod1_asic, 3*iAsic+2, incline_asic);  // now we have ASICs on the inclined FEB
+
+            // ASIC 3
+            asic_pos_x = asic_pos * activeAreaX - 1.1 * asic_width; // (0.5 + asic_distance/2.) * asic_width;
+            trd_asic_trans1     = new TGeoTranslation("", asic_pos_x, feb_thickness/2.+asic_thickness/2.+asic_offset, 0.);  // move asic on top of FEB
+            TGeoHMatrix *incline_asic = new TGeoHMatrix("");
+            (*incline_asic) = (*trd_asic_trans1) * (*incline_feb);
+            trd_feb_box->AddNode(trdmod1_asic, 3*iAsic+3, incline_asic);  // now we have ASICs on the inclined FEB
           }
  
         }
@@ -1451,8 +1619,12 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 
 
       // now go on with FEB placement
+      Double_t feb_pos;
+      Double_t feb_pos_y;
+
       Int_t nofFebs = FebsPerModule[ moduleType - 1 ];
-      for (Int_t iFeb = 0; iFeb < nofFebs; iFeb++) {
+      for (Int_t iFeb = 0; iFeb < nofFebs; iFeb++) 
+      {
         feb_pos   = (iFeb + 0.5) / nofFebs - 0.5;   // equal spacing of FEBs on the backpanel
         feb_pos_y = feb_pos * activeAreaY;
 
@@ -1462,6 +1634,96 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
         trd_feb_vol->AddNode(trd_feb_box, iFeb+1, trd_feb_y_position);  // position FEB in y
 
       }
+
+      if (IncludeRobs) 
+      {
+        // GBTx ROBs
+        Double_t rob_size_x =  9.0; //  4.5; //  45 mm
+        Double_t rob_size_y = 20.0; // 13.0; // 130 mm
+        Double_t rob_thickness = feb_thickness;
+  
+        TGeoVolumeAssembly* trd_rob_box = new TGeoVolumeAssembly("robbox");  // volume for inclined FEBs, then shifted along y
+        TGeoBBox* trd_rob = new TGeoBBox("", rob_size_x/2., rob_size_y/2., rob_thickness/2.);   // the ROB itself
+        TGeoVolume* trdmod1_rob = new TGeoVolume("rob", trd_rob, febVolMed);  // the ROB made of a certain medium
+        trdmod1_rob->SetLineColor(kRed);    // set color
+  
+        //      TGeoHMatrix *incline_rob = new TGeoHMatrix("");
+        trd_rob_box->AddNode(trdmod1_rob, 1);//, "" ); // incline_feb);  
+  
+  
+  
+        // GBTXs
+        Double_t gbtx_pos;
+        Double_t gbtx_pos_x;
+        Double_t gbtx_pos_y;
+        TGeoTranslation *trd_gbtx_trans1;     // center to corner
+  
+        // GBTX parameters
+        const Double_t gbtx_thickness = 0.25; // 2.5 mm
+        const Double_t gbtx_width     = 3.0;  // 2.0;  1.0;   // 1 cm
+  
+        // put many GBTXs on each inclined FEB
+        TGeoBBox* trd_gbtx = new TGeoBBox("", gbtx_width/2., gbtx_width/2., gbtx_thickness/2.); // GBTX dimensions
+        TGeoVolume* trdmod1_gbtx = new TGeoVolume("gbtx", trd_gbtx, asicVolMed);   // the GBTX made of a certain medium
+        trdmod1_gbtx->SetLineColor(kGreen);  // set color for GBTXs
+  
+        Int_t nofGbtxs   = GbtxPerRob[ moduleType - 1 ] % 100;
+        Int_t groupGbtxs = GbtxPerRob[ moduleType - 1 ] / 100;   // usually 1
+  
+  //      nofGbtxs   = 7;
+  //      groupGbtxs = 1;
+  
+        Int_t nofGbtxX = 2;
+        Int_t nofGbtxY = (nofGbtxs - 1) / 2. + 1; // +1 is for GBTx master
+  
+        Double_t gbtx_distance = 0.4;
+        Int_t iGbtx = 1;
+  
+        for (Int_t iGbtxY = 0; iGbtxY < nofGbtxY; iGbtxY++) 
+        {
+  
+          gbtx_pos   = (iGbtxY + 0.5) / nofGbtxY - 0.5;   // equal spacing of GBTXs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
+          gbtx_pos_y = -gbtx_pos * rob_size_y;
+  
+          if (iGbtxY > 0)
+            for (Int_t iGbtxX = 0; iGbtxX < nofGbtxX; iGbtxX++) 
+            {
+              gbtx_pos   = (iGbtxX + 0.5) / nofGbtxX - 0.5;   // equal spacing of GBTXs on the FEB, e.g. for no=3 : -1/3, 0, +1/3
+              gbtx_pos_x = gbtx_pos * rob_size_x;
+  
+              trd_gbtx_trans1     = new TGeoTranslation("", gbtx_pos_x, gbtx_pos_y, rob_thickness/2.+gbtx_thickness/2.);  // move gbtx on top of ROB
+              trd_rob_box->AddNode(trdmod1_gbtx, iGbtx++, trd_gbtx_trans1);  // now we have GBTXs on the ROB
+            }
+          else
+            {
+              gbtx_pos_x = 0;
+     
+              trd_gbtx_trans1     = new TGeoTranslation("", gbtx_pos_x, gbtx_pos_y, rob_thickness/2.+gbtx_thickness/2.);  // move gbtx on top of ROB
+              trd_rob_box->AddNode(trdmod1_gbtx, iGbtx++, trd_gbtx_trans1);  // now we have GBTXs on the ROB
+            }
+  
+        }
+
+        // now go on with ROB placement
+        Double_t rob_pos;
+        Double_t rob_pos_y;
+        TGeoTranslation *trd_rob_y_position; // shift to y position on TRD
+  
+        Int_t nofRobs = RobsPerModule[ moduleType - 1 ];
+        for (Int_t iRob = 0; iRob < nofRobs; iRob++) 
+        {
+          rob_pos   = (iRob + 0.5) / nofRobs - 0.5;   // equal spacing of ROBs on the backpanel
+          rob_pos_y = rob_pos * activeAreaY;
+  
+          // shift inclined ROB in y to its final position
+          trd_rob_y_position = new TGeoTranslation("", 0., rob_pos_y, febvol_thickness/2. - rob_thickness);  // approximate pos at end of feb volume
+          trd_feb_vol->AddNode(trd_rob_box, iRob+1, trd_rob_y_position);  // position FEB in y
+  
+        }
+
+      }  // IncludeGbtx
+
+      // put FEB box on module
       TGeoTranslation* trd_febvol_trans = new TGeoTranslation("", 0., 0., febvol_position);
       gGeoMan->GetVolume(name)->AddNode(trd_feb_vol, 1, trd_febvol_trans);  // put febvol at correct z position wrt to the module
    }
@@ -1522,10 +1784,10 @@ void create_detector_layers(Int_t layerId)
   TGeoVolume* layer = new TGeoVolumeAssembly(layername);
 
   // compute layer copy number
-  Int_t i = LayerType[layerId] / 10   * 10000   // 1 digit 
+  Int_t i = LayerType[layerId] / 10   * 10000   // 1 digit  // fStation
           + LayerType[layerId] % 10   *  1000   // 1 digit  // isRotated
-          + LayerNrInStation[layerId] *   100   // 1 digit
-          + PlaneId[layerId];                   // 2 digits // layer type as leading digit in copy number of layer
+          + LayerNrInStation[layerId] *   100   // 1 digit  // fLayer
+          + PlaneId[layerId];                   // 2 digits // fPlane   // layer type as leading digit in copy number of layer
   gGeoMan->GetVolume(geoVersion)->AddNode(layer, i);
 
 //  Int_t i = 100 + PlaneId[layerId];
@@ -1580,8 +1842,8 @@ void create_detector_layers(Int_t layerId)
 	  }
           else  // layer 2,4 ...
 	  {
-   	    module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
             copy = copy_nr(stationNr, copyNrIn[type - 1], module_id %10    , PlaneId[layerId], modId);
+   	    module_rotation->RotateZ( (module_id %10) * 90. );      // rotate module by  90 or 270 degrees, see layer[1-3][i,o] - horizontal pads
 	  }
 
           // rotation

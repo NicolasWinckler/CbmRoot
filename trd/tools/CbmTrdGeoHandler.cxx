@@ -220,7 +220,8 @@ void CbmTrdGeoHandler::NavigateTo(
       TGeoNode* layernode = gGeoManager->GetMother(2);   // get layer
       Int_t layercopyNr = layernode->GetNumber();
       // fIsRotated is the 4th digit from the back
-      fStation   = ((layercopyNr / 1000) % 10);  // from layer copy number
+      fStation   = ((layercopyNr / 10000) % 10);  // from layer copy number
+      //      std::cout << "DE fStation: " << fStation << " " << std::endl;
       fLayer     = ((layercopyNr /  100) % 10);  // from layer copy number
 
       // We take the mother node (module) of the current node we are in (gas).

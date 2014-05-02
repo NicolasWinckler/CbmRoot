@@ -560,7 +560,7 @@ void CbmKFTrackFitQA::FillHitHistos()
 
 void CbmKFTrackFitQA::StsHitMatch()
 {
-  const bool useLinks = 1; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
+  const bool useLinks = 0; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
   // TODO: fix trunk problem with links. Set useLinks = 1
   
   for (int iH = 0; iH < listStsHits->GetEntriesFast(); iH++){

@@ -139,8 +139,8 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
     vRTracks[iTr] = *( (CbmStsTrack*) flistStsTracks->At(iTr));
 
   CbmKFVertex kfVertex;
-  if(fPrimVtx)
-    kfVertex = CbmKFVertex(*fPrimVtx);
+   if(fPrimVtx)
+     kfVertex = CbmKFVertex(*fPrimVtx);
   
   vector<int> vTrackPDG(vRTracks.size(), -1);
   if(fusePID == 1)
@@ -160,13 +160,16 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
     if (NULL == flsitGlobalTracks) { Fatal("KF Particle Finder", "No GlobalTrack array!"); }
     if (NULL == flistTofHits) { Fatal("KF Particle Finder", "No TOF hits array!"); }
 
-    const Double_t m2P  = 0.867681;
-    const Double_t m2K  = 0.243707;
+    const Double_t m2P  = 0.885;
+    const Double_t m2K  = 0.245;
     const Double_t m2Pi = 0.019479835;
-
-    Double_t sP[3][5] = { {0.0243467, -0.00937908, 0.00970666, -0.00063638, 2.42128e-05},
-                          {0.00691158, -0.000777367, 0.00671164, -0.000123594, -2.17075e-05},
-                          {0.0055599, -0.00327273, 0.00981961, -0.00108836, 7.90106e-05} };
+   
+    Double_t sP[3][5] = { {0.0337428,-0.013939,0.00567602,-0.000202229,4.07531e-06},
+                          {0.00717827,-0.00257353, 0.00389851,-9.83097e-05, 1.33011e-06},
+                          {0.001348,0.00220126,0.0023619,7.35395e-05,-4.06706e-06} };//SIS-300
+//    Double_t sP[3][5] = { {0.056908,-0.0470572,0.0216465,-0.0021016,8.50396e-05},
+//                          {0.00943075,-0.00635429,0.00998695,-0.00111527,7.77811e-05},
+//                          {0.00176298,0.00367263,0.00308013,0.000844013,-0.00010423} }; //SIS-100
 
 //     sP[0][0] =  0.0618927;
 //     sP[0][1] = -0.0719277;
@@ -228,7 +231,8 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
 //       }
 
       Double_t l = globalTrack->GetLength();
-      if( !((l>1000.) && (l<1400.)) ) continue;
+      if( !((l>800.) && (l<1400.)) ) continue;//SIS 300
+//      if( !((l>580.) && (l<700.)) ) continue;//SIS 100
 
       Double_t time;
       Int_t tofHitIndex = globalTrack->GetTofHitIndex();
@@ -240,7 +244,8 @@ void CbmKFParticlesFinder::Exec(Option_t * option)
       else
         continue;
 
-      if( !((time>29.) && (time<50.)) ) continue;
+      if( !((time>29.) && (time<50.)) ) continue; //SIS 300
+//      if( !((time>19.) && (time<42.)) ) continue; //SIS 100
 
       Double_t m2 = p*p*(1./((l/time/29.9792458)*(l/time/29.9792458))-1.);
 

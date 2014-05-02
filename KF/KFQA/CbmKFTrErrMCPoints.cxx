@@ -24,6 +24,7 @@ ClassImp(CbmKFTrErrMCPoints)
 CbmKFTrErrMCPoints::CbmKFTrErrMCPoints():
   StsArray(),
   MvdArray(),
+  TofArray(),
   StsHitsArray(),
   MvdHitsArray()
 {

@@ -19,6 +19,7 @@
 
 #include <CbmMvdPoint.h>
 #include <CbmStsPoint.h>
+#include <CbmTofPoint.h>
 #include <CbmMvdHit.h>
 #include <CbmStsHit.h>
 #include <FairMCPoint.h>
@@ -39,15 +40,18 @@ class CbmKFTrErrMCPoints : public TObject {
 
   CbmMvdPoint* GetMvdPoint(Int_t i) {return MvdArray[i];}
   CbmStsPoint* GetStsPoint(Int_t i) {return StsArray[i];}
+  CbmTofPoint* GetTofPoint(Int_t i) {return TofArray[i];}
   
   CbmMvdHit* GetMvdHit(Int_t i) {return MvdHitsArray[i];}
   CbmStsHit* GetStsHit(Int_t i) {return StsHitsArray[i];}
 
   void SetMvdPoint(CbmMvdPoint* mp) { MvdArray.push_back(mp); }
   void SetStsPoint(CbmStsPoint* sp) { StsArray.push_back(sp); }
+  void SetTofPoint(CbmTofPoint* tp) { TofArray.push_back(tp); }
 
   int GetNMvdPoints() const { return MvdArray.size(); }
   int GetNStsPoints() const { return StsArray.size(); }
+  int GetNTofPoints() const { return TofArray.size(); }
   int GetNMvdHits() const { return MvdHitsArray.size(); }
   int GetNStsHits() const { return StsHitsArray.size(); }
   int GetNConsMCStations();
@@ -72,6 +76,7 @@ class CbmKFTrErrMCPoints : public TObject {
 
   vector<CbmStsPoint*> StsArray;
   vector<CbmMvdPoint*> MvdArray;
+  vector<CbmTofPoint*> TofArray;
   
   vector<CbmStsHit*> StsHitsArray;
   vector<CbmMvdHit*> MvdHitsArray;

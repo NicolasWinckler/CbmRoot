@@ -61,7 +61,7 @@ using std::vector;
 
 ClassImp(CbmKFParticlesFinderQA)
 
-CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t iVerbose, int findParticlesMode, int perf, const char *name, const char *title):
+CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t iVerbose, int findParticlesMode, int perf, const char *name, const char *title, float ekin_):
   FairTask(name,iVerbose),
   fFindParticlesMode(findParticlesMode),
   fPerformance(perf),
@@ -122,8 +122,8 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
                                              "p+","p-",
                                              "K0s",
                                              "#Lambda","#Lambda_bar",
-                                             "#Xi+","#Xi-",
-                                             "#Omega+","#Omega-" };
+                                             "#Xi-","#Xi+",
+                                             "#Omega-","#Omega+" };
   int partPdg[nHistoMotherPdg] = {  -11,   11,
                                     -13,   13,
                                     211, -211,
@@ -190,15 +190,24 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
         gDirectory->mkdir("Parameters");
         gDirectory->cd("Parameters");
         {
-          TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","chi2ndfTopo","prob","#theta","phi","z","l/dl"};
+          TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","chi2ndfTopo","prob","#theta","phi","z","l/dl","Multiplicity"};
           TString parAxisName[nHistoPartParam] = {"m [GeV/c^{2}]","p [GeV/c]","p_{t} [GeV/c]",
                                                   "y","Decay length [cm]","Life time c#tau [cm]",
                                                   "chi2/ndf","chi2/ndf topo","prob","#theta [rad]",
-                                                  "phi [rad]","z [cm]", "l/dl"};
+                                                  "phi [rad]","z [cm]", "l/dl", "Multiplicity"};
+          int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100,100,100, fParteff.partMaxMult[iPart]+1};
+          float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0., -5.,  0.,  0.,  0., 0., -2., -2., -5., -1., -0.5};
+          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 20., 1.,  2.,  2., 55., 35., fParteff.partMaxMult[iPart]+0.5};
+/*
+	  TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","prob","#theta","phi","z","l/dl, chi2prim"};
+          TString parAxisName[nHistoPartParam] = {"m [GeV/c^{2}]","p [GeV/c]","p_{t} [GeV/c]",
+                                                  "y","Decay length [cm]","Life time c#tau [cm]",
+                                                  "chi2/ndf","prob","#theta [rad]",
+                                                  "phi [rad]","z [cm]", "l/dl", "chi2prim"};
           int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100,100,100};
-          float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0., -5.,  0.,  0.,  0., 0., -2., -2., -5., -1.};
-          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 20., 1.,  2.,  2., 55., 35.};
-
+          float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0., -5.,  0.,  0., 0., -2., -2., -5., -1., 0.};
+          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 1.,  2.,  2., 55., 35., 100.};
+*/
           for(int iH=0; iH<nHistoPartParam; iH++)
           {
             hPartParam[iPart][iH]       = new TH1F(parName[iH].Data(),parName[iH].Data(),
@@ -349,6 +358,21 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
   gDirectory->cd(".."); //particle directory
     
   gDirectory = currentDir;
+  
+  gDirectory->mkdir("ModelParameters");
+  gDirectory->cd("ModelParameters");
+  
+  histodirmod = gDirectory;
+  
+  gDirectory = currentDir;
+  
+  int recoLevel = 3;
+  int usePID = 1;
+  int trackNumber = 1;
+  ThermalNoFlow = NULL;
+  //MSSModel = NULL;
+  ThermalNoFlow = new CbmThermalModelNoFlow(ekin_, recoLevel, usePID, trackNumber, iVerbose);
+  //MSSModel = new CbmMSS(ekin_, recoLevel, usePID, trackNumber, iVerbose);
 }
 
 CbmKFParticlesFinderQA::~CbmKFParticlesFinderQA()
@@ -360,6 +384,8 @@ CbmKFParticlesFinderQA::~CbmKFParticlesFinderQA()
     fMCParticles->Delete();
     fMatchParticles->Delete();
   }
+  if (ThermalNoFlow!=NULL) delete ThermalNoFlow;
+  //if (MSSModel!=NULL) delete ThermalNoFlow;
 }
 
 InitStatus CbmKFParticlesFinderQA::ReInit()
@@ -410,6 +436,9 @@ InitStatus CbmKFParticlesFinderQA::Init()
     fMatchParticles = new TClonesArray("KFParticleMatch",100);
     fManger->Register("KFParticleMatch", "KFParticle", fMatchParticles, kTRUE);
   }
+  
+  if (ThermalNoFlow!=NULL) ThermalNoFlow->ReInit(fManger);
+  //if (MSSModel!=NULL) MSSModel->ReInit(fManger);
 
   return kSUCCESS;
 }
@@ -536,10 +565,15 @@ void CbmKFParticlesFinderQA::Exec(Option_t * option)
 //       *p = vMCParticles[iP];
     }
   }
+  
+  if (ThermalNoFlow!=NULL) ThermalNoFlow->Exec();
+  //if (MSSModel!=NULL) MSSModel->Exec();
 }
 
 void CbmKFParticlesFinderQA::Finish()
 {
+  if (ThermalNoFlow!=NULL) ThermalNoFlow->Finish();
+  //if (MSSModel!=NULL) MSSModel->Finish();
   if(!(outfileName == ""))
   {
     TDirectory *curr = gDirectory;
@@ -550,6 +584,8 @@ void CbmKFParticlesFinderQA::Finish()
     outfile = new TFile(outfileName.Data(),"RECREATE");
     outfile->cd();
     WriteHistos(histodir);
+	if (histodirmod!=NULL) WriteHistos(histodirmod);
+	//WriteHistos(gDirectory);
     outfile->Close();
     outfile->Delete();
     gFile = currentFile;
@@ -558,6 +594,8 @@ void CbmKFParticlesFinderQA::Finish()
   else
   {
     WriteHistosCurFile(histodir);
+	if (histodirmod!=NULL) WriteHistosCurFile(histodirmod);
+	//WriteHistosCurFile(gDirectory);
   }
   std::fstream eff(fEfffileName.Data(),fstream::out);
   eff << fParteff;
@@ -592,7 +630,7 @@ void CbmKFParticlesFinderQA::WriteHistosCurFile( TObject *obj ){
 
 void CbmKFParticlesFinderQA::StsHitMatch()
 {
-  const bool useLinks = 1; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
+  const bool useLinks = 0; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
   // TODO: fix trunk problem with links. Set useLinks = 1
   
   for (int iH = 0; iH < flistStsHits->GetEntriesFast(); iH++){
@@ -919,6 +957,11 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
   if(fPrimVtx)
     vtx = CbmKFVertex(*fPrimVtx);
 
+  vector<int> multiplicities(CbmKFPartEfficiencies::nParticles, 0);
+  vector<int> multiplicitiesGhost(CbmKFPartEfficiencies::nParticles, 0);
+  vector<int> multiplicitiesBG(CbmKFPartEfficiencies::nParticles, 0);
+  vector<int> multiplicitiesSignal(CbmKFPartEfficiencies::nParticles, 0);
+	
   for(unsigned int iP=0; iP < fPF->GetParticles().size(); iP++)
   {
     int iParticle = fParteff.GetParticleIndex(fPF->GetParticles()[iP].GetPDG());
@@ -954,8 +997,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     KFParticleSIMD pv(vtx);
     tempSIMDPart.GetDistanceToVertexLine(pv, l, dl);
     dL = sqrt(TempPart.X()*TempPart.X() + TempPart.Y()*TempPart.Y() + TempPart.Z()*TempPart.Z() );
-
-    
+  
     tempSIMDPart.SetProductionVertex(pv);
     fvec chi2topo = tempSIMDPart.Chi2()/tempSIMDPart.GetNDF();
     
@@ -973,6 +1015,7 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     hPartParam[iParticle][11]->Fill(Z);
     hPartParam[iParticle][12]->Fill(l[0]/dl[0]);
 
+	multiplicities[iParticle]++;
 
     hPartParam2D[iParticle][0]->Fill(Rapidity,Pt,1);
 
@@ -993,6 +1036,8 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
         hPartParamGhost[iParticle][10]->Fill(Phi);
         hPartParamGhost[iParticle][11]->Fill(Z);
         hPartParamGhost[iParticle][12]->Fill(l[0]/dl[0]);
+    
+    	multiplicitiesGhost[iParticle]++;
 
         hPartParam2DGhost[iParticle][0]->Fill(Rapidity,Pt,1);
 
@@ -1029,6 +1074,8 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
         hPartParamBG[iParticle][11]->Fill(Z);
         hPartParamBG[iParticle][12]->Fill(l[0]/dl[0]);
 
+		multiplicitiesBG[iParticle]++;
+
         hPartParam2DBG[iParticle][0]->Fill(Rapidity,Pt,1);
       }
       continue;
@@ -1048,14 +1095,20 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     hPartParamSignal[iParticle][12]->Fill(l[0]/dl[0]);
 
     hPartParam2DSignal[iParticle][0]->Fill(Rapidity,Pt,1);
-
+	
+	multiplicitiesSignal[iParticle]++;
+	
     int iMCPart = RtoMCParticleId[iP].GetBestMatchWithPdg();
     KFMCParticle &mcPart = vMCParticles[iMCPart];
     // Fit quality of the mother particle
     {
       int iMCTrack = mcPart.GetMCTrackID();
       CbmMCTrack &mcTrack = *(static_cast<CbmMCTrack*>(flistMCTracks->At(iMCTrack)));
+	  //std::cout << mcPart.NDaughters() << " ";
+	  //std::cout <<  mcPart.GetDaughterIds()[0] << std::endl;
+	  if (mcPart.NDaughters()==0) continue;
       int mcDaughterId = mcPart.GetDaughterIds()[0];
+	  //std::cout <<  mcPart.GetDaughterIds()[0] << " ";
       CbmMCTrack &mcDaughter = *(static_cast<CbmMCTrack*>(flistMCTracks->At(mcDaughterId)));
 
       Double_t decayVtx[3] = { mcDaughter.GetStartX(), mcDaughter.GetStartY(), mcDaughter.GetStartZ() };
@@ -1205,5 +1258,12 @@ void CbmKFParticlesFinderQA::PartHistoPerformance()
     float chiPrim = fPF->GetChiPrim()[iP];
     if(iParticle > -1 && iParticle<CbmKFPartEfficiencies::nParticles)
       hTrackParameters[iParticle]->Fill(chiPrim );
+  }
+  
+  for(unsigned int iP=0; iP < CbmKFPartEfficiencies::nParticles; iP++) {
+	hPartParam[iP][13]->Fill(multiplicities[iP]);
+	hPartParamGhost[iP][13]->Fill(multiplicitiesGhost[iP]);
+	hPartParamBG[iP][13]->Fill(multiplicitiesBG[iP]);
+	hPartParamSignal[iP][13]->Fill(multiplicitiesSignal[iP]);
   }
 } // void CbmKFParticlesFinderQA::ParticlesEfficienciesPerformance()

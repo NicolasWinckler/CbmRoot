@@ -36,6 +36,7 @@
 #pragma link C++ class  KFParticleBase+;
 #pragma link C++ class  KFParticle+;
 
+#pragma link C++ class  CbmThermalModelNoFlow+;
 #pragma link C++ class  CbmKFParticlesFinder+;
 //KFQA
 #pragma link C++ class  CbmKFPartEfficiencies+;

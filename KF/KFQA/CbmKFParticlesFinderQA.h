@@ -22,6 +22,8 @@
 #include "CbmKFPartEfficiencies.h"
 #include "CbmKFTrErrMCPoints.h"
 #include "FairTask.h"
+#include "../KFModelParameters/CbmThermalModelNoFlow.h"
+//#include "../KFModelParameters/CbmMSS.h"
 #include <vector>
 #include <map>
 #include <cstring>
@@ -39,7 +41,7 @@ class CbmKFParticlesFinderQA :public FairTask
 
   CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf=0, Int_t iVerbose = 1, int findParticlesMode = 1, int perf = 3,
                          const char *name ="CbmKFParticlesFinderQA",
-                         const char *title="Cbm KF Particles Finder QA");
+                         const char *title="Cbm KF Particles Finder QA", float ekin_=24.08);
   ~CbmKFParticlesFinderQA();
 
   void SetOutFile(TString outname) {outfileName = outname;}
@@ -120,8 +122,8 @@ class CbmKFParticlesFinderQA :public FairTask
   TH1F *hFitDaughtersQA[CbmKFPartEfficiencies::nParticles][nFitQA];
   TH1F *hFitQA[CbmKFPartEfficiencies::nParticles][nFitQA];
 
-  static const int nHistoPartParam = 13;
-  TH1F *hPartParam[CbmKFPartEfficiencies::nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z
+  static const int nHistoPartParam = 14;
+  TH1F *hPartParam[CbmKFPartEfficiencies::nParticles][nHistoPartParam]; // mass, p, pt, Y, decay length, c*tau, chi/ndf, prob, theta, phi, z, multiplicity
   TH1F *hPartParamBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
   TH1F *hPartParamGhost[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
 //   TH1F *hPartParamCorrBG[CbmKFPartEfficiencies::nParticles][nHistoPartParam];
@@ -158,6 +160,9 @@ class CbmKFParticlesFinderQA :public FairTask
  private:
   CbmKFParticlesFinderQA(const CbmKFParticlesFinderQA&);
   void operator=(const CbmKFParticlesFinderQA&);
+  CbmThermalModelNoFlow* ThermalNoFlow;
+  //CbmMSS* MSSModel;
+  TDirectory* histodirmod;
 };
 
 #endif // _CbmKFParticlesFinderQA_h_

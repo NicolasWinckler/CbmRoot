@@ -17,6 +17,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
+${CBMROOT_SOURCE_DIR}/KF/KFModelParameters
 ${CBMROOT_SOURCE_DIR}/KF/KFQA
 ${CBMROOT_SOURCE_DIR}/KF/KFParticle
 ${CBMROOT_SOURCE_DIR}/KF/KFParticlesFinder
@@ -74,6 +75,7 @@ Interface/CbmGlobalTrackFitterKF.cxx
 CbmKFParticle.cxx
 CbmKFParticle_simd.cxx
 CbmKFParticleInterface.cxx
+KFModelParameters/CbmThermalModelNoFlow.cxx
 KFQA/CbmKFTrErrMCPoints.cxx
 KFQA/CbmKFTrackFitQA.cxx
 KFQA/KFParticleMatch.cxx
@@ -112,6 +114,7 @@ Interface/CbmStsKFSecondaryVertexFinder.h
 Interface/CbmTrdTrackFitterKF.h
 Interface/CbmGlobalTrackFitterKF.h
 CbmKFParticle.h
+KFModelParameters/CbmThermalModelNoFlow.h
 KFQA/CbmKFTrErrMCPoints.h
 KFQA/CbmKFTrackFitQA.h
 KFQA/KFParticleMatch.h
@@ -140,7 +143,7 @@ ENDIF (SSE_FOUND)
 set(LINKDEF KFLinkDef.h)
 Set(LIBRARY_NAME KF)
 Set(DEPENDENCIES
-    Ecal CbmBase CbmData Base 
+    Ecal CbmBase CbmData Base
 )
 
 GENERATE_LIBRARY()

@@ -136,8 +136,12 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   for(unsigned short iTr=0; iTr < vRTracks.size(); iTr++) {
     CbmKFTrack& kfTrack = vRTracks[iTr] ;
     kfTrack.SetId(iTr);
-    KFParticle tmp(&kfTrack);
+    KFParticle tmp(&kfTrack, NULL, NULL, const_cast<int*>(&vTrackPDG[iTr]));
     tmp.SetPDG(211);//vTrackPDG[iTr]);
+	if (vTrackPDG[iTr]==211 || vTrackPDG[iTr]==-211 ||
+		vTrackPDG[iTr]==321 || vTrackPDG[iTr]==-321 ||
+		vTrackPDG[iTr]==2212 || vTrackPDG[iTr]==-2212) tmp.SetPDG(vTrackPDG[iTr]);
+	//std::cout << tmp.GetMass() << " " << vTrackPDG[iTr] << "\t";
     tmp.SetId(Particles.size());
     tmp.SetNDaughters(1);
     tmp.AddDaughterId( iTr );
@@ -170,7 +174,7 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   vector<KFParticle> vXiStarBarPrim;
 
   const float SecCuts[3] = {3.f,5.f,10.f};
-//  const float SecCuts[3] = {3.f,5.f,4.f};
+
 
   //K0s -> pi+ pi-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[5], pdgPos[5], 310,
@@ -199,10 +203,10 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   //phi -> K+ K-
   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[3], pdgPos[3], 333,
                      idNegPrim[3], idPosPrim[3], PrimVtx, cuts[1], 1);
-//   //rho -> pi+ pi-
-//   Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[2], pdgPos[2], 113,
-//                      idNegPrim[2], idPosPrim[2],
-//                      PrimVtx, cuts[1]);
+  //rho -> pi+ pi-
+  Find2DaughterDecay(vRTracks, vField, Particles, pdgNeg[2], pdgPos[2], 113,
+                     idNegPrim[2], idPosPrim[2],
+                     PrimVtx, cuts[1]);
   //gamma -> e+ e-
 
   float SecCutsGamma[3] = {3,3,-100};
@@ -275,7 +279,7 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   CombinePartPart(vPi0Sec, vLambdaBarSec, Particles, PrimVtx, cutSigma0, 0, -3322, 0);
 
   // Find Xi-
-   float cutXi[3] = {10.,5.,6.};
+   float cutXi[3] = {10.,5.,6.};//l, xi2topo Xi-, chi2topo Xi-
 //  float cutXi[3] = {-300.,10.,10.};
   FindTrackV0Decay(3312, Particles, vLambdaSec, vRTracks, vField, pdgNeg[5], idNegSec[5],
                    PrimVtx, cutXi, 0, 0, &vXiPrim, massKsiPDG, 0.002 );
@@ -295,7 +299,7 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
   FindTrackV0Decay(-3312, Particles, vLambdaBarSec, vRTracks, vField, pdgPos[5], idPosSec[5],
                    PrimVtx, cutXiPlus, 0, 0, &vXiBarPrim, massKsiPDG, 0.002);
   //Find Omega-
-  float cutOmega[3] = {10.,3.,3.};
+  float cutOmega[3] = {10.,3.,3.}; //l, xi2topo lambda, chi2topo Omega-
   FindTrackV0Decay(3334, Particles, vLambdaSec, vRTracks, vField, pdgNeg[6], idNegSec[6],
                    PrimVtx, cutOmega, 0, &ChiToPrimVtx);
   //Find Omega+
@@ -382,12 +386,12 @@ void KFParticleFinder::FindParticles(vector<CbmKFTrack> &vRTracks, vector<float>
     vHdibarion[iH].SetId(Particles.size());
     Particles.push_back(vHdibarion[iH]);
   }
-  //                          chi2_prim  chi2_geo    z     pt  chi2_topo
-  const float cutsD[8][8] = {{    6.,        3.,   0.04,  0.3,     3.},  //D0 -> pi+ K-
-                             {    6.,        3.,   0.04,  0.3,     3.},  //D+ -> K- pi+ pi+
-                             {    6.,        3.,   0.04,  0.3,     3.},  //D0 -> pi+ pi+ pi- K-
-                             {    6.,        3.,   0.04,  0.3,     3.},  //Ds+ -> K- K+ pi+
-                             {    6.,        3.,   0.04,  0.3,     3.},  //Lambdac -> pi+ K- p
+  //                          chi2_prim  chi2_geo  l/dl     pt  chi2_topo
+  const float cutsD[8][8] = {{    6.,        3.,   5,     0.3,     3.},  //D0 -> pi+ K-
+                             {    6.,        3.,   5,     0.3,     3.},  //D+ -> K- pi+ pi+
+                             {    6.,        3.,   5,     0.3,     3.},  //D0 -> pi+ pi+ pi- K-
+                             {    6.,        3.,   5,     0.3,     3.},  //Ds+ -> K- K+ pi+
+                             {    6.,        3.,   5,     0.3,     3.},  //Lambdac -> pi+ K- p
                              {    6.,        3.,  -100.,  0.3,  -100.},  //D*0  -> D+ pi-
                              {    6.,        3.,  -100.,  0.3,  -100.},  //D*+  -> D0 pi+
                              {    6.,        3.,  -100.,  0.3,  -100.}}; //D*+4 -> D04 pi+
@@ -797,7 +801,8 @@ void KFParticleFinder::FindTrackV0Decay(const int MotherPDG,
             Double_t mass, errMass;
 
             hyperon_temp.GetMass(mass, errMass);
-            hyperon_temp.SetNonlinearMassConstraint(hyperonPrimMass);
+	    if(hyperonPrimMass < 50)
+              hyperon_temp.SetNonlinearMassConstraint(hyperonPrimMass);
 
             if( (fabs(mass - hyperonPrimMass)/hyperonPrimMassErr) <= 3 )
               vHyperonPrim->push_back(hyperon_temp);
@@ -1163,6 +1168,8 @@ void KFParticleFinder::SelectParticleCandidates(vector<KFParticle>& Particles,
       candTopo.GetDistanceToVertexLine(PrimVtx, l, dl, &isParticleFromVertex);
       if(!(isParticleFromVertex[iv])) continue;
       if(((l/dl)[iv] < cuts[2]) ) continue;
+      
+      if(l[iv] > 3.) continue;
 
       if(candTopo.GetChi2()[iv]/candTopo.GetNDF()[iv] > cuts[4] ) continue;
 

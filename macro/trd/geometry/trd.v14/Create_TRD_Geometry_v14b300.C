@@ -1733,11 +1733,14 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 
 Int_t copy_nr(Int_t stationNr, Int_t copyNr, Int_t isRotated, Int_t planeNr, Int_t modinplaneNr)
 {
-  return (stationNr      * 10000000    // 1 digit
-        + copyNr         *   100000    // 2 digit
-        + isRotated      *    10000    // 1 digit
-        + planeNr        *      100    // 2 digit
-        + modinplaneNr   *        1 ); // 2 digit
+  if (modinplaneNr > 128)
+    printf("Warning: too many modules in this layer %02d (max 128 according to CbmTrdAddress)\n", planeNr);
+
+  return (stationNr      * 100000000    // 1 digit
+        + copyNr         *   1000000    // 2 digit
+        + isRotated      *    100000    // 1 digit
+        + planeNr        *      1000    // 2 digit
+        + modinplaneNr   *         1 ); // 3 digit
 }
 
 void create_detector_layers(Int_t layerId)

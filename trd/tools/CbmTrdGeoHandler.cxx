@@ -70,10 +70,26 @@ Int_t CbmTrdGeoHandler::GetModuleAddress()
     copyNr = node->GetNumber();
   }
   LOG(DEBUG4) << "CopyNr: " << copyNr << FairLogger::endl;
-  
-  // In TGeoManager numbering starts with 1, so we have to subtract 1.
-  Int_t layerId = ((copyNr / 100) % 100) - 1;
-  Int_t moduleId = (copyNr % 100) - 1;
+
+  Int_t layerId  = 0;
+  Int_t moduleId = 0;
+
+  if ((copyNr / 100000000) > 0)  // has 9 digits => 2014 format
+  {
+    // In TGeoManager numbering starts with 1, so we have to subtract 1.
+    layerId = ((copyNr / 1000) % 100) - 1;
+    moduleId = (copyNr % 1000) - 1;
+    LOG(DEBUG4) << "2014 ";
+  }
+  else // 2013 and earlier
+  {
+    // In TGeoManager numbering starts with 1, so we have to subtract 1.
+    layerId = ((copyNr / 100) % 100) - 1;
+    moduleId = (copyNr % 100) - 1;
+    LOG(DEBUG4) << "2013 ";
+  }
+
+  LOG(DEBUG4) << copyNr / 100000000 << " copy " << copyNr << " layerID " << layerId << " moduleId " << moduleId  << FairLogger::endl;
   // Form the module address.
   return CbmTrdAddress::GetAddress(layerId, moduleId, 0, 0, 0);
 }
@@ -222,15 +238,26 @@ void CbmTrdGeoHandler::NavigateTo(
       // fIsRotated is the 4th digit from the back
       fStation   = ((layercopyNr / 10000) % 10);  // from layer copy number
       //      std::cout << "DE fStation: " << fStation << " " << std::endl;
-      fLayer     = ((layercopyNr /  100) % 10);  // from layer copy number
+      fLayer     = ((layercopyNr /   100) % 10);  // from layer copy number
 
       // We take the mother node (module) of the current node we are in (gas).
       TGeoNode* modulenode = gGeoManager->GetMother();
       // Get the module copy number to get the information about layerId and moduleId.
       Int_t modulecopyNr = modulenode->GetNumber();
-      // In TGeoManager numbering starts with 1, so we have to subtract 1.
-      fModuleCopy= ((modulecopyNr / 100000) % 100);  // from module copy number
-      fRotation  = ((modulecopyNr /  10000) %  10);  // from module copy number
+
+      if ((modulecopyNr / 100000000) > 0)  // has 9 digits => 2014 format
+      {
+        // In TGeoManager numbering starts with 1, so we have to subtract 1.
+        fModuleCopy= ((modulecopyNr / 1000000) % 100);  // from module copy number
+        fRotation  = ((modulecopyNr /  100000) %  10);  // from module copy number
+      }
+      else // 2013 and earlier
+      {
+        // In TGeoManager numbering starts with 1, so we have to subtract 1.
+        fModuleCopy= ((modulecopyNr / 100000) % 100);  // from module copy number
+        fRotation  = ((modulecopyNr /  10000) %  10);  // from module copy number
+      }
+
       //      std::cout << "fRotation: " << modulecopyNr << " " << fRotation << std::endl;
       //      fLayerId   = ((modulecopyNr /    100) % 100) - 1;
       //      fModuleId  = ((modulecopyNr /      1) % 100) - 1;

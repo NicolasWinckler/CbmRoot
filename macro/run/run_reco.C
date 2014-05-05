@@ -187,6 +187,7 @@ void run_reco(Int_t nEvents = 2) {
   // ===                     TRD local reconstruction                      ===
   // =========================================================================
 
+  Bool_t  simpleTR  = kTRUE;  // use fast and simple version for TR production
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR,"K++");
   //"K++" : micro structured POKALON
   //"H++" : PE foam foils

@@ -57,6 +57,11 @@ class CbmTrdHitDensityQa : public FairTask
 
  private:
 
+  Double_t TriggerRate2DataRate(Double_t triggerrate);
+  Double_t DataRate2TriggerRate(Double_t datarate);
+  Double_t TriggerCount2TriggerRate(Double_t count);
+  Double_t TriggerRate2TriggerCount(Double_t rate);
+
   std::ofstream myfile;
 
   Double_t fBitPerHit;

@@ -327,6 +327,10 @@ void CbmTrdHitDensityQa::Exec(Option_t * option)
   // ---- Finish --------------------------------------------------------
 void CbmTrdHitDensityQa::Finish()
 { 
+  std::map<Int_t, std::pair<Int_t, TH2D*> > AsicTriggerMap;
+  std::map<Int_t, std::pair<Int_t, TH2D*> >::iterator AsicTriggerMapIt;
+
+
   Bool_t logScale = false;
   Int_t nTotalAsics = 0;
   Int_t nTotalOptLinks = 0;
@@ -425,11 +429,24 @@ void CbmTrdHitDensityQa::Finish()
       Layer->Fill(0.,0.,0);
       Layer->Draw("colz");
     }
- 
+    const Int_t nModules = fDigiPar->GetNrOfModules();
     fModuleInfo = fDigiPar->GetModule(fModuleHitMapIt->first);
     gGeoManager->FindNode(fModuleInfo->GetX(), fModuleInfo->GetY(), fModuleInfo->GetZ());
     std::vector<Int_t> AsicAddresses = fModuleInfo->GetAsicAddresses();
     Int_t nofAsics = fModuleInfo->GetNofAsics();
+    if (fPlotResults){
+      if (AsicTriggerMap.find(nofAsics) == AsicTriggerMap.end()){
+	name.Form("hd_ASICs%03i",nofAsics);
+	title.Form("hd_ASICs%03i_%.1fcmx%.1fcm_%03ix%03ipads", nofAsics, 2*fModuleInfo->GetSizeX(), 2*fModuleInfo->GetSizeY(), fModuleInfo->GetNofRows(), fModuleInfo->GetNofColumns());
+	AsicTriggerMap[nofAsics] = std::make_pair(1, new TH2D(name,title,nofAsics,-0.5,nofAsics-0.5,nModules,-0.5,nModules-0.5));
+	AsicTriggerMap[nofAsics].second->SetContour(99);
+	AsicTriggerMap[nofAsics].second->SetXTitle("ASIC Id");
+	AsicTriggerMap[nofAsics].second->SetYTitle("module count");
+	AsicTriggerMap[nofAsics].second->SetZTitle("trigger per ASIC");
+      } else {
+	AsicTriggerMap[nofAsics].first += 1;
+      }
+    }
     //printf("     NofAsics:     %3i\n",nofAsics);
     myfile << "# NofAsics     : " << nofAsics << endl;
     myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
@@ -468,7 +485,8 @@ void CbmTrdHitDensityQa::Finish()
 	    local_min[i] *= 10.;
 	    local_max[i] *= 10.;
 	  }
-	  Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;// * 
+	  //Double_t rate = Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1)) / Double_t(fEventCounter->GetEntries()) * fEventRate;// * 
+	  Double_t rate = TriggerCount2TriggerRate(Double_t(fModuleHitMapIt->second->GetBinContent(c+1,global_Row+1))); 
 	  ratePerModule += rate;
 	  Int_t AsicAddress = fModuleInfo->GetAsicAddress(channelAddress);
 	  ratePerAsicMap[AsicAddress] += rate;
@@ -511,18 +529,29 @@ void CbmTrdHitDensityQa::Finish()
     module->Draw("same");
     delete fModuleHitMapIt->second;
     for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
-      fModuleHitASICMap[moduleAddress]->Fill(iAsic, ratePerAsicMap[AsicAddresses[iAsic]] * Double_t(fEventCounter->GetEntries()) / fEventRate);
+      //fModuleHitASICMap[moduleAddress]->Fill(iAsic, ratePerAsicMap[AsicAddresses[iAsic]] * Double_t(fEventCounter->GetEntries()) / fEventRate);
+      fModuleHitASICMap[moduleAddress]->Fill(iAsic, TriggerRate2TriggerCount(ratePerAsicMap[AsicAddresses[iAsic]]));
+      if (fPlotResults){
+	if (ratePerAsicMap[AsicAddresses[0]] > ratePerAsicMap[AsicAddresses[nofAsics-1]])
+	  AsicTriggerMap[nofAsics].second->SetBinContent(iAsic+1, AsicTriggerMap[nofAsics].first, ratePerAsicMap[AsicAddresses[iAsic]] * fScaleCentral2mBias);
+	else 
+	  AsicTriggerMap[nofAsics].second->SetBinContent(nofAsics-iAsic, AsicTriggerMap[nofAsics].first, ratePerAsicMap[AsicAddresses[iAsic]] * fScaleCentral2mBias);
+      }
       myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
 	     << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
 	     << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
-      Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]]  * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+      //Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]]  * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+      Double_t dataPerAsic = TriggerRate2DataRate(ratePerAsicMap[AsicAddresses[iAsic]])  * 1e-6;  // Mbit, incl. neighbor
       //HitAsic->Fill(dataPerAsic);
     }
+    //if (fPlotResults)
+    //AsicTriggerMap[nofAsics].first +=1;
     if (!fPlotResults)
       fModuleHitASICMap[moduleAddress]->Write("", TObject::kOverwrite);
     delete fModuleHitASICMap[moduleAddress];
   }
-  Double_t dataPerModule = ratePerModule * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
+  //Double_t dataPerModule = ratePerModule * 1e-6 * fBitPerHit * fScaleCentral2mBias;  // Mbit, incl. neighbor
+  Double_t dataPerModule = TriggerRate2DataRate(ratePerModule) * 1e-6 * fScaleCentral2mBias;  // Mbit, incl. neighbor
   Int_t    nOptLinks     = 1 + dataPerModule / 4000.; // 5000.; // 1 link plus 1 for each 4 Gbps (fill links to 80% max)
   //h1DataModule->Fill(dataPerModule);
   //h1OptLinksModule->Fill(nOptLinks);
@@ -544,6 +573,18 @@ void CbmTrdHitDensityQa::Finish()
   myfile.close();
   fModuleHitASICMap.clear();
   fModuleHitMap.clear();
+  gDirectory->Cd("..");
+  if (!gDirectory->Cd("ASIC")) 
+    gDirectory->mkdir("ASIC");
+  gDirectory->Cd("ASIC");
+  if (fPlotResults){
+    for (AsicTriggerMapIt = AsicTriggerMap.begin();
+	 AsicTriggerMapIt != AsicTriggerMap.end(); ++AsicTriggerMapIt) {
+      AsicTriggerMapIt->second.second->GetYaxis()->SetRangeUser(-0.5,AsicTriggerMapIt->second.first-1.5);
+      AsicTriggerMapIt->second.second->GetZaxis()->SetRangeUser(0,8.0E6);
+      AsicTriggerMapIt->second.second->Write("", TObject::kOverwrite);
+    }
+  }
   gDirectory->Cd("..");
   for (LayerMapIt = LayerMap.begin();
        LayerMapIt != LayerMap.end(); ++LayerMapIt) {
@@ -580,6 +621,19 @@ void CbmTrdHitDensityQa::FinishEvent() {
   // -------------------------------------------------------------------------
 
 void CbmTrdHitDensityQa::SetTriggerThreshold(Double_t triggerthreshold){
-fTriggerThreshold = triggerthreshold;
+  fTriggerThreshold = triggerthreshold;
+}
+
+Double_t CbmTrdHitDensityQa::TriggerRate2DataRate(Double_t triggerrate){
+  return triggerrate * fBitPerHit;
+}
+  Double_t CbmTrdHitDensityQa::DataRate2TriggerRate(Double_t datarate){
+  return datarate / fBitPerHit;
+}
+  Double_t CbmTrdHitDensityQa::TriggerCount2TriggerRate(Double_t count){
+  return count / Double_t(fEventCounter->GetEntries()) * fEventRate;
+}
+Double_t CbmTrdHitDensityQa::TriggerRate2TriggerCount(Double_t rate){
+  return rate * Double_t(fEventCounter->GetEntries()) / fEventRate;
 }
   ClassImp(CbmTrdHitDensityQa)

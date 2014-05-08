@@ -89,6 +89,7 @@ dielectron/CbmAnaLmvmNames.cxx
 dielectron/CbmAnaDielectronStudyReportAll.cxx
 dielectron/CbmAnaDielectronReports.cxx
 
+conversion/CbmAnaConversion.cxx
 #photon/CbmTrdPhotonAnalysis.cxx
 )
 

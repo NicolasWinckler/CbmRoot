@@ -44,6 +44,8 @@
 #pragma link C++ class CbmAnaDielectronReports+;
 #pragma link C++ class CbmAnaMuchBgd+;
 
+#pragma link C++ class CbmAnaConversion+;
+
 //#pragma link C++ class CbmTrdPhotonAnalysis+;
 
 #endif

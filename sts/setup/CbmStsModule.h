@@ -16,6 +16,7 @@
 
 
 class TGeoPhysicalNode;
+class CbmStsDigi;
 
 
 using namespace std;
@@ -86,12 +87,25 @@ class CbmStsModule : public CbmStsElement
 
   private:
 
+    Double_t fDynRange;        // dynamic range [e]
+    Double_t fThreshold;       // threshold [e]
+    Int_t    fNofAdcChannels;  // Number of ADC channels
+
     vector<CbmStsSenzor*> fSensors;       ///< Array of sensors
     // TODO: Unify inherited array and private array
 
 
     /** Buffer for the analogue signals **/
     map<Int_t, pair<Double_t, Double_t> > fBuffer;
+
+
+    /** Create a digi from a charge signal
+     ** @param channel  Module readout channel number
+     ** @param charge   Analogue charge [e]
+     ** @param time     Absolute signal time [ns]
+     ** @return  Pointer to new digi
+     **/
+    CbmStsDigi* CreateDigi(Int_t channel, Double_t charge, Double_t time);
 
 
     CbmStsModule(const CbmStsModule&);

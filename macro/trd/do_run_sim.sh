@@ -8,7 +8,7 @@ while read line
 do
     maxThreads=$line
     echo "${maxThreads} threads are started in parallel"
-done <temp
+done
 rm temp  
  maxThreads=3
 for urqmd in {0..399}

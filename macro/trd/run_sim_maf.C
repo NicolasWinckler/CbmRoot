@@ -10,6 +10,7 @@
 
 void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mbias")
 {
+  const char* setup = "sis300_electron";
 
   // ========================================================================
   // geometry selection for sim + reco  by Cyrano                            
@@ -33,34 +34,29 @@ void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mb
   //  TString inFile  = inDir + "/input/urqmd.ftn14";
   TString fileName;
   fileName.Form("urqmd.auau.25gev.%s.%04i.ftn14",centrality.Data(),urqmd);
-  TString inFile  = inDir + "/input/urqmd/" + fileName;//"/input/urqmd/urqmd.auau.25gev.centr.0000.ftn14";
+  TString inFile  = inDir + "/input/" + fileName;//"/input/urqmd/urqmd.auau.25gev.centr.0000.ftn14";
   TString outDir  = "data/sim/";
   fileName.Form("test.mc.%04i.root",urqmd);
   TString outFile = outDir + fileName;//"/test.mc.root";
   fileName.Form("test.params.%04i.root",urqmd);
   TString parFile = outDir + fileName;//"/params.root";
   
-  // -----  Geometries  -----------------------------------------------------
-  TString caveGeom   = "cave.geo";
-  CbmTarget* target  = new CbmTarget("Gold", 0.025);
-  TString pipeGeom   = "pipe/pipe_standard.geo";
-  TString magnetGeom = "magnet/magnet_v12b.geo.root";
-  TString mvdGeom    = "mvd/mvd_v07a.geo";
-  TString stsGeom    = "sts/sts_v12b.geo.root";
-  TString richGeom   = "rich/rich_v08a.geo";
-  //  TString trdGeom    = "trd/trd_v13o.root";
+  // -----  Geometries  -----------------------------------------------------                                                                        
+  TString setupFile = inDir + "/geometry/setup/" + setup + "_setup.C";
+  TString setupFunct = setup;
+  setupFunct += "_setup()";
+
+  gROOT->LoadMacro(setupFile);
+  gInterpreter->ProcessLine(setupFunct);
+
+  CbmTarget* target = new CbmTarget("Gold", 0.025);
+
+  // -----  set our own TRD  -----------------------------------------------------                                                                   
+  //  TString trdGeom    = "trd/trd_v13o.root";                                                                                                      
   TString trdGeom    = "trd/" + selectGeo;
-  //  TString tofGeom    = "tof/tof_v13b.root";
   TString tofGeom    = "";
-  TString ecalGeom   = "";
-//  TString ecalGeom   = "ecal/ecal_v08a.geo";
-  
-  // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap     = "field_v12b";   // name of field map
-  Double_t fieldZ       = 40.;            // field centre z position
-  Double_t fieldScale   =  1.;            // field scaling factor
-  Int_t    fieldSymType =  3;
-  
+  TString psdGeom    = "";
+
   // In general, the following parts need not be touched
   // ========================================================================
 
@@ -112,6 +108,12 @@ void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mb
     fRun->AddModule(magnet);
   }
   
+  if ( platformGeom != "" ) {
+    FairModule* platform = new CbmPlatform("PLATFORM");
+    platform->SetGeometryFileName(platformGeom);
+    fRun->AddModule(platform);
+  }
+
   if ( mvdGeom != "" ) {
     FairDetector* mvd = new CbmMvd("MVD", kTRUE);
     mvd->SetGeometryFileName(mvdGeom);
@@ -119,7 +121,7 @@ void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mb
   }
 
   if ( stsGeom != "" ) {
-    FairDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmStsMC(kTRUE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
   }
@@ -130,6 +132,17 @@ void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mb
     fRun->AddModule(rich);
   }
   
+  if ( muchGeom != "" ) {
+    FairDetector* much = new CbmMuch("MUCH", kTRUE);
+    much->SetGeometryFileName(muchGeom);
+    fRun->AddModule(much);
+  }
+
+  if ( shieldGeom != "" ) {
+    FairModule* shield = new CbmShield("SHIELD");
+    shield->SetGeometryFileName(shieldGeom);
+    fRun->AddModule(shield);
+  }
 
   if ( trdGeom != "" ) {
     FairDetector* trd = new CbmTrd("TRD",kTRUE );
@@ -148,6 +161,14 @@ void run_sim_maf(Int_t nEvents = 1, Int_t urqmd = 0000, TString centrality = "mb
     fRun->AddModule(ecal);
   }
   
+  if ( psdGeom != "" ) {
+    cout << "Constructing PSD" << endl;
+    CbmPsdv1* psd= new CbmPsdv1("PSD", kTRUE);
+    psd->SetZposition(psdZpos); // in cm                                                                                                             
+    psd->SetXshift(psdXpos);  // in cm                                                                                                               
+    psd->SetGeoFile(psdGeom);
+    fRun->AddModule(psd);
+  }
   // ------------------------------------------------------------------------
 
 

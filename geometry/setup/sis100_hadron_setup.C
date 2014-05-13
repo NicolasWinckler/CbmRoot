@@ -42,7 +42,7 @@ void sis100_hadron_setup()
   pipeGeom     = "pipe/pipe_v13a.geo.root";
   magnetGeom   = "magnet/magnet_v12b.geo.root";
   mvdGeom      = "";
-  stsGeom      = "sts/sts_v13c.geo.root";
+  stsGeom      = "sts/sts_v13d.geo.root";
   richGeom     = "";
   muchGeom     = "";
   platformGeom = ""; // "passive/platform_v13a.geo";

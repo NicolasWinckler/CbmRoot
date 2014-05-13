@@ -42,7 +42,7 @@ void sis100_muon_setup()
   pipeGeom     = "pipe/pipe_v13c.geo.root";
   magnetGeom   = "magnet/magnet_v12b.geo.root";
   mvdGeom      = "";
-  stsGeom      = "sts/sts_v13c.geo.root";
+  stsGeom      = "sts/sts_v13d.geo.root";
   richGeom     = "";
   muchGeom     = "much/much_v13d.geo";
   shieldGeom   = "much/shield_v13d.geo";

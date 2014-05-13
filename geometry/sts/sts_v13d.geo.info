@@ -1,5 +1,11 @@
 STS geometry created with create_stsgeo_v13.C
 
+**** New geometry design by T. Balog. Better coverage of inner region
+**** close to beam pipe (w.r.t. v12). Introduction of two new sensor types and
+**** re-design of ladders and station. 
+**** Cable thinkness changed to more realistic value of 200 mum
+**** (representing two cables for front and back side).
+
 Global variables: 
 Sensor thickness = 0.03 cm
 Vertical gap in sensor chain = 0 cm

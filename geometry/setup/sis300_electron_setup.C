@@ -43,7 +43,7 @@ void sis300_electron_setup()
   pipeGeom     = "pipe/pipe_v13b.geo.root";
   magnetGeom   = "magnet/magnet_v12b.geo.root";
   mvdGeom      = "";
-  stsGeom      = "sts/sts_v13c.geo.root";
+  stsGeom      = "sts/sts_v13d.geo.root";
   richGeom     = "rich/rich_v08a.geo";
   muchGeom     = "";
   shieldGeom   = "";

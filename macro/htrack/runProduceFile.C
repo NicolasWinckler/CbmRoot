@@ -46,7 +46,7 @@ Int_t runProduceFile(Int_t nEvents=2)
   Double_t fieldScale = 1.;      // field scaling factor
 
   // STS geometry
-  TString stsGeom     = "sts/sts_v13c.geo.root";
+  TString stsGeom     = "sts/sts_v13d.geo.root";
   //TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
 
 

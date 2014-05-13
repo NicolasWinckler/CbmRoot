@@ -21,7 +21,7 @@ void mvd_reco(Int_t nEvents = 100)
    TString mvdRecoFile = dir + "mvd.reco.0000.root"; // Output file with reconstructed tracks and hits
 
    TList *parFileList = new TList();
-   TObjString stsDigiFile = parDir + "/sts/sts_v13c_std.digi.par"; // Digi scheme for STS
+   TObjString stsDigiFile = parDir + "/sts/sts_v13d_std.digi.par"; // Digi scheme for STS
    TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13c.root";
 
    TString resultDir = "./test/"; // Directory for output results

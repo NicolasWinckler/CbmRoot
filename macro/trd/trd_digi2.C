@@ -76,7 +76,7 @@ void trd_digi2(Int_t nEvents = 1)
   TString workDir = gSystem->Getenv("VMCWORKDIR");
   TString paramDir = workDir + "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v12b_std.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v13d_std.digi.par";
   parFileList->Add(&stsDigiFile);
 
   //  TObjString trdDigiFile =  paramDir + "/trd/trd_v13o.digi.par";

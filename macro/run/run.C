@@ -14,7 +14,7 @@ void run()
   CbmTarget* target = new CbmTarget("Gold", 0.025);
   TString pipeGeom   = "pipe/pipe_standard.geo";
   TString magnetGeom = "magnet/magnet_v09e.geo";
-  TString stsGeom    = "sts/sts_v13c.geo.root";
+  TString stsGeom    = "sts/sts_v13d.geo.root";
   TString richGeom   = "rich/rich_v08a.geo";
   TString trdGeom    = "trd/trd_v13g.geo.root";
   TString tofGeom    = "tof/tof_v07a.geo";

@@ -52,7 +52,7 @@ void run_digi(Int_t nEvents = 10) {
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters";
 
-  TObjString stsDigiFile = paramDir + "/sts/sts_v13c_std.digi.par";
+  TObjString stsDigiFile = paramDir + "/sts/sts_v13d_std.digi.par";
   parFileList->Add(&stsDigiFile);
 
   

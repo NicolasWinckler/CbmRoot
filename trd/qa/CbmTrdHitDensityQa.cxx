@@ -341,7 +341,8 @@ void CbmTrdHitDensityQa::Finish()
   TDatime time;
   TString outfile;
   outfile.Form("hits_per_asic.%i:%i:%i_%i.%i.%i.txt",time.GetHour(),time.GetMinute(),time.GetSecond(),time.GetDay(),time.GetMonth(),time.GetYear());
-  myfile.open(outfile,std::fstream::out);
+  if (fPlotResults)
+    myfile.open(outfile,std::fstream::out);
   //myfile << "#" << endl;
   //myfile << "##   TRD data per ASIC" << endl;
   //myfile << "#" << endl;
@@ -586,7 +587,8 @@ void CbmTrdHitDensityQa::Finish()
     myfile << "#--------------------------" << endl;
     myfile << "#--------------------------" << endl;
   */
-  myfile.close();
+  if (fPlotResults)
+    myfile.close();
   fModuleHitASICMap.clear();
   fModuleHitMap.clear();
   gDirectory->Cd("..");
@@ -624,33 +626,33 @@ void CbmTrdHitDensityQa::Finish()
 }
 
   // -----   Public method EndOfEvent   --------------------------------------
-void CbmTrdHitDensityQa::FinishEvent() {
-  if (fDigis){
-    fDigis->Clear("C");
-    fDigis->Delete();
+  void CbmTrdHitDensityQa::FinishEvent() {
+    if (fDigis){
+      fDigis->Clear("C");
+      fDigis->Delete();
+    }
+    if (fClusters){
+      fClusters->Clear("C");
+      fClusters->Delete();
+    }
+    fUsedDigiMap.clear();
   }
-  if (fClusters){
-    fClusters->Clear("C");
-    fClusters->Delete();
-  }
-  fUsedDigiMap.clear();
-}
   // -------------------------------------------------------------------------
 
-void CbmTrdHitDensityQa::SetTriggerThreshold(Double_t triggerthreshold){
-  fTriggerThreshold = triggerthreshold;
-}
+  void CbmTrdHitDensityQa::SetTriggerThreshold(Double_t triggerthreshold){
+    fTriggerThreshold = triggerthreshold;
+  }
 
-Double_t CbmTrdHitDensityQa::TriggerRate2DataRate(Double_t triggerrate){
-  return triggerrate * fBitPerHit;
-}
+  Double_t CbmTrdHitDensityQa::TriggerRate2DataRate(Double_t triggerrate){
+    return triggerrate * fBitPerHit;
+  }
   Double_t CbmTrdHitDensityQa::DataRate2TriggerRate(Double_t datarate){
-  return datarate / fBitPerHit;
-}
+    return datarate / fBitPerHit;
+  }
   Double_t CbmTrdHitDensityQa::TriggerCount2TriggerRate(Double_t count){
-  return count / Double_t(fEventCounter->GetEntries()) * fEventRate;
-}
-Double_t CbmTrdHitDensityQa::TriggerRate2TriggerCount(Double_t rate){
-  return rate * Double_t(fEventCounter->GetEntries()) / fEventRate;
-}
+    return count / Double_t(fEventCounter->GetEntries()) * fEventRate;
+  }
+  Double_t CbmTrdHitDensityQa::TriggerRate2TriggerCount(Double_t rate){
+    return rate * Double_t(fEventCounter->GetEntries()) / fEventRate;
+  }
   ClassImp(CbmTrdHitDensityQa)

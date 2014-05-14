@@ -170,6 +170,23 @@ void CbmMuchDigitizeGem::Exec(Option_t* opt) {
     CbmMCBuffer::Instance()->Clear();
     CbmMCBuffer::Instance()->Fill(fPoints,kMUCH,0,0);
     CbmMCBuffer::Instance()->SetEndOfRun();
+
+    // Timur: to fix problem with cleanup between events <
+    vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+
+    for (vector<CbmMuchModule*>::iterator i = modules.begin(); i != modules.end(); ++i)
+    {
+      CbmMuchModuleGemRadial* module = static_cast<CbmMuchModuleGemRadial*> (*i);
+
+      vector<CbmMuchPad*> pads = module->GetPads();
+
+      for (vector<CbmMuchPad*>::iterator j = pads.begin(); j != pads.end(); ++j)
+      {
+        CbmMuchDigiMatch* match = (*j)->GetMatch();
+        match->ClearLinks();
+      }
+    }
+    // Timur >
   }
 
   const CbmMuchPoint* point = dynamic_cast<const CbmMuchPoint*>(CbmMCBuffer::Instance()->GetNextPoint(kMUCH));

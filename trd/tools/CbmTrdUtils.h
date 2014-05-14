@@ -27,6 +27,7 @@ class CbmTrdUtils
   void InitColorVector(Bool_t logScale, Double_t min, Double_t max);
   Int_t GetColorCode(Double_t value);
   void Statusbar(Int_t i, Int_t n);
+  Int_t GetModuleType(Int_t moduleAddress, CbmTrdModule *fModuleInfo, CbmTrdDigiPar *fDigiPar);
   void NiceLegend(TLegend *l);
   void NiceTProfile(TProfile *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) ;
   void NiceTH3(TH3 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle, TString zTitle);

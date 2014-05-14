@@ -7,6 +7,7 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdGeoHandler.h"
+#include "CbmTrdUtils.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -23,6 +24,7 @@
 #include "TH2D.h"
 #include "TColor.h"
 #include "TMath.h"
+#include "TDatime.h"
 
 #include "TProfile.h"
 #include "TLine.h"
@@ -329,19 +331,23 @@ void CbmTrdHitDensityQa::Finish()
 { 
   std::map<Int_t, std::pair<Int_t, TH2D*> > AsicTriggerMap;
   std::map<Int_t, std::pair<Int_t, TH2D*> >::iterator AsicTriggerMapIt;
-
+  CbmTrdUtils* util = new CbmTrdUtils();
 
   Bool_t logScale = false;
   Int_t nTotalAsics = 0;
   Int_t nTotalOptLinks = 0;
   Double_t trdTotalDataRate = 0.;
   Double_t ratePerModule = 0;
-  myfile.open("hits_per_asic.txt",std::fstream::out);
-  myfile << "#" << endl;
-  myfile << "##   TRD data per ASIC" << endl;
-  myfile << "#" << endl;
-  myfile << "#" << endl;
-  myfile << "#--------------------------" << endl;
+  TDatime time;
+  TString outfile;
+  outfile.Form("hits_per_asic.%i:%i:%i_%i.%i.%i.txt",time.GetHour(),time.GetMinute(),time.GetSecond(),time.GetDay(),time.GetMonth(),time.GetYear());
+  myfile.open(outfile,std::fstream::out);
+  //myfile << "#" << endl;
+  //myfile << "##   TRD data per ASIC" << endl;
+  //myfile << "#" << endl;
+  //myfile << "#" << endl;
+  //myfile << "#--------------------------" << endl;
+  
   Double_t min(1E3), max(max = 6E5); // Is not scaled from central to minbias
   if (fPlotResults) {min = 1E3; max = 2.5E5;} // scaling parameter is applied
   std::vector<Int_t> fColors;
@@ -398,7 +404,11 @@ void CbmTrdHitDensityQa::Finish()
       fModuleHitMapIt->second->Write("", TObject::kOverwrite);
     moduleAddress = fModuleHitMapIt->first;
     //printf("# ModuleAddress:     %8i",moduleAddress);
-    myfile << "# ModuleAddress: " <<  moduleAddress  << endl;
+    //myfile << "# ModuleAddress: " <<  moduleAddress  << endl;
+    //if (fPlotResults){
+    //util = new CbmTrdUtils();
+    //myfile << CbmTrdAddress::GetModuleId(moduleAddress) << " " << util->GetModuleType(moduleAddress,fModuleInfo,fDigiPar) << " ";
+    // }
     ratePerModule = 0.;
     Int_t LayerId = CbmTrdAddress::GetLayerId(moduleAddress);
     if (LayerMap.find(LayerId) == LayerMap.end()){
@@ -448,8 +458,8 @@ void CbmTrdHitDensityQa::Finish()
       }
     }
     //printf("     NofAsics:     %3i\n",nofAsics);
-    myfile << "# NofAsics     : " << nofAsics << endl;
-    myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
+    //myfile << "# NofAsics     : " << nofAsics << endl;
+    //myfile << "# moduleAddress / Asic ID / hits per 32ch Asic per second" << endl;
     nTotalAsics += nofAsics;
     std::map<Int_t, Double_t> ratePerAsicMap;
     for (Int_t iAsic = 0; iAsic < nofAsics; iAsic++){
@@ -537,9 +547,14 @@ void CbmTrdHitDensityQa::Finish()
 	else 
 	  AsicTriggerMap[nofAsics].second->SetBinContent(nofAsics-iAsic, AsicTriggerMap[nofAsics].first, ratePerAsicMap[AsicAddresses[iAsic]] * fScaleCentral2mBias);
       }
-      myfile << moduleAddress << " " << setfill('0') << setw(2) << iAsic << " " 
-	     << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
-	     << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
+      if (fPlotResults){
+	util = new CbmTrdUtils();
+	myfile << setfill(' ') << setw(5) << moduleAddress << " " 
+	       << setfill(' ') << setw(2) << CbmTrdAddress::GetModuleId(moduleAddress) << " " << util->GetModuleType(moduleAddress,fModuleInfo,fDigiPar) << " " 
+	       << setfill('0') << setw(2) << iAsic << " " 
+	       << setiosflags(ios::fixed) << setprecision(0) << setfill(' ') << setw(8) 
+	       << ratePerAsicMap[AsicAddresses[iAsic]] << endl;
+      }
       //Double_t dataPerAsic = ratePerAsicMap[AsicAddresses[iAsic]]  * 1e-6 * fBitPerHit;  // Mbit, incl. neighbor
       Double_t dataPerAsic = TriggerRate2DataRate(ratePerAsicMap[AsicAddresses[iAsic]])  * 1e-6;  // Mbit, incl. neighbor
       //HitAsic->Fill(dataPerAsic);
@@ -566,10 +581,11 @@ void CbmTrdHitDensityQa::Finish()
   printf("     total TRD data rate          : %.2f (Gbit/s)\n", trdTotalDataRate * 1e-3 );
   printf("     --------------------------\n");
   printf("     --------------------------\n");
-
-  myfile << "# total number of ASICs: " << nTotalAsics << endl;
-  myfile << "#--------------------------" << endl;
-  myfile << "#--------------------------" << endl;
+  /*
+    myfile << "# total number of ASICs: " << nTotalAsics << endl;
+    myfile << "#--------------------------" << endl;
+    myfile << "#--------------------------" << endl;
+  */
   myfile.close();
   fModuleHitASICMap.clear();
   fModuleHitMap.clear();
@@ -604,6 +620,7 @@ void CbmTrdHitDensityQa::Finish()
   tempFile->Close();
   gDirectory->Cd(origpath);
   gDirectory->pwd();
+  delete util;
 }
 
   // -----   Public method EndOfEvent   --------------------------------------

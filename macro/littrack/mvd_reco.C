@@ -22,7 +22,7 @@ void mvd_reco(Int_t nEvents = 100)
 
    TList *parFileList = new TList();
    TObjString stsDigiFile = parDir + "/sts/sts_v13d_std.digi.par"; // Digi scheme for STS
-   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13c.root";
+   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13d.root";
 
    TString resultDir = "./test/"; // Directory for output results
 

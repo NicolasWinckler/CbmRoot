@@ -35,7 +35,7 @@ void global_reco(Int_t nEvents = 100, // number of events
    TObjString stsDigiFile = parDir + "/sts/sts_v13d_std.digi.par"; // STS digi file
    TObjString trdDigiFile = parDir + "/trd/trd_v13p_3e.digi.par"; // TRD digi file
    TString muchDigiFile = parDir + "/much/much_v12b.digi.root"; // MUCH digi file
-   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13c.root";
+   TString stsMatBudgetFile = parDir + "/sts/sts_matbudget_v13d.root";
    TObjString tofDigiFile = parDir + "/tof/tof_v13b.digi.par";// TOF digi file
 
    // Reconstruction parameters

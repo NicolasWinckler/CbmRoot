@@ -45,7 +45,7 @@ Int_t runHoughStsTrackFinder(Int_t nEvents=2)
   TString anaFile      = outputFolder + "/" + system + "." + beam + "." + trigger + ".ana.root";
 
   // Digitisation file
-  TString digiFile     = "sts_v11a.digi.par";
+  TString digiFile     = "sts_v13d_std.digi.par";
   //TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)

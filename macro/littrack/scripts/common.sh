@@ -61,8 +61,8 @@ function set_default_muon_geometry() {
     export LIT_SHIELD_GEOM=much/shield_v13f.geo
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13d_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13d.root
     export LIT_MUCH_GEOM=much/much_v13f.geo
     export LIT_MUCH_DIGI=${VMCWORKDIR}/parameters/much/much_v13f.digi.root
     export LIT_RICH_GEOM=
@@ -93,8 +93,8 @@ function set_default_electron_geometry() {
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13d_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13d.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=rich/rich_v08a.geo
@@ -125,8 +125,8 @@ function set_default_mvd_geometry() {
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=mvd/mvd_v07a.geo.root
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13d_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13d.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=
@@ -155,8 +155,8 @@ function set_default_sts_geometry() {
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13d_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13d.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=
@@ -187,8 +187,8 @@ function set_default_sts_tof_geometry() {
     export LIT_SHIELD_GEOM=
     export LIT_MVD_GEOM=
     export LIT_STS_GEOM=sts/sts_v13c.geo.root
-    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13c_std.digi.par
-    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13c.root
+    export LIT_STS_DIGI=${VMCWORKDIR}/parameters/sts/sts_v13d_std.digi.par
+    export LIT_STS_MAT_BUDGET_FILE=${VMCWORKDIR}/parameters/sts/sts_matbudget_v13d.root
     export LIT_MUCH_GEOM=
     export LIT_MUCH_DIGI=
     export LIT_RICH_GEOM=

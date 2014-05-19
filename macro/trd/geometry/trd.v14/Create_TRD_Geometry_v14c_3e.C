@@ -143,7 +143,6 @@ const Int_t   MaxLayers = 10;   // max layers
 //
 //const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };  // SIS100-4l  // 1: plot, 0: hide
 //const Int_t    ShowLayer[MaxLayers] = { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 };  // SIS300-mu  // 1: plot, 0: hide
-//const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 const Int_t    ShowLayer[MaxLayers] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };  // SIS300-e   // 1: plot, 0: hide
 
 Int_t    PlaneId[MaxLayers]; // automatically filled with layer ID
@@ -176,20 +175,20 @@ const Int_t LayerArraySize[3][4] =  { { 5, 5, 9, 11 },    // for layer[1-3][i,o]
                                       { 5, 5, 9, 11 } };
 // ### Layer Type 1
 // v12x - module types in the inner sector of layer1 - looking upstream
-const Int_t layer1i[5][5] = { { 423,  423,  321,  421,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers
-                              { 323,  123,  121,  121,  321 },  
-                              { 203,  103,    0,  101,  201 },  
-                              { 303,  103,  101,  101,  301 },  
-                              { 403,  403,  301,  401,  401 } };
+const Int_t layer1i[5][5] = { { 423,  323,  321,  321,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers
+                              { 223,  123,  121,  121,  221 },  
+                              { 203,    0,    0,    0,  201 },  
+                              { 203,  103,  101,  101,  201 },  
+                              { 403,  303,  301,  301,  401 } };
 // number of modules 1x0, 8x1, 4x2, 8x3, 4x4
 
 // v12x - module types in the outer sector of layer1 - looking upstream
 const Int_t layer1o[9][11]= { {  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
                               {  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
                               {  0,    0,  823,  823,  723,  721,  721,  821,  821,    0,    0 },
-                              {  0,    0,  823,  723,    0,    0,    0,  721,  821,    0,    0 },
+                              {  0,    0,  823,  623,    0,    0,    0,  621,  821,    0,    0 },
+                              {  0,    0,  603,  503,    0,    0,    0,  501,  601,    0,    0 },
                               {  0,    0,  803,  603,    0,    0,    0,  601,  801,    0,    0 },
-                              {  0,    0,  803,  703,    0,    0,    0,  701,  801,    0,    0 },
                               {  0,    0,  803,  803,  703,  701,  701,  801,  801,    0,    0 },
                               {  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
                               {  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 } };
@@ -202,21 +201,21 @@ const Int_t layer1o[9][11]= { {  0,    0,    0,    0,    0,    0,    0,    0,   
 
 // ### Layer Type 2
 // v12x - module types in the inner sector of layer2 - looking upstream
-const Int_t layer2i[5][5] = { { 423,  423,  321,  421,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
-                              { 323,  223,  121,  221,  321 },
-                              { 203,  103,    0,  101,  201 },
-                              { 303,  203,  101,  201,  301 },
-                              { 403,  403,  301,  401,  401 } };
+const Int_t layer2i[5][5] = { { 423,  323,  321,  321,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+                              { 223,  123,  121,  121,  221 },
+                              { 203,    0,    0,    0,  201 },
+                              { 203,  103,  101,  101,  201 },
+                              { 403,  303,  301,  301,  401 } };
 // number of modules 1x0, 4x1, 4x2, 12x3, 4x4
 
 // v12x - module types in the outer sector of layer2 - looking upstream
 const Int_t layer2o[9][11]= { {   0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
                               {   0,  823,  823,  823,  823,  821,  821,  821,  821,  821,    0 },
-                              {   0,  823,  823,  823,  623,  621,  621,  821,  821,  821,    0 },
-                              {   0,  823,  823,  623,    0,    0,    0,  621,  821,  821,    0 },
-                              {   0,  803,  803,  603,    0,    0,    0,  601,  801,  801,    0 },
-                              {   0,  803,  803,  603,    0,    0,    0,  601,  801,  801,    0 },
-                              {   0,  803,  803,  803,  603,  601,  601,  801,  801,  801,    0 },
+                              {   0,  823,  823,  723,  723,  721,  721,  721,  821,  821,    0 },
+                              {   0,  823,  723,  623,    0,    0,    0,  621,  721,  821,    0 },
+                              {   0,  803,  603,  503,    0,    0,    0,  501,  601,  801,    0 },
+                              {   0,  803,  703,  603,    0,    0,    0,  601,  701,  801,    0 },
+                              {   0,  803,  803,  703,  703,  701,  701,  701,  801,  801,    0 },
                               {   0,  803,  803,  803,  803,  801,  801,  801,  801,  801,    0 },
                               {   0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 } };
 // number of modules 45x0, 0x5, 12x6, 0x7, 42x8
@@ -233,30 +232,24 @@ const Int_t layer2o[9][11]= { {   0,    0,    0,    0,    0,    0,    0,    0,  
 //                              { 203,    0,    0,    0,  201 },
 //                              { 203,    0,    0,    0,  201 },
 //                              { 203,  203,  201,  201,  201 } };
-const Int_t layer3i[5][5] = { { 223,  223,  221,  221,  221 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
+const Int_t layer3i[5][5] = { { 423,  323,  321,  321,  421 },    // abc: a module type - b orientation (x90 deg) in odd - c even layers 
                               { 223,  123,  121,  121,  221 },
-                              { 203,  103,    0,  101,  201 },
+                              { 203,    0,    0,    0,  201 },
                               { 203,  103,  101,  101,  201 },
-                              { 203,  203,  201,  201,  201 } };
+                              { 403,  303,  301,  301,  401 } };
 // number of modules 25x0 
 // needed only for convenience in the function
 
 // v12x - module types in the outer sector of layer3 - looking upstream
-const Int_t layer3o[9][11] = { // 0 };
-
-//                                   { 823,  823,  823,  823,  823,  821,  821,  821,  821,  821,  821 },
-
-				   {   0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 },
-                                   { 823,  823,  823,  723,  723,  721,  721,  721,  821,  821,  821 },
-                                   { 823,  823,  723,  723,  623,  621,  621,  721,  721,  821,  821 },
-                                   { 823,  823,  723,  623,    0,    0,    0,  621,  721,  821,  821 },
-                                   { 803,  803,  703,  603,    0,    0,    0,  601,  701,  801,  801 },
-                                   { 803,  803,  703,  603,    0,    0,    0,  601,  701,  801,  801 },
-                                   { 803,  803,  703,  703,  603,  601,  601,  701,  701,  801,  801 },
-                                   { 803,  803,  803,  703,  703,  701,  701,  701,  801,  801,  801 },
-                                   {   0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 } };
-
-//                                   { 803,  803,  803,  803,  803,  801,  801,  801,  801,  801,  801 } };
+const Int_t layer3o[9][11] = { { 823,  823,  823,  823,  823,  821,  821,  821,  821,  821,  821 },
+                               { 823,  823,  823,  723,  723,  721,  721,  721,  821,  821,  821 },
+                               { 823,  823,  723,  723,  623,  621,  621,  721,  721,  821,  821 },
+                               { 823,  723,  623,  523,    0,    0,    0,  521,  621,  721,  821 },
+                               { 803,  703,  603,  503,    0,    0,    0,  501,  601,  701,  801 },
+                               { 803,  703,  603,  503,    0,    0,    0,  501,  601,  701,  801 },
+                               { 803,  803,  703,  703,  603,  601,  601,  701,  701,  801,  801 },
+                               { 803,  803,  803,  703,  703,  701,  701,  701,  801,  801,  801 },
+                               { 803,  803,  803,  803,  803,  801,  801,  801,  801,  801,  801 } };
 // number of modules 1x0, 8x5, 12x6, 24x7, 54x8
 // Layer3 = 98;   // v12x
 
@@ -1734,11 +1727,14 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
 
 Int_t copy_nr(Int_t stationNr, Int_t copyNr, Int_t isRotated, Int_t planeNr, Int_t modinplaneNr)
 {
-  return (stationNr      * 10000000    // 1 digit
-        + copyNr         *   100000    // 2 digit
-        + isRotated      *    10000    // 1 digit
-        + planeNr        *      100    // 2 digit
-        + modinplaneNr   *        1 ); // 2 digit
+  if (modinplaneNr > 128)
+    printf("Warning: too many modules in this layer %02d (max 128 according to CbmTrdAddress)\n", planeNr);
+
+  return (stationNr      * 100000000    // 1 digit
+        + copyNr         *   1000000    // 2 digit
+        + isRotated      *    100000    // 1 digit
+        + planeNr        *      1000    // 2 digit
+        + modinplaneNr   *         1 ); // 3 digit
 }
 
 void create_detector_layers(Int_t layerId)

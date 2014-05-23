@@ -192,6 +192,7 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     		                           0,               // ladder
     		                           0,               // halfladder
     		                           0,               // module
+    		                           0,               // sensor
     		                           0,               // front side
     		                           (*it).first);    // channel
     CbmStsDigi* digi =  new CbmStsDigi(address,
@@ -213,6 +214,7 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     		                           0,               // ladder
     		                           0,               // halfladder
     		                           0,               // module
+    		                           0,               // sensor
     		                           1,               // back side
     		                           (*it).first);    // channel
     CbmStsDigi* digi =  new CbmStsDigi(address,

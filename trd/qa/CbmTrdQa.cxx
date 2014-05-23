@@ -99,6 +99,11 @@ CbmTrdQa::CbmTrdQa(CbmTrdRadiator *radiator)
     fTrianglePads(false),
     fLayerDummy(NULL),
     fStsTrdPoints(NULL),
+    fStsMuchPoints(NULL),
+    fStsTofPoints(NULL),
+    //fMuchTrdPoints[11](NULL),
+    //fMuchTofPoints[11](NULL),
+    //fTrdTofPoints[11](NULL),
     fStsTrdPointsTrackable(NULL),
     fTrdPointsPerMcTrack_PID(NULL),
     fTrdPointsPerMcTrack_PT(NULL),
@@ -489,11 +494,48 @@ InitStatus CbmTrdQa::Init()
   fLayerDummy->SetStats(kFALSE);
   fLayerDummy->SetContour(99);
   fLayerDummy->Fill(0.,0.,0.);
+
   fStsTrdPoints = new TH2F("fStsTrdPoints","fStsTrdPoints",12,-0.5,11.5,21,-0.5,20.5);
   fStsTrdPoints->SetStats(kFALSE);
   fStsTrdPoints->SetXTitle("TRD points / track");
   fStsTrdPoints->SetYTitle("STS points / track");
   fStsTrdPoints->SetContour(99);
+
+  fStsMuchPoints = new TH2F("fStsMuchPoints","fStsMuchPoints",12,-0.5,11.5,21,-0.5,20.5);
+  fStsMuchPoints->SetStats(kFALSE);
+  fStsMuchPoints->SetXTitle("MUCH points / track");
+  fStsMuchPoints->SetYTitle("STS points / track");
+  fStsMuchPoints->SetContour(99);
+
+  fStsTofPoints = new TH2F("fStsTofPoints","fStsTofPoints",12,-0.5,11.5,21,-0.5,20.5);
+  fStsTofPoints->SetStats(kFALSE);
+  fStsTofPoints->SetXTitle("TOF points / track");
+  fStsTofPoints->SetYTitle("STS points / track");
+  fStsTofPoints->SetContour(99);
+
+  TString name;
+  for (Int_t iStsPoints = 0; iStsPoints < 11; iStsPoints++){
+    name.Form("_%iStsPoints", iStsPoints);
+
+    fMuchTrdPoints[iStsPoints] = new TH2F("fMuchTrdPoints"+name,"fMuchTrdPoints"+name,12,-0.5,11.5,21,-0.5,20.5);
+    fMuchTrdPoints[iStsPoints]->SetStats(kFALSE);
+    fMuchTrdPoints[iStsPoints]->SetXTitle("TRD points / track");
+    fMuchTrdPoints[iStsPoints]->SetYTitle("MUCH points / track");
+    fMuchTrdPoints[iStsPoints]->SetContour(99);
+
+    fMuchTofPoints[iStsPoints] = new TH2F("fMuchTofPoints"+name,"fMuchTofPoints"+name,12,-0.5,11.5,21,-0.5,20.5);
+    fMuchTofPoints[iStsPoints]->SetStats(kFALSE);
+    fMuchTofPoints[iStsPoints]->SetXTitle("TOF points / track");
+    fMuchTofPoints[iStsPoints]->SetYTitle("MUCH points / track");
+    fMuchTofPoints[iStsPoints]->SetContour(99);
+
+    fTrdTofPoints[iStsPoints] = new TH2F("fTrdTofPoints"+name,"fTrdTofPoints"+name,12,-0.5,11.5,21,-0.5,20.5);
+    fTrdTofPoints[iStsPoints]->SetStats(kFALSE);
+    fTrdTofPoints[iStsPoints]->SetXTitle("TOF points / track");
+    fTrdTofPoints[iStsPoints]->SetYTitle("TRD points / track");
+    fTrdTofPoints[iStsPoints]->SetContour(99);
+  }
+
   fStsTrdPointsTrackable = new TH2F("fStsTrdPointsTrackable","fStsTrdPointsTrackable",12,-0.5,11.5,21,-0.5,20.5);
   fStsTrdPointsTrackable->SetStats(kFALSE);
   fStsTrdPointsTrackable->SetXTitle("TRD points / track");
@@ -519,6 +561,7 @@ InitStatus CbmTrdQa::Init()
   fTrdPointsPerMcTrack_P->SetYTitle("p (GeV/c)");
 
   fTrdTrackCrossedRadiator = new TH2F("fTrdTrackCrossedRadiator","fTrdTrackCrossedRadiator",12,-0.5,11.5,15,-3.5,11.5);
+  fTrdTrackCrossedRadiator->SetStats(kFALSE);
   fTrdTrackCrossedRadiator->SetContour(99);
   fTrdTrackCrossedRadiator->SetXTitle("n TRD Points");
   fTrdTrackCrossedRadiator->SetYTitle("n Radiator crossings");
@@ -1128,8 +1171,16 @@ void CbmTrdQa::Exec(Option_t * option)
 	if (notMultiPointTRDPoints.find(iTrack) == notMultiPointTRDPoints.end()){
 	  //if (track->GetNPoints(kSTS) > 0)
 	  {	
-	    fStsTrdPoints->Fill(track->GetNPoints(kTRD),track->GetNPoints(kSTS));	
-	    notMultiPointTRDPoints[iTrack] = track->GetNPoints(kTRD);
+	    Int_t nStsPoint = track->GetNPoints(kSTS);
+	    fStsTrdPoints->Fill(track->GetNPoints(kTRD),track->GetNPoints(kSTS));
+	    fStsMuchPoints->Fill(track->GetNPoints(kMUCH),track->GetNPoints(kSTS));
+	    fStsTofPoints->Fill(track->GetNPoints(kTOF),track->GetNPoints(kSTS));
+	    if (nStsPoint < 11){
+	      fMuchTrdPoints[nStsPoint]->Fill(track->GetNPoints(kTRD),track->GetNPoints(kMUCH));
+	      fMuchTofPoints[nStsPoint]->Fill(track->GetNPoints(kTOF),track->GetNPoints(kMUCH));
+	      fTrdTofPoints[nStsPoint]->Fill(track->GetNPoints(kTOF),track->GetNPoints(kTRD));
+	    }
+	    notMultiPointTRDPoints[iTrack] = track->GetNPoints(kTRD);       
 	  }
 	}
 	Int_t Pdg_code = track->GetPdgCode();
@@ -1168,11 +1219,18 @@ void CbmTrdQa::Exec(Option_t * option)
 	  if (notMultiPointTRDPoints.find(jTrack) == notMultiPointTRDPoints.end()){
 	    //if (track2->GetNPoints(kSTS) > 0)
 	    {
+	      Int_t nStsPoint = track2->GetNPoints(kSTS);
 	      fStsTrdPoints->Fill(track2->GetNPoints(kTRD),track2->GetNPoints(kSTS));
+	      fStsMuchPoints->Fill(track2->GetNPoints(kMUCH),track2->GetNPoints(kSTS));
+	      fStsTofPoints->Fill(track2->GetNPoints(kTOF),track2->GetNPoints(kSTS));
+	      if (nStsPoint < 11){
+		fMuchTrdPoints[nStsPoint]->Fill(track2->GetNPoints(kTRD),track2->GetNPoints(kMUCH));
+		fMuchTofPoints[nStsPoint]->Fill(track2->GetNPoints(kTOF),track2->GetNPoints(kMUCH));
+		fTrdTofPoints[nStsPoint]->Fill(track2->GetNPoints(kTOF),track2->GetNPoints(kTRD));
+	      }
 	      notMultiPointTRDPoints[jTrack] = track2->GetNPoints(kTRD);
 	    }
 	  }
-
 
 	  Double_t p_global2[3] = {0.5 * (point2->GetXOut() + point2->GetXIn()),
 				   0.5 * (point2->GetYOut() + point2->GetYIn()),
@@ -1532,11 +1590,53 @@ void CbmTrdQa::SaveHistos()
   c->SetLogz(1);
   printf("------------->>>>>>     TRD tracks:%i               TRD tracks trackable:%i     <<<<<<-------------\n",(Int_t)fStsTrdPoints->GetEntries(),(Int_t)fStsTrdPointsTrackable->GetEntries());
   fStsTrdPoints->Scale(100./fStsTrdPoints->GetEntries());
-  fStsTrdPoints->GetZaxis()->SetRangeUser(100./fStsTrdPoints->GetEntries(),fStsTrdPoints->GetBinContent(fStsTrdPoints->GetMaximumBin()));
+  fStsTrdPoints->GetZaxis()->SetRangeUser(0,100);//100./fStsTrdPoints->GetEntries(),fStsTrdPoints->GetBinContent(fStsTrdPoints->GetMaximumBin()));
   fStsTrdPoints->DrawCopy("colz");
   c->SaveAs("pics/TrdQaStsTrdPoints"+title+".pdf");
   c->SaveAs("pics/TrdQaStsTrdPoints"+title+".png");
   fStsTrdPoints->Write("", TObject::kOverwrite);
+
+  fStsMuchPoints->Scale(100./fStsMuchPoints->GetEntries());
+  fStsMuchPoints->GetZaxis()->SetRangeUser(0,100);//100./fStsMuchPoints->GetEntries(),fStsMuchPoints->GetBinContent(fStsMuchPoints->GetMaximumBin()));
+  fStsMuchPoints->DrawCopy("colz");
+  c->SaveAs("pics/TrdQaStsMuchPoints"+title+".pdf");
+  c->SaveAs("pics/TrdQaStsMuchPoints"+title+".png");
+  fStsMuchPoints->Write("", TObject::kOverwrite);
+
+  fStsTofPoints->Scale(100./fStsTofPoints->GetEntries());
+  fStsTofPoints->GetZaxis()->SetRangeUser(0,100);//100./fStsTofPoints->GetEntries(),fStsTofPoints->GetBinContent(fStsTofPoints->GetMaximumBin()));
+  fStsTofPoints->DrawCopy("colz");
+  c->SaveAs("pics/TrdQaStsTofPoints"+title+".pdf");
+  c->SaveAs("pics/TrdQaStsTofPoints"+title+".png");
+  fStsTofPoints->Write("", TObject::kOverwrite);
+  TString name;
+  for (Int_t iStsPoints = 0; iStsPoints < 11; iStsPoints++){
+    name.Form("_%iStsPoints",iStsPoints);
+    fMuchTrdPoints[iStsPoints]->Scale(100./fMuchTrdPoints[iStsPoints]->GetEntries());
+    fMuchTrdPoints[iStsPoints]->GetZaxis()->SetRangeUser(0,100);//100./fMuchTrdPoints[iStsPoints]->GetEntries(),
+    fMuchTrdPoints[iStsPoints]->DrawCopy("colz");
+    c->SaveAs("pics/TrdQaMuchTrdPoints"+name+title+".pdf");
+    c->SaveAs("pics/TrdQaMuchTrdPoints"+name+title+".png");
+    fMuchTrdPoints[iStsPoints]->Write("", TObject::kOverwrite);
+
+    name.Form("_%iStsPoints",iStsPoints);
+    fMuchTofPoints[iStsPoints]->Scale(100./fMuchTofPoints[iStsPoints]->GetEntries());
+    fMuchTofPoints[iStsPoints]->GetZaxis()->SetRangeUser(0,100);//100./fMuchTofPoints[iStsPoints]->GetEntries(),
+    fMuchTofPoints[iStsPoints]->DrawCopy("colz");
+    c->SaveAs("pics/TrdQaMuchTofPoints"+name+title+".pdf");
+    c->SaveAs("pics/TrdQaMuchTofPoints"+name+title+".png");
+    fMuchTofPoints[iStsPoints]->Write("", TObject::kOverwrite);
+
+    name.Form("_%iStsPoints",iStsPoints);
+    fTrdTofPoints[iStsPoints]->Scale(100./fTrdTofPoints[iStsPoints]->GetEntries());
+    fTrdTofPoints[iStsPoints]->GetZaxis()->SetRangeUser(0,100);//100./fTrdTofPoints[iStsPoints]->GetEntries(),
+    fTrdTofPoints[iStsPoints]->DrawCopy("colz");
+    c->SaveAs("pics/TrdQaTrdTofPoints"+name+title+".pdf");
+    c->SaveAs("pics/TrdQaTrdTofPoints"+name+title+".png");
+    fTrdTofPoints[iStsPoints]->Write("", TObject::kOverwrite);
+  }
+
+
   fStsTrdPointsTrackable->Scale(100./fStsTrdPointsTrackable->GetEntries());
   fStsTrdPointsTrackable->GetZaxis()->SetRangeUser(100./fStsTrdPoints->GetEntries(),fStsTrdPoints->GetBinContent(fStsTrdPoints->GetMaximumBin())); // same scale for both histos
   fStsTrdPointsTrackable->DrawCopy("colz");

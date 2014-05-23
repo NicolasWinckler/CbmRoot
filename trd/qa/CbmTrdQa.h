@@ -110,6 +110,12 @@ class CbmTrdQa : public FairTask {
 
   TH2I *fLayerDummy;
   TH2F *fStsTrdPoints;
+  TH2F *fStsMuchPoints;
+  TH2F *fStsTofPoints;
+  TH2F *fMuchTrdPoints[11];
+  TH2F *fMuchTofPoints[11];
+  TH2F *fTrdTofPoints[11];
+
   TH2F *fStsTrdPointsTrackable;
   TH2F *fTrdPointsPerMcTrack_PID;
   TH2F *fTrdPointsPerMcTrack_PT;

@@ -195,8 +195,10 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     		                           0,               // sensor
     		                           0,               // front side
     		                           (*it).first);    // channel
+    // --- Hardcode here 5 ns time resolution :-(
+    Double_t time = gRandom->Gaus(point->GetTime(), 5.);
     CbmStsDigi* digi =  new CbmStsDigi(address,
-    		                              ULong64_t(point->GetTime()),
+    		                              ULong64_t(time),
     		                              iAdc,
     		                              sensor->GetSectorNr() );
     CbmDaqBuffer::Instance()->InsertData(digi);
@@ -217,8 +219,9 @@ void CbmStsDigitizeTb::DigitizePoint(const CbmStsPoint* point,
     		                           0,               // sensor
     		                           1,               // back side
     		                           (*it).first);    // channel
+    Double_t time = gRandom->Gaus(point->GetTime(), 5.);
     CbmStsDigi* digi =  new CbmStsDigi(address,
-    		                              ULong64_t(point->GetTime()),
+    		                              ULong64_t(time),
     		                              iAdc,
     		                              sensor->GetSectorNr() );
     CbmDaqBuffer::Instance()->InsertData(digi);

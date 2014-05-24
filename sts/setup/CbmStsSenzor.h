@@ -10,16 +10,12 @@
 #define CBMSTSSENZOR_H 1
 
 
-#include "TGeoPhysicalNode.h"
-#include "TNamed.h"
-
 #include "CbmStsAddress.h"
-#include "CbmStsElement.h"
-#include "CbmStsSetup.h"
+#include "setup/CbmStsElement.h"
+#include "setup/CbmStsSensorType.h"
 
+class TGeoPhysicalNode;
 class CbmStsModule;
-
-
 class CbmStsPoint;
 class CbmStsSensorType;
 
@@ -29,10 +25,18 @@ class CbmStsSensorType;
  ** @author V.Friese <v.friese@gsi.de>
  ** @version 2.0
  **
+ ** The sensor is the smallest geometric element in the STS setup.
+ ** It is the daughter node of a module, which may contain one sensor
+ ** or several daisy-chained ones. The sensor class represents
+ ** the physical node through its member fNode, but also performs detector
+ ** response simulation through its member fType.
+ ** After being instantiated by the initialisation of CbmStsSetup,
+ ** the sensor type must be assigned to the sensor. This is currently done
+ ** by the digitiser task.
+ ** The sensor class performs the coordinate transformation from the
+ ** global system to the sensor system, having the sensor midpoint as origin.
+ ** The analog response is then modelled by the CbmStsSensorType object.
  **/
-
-
-
 class CbmStsSenzor : public CbmStsElement
 {
 
@@ -69,12 +73,14 @@ class CbmStsSenzor : public CbmStsElement
     CbmStsSensorType* GetType() const { return fType; }
 
 
-    /** Produce charge in the sensor and send it to the module.
+    /** Process one MC Point
+     ** @param point  Pointer to CbmStsPoint object
+     ** @return  Status variable, depends on sensor type
      **
      ** Perform the appropriate action for a particle trajectory in the
      ** sensor characterised by the CbmStsPoint object
      **/
-    void ProcessPoint(CbmStsPoint* point) const;
+    Int_t ProcessPoint(CbmStsPoint* point) const;
 
 
     /** Set the sensor address
@@ -83,26 +89,25 @@ class CbmStsSenzor : public CbmStsElement
     void SetAddress(UInt_t address) { fAddress = address; }
 
 
-    /** Set a pointer to the mother module
-     ** @param  module   Pointer to mother module
+    /** Set the sensor type
+     ** @param Pointer to sensor type object
      **/
-    //void SetModule(CbmStsModule* module) { fModule = module; }
+    void SetType(CbmStsSensorType* type) { fType = type; }
+
 
 
   private:
 
     CbmStsSensorType* fType;    ///< Pointer to sensor type
-    //CbmStsModule* fModule;      ///< Pointer to mother module
 
-
+    /** Prevent usage of copy constructor and assignment operator **/
     CbmStsSenzor(const CbmStsSenzor&);
     CbmStsSenzor& operator=(const CbmStsSenzor&);
+
 
     ClassDef(CbmStsSenzor,1);
 
 };
-
-
 
 
 #endif

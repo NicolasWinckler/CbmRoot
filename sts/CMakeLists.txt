@@ -25,7 +25,8 @@ mc/CbmStsMC.cxx
 )
 # --- Sources in digitize
 set (SRCS_DIGITIZE
-#digitize/CbmStsDigitizeIdeal.cxx
+digitize/CbmStsDigitizeIdeal.cxx
+digitize/CbmStsSensorTypeDssdIdeal.cxx;
 )
 # --- All sources
 set(SRCS

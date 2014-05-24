@@ -7,10 +7,9 @@
 #define CBMSTSELEMENT_H 1
 
 
+#include "TGeoPhysicalNode.h"
 #include "TNamed.h"
 #include "CbmStsAddress.h"
-
-class TGeoPhysicalNode;
 
 
 
@@ -81,6 +80,10 @@ class CbmStsElement : public TNamed
     EStsElementLevel GetLevel() const { return fLevel; }
 
 
+    /** Get the mother element **/
+    CbmStsElement* GetMother() const { return fMother; }
+
+
     /** Get number of daughter elements
      ** @return Number of daughters
      **/
@@ -112,6 +115,11 @@ class CbmStsElement : public TNamed
     EStsElementLevel fLevel;               ///< Level in hierarchy
     TGeoPhysicalNode* fNode;               ///< Pointer to geometry
     vector<CbmStsElement*> fDaughters;     ///< Array of daughters
+    CbmStsElement* fMother;                ///< Mother element
+
+
+    /** Construct the name of the element **/
+    void ConstructName();
 
 
     /** Set the element level from integer
@@ -119,6 +127,12 @@ class CbmStsElement : public TNamed
      ** @param  level  Element level
      **/
     void SetLevel(Int_t level);
+
+
+    /** Set the mother element
+     ** @param Pointer to mother element
+     **/
+    void SetMother(CbmStsElement* mother) { fMother = mother; }
 
 
     // --- Prevent usage of copy constructor and assignment operator

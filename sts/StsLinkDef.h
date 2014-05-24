@@ -19,7 +19,8 @@
 #pragma link C++ class CbmStsTrackStatus;
 
 // Digitization
-//#pragma link C++ class CbmStsDigitizeIdeal;
+#pragma link C++ class CbmStsDigitizeIdeal;
+#pragma link C++ class CbmStsSensorTypeDssdIdeal;
 
 // Enumerators
 #pragma link C++ enum EStsElementLevel;

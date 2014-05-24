@@ -7,12 +7,18 @@
 #include "FairLogger.h"
 #include "CbmStsAddress.h"
 #include "CbmStsDigi.h"
+#include "digitize/CbmStsDigitizeIdeal.h"
 #include "setup/CbmStsModule.h"
 #include "setup/CbmStsSensorType.h"
+#include "setup/CbmStsSetup.h"
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsModule::CbmStsModule() : CbmStsElement(), fSensors(), fBuffer()
+CbmStsModule::CbmStsModule() : CbmStsElement(),
+	                             fDynRange(72000.),
+	                             fThreshold(4000.),
+	                             fNofAdcChannels(16),
+	                             fBuffer()
 {
 }
 // -------------------------------------------------------------------------
@@ -23,7 +29,10 @@ CbmStsModule::CbmStsModule() : CbmStsElement(), fSensors(), fBuffer()
 CbmStsModule::CbmStsModule(const char* name, const char* title,
                            TGeoPhysicalNode* node) :
                            CbmStsElement(name, title, kStsModule, node),
-                           fSensors(), fBuffer()
+                           fDynRange(72000.),
+                           fThreshold(4000.),
+                           fNofAdcChannels(16),
+                           fBuffer()
 {
 }
 // -------------------------------------------------------------------------
@@ -37,78 +46,90 @@ CbmStsModule::~CbmStsModule() {
 
 
 
-// ----- Add a sensor  -----------------------------------------------------
-void CbmStsModule::AddSensor(CbmStsSenzor* sensor) {
-
-  // TODO: Unify adding elements from base class and adding sensors
-  // If AddDaughter is used, compatibility of sensor types is not assured.
-  // Still unclear how sensor types are assigned when setup is read from
-  // geometry.
-
-  // Check compatibility with already present sensors
-  if ( ! fSensors.empty() ) {
-    if ( sensor->GetType() != fSensors[0]->GetType() ) {
-      LOG(ERROR) << "Sensor type " << sensor->GetType()->GetTypeId()
-                 << " incompatible with sensor type "
-                 << fSensors[0]->GetType()->GetTypeId()
-                 << FairLogger::endl;
-      return;
-    }
-  }
-
-  // Add sensor to the array
-  fSensors.push_back(sensor);
-
-  // Set sensor address and pointer to module
-  Int_t sensorId = fDaughters.size() - 1;
-  UInt_t address = CbmStsAddress::SetElementId(fAddress, kStsSensor,
-                                               sensorId);
-  sensor->SetAddress(address);
-
-  return;
-}
-// -------------------------------------------------------------------------
-
-
-
 // -----   Add a signal to the buffer   ------------------------------------
 void CbmStsModule::AddSignal(Int_t channel, Double_t time,
                              Double_t charge) {
 
+	// --- Debug
+	LOG(DEBUG3) << GetName() << ": Receiving signal " << charge
+			        << " in channel " << channel << " at time "
+			        << time << " s" << FairLogger::endl;
+
 	// --- If there is no signal in the buffer for this channel:
 	// --- write the signal into the buffer
-	if ( fBuffer.find(channel) == fBuffer.end() )
+	if ( fBuffer.find(channel) == fBuffer.end() ) {
 		fBuffer[channel] = pair<Double_t, Double_t>(charge, time);
+		LOG(DEBUG3) << GetName() << ": New signal " << charge << " at time "
+				        << time << " in channel " << channel << FairLogger::endl;
+	}  //? No signal in buffer
 
 	// --- If there is already a signal, compare the time of the two
 	else {
 		Double_t chargeOld = (fBuffer.find(channel)->second).first;
 		Double_t timeOld   = (fBuffer.find(channel)->second).second;
+		LOG(DEBUG3) << GetName() << ": old signal in channel " << channel
+				        << " at time " << timeOld << FairLogger::endl;
 
-		// --- Time separation large; no interference. Create a digi from
-		// --- the old signal, send it to the DAQ and write the new signal
-		// --- into the buffer.
+		// --- Time separation large; no interference. Digitise the old signal,
+		// --- send it to the DAQ and write the new signal into the buffer.
 		if ( time - timeOld > 100. ) {  // 5 Mark in die Kasse für hardcoded numbers
-			CreateDigi(channel, chargeOld, timeOld);
+			Digitize(channel, chargeOld, timeOld);
 			fBuffer[channel] = pair<Double_t, Double_t>(charge, time);
-		}
+			LOG(DEBUG3) << GetName() << ": New signal " << charge << " at time "
+					        << time << " in channel " << channel << FairLogger::endl;
+		}  //? No interference of signals
 
 		// --- Time separation small; interference.
 		// --- Current implementation: Add up charge in the buffer.
 		// --- Time is the one of the first signal.
 		else {
-			fBuffer[channel] = pair<Double_t, Double_t>(chargeOld + charge, timeOld);
-		}
+			fBuffer[channel] =
+					pair<Double_t, Double_t>(chargeOld + charge, timeOld);
+			LOG(DEBUG3) << GetName() << ": New signal " << chargeOld + charge
+					        << " at time "<< timeOld << " in channel " << channel
+					        << FairLogger::endl;
+		}  //? Interference of signals
 
-	}
+	}  //? Already signal in buffer
 
 }
 // -------------------------------------------------------------------------
 
 
-// -----   Create a digi   -------------------------------------------------
-CbmStsDigi* CbmStsModule::CreateDigi(Int_t channel, Double_t charge,
-																		Double_t time) {
+
+// -----   Clean the analogue buffer   -------------------------------------
+void CbmStsModule::CleanBuffer(Double_t readoutTime) {
+
+	map<Int_t, pair<Double_t, Double_t> >::iterator it = fBuffer.begin();
+
+	while ( it != fBuffer.end() ) {
+
+		// --- Compare signal time to readout time
+		Double_t signalTime = (it->second).second;
+		if ( readoutTime < 0 || signalTime < readoutTime ) {
+
+			// --- Digitise the signal and remove it from buffer
+			Double_t charge = (it->second).first;
+			Int_t channel = it->first;
+			LOG(DEBUG3) << GetName() << ": Clean Buffer " << channel << " "
+				        << signalTime << " " << charge << FairLogger::endl;
+			Digitize(channel, charge, signalTime);
+
+			// Next entry in buffer. Delete digitised buffer entry.
+			it++;
+			fBuffer.erase(channel);
+
+		} //? Signal before read-out time
+
+	}  // Iterator over buffer
+
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Digitise an analog charge signal   ------------------------------
+void CbmStsModule::Digitize(Int_t channel, Double_t charge, Double_t time) {
 
 	// --- Construct channel address from module address and channel number
 	UInt_t address = CbmStsAddress::SetElementId(GetAddress(),
@@ -126,13 +147,14 @@ CbmStsDigi* CbmStsModule::CreateDigi(Int_t channel, Double_t charge,
 	// TODO: Add Gaussian time resolution
 	ULong64_t dTime = ULong64_t(time);
 
-	// --- Instantiate a digi
-	CbmStsDigi* digi = new CbmStsDigi(address, dTime, adc);
+	// --- Send the message to the digitiser task
+	LOG(DEBUG3) << GetName() << ": Sending message. Address " << address
+			        << ", time " << dTime << ", adc " << adc << FairLogger::endl;
+	CbmStsDigitizeIdeal* digitiser = CbmStsSetup::Instance()->GetDigitizer();
+	if ( digitiser ) digitiser->CreateDigi(address, dTime, adc);
 
-	// TODO: Send digi to DAQ
-
-	return digi;
 }
 // -------------------------------------------------------------------------
+
 
 ClassImp(CbmStsModule)

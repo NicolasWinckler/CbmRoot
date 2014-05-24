@@ -45,9 +45,6 @@
  ** sensor in the daisy chain. The behaviour is implemented in the methods
  ** GetStrip and GetModuleChannel.
  **/
-
-
-
 class CbmStsSensorTypeDssd : public CbmStsSensorType
 {
 
@@ -65,9 +62,17 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     virtual void Print(Option_t* opt = "") const;
 
 
-    /** Process a point **/
-    virtual void ProcessPoint(CbmStsSensorPoint* point,
-                              const CbmStsSenzor* sensor) const;
+    /** Process one STS Point
+     **
+     ** @param point   Pointer to CbmStsSensorPoint with relevant parameters
+     ** @param sensor  Pointer to CbmStsSensor object
+     ** @return  1000* # signals on front side + # signals on back side
+     **
+     ** Perform the appropriate action for a particle trajectory in the
+     ** sensor characterised by the CbmStsSensorPoint object.
+     **/
+     virtual Int_t ProcessPoint(CbmStsSensorPoint* point,
+                               const CbmStsSenzor* sensor) const;
 
 
 
@@ -81,7 +86,7 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
                        Double_t stereoF, Double_t stereoB);
 
 
-  private:
+  protected:
 
     Double_t fDx;             ///< Dimension of active area in x [cm]
     Double_t fDy;             ///< Dimension of active area in y [cm]
@@ -116,11 +121,23 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     void GetStrip(Int_t channel, Int_t sensorId, Int_t& strip, Int_t& side);
 
 
-    /** Produce charge on front or back side from a CbmStsPoint
-     ** @param side   0 = front, 1 = back side
+    /** Get strip number from point coordinates
+     ** @param x     x coordinate [cm]
+     ** @param y     y coordinate [cm]
+     ** @param side  0 = front side, 1 = back side
+     ** @return strip number on selected side
      **/
-    void ProduceCharge(CbmStsSensorPoint* point, Int_t side,
-                       const CbmStsSenzor* sensor) const;
+    Int_t GetStripNumber(Double_t x, Double_t y, Int_t side) const;
+
+
+    /** Produce charge on front or back side from a CbmStsSensorPoint
+     ** @param point  Pointer to CbmStsSensorType object
+     ** @param side   0 = front, 1 = back side
+     ** @param sensor Pointer to sensor object
+     ** @return  Number of generated charge signals (active strips)
+     **/
+    virtual Int_t ProduceCharge(CbmStsSensorPoint* point, Int_t side,
+                                const CbmStsSenzor* sensor) const;
 
 
     /** Register produced charge in one strip

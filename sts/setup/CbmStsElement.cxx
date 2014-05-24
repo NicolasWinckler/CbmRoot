@@ -3,16 +3,14 @@
  ** @date 27.05.2013
  **/
 
+#include "setup/CbmStsElement.h"
 
 #include "TGeoManager.h"
-#include "TGeoPhysicalNode.h"
 
-#include "CbmStsElement.h"
-#include "CbmStsModule.h"
-#include "CbmStsSenzor.h"
-#include "CbmStsSetup.h"
+#include "setup/CbmStsModule.h"
+#include "setup/CbmStsSenzor.h"
+#include "setup/CbmStsSetup.h"
 
-using namespace std;
 
 
 // -----   Default constructor   -------------------------------------------
@@ -20,7 +18,8 @@ CbmStsElement::CbmStsElement() : TNamed(),
                                  fAddress(0),
                                  fLevel(kStsNofLevels),
                                  fNode(NULL),
-                                 fDaughters()
+                                 fDaughters(),
+                                 fMother(NULL)
 {
 }
 // -------------------------------------------------------------------------
@@ -35,7 +34,8 @@ CbmStsElement::CbmStsElement(const char* name, const char* title,
                              fAddress(0),
                              fLevel(kStsSystem),
                              fNode(node),
-                             fDaughters()
+                             fDaughters(),
+                             fMother(NULL)
 {
   SetLevel(level);
 }
@@ -57,7 +57,48 @@ void CbmStsElement::AddDaughter(CbmStsElement* element) {
   element->fAddress = CbmStsAddress::SetElementId(fAddress,
                                                   element->GetLevel(),
                                                   GetNofDaughters() );
+  element->SetMother(this);
+  element->ConstructName();
   fDaughters.push_back(element);
+}
+// -------------------------------------------------------------------------
+
+
+
+// ----- Construct the name of an element   --------------------------------
+void CbmStsElement::ConstructName() {
+
+	// Set the name for the STS system
+	if ( GetLevel() == kStsSystem ) {
+		SetName("STS");
+		return;
+	}
+
+	// Special case halfladder ("U"p or "D"own)
+	if ( GetLevel() == kStsHalfLadder ) {
+		TString label;
+		switch ( CbmStsAddress::GetElementId(fAddress, kStsHalfLadder) ) {
+			case 0: label = "U"; break;
+			case 1: label = "D"; break;
+			default: break;
+		}
+		SetName( fMother->GetName() + label );
+		return;
+	}
+
+	// For other levels: Expand the name of the mother
+	TString label;
+	switch ( GetLevel() ) {
+		case kStsStation: label = "_S"; break;
+		case kStsLadder: label = "_L"; break;
+		case kStsModule: label = "_M"; break;
+		case kStsSensor: label = "_S"; break;
+		default: break;
+	}
+	label += Form("%02i",
+			          CbmStsAddress::GetElementId(fAddress, GetLevel()) + 1 );
+	SetName( fMother->GetName() + label );
+
 }
 // -------------------------------------------------------------------------
 

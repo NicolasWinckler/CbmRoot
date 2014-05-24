@@ -3,20 +3,23 @@
  ** @date 02.05.2013
  **/
 
+#include "setup/CbmStsSensorTypeDssd.h"
+
 #include <iomanip>
 
 #include "TMath.h"
 
 #include "FairLogger.h"
 
-#include "CbmStsAddress.h"
+
 #include "setup/CbmStsModule.h"
-#include "setup/CbmStsSenzor.h"
 #include "setup/CbmStsSensorPoint.h"
-#include "setup/CbmStsSensorTypeDssd.h"
+#include "setup/CbmStsSenzor.h"
 
 
-using namespace std;
+using std::fixed;
+using std::setprecision;
+
 
 
 // --- Energy for creation of an electron-hole pair in silicon [GeV]  ------
@@ -57,6 +60,64 @@ Int_t CbmStsSensorTypeDssd::GetModuleChannel(Int_t strip, Int_t side,
   if ( side ) channel += fNofStrips[0];
 
   return channel;
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Get strip number from coordinates   -----------------------------
+Int_t CbmStsSensorTypeDssd::GetStripNumber(Double_t x, Double_t y,
+		                                       Int_t side) const {
+
+	// Cave: This implementation assumes that the centre of the sensor volume
+	// is also the centre of the active area, i.e. that the inactive borders
+	// (guard ring) are symmetric both and x and y (not necessarily the same
+	// in y and y).
+
+	// Check side
+	if ( side < 0 || side > 1) {
+		LOG(ERROR) << "Illegal side qualifier " << side << FairLogger::endl;
+		return -1;
+	}
+
+	// Check whether in active area (should have been caught before)
+	if ( TMath::Abs(x) > fDx / 2. ) {
+		LOG(ERROR) << GetName() << ": Outside active area : x = "
+				       << x << " cm"<< FairLogger::endl;
+    return -1;
+	}
+	if ( TMath::Abs(y) > fDy / 2. ) {
+		LOG(ERROR) << GetName() << ": Outside active area : y = "
+			         << y << " cm"<< FairLogger::endl;
+    return -1;
+	}
+
+  // Stereo angle and strip pitch
+  Double_t tanphi = fSinStereo[side] / fCosStereo[side];
+  Double_t pitch  = fPitch[side];
+  Int_t nStrips   = fNofStrips[side];
+
+  // Calculate distance from lower left corner of the active area.
+  // Note: the coordinates are given w.r.t. the centre of the volume.
+  Double_t xdist = x + 0.5 * fDx;
+  Double_t ydist = y + 0.5 * fDy;
+
+  // Project coordinates to readout (top) edge
+  Double_t xro = xdist - ( fDy - ydist ) * tanphi;
+
+  // Calculate corresponding strip number
+  Int_t iStrip = TMath::FloorNint( xro / pitch );
+
+  // Account for horizontal cross-connection of strips
+  // not extending to the top edge
+  while ( iStrip < 0 )        iStrip += nStrips;
+  while ( iStrip >= nStrips ) iStrip -= nStrips;
+
+  if ( FairLogger::GetLogger()->IsLogNeeded(DEBUG4)) Print();
+  LOG(DEBUG3) << setprecision(6) << GetName() << ": (x,y) = (" << x << ", " << y
+  		        << ") cm, x(ro) = " << xro << " cm, strip "
+  		        << iStrip << FairLogger::endl;
+  return iStrip;
 }
 // -------------------------------------------------------------------------
 
@@ -121,28 +182,34 @@ void CbmStsSensorTypeDssd::Print(Option_t* opt) const {
 
 
 // -----   Process an MC Point  --------------------------------------------
-void CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point,
-                                        const CbmStsSenzor* sensor) const {
+Int_t CbmStsSensorTypeDssd::ProcessPoint(CbmStsSensorPoint* point,
+                                         const CbmStsSenzor* sensor) const {
 
   // --- Catch if parameters are not set
   if ( ! fIsSet ) {
     LOG(FATAL) << fName << ": parameters are not set!"
                << FairLogger::endl;
-    return;
+    return -1;
   }
 
-  ProduceCharge(point, 0, sensor);
-  ProduceCharge(point, 1, sensor);
+  // --- Created charge signals
+  Int_t nSignals = 0;
 
+  // --- Produce charge on front and back side
+  nSignals += 1000 * ProduceCharge(point, 0, sensor);
+ 	nSignals += ProduceCharge(point, 1, sensor);
+
+  return nSignals;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Produce charge on the strips   ----------------------------------
-void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
-                                         Int_t side,
-                                         const CbmStsSenzor* sensor) const {
+Int_t CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
+                                          Int_t side,
+                                          const CbmStsSenzor* sensor)
+                                          const {
 
   // --- Protect against being called without parameters being set
   if ( ! fIsSet ) LOG(FATAL) << "Parameters of sensor " << fName
@@ -154,7 +221,7 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
   // Check for side qualifier
   if ( side < 0 || side > 1 )  {
     LOG(ERROR) << "Illegal side qualifier!" << FairLogger::endl;
-    return;
+    return -1;
   }
 
   // Total produced charge
@@ -168,7 +235,7 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
 
   // Project point coordinates (in / out) to readout (top) edge
   // Keep in mind that the SensorPoint gives coordinates with
-  // respect to the centre of the active area/
+  // respect to the centre of the active area.
   Double_t x1 = point->GetX1() - 0.5 * fDx
                 - ( 0.5 * fDy - point->GetY1() ) * tanphi;
   Double_t x2 = point->GetX2() - 0.5 * fDx
@@ -194,6 +261,7 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
 
 
   // --- Loop over fired strips
+  Int_t nSignals = 0;
   for (Int_t iStrip = i1; iStrip <= i2; iStrip++) {
 
     // --- Calculate charge in strip
@@ -203,9 +271,11 @@ void CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
 
     // --- Register charge to module
     RegisterCharge(sensor, side, iStrip, charge, point->GetTime());
+    nSignals++;
 
   } // Loop over fired strips
 
+  return nSignals;
 }
 // -------------------------------------------------------------------------
 
@@ -220,13 +290,17 @@ void CbmStsSensorTypeDssd::RegisterCharge(const CbmStsSenzor* sensor,
   // --- Determine module channel for given sensor strip
   Int_t channel = GetModuleChannel(strip, side, sensor->GetSensorId() );
 
-  // --- Send signal to module
-  sensor->GetModule()->AddSignal(channel, time, charge);
-
   // --- Debug output
   LOG(DEBUG3) << fName << ": Registering charge: side " << side
               << ", strip " << strip << ", time " << time
-              << ", charge " << charge << FairLogger::endl;
+              << ", charge " << charge
+              << " to channel " << channel
+              << " of module " << sensor->GetModule()->GetName()
+              << FairLogger::endl;
+
+  // --- Send signal to module
+  sensor->GetModule()->AddSignal(channel, time, charge);
+
 
 }
 // -------------------------------------------------------------------------
@@ -254,7 +328,7 @@ Bool_t CbmStsSensorTypeDssd::SelfTest() {
     } // side loop
   } // sensor loop
 
-  LOG(INFO) << fName << ": self test passed" << FairLogger::endl;
+  //LOG(DEBUG2) << fName << ": self test passed" << FairLogger::endl;
   return kTRUE;
 }
 // -------------------------------------------------------------------------
@@ -298,7 +372,7 @@ void CbmStsSensorTypeDssd::SetParameters(Double_t dx, Double_t dy,
   }
 
   // --- Flag parameters to be set if test is ok
-  //fIsSet = SelfTest();
+  fIsSet = SelfTest();
 
 }
 // -------------------------------------------------------------------------

@@ -71,7 +71,7 @@ function set_default_muon_geometry() {
     export LIT_TOF_GEOM=tof/tof_v13b.geo.root
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
-    export LIT_FIELD_MAP=field_v12a
+    export LIT_FIELD_MAP=field_v12b
     export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
@@ -103,7 +103,7 @@ function set_default_electron_geometry() {
     export LIT_TOF_GEOM=tof/tof_v13b.geo.root
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
-    export LIT_FIELD_MAP=field_v12a
+    export LIT_FIELD_MAP=field_v12b
     export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
@@ -135,7 +135,7 @@ function set_default_mvd_geometry() {
     export LIT_TOF_GEOM=
     export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
-    export LIT_FIELD_MAP=field_v12a
+    export LIT_FIELD_MAP=field_v12b
     export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
@@ -165,7 +165,7 @@ function set_default_sts_geometry() {
     export LIT_TOF_GEOM=
     export LIT_TOF_DIGI=
     export LIT_ECAL_GEOM=
-    export LIT_FIELD_MAP=field_v12a
+    export LIT_FIELD_MAP=field_v12b
     export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1
@@ -197,7 +197,7 @@ function set_default_sts_tof_geometry() {
     export LIT_TOF_GEOM=tof/tof_v13b.geo.root
     export LIT_TOF_DIGI=${VMCWORKDIR}/parameters/tof/tof_v13b.digi.par
     export LIT_ECAL_GEOM=
-    export LIT_FIELD_MAP=field_v12a
+    export LIT_FIELD_MAP=field_v12b
     export LIT_MAGNET_GEOM=magnet/magnet_v12b.geo.root
     
     export LIT_CONSEQUTIVE_STS_POINTS=1

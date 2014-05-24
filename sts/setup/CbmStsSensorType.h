@@ -44,15 +44,17 @@ class CbmStsSensorType : public TNamed
     Int_t GetTypeId() const { return fTypeId; }
 
 
-    /** Produce charge in the sensor
+    /** Perform response simulation for one MC Point
      **
      ** @param point   Pointer to CbmStsSensorPoint with relevant parameters
+     ** @param sensor  Pointer to CbmStsSensor object
+     ** @return  Status variable, depends on concrete type
      **
      ** Perform the appropriate action for a particle trajectory in the
      ** sensor characterised by the CbmStsSensorPoint object.
      **/
-    virtual void ProcessPoint(CbmStsSensorPoint* point,
-                              const CbmStsSenzor* sensor) const = 0;
+    virtual Int_t ProcessPoint(CbmStsSensorPoint* point,
+                               const CbmStsSenzor* sensor) const = 0;
 
 
   private:

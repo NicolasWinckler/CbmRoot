@@ -9,17 +9,9 @@
 
 #include <map>
 #include <vector>
-#include "TNamed.h"
 #include "CbmStsElement.h"
 #include "CbmStsSenzor.h"
 
-
-
-class TGeoPhysicalNode;
-class CbmStsDigi;
-
-
-using namespace std;
 
 
 /** @class CbmStsModule
@@ -37,8 +29,6 @@ using namespace std;
  ** The module digitises the analogue signals and sends them to the
  ** CbmDaq when appropriate.
  **/
-
-
 class CbmStsModule : public CbmStsElement
 {
   public:
@@ -60,18 +50,6 @@ class CbmStsModule : public CbmStsElement
     virtual ~CbmStsModule();
 
 
-    /** Add daughter element (from base class)
-     ** @param element  Pointer to element to be added as daughter.
-     **/
-    //virtual void AddDaughter(CbmStsElement* element);
-
-
-    /** Add a sensor to the module
-     ** @param sensor   Pointer to sensor object
-     **/
-    void AddSensor(CbmStsSenzor* sensor);
-
-
     /** Add an analogue signal to the buffer
      *
      * @param channel        channel number
@@ -85,32 +63,43 @@ class CbmStsModule : public CbmStsElement
     void AddSignal(Int_t channel, Double_t time, Double_t charge);
 
 
+    /** Clean the buffer
+     ** @param time  Read-out time [ns]
+     **
+     ** All analogue signals in the buffer with time prior to the specified
+     ** read-out time are digitised and sent to the digitiser / DAQ.
+     **/
+     void CleanBuffer(Double_t time);
+
+
   private:
 
     Double_t fDynRange;        // dynamic range [e]
     Double_t fThreshold;       // threshold [e]
     Int_t    fNofAdcChannels;  // Number of ADC channels
 
-    vector<CbmStsSenzor*> fSensors;       ///< Array of sensors
-    // TODO: Unify inherited array and private array
 
-
-    /** Buffer for the analogue signals **/
+    /** Buffer for the analogue signals
+     ** This is a std::map from channel number to a pair
+     ** of time and analogue charge
+     **/
     map<Int_t, pair<Double_t, Double_t> > fBuffer;
 
 
-    /** Create a digi from a charge signal
+    /** Digitise an analog charge signal
      ** @param channel  Module readout channel number
-     ** @param charge   Analogue charge [e]
+     ** @param charge   Analog charge [e]
      ** @param time     Absolute signal time [ns]
      ** @return  Pointer to new digi
      **/
-    CbmStsDigi* CreateDigi(Int_t channel, Double_t charge, Double_t time);
+    void Digitize(Int_t channel, Double_t charge, Double_t time);
 
 
+    /** Prevent usage of copy constructor and assignment operator **/
     CbmStsModule(const CbmStsModule&);
     CbmStsModule& operator=(const CbmStsModule&);
     
+
     ClassDef(CbmStsModule,1);
 
 };

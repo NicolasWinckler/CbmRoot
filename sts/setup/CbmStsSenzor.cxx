@@ -4,21 +4,24 @@
  **/
 
 
-#include "TGeoMatrix.h"
-#include "TGeoPhysicalNode.h"
-#include "CbmStsPoint.h"
+// Include class header
 #include "CbmStsSenzor.h"
-#include "CbmStsAddress.h"
-#include "CbmStsModule.h"
-#include "CbmStsSensorPoint.h"
-#include "CbmStsSensorType.h"
-#include "CbmStsSensorTypeDssd.h"
+
+// Includes from ROOT
+#include "TGeoMatrix.h"
+
+// Includes from CbmRoot
+#include "CbmStsPoint.h"
+
+// Includes from STS
+#include "setup/CbmStsModule.h"
+#include "setup/CbmStsSensorPoint.h"
+#include "setup/CbmStsSetup.h"
+
 
 
 // -----   Constructor   ---------------------------------------------------
-CbmStsSenzor::CbmStsSenzor() 
- : CbmStsElement(),
-   fType(NULL)
+CbmStsSenzor::CbmStsSenzor() : CbmStsElement(), fType(NULL)
 {
 }
 // -------------------------------------------------------------------------
@@ -31,19 +34,6 @@ CbmStsSenzor::CbmStsSenzor(const char* name, const char* title,
                            CbmStsElement(name, title, kStsSensor, node),
                            fType(NULL)
 {
-	// TODO: Currently, the sensor type is hard-coded. Should be eventually
-	// replaced by initialisation from parameters / database
-	fType = new CbmStsSensorTypeDssd();
-	Double_t dx = 5.9392;   // sensor size in x (across strips)
-	Double_t dy = 5.9600;   // sensor size in y (along strips)
-	Double_t dz = 0.0300;   // sensor thickness
-	Int_t nStripsF = 1024;  // number of strips on front side
-	Int_t nStripsB = 1024;  // number of strips on back side
-	Double_t stereoF = 0.;  // stereo angle on front side
-	Double_t stereoB = 7.5; // stereo angle on back side [degrees]
-	dynamic_cast<CbmStsSensorTypeDssd*>(fType)->SetParameters(dx, dy, dz,
-																					nStripsF, nStripsB,
-																					stereoF, stereoB);
 }
 // -------------------------------------------------------------------------
 
@@ -51,15 +41,21 @@ CbmStsSenzor::CbmStsSenzor(const char* name, const char* title,
 
 // -----  Get the mother module   ------------------------------------------
 CbmStsModule* CbmStsSenzor::GetModule() const {
-	 return dynamic_cast<CbmStsModule*>
-	    ( CbmStsSetup::Instance()->GetElement(fAddress, kStsModule) );
+	 return dynamic_cast<CbmStsModule*> ( GetMother() );
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Process a CbmStsPoint  ------------------------------------------
-void CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
+Int_t CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
+
+	// Check whether type is assigned
+	if ( ! fType ) {
+		LOG(FATAL) << GetName() << ": No sensor type assigned!"
+				       << FairLogger::endl;
+		return -1;
+	}
 
   Double_t global[3];
   Double_t local[3];
@@ -84,22 +80,17 @@ void CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
   CbmStsSensorPoint* sPoint = new CbmStsSensorPoint(x1, y1, x2, y2,
                                                     point->GetEnergyLoss(),
                                                     point->GetTime());
-
-  LOG(INFO) << "Module of sensor is " << GetModule() << FairLogger::endl;
+  LOG(DEBUG2) << GetName() << ": Local point coordinates are (" << x1
+  		        << ", " << y1 << "), (" << x2 << ", " << y2 << ")"
+  		        << FairLogger::endl;
+  LOG(DEBUG2) << GetName() << ": Sensor type is " << fType->GetName()
+  		        << " " << fType->GetTitle() << FairLogger::endl;
 
   // --- Call ProcessPoint method from sensor type
-  fType->ProcessPoint(sPoint, this);
 
+  return fType->ProcessPoint(sPoint, this);
 }
 // -------------------------------------------------------------------------
-
-
-
-
-
-
-
-
 
 
 ClassImp(CbmStsSenzor)

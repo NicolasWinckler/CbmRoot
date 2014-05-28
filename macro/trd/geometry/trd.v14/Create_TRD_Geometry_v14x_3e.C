@@ -293,9 +293,12 @@ const Int_t ModuleType[NofModuleTypes]    = {  0,  0,  0,  0,  1,  1,  1,  1 }; 
 const Int_t RobsPerModule[NofModuleTypes] = {  2,  2,  1,  1,  2,  1,  1,  1 }; // number of GBTx ROBs on module
 const Int_t GbtxPerRob[NofModuleTypes]    = {107,105,105,103,107,107,105,103 }; // number of GBTx ASICs on ROB
 
-// ultimate density - 540 mm
-const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  6,  4, 12,  6,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
-const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,105,105,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+//// ultimate density - 540 mm
+//const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  6,  4, 12,  6,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+//const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,105,105,108,108,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
+// ginat modules - 1100 mm
+const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  6,  4, 14,  7,  4,  3 }; // number of FEBs on backside - reduced FEBs (64 ch ASICs)
+const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,105,105,110,110,110,110 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //const Int_t FebsPerModule[NofModuleTypes] = {  6,  5,  3,  2,  6,  3,  4,  3 }; // min number of FEBs // number of FEBs on backside - reduced FEBs (64 ch ASICs)
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {315,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
 //const Int_t AsicsPerFeb[NofModuleTypes]   = {216,210,210,210,216,216,108,108 }; //  %100 gives number of ASICs on FEB, /100 gives grouping
@@ -533,7 +536,8 @@ void dump_digi_file()
   const Double_t ActiveAreaX[2] = { DetectorSizeX[0] - 2 * FrameWidth[0],
                                     DetectorSizeX[1] - 2 * FrameWidth[1] };
   const Int_t NofSectors = 3;
-  const Int_t NofPadsInRow[2]  = { 80, 128 };  // numer of pads in rows
+  //  const Int_t NofPadsInRow[2]  = { 80, 128 };  // number of pads in rows
+  const Int_t NofPadsInRow[2]  = { 80, 160 };  // number of pads in rows
 
   const Double_t PadHeightInSector[NofModuleTypes][NofSectors] =  // pad height
         { {  1.50,  1.50,  1.50 },   // module type 1
@@ -541,10 +545,11 @@ void dump_digi_file()
           {  4.50,  4.50,  4.50 },   // module type 3
           {  6.75,  6.75,  6.75 },   // module type 4
 
-          { 11.00, 11.00, 11.00 },   // module type 5
-          { 11.00, 11.00, 11.00 },   // module type 6
-          { 11.00, 11.00, 11.00 },   // module type 7
-          { 11.00, 11.00, 11.00 } }; // module type 8
+          {  4.00,  3.75,  4.00 },   // module type 5
+          {  8.00,  7.75,  8.00 },   // module type 6
+//        { 11.00, 11.00, 11.00 },   // module type 7
+          { 13.75, 13.75, 13.75 },   // module type 7
+          { 18.50, 18.25, 18.50 } }; // module type 8
 
 //          {  3.75,  4.00,  3.75 },   // module type 5
 //          {  7.50,  7.75,  7.50 },   // module type 6
@@ -557,10 +562,11 @@ void dump_digi_file()
           {   1,  10,   1 },         // module type 3
           {   2,   4,   2 },         // module type 4
 
-          {   3,   4,   3 },         // module type 5
-          {   3,   4,   3 },         // module type 6
-          {   3,   4,   3 },         // module type 7
-          {   3,   4,   3 } };       // module type 8
+          {  10,   8,  10 },         // module type 5
+          {   3,   8,   3 },         // module type 6
+//        {   3,   4,   3 },         // module type 7
+          {   2,   4,   2 },         // module type 7
+          {   1,   4,   1 } };       // module type 8
 
 //          {  10,   4,  10 },         // module type 5
 //          {   4,   4,   4 },         // module type 6

@@ -2,7 +2,7 @@
 ##   trd_v14x_3e information file
 #
 
-# created 20140528
+# created 20140530
 
 # envelope
  410 cm   start of TRD (z)
@@ -115,26 +115,26 @@ GBTX readout boards are : NOT included
   856.6000 cm   position of gas volume - layer 10
 
 # angles of acceptance
-v: 32.80 deg, h: 42.06 deg - vertical/horizontal - layer  1
-v: 30.33 deg, h: 39.32 deg - vertical/horizontal - layer  2
-v: 28.17 deg, h: 36.86 deg - vertical/horizontal - layer  3
-v: 26.28 deg, h: 34.65 deg - vertical/horizontal - layer  4
-v: 32.46 deg, h: 39.28 deg - vertical/horizontal - layer  5
-v: 30.69 deg, h: 37.35 deg - vertical/horizontal - layer  6
-v: 29.09 deg, h: 35.57 deg - vertical/horizontal - layer  7
-v: 27.63 deg, h: 33.94 deg - vertical/horizontal - layer  8
-v: 32.28 deg, h: 37.67 deg - vertical/horizontal - layer  9
-v: 30.90 deg, h: 36.18 deg - vertical/horizontal - layer 10
+v: 27.27 deg, h: 42.06 deg - vertical/horizontal - layer  1
+v: 25.08 deg, h: 39.32 deg - vertical/horizontal - layer  2
+v: 23.19 deg, h: 36.86 deg - vertical/horizontal - layer  3
+v: 21.55 deg, h: 34.65 deg - vertical/horizontal - layer  4
+v: 28.60 deg, h: 39.28 deg - vertical/horizontal - layer  5
+v: 26.97 deg, h: 37.35 deg - vertical/horizontal - layer  6
+v: 25.49 deg, h: 35.57 deg - vertical/horizontal - layer  7
+v: 24.17 deg, h: 33.94 deg - vertical/horizontal - layer  8
+v: 29.31 deg, h: 37.67 deg - vertical/horizontal - layer  9
+v: 28.01 deg, h: 36.18 deg - vertical/horizontal - layer 10
 
 # inner aperture
-v:  3.69 deg, h:  3.69 deg - vertical/horizontal - layer  1
-v:  3.35 deg, h:  3.35 deg - vertical/horizontal - layer  2
-v:  3.07 deg, h:  3.07 deg - vertical/horizontal - layer  3
-v:  2.83 deg, h:  2.83 deg - vertical/horizontal - layer  4
-v:  2.60 deg, h:  2.60 deg - vertical/horizontal - layer  5
-v:  2.43 deg, h:  2.43 deg - vertical/horizontal - layer  6
-v:  2.28 deg, h:  2.28 deg - vertical/horizontal - layer  7
-v:  2.14 deg, h:  2.14 deg - vertical/horizontal - layer  8
+v:  7.34 deg, h:  7.34 deg - vertical/horizontal - layer  1
+v:  6.67 deg, h:  6.67 deg - vertical/horizontal - layer  2
+v:  6.11 deg, h:  6.11 deg - vertical/horizontal - layer  3
+v:  5.64 deg, h:  5.64 deg - vertical/horizontal - layer  4
+v:  5.19 deg, h:  5.19 deg - vertical/horizontal - layer  5
+v:  4.85 deg, h:  4.85 deg - vertical/horizontal - layer  6
+v:  4.54 deg, h:  4.54 deg - vertical/horizontal - layer  7
+v:  4.28 deg, h:  4.28 deg - vertical/horizontal - layer  8
 v:  4.01 deg, h:  4.01 deg - vertical/horizontal - layer  9
 v:  3.80 deg, h:  3.80 deg - vertical/horizontal - layer 10
 

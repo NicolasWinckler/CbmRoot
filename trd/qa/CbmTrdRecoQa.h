@@ -68,7 +68,7 @@ class CbmTrdRecoQa : public FairTask
   void SetTriangularPads(Bool_t triangles);
   void SetTriggerThreshold(Double_t triggerthreshold);
  private:
-  TPolyLine *CreateTriangularPad(Int_t column, Int_t row, Double_t content);
+  //TPolyLine *CreateTriangularPad(Int_t column, Int_t row, Double_t content);
   Bool_t fTrianglePads;
   Double_t fTriggerTH;
   /* Data branches*/

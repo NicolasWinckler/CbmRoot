@@ -189,6 +189,7 @@ void CbmTrdRecoQa::SetTriangularPads(Bool_t triangles)
 {
   fTrianglePads = triangles;
 }
+/*
 TPolyLine *CbmTrdRecoQa::CreateTriangularPad(Int_t column, Int_t row, Double_t content){
   const Int_t nCoordinates = 4;
   Double_t x[nCoordinates] = {column-0.5,column+0.5,column+0.5,column-0.5};
@@ -201,6 +202,7 @@ TPolyLine *CbmTrdRecoQa::CreateTriangularPad(Int_t column, Int_t row, Double_t c
   pad->SetFillColor(content);
   return pad;
 }
+*/
 // ---- Task execution ------------------------------------------------------
 void CbmTrdRecoQa::Exec(Option_t* option)
 {
@@ -440,7 +442,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     it->second->cd(2);
     fModuleMapDigi[it->first]->DrawCopy("colz");   
 
-    if (fTrianglePads){
+    {
       TPolyLine *pad = NULL;
       const Int_t nRow = fModuleMapDigi[it->first]->GetNbinsY();
       const Int_t nCol = fModuleMapDigi[it->first]->GetNbinsX();
@@ -449,7 +451,10 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	for (Int_t iCol = 1; iCol <= nCol; iCol++){
 	  Double_t charge = fModuleMapDigi[it->first]->GetBinContent(iCol, iRow);
 	  if (charge > 0.0){
-	    pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, 0.0, max_Range, false);
+	    if (fTrianglePads)
+	      pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, 0.0, max_Range, false);
+	    else
+	      pad = utils->CreateRectangularPad(iCol-1, iRow-1, charge, 0.0, max_Range, false);
 	    pad->Draw("f,same");
 	  }
 	}
@@ -462,7 +467,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     it->second->cd(3)->SetLogz(1);
     fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(fTriggerTH,fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin()));
     fModuleMapDigi[it->first]->DrawCopy("colz");
-    if (fTrianglePads){
+    {
       TPolyLine *pad = NULL;
       const Int_t nRow = fModuleMapDigi[it->first]->GetNbinsY();
       const Int_t nCol = fModuleMapDigi[it->first]->GetNbinsX();
@@ -471,7 +476,10 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	for (Int_t iCol = 1; iCol <= nCol; iCol++){
 	  Double_t charge = fModuleMapDigi[it->first]->GetBinContent(iCol, iRow);
 	  if (charge > fTriggerTH){
-	    pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, 0, max_Range, true);
+	    if (fTrianglePads)
+	      pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, 0, max_Range, true);
+	    else
+	      pad = utils->CreateRectangularPad(iCol-1, iRow-1, charge, 0.0, max_Range, false);
 	    pad->Draw("f,same");
 	  }
 	}
@@ -485,7 +493,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 
     it->second->cd(4);
     fModuleMapCluster[it->first]->DrawCopy("colz");
-    if (fTrianglePads){
+    {
       TPolyLine *pad = NULL;
       const Int_t nRow = fModuleMapCluster[it->first]->GetNbinsY();
       const Int_t nCol = fModuleMapCluster[it->first]->GetNbinsX();
@@ -494,7 +502,10 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	for (Int_t iCol = 1; iCol <= nCol; iCol++){
 	  Double_t clusterId = fModuleMapCluster[it->first]->GetBinContent(iCol, iRow);
 	  if (clusterId > 0){
-	    pad = utils->CreateTriangularPad(iCol-1, iRow-1, clusterId, 0, max_Range, false);	  
+	    if (fTrianglePads)
+	      pad = utils->CreateTriangularPad(iCol-1, iRow-1, clusterId, 0, max_Range, false);
+	    else
+	      pad = utils->CreateRectangularPad(iCol-1, iRow-1, clusterId, 0.0, max_Range, false);
 	    pad->Draw("f,same");
 	  }
 	}
@@ -535,6 +546,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
       ptext->Draw("same");
     }
     it->second->Update();
+    it->second->SaveAs("pics/"+(TString)(it->second->GetName())+".png");
     it->second->Write("", TObject::kOverwrite);
     it->second->Close();
   }

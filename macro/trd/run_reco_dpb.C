@@ -194,17 +194,17 @@ void run_reco_dpb(Int_t nEvents = 1, Int_t urqmd = 0000)
   run->AddTask(trdDigiPrf);
   
 
-  CbmTrdClusterFinderDPB* trdCluster = new CbmTrdClusterFinderFast();
+  CbmTrdClusterFinderDPB* trdCluster = new CbmTrdClusterFinderDPB();
   run->AddTask(trdCluster);
 
   /*
-  CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
-  trdCluster->SetNeighbourTrigger(true);
-  trdCluster->SetTriggerThreshold(triggerThreshold);
-  trdCluster->SetNeighbourRowTrigger(false);
-  trdCluster->SetPrimaryClusterRowMerger(true);
-  trdCluster->SetTriangularPads(triangularPads);
-  run->AddTask(trdCluster);
+    CbmTrdClusterFinderFast* trdCluster = new CbmTrdClusterFinderFast();
+    trdCluster->SetNeighbourTrigger(true);
+    trdCluster->SetTriggerThreshold(triggerThreshold);
+    trdCluster->SetNeighbourRowTrigger(false);
+    trdCluster->SetPrimaryClusterRowMerger(true);
+    trdCluster->SetTriangularPads(triangularPads);
+    run->AddTask(trdCluster);
   */
 
   CbmTrdHitProducerCluster* trdHit = new CbmTrdHitProducerCluster();
@@ -215,17 +215,18 @@ void run_reco_dpb(Int_t nEvents = 1, Int_t urqmd = 0000)
     CbmTrdHitRateFastQa* hitrate = new CbmTrdHitRateFastQa();
     run->AddTask(hitrate);
     } else if (nEvents == 1){
-    CbmTrdRecoQa* trdrecoqa = new CbmTrdRecoQa("CbmTrdRecoQa","CbmTrdRecoQa");
-    trdrecoqa->SetTriangularPads(triangularPads);
-    trdrecoqa->SetTriggerThreshold(triggerThreshold);//1e-6
-    run->AddTask(trdrecoqa);
-    } else*/
-  {    
+  */
+  CbmTrdRecoQa* trdrecoqa = new CbmTrdRecoQa("CbmTrdRecoQa","CbmTrdRecoQa");
+  trdrecoqa->SetTriangularPads(triangularPads);
+  trdrecoqa->SetTriggerThreshold(triggerThreshold);//1e-6
+  run->AddTask(trdrecoqa);
+  /*} else
+    {    
     /*
-      CbmTrdQa* trdqa = new CbmTrdQa(radiator);
-      trdqa->SetTriggerThreshold(triggerThreshold);
-      run->AddTask(trdqa);
-    */
+    CbmTrdQa* trdqa = new CbmTrdQa(radiator);
+    trdqa->SetTriggerThreshold(triggerThreshold);
+    run->AddTask(trdqa);
+    
     /*
     CbmTrdOccupancyQa* trdocc = new CbmTrdOccupancyQa();
     trdocc->SetNeighbourTrigger(true);
@@ -238,9 +239,9 @@ void run_reco_dpb(Int_t nEvents = 1, Int_t urqmd = 0000)
     trdhitdens->SetPlotResults(false);
     trdhitdens->SetScaleCentral2mBias(1.0);
     run->AddTask(trdhitdens);
-    */
-  }
-
+  
+}
+*/
   // -------------------------------------------------------------------------
   // ===                 End of TRD local reconstruction                   ===
   // =========================================================================

@@ -93,6 +93,7 @@ reco/CbmTrdHitProducerSmearing.cxx
 reco/CbmTrdHitProducerDigi.cxx
 #reco/CbmTrdClusterFinder.cxx
 reco/CbmTrdClusterFinderFast.cxx
+reco/CbmTrdClusterFinderDPB.cxx
 reco/CbmTrdHitProducerCluster.cxx
 #reco/CbmTrdSimpleHitProducerCluster.cxx
 

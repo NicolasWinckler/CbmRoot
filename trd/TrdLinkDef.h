@@ -49,6 +49,7 @@
 #pragma link C++ class CbmTrdUtils+;
 //#pragma link C++ class CbmTrdClusterFinder+;
 #pragma link C++ class CbmTrdClusterFinderFast+;
+#pragma link C++ class CbmTrdClusterFinderDPB+;
 //#pragma link C++ class CbmTrdSimpleHitProducerCluster+;
 #pragma link C++ class CbmTrdHitProducerCluster+;
 #pragma link C++ class CbmTrdGeoHandler+;

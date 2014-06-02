@@ -64,6 +64,29 @@ TPolyLine *CbmTrdUtils::CreateTriangularPad(Int_t column, Int_t row, Double_t va
 
   return pad;
 }
+TPolyLine *CbmTrdUtils::CreateRectangularPad(Int_t column, Int_t row, Double_t value, Double_t min_range, Double_t max_range, Bool_t logScale){
+  InitColorVector(logScale, min_range, max_range);
+  const Int_t nCoordinates = 5;
+  Double_t x[nCoordinates];
+  Double_t y[nCoordinates];
+  x[0] = column-0.5;
+  y[0] = row-0.5;
+  x[1] = column-0.5;
+  y[1] = row+0.5;
+  x[2] = column+0.5;
+  y[2] = row+0.5;
+  x[3] = column+0.5;
+  y[3] = row-0.5;
+  x[4] = column-0.5;
+  y[4] = row-0.5;
+  TPolyLine *pad = new TPolyLine(nCoordinates,x,y);
+  pad->SetLineColor(1);
+  pad->SetFillColor(GetColorCode(value));
+
+  return pad;
+}
+
+
 
    void CbmTrdUtils::NiceTH1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle) 
   {

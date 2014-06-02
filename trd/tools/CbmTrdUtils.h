@@ -35,6 +35,7 @@ class CbmTrdUtils
   void NiceTH1(TH1 *h, Int_t color, Int_t mStyle, Int_t mSize, TString xTitle, TString yTitle);
   void CreateLayerView(std::map<Int_t/*moduleAddress*/, TH1*>& Map, CbmTrdModule *fModuleInfo, CbmTrdDigiPar *fDigiPar, const TString folder, const TString pics, const TString zAxisTitle, const Double_t fmax, const Double_t fmin, const Bool_t logScale);
   TPolyLine *CreateTriangularPad(Int_t column, Int_t row, Double_t value, Double_t min_range, Double_t max_range, Bool_t logScale);
+  TPolyLine *CreateRectangularPad(Int_t column, Int_t row, Double_t value, Double_t min_range, Double_t max_range, Bool_t logScale);
   static TString GetGeantName(Int_t GeantId) {
     if (GeantId == 1)
       return (TString)"#gamma";

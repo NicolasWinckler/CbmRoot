@@ -395,14 +395,19 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     }
     digiMaxSpectrum->Fill(chargeMax);
   }
-  /*
+  
   cout << "Hits" << endl;
   Int_t modHit = 0;
   for (Int_t iHit = 0; iHit < nHits; iHit++){
     hit = (CbmTrdHit*) fHits->At(iHit);
+    
     moduleAddress = hit->GetAddress();//GetDetectorID();//?????
-    //cout << moduleAddress << endl;
     fModuleInfo = fDigiPar->GetModule(moduleAddress);
+    if (fModuleInfo == NULL) {
+      //printf("MA:%6i not found!\n",moduleAddress);
+      continue;
+    }
+    
     Double_t pos[3] = {hit->GetX(), hit->GetY(), hit->GetZ()};
     gGeoManager->FindNode(pos[0], pos[1], pos[2]-0.3);
     Double_t local_pos[3];
@@ -412,12 +417,17 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     row = fModuleInfo->GetModuleRow(sec, row);
     Double_t x(-1), y(-1);
     fModuleInfo->TransformToLocalPad(local_pos, x, y);
+
     Double_t W(fModuleInfo->GetPadSizeX(sec)), H(fModuleInfo->GetPadSizeY(sec)); 
     modHit = fModuleMapHit[moduleAddress]->GetN();
-    fModuleMapHit[moduleAddress]->SetPoint(modHit, col + x / W, row + y / H);
-    fModuleMapHit[moduleAddress]->SetPointError(modHit, hit->GetDx() / W, hit->GetDy() / H);
+    fModuleMapHit[moduleAddress]->SetPoint(modHit, col + x / W, row + y / H); 
+
+    if (hit->GetDx() <= W)
+      fModuleMapHit[moduleAddress]->SetPointError(modHit, hit->GetDx() / W, hit->GetDy() / H);
+    else
+      fModuleMapHit[moduleAddress]->SetPointError(modHit, hit->GetDy() / W, hit->GetDx() / H);
   }
-  */
+  
   gDirectory->mkdir("TrdRecoQA");
   gDirectory->cd("TrdRecoQA");
   digiMaxSpectrum->Write("", TObject::kOverwrite);
@@ -476,7 +486,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
       for (Int_t iRow = 1; iRow <= nRow; iRow++){
 	for (Int_t iCol = 1; iCol <= nCol; iCol++){
 	  Double_t charge = fModuleMapDigi[it->first]->GetBinContent(iCol, iRow);
-	  if (charge > fTriggerTH){
+	  if (charge >= fTriggerTH){
 	    if (fTrianglePads)
 	      pad = utils->CreateTriangularPad(iCol-1, iRow-1, charge, 0, max_Range, true);
 	    else

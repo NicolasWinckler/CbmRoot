@@ -395,7 +395,8 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     }
     digiMaxSpectrum->Fill(chargeMax);
   }
-  //cout << "Hits" << endl;
+  /*
+  cout << "Hits" << endl;
   Int_t modHit = 0;
   for (Int_t iHit = 0; iHit < nHits; iHit++){
     hit = (CbmTrdHit*) fHits->At(iHit);
@@ -416,7 +417,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     fModuleMapHit[moduleAddress]->SetPoint(modHit, col + x / W, row + y / H);
     fModuleMapHit[moduleAddress]->SetPointError(modHit, hit->GetDx() / W, hit->GetDy() / H);
   }
-
+  */
   gDirectory->mkdir("TrdRecoQA");
   gDirectory->cd("TrdRecoQA");
   digiMaxSpectrum->Write("", TObject::kOverwrite);

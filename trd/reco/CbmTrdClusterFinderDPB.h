@@ -22,7 +22,7 @@ class TClonesArray;
 class CbmTrdDigi;
 class CbmTrdCluster;
 
-typedef std::list< std::pair<Int_t, CbmTrdDigi*> > DigiList;
+typedef std::list< std::pair<Int_t, Int_t/*CbmTrdDigi**/> > DigiList;
 //typedef std::list<CbmTrdDigi*> DigiList;
 //typedef std::vector<DigiList*> ClusterVector;
 //typedef std::map<Int_t, CbmTrdDigi*> DigiMap;

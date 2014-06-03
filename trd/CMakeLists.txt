@@ -76,6 +76,8 @@ digi/CbmTrdDigitizerPRF_TB.cxx
 digi/CbmTrdDigitizer.cxx
 #digi/CbmTrdDigiWriteoutBuffer.cxx
 
+reco/CbmTrdSPADIC.cxx
+
 qa/CbmTrdHitProducerQa.cxx  
 qa/CbmTrdTracksPidQa.cxx
 qa/CbmTrdQa.cxx

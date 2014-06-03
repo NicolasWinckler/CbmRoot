@@ -1,5 +1,5 @@
 #include "CbmTrdClusterFinderDPB.h"
-//#include "CbmTrdClusterFinderFast.h"
+#include "CbmTrdSPADIC.h"
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdDigi.h"
@@ -58,6 +58,9 @@ InitStatus CbmTrdClusterFinderDPB::Init()
    return kSUCCESS;
 } 
 
+Bool_t CbmDigiSorter2(std::pair< Int_t, Int_t> a, std::pair< Int_t, Int_t> b)
+{return (a.first < b.first);}
+
 void CbmTrdClusterFinderDPB::Exec(Option_t *option)
 {
   std::map<Int_t, DigiList*> ModuleDigiMap;
@@ -65,10 +68,17 @@ void CbmTrdClusterFinderDPB::Exec(Option_t *option)
   for (Int_t iDigi=0; iDigi < nDigis; iDigi++ ) {
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);  
     Int_t digiAddress  = digi->GetAddress();
+    fModuleInfo        = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(digiAddress));
     Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
+    Int_t secRow = CbmTrdAddress::GetRowId(digi->GetAddress());
+    Int_t iSector = CbmTrdAddress::GetSectorId(digi->GetAddress());
+    Int_t globalRow = 0;
+    globalRow = fModuleInfo->GetModuleRow(iSector,secRow);
+    Int_t iCol = CbmTrdAddress::GetColumnId(digi->GetAddress());  
+    Int_t combiId = globalRow * (fModuleInfo->GetNofColumns() + 1) + iCol;
     if (ModuleDigiMap.find(moduleAddress)==ModuleDigiMap.end())
       ModuleDigiMap[moduleAddress] = new DigiList;
-    ModuleDigiMap[moduleAddress]->push_back(std::make_pair(iDigi,digi));
+    ModuleDigiMap[moduleAddress]->push_back(std::make_pair(combiId, iDigi/*digi*/));
   }
   for (std::map<Int_t, DigiList*>::iterator iMod = ModuleDigiMap.begin(); iMod != ModuleDigiMap.end(); iMod++){
     doClustering(iMod->first, iMod->second);   
@@ -87,29 +97,40 @@ void CbmTrdClusterFinderDPB::doClustering(Int_t ModuleAddress, DigiList* digiLis
     Criteria for cluster separation are not jet included. 
     One cluster per event per module is created.
   */
-  Bool_t newCluster = false;
-  DigiList *clusterList = new DigiList;
-  for (DigiList::iterator iDigi = digiList->begin(); iDigi != digiList->end(); iDigi++) {   
-    CbmTrdDigi *digi = (*iDigi).second; 
 
+  DigiList *clusterList = new DigiList;
+
+  digiList->sort(CbmDigiSorter2);
+  Int_t lastCombiId = (*digiList->begin()).first;
+  for (DigiList::iterator iDigi = digiList->begin(); iDigi != digiList->end(); iDigi++) {  
+   
+    CbmTrdDigi *digi =  (CbmTrdDigi*) fDigis->At((*iDigi).second);  //(*iDigi).second; 
+    
     Int_t digiAddress  = digi->GetAddress();
     Int_t layerId      = CbmTrdAddress::GetLayerId(digiAddress);
     Int_t moduleId     = CbmTrdAddress::GetModuleId(digiAddress);
+    Int_t moduleAddress = CbmTrdAddress::GetModuleAddress(digiAddress);
     fModuleInfo        = fDigiPar->GetModule(CbmTrdAddress::GetModuleAddress(digiAddress));
     Int_t secRow       = CbmTrdAddress::GetRowId(digi->GetAddress());
     Int_t iSector      = CbmTrdAddress::GetSectorId(digi->GetAddress());
+    Int_t iCol = CbmTrdAddress::GetColumnId(digi->GetAddress());
     Int_t globalRow    = 0;
     Double_t charge    = digi->GetCharge();
     Double_t time      = digi->GetTime();
     globalRow          = fModuleInfo->GetModuleRow(iSector,secRow);
-
-    if (newCluster)                                                         //new cluster is started
-      {     
+    Int_t combiId = globalRow * (fModuleInfo->GetNofColumns() + 1) + iCol;
+    //printf("MA:%6i  combiId:%4i  primeT:%i  FNR:%i  nT:%i\n",moduleAddress, combiId, digi->GetPrimeTriggerStatus(), digi->GetFNR_TriggerStatus(), (Int_t)digi->GetNeighbourTriggerIds().size());
+    
+    if (digi->GetPrimeTriggerStatus() == true || digi->GetFNR_TriggerStatus() == true){
+      if ((*iDigi).first - lastCombiId > 1) {                                                    //new cluster is started
+	//printf("==============new Cluster\n");
 	addCluster(clusterList);  
 	clusterList->clear();
-	newCluster = false;
-      }
-    clusterList->push_back(std::make_pair((*iDigi).first,digi));
+      }    
+      //printf("MA:%6i  combiId:%4i  primeT:%i  FNR:%i  nT:%i\n",moduleAddress, combiId, digi->GetPrimeTriggerStatus(), digi->GetFNR_TriggerStatus(), (Int_t)digi->GetNeighbourTriggerIds().size());
+      clusterList->push_back(std::make_pair((*iDigi).first, (*iDigi).second));
+      lastCombiId = (*iDigi).first;
+    }
   }
   addCluster(clusterList);                                                // process last cluster   
 }
@@ -119,12 +140,13 @@ void CbmTrdClusterFinderDPB::addCluster(DigiList* clusterList)
   Int_t idigi = 0;
   std::vector<Int_t> digiIndices( (*clusterList).size() );
   for (DigiList::iterator iDigi = clusterList->begin(); iDigi != clusterList->end(); iDigi++) {
-    digiIndices[idigi] = (*iDigi).first;                                                             // store all digiIds (position in TClonesArray) to a vector
+    digiIndices[idigi] = (*iDigi).second;                                                             // store all digiIds (position in TClonesArray) to a vector
     idigi++;
   }
   Int_t size = fClusters->GetEntriesFast();                                                          // put new cluster to the end of the TClonesArray
   CbmTrdCluster* cluster = new ((*fClusters)[size]) CbmTrdCluster();                                 // Create final CbmTrdDigi
-  cluster->SetAddress(CbmTrdAddress::GetModuleAddress((*clusterList->begin()).second->GetAddress()));//Add module address
+  CbmTrdDigi *digi =  (CbmTrdDigi*) fDigis->At((*clusterList->begin()).second);
+  cluster->SetAddress(CbmTrdAddress::GetModuleAddress(digi->GetAddress()));//Add module address
   cluster->SetDigis(digiIndices);                                                                    // add all digis of this cluster
 }
 ClassImp(CbmTrdClusterFinderDPB)

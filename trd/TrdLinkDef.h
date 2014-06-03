@@ -21,6 +21,7 @@
 //#pragma link C++ class  CbmTrdDigitizerMathieson;
 #pragma link C++ class  CbmTrdDigitizerPRF;
 #pragma link C++ class  CbmTrdDigitizerPRF_TB;
+#pragma link C++ class  CbmTrdSPADIC;
 #pragma link C++ class  CbmTrdHitRateQa;
 #pragma link C++ class  CbmTrdHitRateFastQa;
 #pragma link C++ class  CbmTrdHitDensityQa;

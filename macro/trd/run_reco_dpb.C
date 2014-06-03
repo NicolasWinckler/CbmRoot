@@ -193,6 +193,8 @@ void run_reco_dpb(Int_t nEvents = 1, Int_t urqmd = 0000)
   trdDigiPrf->SetNoiseLevel(trdNoiseSigma_keV);
   run->AddTask(trdDigiPrf);
   
+  CbmTrdSPADIC* trdSPADIC = new CbmTrdSPADIC();
+  run->AddTask(trdSPADIC);
 
   CbmTrdClusterFinderDPB* trdCluster = new CbmTrdClusterFinderDPB();
   run->AddTask(trdCluster);

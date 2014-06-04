@@ -14,6 +14,8 @@
 
 #include "TClonesArray.h"
 #include "TArray.h"
+#include "TH1D.h"
+#include "TCanvas.h"
 
 #include <iostream>
 #include <iomanip>
@@ -27,7 +29,15 @@ CbmTrdSPADIC::CbmTrdSPADIC()
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fGeoHandler(NULL),
-   fMinimumChargeTH(1.0e-06)
+   fMinimumChargeTH(1.0e-06),
+   fBitResolution(8),
+   fmaxdEdx(0.0001),//[GeV]
+   fAdcBit(fmaxdEdx/pow(2,fBitResolution)),
+   fSpadicResponse(NULL),
+   fPulseShape(false),
+   fShaperOrder(2),
+   fShapingTime(0.09),
+   fPeakBin(2)
 {
 }
 CbmTrdSPADIC::~CbmTrdSPADIC()
@@ -50,24 +60,122 @@ InitStatus CbmTrdSPADIC::Init()
    fGeoHandler = new CbmTrdGeoHandler();
    fGeoHandler->Init();
 
+   InitSpadicResponseFunction();
+
    return kSUCCESS;
 } 
+
+
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::SetBitResolution(Int_t bit){
+  fBitResolution = pow(2,bit);
+}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::SetMaxRange(Double_t maxRange){
+  fmaxdEdx = maxRange;
+  fAdcBit = fmaxdEdx/fBitResolution;
+}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::SetPulseShapeSim(Bool_t pulseShape){
+  fPulseShape = pulseShape;
+}
 // --------------------------------------------------------------------
 void CbmTrdSPADIC::SetTriggerThreshold(Double_t minCharge){
   fMinimumChargeTH = minCharge;//  To be used for test beam data processing
 }
-
+// --------------------------------------------------------------------
 Bool_t CbmDigiSorter(std::pair< Int_t, Int_t/*CbmTrdDigi**/> a, std::pair< Int_t, Int_t/*CbmTrdDigi**/> b)
 {return (a.first < b.first);}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::InitSpadicResponseFunction(){
+  fSpadicResponse = new TH1D("SpadicResponseFunction","SpadicResponseFunction", fnBins, 0 -(1.8/fnBins), 1.8 -(1.8/fnBins));// 1/25MHz * 45Timebins = 1.8µs200000,0,20);
+  Double_t t = 0; //[µs]
+  Double_t h = 0;
+  Double_t T = 0.09; //[µs]
+  Double_t t_peak   = fSpadicResponse->GetBinCenter(fPeakBin);
+  for (Int_t k = 1; k <= fSpadicResponse->GetNbinsX(); k++) {
+    t = fSpadicResponse->GetBinCenter(k);
+    //t = fSpadicResponse->GetBinCenter(k) * t_peak;
+    //h = t/pow(fShapingTime,fShaperOrder) * exp(-1. * t / fShapingTime); // Tim thesis p.42
+    h = (pow(t / fShapingTime,fShaperOrder) * exp(-1. * t / fShapingTime)); // with time compesation
+    fSpadicResponse->SetBinContent(k,h);
+  }
+  fSpadicResponse->Scale(1./fSpadicResponse->Integral());
+}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::SetSelectionMask(Bool_t mask[fnBins]){
+  for (Int_t iBin = 0; iBin < fnBins; iBin++){
+    fSelectionMask[iBin] = mask[iBin];
+  }
+}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::ADC(TH1D* spadicPulse){
+  for (Int_t k = 1; k <= spadicPulse->GetNbinsX(); k++) { 
+    if (spadicPulse->GetBinContent(k) > fmaxdEdx)
+      spadicPulse->SetBinContent(k,fmaxdEdx);
+    else
+      spadicPulse->SetBinContent(k, Int_t(spadicPulse->GetBinContent(k) / fAdcBit) * fAdcBit);
+    if (!fSelectionMask[k-1]){
+      spadicPulse->SetBinContent(k,0);
+    }
+  }
+}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::ADC(CbmTrdDigi* digi){ 
+  if (digi->GetCharge() > fmaxdEdx)
+    digi->SetCharge(fmaxdEdx);
+  else
+    digi->SetCharge(Int_t(digi->GetCharge() / fAdcBit) * fAdcBit);  
+}
+// --------------------------------------------------------------------
+void CbmTrdSPADIC::CR_RC_Shaper(CbmTrdDigi* digi, TH1D* spadicPulse){
+  Double_t amplitude = digi->GetCharge();
+ if (amplitude <= 0.0) return;
+  TH1D *event = new TH1D("deltaPulse","deltaPulse", fnBins, 0 -(1.8/fnBins), 1.8 -(1.8/fnBins));//   1/25MHz * 45Timebins = 1.8µs
+  event->SetBinContent(1,0);
+  for (Int_t k = fPeakBin; k <= event->GetNbinsX(); k++) {
+    event->SetBinContent(k,amplitude*exp(-0.65*(k-fPeakBin)));
+  }
+  spadicPulse->Reset();
+  Double_t t = 0; //[µs]
+  Double_t x = 0;
+  Double_t h = 0;
+  Double_t T_0 = event->GetBinWidth(1); //[µs]
+  Double_t t_peak   = event->GetBinCenter(event->GetMaximumBin());
+  Double_t max_ampl = event->GetBinContent(event->GetMaximumBin());
+ 
+  for (Int_t k = 1; k <= event->GetNbinsX(); k++) { 
+    Double_t y = 0;
+    for (Int_t i = 1; i <= event->GetNbinsX(); i++) {
+      t = event->GetBinCenter(i);// * t_peak;
+      //h = (pow(t / fShapingTime,fShaperOrder) * exp(-1. * t / fShapingTime)); // with time compesation
+      h = fSpadicResponse->GetBinContent(i);
+      x = event->GetBinContent(k-i);
+      y += x * h;	   
+    } 
+    spadicPulse->SetBinContent(k, y);// * T_0 / max_ampl);
+    //spadicPulse->SetBinContent(k, event->GetBinContent(k));    
+  }
+  spadicPulse->Scale(amplitude/spadicPulse->GetBinContent(spadicPulse->GetMaximumBin())/*spadicPulse->Integral()*/);
+  ADC(spadicPulse);
+  delete event;
+}
+  
 
-// ---- Exec ----------------------------------------------------------
+  // ---- Exec ----------------------------------------------------------
 void CbmTrdSPADIC::Exec(Option_t *option)
 {
   std::map< Int_t, std::map< Int_t, Int_t/*CbmTrdDigi**/> > moduleDigiNotTriggerMap; //<ModuleAddress, <combiId, digiId> >
   std::map< Int_t, std::list< std::pair< Int_t, Int_t/*CbmTrdDigi**/> > > moduleDigiTriggerMap; //<ModuleAddress, <combiId, digiId> >
   Int_t nDigis = fDigis->GetEntries();
+  
+  TH1D* spadicPulse = new TH1D("spadicPulse","spadicPulse", fnBins, 0 -(1.8/fnBins), 1.8 -(1.8/fnBins));// 1/25MHz * 45Timebins = 1.8µs
+  TCanvas* c = new TCanvas("c","c",800,600);
+  
   for (Int_t iDigi=0; iDigi < nDigis; iDigi++ ) {
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
+   
+    
     Int_t digiAddress  = digi->GetAddress();
     Int_t layerId    = CbmTrdAddress::GetLayerId(digiAddress);
     Int_t moduleId = CbmTrdAddress::GetModuleId(digiAddress);
@@ -99,18 +207,48 @@ void CbmTrdSPADIC::Exec(Option_t *option)
   for (std::map< Int_t, std::list< std::pair< Int_t, Int_t/*CbmTrdDigi**/> > >::iterator iModule = moduleDigiTriggerMap.begin(); iModule != moduleDigiTriggerMap.end(); ++iModule) {
     (*iModule).second.sort(CbmDigiSorter);
     for (std::list< std::pair< Int_t, Int_t/*CbmTrdDigi**/> >::iterator iDigi = (*iModule).second.begin(); iDigi != (*iModule).second.end(); iDigi++) {
+
+      digi = (CbmTrdDigi*) fDigis->At((*iDigi).second);
+      if (fPulseShape){
+	CR_RC_Shaper( digi, spadicPulse);
+	//printf("%.6E - %.6E => %.1f%% \n", digi->GetCharge(), spadicPulse->GetBinContent(spadicPulse->GetMaximumBin()), 100.*(digi->GetCharge() - spadicPulse->GetBinContent(spadicPulse->GetMaximumBin())) / digi->GetCharge());
+	c->cd();
+	spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
+	spadicPulse->DrawCopy();
+      } else {
+	ADC(digi);
+      }
       if (moduleDigiNotTriggerMap[(*iModule).first].find((*iDigi).first-1) != moduleDigiNotTriggerMap[(*iModule).first].end()){
 	digi = (CbmTrdDigi*) fDigis->At(moduleDigiNotTriggerMap[(*iModule).first][(*iDigi).first-1]);
+	if (fPulseShape){
+	  CR_RC_Shaper( digi, spadicPulse);
+	  c->cd();
+	  spadicPulse->SetLineColor(kRed);
+	  spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
+	  spadicPulse->DrawCopy("same");
+	} else {
+	  ADC(digi);
+	}
 	digi->SetFNR_TriggerStatus(true);  
 	digi->AddNeighbourTriggerId((*iDigi).second);
       }
       if (moduleDigiNotTriggerMap[(*iModule).first].find((*iDigi).first+1) != moduleDigiNotTriggerMap[(*iModule).first].end()){
 	digi = (CbmTrdDigi*) fDigis->At(moduleDigiNotTriggerMap[(*iModule).first][(*iDigi).first+1]);
+	if (fPulseShape){
+	  CR_RC_Shaper( digi, spadicPulse);
+	  c->cd();
+	  spadicPulse->SetLineColor(kGreen);
+	  spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
+	  spadicPulse->DrawCopy("same");
+	} else {
+	  ADC(digi);
+	}
 	digi->SetFNR_TriggerStatus(true); 
 	digi->AddNeighbourTriggerId((*iDigi).second);	
       }
+      if (fPulseShape)
+	c->Update();
     }
   }
 }
-
 ClassImp(CbmTrdSPADIC)

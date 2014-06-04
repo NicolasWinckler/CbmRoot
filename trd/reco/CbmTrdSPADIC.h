@@ -13,6 +13,8 @@ class CbmTrdDigiPar;
 class CbmTrdModule;
 class CbmTrdGeoHandler;
 class TClonesArray;
+class TH1D;
+class CbmTrdDigi;
 
 class CbmTrdSPADIC : public FairTask
 {
@@ -46,6 +48,26 @@ class CbmTrdSPADIC : public FairTask
   virtual void Exec(Option_t * option);
 
   void SetTriggerThreshold(Double_t triggerthreshold);
+  void SetPulseShapeSim(Bool_t pulseShape);
+  void SetSelectionMask(Bool_t mask[45]);
+  void SetBitResolution(Int_t bit);
+  void SetMaxRange(Double_t maxRange);
+ private:
+
+  void CR_RC_Shaper(CbmTrdDigi* digi, TH1D* spadicPulse);
+  void ADC(TH1D* spadicPulse);
+  void ADC(CbmTrdDigi* digi);
+  void InitSpadicResponseFunction();
+  TH1D *fSpadicResponse;
+  Int_t fShaperOrder;
+  Double_t fShapingTime;
+  Int_t fPeakBin;
+  Int_t fBitResolution;
+  static const Int_t fnBins = 45;
+  Double_t fmaxdEdx;
+  Double_t fAdcBit;
+  Bool_t fPulseShape;
+  Bool_t fSelectionMask[fnBins];
 
   //Bool_t CbmDigiSorter(std::pair< Int_t, Int_t> a, std::pair< Int_t, Int_t> b);
 

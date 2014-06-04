@@ -60,7 +60,9 @@ public:
 
    Bool_t GetFNR_TriggerStatus() const { return fFNR_Triggered; }
 
-   std::list <Int_t> GetNeighbourTriggerIds() const {return fNeighbourTriggerIds; }
+   Int_t* GetNeighbourTriggerIds() {return fNeighbourTriggerIds; }
+
+   Int_t GetNrFNR_Triggers() const { return fn_FNR_Triggers;}
 
    /** Accessors **/
    void SetAddress(Int_t address) { fAddress = address; }
@@ -68,20 +70,21 @@ public:
    void SetTime(Double_t time) { fTime = time; }
    void SetPrimeTriggerStatus(Bool_t primeTriggered)  { fPrimeTriggered = primeTriggered; }
    void SetFNR_TriggerStatus(Bool_t fnr_Triggered)  { fFNR_Triggered = fnr_Triggered; }
-   void AddNeighbourTriggerId(Int_t digiId) { fNeighbourTriggerIds.push_back(digiId); }
-
+   void AddNeighbourTriggerId(Int_t digiId);
+  
    /** Modifiers **/
    void AddCharge(Double_t charge) { fCharge += charge; }
 
    string ToString() const;
   
 private:
+   Int_t fn_FNR_Triggers;
    Int_t fAddress; ///< Unique channel address
    Double_t fCharge; ///< Charge
    Double_t fTime; ///< Absolute time [ns]
    Bool_t fPrimeTriggered;
    Bool_t fFNR_Triggered;
-   std::list <Int_t> fNeighbourTriggerIds;
+   Int_t fNeighbourTriggerIds[8]; // 8 direct neighbours per pad in maximum
    ClassDef(CbmTrdDigi, 4);
 };
 

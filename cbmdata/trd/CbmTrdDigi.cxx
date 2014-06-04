@@ -38,7 +38,8 @@ CbmTrdDigi::CbmTrdDigi(
     fCharge(charge),
     fTime(time),
     fPrimeTriggered(fPrimeTriggered),
-    fFNR_Triggered(fFNR_Triggered)
+    fFNR_Triggered(fFNR_Triggered),
+    fn_FNR_Triggers(0)
 {
 }
 
@@ -51,6 +52,11 @@ string CbmTrdDigi::ToString() const {
    ss << "CbmTrdDigi: address=" << fAddress << " charge=" << fCharge
          << " time=" << fTime << endl;
    return ss.str();
+}
+
+void CbmTrdDigi::AddNeighbourTriggerId(Int_t digiId) {
+  fNeighbourTriggerIds[fn_FNR_Triggers] = digiId;
+  fn_FNR_Triggers++;
 }
 
 ClassImp(CbmTrdDigi)

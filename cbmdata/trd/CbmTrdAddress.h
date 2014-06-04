@@ -126,7 +126,7 @@ public:
     * \param newLayerId New value for layer ID.
     * \return New address with modified layer ID.
     */
-   static UInt_t SetLayerId(UInt_t address, UInt_t newLayerId) {
+   static UInt_t SetLayerId(UInt_t address, Int_t newLayerId) {
       assert(!(newLayerId < 0 || newLayerId > fgkLayerIdLength));
       return GetAddress(newLayerId, GetModuleId(address), GetSectorId(address), GetRowId(address), GetColumnId(address));
    }
@@ -178,16 +178,16 @@ public:
 private:
 
    // Length of the index of the corresponding volume
-   static const Int_t fgkSystemIdLength      = 15; // 2^4 - 1
-   static const Int_t fgkLayerIdLength       = 15; // 2^4 - 1
+   static const Int_t fgkSystemIdLength      =  15; // 2^4 - 1
+   static const Int_t fgkLayerIdLength       =  15; // 2^4 - 1
    static const Int_t fgkModuleIdLength      = 127; // 2^7 - 1
-   static const Int_t fgkSectorIdLength      = 3; // 2^2 - 1
+   static const Int_t fgkSectorIdLength      =   3; // 2^2 - 1
    static const Int_t fgkRowIdLength         = 127; // 2^7 - 1
    static const Int_t fgkColumnIdLength      = 255; // 2^8 - 1
    // Number of a start bit for each volume
-   static const Int_t fgkSystemIdShift       = 0;
-   static const Int_t fgkLayerIdShift        = 4;
-   static const Int_t fgkModuleIdShift       = 8;
+   static const Int_t fgkSystemIdShift       =  0;
+   static const Int_t fgkLayerIdShift        =  4;
+   static const Int_t fgkModuleIdShift       =  8;
    static const Int_t fgkSectorIdShift       = 15;
    static const Int_t fgkRowIdShift          = 17;
    static const Int_t fgkColumnIdShift       = 24;

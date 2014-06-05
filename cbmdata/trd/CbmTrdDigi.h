@@ -71,7 +71,7 @@ public:
    void SetPrimeTriggerStatus(Bool_t primeTriggered)  { fPrimeTriggered = primeTriggered; }
    void SetFNR_TriggerStatus(Bool_t fnr_Triggered)  { fFNR_Triggered = fnr_Triggered; }
    void AddNeighbourTriggerId(Int_t digiId);
-  
+   void SetPulseShape(Float_t pulse[45]);
    /** Modifiers **/
    void AddCharge(Double_t charge) { fCharge += charge; }
 
@@ -85,6 +85,7 @@ private:
    Bool_t fPrimeTriggered;
    Bool_t fFNR_Triggered;
    Int_t fNeighbourTriggerIds[8]; // 8 direct neighbours per pad in maximum
+   Float_t fPulseShape[45];
    ClassDef(CbmTrdDigi, 4);
 };
 

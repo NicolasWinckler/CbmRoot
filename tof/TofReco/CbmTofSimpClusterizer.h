@@ -16,6 +16,7 @@
 //class CbmTofPoint;
 class CbmTofDigi;
 class CbmTofDigiExp;
+class CbmMatch;
    // Geometry
 class CbmTofGeoHandler;
 class CbmTofDetectorId;
@@ -30,6 +31,7 @@ class CbmTofCell;
 class TClonesArray;
 class TH1;
 class TH2;
+class TString;
 #include "TTimeStamp.h"
 
 // C++ Classes and includes
@@ -73,6 +75,19 @@ class CbmTofSimpClusterizer : public FairTask
        **/
       virtual void Finish();
 
+      inline void SetCalMode    (Int_t iMode)           { fCalMode     = iMode;}
+      inline void SetCalTrg     (Int_t iTrg)            { fCalTrg      = iTrg;}
+      inline void SetCalSmType  (Int_t iCalSmType)      { fCalSmType   = iCalSmType;}
+      inline void SetCaldXdYMax (Double_t dCaldXdYMax)  { fdCaldXdYMax   = dCaldXdYMax;}
+      inline void SetTRefId     (Int_t Id)              { fTRefMode    = Id;}
+      inline void SetTRefDifMax (Double_t TRefMax)      { fTRefDifMax  = TRefMax;}
+      inline void SetdTRefMax   (Double_t dTRefMax)     { fdTRefMax    = dTRefMax;}
+      inline void PosYMaxScal   (Double_t PosYmaxScal)  { fPosYMaxScal = PosYmaxScal;}
+      inline void SetTotMax     (Double_t TOTMax)       { fTotMax      = TOTMax;}
+      inline void SetTotMin     (Double_t TOTMin)       { fTotMin      = TOTMin;}
+
+      inline void SetCalParFileName(TString CalParFileName) { fCalParFileName = CalParFileName; }
+
    protected:
 
    private:
@@ -98,6 +113,10 @@ class CbmTofSimpClusterizer : public FairTask
        ** @brief Initialize other parameters not included in parameter classes.
        **/
       Bool_t   InitParameters();
+      /**
+       ** @brief Initialize other parameters not included in parameter classes.
+       **/
+      Bool_t   InitCalibParameter();
       /**
        ** @brief Load the geometry: for now just resizing the Digis temporary vectors
        **/
@@ -132,8 +151,9 @@ class CbmTofSimpClusterizer : public FairTask
 
       // Output variables
       Bool_t                  fbWriteHitsInOut;
-      TClonesArray          * fTofHitsColl; // TOF hits
-      Int_t  fiNbHits;                       // Index of the CbmTofHit TClonesArray
+      TClonesArray          * fTofHitsColl;       // TOF hits
+      TClonesArray          * fTofDigiMatchColl;  // TOF Digis
+      Int_t  fiNbHits;                            // Index of the CbmTofHit TClonesArray
 
       // Generic
       Int_t fVerbose;
@@ -143,12 +163,15 @@ class CbmTofSimpClusterizer : public FairTask
                fStorDigi; //[nbType][nbSm*nbRpc][nbCh][nDigis]
       std::vector< std::vector< std::vector< std::vector< CbmTofDigiExp* > > > >
                fStorDigiExp; //[nbType][nbSm*nbRpc][nbCh][nDigis]
+      std::vector< std::vector< std::vector< std::vector< Int_t > > > >
+               fStorDigiInd; //[nbType][nbSm*nbRpc][nbCh][nDigis]
       /*
       std::vector< std::vector< std::vector< std::vector< std::vector< CbmTofDigi* > > > > >
                fStorDigi; //[nbType][nbSm][nbRpc][nbCh][nDigis]
       std::vector< std::vector< std::vector< std::vector< std::vector< CbmTofDigiExp* > > > > >
                fStorDigiExp; //[nbType][nbSm][nbRpc][nbCh][nDigis]
       */
+      std::vector< std::vector< std::vector< Int_t > > > fviClusterMul; //[nbType][nbSm][nbRpc]
       std::vector< std::vector< std::vector< Int_t > > > fviClusterSize; //[nbType][nbRpc][nClusters]
       std::vector< std::vector< std::vector< Int_t > > > fviTrkMul; //[nbType][nbRpc][nClusters]
       std::vector< std::vector< std::vector< Double_t > > > fvdX; //[nbType][nbRpc][nClusters]
@@ -180,7 +203,36 @@ class CbmTofSimpClusterizer : public FairTask
       TH2* fhChDifDifX;
       TH2* fhChDifDifY;
 
-         // Digis quality
+      std::vector< TH2* > fhRpcDigiCor;     //[nbDet]
+      std::vector< TH1* > fhRpcCluMul;      //[nbDet]
+      std::vector< TH1* > fhRpcSigPropSpeed;//[nbDet]
+      std::vector< TH2* > fhRpcCluPosition; //[nbDet]
+      std::vector< TH2* > fhRpcCluTOff;     //[nbDet] 
+      std::vector< TH2* > fhRpcCluTrms;     //[nbDet] 
+      std::vector< TH2* > fhRpcCluTot;      // [nbDet]
+      std::vector< TH2* > fhRpcCluSize;     // [nbDet]
+      std::vector< TH2* > fhRpcCluAvWalk;   // [nbDet]
+      std::vector< std::vector< std::vector<TH2 *> > >fhRpcCluWalk; // [nbDet][nbCh][nSide]
+
+      std::vector< std::vector< TH1* > > fhTRpcCluMul;      // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluPosition; // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluTOff;     // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluTot;      // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluSize;     // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluAvWalk;   // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCluDelTof;   // [nbDet][nbTrg]
+      std::vector< std::vector< TH2* > > fhTRpcCludXdY;     // [nbDet][nbTrg]
+      std::vector< std::vector< std::vector< std::vector<TH2 *> > > >fhTRpcCluWalk; // [nbDet][nbTrg][nbCh][nSide]
+
+      std::vector< TH1* > fhTrgdT;  //[nbTrg] 
+
+      std::vector< Double_t > fvCPSigPropSpeed;                                          //[nSMT]
+      std::vector< std::vector< std::vector< std::vector< Double_t > > > > fvCPDelTof;   //[nSMT][nRpc][nbClDelTofBinX][nbTrg]
+      std::vector< std::vector< std::vector< std::vector< Double_t > > > > fvCPTOff;     //[nSMT][nRpc][nCh][nbSide]
+      std::vector< std::vector< std::vector< std::vector< Double_t > > > > fvCPTotGain;  //[nSMT][nRpc][nCh][nbSide]
+      std::vector< std::vector< std::vector< std::vector< std::vector< Double_t > > > > > fvCPWalk; //[nSMT][nRpc][nCh][nbSide][nbWalkBins]
+
+      // Digis quality
       Int_t fiNbSameSide;
       TH1* fhNbSameSide;
       TH1* fhNbDigiPerChan;
@@ -188,6 +240,23 @@ class CbmTofSimpClusterizer : public FairTask
       // Control
       TTimeStamp fStart;
       TTimeStamp fStop;
+
+      // Calib
+      Double_t dTRef;
+      Double_t fdTRefMax;
+      Int_t    fCalMode;
+      Int_t    fCalTrg;
+      Int_t    fCalSmType;
+      Double_t fdCaldXdYMax;
+      Int_t    fTRefMode;
+      Int_t    fTRefHits;
+      Double_t fPosYMaxScal;
+      Double_t fTRefDifMax;
+      Double_t fTotMax;
+      Double_t fTotMin;
+
+      TString       fCalParFileName;      // name of the file name with Calibration Parameters
+      TFile*        fCalParFile;          // pointer to Calibration Parameter file 
 
    ClassDef(CbmTofSimpClusterizer, 1);
 };

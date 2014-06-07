@@ -36,9 +36,31 @@
 #include "TVector3.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TProfile.h"
 #include "TDirectory.h"
 #include "TROOT.h"
+#include "TGeoManager.h"
 
+
+const Int_t DetMask = 4194303;
+const Int_t nbClWalkBinX=20;
+const Int_t nbClWalkBinY=41;  // choose odd number to have central bin symmetric around 0
+const Double_t WalkNHmin=100; // minimal number of hits in bin for walk correction 
+Double_t TOTMax=5.E4; 
+Double_t TOTMin=2.E4; 
+const Double_t TTotMean=2.E4; 
+
+const Int_t nbClDelTofBinX=50;
+const Int_t nbClDelTofBinY=49;
+const Double_t DelTofMax=5000.;
+
+const Int_t nbCldXdYBinX=49;
+const Int_t nbCldXdYBinY=49;
+const Double_t dXdYMax=10.;
+
+const Int_t iNTrg=1;
+
+const Double_t Zref = 200.;   // distance of projection plane to target
 // C++ Classes and includes
 
 /************************************************************************************/
@@ -52,6 +74,7 @@ CbmTofSimpClusterizer::CbmTofSimpClusterizer():
    fTofPointsColl(NULL),
    fMcTracksColl(NULL),
    fTofDigisColl(NULL),
+   fTofDigiMatchColl(NULL),
    fbWriteHitsInOut(kTRUE),
    fTofHitsColl(NULL),
    fiNbHits(0),
@@ -104,6 +127,7 @@ CbmTofSimpClusterizer::CbmTofSimpClusterizer(const char *name, Int_t verbose, Bo
    fTofPointsColl(NULL),
    fMcTracksColl(NULL),
    fTofDigisColl(NULL),
+   fTofDigiMatchColl(NULL),
    fbWriteHitsInOut(writeDataInOut),
    fTofHitsColl(NULL),
    fiNbHits(0),
@@ -169,6 +193,9 @@ InitStatus CbmTofSimpClusterizer::Init()
    if( kFALSE == LoadGeometry() )
       return kFATAL;
 
+   if( kFALSE == InitCalibParameter() )
+      return kFATAL;
+
    if( kFALSE == CreateHistos() )
       return kFATAL;
 
@@ -186,6 +213,8 @@ void CbmTofSimpClusterizer::SetParContainers()
    fDigiPar = (CbmTofDigiPar*)
               (rtdb->getContainer("CbmTofDigiPar"));
 
+   LOG(INFO)<<"  CbmTofTestBeamClusterizer::SetParContainers found " 
+            << fDigiPar->GetNrOfModules() << " cells " <<FairLogger::endl;
    fDigiBdfPar = (CbmTofDigiBdfPar*)
               (rtdb->getContainer("CbmTofDigiBdfPar"));
 }
@@ -248,12 +277,18 @@ Bool_t   CbmTofSimpClusterizer::RegisterOutputs()
 
    fTofHitsColl = new TClonesArray("CbmTofHit");
 
-   // Flag check to control whether digis are written in ouput root file
+   // Flag check to control whether digis are written in output root file
    rootMgr->Register( "TofHit","Tof", fTofHitsColl, fbWriteHitsInOut);
+
+   fTofDigiMatchColl = new TClonesArray("CbmMatch",100);
+   rootMgr->Register( "TofDigiMatch","Tof", fTofDigiMatchColl, fbWriteHitsInOut);
+
    return kTRUE;
+
 }
 Bool_t   CbmTofSimpClusterizer::InitParameters()
 {
+
    // Initialize the TOF GeoHandler
    Bool_t isSimulation=kFALSE;
    Int_t iGeoVersion = fGeoHandler->Init(isSimulation);
@@ -269,12 +304,226 @@ Bool_t   CbmTofSimpClusterizer::InitParameters()
    return kTRUE;
 }
 /************************************************************************************/
+Bool_t   CbmTofSimpClusterizer::InitCalibParameter()
+{
+  // dimension and initialize calib parameter
+  // 
+  Int_t iNbSmTypes = fDigiBdfPar->GetNbSmTypes();
+
+  fvCPSigPropSpeed.resize( iNbSmTypes );
+  for (Int_t iT=0; iT<iNbSmTypes; iT++) fvCPSigPropSpeed[iT]=fDigiBdfPar->GetSignalSpeed();
+
+  fvCPTOff.resize( iNbSmTypes );
+  fvCPTotGain.resize( iNbSmTypes );
+  fvCPWalk.resize( iNbSmTypes );
+  fvCPDelTof.resize( iNbSmTypes );
+  for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
+  {
+      Int_t iNbSm  = fDigiBdfPar->GetNbSm(  iSmType);
+      Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType);
+      fvCPTOff[iSmType].resize( iNbSm*iNbRpc );
+      fvCPTotGain[iSmType].resize( iNbSm*iNbRpc );
+      fvCPWalk[iSmType].resize( iNbSm*iNbRpc );
+      fvCPDelTof[iSmType].resize( iNbSm*iNbRpc );
+      for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
+      {
+        for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
+        {
+	  //	  LOG(INFO)<<Form(" fvCPDelTof resize for SmT %d, R %d, B %d ",iSmType,iNbSm*iNbRpc,nbClDelTofBinX)
+	  //	   <<FairLogger::endl;
+	  fvCPDelTof[iSmType][iSm*iNbRpc+iRpc].resize( nbClDelTofBinX );
+	  for(Int_t iBx=0; iBx<nbClDelTofBinX; iBx++){ 
+	    // LOG(INFO)<<Form(" fvCPDelTof for SmT %d, R %d, B %d",iSmType,iSm*iNbRpc+iRpc,iBx)<<FairLogger::endl;
+  	    fvCPDelTof[iSmType][iSm*iNbRpc+iRpc][iBx].resize( iNTrg );
+            for(Int_t iTrg=0; iTrg<iNTrg; iTrg++)
+      	    fvCPDelTof[iSmType][iSm*iNbRpc+iRpc][iBx][iTrg]=0.;  // initialize
+	  }
+
+          Int_t iNbChan = fDigiBdfPar->GetNbChan( iSmType, iRpc );
+	  fvCPTOff[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
+	  fvCPTotGain[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
+	  fvCPWalk[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
+	  Int_t nbSide  =2 - fDigiBdfPar->GetChanType( iSmType, iRpc );
+	  for (Int_t iCh=0; iCh<iNbChan; iCh++)
+	  {
+	    fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh].resize( nbSide );
+	    fvCPTotGain[iSmType][iSm*iNbRpc+iRpc][iCh].resize( nbSide );
+	    fvCPWalk[iSmType][iSm*iNbRpc+iRpc][iCh].resize( nbSide );	  
+	    for(Int_t iSide=0; iSide<nbSide; iSide++){
+	      fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][iSide]=0.;      //initialize
+	      fvCPTotGain[iSmType][iSm*iNbRpc+iRpc][iCh][iSide]=1.;   //initialize
+              fvCPWalk[iSmType][iSm*iNbRpc+iRpc][iCh][iSide].resize( nbClWalkBinX );
+	      for(Int_t iWx=0; iWx<nbClWalkBinX; iWx++){
+		fvCPWalk[iSmType][iSm*iNbRpc+iRpc][iCh][iSide][iWx]=0.;
+	      }
+	    }    
+	  }
+	}
+      }
+  }
+
+  LOG(INFO)<<"CbmTofSimpClusterizer::InitCalibParameter: defaults set"
+	   <<FairLogger::endl;
+
+  TDirectory * oldir = gDirectory; // <= To prevent histos from being sucked in by the param file of the TRootManager!
+  /*
+  gROOT->cd(); // <= To prevent histos from being sucked in by the param file of the TRootManager !
+  */
+
+  if(0<fCalMode){
+    LOG(INFO) << "CbmTofSimpClusterizer::InitCalibParameter: read histos from "
+		 << "file " << fCalParFileName << FairLogger::endl;
+
+  // read parameter from histos
+    if(fCalParFileName.IsNull()) return kTRUE;
+
+    fCalParFile = new TFile(fCalParFileName,"");
+    if(NULL == fCalParFile) {
+      LOG(ERROR) << "CbmTofSimpClusterizer::InitCalibParameter: "
+		 << "file " << fCalParFileName << " does not exist!" << FairLogger::endl;
+      return kTRUE;
+    }
+    /*
+    gDirectory->Print();
+    fCalParFile->cd();
+    fCalParFile->ls();
+    */
+
+    for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
+    {
+      Int_t iNbSm  = fDigiBdfPar->GetNbSm(  iSmType );
+      Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType );
+      for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
+        for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
+        {
+	  TH2F *htempPos_pfx =(TH2F*) gDirectory->FindObjectAny( Form("cl_CorSmT%01d_sm%03d_rpc%03d_Pos_pfx",iSmType,iSm,iRpc));
+	  TH2F *htempTOff_pfx=(TH2F*) gDirectory->FindObjectAny( Form("cl_CorSmT%01d_sm%03d_rpc%03d_TOff_pfx",iSmType,iSm,iRpc));
+	  TH2F *htempTot_pfx =(TH2F*) gDirectory->FindObjectAny( Form("cl_CorSmT%01d_sm%03d_rpc%03d_Tot_pfx",iSmType,iSm,iRpc));
+          if(NULL != htempPos_pfx && NULL != htempTOff_pfx && NULL != htempTot_pfx)  
+	  {
+	    Int_t iNbCh = fDigiBdfPar->GetNbChan( iSmType, iRpc );
+            Int_t iNbinTot = htempTot_pfx->GetNbinsX();
+	    for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
+	      {
+		Double_t YMean=((TProfile *)htempPos_pfx)->GetBinContent(iCh+1);  //nh +1 empirical(?)
+		Double_t TMean=((TProfile *)htempTOff_pfx)->GetBinContent(iCh+1);
+                Double_t dTYOff=YMean/fvCPSigPropSpeed[iSmType] ;
+		fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][0] += -dTYOff + TMean ;
+		fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][1] += +dTYOff + TMean ;
+ 
+		Double_t TotMean=((TProfile *)htempTot_pfx)->GetBinContent(iCh+1);  //nh +1 empirical(?)
+		if(1<TotMean){
+		  fvCPTotGain[iSmType][iSm*iNbRpc+iRpc][iCh][0] *= TTotMean / TotMean;
+		  fvCPTotGain[iSmType][iSm*iNbRpc+iRpc][iCh][1] *= TTotMean / TotMean;
+		}
+		LOG(DEBUG1)<<"CbmTofSimpClusterizer::InitCalibParameter:" 
+			   <<" SmT "<< iSmType<<" Sm "<<iSm<<" Rpc "<<iRpc<<" Ch "<<iCh
+			   <<": YMean "<<YMean<<", TMean "<< TMean
+			   <<" -> " << fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][0]
+			   <<", "   << fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][1]
+			   <<", "   << fvCPTotGain[iSmType][iSm*iNbRpc+iRpc][iCh][0]
+			   <<", NbinTot "<< iNbinTot
+			   <<FairLogger::endl;
+
+		TH1D *htempWalk0=(TH1D*)gDirectory->FindObjectAny( 
+			         Form("Cor_SmT%01d_sm%03d_rpc%03d_Ch%03d_S0_Walk_px", iSmType, iSm, iRpc, iCh ));
+		TH1D *htempWalk1=(TH1D*)gDirectory->FindObjectAny( 
+			         Form("Cor_SmT%01d_sm%03d_rpc%03d_Ch%03d_S1_Walk_px", iSmType, iSm, iRpc, iCh ));
+		if(NULL != htempWalk0 && NULL != htempWalk1 ) { // reinitialize Walk array 
+		  LOG(INFO)<<"Initialize Walk correction for "
+			    <<Form(" SmT%01d_sm%03d_rpc%03d_Ch%03d",iSmType, iSm, iRpc, iCh)
+			    <<FairLogger::endl;
+                  if(htempWalk0->GetNbinsX() != nbClWalkBinX) 
+		    LOG(ERROR)<<"CbmTofTestBeamClusterizer::InitCalibParameter: Inconsistent Walk histograms"
+			      <<FairLogger::endl;
+                   for( Int_t iBin = 0; iBin < nbClWalkBinX; iBin++ )
+		   {
+		     fvCPWalk[iSmType][iSm*iNbRpc+iRpc][iCh][0][iBin]=htempWalk0->GetBinContent(iBin+1);
+		     fvCPWalk[iSmType][iSm*iNbRpc+iRpc][iCh][1][iBin]=htempWalk1->GetBinContent(iBin+1);
+		     LOG(DEBUG1)<<Form(" SmT%01d_sm%03d_rpc%03d_Ch%03d bin %d walk %f ",iSmType, iSm, iRpc, iCh, iBin,
+				       fvCPWalk[iSmType][iSm*iNbRpc+iRpc][iCh][0][iBin])
+			      <<FairLogger::endl;
+
+		   }
+		}
+	    }
+	  }
+	  else {
+	    LOG(ERROR)<<" Histos " << Form("cl_SmT%01d_sm%03d_rpc%03d_XXX", iSmType, iSm, iRpc) << " not found. "
+		      <<FairLogger::endl;
+	  }
+	  for(Int_t iTrg=0; iTrg<iNTrg; iTrg++){
+	   TH1D *htmpDelTof =(TH1D*) gDirectory->FindObjectAny( Form("cl_CorSmT%01d_sm%03d_rpc%03d_Trg%02d_DelTof",iSmType,iSm,iRpc,iTrg));
+	   if (NULL==htmpDelTof) {
+	    LOG(INFO)<<" Histos " << Form("cl_CorSmT%01d_sm%03d_rpc%03d_Trg%02d_DelTof", iSmType, iSm, iRpc) << " not found. "
+		      <<FairLogger::endl;
+	    continue;
+	   }
+	   LOG(INFO)<<" Load DelTof from histos "<< Form("cl_CorSmT%01d_sm%03d_rpc%03d_Trg%02d_DelTof",iSmType,iSm,iRpc,iTrg)<<"."
+	            <<FairLogger::endl;
+           for(Int_t iBx=0; iBx<nbClDelTofBinX; iBx++){
+	    fvCPDelTof[iSmType][iSm*iNbRpc+iRpc][iBx][iTrg] += htmpDelTof->GetBinContent(iBx+1);
+	   }
+
+	   // copy Histo to memory
+	   TDirectory * curdir = gDirectory;
+	   gDirectory->cd( oldir->GetPath() );
+	   TH1D *h1DelTof=(TH1D *)htmpDelTof->Clone(Form("cl_CorSmT%01d_sm%03d_rpc%03d_Trg%02d_DelTof",iSmType,iSm,iRpc,iTrg));
+
+	   LOG(INFO)<<" copy histo "
+	 	    <<h1DelTof->GetName()
+	 	    <<" to directory "
+		    <<oldir->GetName()
+		    <<FairLogger::endl;
+
+	   gDirectory->cd( curdir->GetPath() );
+	  }
+	}
+    }
+  }
+  //   fCalParFile->Delete();
+  gDirectory->cd( oldir->GetPath() ); // <= To prevent histos from being sucked in by the param file of the TRootManager!
+  LOG(INFO)<<"CbmTofSimpClusterizer::InitCalibParameter: initialization done"
+	   <<FairLogger::endl; 
+  return kTRUE;
+}
+/************************************************************************************/
 Bool_t   CbmTofSimpClusterizer::LoadGeometry()
 {
+   LOG(INFO)<<"CbmTofSimpClusterizer::LoadGeometry starting for  "
+            <<fDigiPar->GetNrOfModules() << " geometrically known modules "
+            <<FairLogger::endl;
+
+   Int_t iNrOfCells = fDigiPar->GetNrOfModules();
+   LOG(INFO)<<"Digi Parameter container contains "<<iNrOfCells<<" cells."<<FairLogger::endl;
+   for (Int_t icell = 0; icell < iNrOfCells; ++icell) {
+
+     Int_t cellId = fDigiPar->GetCellId(icell); // cellId is assigned in CbmTofCreateDigiPar
+     fChannelInfo = fDigiPar->GetCell(cellId);
+
+     Int_t smtype  = fGeoHandler->GetSMType(cellId);
+     Int_t smodule = fGeoHandler->GetSModule(cellId);
+     Int_t module  = fGeoHandler->GetCounter(cellId);
+     Int_t cell    = fGeoHandler->GetCell(cellId);
+
+     Double_t x = fChannelInfo->GetX();
+     Double_t y = fChannelInfo->GetY();
+     Double_t z = fChannelInfo->GetZ();
+     Double_t dx = fChannelInfo->GetSizex();
+     Double_t dy = fChannelInfo->GetSizey();
+     LOG(DEBUG1)
+       << "-I- InitPar "<<icell<<" Id: "<< Form("0x%08x",cellId)
+	    << " "<< cell << " tmcs: "<< smtype <<" "<<smodule<<" "<<module<<" "<<cell   
+            << " x="<<Form("%6.2f",x)<<" y="<<Form("%6.2f",y)<<" z="<<Form("%6.2f",z)
+            <<" dx="<<dx<<" dy="<<dy<<FairLogger::endl;
+   }
+
    Int_t iNbSmTypes = fDigiBdfPar->GetNbSmTypes();
+
    if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
    {
       fStorDigiExp.resize( iNbSmTypes );
+      fStorDigiInd.resize( iNbSmTypes );
       fviClusterSize.resize( iNbSmTypes );
       fviTrkMul.resize( iNbSmTypes );
       fvdX.resize( iNbSmTypes );
@@ -282,12 +531,13 @@ Bool_t   CbmTofSimpClusterizer::LoadGeometry()
       fvdDifX.resize( iNbSmTypes );
       fvdDifY.resize( iNbSmTypes );
       fvdDifCh.resize( iNbSmTypes );
+      fviClusterMul.resize( iNbSmTypes );
       for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
       {
          Int_t iNbSm  = fDigiBdfPar->GetNbSm(  iSmType);
          Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType);
-//         fStorDigiExp[iSmType].resize( iNbSm );
          fStorDigiExp[iSmType].resize( iNbSm*iNbRpc );
+         fStorDigiInd[iSmType].resize( iNbSm*iNbRpc );
          fviClusterSize[iSmType].resize( iNbRpc );
          fviTrkMul[iSmType].resize( iNbRpc );
          fvdX[iSmType].resize( iNbRpc );
@@ -297,12 +547,16 @@ Bool_t   CbmTofSimpClusterizer::LoadGeometry()
          fvdDifCh[iSmType].resize( iNbRpc );
          for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
          {
-//            fStorDigiExp[iSmType][iSm].resize( iNbRpc );
-            for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
+           fviClusterMul[iSmType].resize( iNbSm );
+           for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
             {
+ 	       fviClusterMul[iSmType][iSm].resize( iNbRpc );
                Int_t iNbChan = fDigiBdfPar->GetNbChan( iSmType, iRpc );
-//               fStorDigiExp[iSmType][iSm][iRpc].resize( iNbChan );
+               LOG(DEBUG)<<"CbmTofSimpClusterizer::LoadGeometry: StoreDigi with "
+			 << Form(" %3d %3d %3d %3d %5d ",iSmType,iSm,iNbRpc,iRpc,iNbChan)
+                         << FairLogger::endl;
                fStorDigiExp[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
+               fStorDigiInd[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
             } // for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
          } // for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
       } // for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
@@ -310,6 +564,7 @@ Bool_t   CbmTofSimpClusterizer::LoadGeometry()
       else
       {
          fStorDigi.resize( iNbSmTypes );
+         fStorDigiInd.resize( iNbSmTypes );
          fviClusterSize.resize( iNbSmTypes );
          fviTrkMul.resize( iNbSmTypes );
          fvdX.resize( iNbSmTypes );
@@ -321,8 +576,8 @@ Bool_t   CbmTofSimpClusterizer::LoadGeometry()
          {
             Int_t iNbSm  = fDigiBdfPar->GetNbSm(  iSmType);
             Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType);
-//            fStorDigi[iSmType].resize( iNbSm );
             fStorDigi[iSmType].resize( iNbSm*iNbRpc );
+            fStorDigiInd[iSmType].resize( iNbSm*iNbRpc );
             fviClusterSize[iSmType].resize( iNbRpc );
             fviTrkMul[iSmType].resize( iNbRpc );
             fvdX[iSmType].resize( iNbRpc );
@@ -332,13 +587,12 @@ Bool_t   CbmTofSimpClusterizer::LoadGeometry()
             fvdDifCh[iSmType].resize( iNbRpc );
             for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
             {
-//               fStorDigi[iSmType][iSm].resize( iNbRpc );
                for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
                {
-                  Int_t iNbChan = fDigiBdfPar->GetNbChan( iSmType, iRpc );
+                  Int_t iNbChan = fDigiBdfPar->GetNbChan( iSmType, iRpc ); 
                   fStorDigi[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
-//                  fStorDigi[iSmType][iSm][iRpc].resize( iNbChan );
-               } // for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
+                  fStorDigiInd[iSmType][iSm*iNbRpc+iRpc].resize( iNbChan );
+              } // for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
             } // for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
          } // for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
       } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
@@ -355,14 +609,16 @@ Bool_t   CbmTofSimpClusterizer::DeleteGeometry()
          Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType);
          for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
          {
-            for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
-//               fStorDigiExp[iSmType][iSm][iRpc].clear();
+	   for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ ) {
                fStorDigiExp[iSmType][iSm*iNbRpc+iRpc].clear();
-//            fStorDigiExp[iSmType][iSm].clear();
+               fStorDigiInd[iSmType][iSm*iNbRpc+iRpc].clear();
+	   }
          } // for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
          fStorDigiExp[iSmType].clear();
+         fStorDigiInd[iSmType].clear();
       } // for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
       fStorDigiExp.clear();
+      fStorDigiInd.clear();
    } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
       else
       {
@@ -372,14 +628,16 @@ Bool_t   CbmTofSimpClusterizer::DeleteGeometry()
             Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType);
             for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
             {
-               for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
-//                  fStorDigi[iSmType][iSm][iRpc].clear();
-                  fStorDigi[iSmType][iSm*iNbRpc+iRpc].clear();
-//               fStorDigi[iSmType][iSm].clear();
+	      for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ ){
+                 fStorDigi[iSmType][iSm*iNbRpc+iRpc].clear();
+                 fStorDigiInd[iSmType][iSm*iNbRpc+iRpc].clear();
+	      }
             } // for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
             fStorDigi[iSmType].clear();
+            fStorDigiInd[iSmType].clear();
          } // for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
          fStorDigi.clear();
+         fStorDigiInd.clear();
       } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
    return kTRUE;
 }
@@ -664,6 +922,10 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
    Double_t dMaxTimeDist  = fDigiBdfPar->GetMaxTimeDist();
    Double_t dMaxSpaceDist = fDigiBdfPar->GetMaxDistAlongCh();
 
+   LOG(DEBUG)<<" BuildCluster with MaxTimeDist "<<dMaxTimeDist<<", MaxSpaceDist "
+	     <<dMaxSpaceDist
+	     <<FairLogger::endl;
+
    // First Time order the Digis array
 //   fTofDigisColl->Sort();
 
@@ -676,19 +938,131 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
       for( Int_t iDigInd = 0; iDigInd < iNbTofDigi; iDigInd++ )
       {
          pDigi = (CbmTofDigiExp*) fTofDigisColl->At( iDigInd );
-//         cout<<iDigInd<<" "<<pDigi<<" "
-//             <<pDigi->GetType()<<" "
-//             <<pDigi->GetSm()<<" "
-//             <<pDigi->GetRpc()<<" "
-//             <<pDigi->GetChannel()<<" "
-//             <<pDigi->GetTime()<<" "
-//             <<pDigi->GetTot()
-//             <<endl;
+         LOG(DEBUG1)<<"CbmTofSimpClusterizer::BuildClusters: "
+	           <<iDigInd<<" "<<pDigi<<" "
+		   <<pDigi->GetType()<<" "
+		   <<pDigi->GetSm()<<" "
+		   <<pDigi->GetRpc()<<" "
+		   <<pDigi->GetChannel()<<" "
+		   <<pDigi->GetTime()<<" "
+		   <<pDigi->GetTot()
+		   <<FairLogger::endl;
+         if(    fDigiBdfPar->GetNbSmTypes() > pDigi->GetType()  // prevent crash due to misconfiguration 
+	     &&	fDigiBdfPar->GetNbSm(  pDigi->GetType()) > pDigi->GetSm()
+             && fDigiBdfPar->GetNbRpc( pDigi->GetType()) > pDigi->GetRpc()
+	     && fDigiBdfPar->GetNbChan(pDigi->GetType(),0) >pDigi->GetChannel() 
+		){
 
-//         fStorDigiExp[pDigi->GetType()][pDigi->GetSm()][pDigi->GetRpc()][pDigi->GetChannel()].push_back(pDigi);
          fStorDigiExp[pDigi->GetType()]
-                      [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
-                        [pDigi->GetChannel()].push_back(pDigi);
+                     [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+                     [pDigi->GetChannel()].push_back(pDigi);
+         fStorDigiInd[pDigi->GetType()]
+                     [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+                     [pDigi->GetChannel()].push_back(iDigInd);
+
+	 // apply calibration vectors 
+	 pDigi->SetTime(pDigi->GetTime()- // calibrate Digi Time 
+			fvCPTOff[pDigi->GetType()]
+		       [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		       [pDigi->GetChannel()]
+		       [pDigi->GetSide()]);
+
+	 pDigi->SetTot(pDigi->GetTot() *  // calibrate Digi ToT 
+		fvCPTotGain[pDigi->GetType()]
+		       [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		       [pDigi->GetChannel()]
+		       [pDigi->GetSide()]);
+
+	 // walk correction 
+         Double_t dTotBinSize = (TOTMax-TOTMin)/ 2. / nbClWalkBinX;
+         Int_t iWx = (Int_t)((pDigi->GetTot()-TOTMin/2.)/dTotBinSize);
+         if (0>iWx) iWx=0;
+         if (iWx>nbClWalkBinX) iWx=nbClWalkBinX-1;	
+	 Double_t dDTot = (pDigi->GetTot()-TOTMin/2.)/dTotBinSize-(Double_t)iWx-0.5;
+	 Double_t dWT  = fvCPWalk[pDigi->GetType()]
+		         [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		         [pDigi->GetChannel()]
+		         [pDigi->GetSide()]
+                         [iWx];
+         if(dDTot > 0) {    // linear interpolation to next bin
+	   dWT += dDTot * (fvCPWalk[pDigi->GetType()]
+		          [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		          [pDigi->GetChannel()]
+		          [pDigi->GetSide()]
+                          [iWx+1]
+	                 -fvCPWalk[pDigi->GetType()]
+		          [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		          [pDigi->GetChannel()]
+		          [pDigi->GetSide()]
+                          [iWx]);
+	 }else  // dDTot < 0,  linear interpolation to next bin
+	 {
+	   dWT -= dDTot * (fvCPWalk[pDigi->GetType()]
+		          [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		          [pDigi->GetChannel()]
+		          [pDigi->GetSide()]
+                          [iWx-1]
+	                 -fvCPWalk[pDigi->GetType()]
+		          [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		          [pDigi->GetChannel()]
+		          [pDigi->GetSide()]
+                          [iWx]);
+	 }
+	     
+         pDigi->SetTime(pDigi->GetTime() - dWT); // calibrate Digi Time 
+
+	 if(0) {//pDigi->GetType()==2 && pDigi->GetSm()==0){
+	  LOG(INFO)<<"CbmTofTestBeamClusterizer::BuildClusters: CalDigi "
+	            <<iDigInd<<",  T "
+		    <<pDigi->GetType()<<", Sm "
+		    <<pDigi->GetSm()<<", R "
+		    <<pDigi->GetRpc()<<", Ch "
+		    <<pDigi->GetChannel()<<", S "
+		    <<pDigi->GetSide()<<", T "
+		    <<pDigi->GetTime()<<", Tot "
+		    <<pDigi->GetTot()
+		    <<", TotGain "<<
+	               fvCPTotGain[pDigi->GetType()]
+		       [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		       [pDigi->GetChannel()]
+		       [pDigi->GetSide()]
+	            <<", Walk "<<iWx<<": "<<
+		        fvCPWalk[pDigi->GetType()]
+		        [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		        [pDigi->GetChannel()]
+		        [pDigi->GetSide()]
+                        [iWx]
+		   <<FairLogger::endl;
+
+	  LOG(INFO)<<" dDTot "<<dDTot
+		   <<" BinSize: "<<dTotBinSize
+		   <<", CPWalk "<<fvCPWalk[pDigi->GetType()]
+		        [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		        [pDigi->GetChannel()]
+		        [pDigi->GetSide()]
+	                [iWx-1]
+		  <<", "<<fvCPWalk[pDigi->GetType()]
+		        [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		        [pDigi->GetChannel()]
+		        [pDigi->GetSide()]
+                        [iWx]
+		  <<", "<<fvCPWalk[pDigi->GetType()]
+		        [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+		        [pDigi->GetChannel()]
+		        [pDigi->GetSide()]
+                        [iWx+1]
+		  <<" -> dWT = "<< dWT
+		  <<FairLogger::endl;
+	  }
+ 	 } else 
+	   {
+           LOG(DEBUG)<<"CbmTofSimpBeamClusterizer::BuildClusters: Skip Digi "
+		     <<" Type "<<pDigi->GetType()<<" "<< fDigiBdfPar->GetNbSmTypes()
+		     <<" Sm "  <<pDigi->GetSm()<<" " << fDigiBdfPar->GetNbSm(pDigi->GetType())
+		     <<" Rpc " <<pDigi->GetRpc()<<" "<< fDigiBdfPar->GetNbRpc(pDigi->GetType())
+		     <<" Ch " <<pDigi->GetChannel()<<" "<<fDigiBdfPar->GetNbChan(pDigi->GetType(),0)
+		     <<FairLogger::endl;
+	   }
       } // for( Int_t iDigInd = 0; iDigInd < nTofDigi; iDigInd++ )
    } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
       else
@@ -697,10 +1071,12 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
          for( Int_t iDigInd = 0; iDigInd < iNbTofDigi; iDigInd++ )
          {
             pDigi = (CbmTofDigi*) fTofDigisColl->At( iDigInd );
-//            fStorDigi[pDigi->GetType()][pDigi->GetSm()][pDigi->GetRpc()][pDigi->GetChannel()].push_back(pDigi);
             fStorDigi[pDigi->GetType()]
-                      [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
-                        [pDigi->GetChannel()].push_back(pDigi);
+                     [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+                     [pDigi->GetChannel()].push_back(pDigi);
+         fStorDigiInd[pDigi->GetType()]
+                     [pDigi->GetSm()*fDigiBdfPar->GetNbRpc( pDigi->GetType()) + pDigi->GetRpc()]
+                     [pDigi->GetChannel()].push_back(iDigInd);
          } // for( Int_t iDigInd = 0; iDigInd < nTofDigi; iDigInd++ )
       } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
 
@@ -728,6 +1104,7 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
    Double_t dWeightedPosZ = 0.0;
    Double_t dWeightsSum   = 0.0;
    std::vector< CbmTofPoint* > vPtsRef;
+   std::vector< Int_t > vDigiIndRef;
    Int_t    iNbChanInHit  = 0;
    // Last Channel Temp variables
    Int_t    iLastChan = -1;
@@ -750,10 +1127,15 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
          for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
             for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
             {
-               Int_t    iChType = fDigiBdfPar->GetChanType( iSmType, iRpc );
+               Int_t iNbCh = fDigiBdfPar->GetNbChan( iSmType, iRpc );
+               Int_t iChType = fDigiBdfPar->GetChanType( iSmType, iRpc );
+	       LOG(DEBUG2)<<"CbmTofTestBeamClusterizer::BuildClusters: RPC - Loop  "
+			 << Form(" %3d %3d %3d %3d ",iSmType,iSm,iRpc,iChType)
+                         <<FairLogger::endl;
+               fviClusterMul[iSmType][iSm][iRpc]=0; 
+               Int_t  iChId = 0;
                if( 0 == iChType )
                {
-                  Int_t iNbCh = fDigiBdfPar->GetNbChan( iSmType, iRpc );
                   // Don't spread clusters over RPCs!!!
                   dWeightedTime = 0.0;
                   dWeightedPosX = 0.0;
@@ -767,270 +1149,143 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                   dLastPosX = 0.0;
                   dLastPosY = 0.0;
                   dLastTime = 0.0;
+                  LOG(DEBUG2)<<"CbmTofSimpClusterizer::BuildClusters: ChanOrient "
+                             << Form(" %3d %3d %3d %3d %3d ",iSmType,iSm,iRpc,fDigiBdfPar->GetChanOrient( iSmType, iRpc ),iNbCh)
+                             <<FairLogger::endl;
+
                   if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
                   {
                      // Horizontal strips => X comes from left right time difference
-                     for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
-                     {
-                        if( 0 < fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-                           fhNbDigiPerChan->Fill( fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() );
-//                        if( 2 == fStorDigiExp[iSmType][iSm][iRpc][iCh].size() )
-                        if( 2 == fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-                        {
-                           if( (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetSide() ==
-                               (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetSide() )
-                           {
-                              // Not one Digi of each end!
-                              fiNbSameSide++;
-                              continue;
-                           }
-
-                           // 2 Digis = both sides present
-                           CbmTofDetectorInfo xDetInfo(kTOF, iSmType, iSm, iRpc, 0, iCh + 1);
-                           Int_t iChId = fTofId->SetDetectorInfo( xDetInfo );
-                           fChannelInfo = fDigiPar->GetCell( iChId );
-
-//                           CbmTofDigiExp * xDigiA = fStorDigiExp[iSmType][iSm][iRpc][iCh][0];
-//                           CbmTofDigiExp * xDigiB = fStorDigiExp[iSmType][iSm][iRpc][iCh][1];
-
-                           CbmTofDigiExp * xDigiA = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0];
-                           CbmTofDigiExp * xDigiB = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1];
-						   CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
-						   CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
-
-                           // The "Strip" time is the mean time between each end
-                           dTime = xDigiA->GetTime() + xDigiB->GetTime();
-                           dTime /= 2.0;
-
-                           // Weight is the total charge => sum of both ends ToT
-                           dTotS = xDigiA->GetTot() + xDigiB->GetTot();
-
-                           // Y position is just the center of the channel
-                           dPosY = fChannelInfo->GetY();
-
-                           // X position form strip ends time difference
-                           dPosX = fChannelInfo->GetX();
-                           if( 1 == xDigiA->GetSide() )
-                              // 0 is the right side, 1 is the left side
-                              dPosX += fDigiBdfPar->GetSignalSpeed() *
-                                       ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
-                           else
-                              // 0 is the left side, 1 is the right side
-                              dPosX += fDigiBdfPar->GetSignalSpeed() *
-                                       ( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
-
-                           // For Z always just take the one of the channel itself( in fact its gap one)
-                           dPosZ = fChannelInfo->GetZ();
-
-                           // Now check if a hit/cluster is already started
-                           if( 0 < iNbChanInHit)
-                           {
-                              if( iLastChan == iCh - 1 )
-                              {
-                                 fhDigTimeDifClust->Fill( dTime - dLastTime );
-                                 fhDigSpacDifClust->Fill( dPosX - dLastPosX );
-                                 fhDigDistClust->Fill( dPosX - dLastPosX,
-                                                       dTime - dLastTime );
-                              } // if( iLastChan == iCh - 1 )
-                              // a cluster is already started => check distance in space/time
-                              // For simplicity, just check along strip direction for now
-                              // and break cluster when a not fired strip is found
-                              if( TMath::Abs( dTime - dLastTime) < dMaxTimeDist &&
-                                   iLastChan == iCh - 1 &&
-                                   TMath::Abs( dPosX - dLastPosX) < dMaxSpaceDist  )
-                              {
-                                 // Add to cluster/hit
-                                 dWeightedTime += dTime*dTotS;
-                                 dWeightedPosX += dPosX*dTotS;
-                                 dWeightedPosY += dPosY*dTotS;
-                                 dWeightedPosZ += dPosZ*dTotS;
-                                 dWeightsSum   += dTotS;
-                                 iNbChanInHit  += 1;
-                                 // if one of the side digi comes from a CbmTofPoint not already found
-                                 // in this cluster, save its pointer
-                                 Bool_t bFoundA = kFALSE;
-                                 Bool_t bFoundB = kFALSE;
-
-                                 if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-                                    {
-                                       if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
-                                          bFoundA = kTRUE;
-                                       if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
-                                          bFoundB = kTRUE;
-                                    } // for( Int
-                                    else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-                                    {
-                                       if( vPtsRef[iPtRef] == pointA )
-                                          bFoundA = kTRUE;
-                                       if( vPtsRef[iPtRef] == pointB )
-                                          bFoundB = kTRUE;
-                                    } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-
-                                 // CbmTofPoint pointer for 1st digi not found => save it
-                                 if( kFALSE == bFoundA )
-                                    vPtsRef.push_back( pointA );
-                                 // CbmTofPoint pointer for 2nd digi not found => save it
-                                 if( kFALSE == bFoundB )
-                                    vPtsRef.push_back( pointB );
-                              } // if current Digis compatible with last fired chan
-                              else
-                              {
-                                 // Save Hit
-                                 dWeightedTime /= dWeightsSum;
-                                 dWeightedPosX /= dWeightsSum;
-                                 dWeightedPosY /= dWeightsSum;
-                                 dWeightedPosZ /= dWeightsSum;
-                                 TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                                 // Simple errors, not properly done at all for now
-                                 // Right way of doing it should take into account the weight distribution
-                                 // and real system time resolution
-                                 TVector3 hitPosErr( fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
-                                                     fChannelInfo->GetSizey()/TMath::Sqrt(12.0),   // Single strips approximation
-                                                     fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
-                                                     fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
-                                                     TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-
-                                 Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                                 Int_t iDetId = 0;
-                                 Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
-                                 new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                                     hitPos, hitPosErr,
-                                                     iRefId,
-                                                     dWeightedTime,
-                                                     vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
-                                 // Using the SetLinks/GetLinks of the TofHit class seems to conflict
-                                 // with something in littrack QA
-//                                 ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
-                                 fiNbHits++;
-                                 // For Histogramming
-                                 fviClusterSize[iSmType][iRpc].push_back(iNbChanInHit);
-                                 fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
-                                 fvdX[iSmType][iRpc].push_back(dWeightedPosX);
-                                 fvdY[iSmType][iRpc].push_back(dWeightedPosY);
-                                 fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
-                                 fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
-
-                                 fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
-                                 vPtsRef.clear();
-
-                                 // Start a new hit
-                                 dWeightedTime = dTime*dTotS;
-                                 dWeightedPosX = dPosX*dTotS;
-                                 dWeightedPosY = dPosY*dTotS;
-                                 dWeightedPosZ = dPosZ*dTotS;
-                                 dWeightsSum   = dTotS;
-                                 iNbChanInHit  = 1;
-                                 // Save pointer on CbmTofPoint
-                                 vPtsRef.push_back( pointA );
-
-                                 if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                 {
-                                    if( pointA->GetTrackID() !=
-                                          pointB->GetTrackID() )
-                                       // if other side come from a different Track,
-                                       // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( pointB );
-                                 } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    else if( pointA != pointB )
-                                       // if other side come from a different TofPoint,
-                                       // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( pointB );
-                              } // else of if current Digis compatible with last fired chan
-                           } // if( 0 < iNbChanInHit)
-                              else
-                              {
-                                 // first fired strip in this RPC
-                                 dWeightedTime = dTime*dTotS;
-                                 dWeightedPosX = dPosX*dTotS;
-                                 dWeightedPosY = dPosY*dTotS;
-                                 dWeightedPosZ = dPosZ*dTotS;
-                                 dWeightsSum   = dTotS;
-                                 iNbChanInHit  = 1;
-                                 // Save pointer on CbmTofPoint
-                                 vPtsRef.push_back( pointA );
-
-                                 if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                 {
-                                    if( pointA->GetTrackID() !=
-                                          pointB->GetTrackID() )
-                                       // if other side come from a different Track,
-                                       // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( pointB );
-                                 } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    else if( pointA != pointB )
-                                       // if other side come from a different TofPoint,
-                                       // also save the pointer on CbmTofPoint
-                                       vPtsRef.push_back( pointB );
-                              } // else of if( 0 < iNbChanInHit)
-                           iLastChan = iCh;
-                           dLastPosX = dPosX;
-                           dLastPosY = dPosY;
-                           dLastTime = dTime;
-                        } // if( 2 <= fStorDigiExp[iSmType][iSm][iRpc][iCh].size() )
-//                           fStorDigiExp[iSmType][iSm][iRpc][iCh].clear();
-                        fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].clear();
-                     } // for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
                   } // if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
                      else
                      {
                         // Vertical strips => Y comes from bottom top time difference
                         for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
                         {
+			  LOG(DEBUG2)<<"CbmTofSimpClusterizer::BuildClusters: VDigisize "
+			     << Form(" T %3d Sm %3d R %3d Ch %3d Size %3d ",iSmType,iSm,iRpc,iCh,fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size())
+                             <<FairLogger::endl;
+
                            if( 0 < fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
                               fhNbDigiPerChan->Fill( fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() );
-//                           if( 2 == fStorDigiExp[iSmType][iSm][iRpc][iCh].size() )
-                           if( 2 == fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
+                           while( 1 < fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
                            {
-                              if( (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetSide() ==
-                                  (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetSide() )
-                              {
+			       LOG(DEBUG2) << "CbmTofSimpClusterizer::BuildClusters: digis processing for " 
+					  << Form(" SmT %3d Sm %3d Rpc %3d Ch %3d # %3d ",iSmType,iSm,iRpc,iCh,
+						  fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size())
+                               <<FairLogger::endl;
+			       /*
+			      if (3 < fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size()) // needs more work!
+			       LOG(DEBUG) << "CbmTofSimpClusterizer::BuildClusters: digis ignored for " 
+			       << Form(" SmT %3d Sm %3d Rpc %3d Ch %3d # %3d ",iSmType,iSm,iRpc,iCh,fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size())
+                               <<FairLogger::endl;
+			       */
+
+                               while( (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetSide() ==
+                                      (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetSide() )
+                               {
                                  // Not one Digi of each end!
                                  fiNbSameSide++;
-                                 continue;
-                              }
+                                 LOG(DEBUG) << "CbmTofSimpClusterizer::BuildClusters: SameSide Hits! Times: "
+					      <<   (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetTime()
+					      << ", "<<(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetTime()
+					      <<", DeltaT " <<(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetTime() - 
+                                                              (fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetTime()
+				              <<FairLogger::endl;
+                                    LOG(DEBUG2)<<" SameSide Erase fStor entries(d) "<<iSmType<<", SR "<<iSm*iNbRpc+iRpc<<", Ch"<<iCh
+					       <<FairLogger::endl;
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				 if(2 > fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size()) break;
+				 continue;  
+                               }
+
+			      LOG(DEBUG2) << "CbmTofSimpClusterizer::BuildClusters: digis processing for " 
+					  << Form(" SmT %3d Sm %3d Rpc %3d Ch %3d # %3d ",iSmType,iSm,iRpc,iCh,
+						  fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size())
+		  	                  <<FairLogger::endl;
+                              if(2 > fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size()) break;
+                              Int_t iLastChId = iChId; // Save Last hit channel
 
                               // 2 Digis = both sides present
-                              CbmTofDetectorInfo xDetInfo(kTOF, iSmType, iSm, iRpc, 0, iCh + 1);
-                              Int_t iChId = fTofId->SetDetectorInfo( xDetInfo );
+                              CbmTofDetectorInfo xDetInfo(kTOF, iSmType, iSm, iRpc, 0, iCh+1); //FIXME
+                              iChId = fTofId->SetDetectorInfo( xDetInfo );
+			      Int_t iUCellId=CbmTofAddress::GetUniqueAddress(iSm,iRpc,iCh,0,iSmType);
+			      LOG(DEBUG1)<<"CbmTofSimpClusterizer::BuildClusters:" 
+					 << Form(" T %3d Sm %3d R %3d Ch %3d size %3d ",
+						 iSmType,iSm,iRpc,iCh,fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size())
+					 << Form(" ChId: 0x%08x 0x%08x ",iChId,iUCellId)
+					 <<FairLogger::endl;
                               fChannelInfo = fDigiPar->GetCell( iChId );
-
-//                              CbmTofDigiExp * xDigiA = fStorDigiExp[iSmType][iSm][iRpc][iCh][0];
-//                              CbmTofDigiExp * xDigiB = fStorDigiExp[iSmType][iSm][iRpc][iCh][1];
+                              if(NULL == fChannelInfo){
+			      LOG(ERROR)<<"CbmTofSimpClusterizer::BuildClusters: no geometry info! "
+					<< Form(" %3d %3d %3d %3d 0x%08x 0x%08x ",iSmType, iSm, iRpc, iCh, iChId,iUCellId)
+					<<FairLogger::endl;
+			      break;
+			      }
 
                               CbmTofDigiExp * xDigiA = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][0];
                               CbmTofDigiExp * xDigiB = fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh][1];
-							  CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
-							  CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
+
 
                               // The "Strip" time is the mean time between each end
-                              dTime = xDigiA->GetTime() + xDigiB->GetTime();
-                              dTime /= 2.0;
+                              dTime =0.5 * ( xDigiA->GetTime()	+ xDigiB->GetTime() ) ;                             
 
                               // Weight is the total charge => sum of both ends ToT
                               dTotS = xDigiA->GetTot() + xDigiB->GetTot();
 
                               // X position is just the center of the channel
-                              dPosX = fChannelInfo->GetX();
+			      //dPosX = fChannelInfo->GetX();
 
-                              // Y position form strip ends time difference
-                              dPosY = fChannelInfo->GetY();
-                              if( 1 == xDigiA->GetSide() )
-                                 // 0 is the top side, 1 is the bottom side
-                                 dPosY += fDigiBdfPar->GetSignalSpeed() *
-                                          ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
-                              else
-                                 // 0 is the bottom side, 1 is the top side
-                                 dPosY += fDigiBdfPar->GetSignalSpeed() *
-                                          ( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
+                              // Y position from strip ends time difference
+                              //dPosY = fChannelInfo->GetY();
 
                               // For Z always just take the one of the channel itself( in fact its gap one)
-                              dPosZ = fChannelInfo->GetZ();
+                              //dPosZ = fChannelInfo->GetZ();
+
+			      TGeoNode *fNode=        // prepare local->global trafo
+				gGeoManager->FindNode(fChannelInfo->GetX(),fChannelInfo->GetY(),fChannelInfo->GetZ());
+			      LOG(DEBUG1)<<Form(" Node at (%6.1f,%6.1f,%6.1f) : 0x%08x",
+					       fChannelInfo->GetX(),fChannelInfo->GetY(),fChannelInfo->GetZ(),fNode)
+					<<FairLogger::endl;
+			      //        fNode->Print();
+			      
+
+			      // switch to local coordinates, (0,0,0) is in the center of counter  ?
+			      dPosX=((Double_t)(-iNbCh/2 + iCh)+0.5)*fChannelInfo->GetSizex();
+			      dPosY=0.;
+			      dPosZ=0.;
+
+
+                              if( 1 == xDigiA->GetSide() )
+			     
+                                 // 0 is the top side, 1 is the bottom side
+                                 dPosY += fvCPSigPropSpeed[iSmType] *
+				        ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
+
+                              else
+			      
+                                 // 0 is the bottom side, 1 is the top side
+                                 dPosY += fvCPSigPropSpeed[iSmType] *
+				       ( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
+
+
+
+			      LOG(DEBUG1)
+				   <<"CbmTofSimpClusterizer::BuildClusters: NbChanInHit  "
+				   << Form(" %3d %3d %3d 0x%08x %d Time %f PosY %f Svel %f ",
+					   iNbChanInHit,iCh,iLastChan,xDigiA,xDigiA->GetSide(),
+					   dTime,dPosY,fvCPSigPropSpeed[iSmType])
+
+				   << Form( ", Offs %f, %f ",fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][0],
+					                     fvCPTOff[iSmType][iSm*iNbRpc+iRpc][iCh][1])
+				   <<FairLogger::endl;
 
                               // Now check if a hit/cluster is already started
-                              if( 0 < iNbChanInHit)
+                              if( 0 < iNbChanInHit) 
                               {
+
+
                                  if( iLastChan == iCh - 1 )
                                  {
                                     fhDigTimeDifClust->Fill( dTime - dLastTime );
@@ -1056,29 +1311,43 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     // in this cluster, save its pointer
                                     Bool_t bFoundA = kFALSE;
                                     Bool_t bFoundB = kFALSE;
+                                    if(NULL != fTofPointsColl){ // MC 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                        for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                        {
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
+					     //if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() )
                                              bFoundA = kTRUE;
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
+					     //if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
                                              bFoundB = kTRUE;
                                        } // for( Int
                                        else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
                                        {
-                                          if( vPtsRef[iPtRef] == pointA )
+					 //                                          if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiA->GetLinks() )
                                              bFoundA = kTRUE;
-                                          if( vPtsRef[iPtRef] == pointB )
+					 //                                          if( vPtsRef[iPtRef] == (CbmTofPoint*)xDigiB->GetLinks() )
                                              bFoundB = kTRUE;
                                        } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
 
                                     // CbmTofPoint pointer for 1st digi not found => save it
-                                    if( kFALSE == bFoundA )
-                                       vPtsRef.push_back( pointA );
+                                    //if( kFALSE == bFoundA )
+				      //                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
                                     // CbmTofPoint pointer for 2nd digi not found => save it
-                                    if( kFALSE == bFoundB )
-                                       vPtsRef.push_back( pointB );
-                                 } // if current Digis compatible with last fired chan
+				      //                                    if( kFALSE == bFoundB )
+				      //                                       vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
+				    } // MC end 
+				    vDigiIndRef.push_back( (Int_t )(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][0]));
+				    vDigiIndRef.push_back( (Int_t )(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][1]));
+
+                                    LOG(DEBUG1)<<" Add Digi and erase fStor entries(a): NbChanInHit "<< iNbChanInHit<<", "
+					     <<iSmType<<", SR "<<iSm*iNbRpc+iRpc<<", Ch"<<iCh
+					     <<FairLogger::endl;
+		
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+ 
+                                } // if current Digis compatible with last fired chan
                                  else
                                  {
                                     // Save Hit
@@ -1086,24 +1355,70 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightedPosX /= dWeightsSum;
                                     dWeightedPosY /= dWeightsSum;
                                     dWeightedPosZ /= dWeightsSum;
-                                    TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
+				    //  TVector3 hitPosLocal(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
+				    //TVector3 hitPos;
+                                    Double_t hitpos_local[3];
+				    hitpos_local[0] = dWeightedPosX;
+				    hitpos_local[1] = dWeightedPosY;
+				    hitpos_local[2] = dWeightedPosZ;
+
+				    Double_t hitpos[3];
+				    TGeoNode*	cNode= gGeoManager->GetCurrentNode();
+				    TGeoHMatrix* cMatrix = gGeoManager->GetCurrentMatrix();
+				    //cMatrix->Print();
+
+				    gGeoManager->LocalToMaster(hitpos_local, hitpos);
+				    LOG(DEBUG1)<<
+				    Form(" LocalToMaster for node 0x%08x: (%6.1f,%6.1f,%6.1f) ->(%6.1f,%6.1f,%6.1f)", 
+					 cNode, hitpos_local[0], hitpos_local[1], hitpos_local[2], 
+					 hitpos[0], hitpos[1], hitpos[2])
+					     <<FairLogger::endl;
+
+                                    TVector3 hitPos(hitpos[0],hitpos[1],hitpos[2]);
+
                                     // Simple errors, not properly done at all for now
                                     // Right way of doing it should take into account the weight distribution
                                     // and real system time resolution
                                     TVector3 hitPosErr( fChannelInfo->GetSizex()/TMath::Sqrt(12.0),   // Single strips approximation
-                                                        fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
+                                                        fDigiBdfPar->GetFeeTimeRes() * fvCPSigPropSpeed[iSmType], // Use the electronics resolution
                                                         fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
                                                         fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
                                                         TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-                                    Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                                    Int_t iDetId = 0;
-                                    Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                    Int_t iRefId = 0; // Index of the correspondng TofPoint
+
+				    // Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
+			            // calc mean ch from dPosX=((Double_t)(-iNbCh/2 + iCh)+0.5)*fChannelInfo->GetSizex();
+
+			            Int_t iChm=floor(dWeightedPosX/fChannelInfo->GetSizex())+iNbCh/2;
+                                    Int_t iDetId = CbmTofAddress::GetUniqueAddress(iSm,iRpc,iChm,0,iSmType);
+                                    Int_t iRefId = 0; // Index of the correspondng TofPoint
+				    // if(NULL != fTofPointsColl) {     iRefId = fTofPointsColl->IndexOf( vPtsRef[0] ); }
+				    LOG(DEBUG)<<"CbmTofTestBeamClusterizer::BuildClusters: Save Hit  "
+					       << Form(" %3d %3d 0x%08x %3d %3d %3d %f %f",
+						       fiNbHits,iNbChanInHit,iDetId,iCh,iLastChan,iRefId,
+						       dWeightedTime,dWeightedPosY)
+				               <<", DigiSize: "<<vDigiIndRef.size()
+					       <<", DigiInds: ";
+                                    fviClusterMul[iSmType][iSm][iRpc]++; 
+				    for (Int_t i=0; i<vDigiIndRef.size();i++){
+				      LOG(DEBUG)<<" "<<vDigiIndRef.at(i);
+				    }
+				    LOG(DEBUG)  <<FairLogger::endl;
+				    
                                     new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                                        hitPos, hitPosErr,
-                                                        iRefId,
+							hitPos, hitPosErr,  //local detector coordinates
+                                                        fiNbHits,
                                                         dWeightedTime,
-                                                        vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
+							vPtsRef.size(), // flag  = number of TofPoints generating the cluster
+							0) ; //channel
+				      //		vDigiIndRef);
+
+				    CbmMatch* digiMatch = new CbmMatch();
+				    for (Int_t i=0; i<vDigiIndRef.size();i++){
+				      digiMatch->AddLink(CbmLink(0.,vDigiIndRef.at(i)));
+				    }
+				    new((*fTofDigiMatchColl)[fiNbHits]) CbmMatch(*digiMatch);
+				    delete digiMatch;
+				  				    
                                     // Using the SetLinks/GetLinks of the TofHit class seems to conflict
                                     // with something in littrack QA
 //                                    ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
@@ -1113,10 +1428,13 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
                                     fvdX[iSmType][iRpc].push_back(dWeightedPosX);
                                     fvdY[iSmType][iRpc].push_back(dWeightedPosY);
+				    /*  no TofPoint available for data!  
                                     fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
                                     fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
                                     fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
+				    */
                                     vPtsRef.clear();
+                                    vDigiIndRef.clear();
 
                                     // Start a new hit
                                     dWeightedTime = dTime*dTotS;
@@ -1126,24 +1444,41 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightsSum   = dTotS;
                                     iNbChanInHit  = 1;
                                     // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( pointA );
+				    //                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+                                    // Save next digi address
+                                    LOG(DEBUG2)<<" Next fStor Digi "<<iSmType<<", SR "<<iSm*iNbRpc+iRpc<<", Ch"<<iCh
+					       <<", Dig0 "<<(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][0])
+					       <<", Dig1 "<<(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][1])
+					       <<FairLogger::endl;
+
+				    vDigiIndRef.push_back( (Int_t )(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][0]));
+				    vDigiIndRef.push_back( (Int_t )(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][1]));
+                                    LOG(DEBUG2)<<" Erase fStor entries(b) "<<iSmType<<", SR "<<iSm*iNbRpc+iRpc<<", Ch"<<iCh
+					       <<FairLogger::endl;
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     {
-                                       if( pointA->GetTrackID() !=
-                                             pointB->GetTrackID() )
+				      //                                       if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
+				      //                       ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
                                           // if other side come from a different Track,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
+				      //  vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
                                     } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( pointA != pointB )
+				    //else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
                                           // if other side come from a different TofPoint,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
+				    //    vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
                                  } // else of if current Digis compatible with last fired chan
                               } // if( 0 < iNbChanInHit)
                                  else
                                  {
+ 		                    LOG(DEBUG1)<<"CbmTofSimpClusterizer::BuildClusters: 1.Hit on channel " 
+					       <<iCh<<", time: "<<dTime<<FairLogger::endl;
+
                                     // first fired strip in this RPC
                                     dWeightedTime = dTime*dTotS;
                                     dWeightedPosX = dPosX*dTotS;
@@ -1152,29 +1487,42 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                                     dWeightsSum   = dTotS;
                                     iNbChanInHit  = 1;
                                     // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( pointA );
+                                    //if(NULL != fTofPointsColl)
+				    //                                    vPtsRef.push_back( (CbmTofPoint*)(xDigiA->GetLinks()) );
+				    vDigiIndRef.push_back( (Int_t )(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][0]));
+				    vDigiIndRef.push_back( (Int_t )(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh][1]));
+
+                                    LOG(DEBUG2)<<" Erase fStor entries(c) "<<iSmType<<", SR "<<iSm*iNbRpc+iRpc<<", Ch"<<iCh
+					       <<FairLogger::endl;
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
+				    fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].erase(fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].begin());
 
                                     if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
                                     {
-                                       if( pointA->GetTrackID() !=
-                                             pointB->GetTrackID() )
+				      //                                      if( ((CbmTofPoint*)(xDigiA->GetLinks()))->GetTrackID() !=
+				      //     ((CbmTofPoint*)(xDigiB->GetLinks()))->GetTrackID() )
                                           // if other side come from a different Track,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
+				      //                                          vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
                                     } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( pointA != pointB )
+				    //  else if( xDigiA->GetLinks() != xDigiB->GetLinks() )
                                           // if other side come from a different TofPoint,
                                           // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
+				    //    vPtsRef.push_back( (CbmTofPoint*)(xDigiB->GetLinks()) );
                                  } // else of if( 0 < iNbChanInHit)
                               iLastChan = iCh;
                               dLastPosX = dPosX;
                               dLastPosY = dPosY;
                               dLastTime = dTime;
                            } // if( 2 == fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-//                              fStorDigiExp[iSmType][iSm][iRpc][iCh].clear();
                            fStorDigiExp[iSmType][iSm*iNbRpc+iRpc][iCh].clear();
+                           fStorDigiInd[iSmType][iSm*iNbRpc+iRpc][iCh].clear();
                         } // for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
+			LOG(DEBUG2)<<"CbmTofSimpClusterizer::BuildClusters: finished V-RPC"
+				   << Form(" %3d %3d %3d %d",iSmType,iSm,iRpc,fTofHitsColl->GetEntries())
+				   <<FairLogger::endl;
                      } // else of if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
                } // if( 0 == iChType)
                   else
@@ -1185,77 +1533,90 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                      return kFALSE;
                   } // else of if( 0 == iChType)
 
-               // Now check if a hit/cluster is started
+               // Now check if another hit/cluster is started
                // and save it if it's the case
                if( 0 < iNbChanInHit)
                {
+		   LOG(DEBUG1)<<"CbmTofSimpClusterizer::BuildClusters: Process cluster " 
+			      <<iNbChanInHit<<FairLogger::endl;
+
                   // Check orientation to properly assign errors
                   if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
                   {
-                     // Save Hit
-                     dWeightedTime /= dWeightsSum;
-                     dWeightedPosX /= dWeightsSum;
-                     dWeightedPosY /= dWeightsSum;
-                     dWeightedPosZ /= dWeightsSum;
-                     TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                     // Simple errors, not properly done at all for now
-                     // Right way of doing it should take into account the weight distribution
-                     // and real system time resolution
-                     TVector3 hitPosErr( fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
-                                         fChannelInfo->GetSizey()/TMath::Sqrt(12.0),   // Single strips approximation
-                                         fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
-                                         fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
-                                         TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-                     Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                     Int_t iDetId = 0;
-                     Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
-                     new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                         hitPos, hitPosErr,
-                                         iRefId,
-                                         dWeightedTime,
-                                         vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
-//                     ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
-                     fiNbHits++;
-                     // For Histogramming
-                     fviClusterSize[iSmType][iRpc].push_back(iNbChanInHit);
-                     fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
-                     fvdX[iSmType][iRpc].push_back(dWeightedPosX);
-                     fvdY[iSmType][iRpc].push_back(dWeightedPosY);
-                     fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
-                     fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
-                     fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
-                     vPtsRef.clear();
+		     LOG(DEBUG1)<<"CbmTofTestBeamClusterizer::BuildClusters: H-Hit " <<FairLogger::endl;
                   } // if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
                   else
                   {
+		     LOG(DEBUG2)<<"CbmTofSimpClusterizer::BuildClusters: V-Hit " <<FairLogger::endl;
                      // Save Hit
                      dWeightedTime /= dWeightsSum;
                      dWeightedPosX /= dWeightsSum;
                      dWeightedPosY /= dWeightsSum;
                      dWeightedPosZ /= dWeightsSum;
-                     TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                     // Simple errors, not properly done at all for now
+		     //TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
+
+                     Double_t hitpos_local[3];
+		     hitpos_local[0] = dWeightedPosX;
+		     hitpos_local[1] = dWeightedPosY;
+		     hitpos_local[2] = dWeightedPosZ;
+
+		     Double_t hitpos[3];
+		     TGeoNode*	cNode= gGeoManager->GetCurrentNode();
+		     TGeoHMatrix* cMatrix = gGeoManager->GetCurrentMatrix();
+		     //cMatrix->Print();
+
+		     gGeoManager->LocalToMaster(hitpos_local, hitpos);
+		     LOG(DEBUG2)<<
+		     Form(" LocalToMaster for V-node 0x%08x: (%6.1f,%6.1f,%6.1f) ->(%6.1f,%6.1f,%6.1f)", 
+			 cNode, hitpos_local[0], hitpos_local[1], hitpos_local[2], 
+			 hitpos[0], hitpos[1], hitpos[2])
+			     <<FairLogger::endl;
+
+                     TVector3 hitPos(hitpos[0],hitpos[1],hitpos[2]);
+                     // TestBeam errors, not properly done at all for now
                      // Right way of doing it should take into account the weight distribution
                      // and real system time resolution
                      TVector3 hitPosErr( fChannelInfo->GetSizex()/TMath::Sqrt(12.0),   // Single strips approximation
-                                         fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
+                                         fDigiBdfPar->GetFeeTimeRes() * fvCPSigPropSpeed[iSmType], // Use the electronics resolution
                                          fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
                                          fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
                                          TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
 //                     cout<<"a "<<vPtsRef.size()<<endl;
 //                     cout<<"b "<<vPtsRef[0]<<endl;
 //                     cout<<"c "<<vPtsRef[0]->GetDetectorID()<<endl;
-                     Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                     Int_t iDetId = 0;
-                     Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
+//                     Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
+//                     Int_t iDetId = iChId;
+ 	             Int_t iChm=floor(dWeightedPosX/fChannelInfo->GetSizex())+iNbCh/2;
+                     Int_t iDetId = CbmTofAddress::GetUniqueAddress(iSm,iRpc,iChm,0,iSmType);
+                     Int_t iRefId = 0; // Index of the correspondng TofPoint
+		     //                     if(NULL != fTofPointsColl) iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
+		     LOG(DEBUG)<<"CbmTofTestBeamClusterizer::BuildClusters: Save V-Hit  "
+		     << Form(" %3d %3d 0x%08x %3d %3d %3d 0x%08x",
+			     fiNbHits,iNbChanInHit,iDetId,iLastChan,iRefId) //vPtsRef.size(),vPtsRef[0])
+		       //   dWeightedTime,dWeightedPosY)
+				<<", DigiSize: "<<vDigiIndRef.size();
+		     LOG(DEBUG)<<", DigiInds: ";
+                     for (Int_t i=0; i<vDigiIndRef.size();i++){
+		       LOG(DEBUG)<<" "<<vDigiIndRef.at(i);
+		     }
+		     LOG(DEBUG)  <<FairLogger::endl;
+                     
+		     fviClusterMul[iSmType][iSm][iRpc]++; 
 
                      new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
                                          hitPos, hitPosErr,
-                                         iRefId,
+					 fiNbHits, //iRefId
                                          dWeightedTime,
-                                         vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
+					 vPtsRef.size(),
+					 0);
+		     //		                         vDigiIndRef);
+		     CbmMatch* digiMatch = new CbmMatch();
+                     for (Int_t i=0; i<vDigiIndRef.size();i++){
+		       digiMatch->AddLink(CbmLink(0.,vDigiIndRef.at(i)));
+		     }
+                     new((*fTofDigiMatchColl)[fiNbHits]) CbmMatch(*digiMatch);
+		     delete digiMatch;
+
                      // Using the SetLinks/GetLinks of the TofHit class seems to conflict
                      // with something in littrack QA
 //                     ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
@@ -1265,543 +1626,23 @@ Bool_t   CbmTofSimpClusterizer::BuildClusters()
                      fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
                      fvdX[iSmType][iRpc].push_back(dWeightedPosX);
                      fvdY[iSmType][iRpc].push_back(dWeightedPosY);
+		     /*
                      fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
                      fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
                      fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
+		     */
                      vPtsRef.clear();
+                     vDigiIndRef.clear();
                   } // else of if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
                } // if( 0 < iNbChanInHit)
+	       LOG(DEBUG2)<<" Fini-A "<<Form(" %3d %3d %3d ",iSmType, iSm, iRpc)<<FairLogger::endl;
             } // for each sm/rpc pair
+	       LOG(DEBUG2)<<" Fini-B "<<Form(" %3d ",iSmType)<<FairLogger::endl;
       } // for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
    } // if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
-      else
-      {
-         for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
-         {
-            Int_t iNbSm  = fDigiBdfPar->GetNbSm(  iSmType);
-            Int_t iNbRpc = fDigiBdfPar->GetNbRpc( iSmType);
-            for( Int_t iSm = 0; iSm < iNbSm; iSm++ )
-               for( Int_t iRpc = 0; iRpc < iNbRpc; iRpc++ )
-               {
-                  Int_t    iChType = fDigiBdfPar->GetChanType( iSmType, iRpc );
-                  if( 0 == iChType )
-                  {
-                     Int_t iNbCh = fDigiBdfPar->GetNbChan( iSmType, iRpc );
-                     // Don't spread clusters over RPCs!!!
-                     dWeightedTime = 0.0;
-                     dWeightedPosX = 0.0;
-                     dWeightedPosY = 0.0;
-                     dWeightedPosZ = 0.0;
-                     dWeightsSum   = 0.0;
-                     iNbChanInHit  = 0;
-                     vPtsRef.clear();
-                     // For safety reinitialize everything
-                     iLastChan = -1;
-                     dLastPosX = 0.0;
-                     dLastPosY = 0.0;
-                     dLastTime = 0.0;
-                     if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
-                     {
-                        // Horizontal strips => X comes from left right time difference
-                        for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
-                        {
-                           if( 0 < fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-                              fhNbDigiPerChan->Fill( fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].size() );
-//                           if( 2 == fStorDigi[iSmType][iSm][iRpc][iCh].size() )
-                           if( 2 == fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-                           {
-                              if( (fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetSide() ==
-                                    (fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetSide() )
-                              {
-                                 // Not one Digi of each end!
-                                 fiNbSameSide++;
-                                 continue;
-                              }
-
-                              CbmTofDetectorInfo xDetInfo(kTOF, iSmType, iSm, iRpc, 0, iCh + 1);
-                              Int_t iChId = fTofId->SetDetectorInfo( xDetInfo );
-                              fChannelInfo = fDigiPar->GetCell( iChId );
-
-//                              CbmTofDigi * xDigiA = fStorDigi[iSmType][iSm][iRpc][iCh][0];
-//                              CbmTofDigi * xDigiB = fStorDigi[iSmType][iSm][iRpc][iCh][1];
-
-                              CbmTofDigi * xDigiA = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][0];
-                              CbmTofDigi * xDigiB = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][1];
-							  CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
-							  CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
-                             // The "Strip" time is the mean time between each end
-                              dTime = xDigiA->GetTime() + xDigiB->GetTime();
-                              dTime /= 2.0;
-
-                              // Weight is the total charge => sum of both ends ToT
-                              dTotS = xDigiA->GetTot() + xDigiB->GetTot();
-
-                              // Y position is just the center of the channel
-                              dPosY = fChannelInfo->GetY();
-
-                              // X position form strip ends time difference
-                              dPosX = fChannelInfo->GetX();
-                              if( 1 == xDigiA->GetSide() )
-                                 // 0 is the right side, 1 is the left side
-                                 dPosX += fDigiBdfPar->GetSignalSpeed() *
-                                          ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
-                              else
-                                 // 0 is the left side, 1 is the right side
-                                 dPosX += fDigiBdfPar->GetSignalSpeed() *
-                                          ( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
-
-                              // For Z always just take the one of the channel itself( in fact its gap one)
-                              dPosZ = fChannelInfo->GetZ();
-
-                              // Now check if a hit/cluster is already started
-                              if( 0 < iNbChanInHit)
-                              {
-                                 if( iLastChan == iCh - 1 )
-                                 {
-                                    fhDigTimeDifClust->Fill( dTime - dLastTime );
-                                    fhDigSpacDifClust->Fill( dPosX - dLastPosX );
-                                    fhDigDistClust->Fill( dPosX - dLastPosX,
-                                                          dTime - dLastTime );
-                                 } // if( iLastChan == iCh - 1 )
-                                 // a cluster is already started => check distance in space/time
-                                 // For simplicity, just check along strip direction for now
-                                 if( TMath::Abs( dTime - dLastTime) < dMaxTimeDist &&
-                                      iLastChan == iCh - 1 &&
-                                      TMath::Abs( dPosX - dLastPosX) < dMaxSpaceDist  )
-                                 {
-                                    // Add to cluster/hit
-                                    dWeightedTime += dTime*dTotS;
-                                    dWeightedPosX += dPosX*dTotS;
-                                    dWeightedPosY += dPosY*dTotS;
-                                    dWeightedPosZ += dPosZ*dTotS;
-                                    dWeightsSum   += dTotS;
-                                    iNbChanInHit  += 1;
-                                    // if one of the side digi comes from a CbmTofPoint not already found
-                                    // in this cluster, save its pointer
-                                    Bool_t bFoundA = kFALSE;
-                                    Bool_t bFoundB = kFALSE;
-                                    if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-                                       {
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
-                                             bFoundA = kTRUE;
-                                          if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
-                                             bFoundB = kTRUE;
-                                       } // for( Int
-                                       else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-                                       {
-                                          if( vPtsRef[iPtRef] == pointA )
-                                             bFoundA = kTRUE;
-                                          if( vPtsRef[iPtRef] == pointB )
-                                             bFoundB = kTRUE;
-                                       } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-
-                                    // CbmTofPoint pointer for 1st digi not found => save it
-                                    if( kFALSE == bFoundA )
-                                       vPtsRef.push_back( pointA );
-                                    // CbmTofPoint pointer for 2nd digi not found => save it
-                                    if( kFALSE == bFoundB )
-                                       vPtsRef.push_back( pointB );
-                                 } // if current Digis compatible with last fired chan
-                                 else
-                                 {
-                                    // Save Hit
-                                    dWeightedTime /= dWeightsSum;
-                                    dWeightedPosX /= dWeightsSum;
-                                    dWeightedPosY /= dWeightsSum;
-                                    dWeightedPosZ /= dWeightsSum;
-                                    TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                                    // Simple errors, not properly done at all for now
-                                    // Right way of doing it should take into account the weight distribution
-                                    // and real system time resolution
-                                    TVector3 hitPosErr( fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
-                                                        fChannelInfo->GetSizey()/TMath::Sqrt(12.0),   // Single strips approximation
-                                                        fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
-                                                        fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
-                                                        TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-                                    Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                                    Int_t iDetId = 0;
-                                    Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
-
-                                    new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                                        hitPos, hitPosErr,
-                                                        iRefId,
-                                                        dWeightedTime,
-                                                        vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
-                                    // Using the SetLinks/GetLinks of the TofHit class seems to conflict
-                                    // with something in littrack QA
-//                                    ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
-                                    fiNbHits++;
-                                    // For Histogramming
-                                    fviClusterSize[iSmType][iRpc].push_back(iNbChanInHit);
-                                    fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
-                                    fvdX[iSmType][iRpc].push_back(dWeightedPosX);
-                                    fvdY[iSmType][iRpc].push_back(dWeightedPosY);
-                                    fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
-                                    fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
-                                    fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
-                                    vPtsRef.clear();
-
-                                    // Start a new hit
-                                    dWeightedTime = dTime*dTotS;
-                                    dWeightedPosX = dPosX*dTotS;
-                                    dWeightedPosY = dPosY*dTotS;
-                                    dWeightedPosZ = dPosZ*dTotS;
-                                    dWeightsSum   = dTotS;
-                                    iNbChanInHit  = 1;
-                                    // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( pointA );
-
-                                    if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    {
-                                       if( pointA->GetTrackID() !=
-                                             pointB->GetTrackID() )
-                                          // if other side come from a different Track,
-                                          // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
-                                    } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( pointA != pointB )
-                                          // if other side come from a different TofPoint,
-                                          // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
-                                 } // else of if current Digis compatible with last fired chan
-                              } // if( 0 < iNbChanInHit)
-                                 else
-                                 {
-                                    // first fired strip in this RPC
-                                    dWeightedTime = dTime*dTotS;
-                                    dWeightedPosX = dPosX*dTotS;
-                                    dWeightedPosY = dPosY*dTotS;
-                                    dWeightedPosZ = dPosZ*dTotS;
-                                    dWeightsSum   = dTotS;
-                                    iNbChanInHit  = 1;
-                                    // Save pointer on CbmTofPoint
-                                    vPtsRef.push_back( pointA );
-
-                                    if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                    {
-                                       if( pointA->GetTrackID() !=
-                                             pointB->GetTrackID() )
-                                          // if other side come from a different Track,
-                                          // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
-                                    } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       else if( pointA != pointB )
-                                          // if other side come from a different TofPoint,
-                                          // also save the pointer on CbmTofPoint
-                                          vPtsRef.push_back( pointB );
-                                 } // else of if( 0 < iNbChanInHit)
-                              iLastChan = iCh;
-                              dLastPosX = dPosX;
-                              dLastPosY = dPosY;
-                              dLastTime = dTime;
-                           } // if( 2 == fStorDigi[iSmType][iSm][iRpc][iCh].size() )
-//                              fStorDigi[iSmType][iSm][iRpc][iCh].clear();
-                           fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].clear();
-                        } // for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
-                     } // if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
-                        else
-                        {
-                           // Vertical strips => Y comes from bottom top time difference
-                           for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
-                           {
-                              if( 0 < fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-                                 fhNbDigiPerChan->Fill( fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].size() );
-//                              if( 2 == fStorDigi[iSmType][iSm][iRpc][iCh].size() )
-                              if( 2 == fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].size() )
-                              {
-                                 if( (fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][0])->GetSide() ==
-                                       (fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][1])->GetSide() )
-                                 {
-                                    // Not one Digi of each end!
-                                    fiNbSameSide++;
-                                    continue;
-                                 }
-
-                                 // 2 Digis = both sides present
-                                 CbmTofDetectorInfo xDetInfo(kTOF, iSmType, iSm, iRpc, 0, iCh + 1);
-                                 Int_t iChId = fTofId->SetDetectorInfo( xDetInfo );
-                                 fChannelInfo = fDigiPar->GetCell( iChId );
-
-//                                 CbmTofDigi * xDigiA = fStorDigi[iSmType][iSm][iRpc][iCh][0];
-//                                 CbmTofDigi * xDigiB = fStorDigi[iSmType][iSm][iRpc][iCh][1];
-
-                                 CbmTofDigi * xDigiA = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][0];
-                                 CbmTofDigi * xDigiB = fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh][1];
-								 CbmTofPoint* pointA = (CbmTofPoint*)fTofPointsColl->At(xDigiA->GetMatch()->GetMatchedLink().GetIndex());
-								 CbmTofPoint* pointB = (CbmTofPoint*)fTofPointsColl->At(xDigiB->GetMatch()->GetMatchedLink().GetIndex());
-
-                                 // The "Strip" time is the mean time between each end
-                                 dTime = xDigiA->GetTime() + xDigiB->GetTime();
-                                 dTime /= 2.0;
-
-                                 // Weight is the total charge => sum of both ends ToT
-                                 dTotS = xDigiA->GetTot() + xDigiB->GetTot();
-
-                                 // X position is just the center of the channel
-                                 dPosX = fChannelInfo->GetX();
-
-                                 // Y position form strip ends time difference
-                                 dPosY = fChannelInfo->GetY();
-                                 if( 1 == xDigiA->GetSide() )
-                                    // 0 is the top side, 1 is the bottom side
-                                    dPosY += fDigiBdfPar->GetSignalSpeed() *
-                                             ( xDigiA->GetTime() - xDigiB->GetTime() )/2.0;
-                                 else
-                                    // 0 is the bottom side, 1 is the top side
-                                    dPosY += fDigiBdfPar->GetSignalSpeed() *
-                                             ( xDigiB->GetTime() - xDigiA->GetTime() )/2.0;
-
-                                 // For Z always just take the one of the channel itself( in fact its gap one)
-                                 dPosZ = fChannelInfo->GetZ();
-
-                                 // Now check if a hit/cluster is already started
-                                 if( 0 < iNbChanInHit)
-                                 {
-                                    if( iLastChan == iCh - 1 )
-                                    {
-                                       fhDigTimeDifClust->Fill( dTime - dLastTime );
-                                       fhDigSpacDifClust->Fill( dPosY - dLastPosY );
-                                       fhDigDistClust->Fill( dPosY - dLastPosY,
-                                                             dTime - dLastTime );
-                                    } // if( iLastChan == iCh - 1 )
-                                    // a cluster is already started => check distance in space/time
-                                    // For simplicity, just check along strip direction for now
-                                    if( TMath::Abs( dTime - dLastTime) < dMaxTimeDist &&
-                                         iLastChan == iCh - 1 &&
-                                         TMath::Abs( dPosY - dLastPosY) < dMaxSpaceDist  )
-                                    {
-                                       // Add to cluster/hit
-                                       dWeightedTime += dTime*dTotS;
-                                       dWeightedPosX += dPosX*dTotS;
-                                       dWeightedPosY += dPosY*dTotS;
-                                       dWeightedPosZ += dPosZ*dTotS;
-                                       dWeightsSum   += dTotS;
-                                       iNbChanInHit  += 1;
-                                       // if one of the side digi comes from a CbmTofPoint not already found
-                                       // in this cluster, save its pointer
-                                       Bool_t bFoundA = kFALSE;
-                                       Bool_t bFoundB = kFALSE;
-                                       if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                          for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-                                          {
-                                             if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointA->GetTrackID() )
-                                                bFoundA = kTRUE;
-                                             if( ((CbmTofPoint*)(vPtsRef[iPtRef]))->GetTrackID() == pointB->GetTrackID() )
-                                                bFoundB = kTRUE;
-                                          } // for( Int
-                                          else for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-                                          {
-                                             if( vPtsRef[iPtRef] == pointA )
-                                                bFoundA = kTRUE;
-                                             if( vPtsRef[iPtRef] == pointB )
-                                                bFoundB = kTRUE;
-                                          } // for( Int_t iPtRef = 0; iPtRef < vPtsRef.size(); iPtRef++)
-
-                                       // CbmTofPoint pointer for 1st digi not found => save it
-                                       if( kFALSE == bFoundA )
-                                          vPtsRef.push_back( pointA );
-                                       // CbmTofPoint pointer for 2nd digi not found => save it
-                                       if( kFALSE == bFoundB )
-                                          vPtsRef.push_back( pointB );
-                                    } // if current Digis compatible with last fired chan
-                                    else
-                                    {
-                                       // Save Hit
-                                       dWeightedTime /= dWeightsSum;
-                                       dWeightedPosX /= dWeightsSum;
-                                       dWeightedPosY /= dWeightsSum;
-                                       dWeightedPosZ /= dWeightsSum;
-                                       TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                                       // Simple errors, not properly done at all for now
-                                       // Right way of doing it should take into account the weight distribution
-                                       // and real system time resolution
-                                       TVector3 hitPosErr( fChannelInfo->GetSizey()/TMath::Sqrt(12.0),   // Single strips approximation
-                                                           fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
-                                                           fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
-                                                           fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
-                                                           TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-                                       Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                                       Int_t iDetId = 0;
-                                       Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
-
-                                       new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                                           hitPos, hitPosErr,
-                                                           iRefId,
-                                                           dWeightedTime,
-                                                           vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
-                                       // Using the SetLinks/GetLinks of the TofHit class seems to conflict
-                                       // with something in littrack QA
-//                                       ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
-                                       fiNbHits++;
-                                       // For Histogramming
-                                       fviClusterSize[iSmType][iRpc].push_back(iNbChanInHit);
-                                       fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
-                                       fvdX[iSmType][iRpc].push_back(dWeightedPosX);
-                                       fvdY[iSmType][iRpc].push_back(dWeightedPosY);
-                                       fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
-                                       fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
-                                       fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
-                                       vPtsRef.clear();
-
-                                       // Start a new hit
-                                       dWeightedTime = dTime*dTotS;
-                                       dWeightedPosX = dPosX*dTotS;
-                                       dWeightedPosY = dPosY*dTotS;
-                                       dWeightedPosZ = dPosZ*dTotS;
-                                       dWeightsSum   = dTotS;
-                                       iNbChanInHit  = 1;
-                                       // Save pointer on CbmTofPoint
-                                       vPtsRef.push_back( pointA );
-
-                                       if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       {
-                                          if( pointA->GetTrackID() !=
-                                                pointB->GetTrackID() )
-                                             // if other side come from a different Track,
-                                             // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( pointB );
-                                       } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                          else if( pointA != pointB )
-                                             // if other side come from a different TofPoint,
-                                             // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( pointB );
-                                    } // else of if current Digis compatible with last fired chan
-                                 } // if( 0 < iNbChanInHit)
-                                    else
-                                    {
-                                       // first fired strip in this RPC
-                                       dWeightedTime = dTime*dTotS;
-                                       dWeightedPosX = dPosX*dTotS;
-                                       dWeightedPosY = dPosY*dTotS;
-                                       dWeightedPosZ = dPosZ*dTotS;
-                                       dWeightsSum   = dTotS;
-                                       iNbChanInHit  = 1;
-                                       // Save pointer on CbmTofPoint
-                                       vPtsRef.push_back( pointA );
-
-                                       if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                       {
-                                          if( pointA->GetTrackID() !=
-                                                pointB->GetTrackID() )
-                                             // if other side come from a different Track,
-                                             // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( pointB );
-                                       } // if( kTRUE == fDigiBdfPar->ClustUseTrackId() )
-                                          else if( pointA != pointB )
-                                             // if other side come from a different TofPoint,
-                                             // also save the pointer on CbmTofPoint
-                                             vPtsRef.push_back( pointB );
-                                    } // else of if( 0 < iNbChanInHit)
-                                 iLastChan = iCh;
-                                 dLastPosX = dPosX;
-                                 dLastPosY = dPosY;
-                                 dLastTime = dTime;
-                              } // if( 2 <= fStorDigi[iSmType][iSm][iRpc][iCh].size() )
-//                                 fStorDigi[iSmType][iSm][iRpc][iCh].clear();
-                                 fStorDigi[iSmType][iSm*iNbRpc+iRpc][iCh].clear();
-                           } // for( Int_t iCh = 0; iCh < iNbCh; iCh++ )
-                        } // else of if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
-                  } // if( 0 == iChType)
-                     else
-                     {
-                        LOG(ERROR)<<"CbmTofSimpClusterizer::BuildClusters => Cluster building "
-                              <<"from digis to hits not implemented for pads, Sm type "
-                              <<iSmType<<" Rpc "<<iRpc<<FairLogger::endl;
-                        return kFALSE;
-                     } // else of if( 0 == iChType)
-
-                  // Now check if a hit/cluster is started
-                  // and save it if it's the case
-                  if( 0 < iNbChanInHit)
-                  {
-                     // Check orientation to properly assign errors
-                     if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
-                     {
-                        // Save Hit
-                        dWeightedTime /= dWeightsSum;
-                        dWeightedPosX /= dWeightsSum;
-                        dWeightedPosY /= dWeightsSum;
-                        dWeightedPosZ /= dWeightsSum;
-                        TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                        // Simple errors, not properly done at all for now
-                        // Right way of doing it should take into account the weight distribution
-                        // and real system time resolution
-                        TVector3 hitPosErr( fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
-                                            fChannelInfo->GetSizey()/TMath::Sqrt(12.0),   // Single strips approximation
-                                            fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
-                                            fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
-                                            TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-                        Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                        Int_t iDetId = 0;
-                        Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
-
-                        new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                            hitPos, hitPosErr,
-                                            iRefId,
-                                            dWeightedTime,
-                                            vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
-                        // Using the SetLinks/GetLinks of the TofHit class seems to conflict
-                        // with something in littrack QA
-//                        ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
-                        fiNbHits++;
-                        // For Histogramming
-                        fviClusterSize[iSmType][iRpc].push_back(iNbChanInHit);
-                        fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
-                        fvdX[iSmType][iRpc].push_back(dWeightedPosX);
-                        fvdY[iSmType][iRpc].push_back(dWeightedPosY);
-                        fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
-                        fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
-                        fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
-                        vPtsRef.clear();
-                     } // if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
-                     else
-                     {
-                        // Save Hit
-                        dWeightedTime /= dWeightsSum;
-                        dWeightedPosX /= dWeightsSum;
-                        dWeightedPosY /= dWeightsSum;
-                        dWeightedPosZ /= dWeightsSum;
-                        TVector3 hitPos(dWeightedPosX, dWeightedPosY, dWeightedPosZ);
-                        // Simple errors, not properly done at all for now
-                        // Right way of doing it should take into account the weight distribution
-                        // and real system time resolution
-                        TVector3 hitPosErr( fChannelInfo->GetSizex()/TMath::Sqrt(12.0),   // Single strips approximation
-                                            fDigiBdfPar->GetFeeTimeRes() * fDigiBdfPar->GetSignalSpeed(), // Use the electronics resolution
-                                            fDigiBdfPar->GetNbGaps( iSmType, iRpc)*
-                                            fDigiBdfPar->GetGapSize( iSmType, iRpc)/10.0 / // Change gap size in cm
-                                            TMath::Sqrt(12.0) ); // Use full RPC thickness as "Channel" Z size
-                        Int_t iDetId = vPtsRef[0]->GetDetectorID();// detID = pt->GetDetectorID() <= from TofPoint
-//                        Int_t iDetId = 0;
-                        Int_t iRefId = fTofPointsColl->IndexOf( vPtsRef[0] );
-//                                 Int_t iRefId = 0; // Index of the correspondng TofPoint
-
-                        new((*fTofHitsColl)[fiNbHits]) CbmTofHit( iDetId,
-                                            hitPos, hitPosErr,
-                                            iRefId,
-                                            dWeightedTime,
-                                            vPtsRef.size() ); // flag  = number of TofPoints generating the cluster
-                        // Using the SetLinks/GetLinks of the TofHit class seems to conflict
-                        // with something in littrack QA
-//                        ((CbmTofHit*)fTofHitsColl->At(fiNbHits))->SetLinks(vPtsRef[0]);
-                        fiNbHits++;
-                        // For Histogramming
-                        fviClusterSize[iSmType][iRpc].push_back(iNbChanInHit);
-                        fviTrkMul[iSmType][iRpc].push_back( vPtsRef.size() );
-                        fvdX[iSmType][iRpc].push_back(dWeightedPosX);
-                        fvdY[iSmType][iRpc].push_back(dWeightedPosY);
-                        fvdDifX[iSmType][iRpc].push_back( vPtsRef[0]->GetX() - dWeightedPosX);
-                        fvdDifY[iSmType][iRpc].push_back( vPtsRef[0]->GetY() - dWeightedPosY);
-                        fvdDifCh[iSmType][iRpc].push_back( fGeoHandler->GetCell( vPtsRef[0]->GetDetectorID() ) -1 -iLastChan );
-                        vPtsRef.clear();
-                     } // else of if( 1 == fDigiBdfPar->GetChanOrient( iSmType, iRpc ) )
-                  } // if( 0 < iNbChanInHit)
-               } // for each sm/rpc pair
-         } // for( Int_t iSmType = 0; iSmType < iNbSmTypes; iSmType++ )
-      } // else of if( kTRUE == fDigiBdfPar->UseExpandedDigi() )
-//cout<<"test"<<endl;
+   else
+   {
+     LOG(ERROR)<<" Compressed Digis not implemented ... "<<FairLogger::endl;
+   }
    return kTRUE;
 }

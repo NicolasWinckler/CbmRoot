@@ -245,6 +245,8 @@ class CbmTofDigitizerBDF : public FairTask
                fStorDigi; //[nbType][nbSm*nbRpc][nbCh*NbSide][nDigis]
       std::vector< std::vector< std::vector< std::vector< CbmTofDigiExp* > > > >
                fStorDigiExp; //[nbType][nbSm*nbRpc][nbCh*NbSide][nDigis]
+      std::vector< std::vector< std::vector< std::vector< Int_t > > > >
+               fStorDigiMatch; //[nbType][nbSm*nbRpc][nbCh*NbSide][nDigis]
          // Temporary storing of the Track/Point/Digi info to make sure all gap/Tofpoint
          // linked to same track in same channel give same result
       std::vector< std::vector < ULong64_t > > fvlTrckChAddr;   // [nbMcTracks][nbChannelFiredByTrk]
@@ -259,6 +261,7 @@ class CbmTofDigitizerBDF : public FairTask
       // Output variables
       Bool_t                  fbWriteDigisInOut;
       TClonesArray          * fTofDigisColl;  // TOF Digis
+      TClonesArray          * fTofDigiMatchPointsColl; // MC original points
       Int_t  fiNbDigis;                       // Index of the CbmTofDigi/CbmTofDigiExp TClonesArray
 
       // Generic

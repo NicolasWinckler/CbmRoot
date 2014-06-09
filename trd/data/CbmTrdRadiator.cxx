@@ -65,7 +65,7 @@ CbmTrdRadiator::CbmTrdRadiator()
    fnTRabs(),
    fnTRab(-1.),
    fELoss(-1.),
-   fMom(-1.)
+   fMom(-1.,-1.,-1.)
 {
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
@@ -115,7 +115,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
     fnTRabs(),
     fnTRab(-1.),
     fELoss(-1.),
-    fMom(-1.)
+    fMom(-1.,-1.,-1.)
 {
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
@@ -163,7 +163,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick,
     fnTRabs(),
     fnTRab(-1.),
     fELoss(-1.),
-    fMom(-1.)
+    fMom(-1.,-1.,-1.)
 {
   for(Int_t i=0; i<fNMom; i++){
       fFinal[i] = NULL;
@@ -211,7 +211,7 @@ CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, TString prototype)
     fnTRabs(),
     fnTRab(-1.),
     fELoss(-1.),
-    fMom(-1.)
+    fMom(-1.,-1.,-1.)
 {
   for(Int_t i=0; i<fNMom; i++){
     fFinal[i] = NULL;

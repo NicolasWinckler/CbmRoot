@@ -529,24 +529,29 @@ void dump_digi_file()
                                     DetectorSizeX[1] - 2 * FrameWidth[1] };
   const Int_t NofSectors = 3;
   const Int_t NofPadsInRow[2]  = { 80, 128 };  // numer of pads in rows
+  Double_t nrow = 0;   // number of rows in module
 
   const Double_t PadHeightInSector[NofModuleTypes][NofSectors] =  // pad height
-        { {  1.50,  1.50,  1.50 },   // module type 1
-          {  2.75,  2.50,  2.75 },   // module type 2
-          {  4.50,  4.50,  4.50 },   // module type 3
-          {  6.75,  6.75,  6.75 },   // module type 4
-          {  3.75,  4.00,  3.75 },   // module type 5
-          {  7.50,  7.75,  7.50 },   // module type 6
-          { 11.25, 11.50, 11.25 },   // module type 7
-          { 15.00, 15.50, 15.00 } }; // module type 8
+        { {  1.50,  1.50,  1.50 },   // module type 1 -  1.01 mm2
+          {  2.75,  2.50,  2.75 },   // module type 2 -  1.86 mm2
+          {  4.50,  4.50,  4.50 },   // module type 3 -  3.04 mm2
+          {  6.75,  6.75,  6.75 },   // module type 4 -  4.56 mm2
+
+          {  3.75,  4.00,  3.75 },   // module type 5 -  2.84 mm2
+          {  7.50,  7.75,  7.50 },   // module type 6 -  5.51 mm2
+//          {  5.50,  5.75,  5.50 },   // module type 6 -  4.09 mm2
+          { 11.25, 11.50, 11.25 },   // module type 7 -  8.18 mm2
+          { 15.00, 15.50, 15.00 } }; // module type 8 - 11.02 mm2
 
   const Int_t NofRowsInSector[NofModuleTypes][NofSectors] =   // number of rows per sector
         { {  12,  12,  12 },         // module type 1
           {   8,   4,   8 },         // module type 2
           {   1,  10,   1 },         // module type 3
           {   2,   4,   2 },         // module type 4
+
           {  10,   4,  10 },         // module type 5
           {   4,   4,   4 },         // module type 6
+//          {   2,  12,   2 },         // module type 6
           {   2,   4,   2 },         // module type 7
           {   2,   2,   2 } };       // module type 8
 
@@ -607,6 +612,20 @@ void dump_digi_file()
     if (im+1 == 5)
       fprintf(ifile,"//---\n\n");
     fprintf(ifile,"// module type %d\n", im+1);
+
+    // number of pads
+    nrow = 0; // reset number of pad rows to 0
+    for (Int_t is = 0; is < NofSectors; is++)
+      nrow += HeightOfSector[im][is] / PadHeightInSector[im][is]; // add number of rows in this sector  
+    fprintf(ifile,"// number of pads: %3d x %2d = %4d\n", 
+            NofPadsInRow[ModuleType[im]], nrow, NofPadsInRow[ModuleType[im]] * nrow);
+
+    // pad size
+    fprintf(ifile,"// pad size sector 1: %5.2f mm x %5.2f mm = %5.2f mm2\n", 
+            PadWidth[im], PadHeightInSector[im][1], PadWidth[im] * PadHeightInSector[im][1]);
+    fprintf(ifile,"// pad size sector 0: %5.2f mm x %5.2f mm = %5.2f mm2\n", 
+            PadWidth[im], PadHeightInSector[im][0], PadWidth[im] * PadHeightInSector[im][0]);
+
     for (Int_t is = 0; is < NofSectors; is++)
     {
       if ((im == 0) && (is == 0))   fprintf(ifile,"  { { ");
@@ -615,7 +634,7 @@ void dump_digi_file()
   
       fprintf(ifile,"{ %.1f, %5.2f, %.1f/%3d, %5.2f }", 
               ActiveAreaX[ModuleType[im]], HeightOfSector[im][is], ActiveAreaX[ModuleType[im]], NofPadsInRow[ModuleType[im]], PadHeightInSector[im][is]);
-  
+
       if ((im == NofModuleTypes-1) && (is == 2))   fprintf(ifile," } };");
       else if (is == 2)                            fprintf(ifile," },");
       else                                         fprintf(ifile,",");
@@ -1192,7 +1211,7 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
      //     TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("module%d_radiator", moduleType), trd_radiator, radVolMed);
      //     TGeoVolume* trdmod1_radvol = new TGeoVolume(Form("trd1mod%dradiator", moduleType), trd_radiator, radVolMed);
      trdmod1_radvol->SetLineColor(kBlue);
-     trdmod1_radvol->SetTransparency(70);  // (60);  // (70);  // set transparency for the TRD
+     trdmod1_radvol->SetTransparency(70);  // (60);  // (70);  // set transparency for the TRD radiator
      TGeoTranslation* trd_radiator_trans = new TGeoTranslation("", 0., 0., radiator_position);
      module->AddNode(trdmod1_radvol, 1, trd_radiator_trans);
    }
@@ -1397,6 +1416,7 @@ TGeoVolume* create_trd_module_type(Int_t moduleType)
    //   TGeoVolume* trdmod1_gasvol = new TGeoVolume(Form("trd1mod%dgas", moduleType), trd_gas, gasVolMed);
    //   trdmod1_gasvol->SetLineColor(kBlue);
    trdmod1_gasvol->SetLineColor(kGreen); // to avoid blue overlaps in the screenshots
+   trdmod1_radvol->SetTransparency(40); // set transparency for the TRD gas
    TGeoTranslation* trd_gas_trans = new TGeoTranslation("", 0., 0., gas_position);
    module->AddNode(trdmod1_gasvol, 1, trd_gas_trans);
    // end of Frame in z

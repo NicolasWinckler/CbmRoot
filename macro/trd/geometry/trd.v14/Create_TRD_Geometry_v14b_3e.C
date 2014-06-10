@@ -621,9 +621,9 @@ void dump_digi_file()
             NofPadsInRow[ModuleType[im]], nrow, NofPadsInRow[ModuleType[im]] * nrow);
 
     // pad size
-    fprintf(ifile,"// pad size sector 1: %5.2f mm x %5.2f mm = %5.2f mm2\n", 
+    fprintf(ifile,"// pad size sector 1: %5.2f cm x %5.2f cm = %5.2f cm2\n", 
             PadWidth[im], PadHeightInSector[im][1], PadWidth[im] * PadHeightInSector[im][1]);
-    fprintf(ifile,"// pad size sector 0: %5.2f mm x %5.2f mm = %5.2f mm2\n", 
+    fprintf(ifile,"// pad size sector 0: %5.2f cm x %5.2f cm = %5.2f cm2\n", 
             PadWidth[im], PadHeightInSector[im][0], PadWidth[im] * PadHeightInSector[im][0]);
 
     for (Int_t is = 0; is < NofSectors; is++)

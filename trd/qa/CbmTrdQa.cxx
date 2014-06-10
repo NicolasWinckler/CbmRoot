@@ -211,6 +211,8 @@ CbmTrdQa::CbmTrdQa(const char *name, const char *title, const char *geo, Double_
     fTrianglePads(false),
     fLayerDummy(NULL),
     fStsTrdPoints(NULL),
+    fStsMuchPoints(NULL),
+    fStsTofPoints(NULL),
     fStsTrdPointsTrackable(NULL),
     fTrdPointsPerMcTrack_PID(NULL),
     fTrdPointsPerMcTrack_PT(NULL),

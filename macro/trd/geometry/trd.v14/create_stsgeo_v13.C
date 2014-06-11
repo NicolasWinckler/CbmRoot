@@ -274,6 +274,7 @@ void create_stsgeo_v13(const char* geoTag="v13d")
     TString name = Form("Sensor%02d",iSensor);
     TGeoVolume* sensor = gGeoMan->GetVolume(name);
 
+    // add color to sensors
     if (iSensor == 1)
       sensor->SetLineColor(kYellow);
     if (iSensor == 2)
@@ -283,9 +284,9 @@ void create_stsgeo_v13(const char* geoTag="v13d")
     if (iSensor == 4)
       sensor->SetLineColor(kBlue);
     if (iSensor == 5)
-      sensor->SetLineColor(kGreen);
+      sensor->SetLineColor(kYellow);
     if (iSensor == 6)
-      sensor->SetLineColor(kBlue);
+      sensor->SetLineColor(kYellow);
 
     CheckVolume(sensor);
     CheckVolume(sensor, infoFile);
@@ -619,7 +620,7 @@ void create_stsgeo_v13(const char* geoTag="v13d")
 
   TString geoFileName_ = "sts_";
   geoFileName_ = geoFileName_ + geoTag + "_geo.root";
-  //DEDE
+
   TFile* geoFile = new TFile(geoFileName_, "RECREATE");
   gGeoMan->Write();  // use this is you want GeoManager format in the output
   geoFile->Close();
@@ -1249,6 +1250,9 @@ TGeoVolume* ConstructModule(const char* name,
 					     cableX / 2.,
 					     cableY / 2.,
 					     cableZ / 2.);
+    // add color to cables
+    cable->SetLineColor(kOrange);
+//    cable->SetTransparency(50);
     Double_t cableXpos = 0.;
     Double_t cableYpos = sectorY + 0.5 * cableY - 0.5 * moduleY;
     Double_t cableZpos = 0.;

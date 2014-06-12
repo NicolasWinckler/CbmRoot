@@ -110,7 +110,7 @@ void CbmTrdDigitizerPRF::SetNoiseLevel(Double_t sigma_keV)
 
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
 {
-cout << "================CbmTrdDigitizerPRF===============" << endl;
+  cout << "================CbmTrdDigitizerPRF===============" << endl;
  LOG(INFO) << "CbmTrdDigitizerPRF::Exec : Triangular Pads: " << (Bool_t)fTrianglePads << FairLogger::endl;
  LOG(INFO) << "CbmTrdDigitizerPRF::Exec : Noise width:     " << fSigma_noise_keV << " keV"<< FairLogger::endl;
   fDigis->Delete();

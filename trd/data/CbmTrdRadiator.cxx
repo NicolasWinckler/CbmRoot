@@ -278,6 +278,7 @@ void CbmTrdRadiator::CreateHistograms(){
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick, TString material="polyethylen"){
 
+cout << "================CbmTrdRadiator===============" << endl;
   // Set initial parameters defining the radiator 
 
   fNFoils     = Nfoils;
@@ -289,13 +290,11 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 
   CreateHistograms();
 
-  cout << "*********** Initilization of Trd Radiator **************"<<endl;
-  cout << "Foil material       : "<< material << endl;
-  cout << "Nr. of foils        : "<< Nfoils << endl;
-  cout << "Foil thickness      : "<< setprecision(4) << FoilThick <<" cm"<< endl;
-  cout << "Gap thickness       : "<< GapThick << " cm"<<endl;
-  cout << "Simple TR production: "<< setprecision(2)<< SimpleTR << endl;
-
+  LOG(INFO) << "CbmTrdRadiator::Init : Foil material       : " << material << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Nr. of foils        : " << Nfoils << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Foil thickness      : " << setprecision(4) << FoilThick <<" cm" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Gap thickness       : " << GapThick << " cm" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Simple TR production: " << setprecision(2) << SimpleTR << FairLogger::endl;
 
   // material dependent parameters for the radiator material 
   // (polyethylen)
@@ -352,12 +351,12 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
   fDetType  = fTrdGas->GetDetType();
   fGasThick = fTrdGas->GetGasThick();
 
-  cout << "Detector noble gas   : "<< fTrdGas->GetNobleGas() << endl;
-  cout << "Detector cruncher gas: "<< fTrdGas->GetCO2() << endl;
-  cout << "Detector type        : "<< fTrdGas->GetDetType() << endl;
-  cout << "Detector gas thick.  : "<< fTrdGas->GetGasThick() <<" cm" << endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector noble gas   : " << fTrdGas->GetNobleGas() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector cruncher gas: " << fTrdGas->GetCO2() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector type        : " << fTrdGas->GetDetType() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector gas thick.  : " << fTrdGas->GetGasThick() <<" cm"  << FairLogger::endl;
  
-  cout << "************* End of Trd Radiator Init **************"<<endl;
+  //cout << "************* End of Trd Radiator Init **************"<<endl;
 
   // If simplified version is used one didn't calculate the TR
   // for each CbmTrdPoint in full glory, but create at startup
@@ -385,6 +384,7 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick){
 
+cout << "================CbmTrdRadiator===============" << endl;
   // Set initial parameters defining the radiator 
 
   fNFoils     = Nfoils;
@@ -395,11 +395,12 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
  
   CreateHistograms();
 
-  cout << "*********** Initilization of Trd Radiator **************"<<endl;
-  cout << "Nr. of foils        : "<< Nfoils << endl;
-  cout << "Foil thickness      : "<< setprecision(4) << FoilThick <<" cm"<< endl;
-  cout << "Gap thickness       : "<< GapThick << " cm"<<endl;
-  cout << "Simple TR production: "<< setprecision(2)<< SimpleTR << endl;
+  //LOG(INFO) << "CbmTrdRadiator::Init : Foil material       : " << material << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Nr. of foils        : " << Nfoils << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Foil thickness      : " << setprecision(4) << FoilThick <<" cm" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Gap thickness       : " << GapThick << " cm" <<  FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Simple TR production: " << setprecision(2)<< SimpleTR << FairLogger::endl;
+
 
 
   // material dependend parameters for the radiator material 
@@ -433,13 +434,13 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
   fCom1     = fTrdGas->GetCO2();
   fDetType  = fTrdGas->GetDetType();
   fGasThick = fTrdGas->GetGasThick();
-
+  /*
   cout << "Detector noble gas   : "<< fTrdGas->GetNobleGas() << endl;
   cout << "Detector cruncher gas: "<< fTrdGas->GetCO2() << endl;
   cout << "Detector type        : "<< fTrdGas->GetDetType() << endl;
   cout << "Detector gas thick.  : "<< fTrdGas->GetGasThick() <<" cm" << endl;
- 
-  cout << "************* End of Trd Radiator Init **************"<<endl;
+  */
+  //cout << "************* End of Trd Radiator Init **************"<<endl;
 
   // If simplified version is used one didn't calculate the TR
   // for each CbmTrdPoint in full glory, but create at startup
@@ -466,18 +467,20 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(){
+cout << "================CbmTrdRadiator===============" << endl;
   TString material;
   CreateHistograms();
   if (fRadType == "") {
     fFoilMaterial = "polyethylen";
     fnPhotonCorr = 1.0; 
-    cout << "*********** Initilization of Trd Radiator **************"<<endl;
-    cout << "Nr. of foils        : "<< fNFoils << endl;
-    cout << "Foil thickness      : "<< setprecision(4) << fFoilThick <<" cm"<< endl;
-    cout << "Gap thickness       : "<< fGapThick << " cm"<<endl;
-    cout << "Simple TR production: "<< setprecision(2)<< fSimpleTR << endl;
 
-
+    /*
+    LOG(INFO) << "CbmTrdRadiator::Init : Foil material       : " << fFoilMaterial << FairLogger::endl;
+    //LOG(INFO) << "CbmTrdRadiator::Init : Nr. of foils        : " << fNfoils << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Foil thickness      : " << setprecision(4) << fFoilThick <<" cm" << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Gap thickness       : " << fGapThick << " cm" <<  FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Simple TR production: " << setprecision(2)<< fSimpleTR << FairLogger::endl;
+    */
     // material dependend parameters for the radiator material 
     // (polyethylen)
     fFoilDens   = 0.92;      // [g/cm3 ]
@@ -570,8 +573,8 @@ void CbmTrdRadiator::Init(){
       fFoilThick  =  15*0.0001;
       fnPhotonCorr = 0.65;
     } else {
-      cout << "*********** Radiator prototype not known *********** "<<endl;
-      cout << "           switch to default parameters              "<<endl;
+      LOG(WARNING) << "CbmTrdRadiator::Init : *********** Radiator prototype not known ***********" << FairLogger::endl;
+      LOG(WARNING) << "CbmTrdRadiator::Init :             switch to default parameters            " << FairLogger::endl;
       material    = "polyethylen";
       fNFoils     = 130;
       fGapThick   = 0.02;
@@ -608,12 +611,18 @@ void CbmTrdRadiator::Init(){
     // foil between radiator and gas chamber
     fWinDens   = 1.42;           //[g/cm3] for Kapton -> Alu is added only in case of kapton !!!
     fWinThick  = 0.0025;        // [cm]
-    cout << "*********** Initilization of Trd Radiator **************"<<endl;
-    cout << "Prototype            : "<< fRadType << endl;
-    cout << "Foil material        : "<< material << endl;
-    cout << "Nr. of foils         : "<< fNFoils << endl;
-    cout << "Foil thickness       : "<< fFoilThick <<" cm"<< endl;
-    cout << "Gap thickness        : "<< fGapThick << " cm"<<endl;
+
+    LOG(INFO) << "CbmTrdRadiator::Init : Prototype           : " << fRadType << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Scaling factor      : " << fnPhotonCorr << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Foil material       : " << fFoilMaterial << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Nr. of foils        : " << fNFoils << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Foil thickness      : " << setprecision(4) << fFoilThick <<" cm" << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Gap thickness       : " << fGapThick << " cm" <<  FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Simple TR production: " << setprecision(2)<< fSimpleTR << FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Foil plasm. frequ.  : " << fFoilOmega << " keV" <<  FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Gap plasm. frequ.   : " << fGapOmega << " keV" <<  FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Window density      : " << fWinDens << " g/cm^3" <<  FairLogger::endl;
+    LOG(INFO) << "CbmTrdRadiator::Init : Window thickness    : " << fWinThick << " cm" <<  FairLogger::endl;
   }
 
 
@@ -629,13 +638,12 @@ void CbmTrdRadiator::Init(){
   fDetType  = fTrdGas->GetDetType();
   fGasThick = fTrdGas->GetGasThick();
 
-
-  cout << "Detector noble gas   : "<< fTrdGas->GetNobleGas() << endl;
-  cout << "Detector cruncher gas: "<< fTrdGas->GetCO2() << endl;
-  cout << "Detector type        : "<< fTrdGas->GetDetType() << endl;
-  cout << "Detector gas thick.  : "<< fTrdGas->GetGasThick() <<" cm" << endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector noble gas   : " << fTrdGas->GetNobleGas() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector cruncher gas: " << fTrdGas->GetCO2() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector type        : " << fTrdGas->GetDetType() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRadiator::Init : Detector gas thick.  : " << fTrdGas->GetGasThick() <<" cm"  << FairLogger::endl;
  
-  cout << "************* End of Trd Radiator Init **************"<<endl;
+  //cout << "************* End of Trd Radiator Init **************"<<endl;
   // If simplified version is used one didn't calculate the TR
   // for each CbmTrdPoint in full glory, but create at startup
   // some histograms for several momenta which are later used to

@@ -142,6 +142,8 @@ void CbmStsDigitize::Exec(Option_t* opt)
             continue;
         }
         fPointMap[sensor].insert(iPoint);
+        LOG(DEBUG2) << GetName() << ": Point in sensor " << sensor->GetName()
+        		        << FairLogger::endl;
         nPoints++;
     }
 
@@ -209,6 +211,9 @@ void CbmStsDigitize::Exec(Option_t* opt)
                 UInt_t address = CbmStsAddress::GetAddress(stationNr, 0, 0, 0, 0, 0, ifstr);
                 Int_t size = fDigis->GetEntriesFast();
                 new ((*fDigis)[size]) CbmStsDigi(address, 0, digiFSignal, sectorNr);
+                LOG(DEBUG3) << GetName() << ": New digi at address " << address
+                		        << ", sector " << sectorNr << " front side, channel "
+                		        << ifstr << ", ADC " << digiFSignal << FairLogger::endl;
 
                 set<Int_t> chPnt = fFChannelPointsMap[ifstr];
                 if (chPnt.size() == 0)
@@ -255,6 +260,9 @@ void CbmStsDigitize::Exec(Option_t* opt)
                 UInt_t address = CbmStsAddress::GetAddress(stationNr, 0, 0, 0, 0, 1, ibstr);
                 Int_t size = fDigis->GetEntriesFast();
                 new ((*fDigis)[size]) CbmStsDigi(address, 0, digiBSignal, sectorNr);
+                LOG(DEBUG3) << GetName() << ": New digi at address " << address
+                		        << ", sector " << sectorNr << " back side, channel "
+                		        << ibstr << ", ADC " << digiBSignal << FairLogger::endl;
 
                 set<Int_t> chPnt = fBChannelPointsMap[ibstr];
                 if (chPnt.size() == 0)
@@ -317,6 +325,7 @@ void CbmStsDigitize::ProduceHitResponse(CbmStsSensor* sensor)
         iPoint = (*it1);
         point = (CbmStsPoint*)fPoints->At(iPoint);
 
+        point->Print();
         Double_t xin = point->GetXIn();
         Double_t yin = point->GetYIn();
         Double_t zin = point->GetZIn();
@@ -337,6 +346,8 @@ void CbmStsDigitize::ProduceHitResponse(CbmStsSensor* sensor)
         {
 
             Int_t iIChan = sensor->GetFrontChannel(xin, yin, zin);
+            LOG(DEBUG4) << GetName() << ": Front x " << xin << " y " << yin
+            		        << " channel " << iIChan << FairLogger::endl;
 
             if (iIChan != -1)
             {
@@ -345,6 +356,8 @@ void CbmStsDigitize::ProduceHitResponse(CbmStsSensor* sensor)
             }
 
             iIChan = sensor->GetBackChannel(xin, yin, zin);
+            LOG(DEBUG4) << GetName() << ": Back x " << xin << " y " << yin
+            		        << " channel " << iIChan << FairLogger::endl;
 
             if (iIChan != -1)
             {

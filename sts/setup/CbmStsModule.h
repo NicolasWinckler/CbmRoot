@@ -72,11 +72,25 @@ class CbmStsModule : public CbmStsElement
      void CleanBuffer(Double_t time);
 
 
+     /** Set the digitisation parameters
+      ** @param dynRagne   Dynamic range [e]
+      ** @param threshold  Threshold [e]
+      ** @param nAdc       Number of ADC channels
+      **/
+     void SetParameters(Double_t dynRange, Double_t threshold, Int_t nAdc) {
+    	 fDynRange       = dynRange;
+    	 fThreshold      = threshold;
+    	 fNofAdcChannels = nAdc;
+    	 fIsSet = kTRUE;
+     }
+
+
   private:
 
     Double_t fDynRange;        // dynamic range [e]
     Double_t fThreshold;       // threshold [e]
     Int_t    fNofAdcChannels;  // Number of ADC channels
+    Bool_t   fIsSet;           // Flag whether parameters are set
 
 
     /** Buffer for the analogue signals

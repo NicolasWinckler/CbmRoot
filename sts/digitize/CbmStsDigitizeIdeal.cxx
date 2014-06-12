@@ -179,6 +179,10 @@ void CbmStsDigitizeIdeal::ProcessPoint(CbmStsPoint* point) {
 
 	// Debug
 	if ( FairLogger::GetLogger()->IsLogNeeded(DEBUG2) ) point->Print();
+	LOG(DEBUG2) << GetName() << ": Point coordinates: in (" << point->GetXIn()
+			        << ", " << point->GetYIn() << ", " << point->GetZIn() << ")"
+			        << ", out (" << point->GetXOut() << ", " << point->GetYOut()
+			        << ", " << point->GetZOut() << ")" << FairLogger::endl;
 
 	// --- Get the sensor the point is in
 	UInt_t address = point->GetDetectorID();
@@ -224,6 +228,9 @@ InitStatus CbmStsDigitizeIdeal::Init() {
   // Assign types to the sensors in the setup
   SetSensorTypes();
 
+  // Set the digitisation parameters of the modules
+  SetModuleParameters();
+
   // Register this task to the setup
   fSetup->SetDigitizer(this);
 
@@ -251,6 +258,20 @@ InitStatus CbmStsDigitizeIdeal::ReInit() {
 void CbmStsDigitizeIdeal::Reset() {
   fNofPoints = fNofSignalsF = fNofSignalsB = fNofDigis = 0;
   if ( fDigis ) fDigis->Delete();
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Set the digitisation parameters for the modules   ---------------
+// TODO: Currently, all modules have the same parameters. In future,
+// more flexible schemes must be used, in particular for the thersholds.
+void CbmStsDigitizeIdeal::SetModuleParameters() {
+	Int_t nModules = fSetup->GetNofModules();
+	for (Int_t iModule = 0; iModule < nModules; iModule++) {
+		fSetup->GetModule(iModule)->SetParameters(fDynRange, fThreshold,
+				                                      fNofAdcChannels);
+	}
 }
 // -------------------------------------------------------------------------
 

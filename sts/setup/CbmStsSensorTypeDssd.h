@@ -58,7 +58,7 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
     virtual ~CbmStsSensorTypeDssd() { };
 
 
-   /** Print parameters **/
+    /** Print parameters **/
     virtual void Print(Option_t* opt = "") const;
 
 
@@ -71,7 +71,7 @@ class CbmStsSensorTypeDssd : public CbmStsSensorType
      ** Perform the appropriate action for a particle trajectory in the
      ** sensor characterised by the CbmStsSensorPoint object.
      **/
-     virtual Int_t ProcessPoint(CbmStsSensorPoint* point,
+    virtual Int_t ProcessPoint(CbmStsSensorPoint* point,
                                const CbmStsSenzor* sensor) const;
 
 

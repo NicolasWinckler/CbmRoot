@@ -60,6 +60,13 @@ Int_t CbmStsSenzor::ProcessPoint(CbmStsPoint* point) const {
   Double_t global[3];
   Double_t local[3];
 
+  // --- Debug output of transformation matrix
+  if ( FairLogger::GetLogger()->IsLogNeeded(DEBUG4) ) {
+  	LOG(DEBUG4) << GetName() << ": Transformation matrix is:"
+  			        << FairLogger::endl;
+  	fNode->GetMatrix()->Print();
+  }
+
   // --- Transform entry coordinates into local C.S.
   global[0] = point->GetXIn();
   global[1] = point->GetYIn();

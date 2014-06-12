@@ -59,10 +59,28 @@ class CbmStsDigitizeIdeal : public FairTask
   virtual void Exec(Option_t* opt);
 
 
+  /** Set the digitisation parameters (same for all modules)
+   ** @param dynRagne   Dynamic range [e]
+   ** @param threshold  Threshold [e]
+   ** @param nAdc       Number of ADC channels
+   **/
+  void SetParameters(Double_t dynRange, Double_t threshold, Int_t nAdc) {
+ 	 fDynRange       = dynRange;
+ 	 fThreshold      = threshold;
+ 	 fNofAdcChannels = nAdc;
+   }
+
+
+
 
  private:
 
-  Int_t fDigiModel;  ///< Digitisation model. 0 = ideal, 1 = real.
+  Int_t fDigiModel;  ///< Detector response model. 0 = ideal, 1 = real.
+
+  // --- Digitisation parameters
+  Double_t fDynRange;         ///< Dynamic range [e]
+  Double_t fThreshold;        ///< Threshold [e]
+  Int_t    fNofAdcChannels;   ///< Number of ADC channels
 
   CbmStsSetup*   fSetup;        ///< STS setup interface
   TClonesArray*  fPoints;       ///< Input array of CbmStsPoint
@@ -104,6 +122,10 @@ class CbmStsDigitizeIdeal : public FairTask
 
   /** Reset eventwise counters **/
   void Reset();
+
+
+  /** Set the digitisation parameters in the modules **/
+  void SetModuleParameters();
 
 
   /** Set types for the sensors in the setup **/

@@ -7,6 +7,8 @@
 
 #include "CbmStsSensorDigiPar.h"
 
+#include "FairLogger.h"
+
 #include "TMath.h"
 #include "TRandom.h"
 
@@ -603,19 +605,24 @@ Int_t CbmStsSensor::GetFrontChannel(Double_t x, Double_t y, Double_t z) {
 
   // Lorentz shift due to movement of the charges in the magnetic field
   // translates into an angle: 8.5 deg for electrons
-  x += fFrontLorentzShift*z;
+  //x += fFrontLorentzShift*z;
 
   // Calculate internal coordinates. Return -1 if outside sensor.
   Double_t xint  = 0;
   Double_t yint  = 0;
   if ( ! IntCoord(x, y, xint, yint) ) return -1;
   Int_t    iChan = 0;
-
+  LOG(DEBUG3) << GetName() << ": Internal coordinates (front) " << xint << " "
+              << yint << FairLogger::endl;
 //  xint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
   
   Double_t xf = xint + fFrontStripShift + yint * TMath::Tan(fStereoF);
+  LOG(DEBUG3) << GetName() << ": Front strip shift " << fFrontStripShift
+  		        << " xf " << xf << FairLogger::endl;
   xf = xf - TMath::Floor(xf/fLx) * fLx;
+  LOG(DEBUG3) << GetName() << " xf " << xf << FairLogger::endl;
+
   
   iChan = (Int_t)(xf/fDx);
  
@@ -634,13 +641,15 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
 
   // Lorentz shift due to movement of the charges in the magnetic field
   // translates into an angle: 1.5 deg for electrons
-  x += fBackLorentzShift*z;
+  //x += fBackLorentzShift*z;
 
   // Calculate internal coordinates. Return -1 if outside sensor.
   Double_t xint  = 0;
   Double_t yint  = 0;
   if ( ! IntCoord(x, y, xint, yint) ) return -1;
   Int_t    iChan = 0;
+  LOG(DEBUG3) << GetName() << ": Internal coordinates (back) " << xint << " "
+              << yint << FairLogger::endl;
 
 //  xint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
@@ -651,7 +660,10 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
   }
   else {
     Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
+    LOG(DEBUG4) << GetName() << ": Back strip shift " << fBackStripShift
+    		        << " xp " << xp << FairLogger::endl;
     xp = xp - TMath::Floor(xp/fLx) * fLx;
+    LOG(DEBUG4) << GetName() << " xp " << xp << FairLogger::endl;
     iChan = (Int_t)(xp/fDx);
   }
   
@@ -1141,6 +1153,7 @@ Bool_t CbmStsSensor::IntCoord(Double_t x, Double_t y,
   // Translation into sensor corner system
   xint = xint + fLx/2.;
   yint = yint + fLy/2.;
+
 
   // Check whether point is inside the sensor
   if ( ! IsInside(xint, yint) ) {

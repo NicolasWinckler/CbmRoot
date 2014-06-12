@@ -23,7 +23,7 @@ using std::setprecision;
 
 
 // --- Energy for creation of an electron-hole pair in silicon [GeV]  ------
-const double kPairEnergy = 3.6e-9;
+const double kPairEnergy = 3.57142e-9;
 
 
 
@@ -232,14 +232,21 @@ Int_t CbmStsSensorTypeDssd::ProduceCharge(CbmStsSensorPoint* point,
   Double_t pitch  = fPitch[side];
   Int_t nStrips   = fNofStrips[side];
 
+  // Debug output
+  LOG(DEBUG4) << GetName() << ": Side " << side << ", dx = " << fDx
+  		        << " cm, dy = " << fDy << " cm, stereo " << fStereo[side]
+  		        << " degrees, strips " << fNofStrips[side] << ", pitch "
+  		        << pitch << " mum" << FairLogger::endl;
 
-  // Project point coordinates (in / out) to readout (top) edge
+  // Project point coordinates (in / out) along strips to readout (top) edge
   // Keep in mind that the SensorPoint gives coordinates with
   // respect to the centre of the active area.
-  Double_t x1 = point->GetX1() - 0.5 * fDx
+  Double_t x1 = point->GetX1() + 0.5 * fDx
                 - ( 0.5 * fDy - point->GetY1() ) * tanphi;
-  Double_t x2 = point->GetX2() - 0.5 * fDx
+  Double_t x2 = point->GetX2() + 0.5 * fDx
                 - ( 0.5 * fDy - point->GetY2() ) * tanphi;
+  LOG(DEBUG4) << GetName() << ": R/O x coordinates are " << x1 << " "
+  		        << x2 << FairLogger::endl;
 
 
   // Calculate corresponding strip numbers
@@ -291,7 +298,7 @@ void CbmStsSensorTypeDssd::RegisterCharge(const CbmStsSenzor* sensor,
   Int_t channel = GetModuleChannel(strip, side, sensor->GetSensorId() );
 
   // --- Debug output
-  LOG(DEBUG3) << fName << ": Registering charge: side " << side
+  LOG(DEBUG4) << fName << ": Registering charge: side " << side
               << ", strip " << strip << ", time " << time
               << ", charge " << charge
               << " to channel " << channel

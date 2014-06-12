@@ -15,9 +15,10 @@
 
 // -----   Default constructor   -------------------------------------------
 CbmStsModule::CbmStsModule() : CbmStsElement(),
-	                             fDynRange(72000.),
-	                             fThreshold(4000.),
-	                             fNofAdcChannels(16),
+	                             fDynRange(0.),
+	                             fThreshold(0.),
+	                             fNofAdcChannels(0),
+	                             fIsSet(kFALSE),
 	                             fBuffer()
 {
 }
@@ -29,9 +30,10 @@ CbmStsModule::CbmStsModule() : CbmStsElement(),
 CbmStsModule::CbmStsModule(const char* name, const char* title,
                            TGeoPhysicalNode* node) :
                            CbmStsElement(name, title, kStsModule, node),
-                           fDynRange(72000.),
-                           fThreshold(4000.),
-                           fNofAdcChannels(16),
+                           fDynRange(0.),
+                           fThreshold(0.),
+                           fNofAdcChannels(0),
+                           fIsSet(0),
                            fBuffer()
 {
 }
@@ -59,7 +61,7 @@ void CbmStsModule::AddSignal(Int_t channel, Double_t time,
 	// --- write the signal into the buffer
 	if ( fBuffer.find(channel) == fBuffer.end() ) {
 		fBuffer[channel] = pair<Double_t, Double_t>(charge, time);
-		LOG(DEBUG3) << GetName() << ": New signal " << charge << " at time "
+		LOG(DEBUG4) << GetName() << ": New signal " << charge << " at time "
 				        << time << " in channel " << channel << FairLogger::endl;
 	}  //? No signal in buffer
 
@@ -67,7 +69,7 @@ void CbmStsModule::AddSignal(Int_t channel, Double_t time,
 	else {
 		Double_t chargeOld = (fBuffer.find(channel)->second).first;
 		Double_t timeOld   = (fBuffer.find(channel)->second).second;
-		LOG(DEBUG3) << GetName() << ": old signal in channel " << channel
+		LOG(DEBUG4) << GetName() << ": old signal in channel " << channel
 				        << " at time " << timeOld << FairLogger::endl;
 
 		// --- Time separation large; no interference. Digitise the old signal,
@@ -75,7 +77,7 @@ void CbmStsModule::AddSignal(Int_t channel, Double_t time,
 		if ( time - timeOld > 100. ) {  // 5 Mark in die Kasse für hardcoded numbers
 			Digitize(channel, chargeOld, timeOld);
 			fBuffer[channel] = pair<Double_t, Double_t>(charge, time);
-			LOG(DEBUG3) << GetName() << ": New signal " << charge << " at time "
+			LOG(DEBUG4) << GetName() << ": New signal " << charge << " at time "
 					        << time << " in channel " << channel << FairLogger::endl;
 		}  //? No interference of signals
 
@@ -85,7 +87,7 @@ void CbmStsModule::AddSignal(Int_t channel, Double_t time,
 		else {
 			fBuffer[channel] =
 					pair<Double_t, Double_t>(chargeOld + charge, timeOld);
-			LOG(DEBUG3) << GetName() << ": New signal " << chargeOld + charge
+			LOG(DEBUG4) << GetName() << ": New signal " << chargeOld + charge
 					        << " at time "<< timeOld << " in channel " << channel
 					        << FairLogger::endl;
 		}  //? Interference of signals
@@ -111,7 +113,7 @@ void CbmStsModule::CleanBuffer(Double_t readoutTime) {
 			// --- Digitise the signal and remove it from buffer
 			Double_t charge = (it->second).first;
 			Int_t channel = it->first;
-			LOG(DEBUG3) << GetName() << ": Clean Buffer " << channel << " "
+			LOG(DEBUG4) << GetName() << ": Clean Buffer " << channel << " "
 				        << signalTime << " " << charge << FairLogger::endl;
 			Digitize(channel, charge, signalTime);
 
@@ -131,23 +133,29 @@ void CbmStsModule::CleanBuffer(Double_t readoutTime) {
 // -----   Digitise an analog charge signal   ------------------------------
 void CbmStsModule::Digitize(Int_t channel, Double_t charge, Double_t time) {
 
+	// --- No action if charge is below threshold
+	if ( charge <= fThreshold ) return;
+
 	// --- Construct channel address from module address and channel number
 	UInt_t address = CbmStsAddress::SetElementId(GetAddress(),
 			                                         kStsChannel, channel);
 
 	// --- Digitise charge
+	// --- Prescription according to the information on the STS-XYTER
+	// --- by C. Schmidt.
 	UShort_t adc = 0;
-	if ( charge > fThreshold) {
-		if ( charge > fDynRange ) adc = fNofAdcChannels;
-		else adc = UShort_t( (charge - fThreshold) / (fDynRange - fThreshold)
-				                    * Double_t(fNofAdcChannels) );
-	}
+	if ( charge > fDynRange ) adc = fNofAdcChannels - 1;
+	else adc = UShort_t( (charge - fThreshold) / fDynRange
+				     * Double_t(fNofAdcChannels) );
 
 	// --- Digitise time
 	// TODO: Add Gaussian time resolution
 	ULong64_t dTime = ULong64_t(time);
 
 	// --- Send the message to the digitiser task
+	LOG(DEBUG4) << GetName() << ": charge " << charge << ", dyn. range "
+			<< fDynRange << ", threshold " << fThreshold << ", # ADC channels "
+			<< fNofAdcChannels << FairLogger::endl;
 	LOG(DEBUG3) << GetName() << ": Sending message. Address " << address
 			        << ", time " << dTime << ", adc " << adc << FairLogger::endl;
 	CbmStsDigitizeIdeal* digitiser = CbmStsSetup::Instance()->GetDigitizer();

@@ -197,14 +197,14 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 
   Double_t digisOverPoints = (nofPoints > 0) ? fDigis->GetEntriesFast() / nofPoints : 0;
   Double_t latticeHitsOverElectrons = (nofElectrons > 0) ? (Double_t) nofLatticeHits / (Double_t) nofElectrons : 0;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Points=               " << nofPoints << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec PointsAboveThreshold= " << nofPointsAboveThreshold << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Digis=                " << fDigis->GetEntriesFast() << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec digis/points=         " << digisOverPoints << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec BackwardTracks=       " << nofBackwardTracks << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec LatticeHits=          " << nofLatticeHits  << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Electrons=            " << nofElectrons << FairLogger::endl;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec latticeHits/electrons=" << latticeHitsOverElectrons << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Points:               " << nofPoints << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec PointsAboveThreshold: " << nofPointsAboveThreshold << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Digis:                " << fDigis->GetEntriesFast() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec digis/points:         " << digisOverPoints << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec BackwardTracks:       " << nofBackwardTracks << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec LatticeHits:          " << nofLatticeHits  << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Electrons:            " << nofElectrons << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec latticeHits/electrons:" << latticeHitsOverElectrons << FairLogger::endl;
   timer.Stop();
   LOG(INFO) << "CbmTrdDigitizerPRF::Exec real time=" << timer.RealTime()
             << " CPU time=" << timer.CpuTime() << FairLogger::endl;

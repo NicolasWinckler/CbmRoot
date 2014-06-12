@@ -605,7 +605,7 @@ Int_t CbmStsSensor::GetFrontChannel(Double_t x, Double_t y, Double_t z) {
 
   // Lorentz shift due to movement of the charges in the magnetic field
   // translates into an angle: 8.5 deg for electrons
-  //x += fFrontLorentzShift*z;
+  x += fFrontLorentzShift*z;
 
   // Calculate internal coordinates. Return -1 if outside sensor.
   Double_t xint  = 0;
@@ -641,7 +641,7 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
 
   // Lorentz shift due to movement of the charges in the magnetic field
   // translates into an angle: 1.5 deg for electrons
-  //x += fBackLorentzShift*z;
+  x += fBackLorentzShift*z;
 
   // Calculate internal coordinates. Return -1 if outside sensor.
   Double_t xint  = 0;

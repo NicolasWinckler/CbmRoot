@@ -68,7 +68,8 @@ CbmSourceLmd::CbmSourceLmd()
     fMuchBaselineDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
     fBaselineData(kFALSE),
-    fBaselineRoc()
+    fBaselineRoc(),
+    fTriggeredMode(kFALSE)
 {
   // --- Initialise counters
   for (Int_t iType = 0; iType < 8; iType++) { fNofMessType[iType] = 0; }
@@ -116,7 +117,8 @@ CbmSourceLmd::CbmSourceLmd(const char* inFile)
     fMuchBaselineDigis(new TClonesArray("CbmMuchBeamTimeDigi", 10)),
     fAuxDigis(new TClonesArray("CbmAuxDigi", 10)),
     fBaselineData(kFALSE),
-    fBaselineRoc()
+    fBaselineRoc(),
+    fTriggeredMode(kFALSE)
 {
   // --- Initialise counters
   for (Int_t iType = 0; iType < 8; iType++) { fNofMessType[iType] = 0; }
@@ -523,10 +525,24 @@ void CbmSourceLmd::ProcessSystemMessage()
 	LOG(INFO) << " Switching now to baseline mode at " << 
 	  setprecision(9) << Double_t(hitTime) * 1.e-9 << " s" << FairLogger::endl;
       }
+      if (fTriggeredMode) {
+        fBaselineRoc.insert(11);
+        fBaselineRoc.insert(12);
+        LOG(INFO) << "Triggered mode" << FairLogger::endl;
+        LOG(INFO) << "ROC 11" << " now in baseline mode" << FairLogger::endl;
+        LOG(INFO) << "ROC 12" << " now in baseline mode" << FairLogger::endl;
+      }
       fBaselineRoc.insert(rocId);
       LOG(INFO) << "ROC " << rocId << " now in baseline mode" << FairLogger::endl;
       break;
     case roc::SYSMSG_USER_CALIBR_OFF:
+      if (fTriggeredMode) {
+        fBaselineRoc.erase(11);
+        fBaselineRoc.erase(12);
+        LOG(INFO) << "Triggered mode" << FairLogger::endl;
+        LOG(INFO) << "ROC 11" << " now in normal mode" << FairLogger::endl;
+        LOG(INFO) << "ROC 12" << " now in normal mode" << FairLogger::endl;
+      }
       fBaselineRoc.erase(rocId);
       LOG(INFO) << "ROC " << rocId << " now in normal mode" << FairLogger::endl;
       if ( fBaselineRoc.empty() ) {

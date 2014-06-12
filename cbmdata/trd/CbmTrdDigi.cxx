@@ -11,8 +11,12 @@ CbmTrdDigi::CbmTrdDigi()
     fTime(-1.),
     fPrimeTriggered(false),
     fFNR_Triggered(false),
+    fGlobalTriggered(false),
     fn_FNR_Triggers(0),
     fNeighbourTriggerIds(),
+    fNormalStop(true),
+    fBufferFullStop(false),
+    fDoubleHitStop(false),
     fPulseShape()
 {
   for (Int_t i = 0; i < 8; i++)
@@ -31,8 +35,12 @@ CbmTrdDigi::CbmTrdDigi(
     fTime(time),
     fPrimeTriggered(false),
     fFNR_Triggered(false),
+    fGlobalTriggered(false),
     fn_FNR_Triggers(0),
     fNeighbourTriggerIds(),
+    fNormalStop(true),
+    fBufferFullStop(false),
+    fDoubleHitStop(false),
     fPulseShape()
 {
   for (Int_t i = 0; i < 8; i++)
@@ -46,15 +54,24 @@ CbmTrdDigi::CbmTrdDigi(
 		       Double_t charge,
 		       Double_t time, 
 		       Bool_t primeTriggered, 
-		       Bool_t fnr_Triggered)
+		       Bool_t fnr_Triggered,
+		       Bool_t globalTriggered,
+		       Bool_t normalStop,
+		       Bool_t bufferFullStop,
+		       Bool_t doubleHitStop
+)
   : CbmDigi(),
     fAddress(address),
     fCharge(charge),
     fTime(time),
-    fPrimeTriggered(fPrimeTriggered),
-    fFNR_Triggered(fFNR_Triggered),
+    fPrimeTriggered(primeTriggered),
+    fFNR_Triggered(fnr_Triggered),
+    fGlobalTriggered(globalTriggered),
     fn_FNR_Triggers(0),
     fNeighbourTriggerIds(),
+    fNormalStop(normalStop),
+    fBufferFullStop(bufferFullStop),
+    fDoubleHitStop(doubleHitStop),
     fPulseShape()
 {
   for (Int_t i = 0; i < 8; i++)

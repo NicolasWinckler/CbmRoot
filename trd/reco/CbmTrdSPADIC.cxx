@@ -169,12 +169,17 @@ void CbmTrdSPADIC::Exec(Option_t *option)
   LOG(INFO) << "CbmTrdSPADIC::Exec : fPulseShape:    " << (Bool_t)fPulseShape << FairLogger::endl;
   LOG(INFO) << "CbmTrdSPADIC::Exec : fBitResolution: " << fBitResolution << FairLogger::endl;
   LOG(INFO) << "CbmTrdSPADIC::Exec : fShaperOrder:   " << fShaperOrder << FairLogger::endl;
-  LOG(INFO) << "CbmTrdSPADIC::Exec : fShapingTime:   " << fShapingTime << " ns" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fShapingTime:   " << fShapingTime << " µs" << FairLogger::endl;
   LOG(INFO) << "CbmTrdSPADIC::Exec : fmaxdEdx:       " << fmaxdEdx << " GeV" << FairLogger::endl;
   LOG(INFO) << "CbmTrdSPADIC::Exec : fAdcBit:        " <<  fAdcBit << " (GeV/bit)" << FairLogger::endl;
   LOG(INFO) << "CbmTrdSPADIC::Exec : fSelectionMask:";
-  for (Int_t iBin = 0; iBin < fnBins; iBin++)
+  for (Int_t iBin = 0; iBin < fnBins; iBin++){
     LOG(INFO) << " " << (Bool_t)fSelectionMask[iBin];
+    if ((1+iBin) % 5 == 0 && iBin > 0 && (1+iBin) < fnBins){
+      LOG(INFO) << FairLogger::endl;
+      LOG(INFO) << "                                    ";
+    }
+  }
   LOG(INFO) << FairLogger::endl;
   Bool_t debug = false;
   std::map< Int_t, std::map< Int_t, Int_t> > moduleDigiNotTriggerMap; //<ModuleAddress, <combiId, digiId> >

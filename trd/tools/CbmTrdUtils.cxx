@@ -208,7 +208,9 @@ Int_t CbmTrdUtils::GetModuleType(Int_t moduleAddress, CbmTrdModule *fModuleInfo,
   } else if (nCols == 128) {
     if (nRows == 24)
       type = 5;
-    else if (nRows == 12)
+    else if (nRows == 16)  // from v14d
+      type = 6;
+    else if (nRows == 12)  // till v14c
       type = 6;
     else if (nRows == 8)
       type = 7;

@@ -191,7 +191,7 @@ void CbmTrdUtils::Statusbar(Int_t i, Int_t n) {
 }
 
 Int_t CbmTrdUtils::GetModuleType(Int_t moduleAddress, CbmTrdModule *fModuleInfo, CbmTrdDigiPar *fDigiPar){
-  Int_t type = 0;
+  Int_t type = -1;
   fModuleInfo = fDigiPar->GetModule(moduleAddress);
   Int_t nRows = fModuleInfo->GetNofRows();
   Int_t nCols = fModuleInfo->GetNofColumns();
@@ -217,7 +217,7 @@ Int_t CbmTrdUtils::GetModuleType(Int_t moduleAddress, CbmTrdModule *fModuleInfo,
     else if (nRows == 6)
       type = 8;
   }
-  if (type == 0) printf("ERROR::CbmTrdUtils:GetModuleType: nRows:%2i nCols:%3i\n",nRows,nCols);
+  if (type == -1) printf("ERROR::CbmTrdUtils:GetModuleType: nRows:%2i nCols:%3i\n",nRows,nCols);
   return type;
 }
 

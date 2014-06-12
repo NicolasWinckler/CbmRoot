@@ -71,6 +71,7 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    fEventCounter(NULL),
    fTriggerThreshold(1e-6),
    fEventRate(1e7),
+   flogScale(false),
    fScaleCentral2mBias(1./4.),
    fmin(1E3), 
    fmax(2.5E5),
@@ -189,6 +190,10 @@ void CbmTrdHitDensityQa::SetTriggerMaxScale(Double_t max){
 void CbmTrdHitDensityQa::SetTriggerMinScale(Double_t min){
   fmin = min;
 }
+void CbmTrdHitDensityQa::SetLogScale(Bool_t logScale){
+  flogScale = logScale;
+}
+
 void CbmTrdHitDensityQa::Exec(Option_t * option)
 {
  
@@ -340,7 +345,7 @@ void CbmTrdHitDensityQa::Finish()
   std::map<Int_t, std::pair<Int_t, TH2D*> >::iterator AsicTriggerMapIt;
   CbmTrdUtils* util = new CbmTrdUtils();
 
-  Bool_t logScale = false;
+  //Bool_t logScale = false;
   Int_t nTotalAsics = 0;
   Int_t nTotalOptLinks = 0;
   Double_t trdTotalDataRate = 0.;
@@ -362,7 +367,7 @@ void CbmTrdHitDensityQa::Finish()
   std::vector<Double_t> fZLevel;
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
     fColors.push_back(TColor::GetColorPalette(i));
-    if (logScale)
+    if (flogScale)
       fZLevel.push_back(fmin + TMath::Power(10, TMath::Log10(fmax-fmin) / Double_t(TColor::GetNumberOfColors()) * i));
     else
       fZLevel.push_back(fmin + ((fmax-fmin) / Double_t(TColor::GetNumberOfColors()) * i));
@@ -443,7 +448,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->GetZaxis()->SetTitleSize(0.02);
       Layer->GetZaxis()->SetTitleOffset(-2);
       Layer->GetZaxis()->SetRangeUser(fmin/1000,fmax/1000);
-      LayerMap[LayerId]->cd()->SetLogz(logScale);
+      LayerMap[LayerId]->cd()->SetLogz(flogScale);
       Layer->Fill(0.,0.,0);
       Layer->Draw("colz");
     }

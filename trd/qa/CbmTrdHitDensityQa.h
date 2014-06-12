@@ -56,6 +56,7 @@ class CbmTrdHitDensityQa : public FairTask
   void SetScaleCentral2mBias(Double_t scaling);
   void SetTriggerMaxScale(Double_t max);
   void SetTriggerMinScale(Double_t min);
+  void SetLogScale(Bool_t logScale);
  private:
 
   Double_t TriggerRate2DataRate(Double_t triggerrate);
@@ -66,7 +67,7 @@ class CbmTrdHitDensityQa : public FairTask
   std::ofstream myfile;
 
   Double_t fmin, fmax;
-
+  Bool_t flogScale;
   Double_t fBitPerHit;
   TH1F* h1DataModule;
   TH1F* h1OptLinksModule;

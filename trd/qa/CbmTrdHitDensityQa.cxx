@@ -72,6 +72,8 @@ CbmTrdHitDensityQa::CbmTrdHitDensityQa()
    fTriggerThreshold(1e-6),
    fEventRate(1e7),
    fScaleCentral2mBias(1./4.),
+   fmin(1E3), 
+   fmax(2.5E5),
    fUsedDigiMap(),
    fModuleHitMap(),
    fModuleHitMapIt(),
@@ -181,7 +183,12 @@ void CbmTrdHitDensityQa::SetPlotResults(Bool_t plotResults){
 void CbmTrdHitDensityQa::SetNeighbourTrigger(Bool_t trigger){
   fNeighbourTrigger = trigger;
 }
-
+void CbmTrdHitDensityQa::SetTriggerMaxScale(Double_t max){
+  fmax = max;
+}
+void CbmTrdHitDensityQa::SetTriggerMinScale(Double_t min){
+  fmin = min;
+}
 void CbmTrdHitDensityQa::Exec(Option_t * option)
 {
  
@@ -349,16 +356,16 @@ void CbmTrdHitDensityQa::Finish()
   //myfile << "#" << endl;
   //myfile << "#--------------------------" << endl;
   
-  Double_t min(1E3), max(max = 6E5); // Is not scaled from central to minbias
-  if (fPlotResults) {min = 1E3; max = 2.5E5;} // scaling parameter is applied
+  //Double_t min(1E3), max(max = 6E5); // Is not scaled from central to minbias
+  //if (fPlotResults) {min = 1E3; max = 2.5E5;} // scaling parameter is applied
   std::vector<Int_t> fColors;
   std::vector<Double_t> fZLevel;
   for (Int_t i = 0; i < TColor::GetNumberOfColors(); i++){
     fColors.push_back(TColor::GetColorPalette(i));
     if (logScale)
-      fZLevel.push_back(min + TMath::Power(10, TMath::Log10(max-min) / Double_t(TColor::GetNumberOfColors()) * i));
+      fZLevel.push_back(fmin + TMath::Power(10, TMath::Log10(fmax-fmin) / Double_t(TColor::GetNumberOfColors()) * i));
     else
-      fZLevel.push_back(min + ((max-min) / Double_t(TColor::GetNumberOfColors()) * i));
+      fZLevel.push_back(fmin + ((fmax-fmin) / Double_t(TColor::GetNumberOfColors()) * i));
   }
   TString title, name;
   std::map< Int_t, TCanvas*> LayerMap;
@@ -435,7 +442,7 @@ void CbmTrdHitDensityQa::Finish()
       Layer->GetYaxis()->SetTitleOffset(2);
       Layer->GetZaxis()->SetTitleSize(0.02);
       Layer->GetZaxis()->SetTitleOffset(-2);
-      Layer->GetZaxis()->SetRangeUser(min/1000,max/1000);
+      Layer->GetZaxis()->SetRangeUser(fmin/1000,fmax/1000);
       LayerMap[LayerId]->cd()->SetLogz(logScale);
       Layer->Fill(0.,0.,0);
       Layer->Draw("colz");
@@ -519,7 +526,7 @@ void CbmTrdHitDensityQa::Finish()
 	  pad->SetFillColor(fColors[j]);
 	  if (j == (Int_t)fZLevel.size())
 	    pad->SetFillColor(12);
-	  if (rate < min)
+	  if (rate < fmin)
 	    pad->SetFillColor(17);
 	 
 	  LayerMap[LayerId]->cd();

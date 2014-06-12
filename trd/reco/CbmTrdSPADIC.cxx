@@ -165,13 +165,26 @@ void CbmTrdSPADIC::CR_RC_Shaper(CbmTrdDigi* digi, TH1D* spadicPulse){
   // ---- Exec ----------------------------------------------------------
 void CbmTrdSPADIC::Exec(Option_t *option)
 {
-  std::map< Int_t, std::map< Int_t, Int_t/*CbmTrdDigi**/> > moduleDigiNotTriggerMap; //<ModuleAddress, <combiId, digiId> >
-  std::map< Int_t, std::list< std::pair< Int_t, Int_t/*CbmTrdDigi**/> > > moduleDigiTriggerMap; //<ModuleAddress, <combiId, digiId> >
+  cout << "================CbmTrdSPADIC===============" << endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fPulseShape:    " << (Bool_t)fPulseShape << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fBitResolution: " << fBitResolution << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fShaperOrder:   " << fShaperOrder << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fShapingTime:   " << fShapingTime << " ns" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fmaxdEdx:       " << fmaxdEdx << " GeV" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fAdcBit:        " <<  fAdcBit << " (GeV/bit)" << FairLogger::endl;
+  LOG(INFO) << "CbmTrdSPADIC::Exec : fSelectionMask:";
+  for (Int_t iBin = 0; iBin < fnBins; iBin++)
+    LOG(INFO) << " " << (Bool_t)fSelectionMask[iBin];
+  LOG(INFO) << FairLogger::endl;
+  Bool_t debug = false;
+  std::map< Int_t, std::map< Int_t, Int_t> > moduleDigiNotTriggerMap; //<ModuleAddress, <combiId, digiId> >
+  std::map< Int_t, std::list< std::pair< Int_t, Int_t> > > moduleDigiTriggerMap; //<ModuleAddress, <combiId, digiId> >
   Int_t nDigis = fDigis->GetEntries();
   
   TH1D* spadicPulse = new TH1D("spadicPulse","spadicPulse", fnBins, 0 -(1.8/fnBins), 1.8 -(1.8/fnBins));// 1/25MHz * 45Timebins = 1.8µs
-  TCanvas* c = new TCanvas("c","c",800,600);
-  
+  TCanvas* c = NULL;
+  if (debug)
+    c = new TCanvas("c","c",800,600);
   for (Int_t iDigi=0; iDigi < nDigis; iDigi++ ) {
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
    
@@ -197,6 +210,7 @@ void CbmTrdSPADIC::Exec(Option_t *option)
  
     if (digi->GetCharge() >= fMinimumChargeTH){
       digi->SetPrimeTriggerStatus(true);
+      digi->SetNormalStop(true);
       moduleDigiTriggerMap[moduleAddress].push_back(std::make_pair(combiId, iDigi));
     } else {    
       moduleDigiNotTriggerMap[moduleAddress][combiId] = iDigi;
@@ -204,50 +218,76 @@ void CbmTrdSPADIC::Exec(Option_t *option)
 
   }
   CbmTrdDigi *digi = NULL;
-  for (std::map< Int_t, std::list< std::pair< Int_t, Int_t/*CbmTrdDigi**/> > >::iterator iModule = moduleDigiTriggerMap.begin(); iModule != moduleDigiTriggerMap.end(); ++iModule) {
+  for (std::map< Int_t, std::list< std::pair< Int_t, Int_t> > >::iterator iModule = moduleDigiTriggerMap.begin(); iModule != moduleDigiTriggerMap.end(); ++iModule) {
     (*iModule).second.sort(CbmDigiSorter);
-    for (std::list< std::pair< Int_t, Int_t/*CbmTrdDigi**/> >::iterator iDigi = (*iModule).second.begin(); iDigi != (*iModule).second.end(); iDigi++) {
-
-      digi = (CbmTrdDigi*) fDigis->At((*iDigi).second);
+    Int_t moduleAddress = (*iModule).first;
+    for (std::list< std::pair< Int_t, Int_t> >::iterator iDigi = (*iModule).second.begin(); iDigi != (*iModule).second.end(); iDigi++) {
+      Int_t combiId = (*iDigi).first;
+      Int_t digiId = (*iDigi).second;
+      digi = (CbmTrdDigi*) fDigis->At(digiId);
       if (fPulseShape){
 	CR_RC_Shaper( digi, spadicPulse);
-	//printf("%.6E - %.6E => %.1f%% \n", digi->GetCharge(), spadicPulse->GetBinContent(spadicPulse->GetMaximumBin()), 100.*(digi->GetCharge() - spadicPulse->GetBinContent(spadicPulse->GetMaximumBin())) / digi->GetCharge());
-	c->cd();
-	spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
-	spadicPulse->DrawCopy();
+	Float_t pulse[fnBins] = {0.0};
+	for (Int_t k = 1; k <= spadicPulse->GetNbinsX(); k++){
+	  pulse[k-1] = spadicPulse->GetBinContent(k);
+	}
+	digi->SetPulseShape(pulse);
+	if (debug){
+	  //printf("%.6E - %.6E => %.1f%% \n", digi->GetCharge(), spadicPulse->GetBinContent(spadicPulse->GetMaximumBin()), 100.*(digi->GetCharge() - spadicPulse->GetBinContent(spadicPulse->GetMaximumBin())) / digi->GetCharge());
+	  c->cd();
+	  spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
+	  spadicPulse->DrawCopy();
+	}
       } else {
 	ADC(digi);
       }
-      if (moduleDigiNotTriggerMap[(*iModule).first].find((*iDigi).first-1) != moduleDigiNotTriggerMap[(*iModule).first].end()){
-	digi = (CbmTrdDigi*) fDigis->At(moduleDigiNotTriggerMap[(*iModule).first][(*iDigi).first-1]);
+      if (moduleDigiNotTriggerMap[moduleAddress].find(combiId-1) != moduleDigiNotTriggerMap[moduleAddress].end()){
+	digi = (CbmTrdDigi*) fDigis->At(moduleDigiNotTriggerMap[moduleAddress][combiId-1]);
 	if (fPulseShape){
 	  CR_RC_Shaper( digi, spadicPulse);
-	  c->cd();
-	  spadicPulse->SetLineColor(kRed);
-	  spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
-	  spadicPulse->DrawCopy("same");
+	  Float_t pulse[fnBins] = {0.0};
+	  for (Int_t k = 1; k <= spadicPulse->GetNbinsX(); k++){
+	    pulse[k-1] = spadicPulse->GetBinContent(k);
+	  }
+	  digi->SetPulseShape(pulse);
+	  if (debug){
+	    c->cd();
+	    spadicPulse->SetLineColor(kRed);
+	    spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
+	    spadicPulse->DrawCopy("same");
+	  }
 	} else {
 	  ADC(digi);
 	}
+	digi->SetNormalStop(true);
 	digi->SetFNR_TriggerStatus(true);  
-	digi->AddNeighbourTriggerId((*iDigi).second);
+	digi->AddNeighbourTriggerId(digiId);
       }
-      if (moduleDigiNotTriggerMap[(*iModule).first].find((*iDigi).first+1) != moduleDigiNotTriggerMap[(*iModule).first].end()){
-	digi = (CbmTrdDigi*) fDigis->At(moduleDigiNotTriggerMap[(*iModule).first][(*iDigi).first+1]);
+      if (moduleDigiNotTriggerMap[moduleAddress].find(combiId+1) != moduleDigiNotTriggerMap[moduleAddress].end()){
+	digi = (CbmTrdDigi*) fDigis->At(moduleDigiNotTriggerMap[moduleAddress][combiId+1]);
 	if (fPulseShape){
 	  CR_RC_Shaper( digi, spadicPulse);
-	  c->cd();
-	  spadicPulse->SetLineColor(kGreen);
-	  spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
-	  spadicPulse->DrawCopy("same");
+	  Float_t pulse[fnBins] = {0.0};
+	  for (Int_t k = 1; k <= spadicPulse->GetNbinsX(); k++){
+	    pulse[k-1] = spadicPulse->GetBinContent(k);
+	  }
+	  digi->SetPulseShape(pulse);
+	  if (debug){
+	    c->cd();
+	    spadicPulse->SetLineColor(kGreen);
+	    spadicPulse->GetYaxis()->SetRangeUser(0-0.01*fmaxdEdx,fmaxdEdx+0.01*fmaxdEdx);
+	    spadicPulse->DrawCopy("same");
+	  }
 	} else {
 	  ADC(digi);
 	}
+	digi->SetNormalStop(true);
 	digi->SetFNR_TriggerStatus(true); 
-	digi->AddNeighbourTriggerId((*iDigi).second);	
+	digi->AddNeighbourTriggerId(digiId);	
       }
       if (fPulseShape)
-	c->Update();
+	if (debug)
+	  c->Update();
     }
   }
 }

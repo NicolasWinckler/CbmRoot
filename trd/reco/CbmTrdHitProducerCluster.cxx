@@ -14,6 +14,11 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
+#include <iomanip>
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
   :FairTask("CbmTrdHitProducerCluster",1),
@@ -62,21 +67,24 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 
   TStopwatch timer;
   timer.Start();
-
+  cout << "================CbmTrdHitProducerCluster===============" << endl;
+  LOG(INFO) << "CbmTrdHitProducerCluster::Exec : Triangular Pads: " << (Bool_t)fTrianglePads << FairLogger::endl;
   Int_t nofCluster = fClusters->GetEntries();
+ 
   for (Int_t iCluster = 0; iCluster < nofCluster; iCluster++) {
     //if(fTrianglePads)
     //TriangularPadReconstruction(iCluster);
     //else
-      CenterOfGravity(iCluster);
+    CenterOfGravity(iCluster);
   }
 
-  LOG(INFO) << "CbmTrdHitProducerCluster::Exec nofHits=" << fHits->GetEntriesFast()
-	    << " nofClusters=" << fClusters->GetEntriesFast() << " nofDigis="
-	    << fDigis->GetEntriesFast() << " nofTriangularReco.=" << fRecoTriangular << FairLogger::endl;
+  LOG(INFO) << "CbmTrdHitProducerCluster::Exec : Digis:          " << fDigis->GetEntriesFast()  << FairLogger::endl;
+  LOG(INFO) << "CbmTrdHitProducerCluster::Exec : Clusters:       " << fClusters->GetEntriesFast() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdHitProducerCluster::Exec : Hits:           " << fHits->GetEntriesFast() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdHitProducerCluster::Exec : TriangularReco.:" << fRecoTriangular << FairLogger::endl;
 
   timer.Stop();
-  LOG(INFO) << "CbmTrdHitProducerCluster::Exec real time=" << timer.RealTime()
+  LOG(INFO) << "CbmTrdHitProducerCluster::Exec : real time=" << timer.RealTime()
 	    << " CPU time=" << timer.CpuTime() << FairLogger::endl;
 }
 Double_t CbmTrdHitProducerCluster::CalcDisplacement(Double_t Q_left, Double_t Q_center, Double_t Q_right, Double_t padWidth){
@@ -131,7 +139,7 @@ void CbmTrdHitProducerCluster::TriangularPadReconstruction(Int_t clusterId){
     rowId = moduleInfo->GetModuleRow(secId, rowId);
     nCol = moduleInfo->GetNofColumns();
     combiId = rowId * (nCol + 1) + colId;
-    //printf("r:%4i  c:%4i   ->  %4i\n", rowId, colId, combiId);
+    printf("r:%4i(r:%4i)  c:%4i   ->  %4i\n", rowId, CbmTrdAddress::GetRowId(digiAddress), colId, combiId);
     //digiList.push_back(make_pair(combiId,digiId));  
     moduleAddress = CbmTrdAddress::GetModuleAddress(digi->GetAddress());
     Double_t charge = digi->GetCharge();
@@ -281,6 +289,7 @@ void CbmTrdHitProducerCluster::CenterOfGravity(Int_t clusterId)
       return;
     }
     totalCharge += digi->GetCharge();
+    //printf("DigiAddress:%i ModuleAddress:%i\n",digi->GetAddress(), CbmTrdAddress::GetModuleAddress(digi->GetAddress()));
     moduleInfo->GetPadPosition(digi->GetAddress(), local_pad_posV, local_pad_dposV);//local_pad_pos[0], local_pad_pos[1], local_pad_pos[2]);
     if (fTrianglePads){
       Double_t local_pad_pos[3];

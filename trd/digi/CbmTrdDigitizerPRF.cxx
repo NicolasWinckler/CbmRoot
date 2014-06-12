@@ -24,10 +24,14 @@
 
 #include <iomanip>
 #include <iostream>
+#include <cmath>
 
+using std::cout;
+using std::endl;
 using std::make_pair;
 using std::max;
 using std::fabs;
+
 
 CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(CbmTrdRadiator *radiator)
   :FairTask("CbmTrdDigitizerPRF"),
@@ -36,6 +40,7 @@ CbmTrdDigitizerPRF::CbmTrdDigitizerPRF(CbmTrdRadiator *radiator)
    fTrianglePads(false),
    fSigma_noise_keV(0.0),
    fNoise(NULL),
+   fMinimumChargeTH(1.0e-06),
    fMCPointId(-1),
    fnRow(-1),
    fnCol(-1),
@@ -64,7 +69,9 @@ void CbmTrdDigitizerPRF::SetParContainers()
 {
 	fDigiPar = (CbmTrdDigiPar*)(FairRunAna::Instance()->GetRuntimeDb()->getContainer("CbmTrdDigiPar"));
 }
-
+void CbmTrdDigitizerPRF::SetTriggerThreshold(Double_t minCharge){
+  fMinimumChargeTH = minCharge;//  To be used for test beam data processing
+}
 InitStatus CbmTrdDigitizerPRF::Init()
 {
   FairRootManager* ioman = FairRootManager::Instance();
@@ -103,6 +110,9 @@ void CbmTrdDigitizerPRF::SetNoiseLevel(Double_t sigma_keV)
 
 void CbmTrdDigitizerPRF::Exec(Option_t * option)
 {
+cout << "================CbmTrdDigitizerPRF===============" << endl;
+ LOG(INFO) << "CbmTrdDigitizerPRF::Exec : Triangular Pads: " << (Bool_t)fTrianglePads << FairLogger::endl;
+ LOG(INFO) << "CbmTrdDigitizerPRF::Exec : Noise width:     " << fSigma_noise_keV << " keV"<< FairLogger::endl;
   fDigis->Delete();
   fDigiMatches->Delete();
 
@@ -113,6 +123,7 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
   Int_t nofLatticeHits = 0;
   Int_t nofElectrons = 0;
   Int_t nofBackwardTracks = 0;
+  Int_t nofPointsAboveThreshold = 0;
   Int_t nofPoints = fPoints->GetEntries();
   for (Int_t iPoint = 0; iPoint < nofPoints ; iPoint++) {
     fMCPointId = iPoint;
@@ -147,7 +158,8 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
       }
     ELossdEdX = point->GetEnergyLoss();
     ELoss = ELossTR + ELossdEdX;
-
+    if (ELoss > fMinimumChargeTH) 
+      nofPointsAboveThreshold++;
     fTime = point->GetTime();
 
     // Find node corresponding to the point in the center between entrance and exit MC-point coordinates
@@ -185,10 +197,14 @@ void CbmTrdDigitizerPRF::Exec(Option_t * option)
 
   Double_t digisOverPoints = (nofPoints > 0) ? fDigis->GetEntriesFast() / nofPoints : 0;
   Double_t latticeHitsOverElectrons = (nofElectrons > 0) ? (Double_t) nofLatticeHits / (Double_t) nofElectrons : 0;
-  LOG(INFO) << "CbmTrdDigitizerPRF::Exec nofPoints=" << nofPoints << " nofDigis=" << fDigis->GetEntriesFast()
-            << " digis/points=" << digisOverPoints << " nofBackwardTracks=" << nofBackwardTracks
-            << " nofLatticeHits=" << nofLatticeHits << " nofElectrons=" << nofElectrons
-            << " latticeHits/electrons=" << latticeHitsOverElectrons << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Points=               " << nofPoints << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec PointsAboveThreshold= " << nofPointsAboveThreshold << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Digis=                " << fDigis->GetEntriesFast() << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec digis/points=         " << digisOverPoints << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec BackwardTracks=       " << nofBackwardTracks << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec LatticeHits=          " << nofLatticeHits  << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec Electrons=            " << nofElectrons << FairLogger::endl;
+  LOG(INFO) << "CbmTrdDigitizerPRF::Exec latticeHits/electrons=" << latticeHitsOverElectrons << FairLogger::endl;
   timer.Stop();
   LOG(INFO) << "CbmTrdDigitizerPRF::Exec real time=" << timer.RealTime()
             << " CPU time=" << timer.CpuTime() << FairLogger::endl;
@@ -505,7 +521,11 @@ void CbmTrdDigitizerPRF::ScanPadPlane(const Double_t* local_point, Double_t clus
 
             sum += chargeFraction;
             //if (iCol >= stopCol)
-
+	    /*
+	    if(iCol >= 128) printf("\n----K----\n");
+	    if(CbmTrdAddress::GetColumnId(address) < 0) printf("address:%i amod:%i\n            icol:%i   irow:%i\n asec:%i     acol:%i   arow:%i\n",address,CbmTrdAddress::GetModuleId(address),iCol,secRow,CbmTrdAddress::GetSectorId(address),CbmTrdAddress::GetColumnId(address),CbmTrdAddress::GetRowId(address));
+	    if(iCol >= 128) printf("\n---------\n");
+	    */
             AddDigi(fMCPointId, address, Double_t(chargeFraction * clusterELoss), fTime);
 
             if (fDebug) {
@@ -595,6 +615,8 @@ void CbmTrdDigitizerPRF::SplitTrackPath(const CbmTrdPoint* point, Double_t ELoss
 
 void CbmTrdDigitizerPRF::AddDigi(Int_t pointId, Int_t address, Double_t charge, Double_t time)
 {
+  //if (address < 0)
+  //printf("DigiAddress:%u ModuleAddress:%i\n",address, CbmTrdAddress::GetModuleAddress(address));
   const FairMCPoint* point = static_cast<const FairMCPoint*>(fPoints->At(pointId));
   std::map<Int_t, pair<CbmTrdDigi*, CbmMatch*> >::iterator it = fDigiMap.find(address);
   if (it == fDigiMap.end()) { // Pixel not yet in map -> Add new pixel

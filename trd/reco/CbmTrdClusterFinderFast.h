@@ -38,6 +38,7 @@ class RowCluster
     minCol(-1),
     maxCol(-1),
     row(-1),
+    centerOfGravity(-1.),
     digis(new MyDigiList),
     parents(),
     children()
@@ -54,6 +55,7 @@ class RowCluster
   Int_t minCol;
   Int_t maxCol;
   Int_t row;
+  Double_t centerOfGravity;
   MyDigiList *digis;
   std::list<RowCluster*> parents;
   std::list<RowCluster*> children;
@@ -118,6 +120,8 @@ class CbmTrdClusterFinderFast : public FairTask
 
   void addCluster(std::map<Int_t, ClusterList*> fModClusterMap);
 
+  Double_t CenterOfGravity(RowCluster *rowCluster);
+
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters;    /** Output array of CbmTrdCluster **/
 
@@ -127,7 +131,7 @@ class CbmTrdClusterFinderFast : public FairTask
   CbmTrdGeoHandler* fGeoHandler; //!
 
   //static const Float_t minimumChargeTH = 5e-03;
-
+  Int_t fRowMergerCounter;
   Int_t ClusterSum;
   //static 
   Double_t fMinimumChargeTH;

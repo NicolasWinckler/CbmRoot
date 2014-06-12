@@ -225,7 +225,10 @@ void CbmTrdRecoQa::Exec(Option_t* option)
   TH1D* digiMaxSpectrum = new TH1D("digiMaxSpectrum","digiMaxSpectrum",10000,0,1e-4);
   TH1D* digiSpectrum = new TH1D("digiSpectrum","digiSpectrum",10000,0,1e-4);
 
-  printf("Found:\n     MC-Points:%i\n     Digis:%i\n     Cluster:%i\n     Hits:%i\n",nPoints,nDigis,nClusters,nHits);
+  LOG(INFO) << "CbmTrdRecoQa::Exec : MC-Points:" <<  nPoints << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRecoQa::Exec : Digis:    " <<  nDigis << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRecoQa::Exec : Cluster:  " <<  nClusters << FairLogger::endl;
+  LOG(INFO) << "CbmTrdRecoQa::Exec : Hits:     " <<  nHits << FairLogger::endl;
   Int_t moduleAddress(-1), moduleId(-1);
 
   Double_t dummy_x(-1), dummy_y(-1);
@@ -254,9 +257,9 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     if (fModuleInfo) {
       std::map<Int_t, TGraphErrors* >::iterator it = fModuleMapPoint.find(moduleAddress);
       if (it == fModuleMapPoint.end()) {  
-	name.Form("ModuleAddress%i",moduleAddress);   
-	fModuleMap[moduleAddress] = new TCanvas(name,name,1500,1000);
-	fModuleMap[moduleAddress]->Divide(3,2);
+	name.Form("ModuleAddress%05i",moduleAddress);   
+	fModuleMap[moduleAddress] = new TCanvas(name,name,1000,1000);
+	fModuleMap[moduleAddress]->Divide(2,2);
 	//name.Form("ModuleAddress%iPoints",moduleAddress);  
 	fModuleMapPoint[moduleAddress] = new TGraphErrors();
 	fModuleMapPoint[moduleAddress]->SetMarkerStyle(20);
@@ -264,13 +267,16 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	fModuleMapPoint[moduleAddress]->SetMarkerColor(15);
 	//fModuleMapPoint[moduleAddress] = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	TH2I* dummy = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
-	name.Form("ModuleAddress%iDigis",moduleAddress);   
+	dummy->SetStats(kFALSE);
+	name.Form("ModuleAddress%05iDigis",moduleAddress);   
 	fModuleMapDigi[moduleAddress] = new TH2D(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	fModuleMapDigi[moduleAddress]->SetContour(99);
-	name.Form("ModuleAddress%iClusters",moduleAddress);   
+	fModuleMapDigi[moduleAddress]->SetStats(kFALSE);
+	name.Form("ModuleAddress%05iClusters",moduleAddress);   
 	fModuleMapCluster[moduleAddress] = new TH2I(name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	fModuleMapCluster[moduleAddress]->SetContour(99);
-	name.Form("ModuleAddress%iHits",moduleAddress);   
+	fModuleMapCluster[moduleAddress]->SetStats(kFALSE);
+	name.Form("ModuleAddress%05iHits",moduleAddress);   
 	fModuleMapHit[moduleAddress] = new TGraphErrors();//name,name,fModuleInfo->GetNofColumns(),-0.5,fModuleInfo->GetNofColumns()-0.5,fModuleInfo->GetNofRows(),-0.5,fModuleInfo->GetNofRows()-0.5);
 	fModuleMapHit[moduleAddress]->SetMarkerStyle(24);
 	fModuleMapTrack[moduleAddress] = new std::vector<TLine*>;
@@ -396,7 +402,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     digiMaxSpectrum->Fill(chargeMax);
   }
   
-  cout << "Hits" << endl;
+  //cout << "Hits" << endl;
   Int_t modHit = 0;
   for (Int_t iHit = 0; iHit < nHits; iHit++){
     hit = (CbmTrdHit*) fHits->At(iHit);
@@ -451,6 +457,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     ptext->Draw("same");
     it->second->cd(1)->Update();
     it->second->cd(2);
+    fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(0,0.0001);
     fModuleMapDigi[it->first]->DrawCopy("colz");   
 
     {
@@ -474,7 +481,7 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 
     for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
       fModuleMapTrack[it->first]->at(t)->Draw("same");
-
+    /*
     it->second->cd(3)->SetLogz(1);
     fModuleMapDigi[it->first]->GetZaxis()->SetRangeUser(fTriggerTH,fModuleMapDigi[it->first]->GetBinContent(fModuleMapDigi[it->first]->GetMaximumBin()));
     fModuleMapDigi[it->first]->DrawCopy("colz");
@@ -496,13 +503,13 @@ void CbmTrdRecoQa::Exec(Option_t* option)
 	}
       }
     }
-
+    */
 
 
     for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
       fModuleMapTrack[it->first]->at(t)->Draw("same");
 
-    it->second->cd(4);
+    it->second->cd(3);
     fModuleMapCluster[it->first]->DrawCopy("colz");
     {
       TPolyLine *pad = NULL;
@@ -524,8 +531,8 @@ void CbmTrdRecoQa::Exec(Option_t* option)
     }  
     for (Int_t t = 0; t < fModuleMapTrack[it->first]->size(); t++)
       fModuleMapTrack[it->first]->at(t)->Draw("same");
-    it->second->cd(4)->Update();
-    it->second->cd(5);
+    it->second->cd(3)->Update();
+    it->second->cd(4);
     //fModuleMapPoint[it->first]->Draw();
     //fModuleMapHit[it->first]->Draw("P,same");
     if (fHits){

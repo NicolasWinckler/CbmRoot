@@ -46,7 +46,7 @@ class CbmTrdDigitizerPRF : public FairTask {
   void SetTriangularPads(Bool_t triangles);
 
   void SetNoiseLevel(Double_t sigma_keV);
-
+  void SetTriggerThreshold(Double_t minCharge); //only for debugging. has no impact on the output!!!!
  private:
 
   CbmTrdDigitizerPRF& operator=(const CbmTrdDigitizerPRF&);
@@ -71,7 +71,7 @@ class CbmTrdDigitizerPRF : public FairTask {
 
   Double_t fSigma_noise_keV;
   TRandom3 *fNoise;
-
+  Double_t fMinimumChargeTH;
   Double_t fTime;
   Int_t fnRow;
   Int_t fnCol;

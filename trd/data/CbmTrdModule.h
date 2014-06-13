@@ -29,6 +29,13 @@ class CbmTrdModule : public TNamed
 	       const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
 	       const TArrayD& padSizeX, const TArrayD& padSizeY);
 
+  CbmTrdModule(
+	       Int_t address, Int_t orientation, Double_t x, Double_t y, Double_t z,
+	       Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
+	       const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
+	       const TArrayD& padSizeX, const TArrayD& padSizeY,
+	       const Bool_t padGeoTriangular);
+
   /**
    * \brief Destructor.
    **/
@@ -43,7 +50,10 @@ class CbmTrdModule : public TNamed
   Double_t GetSizeX() const { return fSizeX; }
   Double_t GetSizeY() const { return fSizeY; }
   Double_t GetSizeZ() const { return fSizeZ; }
-  
+
+  Bool_t GetPadGeoTriangular() const { return fTriangularPads; }
+  void SetPadGeoTriangular(Bool_t geoTriangular) { fTriangularPads = geoTriangular; }
+
   Int_t GetNofColumns() const;
   Int_t GetNofRows() const;
 
@@ -161,10 +171,12 @@ class CbmTrdModule : public TNamed
   TArrayD fPadSizeX; // size of the readout pad in x [cm]
   TArrayD fPadSizeY; // size of the readout pad in y [cm]
 
+  Bool_t fTriangularPads;
+
   std::map<Int_t, CbmTrdAsic*> fAsicMap;
   Int_t fNofAsics;
 
-  ClassDef(CbmTrdModule, 3);
+  ClassDef(CbmTrdModule, 4);
 };
 
 #endif

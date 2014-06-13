@@ -34,10 +34,51 @@ CbmTrdModule::CbmTrdModule()
     fSectorSizeY(0),
     fPadSizeX(0),
     fPadSizeY(0),
+    fTriangularPads(false),
     fNofAsics(0),
     fAsicMap()
 {
 }
+CbmTrdModule::CbmTrdModule(
+			   Int_t address, Int_t orientation, Double_t x, Double_t y, Double_t z,
+			   Double_t sizex, Double_t sizey, Double_t sizez, Int_t nofSectors,
+			   const TArrayD& sectorSizeX, const TArrayD& sectorSizeY,
+			   const TArrayD& padSizeX, const TArrayD& padSizeY,
+			   const Bool_t padGeoTriangular)
+  : TNamed(),
+    fModuleAddress(address),
+    fOrientation(orientation),
+    fX(x),
+    fY(y),
+    fZ(z),
+    fSizeX(sizex),
+    fSizeY(sizey),
+    fSizeZ(sizez),
+    fAnodeWireOffset(0.375),
+    fAnodeWireSpacing(0.25),
+    fAnodeWireToPadPlaneDistance(0.35),
+    fNofSectors(nofSectors),
+    fSectorX(nofSectors),
+    fSectorY(nofSectors),
+    fSectorZ(nofSectors),
+    fSectorBeginX(nofSectors),
+    fSectorBeginY(nofSectors),
+    fSectorEndX(nofSectors),
+    fSectorEndY(nofSectors),
+    fSectorSizeX(sectorSizeX),
+    fSectorSizeY(sectorSizeY),
+    fPadSizeX(padSizeX),
+    fPadSizeY(padSizeY) ,
+    fTriangularPads(padGeoTriangular),
+    fNofAsics(0),
+    fAsicMap()  
+{
+  CbmTrdModule(address, orientation, x, y, z,
+	       sizex, sizey, sizez, nofSectors,
+	       sectorSizeX, sectorSizeY,
+	       padSizeX, padSizeY);
+}
+
 
 CbmTrdModule::CbmTrdModule(
 			   Int_t address, Int_t orientation, Double_t x, Double_t y, Double_t z,
@@ -68,6 +109,7 @@ CbmTrdModule::CbmTrdModule(
     fSectorSizeY(sectorSizeY),
     fPadSizeX(padSizeX),
     fPadSizeY(padSizeY) ,
+    fTriangularPads(false),
     fNofAsics(0),
     fAsicMap()  
 {

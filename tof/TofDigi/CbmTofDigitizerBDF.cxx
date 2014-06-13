@@ -919,15 +919,17 @@ Bool_t   CbmTofDigitizerBDF::MergeSameChanDigis()
 
                         Int_t iChosenDigi = -1;
                         Double_t dMinTime = 1e18;
+			Int_t    ivDigiInd[iNbDigis];
+			Double_t dvDigiTime[iNbDigis];
                         for( Int_t iDigi = 0; iDigi < iNbDigis; iDigi++)
-                           if( fStorDigiExp[iSmType][iSm*iNbRpc + iRpc][iNbSides*iCh+iSide][iDigi]->GetTime()
+                          if( fStorDigiExp[iSmType][iSm*iNbRpc + iRpc][iNbSides*iCh+iSide][iDigi]->GetTime()
                                                                                           < dMinTime )
-                           {
+                          {
                               iChosenDigi = iDigi;
                               dMinTime = fStorDigiExp[iSmType][iSm*iNbRpc + iRpc][iNbSides*iCh+iSide][iDigi]->GetTime();
-                           }
+                          }
 
-			if (0 == fStorDigiMatch[iSmType][iSm*iNbRpc + iRpc][iNbSides*iCh+iSide].size()){
+		        if (0 == fStorDigiMatch[iSmType][iSm*iNbRpc + iRpc][iNbSides*iCh+iSide].size()){
 			  LOG(ERROR)<<Form(" cannot add digiMatch for (%d,%d,%d,%d,%d) at pos  %d",
 					   iSmType,iSm,iRpc,iCh,iSide,fiNbDigis)<<FairLogger::endl;
 			  break;

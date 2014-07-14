@@ -197,7 +197,7 @@ CbmKFParticlesFinderQA::CbmKFParticlesFinderQA(CbmKFParticlesFinder *pf, Int_t i
                                                   "phi [rad]","z [cm]", "l/dl", "Multiplicity"};
           int nBins[nHistoPartParam] = {1000,100,100,100,100,100,100,100,100,100,100,100,100, fParteff.partMaxMult[iPart]+1};
           float xMin[nHistoPartParam] = {fParteff.partMHistoMin[iPart],  0., 0., 0., -5.,  0.,  0.,  0., 0., -2., -2., -5., -1., -0.5};
-          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 20., 1.,  2.,  2., 55., 35., fParteff.partMaxMult[iPart]+0.5};
+          float xMax[nHistoPartParam] = {fParteff.partMHistoMax[iPart], 10., 3., 6., 55., 30., 20., 20., 1.,  2.,  2., 55., 35., static_cast<float>(fParteff.partMaxMult[iPart]+0.5)};
 /*
 	  TString parName[nHistoPartParam] = {"M","p","p_{t}","y","DL","c#tau","chi2ndf","prob","#theta","phi","z","l/dl, chi2prim"};
           TString parAxisName[nHistoPartParam] = {"m [GeV/c^{2}]","p [GeV/c]","p_{t} [GeV/c]",

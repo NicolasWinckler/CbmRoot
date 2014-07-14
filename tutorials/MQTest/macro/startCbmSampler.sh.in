@@ -1,0 +1,16 @@
+#!/bin/bash
+
+buffSize="1000" # zeromq high-water mark is in messages
+dataFormat="Boost"
+ID="101"
+inputFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/test.raw.root"
+parameterFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/params.root"
+branch="TimeSlice."
+eventRate="0"
+numIoThreads="1"
+outputSocketType="push"
+outputBufSize=$buffSize
+outputMethod="bind"
+outputAddress="tcp://*:5566"
+@CMAKE_BINARY_DIR@/bin/testCBMDetectorSampler_cbm$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress 
+

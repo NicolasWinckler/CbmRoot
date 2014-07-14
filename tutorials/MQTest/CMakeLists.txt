@@ -1,0 +1,113 @@
+# Create a library called "MQcbmExample" which includes the source files given in
+# the array .
+# The extension is already found.  Any number of sources could be listed here.
+
+
+
+set(INCLUDE_DIRECTORIES
+${BASE_INCLUDE_DIRECTORIES}
+${ROOT_INCLUDE_DIR}
+${ZMQ_INCLUDE_DIR}
+${BASE_INCLUDE_DIRECTORIES}/base
+${BASE_INCLUDE_DIRECTORIES}/base/MQ
+${BASE_INCLUDE_DIRECTORIES}/parbase
+${BASE_INCLUDE_DIRECTORIES}/fairtools
+${BASE_INCLUDE_DIRECTORIES}/fairmq
+${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/data
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/fles_ipc
+${CBMROOT_SOURCE_DIR}/cbmdata
+${CBMROOT_SOURCE_DIR}/cbmdata/beamtime
+${CBMROOT_SOURCE_DIR}/cbmdata/beamtime/fhodo
+${CBMROOT_SOURCE_DIR}/cbmdata/ecal
+${CBMROOT_SOURCE_DIR}/cbmdata/global
+${CBMROOT_SOURCE_DIR}/cbmdata/much
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd
+${CBMROOT_SOURCE_DIR}/cbmdata/psd
+${CBMROOT_SOURCE_DIR}/cbmdata/rich
+${CBMROOT_SOURCE_DIR}/cbmdata/sts
+${CBMROOT_SOURCE_DIR}/cbmdata/stt
+${CBMROOT_SOURCE_DIR}/cbmdata/tof
+${CBMROOT_SOURCE_DIR}/cbmdata/trd
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQDevices
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQTask
+)
+
+add_subdirectory (fles_ipc)
+
+include_directories(${INCLUDE_DIRECTORIES})
+
+If (Boost_FOUND)
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startPushPull_cbm.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSampler.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSampler.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmMerger.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmMerger.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSink.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSink.sh )
+EndIf (Boost_FOUND)
+
+set(LINK_DIRECTORIES
+${ROOT_LIBRARY_DIR}
+${Boost_LIBRARY_DIRS}
+${FAIRROOT_LIBRARY_DIR}
+) 
+
+link_directories(${LINK_DIRECTORIES})
+
+Set(SRCS
+  data/CbmTimeSlice.cxx
+)
+
+If (Boost_FOUND)
+  Set(NO_DICT_SRCS
+    MQDevices/CbmMQFileSink.cxx
+    data/CbmMicroSlice.cxx
+    MQDevices/CbmMicroSliceMerger.cxx
+    MQTask/CbmMicroSliceMergerTask.cxx
+  )
+EndIf (Boost_FOUND)
+
+
+
+
+Set(LINKDEF CbmMqExampleLinkDef.h)
+Set(LIBRARY_NAME MQcbmExample)
+
+If (Boost_FOUND)
+  Set(DEPENDENCIES 
+    Base ParBase FairTools MCStack CbmData fles_ipc FairMQ FairMQSampler 
+    boost_thread boost_system boost_serialization boost_timer 
+    RIO Cint Core)
+Else (Boost_FOUND)
+  message( FATAL_ERROR "Boost library required to compile the MQ example" )
+EndIf (Boost_FOUND)
+
+GENERATE_LIBRARY()
+
+
+If (Boost_FOUND)
+  Set(Exe_Names
+    testCBMDetectorSampler_cbmBoost
+    testCBMDetectorProcessor_cbmBoost
+    testCBMfileSink_cbmBoost 
+  )
+
+
+  set(Exe_Source
+    run/runTestDetectorSampler_cbmBoost.cxx
+    run/runTestDetectorProcessor_cbmBoost.cxx
+    run/runFileSink_cbmBoost.cxx
+    )
+
+
+  List(LENGTH Exe_Names _length)
+  Math(EXPR _length ${_length}-1)
+
+  ForEach(_file RANGE 0 ${_length})
+    List(GET Exe_Names ${_file} _name)
+    List(GET Exe_Source ${_file} _src)
+    Set(EXE_NAME ${_name})
+    Set(SRCS ${_src})
+    Set(DEPENDENCIES MQcbmExample)
+    GENERATE_EXECUTABLE()
+  EndForEach(_file RANGE 0 ${_length})
+EndIf (Boost_FOUND)

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+buffSize="1000" # zeromq high-water mark is in messages
+dataFormat="Boost"
+ID="101"
+inputFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/test.raw.root"
+parameterFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/params.root"
+branch="TimeSlice."
+eventRate="0"
+numIoThreads="1"
+outputSocketType="push"
+outputBufSize=$buffSize
+outputMethod="bind"
+outputAddress="tcp://*:5566"
+xterm -e @CMAKE_BINARY_DIR@/bin/testCBMDetectorSampler_cbm$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
+
+
+ID="201"
+numIoThreads="1"
+inputSocketType="pull"
+inputRcvBufSize=$buffSize
+inputMethod="connect"
+inputAddress="tcp://localhost:5566"
+outputSocketType="push"
+outputSndBufSize=$buffSize
+outputMethod="connect"
+outputAddress="tcp://localhost:5567"
+xterm -e @CMAKE_BINARY_DIR@/bin/testCBMDetectorProcessor_cbm$dataFormat $ID $processorTask $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $outputSocketType $outputSndBufSize $outputMethod $outputAddress &
+
+
+
+ID="401"
+numIoThreads="1"
+inputSocketType="pull"
+inputRcvBufSize=$buffSize
+inputMethod="bind"
+inputAddress="tcp://*:5567"
+xterm -e @CMAKE_BINARY_DIR@/bin/testCBMfileSink_cbm$dataFormat $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress &
+#alternative for regular sink:
+#xterm -e @CMAKE_BINARY_DIR@/bin/sink $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputAddress &
+

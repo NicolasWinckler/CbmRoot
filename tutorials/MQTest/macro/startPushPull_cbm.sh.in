@@ -16,6 +16,8 @@ outputAddress="tcp://*:5566"
 xterm -e @CMAKE_BINARY_DIR@/bin/testCBMDetectorSampler_cbm$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
 
 
+MicroSliceNumberToMerge="16"
+TimeSliceIndex="1"
 ID="201"
 numIoThreads="1"
 inputSocketType="pull"
@@ -26,7 +28,7 @@ outputSocketType="push"
 outputSndBufSize=$buffSize
 outputMethod="connect"
 outputAddress="tcp://localhost:5567"
-xterm -e @CMAKE_BINARY_DIR@/bin/testCBMDetectorProcessor_cbm$dataFormat $ID $processorTask $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $outputSocketType $outputSndBufSize $outputMethod $outputAddress &
+xterm -e @CMAKE_BINARY_DIR@/bin/testCBMDetectorProcessor_cbm$dataFormat $MicroSliceNumberToMerge $TimeSliceIndex $ID $processorTask $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $outputSocketType $outputSndBufSize $outputMethod $outputAddress &
 
 
 

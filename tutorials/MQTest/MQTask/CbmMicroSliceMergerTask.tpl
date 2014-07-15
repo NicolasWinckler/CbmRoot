@@ -7,10 +7,15 @@
 
 
 template <typename TPayloadIn, typename TPayloadOut>
-CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask()
+CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
+        fMaxMicroSliceNumber(0),
+        fTimeSliceIndex(0),
+        fMaxComponentNumber(0),
+        fMicroSliceIndex(0),
+        fComponentIndex(0),
+        fTSReady(false)
 {
-    fMaxMicroSliceNumber=16;// max number of microslice per timeslices
-    fTimeSliceIndex=1; // index of the timeslice
+    
 }
 
 

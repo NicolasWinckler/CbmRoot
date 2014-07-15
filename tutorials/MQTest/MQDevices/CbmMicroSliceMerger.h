@@ -11,32 +11,22 @@
 #include "FairMQDevice.h"
 #include "StorableTimeslice.hpp"
 #include "CbmMicroSlice.h"
-#include "FairMQProcessorTask.h"
-#include "CbmMicroSliceMergerTask.h"
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
+#include "FairMQLogger.h"
 
-
-
-typedef boost::archive::binary_iarchive TBoostBinPayloadIn; // boost binary format
-typedef boost::archive::text_iarchive TBoostTextPayloadIn; // boost text format
-typedef boost::archive::binary_oarchive TBoostBinPayloadOut; // boost binary format
-typedef boost::archive::text_oarchive TBoostTextPayloadOut; // boost text format
-typedef CbmMicroSliceMergerTask<TBoostBinPayloadIn, TBoostBinPayloadOut> TProcessorTask;
-
-
-
+template <typename TPolicyTask>
 class CbmMicroSliceMerger: public FairMQDevice 
 {
 public:
     CbmMicroSliceMerger();
     CbmMicroSliceMerger(unsigned int ComponentNumber);
     virtual ~CbmMicroSliceMerger();
-    void SetTask(TProcessorTask* task);
+    void SetTask(TPolicyTask* task);
+    void SetMicroSliceNum(uint64_t MSNumber);
+    void SetTimeSliceIdx(uint64_t TSIndex);
     
 protected:
 
@@ -47,9 +37,12 @@ protected:
 
 private:
     //FairMQProcessorTask* fProcessorTask;
-    TProcessorTask* fProcessorTask;
+    TPolicyTask* fProcessorTask;
     
 };
+
+
+#include "CbmMicroSliceMerger.tpl"
 
 #endif	/* CBMMICROSLICEMERGER_H */
 

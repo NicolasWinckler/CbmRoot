@@ -19,20 +19,35 @@
 #endif
 
 
+
+#include "CbmMicroSliceMergerTask.h"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+
+
 using std::cout;
 using std::cin;
 using std::endl;
 using std::stringstream;
 
+typedef boost::archive::binary_iarchive TBoostBinPayloadIn; // boost binary format
+typedef boost::archive::text_iarchive TBoostTextPayloadIn; // boost text format
+typedef boost::archive::binary_oarchive TBoostBinPayloadOut; // boost binary format
+typedef boost::archive::text_oarchive TBoostTextPayloadOut; // boost text format
+typedef CbmMicroSliceMergerTask<TBoostBinPayloadIn, TBoostBinPayloadOut> TProcessorTask;
 
-CbmMicroSliceMerger processor;
+
+
+CbmMicroSliceMerger<TProcessorTask> processor;
 
 static void s_signal_handler (int signal)
 {
   cout << endl << "Caught signal " << signal << endl;
 
-  processor.ChangeState(CbmMicroSliceMerger::STOP);
-  processor.ChangeState(CbmMicroSliceMerger::END);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::STOP);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::END);
 
   cout << "Shutdown complete. Bye!" << endl;
   exit(1);
@@ -50,8 +65,8 @@ static void s_catch_signals (void)
 
 int main(int argc, char** argv)
 {
-  if ( argc != 11 ) {
-    cout << "Usage: testDetectorProcessor \tID numIoTreads\n"
+  if ( argc != 13 ) {
+    cout << "Usage: testDetectorProcessor \tMicroSliceNumber TimeSliceIndex ID numIoTreads\n"
               << "\t\tinputSocketType inputRcvBufSize inputMethod inputAddress\n"
               << "\t\toutputSocketType outputSndBufSize outputMethod outputAddress\n" << endl;
     return 1;
@@ -70,67 +85,62 @@ int main(int argc, char** argv)
   processor.SetTransport(transportFactory);
 
   int i = 1;
-
-  processor.SetProperty(CbmMicroSliceMerger::Id, argv[i]);
+  uint64_t MSNumber;
+  stringstream(argv[i]) >> MSNumber;
+  processor.SetMicroSliceNum(MSNumber);// MicroSlice number to merge
   ++i;
-  
-  /*
-  //if (strcmp(argv[i], "FairTestDetectorMQRecoTask") == 0) {
-  if (strcmp(argv[i], "CbmMicroSliceMergerTask") == 0) {
-    TProcessorTask* task = new TProcessorTask();
-    processor.SetTask(task);
-  } else {
-    LOG(ERROR) << "task not supported.";
-    exit(1);
-  }
+  uint64_t TSIndex;
+  stringstream(argv[i]) >> TSIndex;
+  processor.SetTimeSliceIdx(TSIndex);// TimeSlice index
   ++i;
-  */
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::Id, argv[i]);
+  ++i;
   
   int numIoThreads;
   stringstream(argv[i]) >> numIoThreads;
-  processor.SetProperty(CbmMicroSliceMerger::NumIoThreads, numIoThreads);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumIoThreads, numIoThreads);
   ++i;
 
-  processor.SetProperty(CbmMicroSliceMerger::NumInputs, 1);
-  processor.SetProperty(CbmMicroSliceMerger::NumOutputs, 1);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumInputs, 1);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumOutputs, 1);
 
 
-  processor.ChangeState(CbmMicroSliceMerger::INIT);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::INIT);
 
 
-  processor.SetProperty(CbmMicroSliceMerger::InputSocketType, argv[i], 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputSocketType, argv[i], 0);
   ++i;
   int inputRcvBufSize;
   stringstream(argv[i]) >> inputRcvBufSize;
-  processor.SetProperty(CbmMicroSliceMerger::InputRcvBufSize, inputRcvBufSize, 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputRcvBufSize, inputRcvBufSize, 0);
   ++i;
-  processor.SetProperty(CbmMicroSliceMerger::InputMethod, argv[i], 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputMethod, argv[i], 0);
   ++i;
-  processor.SetProperty(CbmMicroSliceMerger::InputAddress, argv[i], 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputAddress, argv[i], 0);
   ++i;
 
-  processor.SetProperty(CbmMicroSliceMerger::OutputSocketType, argv[i], 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::OutputSocketType, argv[i], 0);
   ++i;
   int outputSndBufSize;
   stringstream(argv[i]) >> outputSndBufSize;
-  processor.SetProperty(CbmMicroSliceMerger::OutputSndBufSize, outputSndBufSize, 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::OutputSndBufSize, outputSndBufSize, 0);
   ++i;
-  processor.SetProperty(CbmMicroSliceMerger::OutputMethod, argv[i], 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::OutputMethod, argv[i], 0);
   ++i;
-  processor.SetProperty(CbmMicroSliceMerger::OutputAddress, argv[i], 0);
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::OutputAddress, argv[i], 0);
   ++i;
 
 
-  processor.ChangeState(CbmMicroSliceMerger::SETOUTPUT);
-  processor.ChangeState(CbmMicroSliceMerger::SETINPUT);
-  processor.ChangeState(CbmMicroSliceMerger::RUN);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::SETOUTPUT);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::SETINPUT);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::RUN);
 
 
   char ch;
   cin.get(ch);
 
-  processor.ChangeState(CbmMicroSliceMerger::STOP);
-  processor.ChangeState(CbmMicroSliceMerger::END);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::STOP);
+  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::END);
 
   return 0;
 }

@@ -42,17 +42,27 @@ public:
     bool TSReady();
     
     void SetMicroSliceNumber(uint64_t MaxMicroSliceNumber)
-    {fMaxMicroSliceNumber=MaxMicroSliceNumber;}
+        {fMaxMicroSliceNumber=MaxMicroSliceNumber;}
     
-    void SetComponentNumber(unsigned int MaxComponentNumber)
+    void SetComponentNumber(uint64_t MaxComponentNumber)
         {fMaxComponentNumber=MaxComponentNumber;}
+    
+    void SetTimeSliceIndex(uint64_t TimeSliceIndex)
+        {fTimeSliceIndex=TimeSliceIndex;}
+    
     
     uint64_t GetMaxMicroSliceNumber()
         {return fMaxMicroSliceNumber;}
-    unsigned int GetMaxComponentNumber()
+    
+    uint64_t GetMaxComponentNumber()
         {return fMaxComponentNumber;}
+    
+    uint64_t GetTimeSliceIndex()
+        {return fTimeSliceIndex;}
+    
     unsigned int GetMicroSliceIndex()
         {return fMicroSliceIndex;}
+    
     unsigned int GetComponentIndex()
         {return fComponentIndex;}
     
@@ -114,8 +124,8 @@ public:
     
 private:
 
-    uint64_t fMaxMicroSliceNumber;
-    uint64_t fTimeSliceIndex;
+    uint64_t fMaxMicroSliceNumber;      // max number of microslice per timeslices
+    uint64_t fTimeSliceIndex;           // index of the timeslice
     uint64_t fMaxComponentNumber;
     unsigned int fMicroSliceIndex;
     unsigned int fComponentIndex;

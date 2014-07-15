@@ -14,6 +14,7 @@ ${BASE_INCLUDE_DIRECTORIES}/parbase
 ${BASE_INCLUDE_DIRECTORIES}/fairtools
 ${BASE_INCLUDE_DIRECTORIES}/fairmq
 ${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/run
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/data
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/fles_ipc
@@ -54,7 +55,7 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories(${LINK_DIRECTORIES})
 
 Set(SRCS
-  data/CbmTimeSlice.cxx
+  ${CBMROOT_SOURCE_DIR}/run/CbmTimeSlice.cxx
 )
 
 If (Boost_FOUND)

@@ -20,7 +20,7 @@
 #include "FairMQDevice.h"
 #include "FairMQLogger.h"
 
-
+#include "CbmUnpacker.h"
 #include "StorableTimeslice.hpp"
 
 
@@ -46,32 +46,6 @@ class CbmMQFileSink: public FairMQDevice
     CbmMQFileSink();
     virtual ~CbmMQFileSink();
     virtual void InitOutputFile(TString defaultId = "100");
-    
-    
-    
-    // reconstruct data
-    template<typename U2>
-    U2 CombineData(std::vector<uint8_t> input)
-    {
-        
-        assert( sizeof(U2)==input.size());
-        
-        uint64_t combinedData=0;
-        for(unsigned int i=0;i<input.size();i++)
-        {
-            uint64_t temp=0;
-            temp=(uint64_t)input[i];
-            if(i>0)
-                temp<<=8*i;
-            combinedData|=temp;
-            
-            
-        }
-        
-        U2 output=(U2)combinedData;
-        return output;
-    }
-    
     
     
     template<class Archive>

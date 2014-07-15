@@ -21,6 +21,7 @@
 
 #include "StorableTimeslice.hpp"
 #include "CbmMicroSlice.h"
+#include "CbmUnpacker.h"
 
 #if __cplusplus >= 201103L
 #include <type_traits>
@@ -48,42 +49,6 @@ public :
         ar & fDigiVector;
     }
     
-    template<typename U1>
-    vector<uint8_t> SplitData(U1 DataToSplit)
-    {
-        U1 Input=DataToSplit;
-        std::size_t InputTypeSize=sizeof(U1);
-        uint8_t *Data_ptr = (uint8_t*)&Input;
-        
-        vector<uint8_t> output;
-        for(unsigned int i=0;i<InputTypeSize;i++)
-        {
-            output.push_back(Data_ptr[i]);
-        }
-    
-        return output;
-    }
-    
-    template<typename U2>
-    U2 CombineData(vector<uint8_t> input)
-    {
-        
-        assert( sizeof(U2)==input.size());
-        
-        uint64_t combinedData=0;
-        for(unsigned int i=0;i<input.size();i++)
-        {
-            uint64_t temp=0;
-            temp=(uint64_t)input[i];
-            if(i>0)
-                temp<<=8*i;
-            combinedData|=temp;
-            
-        }
-        
-        U2 output=(U2)combinedData;
-        return output;
-    }
     
 private :
     CbmTimeSlice* fCBMTimeSlice;

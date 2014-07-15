@@ -55,12 +55,9 @@ void CbmMQFileSink<TPayloadIn>::Run()
 
         while ( fState == RUNNING ) 
         {
-            LOG(INFO) << ">>>>>>> fState == RUNNING0 <<<<<<<";
             FairMQMessage* msg = fTransportFactory->CreateMessage();
-            LOG(ERROR) << ">>>>>>> fState == RUNNING1 <<<<<<<";
-            bytes_received = fPayloadInputs->at(0)->Receive(msg);// <--- bug here 
-            LOG(INFO) << ">>>>>>> fState == RUNNING2 <<<<<<<";
-            LOG(INFO) << ">>>>>>> bytes_received= <<<<<<<"<<bytes_received;
+            bytes_received = fPayloadInputs->at(0)->Receive(msg);
+            
             if (bytes_received) 
             {
                 receivedMsgs++;

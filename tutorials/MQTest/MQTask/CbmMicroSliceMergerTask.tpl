@@ -172,6 +172,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         }
             
 
+        LOG(INFO) << "* SystemId = "  << index;
         if(index==fMaxMicroSliceNumber-1)
             fTSReady=true;
         else 

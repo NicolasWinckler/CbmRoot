@@ -47,29 +47,29 @@ void CbmProcessor<TPolicyTask>::Run()
   int receivedMsgs = 0;
   int sentMsgs = 0;
 
-  bool received = false;
+  size_t bytes_received = 0;
   
   while ( fState == RUNNING ) 
   {    
       
       FairMQMessage* msg = fTransportFactory->CreateMessage();
       
-      received = fPayloadInputs->at(0)->Receive(msg);
+      bytes_received = fPayloadInputs->at(0)->Receive(msg);
       receivedMsgs++;
       
-      if (received) 
+      if (bytes_received) 
       {
           
           fProcessorTask->Exec(msg, NULL);
           
-          bool ReadyToSend=fProcessorTask->TSReady();
+          bool ReadyToSend=fProcessorTask->MsgReadyToSend();
           
           if(ReadyToSend)
           {  
               fPayloadOutputs->at(0)->Send(msg);  
               sentMsgs++;
           }  
-          received = false;
+          bytes_received = 0;
       }
       
       delete msg;

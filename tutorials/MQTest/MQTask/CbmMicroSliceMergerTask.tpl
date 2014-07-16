@@ -204,7 +204,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
 
 
 template <typename TPayloadIn, typename TPayloadOut> 
-bool CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::TSReady()
+bool CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::MsgReadyToSend()
 {
     return fTSReady;
 }

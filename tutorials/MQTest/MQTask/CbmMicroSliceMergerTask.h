@@ -41,7 +41,7 @@ public:
     /** Virtual method Exec **/
     virtual void Exec(FairMQMessage* msg, Option_t* opt);
     
-    bool TSReady();
+    bool MsgReadyToSend();
     
     void SetMicroSliceNumber(uint64_t MaxMicroSliceNumber)
         {fMaxMicroSliceNumber=MaxMicroSliceNumber;}

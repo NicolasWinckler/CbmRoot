@@ -1,53 +1,33 @@
 /* 
- * File:   CbmMicroSliceMerger.tpl
+ * File:   CbmProcessor.tpl
  * Author: winckler
  *
- * Created on July 15, 2014, 12:33 PM
+ * Created on July 16, 2014, 10:49 AM
  */
-template <typename TPolicyTask>
-CbmMicroSliceMerger<TPolicyTask>::CbmMicroSliceMerger() : CbmProcessor<TPolicyTask>()
-{
-}
 
-/*
+
+
 
 template <typename TPolicyTask>
-CbmMicroSliceMerger<TPolicyTask>::CbmMicroSliceMerger() : fProcessorTask(new TPolicyTask())
-{
-}
-
-template <typename TPolicyTask>
-CbmMicroSliceMerger<TPolicyTask>::CbmMicroSliceMerger(unsigned int ComponentNumber) : fComponentNumber(ComponentNumber)
+CbmProcessor<TPolicyTask>::CbmProcessor() : fProcessorTask(new TPolicyTask())
 {
 }
 
 template <typename TPolicyTask>
-CbmMicroSliceMerger<TPolicyTask>::~CbmMicroSliceMerger()
+CbmProcessor<TPolicyTask>::~CbmProcessor()
 {
   delete fProcessorTask;
 }
 
 template <typename TPolicyTask>
-void CbmMicroSliceMerger<TPolicyTask>::SetTask(TPolicyTask* task)
+void CbmProcessor<TPolicyTask>::SetTask(TPolicyTask* task)
 {
   fProcessorTask = task;
 }
 
-template <typename TPolicyTask>
-void CbmMicroSliceMerger<TPolicyTask>::SetMicroSliceNum(uint64_t MSNumber)
-{
-    fProcessorTask->SetMicroSliceNumber(MSNumber);
-}
 
 template <typename TPolicyTask>
-void CbmMicroSliceMerger<TPolicyTask>::SetTimeSliceIdx(uint64_t TSIndex)
-{
-    fProcessorTask->SetTimeSliceIndex(TSIndex);
-}
-
-
-template <typename TPolicyTask>
-void CbmMicroSliceMerger<TPolicyTask>::Init()
+void CbmProcessor<TPolicyTask>::Init()
 {
   FairMQDevice::Init();
 
@@ -56,7 +36,7 @@ void CbmMicroSliceMerger<TPolicyTask>::Init()
 
 
 template <typename TPolicyTask>
-void CbmMicroSliceMerger<TPolicyTask>::Run()
+void CbmProcessor<TPolicyTask>::Run()
 {
   LOG(INFO) << ">>>>>>> Run <<<<<<<";
 
@@ -105,5 +85,3 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
   rateLogger.interrupt();
   rateLogger.join();
 }
-  
- */

@@ -62,6 +62,7 @@ If (Boost_FOUND)
   Set(NO_DICT_SRCS
     MQDevices/CbmMQFileSink.cxx
     data/CbmMicroSlice.cxx
+    MQDevices/CbmProcessor.cxx
     MQDevices/CbmMicroSliceMerger.cxx
     MQTask/CbmMicroSliceMergerTask.cxx
   )

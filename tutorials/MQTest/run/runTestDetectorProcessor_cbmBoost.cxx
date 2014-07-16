@@ -11,7 +11,7 @@
 #include "FairMQLogger.h"
 #include "CbmMicroSliceMerger.h"
 #include "FairMQProcessor.h"
-
+//#include "CbmProcessor.h"
 #ifdef NANOMSG
   #include "FairMQTransportFactoryNN.h"
 #else

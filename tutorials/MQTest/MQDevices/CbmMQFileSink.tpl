@@ -9,7 +9,7 @@
 
 
 template <typename TPayloadIn>
-CbmMQFileSink<TPayloadIn>::CbmMQFileSink()
+CbmMQFileSink<TPayloadIn>::CbmMQFileSink() //: fStsUnpacker(NULL)
 {
         
     
@@ -26,6 +26,14 @@ CbmMQFileSink<TPayloadIn>::~CbmMQFileSink()
     */
 }
 
+/*
+template <typename TPayloadIn>
+void CbmMQFileSink<TPayloadIn>::Init()
+{
+    fStsUnpacker = new CbmStsUnpacker();
+
+}
+*/
 
 template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::InitOutputFile(TString defaultId)
@@ -69,85 +77,103 @@ void CbmMQFileSink<TPayloadIn>::Run()
                 {
                     InputArchive >> fFlesTimeSlices;
                 }
-                catch (boost::archive::archive_exception e)
+                catch (boost::archive::archive_exception& e)
                 {
                     LOG(ERROR) << e.what();
                 }
 
                 LOG(INFO) << "Message received";
                 
-                for(unsigned int i = 0; i < 16; ++i)
+                
+                uint64_t  InputLinkNumber=fFlesTimeSlices.num_components();
+                uint64_t  MSlicesNumber=fFlesTimeSlices.num_microslices(2);
+                
+                LOG(INFO) << "InputLinkNumber = "<<InputLinkNumber;
+                
+                for(unsigned int comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
                 {
-                    LOG(INFO) << "---------------------------------------";
-                    const fles::MicrosliceDescriptor MSdesc=fFlesTimeSlices.descriptor(2,i);
-                    uint64_t MSliceIndex=MSdesc.idx-1;
-                    uint16_t eqid=MSdesc.eq_id;
-                    uint32_t ContentSize=MSdesc.size;
-                    
-                    LOG(INFO) << "Micro Slice Index = "<<MSliceIndex;
-                    LOG(INFO) << "Input link = "<<eqid;
-                    LOG(INFO) << "Content size = "<<ContentSize;
-                    
-                    if(ContentSize>0)
+                    uint64_t  MSlicesNumberk=fFlesTimeSlices.num_microslices(comp_j);                    
+                
+                
+                    for(unsigned int i = 0; i < MSlicesNumber; ++i)
                     {
-                        std::vector<uint8_t> vectTimestamp_sts;     // ULong64_t
-                        std::vector<uint8_t> vectAdress_sts;        // UInt_t
-                        std::vector<uint8_t> vectCharge_sts;        // UShort_t
-                        std::vector<uint8_t> vectSectorNr_sts;      // Int_t
-                        std::vector<uint8_t> vectSystemId_sts;      // Int_t
                         
-                        /// get data of first digi of current microslice
-
-                        // time stamp
-                        unsigned int start=0;
-                        unsigned int end=sizeof(ULong64_t);
-                        for (unsigned int k = start; k < end; ++k)
-                            vectTimestamp_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                        // adress
-                        start=end;
-                        end+=sizeof(UInt_t);
-                        for (unsigned int k = start; k < end; ++k)
-                            vectAdress_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                        // charge
-                        start=end;
-                        end+=sizeof(UShort_t);
-                        for (unsigned int k = start; k < end; ++k)
-                            vectCharge_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                        // sectorNr
-                        start=end;
-                        end+=sizeof(Int_t);
-                        for (unsigned int k = start; k < end; ++k)
-                            vectSectorNr_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                        // systemId
-                        start=end;
-                        end+=sizeof(Int_t);
-                        for (unsigned int k = start; k < end; ++k)
-                            vectSystemId_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
+                        const fles::MicrosliceDescriptor MSdesc=fFlesTimeSlices.descriptor(comp_j,i);
+                        uint64_t MSliceIndex=MSdesc.idx-1;
+                        uint16_t eqid=MSdesc.eq_id;
+                        uint32_t ContentSize=MSdesc.size;
 
                         
-                        ULong64_t tempTimestamp=CombineData<ULong64_t>(vectTimestamp_sts);
-                        UInt_t tempAdress=CombineData<UInt_t>(vectAdress_sts);
-                        UShort_t tempCharge=CombineData<UShort_t>(vectCharge_sts);
-                        Int_t tempSectorNr=CombineData<Int_t>(vectSectorNr_sts);
-                        Int_t tempSystemId=CombineData<Int_t>(vectSystemId_sts);
-                        
-                        
-                        LOG(INFO) << "*****************";
-                        LOG(INFO) << "* Data of first digi in current microslice:";
-                        LOG(INFO) << "* TimeStamp = " << tempTimestamp <<" ns";
-                        LOG(INFO) << "* Address = "   << tempAdress;
-                        LOG(INFO) << "* Charge = "    << tempCharge;
-                        LOG(INFO) << "* SectorNr = "  << tempSectorNr;
-                        LOG(INFO) << "* SystemId = "  << tempSystemId;
-                        LOG(INFO) << "*****************";
+
+                        if(ContentSize>0 && eqid==2)
+                        {
+                            //const uint8_t* ptr_FlesTimeSliceContent;
+                            //ptr_FlesTimeSliceContent=fFlesTimeSlices.content(2,i);
+                            //fStsUnpacker->Exec(fFlesTimeSlices.content(2,i));
+                            ///*
+                            LOG(INFO) << "---------------------------------------";
+                            LOG(INFO) << "Micro Slice Index = "<<MSliceIndex;
+                            LOG(INFO) << "Input link = "<<eqid;
+                            LOG(INFO) << "Content size = "<<ContentSize;
+                            std::vector<uint8_t> vectTimestamp_sts;     // ULong64_t
+                            std::vector<uint8_t> vectAdress_sts;        // UInt_t
+                            std::vector<uint8_t> vectCharge_sts;        // UShort_t
+                            std::vector<uint8_t> vectSectorNr_sts;      // Int_t
+                            std::vector<uint8_t> vectSystemId_sts;      // Int_t
+
+                            /// get data of first digi of current microslice
+
+                            // time stamp
+                            unsigned int start=0;
+                            unsigned int end=sizeof(ULong64_t);
+                            for (unsigned int k = start; k < end; ++k)
+                                vectTimestamp_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
+
+                            // adress
+                            start=end;
+                            end+=sizeof(UInt_t);
+                            for (unsigned int k = start; k < end; ++k)
+                                vectAdress_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
+
+                            // charge
+                            start=end;
+                            end+=sizeof(UShort_t);
+                            for (unsigned int k = start; k < end; ++k)
+                                vectCharge_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
+
+                            // sectorNr
+                            start=end;
+                            end+=sizeof(Int_t);
+                            for (unsigned int k = start; k < end; ++k)
+                                vectSectorNr_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
+
+                            // systemId
+                            start=end;
+                            end+=sizeof(Int_t);
+                            for (unsigned int k = start; k < end; ++k)
+                                vectSystemId_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
+
+
+                            ULong64_t tempTimestamp=CombineData<ULong64_t>(vectTimestamp_sts);
+                            UInt_t tempAdress=CombineData<UInt_t>(vectAdress_sts);
+                            UShort_t tempCharge=CombineData<UShort_t>(vectCharge_sts);
+                            Int_t tempSectorNr=CombineData<Int_t>(vectSectorNr_sts);
+                            Int_t tempSystemId=CombineData<Int_t>(vectSystemId_sts);
+
+
+                            LOG(INFO) << "*****************";
+                            LOG(INFO) << "* Data of first digi in current microslice:";
+                            LOG(INFO) << "* TimeStamp = " << tempTimestamp <<" ns";
+                            LOG(INFO) << "* Address = "   << tempAdress;
+                            LOG(INFO) << "* Charge = "    << tempCharge;
+                            LOG(INFO) << "* SectorNr = "  << tempSectorNr;
+                            LOG(INFO) << "* SystemId = "  << tempSystemId;
+                            LOG(INFO) << "*****************";
+                            //*/
+                        }
                     }
-                }
                 
-                
+                }//loop k
                 
                 
                 bytes_received = 0;

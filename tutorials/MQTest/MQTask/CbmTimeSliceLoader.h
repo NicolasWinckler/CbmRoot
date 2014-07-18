@@ -56,6 +56,8 @@ private :
     vector<T1> fDigiVector;
     vector<CbmStsDigi> fStsData;
     vector<CbmMuchDigi> fMuchData;
+    // to do: add template argument for detector types --> one detector data member :
+    //vector<TDetecorDigi> fDetectorData;
     
     CbmMicroSlice fStsMicroSlice;
     fles::MicrosliceDescriptor fdesc;

@@ -22,7 +22,7 @@
 
 #include "CbmUnpacker.h"
 #include "StorableTimeslice.hpp"
-
+#include "CbmStsUnpacker.h"
 
 #ifndef __CINT__
 #include <boost/thread.hpp>
@@ -45,6 +45,7 @@ class CbmMQFileSink: public FairMQDevice
   public:
     CbmMQFileSink();
     virtual ~CbmMQFileSink();
+    //virtual void Init();
     virtual void InitOutputFile(TString defaultId = "100");
     
     
@@ -56,6 +57,8 @@ class CbmMQFileSink: public FairMQDevice
     
   protected:
     virtual void Run();
+    
+    //CbmStsUnpacker* fStsUnpacker;
   private:
     TFile* fOutFile;
     TTree* fTree;

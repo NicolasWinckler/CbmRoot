@@ -18,6 +18,9 @@ ${CBMROOT_SOURCE_DIR}/run
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/data
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/fles_ipc
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQDevices
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQTask
+${CBMROOT_SOURCE_DIR}/tutorials/MQTest/SubTask
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime
 ${CBMROOT_SOURCE_DIR}/cbmdata/beamtime/fhodo
@@ -31,8 +34,6 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/stt
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
-${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQDevices
-${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQTask
 )
 
 add_subdirectory (fles_ipc)
@@ -65,6 +66,7 @@ If (Boost_FOUND)
     MQDevices/CbmProcessor.cxx
     MQDevices/CbmMicroSliceMerger.cxx
     MQTask/CbmMicroSliceMergerTask.cxx
+    #SubTask/CbmStsUnpacker.cxx
   )
 EndIf (Boost_FOUND)
 

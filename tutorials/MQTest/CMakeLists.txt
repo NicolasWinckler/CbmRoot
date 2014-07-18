@@ -66,7 +66,7 @@ If (Boost_FOUND)
     MQDevices/CbmProcessor.cxx
     MQDevices/CbmMicroSliceMerger.cxx
     MQTask/CbmMicroSliceMergerTask.cxx
-    #SubTask/CbmStsUnpacker.cxx
+    SubTask/CbmStsUnpacker.cxx
   )
 EndIf (Boost_FOUND)
 

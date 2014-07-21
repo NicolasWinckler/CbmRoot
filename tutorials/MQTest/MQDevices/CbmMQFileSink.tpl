@@ -9,7 +9,7 @@
 
 
 template <typename TPayloadIn>
-CbmMQFileSink<TPayloadIn>::CbmMQFileSink() //: fStsUnpacker(NULL)
+CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fStsUnpacker(new CbmDataConverter())
 {
         
     
@@ -30,10 +30,10 @@ CbmMQFileSink<TPayloadIn>::~CbmMQFileSink()
 template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::Init()
 {
-    fStsUnpacker = new CbmStsUnpacker();
+    //fStsUnpacker = new CbmStsUnpacker();
 
 }
-*/
+//*/
 
 template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::InitOutputFile(TString defaultId)
@@ -102,15 +102,19 @@ void CbmMQFileSink<TPayloadIn>::Run()
                         uint64_t MSliceIndex=MSdesc.idx-1;
                         uint16_t eqid=MSdesc.eq_id;
                         uint32_t ContentSize=MSdesc.size;
+                        uint8_t Det_id=MSdesc.sys_id;
+                        Det_id=2;
 
                         
 
                         if(ContentSize>0 && eqid==2)
                         {
-                            //const uint8_t* ptr_FlesTimeSliceContent;
-                            //ptr_FlesTimeSliceContent=fFlesTimeSlices.content(2,i);
-                            //fStsUnpacker->Exec(fFlesTimeSlices.content(2,i));
-                            ///*
+                            const uint8_t* ptr_FlesTimeSliceContent;
+                            ptr_FlesTimeSliceContent=fFlesTimeSlices.content(2,i);
+                            
+                            
+                            fStsUnpacker->Convert(Det_id,ptr_FlesTimeSliceContent);
+                            /*
                             LOG(INFO) << "---------------------------------------";
                             LOG(INFO) << "Micro Slice Index = "<<MSliceIndex;
                             LOG(INFO) << "Input link = "<<eqid;

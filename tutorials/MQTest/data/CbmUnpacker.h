@@ -9,6 +9,7 @@
 #define	CBMUNPACKER_H
 
 #include <assert.h>
+#include <vector>
 
     // split data member of type U1 in N pieces of 1 byte
     template<typename U1>

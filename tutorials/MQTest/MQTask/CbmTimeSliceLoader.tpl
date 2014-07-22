@@ -18,7 +18,7 @@ CbmTimeSliceLoader<T1,T2>::CbmTimeSliceLoader() : FairMQSamplerTask("Load class 
     fdesc = fles::MicrosliceDescriptor();
     fdesc.hdr_id = 0xDD;
     fdesc.hdr_ver = 0x01;
-    fdesc.sys_id = 0xFF;
+    //fdesc.sys_id = 0xFF;
     fdesc.sys_ver = 1;
     
     
@@ -124,7 +124,8 @@ void CbmTimeSliceLoader<T1,T2>::Exec(Option_t* opt)
         // initialize microslice header
         fles::MicrosliceDescriptor desc_sts = fles::MicrosliceDescriptor();
         desc_sts=fdesc;
-        desc_sts.eq_id = (uint16_t)(kSTS);// e.g. sts?
+        desc_sts.eq_id = (uint16_t)(kSTS);// input link id (component)
+        fdesc.sys_id = (uint16_t)(kSTS);// detector id
         desc_sts.idx = (uint64_t)(fEventIndex+1);// Microslice index => interval [0,1]mus ?
         desc_sts.size = fMicroSliceContent.size();
         

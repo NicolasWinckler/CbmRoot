@@ -85,100 +85,57 @@ void CbmMQFileSink<TPayloadIn>::Run()
                 LOG(INFO) << "Message received";
                 
                 
+                 
+                
                 uint64_t  InputLinkNumber=fFlesTimeSlices.num_components();
-                uint64_t  MSlicesNumber=fFlesTimeSlices.num_microslices(2);
+                uint64_t  MSlicesNumber_MAX=0;
                 
-                LOG(INFO) << "InputLinkNumber = "<<InputLinkNumber;
-                
+                // In order to fill the root cbm TimeSlice we first get the maximum index (time) 
+                // among all components of the fles TimeSlice
                 for(unsigned int comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
                 {
-                    uint64_t  MSlicesNumberk=fFlesTimeSlices.num_microslices(comp_j);                    
+                    uint64_t MSnum_MAX=fFlesTimeSlices.num_microslices(comp_j);
+                    if(MSnum_MAX>MSlicesNumber_MAX) 
+                            MSlicesNumber_MAX=MSnum_MAX;
+                }
                 
                 
-                    for(unsigned int i = 0; i < MSlicesNumber; ++i)
+                
+                LOG(INFO) << "InputLinkNumber = "<<InputLinkNumber;
+                LOG(INFO) << "MSlicesNumber_MAX = "<<MSlicesNumber_MAX;
+                
+                //loop over fles MS index (time)
+                for(unsigned int i = 0; i < MSlicesNumber_MAX; ++i)
+                {
+                    //CbmTimeSlice* fTimeSlice = new CbmTimeSlice(fCurrentStartTime, fDuration);
+                    
+                    for(unsigned int comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
                     {
+                        uint64_t  MSlicesNumber_j=fFlesTimeSlices.num_microslices(comp_j);
                         
-                        const fles::MicrosliceDescriptor MSdesc=fFlesTimeSlices.descriptor(comp_j,i);
-                        uint64_t MSliceIndex=MSdesc.idx-1;
-                        uint16_t eqid=MSdesc.eq_id;
-                        uint32_t ContentSize=MSdesc.size;
-                        uint8_t Det_id=MSdesc.sys_id;
-                        Det_id=2;
-
                         
-
-                        if(ContentSize>0 && eqid==2)
+                        if(i<MSlicesNumber_j)
                         {
-                            const uint8_t* ptr_FlesTimeSliceContent;
-                            ptr_FlesTimeSliceContent=fFlesTimeSlices.content(2,i);
+
                             
-                            
-                            fStsUnpacker->Convert(Det_id,ptr_FlesTimeSliceContent);
-                            /*
-                            LOG(INFO) << "---------------------------------------";
-                            LOG(INFO) << "Micro Slice Index = "<<MSliceIndex;
-                            LOG(INFO) << "Input link = "<<eqid;
-                            LOG(INFO) << "Content size = "<<ContentSize;
-                            std::vector<uint8_t> vectTimestamp_sts;     // ULong64_t
-                            std::vector<uint8_t> vectAdress_sts;        // UInt_t
-                            std::vector<uint8_t> vectCharge_sts;        // UShort_t
-                            std::vector<uint8_t> vectSectorNr_sts;      // Int_t
-                            std::vector<uint8_t> vectSystemId_sts;      // Int_t
-
-                            /// get data of first digi of current microslice
-
-                            // time stamp
-                            unsigned int start=0;
-                            unsigned int end=sizeof(ULong64_t);
-                            for (unsigned int k = start; k < end; ++k)
-                                vectTimestamp_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                            // adress
-                            start=end;
-                            end+=sizeof(UInt_t);
-                            for (unsigned int k = start; k < end; ++k)
-                                vectAdress_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                            // charge
-                            start=end;
-                            end+=sizeof(UShort_t);
-                            for (unsigned int k = start; k < end; ++k)
-                                vectCharge_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                            // sectorNr
-                            start=end;
-                            end+=sizeof(Int_t);
-                            for (unsigned int k = start; k < end; ++k)
-                                vectSectorNr_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-                            // systemId
-                            start=end;
-                            end+=sizeof(Int_t);
-                            for (unsigned int k = start; k < end; ++k)
-                                vectSystemId_sts.push_back(*(fFlesTimeSlices.content(2,i)+k));
-
-
-                            ULong64_t tempTimestamp=CombineData<ULong64_t>(vectTimestamp_sts);
-                            UInt_t tempAdress=CombineData<UInt_t>(vectAdress_sts);
-                            UShort_t tempCharge=CombineData<UShort_t>(vectCharge_sts);
-                            Int_t tempSectorNr=CombineData<Int_t>(vectSectorNr_sts);
-                            Int_t tempSystemId=CombineData<Int_t>(vectSystemId_sts);
-
-
-                            LOG(INFO) << "*****************";
-                            LOG(INFO) << "* Data of first digi in current microslice:";
-                            LOG(INFO) << "* TimeStamp = " << tempTimestamp <<" ns";
-                            LOG(INFO) << "* Address = "   << tempAdress;
-                            LOG(INFO) << "* Charge = "    << tempCharge;
-                            LOG(INFO) << "* SectorNr = "  << tempSectorNr;
-                            LOG(INFO) << "* SystemId = "  << tempSystemId;
-                            LOG(INFO) << "*****************";
-                            //*/
+                            const fles::MicrosliceDescriptor MSdesc=fFlesTimeSlices.descriptor(comp_j,i);
+                            uint64_t MSliceIndex=MSdesc.idx-1;
+                            uint16_t eqid=MSdesc.eq_id;
+                            uint32_t ContentSize=MSdesc.size;
+                            uint8_t Det_id=MSdesc.sys_id;
+                            Det_id=2;
+                            if(ContentSize>0 && eqid==2)
+                            {
+                                
+                                const uint8_t* ptr_FlesTimeSliceContent;
+                                ptr_FlesTimeSliceContent=fFlesTimeSlices.content(2,i);
+                                //fStsUnpacker->Convert(Det_id,ptr_FlesTimeSliceContent);
+                                fStsUnpacker->Convert(&MSdesc,ptr_FlesTimeSliceContent);
+                            }
                         }
-                    }
-                
-                }//loop k
-                
+
+                    }//loop k
+                }
                 
                 bytes_received = 0;
             }

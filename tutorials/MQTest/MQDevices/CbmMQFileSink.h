@@ -18,7 +18,7 @@
 #include "TString.h"
 
 #include "FairMQDevice.h"
-#include "FairMQLogger.h"
+
 
 #include "CbmUnpacker.h"
 #include "StorableTimeslice.hpp"
@@ -34,7 +34,7 @@
 #include <boost/serialization/vector.hpp>
 #endif //__CINT__
 
-
+#include "FairMQLogger.h"
 class TVector3;
 class TFile;
 class TTree;

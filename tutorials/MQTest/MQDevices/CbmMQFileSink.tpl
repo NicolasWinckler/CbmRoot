@@ -1,17 +1,21 @@
+/********************************************************************************
+ *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
+ *                                                                              *
+ *              This software is distributed under the terms of the             * 
+ *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *  
+ *                  copied verbatim in the file "LICENSE"                       *
+ ********************************************************************************/
 /* 
  * File:   CbmMQFileSink.tpl
- * Author: winckler, A. Rybalchenko
- *
- * Created on March 11, 2014, 12:12 PM
+ * Author: winckler
  */
 
-
-
-
 template <typename TPayloadIn>
-CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fStsUnpacker(new CbmDataConverter())
+CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fCbmDataUnpacker(new CbmDataConverter()), 
+        fCurrentStartTime (0.),
+        fDuration (1000.)
 {
-        
+        fCbmDataUnpacker->InitCbmTS(fCurrentStartTime,fDuration);
     
 }
 
@@ -19,33 +23,16 @@ CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fStsUnpacker(new CbmDataConverter()
 template <typename TPayloadIn>
 CbmMQFileSink<TPayloadIn>::~CbmMQFileSink()
 {
-    /*
-    fTree->Write();
-    fOutFile->Close();
-
-    */
+    fCbmDataUnpacker->WriteTreeToFile();
+    delete fCbmDataUnpacker;
 }
-
-/*
-template <typename TPayloadIn>
-void CbmMQFileSink<TPayloadIn>::Init()
-{
-    //fStsUnpacker = new CbmStsUnpacker();
-
-}
-//*/
 
 template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::InitOutputFile(TString defaultId)
 {
-    /*
-    fOutput = new TClonesArray("FairTestDetectorHit");
-    char out[256];
-    sprintf(out, "filesink%s.root", defaultId.Data());
-
-    fOutFile = new TFile(out,"recreate");
-    fTree = new TTree("MQOut", "Test output");
-    fTree->Branch("Output","TClonesArray", &fOutput, 64000, 99);*/
+    char outname[256];
+    sprintf(outname, "cbmTimeSlicefilesink%s.root", defaultId.Data());
+    fCbmDataUnpacker->InitCbmTSOutputFile(outname);
 }
 
 
@@ -53,8 +40,9 @@ void CbmMQFileSink<TPayloadIn>::InitOutputFile(TString defaultId)
 template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::Run()
 {
-  
         LOG(INFO) << ">>>>>>> Run <<<<<<<";
+        bool printinfo=true;
+        fCbmDataUnpacker->SetPrintOption(0,printinfo);
 
         boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
         int receivedMsgs = 0;
@@ -85,71 +73,94 @@ void CbmMQFileSink<TPayloadIn>::Run()
                 LOG(INFO) << "Message received";
                 
                 
-                 
+                /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // In order to fill the root cbm TimeSlice we first get the max number of mircoslice among all components
+                // (= total duration of the current fles TimeSlice) 
+                // and we also get the smallest MS index (=start time of the current fles Timeslice)
                 
-                uint64_t  InputLinkNumber=fFlesTimeSlices.num_components();
-                uint64_t  MSlicesNumber_MAX=0;
+                uint64_t InputLinkNumber=fFlesTimeSlices.num_components();
+                uint64_t MSlicesNumber_MAX=0;
+                uint64_t MSliceIndex_MIN=UINTMAX_MAX;
                 
-                // In order to fill the root cbm TimeSlice we first get the maximum index (time) 
-                // among all components of the fles TimeSlice
                 for(unsigned int comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
                 {
+                    // get max number of fles microslices in the current fles timeslice
                     uint64_t MSnum_MAX=fFlesTimeSlices.num_microslices(comp_j);
                     if(MSnum_MAX>MSlicesNumber_MAX) 
                             MSlicesNumber_MAX=MSnum_MAX;
+                    
+                    // get smallest microslice index
+                    uint64_t MSIndex_MIN=fFlesTimeSlices.descriptor(comp_j,0).idx;
+                    if(MSIndex_MIN<MSliceIndex_MIN)
+                        MSliceIndex_MIN=MSIndex_MIN;
                 }
                 
                 
+                /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /// initialize time interval of the cbmroot timeslice obtained from the fles header 
+                /// assume duration of 1 mus
+                fCurrentStartTime=1000.0*(Double_t)MSliceIndex_MIN;
+                fCbmDataUnpacker->SetCbmTSInterval(fCurrentStartTime, fDuration);
                 
-                LOG(INFO) << "InputLinkNumber = "<<InputLinkNumber;
-                LOG(INFO) << "MSlicesNumber_MAX = "<<MSlicesNumber_MAX;
-                
-                //loop over fles MS index (time)
-                for(unsigned int i = 0; i < MSlicesNumber_MAX; ++i)
+                /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /// loop over all fles MS index (time) of the current fles timeslice
+                /// and fill cbmroot timeslice in tree
+                for(uint64_t MS_i = 0; MS_i < MSlicesNumber_MAX; ++MS_i)
                 {
-                    //CbmTimeSlice* fTimeSlice = new CbmTimeSlice(fCurrentStartTime, fDuration);
                     
-                    for(unsigned int comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
+                    if(printinfo)
                     {
-                        uint64_t  MSlicesNumber_j=fFlesTimeSlices.num_microslices(comp_j);
+                        LOG(INFO) << "-------------------------------------------"<<"\n";
+                        LOG(INFO) <<MS_i<< "th MS in current fles TS "<<"\n";
+                        LOG(INFO) << "Current Time Slice interval = ["<<fCurrentStartTime
+                                <<";"<< fCurrentStartTime+fDuration<<"]\n";
+                        LOG(INFO) << "InputLinkNumber = "<<InputLinkNumber<<"\n";
+                    }
+                    
+                    fCurrentStartTime+=fDuration;// not used but in the initialization or in print
+                    
+                    /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    /// loop over all component in fles time slice in the current time interval
+                    for(uint64_t comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
+                    {
+                        uint64_t MSlicesNumber_j=fFlesTimeSlices.num_microslices(comp_j);
                         
-                        
-                        if(i<MSlicesNumber_j)
+                        if(MS_i<MSlicesNumber_j)
                         {
-
+                            const fles::MicrosliceDescriptor MSdesc=fFlesTimeSlices.descriptor(comp_j,MS_i);
                             
-                            const fles::MicrosliceDescriptor MSdesc=fFlesTimeSlices.descriptor(comp_j,i);
-                            uint64_t MSliceIndex=MSdesc.idx-1;
-                            uint16_t eqid=MSdesc.eq_id;
-                            uint32_t ContentSize=MSdesc.size;
-                            uint8_t Det_id=MSdesc.sys_id;
-                            Det_id=2;
-                            if(ContentSize>0 && eqid==2)
-                            {
-                                
-                                const uint8_t* ptr_FlesTimeSliceContent;
-                                ptr_FlesTimeSliceContent=fFlesTimeSlices.content(2,i);
-                                //fStsUnpacker->Convert(Det_id,ptr_FlesTimeSliceContent);
-                                fStsUnpacker->Convert(&MSdesc,ptr_FlesTimeSliceContent);
-                            }
+                            const uint8_t* ptr_FlesTimeSliceContent;
+                            ptr_FlesTimeSliceContent=fFlesTimeSlices.content(comp_j,MS_i);
+                            fCbmDataUnpacker->CbmTSFiller(&MSdesc,ptr_FlesTimeSliceContent);
+                            
                         }
 
-                    }//loop k
-                }
-                
+                    } // end loop on MS component
+                    
+                    /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    /// fill tree and update currentStartTime
+                    fCbmDataUnpacker->FillCbmTSTree();
+                    
+                } // end loop on MS index
+                break;// break temporary
                 bytes_received = 0;
-            }
+            } //end of if (bytes_received) 
             delete msg;
             
-        }
+               
+        } // end while loop on state machine
         
+        //fCbmDataUnpacker->WriteTreeToFile();
         cout << "I've received " << receivedMsgs << " messages!" << endl;
         boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
         rateLogger.interrupt();
         rateLogger.join();
+        
+        
     
     
 }
+
 
 
 

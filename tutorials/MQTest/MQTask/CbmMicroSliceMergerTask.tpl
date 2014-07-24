@@ -100,7 +100,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         {            
             CbmMicroSlice MSlice=fDigiVector[i];
             desc=MSlice.GetHeader();
-            index=desc.idx-1;
+            index=desc.idx;
             eqid=desc.eq_id;
             ContentSize=desc.size;
             MSliceData=MSlice.GetData();

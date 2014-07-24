@@ -126,7 +126,7 @@ void CbmTimeSliceLoader<T1,T2>::Exec(Option_t* opt)
         desc_sts=fdesc;
         desc_sts.eq_id = (uint16_t)(kSTS);// input link id (component)
         fdesc.sys_id = (uint16_t)(kSTS);// detector id
-        desc_sts.idx = (uint64_t)(fEventIndex+1);// Microslice index => interval [0,1]mus ?
+        desc_sts.idx = (uint64_t)(fEventIndex);// Microslice index => interval [0,1]mus 
         desc_sts.size = fMicroSliceContent.size();
         
         fStsMicroSlice.SetHeader(desc_sts);

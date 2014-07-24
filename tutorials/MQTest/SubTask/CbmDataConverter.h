@@ -1,3 +1,11 @@
+/********************************************************************************
+ *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
+ *                                                                              *
+ *              This software is distributed under the terms of the             * 
+ *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *  
+ *                  copied verbatim in the file "LICENSE"                       *
+ ********************************************************************************/
+
 /* 
  * File:   CbmDataConverter.h
  * Author: winckler
@@ -9,7 +17,9 @@
 #define	CBMDATACONVERTER_H
 
 #include <iostream>
-
+#include "TFile.h"
+#include "TTree.h"
+#include "FairTask.h"
 #include "CbmUnpacker.h"
 #include "StorableTimeslice.hpp"
 #include "CbmTimeSlice.h"
@@ -18,30 +28,47 @@
 #include "CbmStsDigi.h"
 #include "CbmMuchDigi.h"
 #include "FairMQLogger.h"
-class CbmDataConverter 
+class CbmDataConverter : public FairTask
 {
 public:
     CbmDataConverter();
-    //CbmDataConverter(const CbmDataConverter& orig);
     virtual ~CbmDataConverter();
-    void Convert(uint8_t DetectorId, const uint8_t* FlesTimeSliceContent);
-    void Convert(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    //virtual void Exec(Option_t* opt);
+    //virtual InitStatus Init();
     
-    void Convert(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
+    CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    void SetPrintOption(uint32_t DigiToPrint, bool print=true); //temporary
+    
+    /// stuff to to convert fles microslices to cbm root timeslices
+    void CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    
+    /// stuff to handle cbm root timeslices
+    void InitCbmTS(Double_t start=0., Double_t duration=1000.);
+    void InitCbmTSOutputFile(const char* filename);
+    void FillCbmTSTree();
+    void SetCbmTSInterval(Double_t start, Double_t duration);
+    void WriteTreeToFile();
+    
     
 protected:
-    void StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
-    
     vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    void StsConverter(const uint8_t* FlesTimeSliceContent);
-    void MuchConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    void MuchConverter(const uint8_t* FlesTimeSliceContent);
-    CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    vector<CbmMuchDigi> MuchConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     
+    void  StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    void  MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    
+    
+    TFile* fOutFile;
+    TTree* fTree;
     CbmTimeSlice* fCBMTimeSlice;
-    //unsigned int fStsMSDigiSize;
-    //unsigned int fMuchMSDigiSize;
+    /** Start time of current time slice [ns] **/
+    Double_t fCurrentStartTime;
+    /** Duration of time slice [ns] **/
+    Double_t fDuration;
+    bool fPrint; //temporary
+    uint32_t fDigiToPrint; //temporary
 
+    
 };
 
 #endif	/* CBMDATACONVERTER_H */

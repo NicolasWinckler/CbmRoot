@@ -1,8 +1,14 @@
-/**
- * CbmMQFileSink.h
- *
- * @since 2013-06-05
- * @author A. Rybalchenko
+/********************************************************************************
+ *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
+ *                                                                              *
+ *              This software is distributed under the terms of the             * 
+ *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *  
+ *                  copied verbatim in the file "LICENSE"                       *
+ ********************************************************************************/
+
+/* 
+ * File:   CbmMQFileSink.h
+ * Author: winckler
  */
 
 #ifndef FAIRMQFILESINK_H_
@@ -11,18 +17,12 @@
 #include <iostream>
 
 #include "Rtypes.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TClonesArray.h"
-#include "TVector3.h"
 #include "TString.h"
+#include <chrono>
+
 
 #include "FairMQDevice.h"
-
-
-#include "CbmUnpacker.h"
 #include "StorableTimeslice.hpp"
-#include "CbmStsUnpacker.h"
 #include "CbmDataConverter.h"
 
 #ifndef __CINT__
@@ -35,10 +35,6 @@
 #endif //__CINT__
 
 #include "FairMQLogger.h"
-class TVector3;
-class TFile;
-class TTree;
-class TClonesArray;
 
 template <typename TPayloadIn>
 class CbmMQFileSink: public FairMQDevice
@@ -46,7 +42,6 @@ class CbmMQFileSink: public FairMQDevice
   public:
     CbmMQFileSink();
     virtual ~CbmMQFileSink();
-    //void Init();
     virtual void InitOutputFile(TString defaultId = "100");
     
     
@@ -59,12 +54,15 @@ class CbmMQFileSink: public FairMQDevice
   protected:
     virtual void Run();
     
-    //CbmStsUnpacker* fStsUnpacker;
-    CbmDataConverter* fStsUnpacker;
+    CbmDataConverter* fCbmDataUnpacker;
   private:
-    TFile* fOutFile;
-    TTree* fTree;
-    TClonesArray* fOutput;
+    
+    // Start time of current time slice [ns]
+    Double_t fCurrentStartTime;
+    
+    // Duration of time slice [ns] 
+    Double_t fDuration;
+    
     #ifndef __CINT__ // for BOOST serialization
     friend class boost::serialization::access;
     fles::StorableTimeslice fFlesTimeSlices{1,1};

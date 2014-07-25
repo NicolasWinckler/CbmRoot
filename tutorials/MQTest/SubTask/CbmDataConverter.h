@@ -37,6 +37,10 @@ public:
     //virtual InitStatus Init();
     
     CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    CbmMicroSlice GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
+    
+    CbmMicroSlice GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
+
     void SetPrintOption(uint32_t DigiToPrint, bool print=true); //temporary
     
     /// stuff to to convert fles microslices to cbm root timeslices

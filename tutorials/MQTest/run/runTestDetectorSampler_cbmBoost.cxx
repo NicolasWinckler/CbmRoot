@@ -23,7 +23,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include "CbmTimeSlice.h"
-#include "CbmMicroSlice.h"
+#include "CbmStsDigi.h"
 
 using std::cout;
 using std::cin;
@@ -31,11 +31,10 @@ using std::endl;
 using std::stringstream;
 
 
-
-typedef CbmMicroSlice TMicroSlice; // class to serialize/deserialize
+typedef CbmStsDigi TCbmDigi;
 typedef boost::archive::binary_oarchive TBoostBinPayloadOut; // boost binary format
-typedef boost::archive::text_oarchive TBoostTextPayloadOut; // boost text format
-typedef CbmTimeSliceLoader<TMicroSlice, TBoostBinPayloadOut> TLoader;
+//typedef boost::archive::text_oarchive TBoostTextPayloadOut; // boost text format
+typedef CbmTimeSliceLoader<TCbmDigi, TBoostBinPayloadOut> TLoader;
 
 FairMQSampler<TLoader> sampler;
 

@@ -2,38 +2,29 @@
 #ifndef CBMTIMESLICELOADER_H
 #define	CBMTIMESLICELOADER_H
 
-#include "FairMQSamplerTask.h"
+#if __cplusplus >= 201103L
+#include <type_traits>
+#include <array>
+#endif
 
-#include "FairMQLogger.h"
+#include <iostream> 
 #include <boost/timer/timer.hpp>
-
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <iostream> 
-#include <iterator>
-#include <algorithm>
-#include <cassert>
+#include "FairMQSamplerTask.h"
 #include "CbmTimeSlice.h"
-#include "CbmStsDigi.h"
-#include "CbmMuchDigi.h"
-
-#include "StorableTimeslice.hpp"
 #include "CbmMicroSlice.h"
-#include "CbmUnpacker.h"
+#include "CbmDataConverter.h"
+#include "FairMQLogger.h"
 
-#if __cplusplus >= 201103L
-#include <type_traits>
-#include <array>
-
-#endif
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////
 
 
-////////// Base template header <T1,T2>
-template <typename T1, typename T2>
+////////// Base template header <TCbmDigi,TPayloadOut>
+template <typename TCbmDigi, typename TPayloadOut>
 class CbmTimeSliceLoader : public FairMQSamplerTask
 { 
 public : 
@@ -51,17 +42,12 @@ public :
     
     
 private :
+    CbmDataConverter* fCbmDataConverter;
     CbmTimeSlice* fCBMTimeSlice;
     friend class boost::serialization::access;
-    vector<T1> fDigiVector;
-    vector<CbmStsDigi> fStsData;
-    vector<CbmMuchDigi> fMuchData;
-    // to do: add template argument for detector types --> one detector data member :
-    //vector<TDetecorDigi> fDetectorData;
-    
-    CbmMicroSlice fStsMicroSlice;
-    fles::MicrosliceDescriptor fdesc;
-    vector<uint8_t> fMicroSliceContent;
+    vector<CbmMicroSlice> fDigiVector;
+    CbmMicroSlice fMicroSlice;
+    DetectorId fDetID;
 }; 
 
 

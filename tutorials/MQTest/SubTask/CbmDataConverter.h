@@ -20,14 +20,19 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "FairTask.h"
-#include "CbmUnpacker.h"
+
 #include "StorableTimeslice.hpp"
 #include "CbmTimeSlice.h"
-#include "CbmDetectorList.h"
+
+#include "CbmUnpacker.h"
 #include "CbmMicroSlice.h"
+
+#include "CbmDetectorList.h"
 #include "CbmStsDigi.h"
 #include "CbmMuchDigi.h"
+
 #include "FairMQLogger.h"
+
 class CbmDataConverter : public FairTask
 {
 public:
@@ -37,13 +42,12 @@ public:
     //virtual InitStatus Init();
     
     CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    
+    /// stuff to convert cbm root timeslices to fles microslices
     CbmMicroSlice GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
-    
     CbmMicroSlice GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
-
-    void SetPrintOption(uint32_t DigiToPrint, bool print=true); //temporary
     
-    /// stuff to to convert fles microslices to cbm root timeslices
+    /// stuff to convert fles microslices to cbm root timeslices
     void CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     
     /// stuff to handle cbm root timeslices
@@ -53,6 +57,7 @@ public:
     void SetCbmTSInterval(Double_t start, Double_t duration);
     void WriteTreeToFile();
     
+    void SetPrintOption(uint32_t DigiToPrint, bool print=true); //temporary
     
 protected:
     vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
@@ -65,13 +70,16 @@ protected:
     TFile* fOutFile;
     TTree* fTree;
     CbmTimeSlice* fCBMTimeSlice;
-    /** Start time of current time slice [ns] **/
+    /// Start time of current time slice [ns]
     Double_t fCurrentStartTime;
-    /** Duration of time slice [ns] **/
+    /// Duration of time slice [ns] 
     Double_t fDuration;
+
     bool fPrint; //temporary
     uint32_t fDigiToPrint; //temporary
 
+    size_t fStsDigiPayloadSize;
+    size_t fMuchDigiPayloadSize;
     
 };
 

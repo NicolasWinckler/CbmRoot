@@ -24,7 +24,8 @@ CbmDataConverter::CbmDataConverter() : FairTask("CbmDataConverter"),
         fPrint(false),
         fDigiToPrint(0)
 {
-    
+        fStsDigiPayloadSize=sizeof(ULong64_t)+sizeof(UInt_t)+sizeof(UShort_t)+sizeof(Int_t)+sizeof(Int_t);
+        fMuchDigiPayloadSize=0;// TODO : implement MUCH part
 }
 
 
@@ -304,18 +305,14 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
         if(fPrint)
         {
             std::cout   << "   number of STS points = "
-                        << CbmTSlice->GetDataSize(kSTS) 
-                        <<std::endl;
-                        int truc=sizeof(CbmStsDigi)*CbmTSlice->GetDataSize(kSTS);
-                        std::cout<<"SIZE OF sts digi = "<< sizeof(CbmStsDigi) <<std::endl;
-                        std::cout<<"SIZE OF CONTENT = "<< truc <<std::endl;
+                        << CbmTSlice->GetDataSize(kSTS) <<std::endl;
         }
 
-        // define fles MicroSlice header specific to sts detector
+        // define fles MicroSlice header specific to STS detector
         MSdesc.sys_ver = 1;
         MSdesc.eq_id = (uint16_t)(kSTS);// input link id (component)
         MSdesc.sys_id = (uint16_t)(kSTS);// detector id
-        //MSdesc.size -> define in GetCbmStsMicroSlice
+        MSdesc.size = (uint32_t)(fStsDigiPayloadSize*CbmTSlice->GetDataSize(kSTS));
         vector<CbmStsDigi> StsData=CbmTSlice->GetStsData();
         MicroSlice=GetCbmStsMicroSlice(&MSdesc, StsData);
 
@@ -324,16 +321,17 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
     case kMUCH:
     {
         if(fPrint)
-            {
-                std::cout   << "   number of MUCH points = "
-                            << CbmTSlice->GetDataSize(kMUCH) 
-                            <<std::endl;
-            }
+        {
+            std::cout   << "   number of MUCH points = "
+                        << CbmTSlice->GetDataSize(kMUCH) <<std::endl;
+        }
+
+        // define fles MicroSlice header specific to MUCH detector
         MSdesc.sys_ver = 1;
         MSdesc.eq_id = (uint16_t)(kMUCH);// input link id (component)
         MSdesc.sys_id = (uint16_t)(kMUCH);// detector id
+        MSdesc.size = (uint32_t)(fMuchDigiPayloadSize*CbmTSlice->GetDataSize(kMUCH));
         vector<CbmMuchDigi> MuchData=CbmTSlice->GetMuchData();
-        //MSdesc.size -> define in GetCbmStsMicroSlice
         //MicroSlice=GetCbmMuchMicroSlice(&MSdesc, MuchData);
       break;
     }
@@ -366,24 +364,20 @@ CbmMicroSlice CbmDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescriptor* 
         // print 
         if(fPrint && iDigi==fDigiToPrint)
         {
-           
             // recombine the splitted data to check whether everything is ok
-            ULong64_t testmystuff=CombineData<ULong64_t>(StsData_TimeStamp);
-            std::cout   << "testmystuff = "     << testmystuff <<std::endl;
-            std::cout   << "STS digi Nr "       << iDigi << std::endl;
-            std::cout   << " time stamp =  "    << vStsDigi[iDigi].GetTime() 
-                        << " Address = "        << vStsDigi[iDigi].GetAddress() 
-                        << " Charge = "         << vStsDigi[iDigi].GetCharge()
-                        << " Sector Nr = "      << vStsDigi[iDigi].GetSectorNr()
-                        << " System Id = "      << vStsDigi[iDigi].GetSystemId()
-                        << std::endl;
-            
+            std::cout   << "*******************************************"<< std::endl;
+            std::cout   << "* Content of STS digi Nr "      << iDigi <<" in CbmRoot Time Slice:" << std::endl;
+            std::cout   << "* time stamp =  "    << vStsDigi[iDigi].GetTime()       << " ns" <<std::endl;
+            std::cout   << "* Address = "        << vStsDigi[iDigi].GetAddress()    << std::endl;
+            std::cout   << "* Charge = "         << vStsDigi[iDigi].GetCharge()     << std::endl;
+            std::cout   << "* Sector Nr = "      << vStsDigi[iDigi].GetSectorNr()   << std::endl;
+            std::cout   << "* System Id = "      << vStsDigi[iDigi].GetSystemId()   << std::endl;
+            std::cout   << "*******************************************"<< std::endl;
         }
         
         // fill Micro slice content 
         // Note:  "start time" and "duration" data members 
         //are implicitely given by the microslice index idx -> interval[idx-1,idx] mus
-        
        
         MicroSliceContent.insert(MicroSliceContent.end(), 
                 StsData_TimeStamp.begin(), StsData_TimeStamp.end());
@@ -403,16 +397,12 @@ CbmMicroSlice CbmDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescriptor* 
         
     }
     
-    // initialize microslice header
-    //fles::MicrosliceDescriptor desc_sts = fles::MicrosliceDescriptor();
-    //desc_sts=fdesc;
-    //desc_sts.eq_id = (uint16_t)(kSTS);// input link id (component)
-    //desc_sts.sys_id = (uint16_t)(kSTS);// detector id
-    //desc_sts.idx = (uint64_t)(fEventIndex);// Microslice index => interval [0,1]mus 
-    //desc_sts.size = MicroSliceContent.size();
-    MSdesc->size = MicroSliceContent.size();
+    if(MicroSliceContent.size()!=MSdesc->size)
+    {
+        LOG(ERROR)<<"MicroSlice content does not match with expected CbmRoot Time slice content";
+        MSdesc->size = MicroSliceContent.size();
+    }
 
-    //MicroSlice.SetHeader(desc_sts);
     MicroSlice.SetHeader(*MSdesc);
     MicroSlice.SetData(MicroSliceContent);
 

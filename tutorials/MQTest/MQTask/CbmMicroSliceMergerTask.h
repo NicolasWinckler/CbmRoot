@@ -20,6 +20,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #endif //__CINT__
 
+#include "CbmDataConverter.h"
 #include "CbmUnpacker.h"
 
 #include "FairMQProcessorTask.h"
@@ -90,6 +91,7 @@ private:
     unsigned int fMicroSliceIndex;
     unsigned int fComponentIndex;
     bool fTSReady;
+    CbmDataConverter* fCbmDataConverter;
     std::vector<CbmMicroSlice> fDigiVector;
     #ifndef __CINT__ 
     friend class boost::serialization::access;

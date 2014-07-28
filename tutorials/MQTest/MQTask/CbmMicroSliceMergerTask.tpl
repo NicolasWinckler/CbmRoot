@@ -13,9 +13,10 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
         fMaxComponentNumber(0),
         fMicroSliceIndex(0),
         fComponentIndex(0),
-        fTSReady(false)
+        fTSReady(false),
+        fCbmDataConverter(new CbmDataConverter())
 {
-    
+    delete fCbmDataConverter;
 }
 
 
@@ -88,7 +89,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         }
 
         
-        LOG(INFO) << "---------------------------------------";
+        LOG(INFO) << "---------------------------------------\n";
         
         fles::MicrosliceDescriptor desc;
         std::vector<uint8_t> MSliceData;
@@ -104,80 +105,31 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
             eqid=desc.eq_id;
             ContentSize=desc.size;
             MSliceData=MSlice.GetData();
-            LOG(INFO) << "Micro Slice Index = "<<index;
-            LOG(INFO) << "Input link = "<<eqid;
-            LOG(INFO) << "Content size = "<<ContentSize;
+            
             fFlesTimeSlices.append_microslice(eqid, index, desc, MSliceData.data());
             
+            LOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
+            std::cout<<std::endl;
+        
+            /// temporary : to check whether we get data 
+            bool printdata=true;
+            if(printdata)
+            {
+                LOG(INFO) << "Micro Slice Index = "<<index;
+                std::cout<<std::endl;
+                LOG(INFO) << "Input link = "<<eqid;
+                std::cout<<std::endl;
+                LOG(INFO) << "Content size = "<<ContentSize;
+                std::cout<<std::endl;
+                fCbmDataConverter->PrintCbmMicroSlice(&MSlice,0);
+
+            }
+
         }
         
         
-        
-        LOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
-        
-        /// temporary : to check whether we get data 
-        bool printdata=true;
-        if(printdata && MSliceData.size()>0)
-        {
-            
-            std::vector<uint8_t> vectTimestamp_sts;     // ULong64_t
-            std::vector<uint8_t> vectAdress_sts;        // UInt_t
-            std::vector<uint8_t> vectCharge_sts;        // UShort_t
-            std::vector<uint8_t> vectSectorNr_sts;      // Int_t
-            std::vector<uint8_t> vectSystemId_sts;      // Int_t
-            
-            /// get data of first digi of current microslice
-            
-            // time stamp
-            unsigned int start=0;
-            unsigned int end=sizeof(ULong64_t);
-            for (unsigned int i = start; i < end; ++i)
-                vectTimestamp_sts.push_back(MSliceData.at(i));
-            
-            // adress
-            start=end;
-            end+=sizeof(UInt_t);
-            for (unsigned int i = start; i < end; ++i)
-                vectAdress_sts.push_back(MSliceData.at(i));
-            
-            // charge
-            start=end;
-            end+=sizeof(UShort_t);
-            for (unsigned int i = start; i < end; ++i)
-                vectCharge_sts.push_back(MSliceData.at(i));
-            
-            // sectorNr
-            start=end;
-            end+=sizeof(Int_t);
-            for (unsigned int i = start; i < end; ++i)
-                vectSectorNr_sts.push_back(MSliceData.at(i));
-            
-            // systemId
-            start=end;
-            end+=sizeof(Int_t);
-            for (unsigned int i = start; i < end; ++i)
-                vectSystemId_sts.push_back(MSliceData.at(i));
-            
-            
-            ULong64_t tempTimestamp=CombineData<ULong64_t>(vectTimestamp_sts);
-            UInt_t tempAdress=CombineData<UInt_t>(vectAdress_sts);
-            UShort_t tempCharge=CombineData<UShort_t>(vectCharge_sts);
-            Int_t tempSectorNr=CombineData<Int_t>(vectSectorNr_sts);
-            Int_t tempSystemId=CombineData<Int_t>(vectSystemId_sts);
-            
-            LOG(INFO) << "*****************";
-            LOG(INFO) << "* Data of first digi in current microslice:";
-            LOG(INFO) << "* TimeStamp = " << tempTimestamp <<" ns";
-            LOG(INFO) << "* Address = "   << tempAdress;
-            LOG(INFO) << "* Charge = "    << tempCharge;
-            LOG(INFO) << "* SectorNr = "  << tempSectorNr;
-            LOG(INFO) << "* SystemId = "  << tempSystemId;
-            LOG(INFO) << "*****************";
-            
-        }
             
 
-        LOG(INFO) << "* SystemId = "  << index;
         if(index==fMaxMicroSliceNumber-1)
             fTSReady=true;
         else 

@@ -24,8 +24,8 @@ public:
     
     void SetHeader(fles::MicrosliceDescriptor header) {fMicroSliceHeader=header;}
     void SetData(std::vector<uint8_t> Data) {fMicroSliceData=Data;}
-    fles::MicrosliceDescriptor GetHeader() {return fMicroSliceHeader;}
-    std::vector<uint8_t> GetData() {return fMicroSliceData;}
+    fles::MicrosliceDescriptor GetHeader() const {return fMicroSliceHeader;}
+    std::vector<uint8_t> GetData() const {return fMicroSliceData;}
     
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)

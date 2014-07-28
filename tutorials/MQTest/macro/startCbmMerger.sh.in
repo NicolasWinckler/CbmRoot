@@ -15,5 +15,5 @@ outputSndBufSize=$buffSize
 outputMethod="bind"
 outputAddress="tcp://*:5568"
 
-@CMAKE_BINARY_DIR@/bin/testCBMDetectorProcessor_cbm$dataFormat $MicroSliceNumberToMerge $TimeSliceIndex $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $outputSocketType $outputSndBufSize $outputMethod $outputAddress 
+@CMAKE_BINARY_DIR@/bin/testCbmDetectorProcessor_$dataFormat $MicroSliceNumberToMerge $TimeSliceIndex $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $outputSocketType $outputSndBufSize $outputMethod $outputAddress 
 

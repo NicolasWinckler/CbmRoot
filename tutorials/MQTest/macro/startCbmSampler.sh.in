@@ -12,5 +12,5 @@ outputSocketType="push"
 outputBufSize=$buffSize
 outputMethod="bind"
 outputAddress="tcp://*:5566"
-@CMAKE_BINARY_DIR@/bin/testCBMDetectorSampler_cbm$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress 
+@CMAKE_BINARY_DIR@/bin/testCbmDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress 
 

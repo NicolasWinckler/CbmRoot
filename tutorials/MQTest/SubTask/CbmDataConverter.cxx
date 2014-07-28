@@ -123,6 +123,36 @@ void CbmDataConverter::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, con
 }
 
 
+void CbmDataConverter::PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint)
+{
+    SetPrintOption(DigiToPrint);
+    //std::vector<uint8_t> MSliceData=MSlice->GetData();
+    const fles::MicrosliceDescriptor desc=MSlice->GetHeader();
+    uint8_t DetectorId=MSlice->GetHeader().sys_id;
+    uint32_t ContentSize=MSlice->GetHeader().size;
+    //uint8_t DetectorId=MSdesc->sys_id;
+    //uint32_t ContentSize=MSdesc->size;
+    if(ContentSize>0)
+    {
+        switch (DetectorId) 
+        {
+
+        case kSTS:
+            StsConverter(&desc, MSlice->GetData().data());
+          break;
+        case kMUCH:
+          break;
+        default:
+          break;
+        }
+    }
+}
+
+
+
+
+
+
 void CbmDataConverter::StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent)
 {
     uint32_t ContentSize=MSdesc->size;
@@ -203,8 +233,10 @@ void CbmDataConverter::StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, 
 vector<CbmStsDigi>  CbmDataConverter::StsConverter(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent)
 {
     uint32_t ContentSize=MSdesc->size;
+    uint64_t MSliceIndex=MSdesc->idx;
     uint32_t start=0;
     uint32_t end=0;
+    uint32_t iDigi=0;
     vector<CbmStsDigi> StsData;
     while(end<ContentSize)
     {
@@ -251,9 +283,30 @@ vector<CbmStsDigi>  CbmDataConverter::StsConverter(const fles::MicrosliceDescrip
         UInt_t Digi_Adress=CombineData<UInt_t>(vAdress_sts);
         UShort_t Digi_Charge=CombineData<UShort_t>(vCharge_sts);
         Int_t Digi_SectorNr=CombineData<Int_t>(vSectorNr_sts);
-        //Int_t Digi_SystemId=CombineData<Int_t>(vSystemId_sts);
+        Int_t Digi_SystemId=CombineData<Int_t>(vSystemId_sts);
         CbmStsDigi StsDigi(Digi_Adress, Digi_Timestamp, Digi_Charge, Digi_SectorNr);
         StsData.push_back(StsDigi);
+
+
+
+        if(fPrint && iDigi==fDigiToPrint)
+        {
+            
+            LOG(INFO) << "*****************";
+            LOG(INFO) << "* Header in current microslice: ";
+            LOG(INFO) << "* MS index = "   << MSliceIndex;
+            LOG(INFO) << "* Content size = "   << ContentSize;
+            LOG(INFO) << "* Data of first digi in current microslice: ";
+            LOG(INFO) << "* TimeStamp = " << Digi_Timestamp <<" ns";
+            LOG(INFO) << "* Address = "   << Digi_Adress;
+            LOG(INFO) << "* Charge = "    << Digi_Charge;
+            LOG(INFO) << "* SectorNr = "  << Digi_SectorNr;
+            LOG(INFO) << "* SystemId = "  << Digi_SystemId;
+            LOG(INFO) << "*****************";
+            
+        }
+        iDigi++;
+
     }
     
     return StsData;

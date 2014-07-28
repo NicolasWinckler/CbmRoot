@@ -8,7 +8,7 @@ inputSocketType="pull"
 inputRcvBufSize=$buffSize
 inputMethod="bind"
 inputAddress="tcp://*:5567"
-@CMAKE_BINARY_DIR@/bin/testCBMfileSink_cbm$dataFormat $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress &
+@CMAKE_BINARY_DIR@/bin/testCbmfileSink_$dataFormat $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress &
 #alternative for regular sink:
 #xterm -e @CMAKE_BINARY_DIR@/bin/sink $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputAddress &
 

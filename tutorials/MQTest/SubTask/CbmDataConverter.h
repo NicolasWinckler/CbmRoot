@@ -42,7 +42,10 @@ public:
     //virtual InitStatus Init();
     
     CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    void PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint=0);
     
+
+
     /// stuff to convert cbm root timeslices to fles microslices
     CbmMicroSlice GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
     CbmMicroSlice GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
@@ -57,7 +60,7 @@ public:
     void SetCbmTSInterval(Double_t start, Double_t duration);
     void WriteTreeToFile();
     
-    void SetPrintOption(uint32_t DigiToPrint, bool print=true); //temporary
+    void SetPrintOption(uint32_t DigiToPrint=0, bool print=true); //temporary
     
 protected:
     vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);

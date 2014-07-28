@@ -40,8 +40,10 @@ add_subdirectory (fles_ipc)
 
 include_directories(${INCLUDE_DIRECTORIES})
 
+
 If (Boost_FOUND)
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startPushPull_cbm.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startMultiSamplerPushPull_cbm.sh )  
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSampler.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSampler.sh )
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmMerger.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmMerger.sh )
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSink.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSink.sh )
@@ -66,7 +68,6 @@ If (Boost_FOUND)
     MQDevices/CbmProcessor.cxx
     MQDevices/CbmMicroSliceMerger.cxx
     MQTask/CbmMicroSliceMergerTask.cxx
-    SubTask/CbmStsUnpacker.cxx
     SubTask/CbmDataConverter.cxx
   )
 EndIf (Boost_FOUND)
@@ -91,14 +92,18 @@ GENERATE_LIBRARY()
 
 If (Boost_FOUND)
   Set(Exe_Names
-    testCBMDetectorSampler_cbmBoost
-    testCBMDetectorProcessor_cbmBoost
-    testCBMfileSink_cbmBoost 
+    testCbmDetectorSampler_Boost
+    testCbmStsDetectorSampler_Boost
+    testCbmMuchDetectorSampler_Boost
+    testCbmDetectorProcessor_Boost
+    testCbmfileSink_Boost 
   )
 
 
   set(Exe_Source
     run/runTestDetectorSampler_cbmBoost.cxx
+    run/runCbmStsDetectorSamplerBoost.cxx
+    run/runCbmMuchDetectorSamplerBoost.cxx
     run/runTestDetectorProcessor_cbmBoost.cxx
     run/runFileSink_cbmBoost.cxx
     )

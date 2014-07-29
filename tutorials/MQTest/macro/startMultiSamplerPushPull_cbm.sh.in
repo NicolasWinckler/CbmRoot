@@ -7,7 +7,7 @@ dataFormat="Boost"
 # STS SAMPLER
 
 ID="101"
-inputFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/test.raw.root"
+inputFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/test.rawsts.root"
 parameterFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/params.root"
 branch="TimeSlice."
 eventRate="0"
@@ -21,7 +21,7 @@ xterm -e @CMAKE_BINARY_DIR@/bin/testCbmStsDetectorSampler_$dataFormat $ID $input
 # MUCH SAMPLER
 
 ID="201"
-inputFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/test.raw.root"
+inputFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/test.rawmuch.root"
 parameterFile="@CBMROOT_SOURCE_DIR@/tutorials/MQTest/macro/data/params.root"
 branch="TimeSlice."
 eventRate="0"

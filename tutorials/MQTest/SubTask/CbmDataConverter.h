@@ -49,6 +49,7 @@ public:
     /// stuff to convert cbm root timeslices to fles microslices
     CbmMicroSlice GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
     CbmMicroSlice GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
+    CbmMicroSlice GetCbmMuchMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi);
     
     /// stuff to convert fles microslices to cbm root timeslices
     void CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);

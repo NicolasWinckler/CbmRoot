@@ -30,8 +30,8 @@ using std::endl;
 using std::stringstream;
 
 
-typedef CbmStsDigi TCbmDigi;
-//typedef CbmMuchDigi TCbmDigi;
+//typedef CbmStsDigi TCbmDigi;
+typedef CbmMuchDigi TCbmDigi;
 typedef boost::archive::binary_oarchive TBoostBinPayloadOut; // boost binary format
 //typedef boost::archive::text_oarchive TBoostTextPayloadOut; // boost text format
 typedef CbmTimeSliceLoader<TCbmDigi, TBoostBinPayloadOut> TLoader;

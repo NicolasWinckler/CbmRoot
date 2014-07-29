@@ -14,9 +14,11 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
         fMicroSliceIndex(0),
         fComponentIndex(0),
         fTSReady(false),
-        fCbmDataConverter(new CbmDataConverter())
+        fCbmDataConverter(new CbmDataConverter()),
+        findex_sts(0),
+        findex_much(0)
 {
-    delete fCbmDataConverter;
+    
 }
 
 
@@ -25,7 +27,7 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
 template <typename TPayloadIn, typename TPayloadOut> 
 CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::~CbmMicroSliceMergerTask()
 {
-        
+        delete fCbmDataConverter;
 }
 
 
@@ -93,14 +95,24 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         
         fles::MicrosliceDescriptor desc;
         std::vector<uint8_t> MSliceData;
+        uint64_t index_sts=0;
+        uint64_t index_much=0;
         uint64_t index=0;
         uint16_t eqid=0;// component (input link)
+        uint16_t sysid=100;
         uint32_t ContentSize=0;
         // Merge Microslices into timeslices
         for (unsigned int i = 0; i < fDigiVector.size(); ++i) 
         {            
             CbmMicroSlice MSlice=fDigiVector[i];
             desc=MSlice.GetHeader();
+            sysid=desc.sys_id;
+            if(sysid==kSTS)
+                findex_sts=desc.idx;
+            
+            if(sysid==kMUCH)
+                findex_much=desc.idx;
+
             index=desc.idx;
             eqid=desc.eq_id;
             ContentSize=desc.size;
@@ -108,18 +120,38 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
             
             fFlesTimeSlices.append_microslice(eqid, index, desc, MSliceData.data());
             
-            LOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
-            std::cout<<std::endl;
+            //LOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
+            //std::cout<<std::endl;
         
             /// temporary : to check whether we get data 
             bool printdata=true;
             if(printdata)
             {
-                LOG(INFO) << "Micro Slice Index = "<<index;
-                std::cout<<std::endl;
-                LOG(INFO) << "Input link = "<<eqid;
-                std::cout<<std::endl;
-                LOG(INFO) << "Content size = "<<ContentSize;
+                
+                switch (sysid) 
+                {
+
+                case kSTS:
+                {
+                    LOG(INFO) << "Detector ID  = STS"<<std::endl;
+                    LOG(INFO) << "Micro Slice Index = "<<findex_sts<<std::endl;
+                    LOG(INFO) << "Input link = "<<eqid<<std::endl;
+                    LOG(INFO) << "Content size = "<<ContentSize<<std::endl;
+                  break;
+                }
+                case kMUCH:
+                {
+                    LOG(INFO) << "Detector ID  = MUCH"<<std::endl;
+                    LOG(INFO) << "Micro Slice Index_much = "<<findex_much<<std::endl;
+                    LOG(INFO) << "Input link = "<<eqid<<std::endl;
+                    LOG(INFO) << "Content size = "<<ContentSize<<std::endl;
+                  break;
+                }
+                default:
+                  break;
+                }
+                //LOG(INFO) << "Micro Slice Index = "<<index<<std::endl;
+                
                 std::cout<<std::endl;
                 fCbmDataConverter->PrintCbmMicroSlice(&MSlice,0);
 
@@ -130,8 +162,12 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         
             
 
-        if(index==fMaxMicroSliceNumber-1)
+        //if(index==fMaxMicroSliceNumber-1)
+        if(findex_sts==fMaxMicroSliceNumber-1  && findex_much==fMaxMicroSliceNumber-1)
+        {
             fTSReady=true;
+            //std::cout<< "++++++++++ READY +++++++++++++++" <<std::endl;
+        }
         else 
             fTSReady=false;
         

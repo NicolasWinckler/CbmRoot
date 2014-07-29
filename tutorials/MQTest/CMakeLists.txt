@@ -40,7 +40,6 @@ add_subdirectory (fles_ipc)
 
 include_directories(${INCLUDE_DIRECTORIES})
 
-
 If (Boost_FOUND)
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startPushPull_cbm.sh )
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startMultiSamplerPushPull_cbm.sh )  

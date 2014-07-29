@@ -59,7 +59,7 @@ void CbmProcessor<TPolicyTask>::Run()
       
       if (bytes_received) 
       {
-          
+          cout << "I've received " << receivedMsgs << " messages!" << endl;
           fProcessorTask->Exec(msg, NULL);
           
           bool ReadyToSend=fProcessorTask->MsgReadyToSend();
@@ -72,7 +72,10 @@ void CbmProcessor<TPolicyTask>::Run()
           bytes_received = 0;
       }
       
-      delete msg;
+      delete msg; 
+      // temporary
+      if(receivedMsgs==32 && sentMsgs==1) 
+        break;
   }
 
   

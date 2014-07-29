@@ -20,6 +20,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #endif //__CINT__
 
+#include "CbmDetectorList.h"
 #include "CbmDataConverter.h"
 #include "CbmUnpacker.h"
 
@@ -92,6 +93,8 @@ private:
     unsigned int fComponentIndex;
     bool fTSReady;
     CbmDataConverter* fCbmDataConverter;
+    uint64_t findex_sts;
+    uint64_t findex_much;
     std::vector<CbmMicroSlice> fDigiVector;
     #ifndef __CINT__ 
     friend class boost::serialization::access;

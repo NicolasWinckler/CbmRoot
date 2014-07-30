@@ -699,8 +699,6 @@ CbmMicroSlice CbmDataConverter::GetCbmMuchMicroSlice(fles::MicrosliceDescriptor*
 
 
 
-
-
 void CbmDataConverter::SetPrintOption(uint32_t DigiToPrint, bool print)
 {
     fPrint=print;

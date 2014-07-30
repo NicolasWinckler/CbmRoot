@@ -30,6 +30,7 @@
 #include "CbmDetectorList.h"
 #include "CbmStsDigi.h"
 #include "CbmMuchDigi.h"
+#include "CbmMuchDataConverter.h"
 
 #include "FairMQLogger.h"
 
@@ -74,6 +75,7 @@ protected:
     TFile* fOutFile;
     TTree* fTree;
     CbmTimeSlice* fCBMTimeSlice;
+    CbmMuchDataConverter* fMuchConverter;
     /// Start time of current time slice [ns]
     Double_t fCurrentStartTime;
     /// Duration of time slice [ns] 

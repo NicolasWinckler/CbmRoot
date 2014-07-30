@@ -15,23 +15,30 @@
 
 #include "CbmDataConverter.h"
 
+
 CbmDataConverter::CbmDataConverter() : FairTask("CbmDataConverter"),
         fOutFile(NULL),
         fTree(NULL),
         fCBMTimeSlice(NULL),
+        fMuchConverter(new CbmMuchDataConverter()),
         fCurrentStartTime (0.),
         fDuration (1000.),
         fPrint(false),
         fDigiToPrint(0)
 {
         fStsDigiPayloadSize=sizeof(ULong64_t)+sizeof(UInt_t)+sizeof(UShort_t)+sizeof(Int_t)+sizeof(Int_t);
-        fMuchDigiPayloadSize=sizeof(Int_t)+sizeof(Int_t)+sizeof(Int_t)+sizeof(Int_t);// TODO : implement MUCH part
+        fMuchDigiPayloadSize=fMuchConverter->GetDigiPayloadSize();
 }
 
 
 CbmDataConverter::~CbmDataConverter() 
 {
-    delete fCBMTimeSlice;
+    if(fCBMTimeSlice)
+        delete fCBMTimeSlice;
+    
+    if(fMuchConverter)
+        delete fMuchConverter;
+    
 }
 
 /*
@@ -115,7 +122,8 @@ void CbmDataConverter::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, con
             StsCbmTSFiller(MSdesc, FlesTimeSliceContent);
           break;
         case kMUCH:
-            MuchCbmTSFiller(MSdesc, FlesTimeSliceContent);
+            //MuchCbmTSFiller(MSdesc, FlesTimeSliceContent);
+            fMuchConverter->
           break;
         default:
           break;

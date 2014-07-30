@@ -31,6 +31,7 @@
 #include "CbmStsDigi.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDataConverter.h"
+#include "CbmStsDataConverter.h"
 
 #include "FairMQLogger.h"
 
@@ -45,12 +46,8 @@ public:
     CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     void PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint=0);
     
-
-
     /// stuff to convert cbm root timeslices to fles microslices
     CbmMicroSlice GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
-    CbmMicroSlice GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
-    CbmMicroSlice GetCbmMuchMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi);
     
     /// stuff to convert fles microslices to cbm root timeslices
     void CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
@@ -65,16 +62,11 @@ public:
     void SetPrintOption(uint32_t DigiToPrint=0, bool print=true); //temporary
     
 protected:
-    vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    vector<CbmMuchDigi> MuchConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    
-    void  StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    void  MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    
     
     TFile* fOutFile;
     TTree* fTree;
     CbmTimeSlice* fCBMTimeSlice;
+    CbmStsDataConverter* fStsConverter;
     CbmMuchDataConverter* fMuchConverter;
     /// Start time of current time slice [ns]
     Double_t fCurrentStartTime;

@@ -87,11 +87,11 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         }
         catch (boost::archive::archive_exception e)
         {
-             LOG(ERROR) << e.what();
+             MQLOG(ERROR) << e.what();
         }
 
         
-        LOG(INFO) << "---------------------------------------\n";
+        MQLOG(INFO) << "---------------------------------------";
         
         fles::MicrosliceDescriptor desc;
         std::vector<uint8_t> MSliceData;
@@ -120,7 +120,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
             
             fFlesTimeSlices.append_microslice(eqid, index, desc, MSliceData.data());
             
-            //LOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
+            //MQLOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
             //std::cout<<std::endl;
         
             /// temporary : to check whether we get data 
@@ -133,24 +133,24 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
 
                 case kSTS:
                 {
-                    LOG(INFO) << "Detector ID  = STS"<<std::endl;
-                    LOG(INFO) << "Micro Slice Index = "<<findex_sts<<std::endl;
-                    LOG(INFO) << "Input link = "<<eqid<<std::endl;
-                    LOG(INFO) << "Content size = "<<ContentSize<<std::endl;
+                    MQLOG(INFO) << "Detector ID  = STS";
+                    MQLOG(INFO) << "Micro Slice Index = "<<findex_sts;
+                    MQLOG(INFO) << "Input link = "<<eqid;
+                    MQLOG(INFO) << "Content size = "<<ContentSize;
                   break;
                 }
                 case kMUCH:
                 {
-                    LOG(INFO) << "Detector ID  = MUCH"<<std::endl;
-                    LOG(INFO) << "Micro Slice Index_much = "<<findex_much<<std::endl;
-                    LOG(INFO) << "Input link = "<<eqid<<std::endl;
-                    LOG(INFO) << "Content size = "<<ContentSize<<std::endl;
+                    MQLOG(INFO) << "Detector ID  = MUCH";
+                    MQLOG(INFO) << "Micro Slice Index_much = "<<findex_much;
+                    MQLOG(INFO) << "Input link = "<<eqid;
+                    MQLOG(INFO) << "Content size = "<<ContentSize;
                   break;
                 }
                 default:
                   break;
                 }
-                //LOG(INFO) << "Micro Slice Index = "<<index<<std::endl;
+                //MQLOG(INFO) << "Micro Slice Index = "<<index<<std::endl;
                 
                 std::cout<<std::endl;
                 fCbmDataConverter->PrintCbmMicroSlice(&MSlice,0);
@@ -174,7 +174,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
         
         if(fTSReady)
         {
-            LOG(INFO) <<"Send time slice to sink";
+            MQLOG(INFO) <<"Send time slice to sink";
             //prepare boost output archive
             std::ostringstream obuffer;
             TPayloadOut OutputArchive(obuffer); 

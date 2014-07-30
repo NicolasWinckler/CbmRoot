@@ -8,20 +8,11 @@
 #ifndef CBMSTSDATACONVERTER_H
 #define	CBMSTSDATACONVERTER_H
 
-#include <iostream>
-
-#include "StorableTimeslice.hpp"
-#include "CbmTimeSlice.h"
-
-#include "CbmUnpacker.h"
-#include "CbmMicroSlice.h"
-
-#include "CbmDetectorList.h"
+#include "CbmDigiConverter.h"
 #include "CbmStsDigi.h"
 
-#include "FairMQLogger.h"
-
-class CbmStsDataConverter {
+class CbmStsDataConverter : public CbmDigiConverter
+{
 public:
     CbmStsDataConverter();
     virtual ~CbmStsDataConverter();
@@ -30,13 +21,13 @@ public:
     vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     void  StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
 
-    void SetPrintOption(uint32_t DigiToPrint=0, bool print=true); 
+    void PrintDigiContent(CbmStsDigi Stsdigi);
     size_t GetDigiPayloadSize(){return fStsDigiPayloadSize;}
     
+protected:
+    CbmStsDigi ConvertFlesPtrToDigi(uint32_t* end, const uint8_t* FlesTimeSliceContent);
 private:
-
-    bool fPrint; //temporary
-    uint32_t fDigiToPrint; //temporary
+    
     size_t fStsDigiPayloadSize;
 };
 

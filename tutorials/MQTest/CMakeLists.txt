@@ -70,6 +70,7 @@ If (Boost_FOUND)
     SubTask/CbmDataConverter.cxx
     SubTask/CbmMuchDataConverter.cxx
     SubTask/CbmStsDataConverter.cxx
+    SubTask/CbmDigiConverter.cxx
   )
 EndIf (Boost_FOUND)
 

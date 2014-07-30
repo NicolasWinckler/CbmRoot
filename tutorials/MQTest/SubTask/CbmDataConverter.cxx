@@ -216,6 +216,7 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
         MSdesc.eq_id = (uint16_t)(kSTS);// input link id (component)
         MSdesc.sys_id = (uint16_t)(kSTS);// detector id
         MSdesc.size = (uint32_t)(fStsDigiPayloadSize*CbmTSlice->GetDataSize(kSTS));
+        MSdesc.offset=0;
         vector<CbmStsDigi> StsData=CbmTSlice->GetStsData();
         MicroSlice=fStsConverter->GetCbmStsMicroSlice(&MSdesc, StsData);
 
@@ -245,7 +246,7 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
             NMuchPoints=(uint32_t)CbmTSlice->GetDataSize(kMUCH);
         
         MSdesc.size = (uint32_t)(fMuchDigiPayloadSize)*NMuchPoints;
-        
+        MSdesc.offset=0;
         // loop below temporary
         vector<CbmMuchDigi> MuchData;
         if(fakeMuchDigi)

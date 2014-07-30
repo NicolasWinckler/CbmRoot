@@ -40,7 +40,7 @@ void CbmMQFileSink<TPayloadIn>::InitOutputFile(TString defaultId)
 template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::Run()
 {
-        LOG(INFO) << ">>>>>>> Run <<<<<<<";
+        MQLOG(INFO) << ">>>>>>> Run <<<<<<<";
         bool printinfo=true;
         fCbmDataUnpacker->SetPrintOption(0,printinfo);
 
@@ -67,10 +67,10 @@ void CbmMQFileSink<TPayloadIn>::Run()
                 }
                 catch (boost::archive::archive_exception& e)
                 {
-                    LOG(ERROR) << e.what();
+                    MQLOG(ERROR) << e.what();
                 }
 
-                LOG(INFO) << "Message received";
+                MQLOG(INFO) << "Message received";
                 
                 
                 /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,11 +110,11 @@ void CbmMQFileSink<TPayloadIn>::Run()
                     
                     if(printinfo)
                     {
-                        LOG(INFO) << "-------------------------------------------"<<"\n";
-                        LOG(INFO) <<MS_i<< "th MS in current fles TS "<<"\n";
-                        LOG(INFO) << "Current Time Slice interval = ["<<fCurrentStartTime
-                                <<";"<< fCurrentStartTime+fDuration<<"]\n";
-                        LOG(INFO) << "InputLinkNumber = "<<InputLinkNumber<<"\n";
+                        MQLOG(INFO) << "-------------------------------------------";
+                        MQLOG(INFO) <<MS_i<< "th MS in current fles TS ";
+                        MQLOG(INFO) << "Current Time Slice interval = ["<<fCurrentStartTime
+                                <<";"<< fCurrentStartTime+fDuration;
+                        MQLOG(INFO) << "InputLinkNumber = "<<InputLinkNumber;
                     }
                     
                     fCurrentStartTime+=fDuration;// not used but in the initialization or in print

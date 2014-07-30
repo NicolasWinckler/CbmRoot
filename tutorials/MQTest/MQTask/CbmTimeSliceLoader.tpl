@@ -42,8 +42,8 @@ void CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Exec(Option_t* opt)
         bool printinfo=true;
         if (printinfo)
         {
-            std::cout<< "------------------------------------------"<< std::endl;
-            std::cout<<"Event Index = "<< fEventIndex <<std::endl;
+            MQLOG(INFO)<< "------------------------------------------";
+            MQLOG(INFO)<<"Event Index = "<< fEventIndex ;
             fCbmDataConverter->SetPrintOption(0,printinfo);
         }
         

@@ -34,7 +34,7 @@
 #include <boost/serialization/vector.hpp>
 #endif //__CINT__
 
-#include "FairMQLogger.h"
+#include "MQLogger.h"
 
 template <typename TPayloadIn>
 class CbmMQFileSink: public FairMQDevice

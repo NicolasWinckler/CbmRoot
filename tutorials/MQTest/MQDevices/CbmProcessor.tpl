@@ -38,7 +38,7 @@ void CbmProcessor<TPolicyTask>::Init()
 template <typename TPolicyTask>
 void CbmProcessor<TPolicyTask>::Run()
 {
-  LOG(INFO) << ">>>>>>> Run <<<<<<<";
+  MQLOG(INFO) << ">>>>>>> Run <<<<<<<";
 
   boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
 

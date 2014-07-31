@@ -27,22 +27,12 @@ void CbmMuchDataConverter::MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSd
     while(offset<ContentSize)
     {
         
-        //CbmMuchDigi MuchDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
-        //CbmMuchDigi* MuchDigi=(CbmMuchDigi*)ConvertFlesPtrToDigi2(&offset,FlesTimeSliceContent);
-        CbmMuchDigi MuchDigi((CbmMuchDigi*)ConvertFlesPtrToDigi2(&offset,FlesTimeSliceContent));
-
+        CbmMuchDigi MuchDigi(static_cast<CbmMuchDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
         CbmRootTimeSlice->InsertData(&MuchDigi);
         
         if(fPrint && iDigi==fDigiToPrint)
-        {
-            MQLOG(INFO) << "**********************************";
-            MQLOG(INFO) << "* --Header in current MUCH Micro Slice : ";
-            PrintFlesMicroSliceHeader(MSdesc);
-            MQLOG(INFO) << "* * * * * * * * * * * * * * * * *";
-            MQLOG(INFO) << "* --Content of the "<< iDigi <<"th MUCH digi :";
-            PrintDigiContent(MuchDigi);
-            MQLOG(INFO) << "**********************************";
-        }
+            PrintInfo(MSdesc, &MuchDigi,  iDigi);
+        
         iDigi++;
     }
 }
@@ -57,20 +47,12 @@ vector<CbmMuchDigi> CbmMuchDataConverter::MuchConverter(const fles::MicrosliceDe
     vector<CbmMuchDigi> MuchData;
     while(offset<ContentSize)
     {
-        //CbmMuchDigi MuchDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
-        CbmMuchDigi MuchDigi((CbmMuchDigi*)ConvertFlesPtrToDigi2(&offset,FlesTimeSliceContent));
+        CbmMuchDigi MuchDigi(static_cast<CbmMuchDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
         MuchData.push_back(MuchDigi);
         
         if(fPrint && iDigi==fDigiToPrint)
-        {
-            MQLOG(INFO) << "**********************************";
-            MQLOG(INFO) << "* --Header in current MUCH Micro Slice : ";
-            PrintFlesMicroSliceHeader(MSdesc);
-            MQLOG(INFO) << "* * * * * * * * * * * * * * * * *";
-            MQLOG(INFO) << "* --Content of the "<< iDigi <<"th MUCH digi :";
-            PrintDigiContent(MuchDigi);
-            MQLOG(INFO) << "**********************************";
-        }
+            PrintInfo(MSdesc, &MuchDigi,  iDigi);
+        
         iDigi++;
     }
     return MuchData;
@@ -95,16 +77,7 @@ CbmMicroSlice CbmMuchDataConverter::GetCbmMuchMicroSlice(fles::MicrosliceDescrip
         
         // print 
         if(fPrint && iDigi==fDigiToPrint)
-        {
-            MQLOG(INFO) << "**********************************";
-            MQLOG(INFO) << "* --Header in current MUCH Micro Slice : ";
-            PrintFlesMicroSliceHeader(MSdesc);
-            MQLOG(INFO) << "* * * * * * * * * * * * * * * * *";
-            MQLOG(INFO) << "* --Content of the "<< iDigi <<"th MUCH digi :";
-            PrintDigiContent(vMuchDigi[iDigi]);
-            MQLOG(INFO) << "**********************************";
-            
-        }
+            PrintInfo(MSdesc, &(vMuchDigi[iDigi]),  iDigi);
         
         // fill Micro slice content 
         // Note:  "start time" and "duration" data members 
@@ -139,53 +112,7 @@ CbmMicroSlice CbmMuchDataConverter::GetCbmMuchMicroSlice(fles::MicrosliceDescrip
 
 
 
-
-CbmMuchDigi CbmMuchDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
-{
-    uint32_t start=0;
-    std::vector<uint8_t> vTimestamp_much;     // ULong64_t
-    std::vector<uint8_t> vAdress_much;        // UInt_t
-    std::vector<uint8_t> vCharge_much;        // UShort_t
-    std::vector<uint8_t> vSystemId_much;      // Int_t
-
-    /// get data of first digi of current microslice
-
-    // time stamp
-    start=*offset;
-    *offset+=sizeof(Int_t);
-    for (uint32_t k = start; k < *offset; ++k)
-        vTimestamp_much.push_back(*(FlesTimeSliceContent+k));
-
-    // adress
-    start=*offset;
-    *offset+=sizeof(Int_t);
-    for (uint32_t k = start; k < *offset; ++k)
-        vAdress_much.push_back(*(FlesTimeSliceContent+k));
-
-    // charge
-    start=*offset;
-    *offset+=sizeof(Int_t);
-    for (uint32_t k = start; k < *offset; ++k)
-        vCharge_much.push_back(*(FlesTimeSliceContent+k));
-
-    // systemId
-    start=*offset;
-    *offset+=sizeof(Int_t);
-    for (uint32_t k = start; k < *offset; ++k)
-        vSystemId_much.push_back(*(FlesTimeSliceContent+k));
-
-    /// reconvert and fill digi in time slices
-    Int_t Digi_Timestamp=CombineData<Int_t>(vTimestamp_much);
-    Int_t Digi_Adress=CombineData<Int_t>(vAdress_much);
-    Int_t Digi_Charge=CombineData<Int_t>(vCharge_much);
-    Int_t Digi_SystemId=CombineData<Int_t>(vSystemId_much);
-    CbmMuchDigi MuchDigi(Digi_Adress, Digi_Charge,  Digi_Timestamp);
-    
-    return MuchDigi;
-}
-
-
-CbmDigi* CbmMuchDataConverter::ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
+CbmDigi* CbmMuchDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
 {
     CbmDigi* digi = NULL;
     uint32_t start=0;
@@ -231,24 +158,9 @@ CbmDigi* CbmMuchDataConverter::ConvertFlesPtrToDigi2(uint32_t *offset, const uin
 }
 
 
-void CbmMuchDataConverter::PrintDigiContent(CbmMuchDigi MuchDigi)
+void CbmMuchDataConverter::PrintDigiContent(const CbmDigi* digi)
 {
-    MQLOG(INFO) << "* OK0 : PrintDigiContent(CbmMuchDigi MuchDigi) ";
-    Int_t Digi_Timestamp=(Int_t)MuchDigi.GetTime();
-    Int_t Digi_Adress=(Int_t)MuchDigi.GetAddress();
-    Int_t Digi_Charge=(Int_t)MuchDigi.GetAdc();
-    Int_t Digi_SystemId=(Int_t)MuchDigi.GetSystemId();
-    MQLOG(INFO) << "* System Id = "  << Digi_SystemId;
-    MQLOG(INFO) << "* TimeStamp = " << Digi_Timestamp <<" ns";
-    MQLOG(INFO) << "* Address = "   << Digi_Adress;
-    MQLOG(INFO) << "* Charge = "    << Digi_Charge;
-}
-
-
-
-void CbmMuchDataConverter::PrintDigiContent(CbmMuchDigi* MuchDigi)
-{
-    MQLOG(INFO) << "* OK0 : PrintDigiContent(CbmMuchDigi* MuchDigi) ";
+    const CbmMuchDigi* MuchDigi=static_cast<const CbmMuchDigi*>(digi);
     Int_t Digi_Timestamp=(Int_t)MuchDigi->GetTime();
     Int_t Digi_Adress=(Int_t)MuchDigi->GetAddress();
     Int_t Digi_Charge=(Int_t)MuchDigi->GetAdc();
@@ -258,3 +170,6 @@ void CbmMuchDataConverter::PrintDigiContent(CbmMuchDigi* MuchDigi)
     MQLOG(INFO) << "* Address = "   << Digi_Adress;
     MQLOG(INFO) << "* Charge = "    << Digi_Charge;
 }
+
+
+

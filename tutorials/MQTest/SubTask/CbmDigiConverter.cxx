@@ -34,7 +34,6 @@ void CbmDigiConverter::PrintFlesMicroSliceHeader(const fles::MicrosliceDescripto
     uint32_t MSContentSize=MSdesc->size;        ///< Content size (bytes)
     uint64_t MSoffset=MSdesc->offset;           ///< Offset in event buffer (bytes)
     
-    //MQLOG(INFO) << "* --Header in current Micro Slice : ";
     MQLOG(INFO) << "* Header format identifier (0xDD) = "   << (uint16_t)MSHeaderID;
     MQLOG(INFO) << "* Header format version (0x01) = "   << (uint16_t)MSHeaderVer;
     MQLOG(INFO) << "* Subsystem format version = "   << (uint16_t)MSSysVer;
@@ -42,7 +41,43 @@ void CbmDigiConverter::PrintFlesMicroSliceHeader(const fles::MicrosliceDescripto
     MQLOG(INFO) << "* Component ID = "   << MSComponent;
     MQLOG(INFO) << "* Micro Slice index = "   << MSliceIndex;
     MQLOG(INFO) << "* Micro Slice Content size (bytes) = "   << MSContentSize;
-    MQLOG(INFO) << "* Micro Slice index = "   << MSliceIndex;
     MQLOG(INFO) << "* Offset in event buffer (bytes) = "   << MSoffset;
     
+}
+
+
+void CbmDigiConverter::PrintInfo(const fles::MicrosliceDescriptor* MSdesc, const CbmDigi* Digi, uint32_t iDigi)
+{
+    Int_t iDet = Digi->GetSystemId();
+    std::string strHeader;
+    std::string strIdigi;
+    switch (iDet) 
+    {
+        case kSTS:
+        {
+            strHeader="* --Header in current STS Micro Slice : ";
+            strIdigi="th STS digi :";
+            break;
+        }
+        case kMUCH:
+        {
+            strHeader="* --Header in current MUCH Micro Slice : ";
+            strIdigi="th MUCH digi :";
+            break;
+        }
+        default:
+        {
+          strHeader="* --Header in current unknown detector Micro Slice : ";
+          strIdigi="th unknown detector digi :";
+          break;
+        }
+    }
+    
+    MQLOG(INFO) << "******************";
+    MQLOG(INFO) << strHeader;
+    PrintFlesMicroSliceHeader(MSdesc);
+    MQLOG(INFO) << "* * * * * * * * * ";
+    MQLOG(INFO) << "* --Content of the "<< iDigi <<strIdigi;
+    PrintDigiContent(Digi);
+    MQLOG(INFO) << "******************";
 }

@@ -33,10 +33,10 @@ public:
     
     void SetPrintOption(uint32_t DigiToPrint, bool print);
     void PrintFlesMicroSliceHeader(const fles::MicrosliceDescriptor* MSdesc);
-    
-    
+    void PrintInfo(const fles::MicrosliceDescriptor* MSdesc, const CbmDigi* Digi, uint32_t iDigi);
+    virtual void PrintDigiContent(const CbmDigi* Digi)=0;
 protected:
-    virtual CbmDigi* ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent)=0;
+    virtual CbmDigi* ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)=0;
     bool fPrint;
     uint32_t fDigiToPrint;
 };

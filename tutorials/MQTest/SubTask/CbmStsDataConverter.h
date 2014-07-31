@@ -21,12 +21,13 @@ public:
     vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     void  StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
 
-    void PrintDigiContent(CbmStsDigi Stsdigi);
+    //virtual void PrintInfo(const fles::MicrosliceDescriptor* MSdesc, const CbmDigi* Digi, uint32_t iDigi);
+    
+    virtual void PrintDigiContent(const CbmDigi* Digi);
     size_t GetDigiPayloadSize(){return fStsDigiPayloadSize;}
     
 protected:
-    CbmStsDigi ConvertFlesPtrToDigi(uint32_t* end, const uint8_t* FlesTimeSliceContent);
-    CbmDigi* ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
+    CbmDigi* ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
 
 private:
     

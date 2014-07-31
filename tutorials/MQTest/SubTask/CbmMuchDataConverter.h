@@ -22,12 +22,11 @@ public:
     void  MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
     CbmMicroSlice GetCbmMuchMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi);
 
-    void PrintDigiContent(CbmMuchDigi MuchDigi);
-    void PrintDigiContent(CbmMuchDigi* MuchDigi);
+    
+    virtual void PrintDigiContent(const CbmDigi* Digi);
     size_t GetDigiPayloadSize(){return fMuchDigiPayloadSize;}
 protected:
-    CbmMuchDigi ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
-    virtual CbmDigi* ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
+    virtual CbmDigi* ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
 
 private:
     size_t fMuchDigiPayloadSize;

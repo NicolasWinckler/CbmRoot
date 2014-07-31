@@ -24,19 +24,12 @@ void CbmStsDataConverter::StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdes
     uint32_t iDigi=0;
     while(offset<ContentSize)
     {
-        CbmStsDigi StsDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
+        CbmStsDigi StsDigi=*(static_cast<CbmStsDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
         CbmRootTimeSlice->InsertData(&StsDigi);
         
         if(fPrint && iDigi==fDigiToPrint)
-        {
-            MQLOG(INFO) << "**********************************";
-            MQLOG(INFO) << "* --Header in current STS Micro Slice : ";
-            PrintFlesMicroSliceHeader(MSdesc);
-            MQLOG(INFO) << "* * * * * * * * * * * * * * * * *";
-            MQLOG(INFO) << "* --Content of the "<< iDigi <<"th STS digi :";
-            PrintDigiContent(StsDigi);
-            MQLOG(INFO) << "**********************************";
-        }
+            PrintInfo(MSdesc, &StsDigi,  iDigi);
+
         iDigi++;
     }
 }
@@ -51,19 +44,12 @@ vector<CbmStsDigi>  CbmStsDataConverter::StsConverter(const fles::MicrosliceDesc
     vector<CbmStsDigi> StsData;
     while(offset<ContentSize)
     {
-        CbmStsDigi StsDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
+        CbmStsDigi StsDigi=*(static_cast<CbmStsDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
         StsData.push_back(StsDigi);
 
         if(fPrint && iDigi==fDigiToPrint)
-        {
-            MQLOG(INFO) << "**********************************";
-            MQLOG(INFO) << "* --Header in current STS Micro Slice : ";
-            PrintFlesMicroSliceHeader(MSdesc);
-            MQLOG(INFO) << "* * * * * * * * * * * * * * * * *";
-            MQLOG(INFO) << "* --Content of the "<< iDigi <<"th STS digi :";
-            PrintDigiContent(StsDigi);
-            MQLOG(INFO) << "**********************************";
-        }
+            PrintInfo(MSdesc, &StsDigi,  iDigi);
+        
         iDigi++;
     }
     return StsData;
@@ -91,15 +77,7 @@ CbmMicroSlice CbmStsDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescripto
         
         // print 
         if(fPrint && iDigi==fDigiToPrint)
-        {
-            MQLOG(INFO) << "**********************************";
-            MQLOG(INFO) << "* --Header in current STS Micro Slice : ";
-            PrintFlesMicroSliceHeader(MSdesc);
-            MQLOG(INFO) << "* * * * * * * * * * * * * * * * *";
-            MQLOG(INFO) << "* --Content of the "<< iDigi <<"th STS digi :";
-            PrintDigiContent(vStsDigi[iDigi]);
-            MQLOG(INFO) << "**********************************";
-        }
+            PrintInfo(MSdesc, &(vStsDigi[iDigi]),  iDigi);
         // fill Micro slice content 
         // Note:  "start time" and "duration" data members 
         //are implicitely given by the microslice index idx -> interval[idx-1,idx] mus
@@ -132,14 +110,9 @@ CbmMicroSlice CbmStsDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescripto
     return MicroSlice;
 }
     
-CbmDigi* CbmStsDataConverter::ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
+CbmDigi* CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
 {
     CbmDigi* digi = NULL;
-    return digi;
-}
-
-CbmStsDigi CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
-{
     uint32_t start=0;
     std::vector<uint8_t> vTimestamp_sts;     // ULong64_t
     std::vector<uint8_t> vAdress_sts;        // UInt_t
@@ -184,22 +157,22 @@ CbmStsDigi CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uin
     Int_t Digi_SectorNr=CombineData<Int_t>(vSectorNr_sts);
     Int_t Digi_SystemId=CombineData<Int_t>(vSystemId_sts);
     CbmStsDigi StsDigi(Digi_Adress, Digi_Timestamp, Digi_Charge, Digi_SectorNr);
-    
-    return StsDigi;
+    digi=&StsDigi;
+    return digi;
 }
 
-void CbmStsDataConverter::PrintDigiContent(CbmStsDigi StsDigi)
+
+void CbmStsDataConverter::PrintDigiContent(const CbmDigi* digi)
 {
-    ULong64_t Digi_Timestamp=(ULong64_t)StsDigi.GetTime();
-    UInt_t Digi_Adress=(UInt_t)StsDigi.GetAddress();
-    UShort_t Digi_Charge=(UShort_t)StsDigi.GetCharge();
-    Int_t Digi_SectorNr=(Int_t)StsDigi.GetSectorNr();
-    Int_t Digi_SystemId=(Int_t)StsDigi.GetSystemId();
+    const CbmStsDigi* StsDigi=static_cast<const CbmStsDigi*>(digi);
+    ULong64_t Digi_Timestamp=(ULong64_t)StsDigi->GetTime();
+    UInt_t Digi_Adress=(UInt_t)StsDigi->GetAddress();
+    UShort_t Digi_Charge=(UShort_t)StsDigi->GetCharge();
+    Int_t Digi_SectorNr=(Int_t)StsDigi->GetSectorNr();
+    Int_t Digi_SystemId=(Int_t)StsDigi->GetSystemId();
     MQLOG(INFO) << "* SystemId = "  << Digi_SystemId;
     MQLOG(INFO) << "* TimeStamp = " << Digi_Timestamp <<" ns";
     MQLOG(INFO) << "* Address = "   << Digi_Adress;
     MQLOG(INFO) << "* Charge = "    << Digi_Charge;
     MQLOG(INFO) << "* SectorNr = "  << Digi_SectorNr;
 }
-
-

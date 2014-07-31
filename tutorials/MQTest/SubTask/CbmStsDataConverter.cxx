@@ -131,6 +131,12 @@ CbmMicroSlice CbmStsDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescripto
 
     return MicroSlice;
 }
+    
+CbmDigi* CbmStsDataConverter::ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
+{
+    CbmDigi* digi = NULL;
+    return digi;
+}
 
 CbmStsDigi CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
 {

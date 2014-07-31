@@ -36,6 +36,7 @@ public:
     
     
 protected:
+    virtual CbmDigi* ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent)=0;
     bool fPrint;
     uint32_t fDigiToPrint;
 };

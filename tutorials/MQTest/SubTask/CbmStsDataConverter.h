@@ -26,6 +26,8 @@ public:
     
 protected:
     CbmStsDigi ConvertFlesPtrToDigi(uint32_t* end, const uint8_t* FlesTimeSliceContent);
+    CbmDigi* ConvertFlesPtrToDigi2(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
+
 private:
     
     size_t fStsDigiPayloadSize;

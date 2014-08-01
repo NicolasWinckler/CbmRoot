@@ -23,7 +23,7 @@
 
 #include "FairMQDevice.h"
 #include "StorableTimeslice.hpp"
-#include "CbmDataConverter.h"
+#include "CbmDataConverterTask.h"
 
 #ifndef __CINT__
 #include <boost/thread.hpp>
@@ -54,7 +54,7 @@ class CbmMQFileSink: public FairMQDevice
   protected:
     virtual void Run();
     
-    CbmDataConverter* fCbmDataUnpacker;
+    CbmDataConverterTask* fDataConverterTask;
   private:
     
     // Start time of current time slice [ns]

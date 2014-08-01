@@ -16,7 +16,7 @@
 #include "FairMQSamplerTask.h"
 #include "CbmTimeSlice.h"
 #include "CbmMicroSlice.h"
-#include "CbmDataConverter.h"
+#include "CbmDataConverterTask.h"
 #include "MQLogger.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ public :
     
     
 private :
-    CbmDataConverter* fCbmDataConverter;
+    CbmDataConverterTask* fDataConverterTask;
     CbmTimeSlice* fCBMTimeSlice;
     friend class boost::serialization::access;
     vector<CbmMicroSlice> fDigiVector;

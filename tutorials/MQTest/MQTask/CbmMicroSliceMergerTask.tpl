@@ -14,7 +14,7 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
         fMicroSliceIndex(0),
         fComponentIndex(0),
         fTSReady(false),
-        fCbmDataConverter(new CbmDataConverter()),
+        fDataConverterTask(new CbmDataConverterTask()),
         findex_sts(0),
         findex_much(0)
 {
@@ -27,7 +27,7 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
 template <typename TPayloadIn, typename TPayloadOut> 
 CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::~CbmMicroSliceMergerTask()
 {
-        delete fCbmDataConverter;
+        delete fDataConverterTask;
 }
 
 
@@ -153,7 +153,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
                 //MQLOG(INFO) << "Micro Slice Index = "<<index<<std::endl;
                 
                 std::cout<<std::endl;
-                fCbmDataConverter->PrintCbmMicroSlice(&MSlice,0);
+                fDataConverterTask->PrintCbmMicroSlice(&MSlice,0);
 
             }
 

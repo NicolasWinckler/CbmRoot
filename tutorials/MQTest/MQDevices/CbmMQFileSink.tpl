@@ -11,11 +11,11 @@
  */
 
 template <typename TPayloadIn>
-CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fCbmDataUnpacker(new CbmDataConverter()), 
+CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fDataConverterTask(new CbmDataConverterTask()), 
         fCurrentStartTime (0.),
         fDuration (1000.)
 {
-        fCbmDataUnpacker->InitCbmTS(fCurrentStartTime,fDuration);
+        fDataConverterTask->InitCbmTS(fCurrentStartTime,fDuration);
     
 }
 
@@ -23,8 +23,8 @@ CbmMQFileSink<TPayloadIn>::CbmMQFileSink() : fCbmDataUnpacker(new CbmDataConvert
 template <typename TPayloadIn>
 CbmMQFileSink<TPayloadIn>::~CbmMQFileSink()
 {
-    fCbmDataUnpacker->WriteTreeToFile();
-    delete fCbmDataUnpacker;
+    fDataConverterTask->WriteTreeToFile();
+    delete fDataConverterTask;
 }
 
 template <typename TPayloadIn>
@@ -32,7 +32,7 @@ void CbmMQFileSink<TPayloadIn>::InitOutputFile(TString defaultId)
 {
     char outname[256];
     sprintf(outname, "cbmTimeSlicefilesink%s.root", defaultId.Data());
-    fCbmDataUnpacker->InitCbmTSOutputFile(outname);
+    fDataConverterTask->InitCbmTSOutputFile(outname);
 }
 
 
@@ -42,7 +42,7 @@ void CbmMQFileSink<TPayloadIn>::Run()
 {
         MQLOG(INFO) << ">>>>>>> Run <<<<<<<";
         bool printinfo=true;
-        fCbmDataUnpacker->SetPrintOption(0,printinfo);
+        fDataConverterTask->SetPrintOption(0,printinfo);
 
         boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
         int receivedMsgs = 0;
@@ -100,7 +100,7 @@ void CbmMQFileSink<TPayloadIn>::Run()
                 /// initialize time interval of the cbmroot timeslice obtained from the fles header 
                 /// assume duration of 1 mus
                 fCurrentStartTime=1000.0*(Double_t)MSliceIndex_MIN;
-                fCbmDataUnpacker->SetCbmTSInterval(fCurrentStartTime, fDuration);
+                fDataConverterTask->SetCbmTSInterval(fCurrentStartTime, fDuration);
                 
                 /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// loop over all fles MS index (time) of the current fles timeslice
@@ -131,7 +131,7 @@ void CbmMQFileSink<TPayloadIn>::Run()
                             
                             const uint8_t* ptr_FlesTimeSliceContent;
                             ptr_FlesTimeSliceContent=fFlesTimeSlices.content(comp_j,MS_i);
-                            fCbmDataUnpacker->CbmTSFiller(&MSdesc,ptr_FlesTimeSliceContent);
+                            fDataConverterTask->CbmTSFiller(&MSdesc,ptr_FlesTimeSliceContent);
                             
                         }
 
@@ -139,7 +139,7 @@ void CbmMQFileSink<TPayloadIn>::Run()
                     
                     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     /// fill tree and update currentStartTime
-                    fCbmDataUnpacker->FillCbmTSTree();
+                    fDataConverterTask->FillCbmTSTree();
                     
                 } // end loop on MS index
                 break;// break temporary
@@ -150,7 +150,7 @@ void CbmMQFileSink<TPayloadIn>::Run()
                
         } // end while loop on state machine
         
-        //fCbmDataUnpacker->WriteTreeToFile();
+        //fDataConverterTask->WriteTreeToFile();
         cout << "I've received " << receivedMsgs << " messages!" << endl;
         boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
         rateLogger.interrupt();

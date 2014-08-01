@@ -7,14 +7,14 @@
  ********************************************************************************/
 
 /* 
- * File:   CbmDataConverter.h
+ * File:   CbmDataConverterTask.h
  * Author: winckler
  *
  * Created on July 18, 2014, 7:23 PM
  */
 
-#ifndef CBMDATACONVERTER_H
-#define	CBMDATACONVERTER_H
+#ifndef CBMDATACONVERTERTASK_H
+#define	CBMDATACONVERTERTASK_H
 
 #include <iostream>
 #include "TFile.h"
@@ -36,11 +36,11 @@
 
 #include "FairMQLogger.h"
 
-class CbmDataConverter : public FairTask
+class CbmDataConverterTask : public FairTask
 {
 public:
-    CbmDataConverter();
-    virtual ~CbmDataConverter();
+    CbmDataConverterTask();
+    virtual ~CbmDataConverterTask();
     //virtual void Exec(Option_t* opt);
     //virtual InitStatus Init();
     
@@ -82,5 +82,5 @@ protected:
     
 };
 
-#endif	/* CBMDATACONVERTER_H */
+#endif	/* CBMDATACONVERTERTASK_H */
 

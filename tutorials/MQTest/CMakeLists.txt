@@ -67,7 +67,7 @@ If (Boost_FOUND)
     MQDevices/CbmProcessor.cxx
     MQDevices/CbmMicroSliceMerger.cxx
     MQTask/CbmMicroSliceMergerTask.cxx
-    SubTask/CbmDataConverter.cxx
+    SubTask/CbmDataConverterTask.cxx
     SubTask/CbmMuchDataConverter.cxx
     SubTask/CbmStsDataConverter.cxx
     SubTask/CbmDigiConverter.cxx

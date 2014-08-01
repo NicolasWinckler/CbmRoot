@@ -21,7 +21,7 @@
 #endif //__CINT__
 
 #include "CbmDetectorList.h"
-#include "CbmDataConverter.h"
+#include "CbmDataConverterTask.h"
 #include "CbmUnpacker.h"
 
 #include "FairMQProcessorTask.h"
@@ -92,7 +92,7 @@ private:
     unsigned int fMicroSliceIndex;
     unsigned int fComponentIndex;
     bool fTSReady;
-    CbmDataConverter* fCbmDataConverter;
+    CbmDataConverterTask* fDataConverterTask;
     uint64_t findex_sts;
     uint64_t findex_much;
     std::vector<CbmMicroSlice> fDigiVector;

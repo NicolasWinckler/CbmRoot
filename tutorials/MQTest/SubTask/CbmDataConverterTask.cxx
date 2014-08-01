@@ -7,16 +7,16 @@
  ********************************************************************************/
 
 /* 
- * File:   CbmDataConverter.cxx
+ * File:   CbmDataConverterTask.cxx
  * Author: winckler
  * 
  * Created on July 18, 2014, 7:23 PM
  */
 
-#include "CbmDataConverter.h"
+#include "CbmDataConverterTask.h"
 
 
-CbmDataConverter::CbmDataConverter() : FairTask("CbmDataConverter"),
+CbmDataConverterTask::CbmDataConverterTask() : FairTask("CbmDataConverterTask"),
         fOutFile(NULL),
         fTree(NULL),
         fCBMTimeSlice(NULL),
@@ -32,7 +32,7 @@ CbmDataConverter::CbmDataConverter() : FairTask("CbmDataConverter"),
 }
 
 
-CbmDataConverter::~CbmDataConverter() 
+CbmDataConverterTask::~CbmDataConverterTask() 
 {
     if(fCBMTimeSlice)
         delete fCBMTimeSlice;
@@ -57,7 +57,7 @@ InitStatus Init()
 }
 // */
 
-void CbmDataConverter::InitCbmTS(Double_t start, Double_t duration)
+void CbmDataConverterTask::InitCbmTS(Double_t start, Double_t duration)
 {
     fCurrentStartTime=start;
     fDuration=duration;
@@ -67,7 +67,7 @@ void CbmDataConverter::InitCbmTS(Double_t start, Double_t duration)
         fCBMTimeSlice->Reset(fCurrentStartTime, fDuration);
 }
 
-void CbmDataConverter::InitCbmTSOutputFile(const char* filename)
+void CbmDataConverterTask::InitCbmTSOutputFile(const char* filename)
 {
     
     fOutFile = new TFile(filename,"recreate");
@@ -85,7 +85,7 @@ void CbmDataConverter::InitCbmTSOutputFile(const char* filename)
     
 }
 
-void CbmDataConverter::SetCbmTSInterval(Double_t start, Double_t duration)
+void CbmDataConverterTask::SetCbmTSInterval(Double_t start, Double_t duration)
 {
     fCurrentStartTime=start;
     fDuration=duration;
@@ -93,7 +93,7 @@ void CbmDataConverter::SetCbmTSInterval(Double_t start, Double_t duration)
     
 }
 
-void CbmDataConverter::FillCbmTSTree() 
+void CbmDataConverterTask::FillCbmTSTree() 
 {
   fTree->Fill();
   // --- Reset time slice with new time interval
@@ -103,7 +103,7 @@ void CbmDataConverter::FillCbmTSTree()
 }
 
 
-void CbmDataConverter::WriteTreeToFile()
+void CbmDataConverterTask::WriteTreeToFile()
 {
     MQLOG(INFO)<<"Save Tree to file";
     fCBMTimeSlice->Reset(0.,0.);
@@ -113,7 +113,7 @@ void CbmDataConverter::WriteTreeToFile()
 
 
 
-void CbmDataConverter::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent)
+void CbmDataConverterTask::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent)
 {
     uint8_t DetectorId=MSdesc->sys_id;
     uint32_t ContentSize=MSdesc->size;
@@ -135,7 +135,7 @@ void CbmDataConverter::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, con
 }
 
 
-void CbmDataConverter::PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint)
+void CbmDataConverterTask::PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint)
 {
     SetPrintOption(DigiToPrint);
     const fles::MicrosliceDescriptor desc=MSlice->GetHeader();
@@ -160,7 +160,7 @@ void CbmDataConverter::PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t 
 
 
 
-CbmMicroSlice CbmDataConverter::BuildMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent)
+CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent)
 {
     CbmMicroSlice MicroSlice;
     vector<uint8_t> MicroSliceContent;
@@ -178,7 +178,7 @@ CbmMicroSlice CbmDataConverter::BuildMicroSlice(const fles::MicrosliceDescriptor
     return MicroSlice;
 }
 
-CbmMicroSlice CbmDataConverter::BuildMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice)
+CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice)
 {
     CbmMicroSlice MicroSlice;
 
@@ -273,7 +273,7 @@ CbmMicroSlice CbmDataConverter::BuildMicroSlice(DetectorId iDet, CbmTimeSlice* C
 }
 
 
-void CbmDataConverter::SetPrintOption(uint32_t DigiToPrint, bool print)
+void CbmDataConverterTask::SetPrintOption(uint32_t DigiToPrint, bool print)
 {
     fPrint=print;
     fDigiToPrint=DigiToPrint;

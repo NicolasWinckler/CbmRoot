@@ -187,10 +187,9 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
     if(fPrint)
     {
         
-        std::cout<< "Time interval in ns [" 
+        MQLOG(ERROR)<< "Time interval in ns [" 
                     << CbmTSlice->GetStartTime() << ", "
-                    << CbmTSlice->GetEndTime() << "]"
-                    << std::endl;
+                    << CbmTSlice->GetEndTime() << "]";
     }
     
     // initialize fles MicroSlice header common to all detectors
@@ -207,8 +206,8 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
     {
         if(fPrint)
         {
-            std::cout   << "   number of STS points = "
-                        << CbmTSlice->GetDataSize(kSTS) <<std::endl;
+            MQLOG(ERROR)   << "   number of STS points = "
+                           << CbmTSlice->GetDataSize(kSTS);
         }
 
         // define fles MicroSlice header specific to STS detector
@@ -227,11 +226,10 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
         bool fakeMuchDigi=true;
         if(fPrint)
         {
-            std::cout   << "   number of MUCH points = "
-                        << CbmTSlice->GetDataSize(kMUCH) <<std::endl;
+            MQLOG(ERROR) << "   number of MUCH points = "
+                        << CbmTSlice->GetDataSize(kMUCH);
             if(fakeMuchDigi)
-                std::cout   << "   Warning: dummy MUCH digi created for test"
-                            <<std::endl;
+                MQLOG(ERROR)   << "   Warning: dummy MUCH digi created for test";
         }
 
         // define fles MicroSlice header specific to MUCH detector

@@ -30,6 +30,7 @@
 #include "CbmDetectorList.h"
 #include "CbmStsDigi.h"
 #include "CbmMuchDigi.h"
+#include "CbmDigiConverter.h"
 #include "CbmMuchDataConverter.h"
 #include "CbmStsDataConverter.h"
 

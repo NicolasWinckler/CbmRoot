@@ -26,12 +26,14 @@ void CbmMuchDataConverter::MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSd
     uint32_t iDigi=0;
     while(offset<ContentSize)
     {
+        std::shared_ptr<CbmDigi> spDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
+        std::shared_ptr<CbmMuchDigi> spMuchDigi=dynamic_pointer_cast<CbmMuchDigi>(spDigi);
         
-        CbmMuchDigi MuchDigi(static_cast<CbmMuchDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
-        CbmRootTimeSlice->InsertData(&MuchDigi);
+        
+        CbmRootTimeSlice->InsertData(spMuchDigi.get());
         
         if(fPrint && iDigi==fDigiToPrint)
-            PrintInfo(MSdesc, &MuchDigi,  iDigi);
+            PrintInfo(MSdesc, spMuchDigi.get(),  iDigi);
         
         iDigi++;
     }
@@ -47,13 +49,18 @@ vector<CbmMuchDigi> CbmMuchDataConverter::MuchConverter(const fles::MicrosliceDe
     vector<CbmMuchDigi> MuchData;
     while(offset<ContentSize)
     {
-        CbmMuchDigi MuchDigi(static_cast<CbmMuchDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
+        std::shared_ptr<CbmDigi> spDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
+        std::shared_ptr<CbmMuchDigi> spMuchDigi=dynamic_pointer_cast<CbmMuchDigi>(spDigi);
+        
+        
+        CbmMuchDigi MuchDigi(spMuchDigi.get());
+        
         MuchData.push_back(MuchDigi);
         
         if(fPrint && iDigi==fDigiToPrint)
-            PrintInfo(MSdesc, &MuchDigi,  iDigi);
-        
+            PrintInfo(MSdesc, spMuchDigi.get(),  iDigi);
         iDigi++;
+        
     }
     return MuchData;
 }
@@ -112,9 +119,8 @@ CbmMicroSlice CbmMuchDataConverter::GetCbmMuchMicroSlice(fles::MicrosliceDescrip
 
 
 
-CbmDigi* CbmMuchDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
-{
-    CbmDigi* digi = NULL;
+std::shared_ptr<CbmDigi> CbmMuchDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
+{    
     uint32_t start=0;
     std::vector<uint8_t> vTimestamp_much;     // ULong64_t
     std::vector<uint8_t> vAdress_much;        // UInt_t
@@ -152,9 +158,9 @@ CbmDigi* CbmMuchDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint
     Int_t Digi_Adress=CombineData<Int_t>(vAdress_much);
     Int_t Digi_Charge=CombineData<Int_t>(vCharge_much);
     Int_t Digi_SystemId=CombineData<Int_t>(vSystemId_much);
-    CbmMuchDigi MuchDigi(Digi_Adress, Digi_Charge,  Digi_Timestamp);
-    digi=&MuchDigi;
-    return digi;
+    
+    std::shared_ptr<CbmDigi> spDigi(std::make_shared<CbmMuchDigi>(Digi_Adress, Digi_Charge,  Digi_Timestamp));
+    return spDigi;
 }
 
 

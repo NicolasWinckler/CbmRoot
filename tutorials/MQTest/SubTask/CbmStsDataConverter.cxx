@@ -24,11 +24,14 @@ void CbmStsDataConverter::StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdes
     uint32_t iDigi=0;
     while(offset<ContentSize)
     {
-        CbmStsDigi StsDigi=*(static_cast<CbmStsDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
-        CbmRootTimeSlice->InsertData(&StsDigi);
+        //CbmStsDigi StsDigi=*(static_cast<CbmStsDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
+        std::shared_ptr<CbmDigi> spDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
+        std::shared_ptr<CbmStsDigi> spStsDigi=dynamic_pointer_cast<CbmStsDigi>(spDigi);
+        
+        CbmRootTimeSlice->InsertData(spStsDigi.get());
         
         if(fPrint && iDigi==fDigiToPrint)
-            PrintInfo(MSdesc, &StsDigi,  iDigi);
+            PrintInfo(MSdesc, spStsDigi.get(),  iDigi);
 
         iDigi++;
     }
@@ -44,11 +47,14 @@ vector<CbmStsDigi>  CbmStsDataConverter::StsConverter(const fles::MicrosliceDesc
     vector<CbmStsDigi> StsData;
     while(offset<ContentSize)
     {
-        CbmStsDigi StsDigi=*(static_cast<CbmStsDigi*>(ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent)));
+        std::shared_ptr<CbmDigi> spDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
+        std::shared_ptr<CbmStsDigi> spStsDigi=dynamic_pointer_cast<CbmStsDigi>(spDigi);
+        
+        CbmStsDigi StsDigi=*(spStsDigi.get());
         StsData.push_back(StsDigi);
 
         if(fPrint && iDigi==fDigiToPrint)
-            PrintInfo(MSdesc, &StsDigi,  iDigi);
+            PrintInfo(MSdesc, spStsDigi.get(),  iDigi);
         
         iDigi++;
     }
@@ -110,9 +116,8 @@ CbmMicroSlice CbmStsDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescripto
     return MicroSlice;
 }
     
-CbmDigi* CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
+std::shared_ptr<CbmDigi> CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)
 {
-    CbmDigi* digi = NULL;
     uint32_t start=0;
     std::vector<uint8_t> vTimestamp_sts;     // ULong64_t
     std::vector<uint8_t> vAdress_sts;        // UInt_t
@@ -156,9 +161,9 @@ CbmDigi* CbmStsDataConverter::ConvertFlesPtrToDigi(uint32_t *offset, const uint8
     UShort_t Digi_Charge=CombineData<UShort_t>(vCharge_sts);
     Int_t Digi_SectorNr=CombineData<Int_t>(vSectorNr_sts);
     Int_t Digi_SystemId=CombineData<Int_t>(vSystemId_sts);
-    CbmStsDigi StsDigi(Digi_Adress, Digi_Timestamp, Digi_Charge, Digi_SectorNr);
-    digi=&StsDigi;
-    return digi;
+    
+    std::shared_ptr<CbmDigi> spDigi(std::make_shared<CbmStsDigi>(Digi_Adress, Digi_Timestamp, Digi_Charge, Digi_SectorNr));
+    return spDigi;
 }
 
 

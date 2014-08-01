@@ -10,12 +10,11 @@
 
 
 #include <iostream>
-#include <iostream>
+#include <memory>
 
 #include "StorableTimeslice.hpp"
 #include "CbmTimeSlice.h"
 
-#include "CbmDigiConverter.h"
 #include "CbmUnpacker.h"
 #include "CbmMicroSlice.h"
 
@@ -36,7 +35,7 @@ public:
     void PrintInfo(const fles::MicrosliceDescriptor* MSdesc, const CbmDigi* Digi, uint32_t iDigi);
     virtual void PrintDigiContent(const CbmDigi* Digi)=0;
 protected:
-    virtual CbmDigi* ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)=0;
+    virtual std::shared_ptr<CbmDigi> ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent)=0;
     bool fPrint;
     uint32_t fDigiToPrint;
 };

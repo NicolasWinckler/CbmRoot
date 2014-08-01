@@ -27,7 +27,7 @@ public:
     size_t GetDigiPayloadSize(){return fStsDigiPayloadSize;}
     
 protected:
-    CbmDigi* ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
+    std::shared_ptr<CbmDigi> ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
 
 private:
     

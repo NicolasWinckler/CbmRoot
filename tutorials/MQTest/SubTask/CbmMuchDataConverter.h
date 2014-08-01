@@ -26,7 +26,7 @@ public:
     virtual void PrintDigiContent(const CbmDigi* Digi);
     size_t GetDigiPayloadSize(){return fMuchDigiPayloadSize;}
 protected:
-    virtual CbmDigi* ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
+    virtual std::shared_ptr<CbmDigi> ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
 
 private:
     size_t fMuchDigiPayloadSize;

@@ -105,6 +105,7 @@ void CbmDataConverter::FillCbmTSTree()
 
 void CbmDataConverter::WriteTreeToFile()
 {
+    MQLOG(INFO)<<"Save Tree to file";
     fCBMTimeSlice->Reset(0.,0.);
     fTree->Write();
     fOutFile->Close();
@@ -122,10 +123,10 @@ void CbmDataConverter::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, con
         {
 
         case kSTS:
-            fStsConverter->StsCbmTSFiller(MSdesc, FlesTimeSliceContent,fCBMTimeSlice);
+            fStsConverter->FillCbmRootTSlice(MSdesc, FlesTimeSliceContent,fCBMTimeSlice);
           break;
         case kMUCH:
-            fMuchConverter->MuchCbmTSFiller(MSdesc, FlesTimeSliceContent,fCBMTimeSlice);
+            fMuchConverter->FillCbmRootTSlice(MSdesc, FlesTimeSliceContent,fCBMTimeSlice);
           break;
         default:
           break;
@@ -137,22 +138,19 @@ void CbmDataConverter::CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, con
 void CbmDataConverter::PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint)
 {
     SetPrintOption(DigiToPrint);
-    //std::vector<uint8_t> MSliceData=MSlice->GetData();
     const fles::MicrosliceDescriptor desc=MSlice->GetHeader();
     uint8_t DetectorId=MSlice->GetHeader().sys_id;
     uint32_t ContentSize=MSlice->GetHeader().size;
-    //uint8_t DetectorId=MSdesc->sys_id;
-    //uint32_t ContentSize=MSdesc->size;
     if(ContentSize>0)
     {
         switch (DetectorId) 
         {
 
         case kSTS:
-            fStsConverter->StsConverter(&desc, MSlice->GetData().data());
+            fStsConverter->GetDigiVector(&desc, MSlice->GetData().data());
           break;
         case kMUCH:
-            fMuchConverter->MuchConverter(&desc, MSlice->GetData().data());
+            fMuchConverter->GetDigiVector(&desc, MSlice->GetData().data());
           break;
         default:
           break;
@@ -162,7 +160,7 @@ void CbmDataConverter::PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t 
 
 
 
-CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent)
+CbmMicroSlice CbmDataConverter::BuildMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent)
 {
     CbmMicroSlice MicroSlice;
     vector<uint8_t> MicroSliceContent;
@@ -180,14 +178,14 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(const fles::MicrosliceDescripto
     return MicroSlice;
 }
 
-CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice)
+CbmMicroSlice CbmDataConverter::BuildMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice)
 {
     CbmMicroSlice MicroSlice;
 
     if(fPrint)
     {
         
-        MQLOG(ERROR)<< "Time interval in ns [" 
+        MQLOG(INFO)<< "Time interval in ns [" 
                     << CbmTSlice->GetStartTime() << ", "
                     << CbmTSlice->GetEndTime() << "]";
     }
@@ -206,7 +204,7 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
     {
         if(fPrint)
         {
-            MQLOG(ERROR)   << "   number of STS points = "
+            MQLOG(INFO)   << "   number of STS points = "
                            << CbmTSlice->GetDataSize(kSTS);
         }
 
@@ -217,7 +215,7 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
         MSdesc.size = (uint32_t)(fStsDigiPayloadSize*CbmTSlice->GetDataSize(kSTS));
         MSdesc.offset=0;
         vector<CbmStsDigi> StsData=CbmTSlice->GetStsData();
-        MicroSlice=fStsConverter->GetCbmStsMicroSlice(&MSdesc, StsData);
+        MicroSlice=fStsConverter->DigiVectToMSlice(&MSdesc, StsData);
 
       break;
     }
@@ -226,10 +224,10 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
         bool fakeMuchDigi=true;
         if(fPrint)
         {
-            MQLOG(ERROR) << "   number of MUCH points = "
+            MQLOG(INFO) << "   number of MUCH points = "
                         << CbmTSlice->GetDataSize(kMUCH);
             if(fakeMuchDigi)
-                MQLOG(ERROR)   << "   Warning: dummy MUCH digi created for test";
+                MQLOG(DEBUG)   << "   Warning: dummy MUCH digi created for test";
         }
 
         // define fles MicroSlice header specific to MUCH detector
@@ -255,22 +253,16 @@ CbmMicroSlice CbmDataConverter::GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* 
                 Int_t Muchcharge=(Int_t)(rand() % 100 + 1);
                 Int_t Muchtime=(Int_t)(CbmTSlice->GetStartTime()+(Double_t)(rand() % 100 + 1));
                 CbmMuchDigi muchdigi(Muchaddress, Muchcharge, Muchtime);
-                //std::cout<<"Muchtime= " << Muchtime<<std::endl;
-                //std::cout<<"Muchcharge= " << Muchcharge<<std::endl;
-                //std::cout<<"Muchaddress= " << Muchaddress<<std::endl;
 
                 MuchData.push_back(muchdigi);
-
             }
         }
         else 
         {
             MuchData=CbmTSlice->GetMuchData();
         }
-        MicroSlice=fMuchConverter->GetCbmMuchMicroSlice(&MSdesc, MuchData);
-
-        
-      break;
+        MicroSlice=fMuchConverter->DigiVectToMSlice(&MSdesc, MuchData);
+        break;
     }
     default:
       break;

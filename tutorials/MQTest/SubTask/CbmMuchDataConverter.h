@@ -18,13 +18,13 @@ public:
     CbmMuchDataConverter();
     virtual ~CbmMuchDataConverter();
     
-    vector<CbmMuchDigi> MuchConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    void  MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
-    CbmMicroSlice GetCbmMuchMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi);
-
+    void  FillCbmRootTSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);    
+    vector<CbmMuchDigi> GetDigiVector(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    CbmMicroSlice DigiVectToMSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi);
     
     virtual void PrintDigiContent(const CbmDigi* Digi);
     size_t GetDigiPayloadSize(){return fMuchDigiPayloadSize;}
+    
 protected:
     virtual std::shared_ptr<CbmDigi> ConvertFlesPtrToDigi(uint32_t *offset, const uint8_t* FlesTimeSliceContent);
 

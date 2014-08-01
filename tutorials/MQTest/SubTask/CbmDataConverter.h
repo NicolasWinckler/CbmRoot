@@ -44,11 +44,11 @@ public:
     //virtual void Exec(Option_t* opt);
     //virtual InitStatus Init();
     
-    CbmMicroSlice GetCbmMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    CbmMicroSlice BuildMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     void PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint=0);
     
     /// stuff to convert cbm root timeslices to fles microslices
-    CbmMicroSlice GetCbmMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
+    CbmMicroSlice BuildMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice);
     
     /// stuff to convert fles microslices to cbm root timeslices
     void CbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);

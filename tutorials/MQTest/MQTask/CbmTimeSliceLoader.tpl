@@ -48,7 +48,7 @@ void CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Exec(Option_t* opt)
         }
         
         /// convert data : CbmRoot -> Fles
-        fMicroSlice=fCbmDataConverter->GetCbmMicroSlice(fDetID,fCBMTimeSlice);
+        fMicroSlice=fCbmDataConverter->BuildMicroSlice(fDetID,fCBMTimeSlice);
         fDigiVector.push_back(fMicroSlice);
 
         /// boost serialization and create FairMQ message

@@ -113,7 +113,7 @@ void CbmMQFileSink<TPayloadIn>::Run()
                         MQLOG(INFO) << "-------------------------------------------";
                         MQLOG(INFO) <<MS_i<< "th MS in current fles TS ";
                         MQLOG(INFO) << "Current Time Slice interval = ["<<fCurrentStartTime
-                                <<";"<< fCurrentStartTime+fDuration;
+                                <<";"<< fCurrentStartTime+fDuration<<"]";
                         MQLOG(INFO) << "InputLinkNumber = "<<InputLinkNumber;
                     }
                     

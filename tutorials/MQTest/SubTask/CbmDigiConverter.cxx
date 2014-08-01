@@ -55,29 +55,29 @@ void CbmDigiConverter::PrintInfo(const fles::MicrosliceDescriptor* MSdesc, const
     {
         case kSTS:
         {
-            strHeader="* --Header in current STS Micro Slice : ";
+            strHeader="*********STS*********";
             strIdigi="th STS digi :";
             break;
         }
         case kMUCH:
         {
-            strHeader="* --Header in current MUCH Micro Slice : ";
+            strHeader="********MUCH*********";
             strIdigi="th MUCH digi :";
             break;
         }
         default:
         {
-          strHeader="* --Header in current unknown detector Micro Slice : ";
+          strHeader="********UNKNOWN**********";
           strIdigi="th unknown detector digi :";
           break;
         }
     }
     
-    MQLOG(INFO) << "******************";
     MQLOG(INFO) << strHeader;
+    MQLOG(INFO) <<"* --Header of current Micro Slice : ";
     PrintFlesMicroSliceHeader(MSdesc);
     MQLOG(INFO) << "* * * * * * * * * ";
     MQLOG(INFO) << "* --Content of the "<< iDigi <<strIdigi;
     PrintDigiContent(Digi);
-    MQLOG(INFO) << "******************";
+    MQLOG(INFO) << "*********************";
 }

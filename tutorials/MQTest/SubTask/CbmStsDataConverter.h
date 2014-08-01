@@ -17,11 +17,9 @@ public:
     CbmStsDataConverter();
     virtual ~CbmStsDataConverter();
     
-    CbmMicroSlice GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
-    vector<CbmStsDigi>  StsConverter(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
-    void  StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
-
-    //virtual void PrintInfo(const fles::MicrosliceDescriptor* MSdesc, const CbmDigi* Digi, uint32_t iDigi);
+    void  FillCbmRootTSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice);
+    vector<CbmStsDigi>  GetDigiVector(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
+    CbmMicroSlice DigiVectToMSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi);
     
     virtual void PrintDigiContent(const CbmDigi* Digi);
     size_t GetDigiPayloadSize(){return fStsDigiPayloadSize;}

@@ -19,7 +19,7 @@ CbmMuchDataConverter::~CbmMuchDataConverter()
 }
 
 
-void CbmMuchDataConverter::MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice)
+void CbmMuchDataConverter::FillCbmRootTSlice(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice)
 {
     uint32_t ContentSize=MSdesc->size;
     uint32_t offset=0;
@@ -28,7 +28,6 @@ void CbmMuchDataConverter::MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSd
     {
         std::shared_ptr<CbmDigi> spDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
         std::shared_ptr<CbmMuchDigi> spMuchDigi=dynamic_pointer_cast<CbmMuchDigi>(spDigi);
-        
         
         CbmRootTimeSlice->InsertData(spMuchDigi.get());
         
@@ -41,7 +40,7 @@ void CbmMuchDataConverter::MuchCbmTSFiller(const fles::MicrosliceDescriptor* MSd
 
 
 
-vector<CbmMuchDigi> CbmMuchDataConverter::MuchConverter(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent)
+vector<CbmMuchDigi> CbmMuchDataConverter::GetDigiVector(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent)
 {
     uint32_t ContentSize=MSdesc->size;
     uint32_t offset=0;
@@ -51,7 +50,6 @@ vector<CbmMuchDigi> CbmMuchDataConverter::MuchConverter(const fles::MicrosliceDe
     {
         std::shared_ptr<CbmDigi> spDigi=ConvertFlesPtrToDigi(&offset,FlesTimeSliceContent);
         std::shared_ptr<CbmMuchDigi> spMuchDigi=dynamic_pointer_cast<CbmMuchDigi>(spDigi);
-        
         
         CbmMuchDigi MuchDigi(spMuchDigi.get());
         
@@ -67,7 +65,7 @@ vector<CbmMuchDigi> CbmMuchDataConverter::MuchConverter(const fles::MicrosliceDe
 
 
 
-CbmMicroSlice CbmMuchDataConverter::GetCbmMuchMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi)
+CbmMicroSlice CbmMuchDataConverter::DigiVectToMSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmMuchDigi> vMuchDigi)
 {
 
     CbmMicroSlice MicroSlice;

@@ -17,7 +17,7 @@ CbmStsDataConverter::~CbmStsDataConverter()
 }
 
 
-void CbmStsDataConverter::StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice)
+void CbmStsDataConverter::FillCbmRootTSlice(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent, CbmTimeSlice* CbmRootTimeSlice)
 {
     uint32_t ContentSize=MSdesc->size;
     uint32_t offset=0;
@@ -39,7 +39,7 @@ void CbmStsDataConverter::StsCbmTSFiller(const fles::MicrosliceDescriptor* MSdes
 
 
 
-vector<CbmStsDigi>  CbmStsDataConverter::StsConverter(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent)
+vector<CbmStsDigi>  CbmStsDataConverter::GetDigiVector(const fles::MicrosliceDescriptor* MSdesc,  const uint8_t* FlesTimeSliceContent)
 {
     uint32_t ContentSize=MSdesc->size;
     uint32_t offset=0;
@@ -63,7 +63,7 @@ vector<CbmStsDigi>  CbmStsDataConverter::StsConverter(const fles::MicrosliceDesc
 
 
 
-CbmMicroSlice CbmStsDataConverter::GetCbmStsMicroSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi)
+CbmMicroSlice CbmStsDataConverter::DigiVectToMSlice(fles::MicrosliceDescriptor* MSdesc, const vector<CbmStsDigi> vStsDigi)
 {
 
     CbmMicroSlice MicroSlice;

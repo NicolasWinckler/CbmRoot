@@ -41,7 +41,7 @@ public:
     virtual InitStatus Init();
 
     /** Virtual method Exec **/
-    virtual void Exec(FairMQMessage* msg, Option_t* opt);
+    virtual void Exec(Option_t* opt = "0");
     
     bool MsgReadyToSend();
     

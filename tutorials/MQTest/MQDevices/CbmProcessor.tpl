@@ -60,7 +60,8 @@ void CbmProcessor<TPolicyTask>::Run()
       if (bytes_received) 
       {
           cout << "I've received " << receivedMsgs << " messages!" << endl;
-          fProcessorTask->Exec(msg, NULL);
+          fProcessorTask->SetPayload(msg);
+          fProcessorTask->Exec();
           
           bool ReadyToSend=fProcessorTask->MsgReadyToSend();
           

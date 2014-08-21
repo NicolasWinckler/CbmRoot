@@ -73,12 +73,12 @@ void InitFlesTimeSlice(uint64_t num_microslices, uint64_t index = UINT64_MAX)
 }
 
 template <typename TPayloadIn, typename TPayloadOut> 
-void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, Option_t* opt)
+void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
 { 
         
         fTSReady=false;
         //prepare boost input archive
-        std::string msgStr( static_cast<char*>(msg->GetData()), msg->GetSize() );
+        std::string msgStr( static_cast<char*>(fPayload->GetData()), fPayload->GetSize() );
         std::istringstream ibuffer(msgStr);
         TPayloadIn InputArchive(ibuffer);
         try
@@ -180,8 +180,8 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(FairMQMessage* msg, O
             TPayloadOut OutputArchive(obuffer); 
             OutputArchive << fFlesTimeSlices;
             int outputSize=obuffer.str().length();
-            msg->Rebuild(outputSize);
-            std::memcpy(msg->GetData(), obuffer.str().c_str(), outputSize);
+            fPayload->Rebuild(outputSize);
+            std::memcpy(fPayload->GetData(), obuffer.str().c_str(), outputSize);
         }
     
         

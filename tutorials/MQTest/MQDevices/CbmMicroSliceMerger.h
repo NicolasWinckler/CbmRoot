@@ -34,12 +34,12 @@ public:
     
     void SetMicroSliceNum(uint64_t MSNumber)
     {
-        fProcessorTask->SetMicroSliceNumber(MSNumber);
+        fMaxMicroSliceNumber=MSNumber;
     }
     
     void SetTimeSliceIdx(uint64_t TSIndex)
     {
-        fProcessorTask->SetTimeSliceIndex(TSIndex);
+        fTSIndex=TSIndex;
     }
     
 
@@ -47,7 +47,11 @@ protected:
     
     virtual void Init();
     virtual void Run();
+    void ReInitMergerTask();
+
     uint64_t fTSIndex;
+    uint64_t fMaxMicroSliceNumber;
+    bool fMSIndexSync;
     TPolicyTask* fProcessorTask; 
     
     fles::StorableTimeslice fFlesTimeSlices{1, 1};

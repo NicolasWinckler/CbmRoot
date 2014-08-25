@@ -8,14 +8,21 @@
 
 
 template <typename TPolicyTask>
-CbmMicroSliceMerger<TPolicyTask>::CbmMicroSliceMerger() : fTSIndex(0), fProcessorTask(new TPolicyTask())
+CbmMicroSliceMerger<TPolicyTask>::CbmMicroSliceMerger() : fTSIndex(0), 
+        fMaxMicroSliceNumber(0),
+        fMSIndexSync(false),
+        fProcessorTask(new TPolicyTask())
 {
 }
 
 template <typename TPolicyTask>
 CbmMicroSliceMerger<TPolicyTask>::~CbmMicroSliceMerger()
 {
-  delete fProcessorTask;
+    if(fProcessorTask)
+    {
+        delete fProcessorTask;
+        fProcessorTask=NULL;
+    }
 }
 
 
@@ -23,9 +30,28 @@ CbmMicroSliceMerger<TPolicyTask>::~CbmMicroSliceMerger()
 template <typename TPolicyTask>
 void CbmMicroSliceMerger<TPolicyTask>::Init()
 {
-  FairMQDevice::Init();
+    FairMQDevice::Init();
+    fProcessorTask->SetTimeSliceIndex(fTSIndex);
+    fProcessorTask->SetMicroSliceNumber(fMaxMicroSliceNumber);
+    fProcessorTask->InitTask();
+}
 
-  fProcessorTask->InitTask();
+template <typename TPolicyTask>
+void CbmMicroSliceMerger<TPolicyTask>::ReInitMergerTask()
+{
+    
+    if(fProcessorTask)
+    {
+        delete fProcessorTask;
+        fProcessorTask=NULL;
+        fProcessorTask =new TPolicyTask();
+    }
+    else
+        fProcessorTask =new TPolicyTask();
+    
+    fProcessorTask->SetTimeSliceIndex(fTSIndex);
+    fProcessorTask->SetMicroSliceNumber(fMaxMicroSliceNumber);
+    fProcessorTask->InitTask();
 }
 
 
@@ -36,7 +62,7 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
 
     boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
 
-    FairMQPoller* poller = fTransportFactory->CreatePoller(*fPayloadInputs);
+    //FairMQPoller* poller = fTransportFactory->CreatePoller(*fPayloadInputs);
 
 
     int receivedMsgs = 0;
@@ -45,44 +71,51 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
 
     size_t bytes_received = 0;
 
-    while ( FairMQDevice::fState == FairMQDevice::RUNNING ) 
+    //temporary
+    int NumTSinSampler=16;
+    int NumTStoSend=NumTSinSampler/fMaxMicroSliceNumber;
+    
+    while (fState == RUNNING ) 
     {    
 
         FairMQMessage* msg = fTransportFactory->CreateMessage();
-        poller->Poll(100);
+        //poller->Poll(100);
 
-          for (int i = 0; i < fNumInputs; i++)
-          {
-              if (poller->CheckInput(i))
-                  bytes_received = fPayloadInputs->at(i)->Receive(msg);
+        for (int i = 0; i < fNumInputs; i++)
+        {
+            //if (poller->CheckInput(i))
+                bytes_received = fPayloadInputs->at(i)->Receive(msg);
 
-              if (bytes_received)
-              {
-                  receivedMsgs++;
-                  cout << "I've received " << receivedMsgs << " messages!" << endl;
-                  fProcessorTask->SetPayload(msg);
-                  fProcessorTask->Exec();
+            if (bytes_received)
+            {
+                receivedMsgs++;
+                cout << "I've received " << receivedMsgs << " messages!" << endl;
+                fProcessorTask->SetPayload(msg);
+                fProcessorTask->Exec();
 
-                  ReadyToSend=fProcessorTask->MsgReadyToSend();
+                ReadyToSend=fProcessorTask->MsgReadyToSend();
 
-                  if(ReadyToSend)
-                  {  
-                      fPayloadOutputs->at(0)->Send(msg);  
-                      sentMsgs++;
-                      fTSIndex++;
-                  }
-                  bytes_received = 0;
-              }
-          }
-          delete msg; 
-          // temporary
-          if(ReadyToSend && sentMsgs==1) 
-              break;
+                if(ReadyToSend)
+                {  
+                    fPayloadOutputs->at(0)->Send(msg);  
+                    sentMsgs++;
+                    fTSIndex++;
+                    ReInitMergerTask();
+                }
+                bytes_received = 0;
+            }
+        }
+        
+        //if(fMSIndexSync)
+            delete msg; 
+        // temporary
+        if(ReadyToSend && sentMsgs==NumTStoSend) 
+            break;
     }
 
-    delete poller;
+    //delete poller;
 
-    cout << "I've received " << receivedMsgs << " and sent " << sentMsgs << " messages!" << endl;
+    cout << "I've received " << receivedMsgs << " Microslices and sent " << sentMsgs << " TimeSlice(s)!" << endl;
 
     boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
 

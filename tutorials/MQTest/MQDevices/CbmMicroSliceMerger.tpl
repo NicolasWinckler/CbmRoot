@@ -10,7 +10,6 @@
 template <typename TPolicyTask>
 CbmMicroSliceMerger<TPolicyTask>::CbmMicroSliceMerger() : fTSIndex(0), 
         fMaxMicroSliceNumber(0),
-        fMSIndexSync(false),
         fProcessorTask(new TPolicyTask())
 {
 }
@@ -25,7 +24,14 @@ CbmMicroSliceMerger<TPolicyTask>::~CbmMicroSliceMerger()
     }
 }
 
-
+/*
+Warning in <TClass::TClass>: no dictionary for class CbmTrd is available
+Warning in <TClass::TClass>: no dictionary for class CbmTof is available
+Warning in <TClass::TClass>: no dictionary for class CbmPsdv1 is available
+Warning in <TClass::TClass>: no dictionary for class CbmPsd is available
+Warning in <TClass::TClass>: no dictionary for class CbmUrqmdGenerator is available
+Warning in <TClass::TClass>: no dictionary for class CbmFieldPar is availa
+ */
 
 template <typename TPolicyTask>
 void CbmMicroSliceMerger<TPolicyTask>::Init()
@@ -105,10 +111,10 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
                 bytes_received = 0;
             }
         }
+                    
+        delete msg; 
         
-        //if(fMSIndexSync)
-            delete msg; 
-        // temporary
+        // temporary to break the merger loop when finished
         if(ReadyToSend && sentMsgs==NumTStoSend) 
             break;
     }

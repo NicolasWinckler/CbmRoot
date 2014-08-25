@@ -50,10 +50,10 @@ protected:
 
     uint64_t fTSIndex;
     uint64_t fMaxMicroSliceNumber;
-    bool fMSIndexSync;
+    //bool fMSIndexSync;
     TPolicyTask* fProcessorTask; 
     
-    fles::StorableTimeslice fFlesTimeSlices{1, 1};
+    //fles::StorableTimeslice fFlesTimeSlices{1, 1};
        
 };
 

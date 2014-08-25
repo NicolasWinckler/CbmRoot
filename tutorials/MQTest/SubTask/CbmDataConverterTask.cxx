@@ -35,12 +35,22 @@ CbmDataConverterTask::CbmDataConverterTask() : FairTask("CbmDataConverterTask"),
 CbmDataConverterTask::~CbmDataConverterTask() 
 {
     if(fCBMTimeSlice)
+    {
         delete fCBMTimeSlice;
+        fCBMTimeSlice=NULL;
+    }
     
     if(fMuchConverter)
+    {
         delete fMuchConverter;
+        fMuchConverter=NULL;
+    }
+    
     if(fStsConverter)
+    {
         delete fStsConverter;
+        fStsConverter=NULL;
+    }
     
 }
 
@@ -227,7 +237,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
             MQLOG(INFO) << "   number of MUCH points = "
                         << CbmTSlice->GetDataSize(kMUCH);
             if(fakeMuchDigi)
-                MQLOG(DEBUG)   << "   Warning: dummy MUCH digi created for test";
+                MQLOG(WARN)   << "   Warning: dummy MUCH digi created for test";
         }
 
         // define fles MicroSlice header specific to MUCH detector

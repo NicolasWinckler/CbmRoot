@@ -23,7 +23,12 @@ CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::~CbmTimeSliceLoader()
 {
     if(fDigiVector.size()>0) 
         fDigiVector.clear();
-    delete fDataConverterTask;
+    
+    if(fDataConverterTask)
+    {
+        delete fDataConverterTask;
+        fDataConverterTask=NULL;
+    }
 }
 //*
 template <typename TCbmDigi, typename TPayloadOut> 

@@ -16,7 +16,7 @@ outputSocketType="push"
 outputBufSize=$buffSize
 outputMethod="connect"
 outputAddress="tcp://localhost:5566"
-xterm -e @CMAKE_BINARY_DIR@/bin/testCbmStsDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
+xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmStsDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
 
 # MUCH SAMPLER
 
@@ -29,25 +29,30 @@ numIoThreads="1"
 outputSocketType="push"
 outputBufSize=$buffSize
 outputMethod="connect"
-outputAddress="tcp://localhost:5566"
-xterm -e @CMAKE_BINARY_DIR@/bin/testCbmMuchDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
+outputAddress="tcp://localhost:5567"
+xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmMuchDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
 
 
 # MICROSLICE MERGER (processor)
 
-MicroSliceNumberToMerge="16"
+MicroSliceNumberToMerge="8"
 TimeSliceIndex="1"
 ID="301"
+numInputs="2"
 numIoThreads="1"
-inputSocketType="pull"
-inputRcvBufSize=$buffSize
-inputMethod="bind"
-inputAddress="tcp://*:5566"
+inputSocketType1="pull"
+inputRcvBufSize1=$buffSize
+inputMethod1="bind"
+inputAddress1="tcp://*:5566"
+inputSocketType2="pull"
+inputRcvBufSize2=$buffSize
+inputMethod2="bind"
+inputAddress2="tcp://*:5567"
 outputSocketType="push"
 outputSndBufSize=$buffSize
 outputMethod="connect"
-outputAddress="tcp://localhost:5567"
-xterm -e @CMAKE_BINARY_DIR@/bin/testCbmDetectorProcessor_$dataFormat $MicroSliceNumberToMerge $TimeSliceIndex $ID $processorTask $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $outputSocketType $outputSndBufSize $outputMethod $outputAddress &
+outputAddress="tcp://localhost:5568"
+xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmDetectorProcessor_$dataFormat $MicroSliceNumberToMerge $TimeSliceIndex $ID $processorTask $numIoThreads $numInputs $inputSocketType1 $inputRcvBufSize1 $inputMethod1 $inputAddress1 $inputSocketType2 $inputRcvBufSize2 $inputMethod2 $inputAddress2 $outputSocketType $outputSndBufSize $outputMethod $outputAddress &
 
 
 # FILESINK
@@ -57,8 +62,8 @@ numIoThreads="1"
 inputSocketType="pull"
 inputRcvBufSize=$buffSize
 inputMethod="bind"
-inputAddress="tcp://*:5567"
-xterm -e @CMAKE_BINARY_DIR@/bin/testCbmfileSink_$dataFormat $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress &
+inputAddress="tcp://*:5568"
+xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmfileSink_$dataFormat $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress &
 #alternative for regular sink:
 #xterm -e @CMAKE_BINARY_DIR@/bin/sink $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputAddress &
 

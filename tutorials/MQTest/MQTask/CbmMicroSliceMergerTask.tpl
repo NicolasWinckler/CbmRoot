@@ -14,9 +14,12 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
         fMicroSliceIndex(0),
         fComponentIndex(0),
         fTSReady(false),
+        fMSIndexSync(false),
         fDataConverterTask(new CbmDataConverterTask()),
         findex_sts(0),
-        findex_much(0)
+        findex_much(0),
+        fMSCounter_sts(0),
+        fMSCounter_much(0)
 {
     
 }
@@ -27,7 +30,11 @@ CbmMicroSliceMergerTask<TPayloadIn, TPayloadOut>::CbmMicroSliceMergerTask() :
 template <typename TPayloadIn, typename TPayloadOut> 
 CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::~CbmMicroSliceMergerTask()
 {
+    if(fDataConverterTask)
+    {
         delete fDataConverterTask;
+        fDataConverterTask=NULL;
+    }
 }
 
 
@@ -95,9 +102,8 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
         
         fles::MicrosliceDescriptor desc;
         std::vector<uint8_t> MSliceData;
-        uint64_t index_sts=0;
-        uint64_t index_much=0;
-        uint64_t index=0;
+        
+        uint64_t RelativeIndex=0;
         uint16_t eqid=0;// component (input link)
         uint16_t sysid=100;
         uint32_t ContentSize=0;
@@ -108,17 +114,24 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
             desc=MSlice.GetHeader();
             sysid=desc.sys_id;
             if(sysid==kSTS)
+            {
                 findex_sts=desc.idx;
-            
+                RelativeIndex=fMSCounter_sts;
+                fMSCounter_sts++;
+            }
             if(sysid==kMUCH)
+            {
                 findex_much=desc.idx;
+                RelativeIndex=fMSCounter_much;
+                fMSCounter_much++;
+            }
 
-            index=desc.idx;
+            
             eqid=desc.eq_id;
             ContentSize=desc.size;
             MSliceData=MSlice.GetData();
             
-            fFlesTimeSlices.append_microslice(eqid, index, desc, MSliceData.data());
+            fFlesTimeSlices.append_microslice(eqid, RelativeIndex, desc, MSliceData.data());
             
             //MQLOG(INFO) << "MSliceData.size() = "<<MSliceData.size();
             //std::cout<<std::endl;
@@ -131,24 +144,24 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
                 switch (sysid) 
                 {
 
-                case kSTS:
-                {
-                    MQLOG(INFO) << "Detector ID  = STS";
-                    MQLOG(INFO) << "Micro Slice Index = "<<findex_sts;
-                    MQLOG(INFO) << "Input link = "<<eqid;
-                    MQLOG(INFO) << "Content size = "<<ContentSize;
-                  break;
-                }
-                case kMUCH:
-                {
-                    MQLOG(INFO) << "Detector ID  = MUCH";
-                    MQLOG(INFO) << "Micro Slice Index_much = "<<findex_much;
-                    MQLOG(INFO) << "Input link = "<<eqid;
-                    MQLOG(INFO) << "Content size = "<<ContentSize;
-                  break;
-                }
-                default:
-                  break;
+                    case kSTS:
+                    {
+                        MQLOG(INFO) << "Detector ID  = STS";
+                        MQLOG(INFO) << "Micro Slice Index = "<<findex_sts;
+                        MQLOG(INFO) << "Input link = "<<eqid;
+                        MQLOG(INFO) << "Content size = "<<ContentSize;
+                      break;
+                    }
+                    case kMUCH:
+                    {
+                        MQLOG(INFO) << "Detector ID  = MUCH";
+                        MQLOG(INFO) << "Micro Slice Index_much = "<<findex_much;
+                        MQLOG(INFO) << "Input link = "<<eqid;
+                        MQLOG(INFO) << "Content size = "<<ContentSize;
+                      break;
+                    }
+                    default:
+                      break;
                 }
                 //MQLOG(INFO) << "Micro Slice Index = "<<index<<std::endl;
                 
@@ -162,8 +175,12 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
         
             
 
-        //if(index==fMaxMicroSliceNumber-1)
-        if(findex_sts==fMaxMicroSliceNumber-1  && findex_much==fMaxMicroSliceNumber-1)
+        if(findex_sts == findex_much)
+            fMSIndexSync=true;
+        else
+            fMSIndexSync=false;
+        
+        if(fMSCounter_sts==fMaxMicroSliceNumber  && fMSCounter_much==fMaxMicroSliceNumber)
         {
             fTSReady=true;
             //std::cout<< "++++++++++ READY +++++++++++++++" <<std::endl;

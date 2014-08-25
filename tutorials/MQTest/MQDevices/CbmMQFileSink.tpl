@@ -24,7 +24,11 @@ template <typename TPayloadIn>
 CbmMQFileSink<TPayloadIn>::~CbmMQFileSink()
 {
     fDataConverterTask->WriteTreeToFile();
-    delete fDataConverterTask;
+    if(fDataConverterTask)
+    {
+        delete fDataConverterTask;
+        fDataConverterTask=NULL;
+    }
 }
 
 template <typename TPayloadIn>
@@ -46,15 +50,14 @@ void CbmMQFileSink<TPayloadIn>::Run()
 
         boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
         int receivedMsgs = 0;
-        size_t bytes_received = 0;
-
+        int bytes_received = 0;
 
         while ( fState == RUNNING ) 
         {
             FairMQMessage* msg = fTransportFactory->CreateMessage();
             bytes_received = fPayloadInputs->at(0)->Receive(msg);
             
-            if (bytes_received) 
+            if (bytes_received > 0) 
             {
                 receivedMsgs++;
                 std::string msgStr( static_cast<char*>(msg->GetData()), msg->GetSize() );
@@ -89,10 +92,18 @@ void CbmMQFileSink<TPayloadIn>::Run()
                     if(MSnum_MAX>MSlicesNumber_MAX) 
                             MSlicesNumber_MAX=MSnum_MAX;
                     
-                    // get smallest microslice index
-                    uint64_t MSIndex_MIN=fFlesTimeSlices.descriptor(comp_j,0).idx;
+                    // get smallest microslice index in current time slice 
+                    // if components are non empty
+                    
+                    uint64_t MSIndex_MIN=UINTMAX_MAX;
+                    if(fFlesTimeSlices.descriptor(comp_j,0).size>0)
+                        MSIndex_MIN=fFlesTimeSlices.descriptor(comp_j,0).idx;
+                    
+                    
                     if(MSIndex_MIN<MSliceIndex_MIN)
                         MSliceIndex_MIN=MSIndex_MIN;
+                    
+                    
                 }
                 
                 
@@ -142,7 +153,6 @@ void CbmMQFileSink<TPayloadIn>::Run()
                     fDataConverterTask->FillCbmTSTree();
                     
                 } // end loop on MS index
-                break;// break temporary
                 bytes_received = 0;
             } //end of if (bytes_received) 
             delete msg;
@@ -153,11 +163,18 @@ void CbmMQFileSink<TPayloadIn>::Run()
         //fDataConverterTask->WriteTreeToFile();
         cout << "I've received " << receivedMsgs << " messages!" << endl;
         boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
-        rateLogger.interrupt();
-        rateLogger.join();
         
+        try 
+        {
+            rateLogger.interrupt();
+            rateLogger.join();
+        } 
+        catch(boost::thread_resource_error& e) 
+        {
+            MQLOG(ERROR) << e.what();
+        }
         
-    
+        FairMQDevice::Shutdown();
     
 }
 

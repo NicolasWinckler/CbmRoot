@@ -1,3 +1,4 @@
+
 /* 
  * File:   CbmMicroSliceMerger.h
  * Author: winckler
@@ -7,29 +8,56 @@
 
 #ifndef CBMMICROSLICEMERGER_H
 #define	CBMMICROSLICEMERGER_H
-#include "CbmProcessor.h"
+#include "FairMQDevice.h"
+#include "StorableTimeslice.hpp"
+#include "CbmMicroSlice.h"
+
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+
+#include "FairMQLogger.h"
 
 template <typename TPolicyTask>
-class CbmMicroSliceMerger: public CbmProcessor<TPolicyTask>
+class CbmMicroSliceMerger: public FairMQDevice 
 {
 public:
     
-    using CbmProcessor<TPolicyTask>::fProcessorTask;
+    //using CbmProcessor<TPolicyTask>::fProcessorTask;
     
-    CbmMicroSliceMerger() : CbmProcessor<TPolicyTask>(){}
-    virtual ~CbmMicroSliceMerger(){}
+    
+    CbmMicroSliceMerger(); 
+    virtual ~CbmMicroSliceMerger();
+    void SetTask(TPolicyTask* task);
+    
+    
+    
     void SetMicroSliceNum(uint64_t MSNumber)
     {
-        fProcessorTask->SetMicroSliceNumber(MSNumber);
+        fMaxMicroSliceNumber=MSNumber;
     }
     
     void SetTimeSliceIdx(uint64_t TSIndex)
     {
-        fProcessorTask->SetTimeSliceIndex(TSIndex);
+        fTSIndex=TSIndex;
     }
     
+
+protected:
     
+    virtual void Init();
+    virtual void Run();
+    void ReInitMergerTask();
+
+    uint64_t fTSIndex;
+    uint64_t fMaxMicroSliceNumber;
+    //bool fMSIndexSync;
+    TPolicyTask* fProcessorTask; 
+    
+    //fles::StorableTimeslice fFlesTimeSlices{1, 1};
+       
 };
+
+#include "CbmMicroSliceMerger.tpl"
 
 #endif	/* CBMMICROSLICEMERGER_H */
 

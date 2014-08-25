@@ -25,7 +25,7 @@
 #include "CbmUnpacker.h"
 
 #include "FairMQProcessorTask.h"
-#include "MQLogger.h"
+#include "FairMQLogger.h"
 
 #include "StorableTimeslice.hpp"
 #include "CbmMicroSlice.h"
@@ -92,9 +92,12 @@ private:
     unsigned int fMicroSliceIndex;
     unsigned int fComponentIndex;
     bool fTSReady;
+    bool fMSIndexSync;
     CbmDataConverterTask* fDataConverterTask;
     uint64_t findex_sts;
     uint64_t findex_much;
+    uint64_t fMSCounter_sts;
+    uint64_t fMSCounter_much;
     std::vector<CbmMicroSlice> fDigiVector;
     #ifndef __CINT__ 
     friend class boost::serialization::access;

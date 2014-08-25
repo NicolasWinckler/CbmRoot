@@ -65,8 +65,11 @@ static void s_catch_signals (void)
 
 int main(int argc, char** argv)
 {
-  if ( argc != 13 ) {
-    cout << "Usage: testDetectorProcessor \tMicroSliceNumber TimeSliceIndex ID numIoTreads\n"
+  if ( argc != 18 ) 
+  {
+      cout<<"argc="<<argc<<endl;
+    
+      cout << "Usage: testDetectorProcessor \tMicroSliceNumber TimeSliceIndex ID numIoTreads\n"
               << "\t\tinputSocketType inputRcvBufSize inputMethod inputAddress\n"
               << "\t\toutputSocketType outputSndBufSize outputMethod outputAddress\n" << endl;
     return 1;
@@ -101,23 +104,31 @@ int main(int argc, char** argv)
   processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumIoThreads, numIoThreads);
   ++i;
 
-  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumInputs, 1);
+  
+  int numInputs;
+  stringstream(argv[i]) >> numInputs;
+  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumInputs, numInputs);
+  ++i;
   processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::NumOutputs, 1);
 
 
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::INIT);
 
-
-  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputSocketType, argv[i], 0);
-  ++i;
-  int inputRcvBufSize;
-  stringstream(argv[i]) >> inputRcvBufSize;
-  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputRcvBufSize, inputRcvBufSize, 0);
-  ++i;
-  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputMethod, argv[i], 0);
-  ++i;
-  processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputAddress, argv[i], 0);
-  ++i;
+  
+    for (int iInput = 0; iInput < numInputs; iInput++)
+    {
+        //cout<<""<< argv[i] <<endl;
+        processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputSocketType, argv[i], iInput);
+        ++i;//cout<<""<< argv[i] <<endl;
+        int inputRcvBufSize;
+        stringstream(argv[i]) >> inputRcvBufSize;
+        processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputRcvBufSize, inputRcvBufSize, iInput);
+        ++i;//cout<<""<< argv[i] <<endl;
+        processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputMethod, argv[i], iInput);
+        ++i;//cout<<""<< argv[i] <<endl;
+        processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::InputAddress, argv[i], iInput);
+        ++i;
+    }
 
   processor.SetProperty(CbmMicroSliceMerger<TProcessorTask>::OutputSocketType, argv[i], 0);
   ++i;
@@ -133,9 +144,16 @@ int main(int argc, char** argv)
 
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::SETOUTPUT);
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::SETINPUT);
-  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::RUN);
-
-
+  
+  try
+  {
+      processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::RUN);
+  }
+  catch (boost::archive::archive_exception& e)
+  {
+      LOG(ERROR) << e.what();
+  }  
+  
   char ch;
   cin.get(ch);
 

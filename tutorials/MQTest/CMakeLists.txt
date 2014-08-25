@@ -36,6 +36,8 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 )
 
+
+
 add_subdirectory (fles_ipc)
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -64,7 +66,6 @@ If (Boost_FOUND)
   Set(NO_DICT_SRCS
     MQDevices/CbmMQFileSink.cxx
     data/CbmMicroSlice.cxx
-    MQDevices/CbmProcessor.cxx
     MQDevices/CbmMicroSliceMerger.cxx
     MQTask/CbmMicroSliceMergerTask.cxx
     SubTask/CbmDataConverterTask.cxx
@@ -82,8 +83,10 @@ Set(LIBRARY_NAME MQcbmExample)
 
 If (Boost_FOUND)
   Set(DEPENDENCIES 
-    Base ParBase FairTools MCStack CbmData fles_ipc FairMQ FairMQSampler 
-    boost_thread boost_system boost_serialization boost_timer 
+    Base ParBase FairTools MCStack 
+    CbmData Rich Trd Tof Psd CbmGenerators Field Sts
+    fles_ipc FairMQ FairMQSampler 
+    boost_thread boost_system boost_serialization boost_timer Passive
     RIO Cint Core)
 Else (Boost_FOUND)
   message( FATAL_ERROR "Boost library required to compile the MQ example" )

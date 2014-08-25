@@ -14,8 +14,7 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-
-#include "MQLogger.h"
+#include "FairMQLogger.h"
 
 template <typename TPolicyTask>
 class CbmProcessor: public FairMQDevice 

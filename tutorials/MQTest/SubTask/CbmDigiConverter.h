@@ -20,8 +20,7 @@
 
 #include "CbmDetectorList.h"
 
-#include "MQLogger.h"
-
+#include "FairMQLogger.h"
 
 
 class CbmDigiConverter 

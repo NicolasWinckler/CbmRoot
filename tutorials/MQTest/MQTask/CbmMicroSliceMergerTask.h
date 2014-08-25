@@ -25,7 +25,7 @@
 #include "CbmUnpacker.h"
 
 #include "FairMQProcessorTask.h"
-#include "MQLogger.h"
+#include "FairMQLogger.h"
 
 #include "StorableTimeslice.hpp"
 #include "CbmMicroSlice.h"

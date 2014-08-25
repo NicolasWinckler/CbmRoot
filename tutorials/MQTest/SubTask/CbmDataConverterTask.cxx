@@ -227,7 +227,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
             MQLOG(INFO) << "   number of MUCH points = "
                         << CbmTSlice->GetDataSize(kMUCH);
             if(fakeMuchDigi)
-                MQLOG(DEBUG)   << "   Warning: dummy MUCH digi created for test";
+                MQLOG(WARN)   << "   Warning: dummy MUCH digi created for test";
         }
 
         // define fles MicroSlice header specific to MUCH detector

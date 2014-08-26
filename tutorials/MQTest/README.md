@@ -15,7 +15,9 @@ In particular this example provides :
 
 This example requires [FairSoft](https://github.com/FairRootGroup/FairSoft/tree/dev), [FairRoot](https://github.com/FairRootGroup/FairRoot/tree/dev) and [fles_ipc](https://github.com/cbm-fles/fles_ipc) to be installed.
 * For FairSoft, and FairRoot installation see for example the [step by step installation](https://github.com/NicolasWinckler/CbmRoot/tree/devmq).
-* For the fles_ipc either modify the [CMakeLists.txt](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/tutorials/MQTest/CMakeLists.txt) and link to the lib or, alternatively copy the [fles_ipc](https://github.com/cbm-fles/fles_ipc) headers and source files (without the CMakeList.txt) in the [CbmRoot/tutorials/MQTest/fles_ipc directory](https://github.com/NicolasWinckler/CbmRoot/tree/devmq/tutorials/MQTest/fles_ipc).
+* For the fles_ipc either 
+ * modify the [CMakeLists.txt](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/tutorials/MQTest/CMakeLists.txt) and link to the lib 
+ * or, alternatively, copy the [fles_ipc](https://github.com/cbm-fles/fles_ipc) headers and source files (without the CMakeList.txt) in the [CbmRoot/tutorials/MQTest/fles_ipc](https://github.com/NicolasWinckler/CbmRoot/tree/devmq/tutorials/MQTest/fles_ipc) directory.
 
 Once the required installation done, simulated digi and CbmTimeSlices have to be produced via the root macro run_sim.C and run_digi.C found in the [CbmRoot/macro/run](https://github.com/NicolasWinckler/CbmRoot/tree/devmq/macro/run) directory, e.g.:
 ```bash
@@ -25,7 +27,7 @@ root -l
 .x run_digi.C
 ```
 The produced test.raw.root and params.root files are input files of the samplers.
-Provide the correct paths of these input files in the script found in CbmRoot/build/bin (or alternatively modify the paths in [CbmRoot/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in) and recompile)
+Provide the correct paths of these input files in the script found in CbmRoot/build/bin (or alternatively modify the root file names in the [CbmRoot/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in script](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in) and recompile)
 
 - - - -
 

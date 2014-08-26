@@ -13,6 +13,17 @@ In particular this example provides :
 
 ### Running the example
 
+This example requires [FairSoft](https://github.com/FairRootGroup/FairSoft/tree/dev) and [FairRoot](https://github.com/FairRootGroup/FairRoot/tree/dev).
+See for example the step by step installation
+Once the required installation are done, simulated digi have to be produced via the root macro run_sim.C and run_digi.C found in the [CbmRoot/macro/run](https://github.com/NicolasWinckler/CbmRoot/tree/devmq/macro/run) directory:
+```bash
+#in CbmRoot/macro/run
+root -l
+.x run_sim.C
+.x run_digi.C
+```
+The produced test.raw.root file is the input file of the samplers.
+
 - - - -
 
 ### Details

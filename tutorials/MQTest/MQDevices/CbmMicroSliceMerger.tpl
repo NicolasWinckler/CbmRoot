@@ -75,7 +75,7 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
     int sentMsgs = 0;
     bool ReadyToSend=false;
 
-    size_t bytes_received = 0;
+    int bytes_received = 0;
 
     //temporary
     int NumTSinSampler=16;
@@ -92,7 +92,7 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
             //if (poller->CheckInput(i))
                 bytes_received = fPayloadInputs->at(i)->Receive(msg);
 
-            if (bytes_received)
+            if (bytes_received>0)
             {
                 receivedMsgs++;
                 cout << "I've received " << receivedMsgs << " messages!" << endl;
@@ -115,8 +115,8 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
         delete msg; 
         
         // temporary to break the merger loop when finished
-        if(ReadyToSend && sentMsgs==NumTStoSend) 
-            break;
+        //if(ReadyToSend && sentMsgs==NumTStoSend) 
+          //  break;
     }
 
     //delete poller;

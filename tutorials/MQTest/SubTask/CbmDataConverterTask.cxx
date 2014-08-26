@@ -35,12 +35,22 @@ CbmDataConverterTask::CbmDataConverterTask() : FairTask("CbmDataConverterTask"),
 CbmDataConverterTask::~CbmDataConverterTask() 
 {
     if(fCBMTimeSlice)
+    {
         delete fCBMTimeSlice;
+        fCBMTimeSlice=NULL;
+    }
     
     if(fMuchConverter)
+    {
         delete fMuchConverter;
+        fMuchConverter=NULL;
+    }
+    
     if(fStsConverter)
+    {
         delete fStsConverter;
+        fStsConverter=NULL;
+    }
     
 }
 

@@ -50,16 +50,14 @@ void CbmMQFileSink<TPayloadIn>::Run()
 
         boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
         int receivedMsgs = 0;
-        size_t bytes_received = 0;
-        bool LastTS=false;
-
+        int bytes_received = 0;
 
         while ( fState == RUNNING ) 
         {
             FairMQMessage* msg = fTransportFactory->CreateMessage();
             bytes_received = fPayloadInputs->at(0)->Receive(msg);
             
-            if (bytes_received) 
+            if (bytes_received > 0) 
             {
                 receivedMsgs++;
                 std::string msgStr( static_cast<char*>(msg->GetData()), msg->GetSize() );
@@ -136,10 +134,6 @@ void CbmMQFileSink<TPayloadIn>::Run()
                     /// loop over all component in fles time slice in the current time interval
                     for(uint64_t comp_j = 0; comp_j < InputLinkNumber; ++comp_j)
                     {
-                        //temporary hack to finish the filesink once the 16th Microslice is reached
-                        if(fFlesTimeSlices.descriptor(comp_j,MS_i).idx==15) 
-                            LastTS=true;
-                        
                         uint64_t MSlicesNumber_j=fFlesTimeSlices.num_microslices(comp_j);
                         
                         if(MS_i<MSlicesNumber_j)
@@ -159,7 +153,6 @@ void CbmMQFileSink<TPayloadIn>::Run()
                     fDataConverterTask->FillCbmTSTree();
                     
                 } // end loop on MS index
-                if(LastTS) break;// break temporary
                 bytes_received = 0;
             } //end of if (bytes_received) 
             delete msg;

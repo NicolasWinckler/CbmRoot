@@ -104,12 +104,21 @@ int main(int argc, char** argv)
 
   filesink.ChangeState(TSink::SETOUTPUT);
   filesink.ChangeState(TSink::SETINPUT);
-  filesink.ChangeState(TSink::RUN);
-
-  //char ch;
-  //cin.get(ch);
   
-  sleep(2);
+  
+  try
+  {
+      filesink.ChangeState(TSink::RUN);
+  }
+  catch (boost::archive::archive_exception& e)
+  {
+      LOG(ERROR) << e.what();
+  }
+  
+  char ch;
+  cin.get(ch);
+  
+  //sleep(3);
 
   filesink.ChangeState(TSink::STOP);
   filesink.ChangeState(TSink::END);

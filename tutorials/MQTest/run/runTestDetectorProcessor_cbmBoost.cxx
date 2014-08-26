@@ -144,9 +144,16 @@ int main(int argc, char** argv)
 
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::SETOUTPUT);
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::SETINPUT);
-  processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::RUN);
-
-
+  
+  try
+  {
+      processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::RUN);
+  }
+  catch (boost::archive::archive_exception& e)
+  {
+      LOG(ERROR) << e.what();
+  }  
+  
   char ch;
   cin.get(ch);
 

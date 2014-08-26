@@ -47,7 +47,7 @@ void CbmProcessor<TPolicyTask>::Run()
   int receivedMsgs = 0;
   int sentMsgs = 0;
 
-  size_t bytes_received = 0;
+  int bytes_received = 0;
   
   while ( fState == RUNNING ) 
   {    

@@ -231,6 +231,27 @@ add_subdirectory (analysis)
 #add_subdirectory (vis)
 add_subdirectory (tracking)
 
+
+# Check if the compilation flag -std=c++11 is set
+
+# In this case the code is compiled with the new standard and it is possible
+
+# to compile the fles_ipc library
+
+If(NOT CMAKE_CXX_FLAGS)
+  Message(STATUS "No C++11 support found. FLES_IPC library will not be build.")
+Else()
+  String(FIND ${CMAKE_CXX_FLAGS} "-std=c++11" POS_C++11)
+  If(${POS_C++11} EQUAL -1)
+    Message(STATUS "No C++11 support found. FLES_IPC library will not be build.")
+  Else()
+    Message(STATUS "C++11 support found. Build FLES_IPC library.")
+    add_subdirectory(fles)
+  EndIf()
+EndIf()
+
+
+
 Option(BUILD_UNITTESTS "Build all unit tests and add them as new tests" OFF)
 If(BUILD_UNITTESTS)
 

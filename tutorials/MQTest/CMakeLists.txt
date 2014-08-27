@@ -17,7 +17,7 @@ ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/run
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/data
-${CBMROOT_SOURCE_DIR}/tutorials/MQTest/fles_ipc
+${CBMROOT_SOURCE_DIR}/fles/ipc
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQDevices
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/MQTask
 ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/SubTask
@@ -38,7 +38,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 
 
 
-add_subdirectory (fles_ipc)
+#add_subdirectory (fles_ipc)
 
 include_directories(${INCLUDE_DIRECTORIES})
 

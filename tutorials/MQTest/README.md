@@ -2,7 +2,7 @@ MQTest
 ========
 Example of a [FAIRMQ (ALFA)](https://github.com/FairRootGroup/FairRoot/tree/master/fairmq) application in CbmRoot.
 
-### Features
+### What the example does
 In this example StsDigi and MuchDigi data are converted into [fles_ipc](https://github.com/cbm-fles/fles_ipc) format and transported to different nodes where they can be further processed (e.g. merged and stored).
 
 In particular this example provides :
@@ -13,7 +13,7 @@ In particular this example provides :
 
 ### Running the example
 
-This example requires [FairSoft](https://github.com/FairRootGroup/FairSoft/tree/dev), [FairRoot](https://github.com/FairRootGroup/FairRoot/tree/dev) and [fles_ipc](https://github.com/cbm-fles/fles_ipc) to be installed.
+This example requires [FairSoft](https://github.com/FairRootGroup/FairSoft/tree/dev), [FairRoot](https://github.com/FairRootGroup/FairRoot/tree/dev) and [fles_ipc](https://github.com/cbm-fles/fles_ipc) libraries (and build with c++11 flag).
 * For FairSoft, and FairRoot installation see for example the [step by step installation](https://github.com/NicolasWinckler/CbmRoot/tree/devmq).
 * For the fles_ipc either 
  * modify the [CMakeLists.txt](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/tutorials/MQTest/CMakeLists.txt) and link to the lib 

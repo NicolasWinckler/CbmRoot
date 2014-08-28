@@ -15,7 +15,7 @@ One simple example of 4-nodes topology that the tutorial provides consists of :
 ![example of topology](Doc/CBM-MQTest-Topology01.jpg?raw=true "Simple topology example")
 
 For now, the setup of topologies is done via scripts, where the necessary parameters to configure the devices (I/O methods, I/O numbers, ip adress, etc...) are found.
-A Dynamic Deployment System is under development.
+A Dynamic Deployment System ([DDS](https://github.com/FairRootGroup/DDS)) which is under development is aimed to replace the scripts.
 Below is an example of script (corresponding to the topology above) : 
 
 ```bash
@@ -88,8 +88,8 @@ xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmfileSink_$dataFormat $ID $numIoThre
 #alternative for regular sink:
 #xterm -e @CMAKE_BINARY_DIR@/bin/sink $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputAddress &
 
-
 ```
+
 
 ### Running the example
 
@@ -105,6 +105,14 @@ root -l
 ```
 The produced test.raw.root and params.root files are input files of the samplers.
 Provide the correct paths of these input files in the script found in CbmRoot/build/bin (or alternatively modify the root file names in the [CbmRoot/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in script](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in) and recompile)
+
+```bash
+#in CbmRoot/build/bin
+. /startMultiSamplerPushPull_cbm.sh
+```
+
+Four windows - corresponding to the four devices - will pop up.
+
 
 - - - -
 

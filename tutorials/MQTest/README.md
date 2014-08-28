@@ -11,6 +11,8 @@ In particular this example provides :
 * 1 merger that receive and merges fles_ipc microslices into [fles storable timeslices](https://github.com/cbm-fles/fles_ipc/blob/master/StorableTimeslice.hpp) and send them to a file sink
 * 1 File Sink that convert fles_ipc timeslices into CbmRoot timeslices and store them into a rootfile
 
+![example of topology](/doc/CBM-MQTest-Topology01.jpg?raw=true "Simple topology example")
+
 ### Running the example
 
 This example requires that [FairSoft](https://github.com/FairRootGroup/FairSoft/tree/dev), [FairRoot](https://github.com/FairRootGroup/FairRoot/tree/dev) and [fles_ipc](https://github.com/cbm-fles/fles_ipc) libraries are build with the c++11 flag.

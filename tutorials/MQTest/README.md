@@ -1,12 +1,12 @@
 MQTest
 ========
-Example of a [FAIRMQ (ALFA)](https://github.com/FairRootGroup/FairRoot/tree/master/fairmq) application in CbmRoot.
+This tutorial shows a simple example of a [FAIRMQ (ALFA)](https://github.com/FairRootGroup/FairRoot/tree/master/fairmq) application in CbmRoot.
 
 ### Introduction
 In this tutorial, Message Queue (MQ) devices and tasks are provided to construct topologies to transport data in the CbmRoot framework.
 For example, this tutorial shows how StsDigi and MuchDigi data are converted into [fles_ipc](https://github.com/cbm-fles/fles_ipc) format and transported to different nodes where they can be further processed (e.g. merged and stored).
 
-One simple example of 4-nodes topology that the tutorial provides consists of :
+One simple example of a 4-nodes topology that the tutorial provides consists of :
 * 1 sampler that read [CbmRoot timeslices](https://github.com/NicolasWinckler/CbmRoot/blob/devmq/run/CbmTimeSlice.h) from root file, extract the stsDigi data, convert them into fles_ipc microslice format, and send them to a merger.
 * 1 sampler that fill dummy MuchDigi in CbmRoot timeslices, convert them into fles_ipc microslice format and send them to a merger.
 * 1 merger that receive and merges fles_ipc microslices into [fles storable timeslices](https://github.com/cbm-fles/fles_ipc/blob/master/StorableTimeslice.hpp) and send them to a file sink
@@ -16,7 +16,7 @@ One simple example of 4-nodes topology that the tutorial provides consists of :
 
 For now, the setup of topologies is done via scripts, where the necessary parameters to configure the devices (I/O methods, I/O numbers, ip adress, etc...) are found.
 A Dynamic Deployment System ([DDS](https://github.com/FairRootGroup/DDS)) which is under development is aimed to replace the scripts.
-Below is an example of script (corresponding to the topology above) : 
+Below is an example of script (corresponding to the topology described above) : 
 
 ```bash
 #!/bin/bash

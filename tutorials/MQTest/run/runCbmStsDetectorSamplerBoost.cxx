@@ -77,6 +77,7 @@ int main(int argc, char** argv)
   FairMQTransportFactory* transportFactory = new FairMQTransportFactoryZMQ();
 #endif
 
+  sampler.SetContinuous(true);
   sampler.SetTransport(transportFactory);
 
   int i = 1;

@@ -44,7 +44,7 @@ InitStatus CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Init()
 template <typename TCbmDigi, typename TPayloadOut> 
 void CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Exec(Option_t* opt) 
 {         
-        bool printinfo=true;
+        bool printinfo=false;
         if (printinfo)
         {
             MQLOG(INFO)<< "------------------------------------------";

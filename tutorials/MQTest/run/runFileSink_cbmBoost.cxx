@@ -115,10 +115,11 @@ int main(int argc, char** argv)
       LOG(ERROR) << e.what();
   }
   
-  char ch;
-  cin.get(ch);
-  
-  //sleep(3);
+  boost::unique_lock<boost::mutex> lock(filesink.fRunningMutex);
+  while (!filesink.fRunningFinished)
+  {
+      filesink.fRunningCondition.wait(lock);
+  }
 
   filesink.ChangeState(TSink::STOP);
   filesink.ChangeState(TSink::END);

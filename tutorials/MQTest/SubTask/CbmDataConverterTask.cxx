@@ -241,7 +241,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
         //MSdesc.size = (uint32_t)(fMuchDigiPayloadSize*CbmTSlice->GetDataSize(kMUCH));
         uint32_t NMuchPoints;
         if(fakeMuchDigi)
-            NMuchPoints=2000;
+            NMuchPoints=20000;
         else
             NMuchPoints=(uint32_t)CbmTSlice->GetDataSize(kMUCH);
         

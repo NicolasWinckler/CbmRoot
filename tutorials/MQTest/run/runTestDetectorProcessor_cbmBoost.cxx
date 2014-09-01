@@ -153,9 +153,14 @@ int main(int argc, char** argv)
   {
       LOG(ERROR) << e.what();
   }  
+
   
-  char ch;
-  cin.get(ch);
+  
+  boost::unique_lock<boost::mutex> lock(processor.fRunningMutex);
+  while (!processor.fRunningFinished)
+  {
+      processor.fRunningCondition.wait(lock);
+  }  
 
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::STOP);
   processor.ChangeState(CbmMicroSliceMerger<TProcessorTask>::END);

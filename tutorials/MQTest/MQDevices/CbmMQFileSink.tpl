@@ -45,7 +45,7 @@ template <typename TPayloadIn>
 void CbmMQFileSink<TPayloadIn>::Run()
 {
         MQLOG(INFO) << ">>>>>>> Run <<<<<<<";
-        bool printinfo=true;
+        bool printinfo=false;
         fDataConverterTask->SetPrintOption(0,printinfo);
 
         boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
@@ -176,6 +176,9 @@ void CbmMQFileSink<TPayloadIn>::Run()
         
         FairMQDevice::Shutdown();
     
+        boost::lock_guard<boost::mutex> lock(fRunningMutex);
+        fRunningFinished = true;
+        fRunningCondition.notify_one();
 }
 
 

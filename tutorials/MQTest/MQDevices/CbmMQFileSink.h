@@ -41,12 +41,10 @@ template <typename TPayloadIn>
 class CbmMQFileSink: public FairMQDevice
 {
   public:
-    enum LogLevel{kDebug, kDetail, kWarning, kError, kNothing}
     CbmMQFileSink();
     virtual ~CbmMQFileSink();
     virtual void InitOutputFile(TString defaultId = "100");
     
-    virtual void SetVerbose(int loglevel);
     
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)

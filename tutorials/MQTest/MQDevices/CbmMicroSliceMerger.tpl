@@ -95,7 +95,7 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
             if (bytes_received>0)
             {
                 receivedMsgs++;
-                cout << "I've received " << receivedMsgs << " messages!" << endl;
+                //MQLOG(INFO) << "I've received " << receivedMsgs << " messages!";
                 fProcessorTask->SetPayload(msg);
                 fProcessorTask->Exec();
 
@@ -135,6 +135,10 @@ void CbmMicroSliceMerger<TPolicyTask>::Run()
     {
         MQLOG(ERROR) << e.what();
     }
+    
     FairMQDevice::Shutdown();
+    boost::lock_guard<boost::mutex> lock(fRunningMutex);
+    fRunningFinished = true;
+    fRunningCondition.notify_one();
 }
 

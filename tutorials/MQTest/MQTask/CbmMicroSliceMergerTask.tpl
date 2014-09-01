@@ -98,7 +98,7 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
         }
 
         
-        MQLOG(INFO) << "---------------------------------------";
+        
         
         fles::MicrosliceDescriptor desc;
         std::vector<uint8_t> MSliceData;
@@ -137,10 +137,10 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
             //std::cout<<std::endl;
         
             /// temporary : to check whether we get data 
-            bool printdata=true;
+            bool printdata=false;
             if(printdata)
             {
-                
+                MQLOG(INFO) << "---------------------------------------";
                 switch (sysid) 
                 {
 
@@ -191,7 +191,8 @@ void CbmMicroSliceMergerTask<TPayloadIn,TPayloadOut>::Exec(Option_t* opt)
         
         if(fTSReady)
         {
-            MQLOG(INFO) <<"Send time slice to sink";
+            
+            //MQLOG(INFO) <<"Send time slice to sink";
             //prepare boost output archive
             std::ostringstream obuffer;
             TPayloadOut OutputArchive(obuffer); 

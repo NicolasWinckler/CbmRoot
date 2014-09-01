@@ -232,13 +232,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
     case kMUCH:
     {
         bool fakeMuchDigi=true;
-        if(fPrint)
-        {
-            MQLOG(INFO) << "   number of MUCH points = "
-                        << CbmTSlice->GetDataSize(kMUCH);
-            if(fakeMuchDigi)
-                MQLOG(WARN)   << "   Warning: dummy MUCH digi created for test";
-        }
+        
 
         // define fles MicroSlice header specific to MUCH detector
         MSdesc.sys_ver = 1;
@@ -247,9 +241,18 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
         //MSdesc.size = (uint32_t)(fMuchDigiPayloadSize*CbmTSlice->GetDataSize(kMUCH));
         uint32_t NMuchPoints;
         if(fakeMuchDigi)
-            NMuchPoints=100;
+            NMuchPoints=2000;
         else
             NMuchPoints=(uint32_t)CbmTSlice->GetDataSize(kMUCH);
+        
+        
+        if(fPrint)
+        {
+            MQLOG(INFO) << "   number of MUCH points = "
+                        << CbmTSlice->GetDataSize(kMUCH);
+            if(fakeMuchDigi)
+                MQLOG(WARN)   << "   Warning: "<< NMuchPoints <<" dummy MUCH digi created for test";
+        }
         
         MSdesc.size = (uint32_t)(fMuchDigiPayloadSize)*NMuchPoints;
         MSdesc.offset=0;

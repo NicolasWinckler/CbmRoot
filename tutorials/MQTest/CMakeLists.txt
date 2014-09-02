@@ -50,6 +50,21 @@ If (Boost_FOUND)
   configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSink.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSink.sh )
 EndIf (Boost_FOUND)
 
+
+
+If (Boost_FOUND)
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startPushPull_cbm.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startMultiSamplerPushPull_cbm.sh.in ${CMAKE_BINARY_DIR}/bin/startMultiSamplerPushPull_cbm.sh )  
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSampler.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSampler.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmMerger.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmMerger.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmSink.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmSink.sh )
+
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmStsSampler.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmStsSampler.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbmMuchSampler.sh.in ${CMAKE_BINARY_DIR}/bin/startCbmMuchSampler.sh )
+  configure_file( ${CBMROOT_SOURCE_DIR}/tutorials/MQTest/macro/startCbm2SamplerOnly.sh.in ${CMAKE_BINARY_DIR}/bin/startCbm2SamplerOnly.sh )
+
+EndIf (Boost_FOUND)
+
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${Boost_LIBRARY_DIRS}

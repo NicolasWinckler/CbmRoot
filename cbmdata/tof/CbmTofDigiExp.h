@@ -122,8 +122,10 @@ class CbmTofDigiExp : public CbmDigi
       
       /** Modifiers **/
       void SetAddress(Int_t address) { fuAddress = address; };
-      void SetAddress( UInt_t Sm, UInt_t Rpc, UInt_t Channel,
-                        UInt_t Side = 0, UInt_t SmType = 0 );
+      
+      // line below commented because do not compile with gcc (not implemented in the cpp file)
+      //void SetAddress( UInt_t Sm, UInt_t Rpc, UInt_t Channel,
+      //                  UInt_t Side = 0, UInt_t SmType = 0 );
       void SetTime(Double_t time) { fdTime = time; };
       void SetTot(Double_t tot) { fdTot = tot; };
 

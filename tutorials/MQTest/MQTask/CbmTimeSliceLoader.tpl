@@ -11,7 +11,7 @@
 
 template <typename TCbmDigi, typename TPayloadOut> 
 CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::CbmTimeSliceLoader() : FairMQSamplerTask("Load class TCbmDigi"),
-fDataConverterTask(new CbmDataConverterTask())
+fDataConverterTask(new CbmDataConverterTask()), fLoopCounter(0)
 {
     TCbmDigi Digi;
     fDetID=(DetectorId)Digi.GetSystemId();
@@ -44,18 +44,25 @@ InitStatus CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Init()
 template <typename TCbmDigi, typename TPayloadOut> 
 void CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Exec(Option_t* opt) 
 {         
+        //hack to make much time working
+        //fLoopCounter=fEventIndex;
         bool printinfo=false;
         if (printinfo)
         {
             MQLOG(INFO)<< "------------------------------------------";
             MQLOG(INFO)<<"Event Index = "<< fEventIndex ;
+            MQLOG(INFO)<<"fLoopCounter  = "<< fLoopCounter ;
             fDataConverterTask->SetPrintOption(0,printinfo);
         }
-        
+        //if(fLoopCounter==30) while(true){};
+        fDataConverterTask->SetCurrentSamplerLoopIndex(fLoopCounter);
+        fLoopCounter++;
         /// convert data : CbmRoot -> Fles
         fMicroSlice=fDataConverterTask->BuildMicroSlice(fDetID,fCBMTimeSlice);
         fDigiVector.push_back(fMicroSlice);
 
+        
+        
         /// boost serialization and create FairMQ message
         std::ostringstream buffer;
         TPayloadOut OutputArchive(buffer);

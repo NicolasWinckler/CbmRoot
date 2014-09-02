@@ -29,6 +29,7 @@ CbmDataConverterTask::CbmDataConverterTask() : FairTask("CbmDataConverterTask"),
 {
         fStsDigiPayloadSize=fStsConverter->GetDigiPayloadSize();
         fMuchDigiPayloadSize=fMuchConverter->GetDigiPayloadSize();
+        fSamplerIndex=0;
 }
 
 
@@ -205,29 +206,76 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
     MSdesc.hdr_id = 0xDD;// From Jan's example
     MSdesc.hdr_ver = 0x01;
     
-    MSdesc.idx=(uint64_t)(CbmTSlice->GetStartTime()/1000.0);// assume 1mus interval
+    
+    bool fakeData=true;
+    if(fakeData)
+        MSdesc.idx=(uint64_t)fSamplerIndex;
+    else
+        MSdesc.idx=(uint64_t)(CbmTSlice->GetStartTime()/1000.0);// assume 1mus interval
 
     switch (iDet) 
     {
 
     case kSTS:
     {
-        if(fPrint)
-        {
-            MQLOG(INFO)   << "   number of STS points = "
-                           << CbmTSlice->GetDataSize(kSTS);
-        }
-
+        bool fakeStsDigi=true;
+        
         // define fles MicroSlice header specific to STS detector
         MSdesc.sys_ver = 1;
         MSdesc.eq_id = (uint16_t)(kSTS);// input link id (component)
         MSdesc.sys_id = (uint16_t)(kSTS);// detector id
-        MSdesc.size = (uint32_t)(fStsDigiPayloadSize*CbmTSlice->GetDataSize(kSTS));
+        //MSdesc.size = (uint32_t)(fStsDigiPayloadSize*CbmTSlice->GetDataSize(kSTS));
+        
+        
+        
+        uint32_t NStsPoints;
+        if(fakeStsDigi)
+            NStsPoints=20000;
+        else
+            NStsPoints=(uint32_t)CbmTSlice->GetDataSize(kSTS);
+        
+        if(fPrint)
+        {
+            MQLOG(INFO)   << "   number of STS points = "
+                           << CbmTSlice->GetDataSize(kSTS);
+            if(fakeStsDigi)
+                MQLOG(WARN)   << "   Warning: "<< NStsPoints <<" dummy STS digi created for test";
+        }
+        
+        
+        MSdesc.size = (uint32_t)(fStsDigiPayloadSize)*NStsPoints;
         MSdesc.offset=0;
-        vector<CbmStsDigi> StsData=CbmTSlice->GetStsData();
-        MicroSlice=fStsConverter->DigiVectToMSlice(&MSdesc, StsData);
+        //vector<CbmStsDigi> StsData=CbmTSlice->GetStsData();
+        //MicroSlice=fStsConverter->DigiVectToMSlice(&MSdesc, StsData);
 
-      break;
+        
+        // loop below temporary
+        vector<CbmStsDigi> StsData;
+        if(fakeStsDigi)
+        {
+            for(uint32_t iStsDigi=0;iStsDigi<NStsPoints;iStsDigi++)
+            {
+                UInt_t Stsaddress=(UInt_t)(rand() % 100 + 1);
+                UShort_t Stscharge=(UShort_t)(rand() % 100 + 1);
+                //ULong64_t Ststime=(ULong64_t)(CbmTSlice->GetStartTime()+(Double_t)(rand() % 100 + 1));
+                Int_t StssectorNr=(Int_t)(rand() % 100 + 1);
+                //Int_t Ststime=(Int_t)(CbmTSlice->GetStartTime()+(Double_t)(rand() % 100 + 1));
+                Int_t Ststime=(Int_t)(fSamplerIndex*1000+(Double_t)(rand() % 100 + 1));
+                CbmStsDigi Stsdigi(Stsaddress, Ststime, Stscharge, StssectorNr);
+
+                StsData.push_back(Stsdigi);
+            }
+            
+            
+        }
+        else 
+        {
+            StsData=CbmTSlice->GetStsData();
+        }
+        MicroSlice=fStsConverter->DigiVectToMSlice(&MSdesc, StsData);
+        
+        
+        break;
     }
     case kMUCH:
     {
@@ -264,7 +312,8 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
             {
                 Int_t Muchaddress=(Int_t)(rand() % 100 + 1);
                 Int_t Muchcharge=(Int_t)(rand() % 100 + 1);
-                Int_t Muchtime=(Int_t)(CbmTSlice->GetStartTime()+(Double_t)(rand() % 100 + 1));
+                //Int_t Muchtime=(Int_t)(CbmTSlice->GetStartTime()+(Double_t)(rand() % 100 + 1));
+                Int_t Muchtime=(Int_t)(fSamplerIndex*1000+(Double_t)(rand() % 100 + 1));
                 CbmMuchDigi muchdigi(Muchaddress, Muchcharge, Muchtime);
 
                 MuchData.push_back(muchdigi);
@@ -275,6 +324,8 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
             MuchData=CbmTSlice->GetMuchData();
         }
         MicroSlice=fMuchConverter->DigiVectToMSlice(&MSdesc, MuchData);
+        
+        
         break;
     }
     default:

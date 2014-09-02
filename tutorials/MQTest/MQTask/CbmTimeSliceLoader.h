@@ -48,6 +48,8 @@ private :
     vector<CbmMicroSlice> fDigiVector;
     CbmMicroSlice fMicroSlice;
     DetectorId fDetID;
+    int fLoopCounter;
+    
 }; 
 
 

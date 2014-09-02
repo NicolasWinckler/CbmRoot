@@ -33,7 +33,8 @@ class CbmMuchDigi : public CbmDigi{
   Int_t GetSystemId() const { return kMUCH; }
   Int_t GetAddress()  const { return (fData >> fgkAddrShift) & fgkAddrMask; }
   Int_t GetAdc()      const { return (fData >> fgkCharShift) & fgkCharMask; }
-  Double_t GetTime()  const { return (fData >> fgkTimeShift) & fgkTimeMask; }
+  //Double_t GetTime()  const { return (fData >> fgkTimeShift) & fgkTimeMask; }
+  Double_t GetTime()  const { return fTime; }
   
   void AddAdc(Int_t adc);
   void SetAdc(Int_t adc);
@@ -52,7 +53,7 @@ class CbmMuchDigi : public CbmDigi{
  private:
   Long64_t fData;
   CbmMuchDigiMatch* fMatch;  ///< matches to MC points (to be replaced with Fair links)
-  
+  Double_t fTime;     ///< Time [ns]
   static const Int_t fgkAddrBits;
   static const Int_t fgkCharBits;
   static const Int_t fgkTimeBits;

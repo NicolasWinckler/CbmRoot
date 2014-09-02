@@ -35,7 +35,7 @@ xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmMuchDetectorSampler_$dataFormat $ID
 
 # MICROSLICE MERGER (processor)
 
-MicroSliceNumberToMerge="8"
+MicroSliceNumberToMerge="50"
 TimeSliceIndex="1"
 ID="301"
 numInputs="2"

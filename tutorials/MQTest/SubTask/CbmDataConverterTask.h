@@ -44,6 +44,8 @@ public:
     //virtual void Exec(Option_t* opt);
     //virtual InitStatus Init();
     
+    void SetCurrentSamplerLoopIndex(int index){fSamplerIndex=index;}
+    
     CbmMicroSlice BuildMicroSlice(const fles::MicrosliceDescriptor* MSdesc, const uint8_t* FlesTimeSliceContent);
     void PrintCbmMicroSlice(const CbmMicroSlice* MSlice, uint32_t DigiToPrint=0);
     
@@ -79,6 +81,7 @@ protected:
 
     size_t fStsDigiPayloadSize;
     size_t fMuchDigiPayloadSize;
+    int fSamplerIndex;
     
 };
 

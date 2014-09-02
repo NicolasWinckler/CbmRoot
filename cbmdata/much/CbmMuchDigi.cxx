@@ -38,7 +38,8 @@ const Long64_t CbmMuchDigi::fgkTimeMask = (1LL << CbmMuchDigi::fgkTimeBits) - 1;
 CbmMuchDigi::CbmMuchDigi() 
   : CbmDigi(),
     fData(0),
-    fMatch(0)
+    fMatch(0),
+    fTime(0)
 {
 }
 // -------------------------------------------------------------------------
@@ -48,7 +49,8 @@ CbmMuchDigi::CbmMuchDigi()
 CbmMuchDigi::CbmMuchDigi(Int_t address, Int_t charge, Int_t time)
   : CbmDigi(),
     fData(0),
-    fMatch(0)
+    fMatch(0),
+    fTime(time)
 {
   fData |= (address & fgkAddrMask) << fgkAddrShift;
   fData |= (charge  & fgkCharMask) << fgkCharShift;
@@ -59,14 +61,16 @@ CbmMuchDigi::CbmMuchDigi(Int_t address, Int_t charge, Int_t time)
 CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi)
   : CbmDigi(*digi),
     fData(digi->fData),
-    fMatch(0)
+    fMatch(0),
+    fTime(digi->GetTime())
 { 
 }
 
 CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi,CbmMuchDigiMatch* match)
   : CbmDigi(*digi),
     fData(digi->fData),
-    fMatch(new CbmMuchDigiMatch(match))
+    fMatch(new CbmMuchDigiMatch(match)),
+    fTime(digi->GetTime())
 {  
 }
 
@@ -74,7 +78,8 @@ CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi,CbmMuchDigiMatch* match)
 CbmMuchDigi::CbmMuchDigi(const CbmMuchDigi& rhs)
  : CbmDigi(rhs),
    fData(rhs.fData),
-   fMatch(NULL)
+   fMatch(NULL),
+    fTime(rhs.GetTime())
 {
   if (NULL != rhs.fMatch) {
      fMatch = new CbmMuchDigiMatch(*(rhs.fMatch));
@@ -87,6 +92,7 @@ CbmMuchDigi& CbmMuchDigi::operator=(const CbmMuchDigi& rhs)
   if (this != &rhs) {
     CbmDigi::operator=(rhs);
     fData = rhs.fData;
+    fTime=rhs.GetTime();
     if (NULL != rhs.fMatch) {
       std::auto_ptr<CbmMuchDigiMatch> tmp(new CbmMuchDigiMatch(*rhs.fMatch));
       delete fMatch;

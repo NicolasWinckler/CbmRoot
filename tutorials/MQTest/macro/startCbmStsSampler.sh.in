@@ -1,0 +1,21 @@
+#!/bin/bash
+
+
+buffSize="1000" # zeromq high-water mark is in messages
+dataFormat="Boost"
+
+# STS SAMPLER
+
+ID="101"
+inputFile="/Users/winckler/fair/exp/CBMRoot/trunk/tutorials/MQTest/macro/data/test.rawsts.root"
+parameterFile="/Users/winckler/fair/exp/CBMRoot/trunk/tutorials/MQTest/macro/data/params.root"
+branch="TimeSlice."
+eventRate="0"
+numIoThreads="1"
+outputSocketType="push"
+outputBufSize=$buffSize
+outputMethod="connect"
+outputAddress="tcp://depc310:5566"
+
+#xterm -hold -e @CMAKE_BINARY_DIR@/bin/testCbmStsDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress &
+@CMAKE_BINARY_DIR@/bin/testCbmStsDetectorSampler_$dataFormat $ID $inputFile $parameterFile $branch $eventRate $numIoThreads $outputSocketType $outputBufSize $outputMethod $outputAddress

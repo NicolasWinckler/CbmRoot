@@ -192,7 +192,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(const fles::MicrosliceDescri
 CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice)
 {
     CbmMicroSlice MicroSlice;
-
+    int DigiNumber=20000;
     if(fPrint)
     {
         
@@ -230,7 +230,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
         
         uint32_t NStsPoints;
         if(fakeStsDigi)
-            NStsPoints=20000;
+            NStsPoints=DigiNumber;
         else
             NStsPoints=(uint32_t)CbmTSlice->GetDataSize(kSTS);
         
@@ -289,7 +289,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlic
         //MSdesc.size = (uint32_t)(fMuchDigiPayloadSize*CbmTSlice->GetDataSize(kMUCH));
         uint32_t NMuchPoints;
         if(fakeMuchDigi)
-            NMuchPoints=20000;
+            NMuchPoints=DigiNumber;
         else
             NMuchPoints=(uint32_t)CbmTSlice->GetDataSize(kMUCH);
         

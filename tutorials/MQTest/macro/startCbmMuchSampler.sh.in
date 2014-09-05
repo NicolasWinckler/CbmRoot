@@ -7,7 +7,7 @@ dataFormat="Boost"
 # MUCH SAMPLER
 
 ID="201"
-inputFile="@CMAKE_SOURCE_DIR@/tutorials/MQTest/macro/data/test.rawmuch.root"
+inputFile="@CMAKE_SOURCE_DIR@/tutorials/MQTest/macro/data/test.raw.root"
 parameterFile="@CMAKE_SOURCE_DIR@/tutorials/MQTest/macro/data/params.root"
 branch="TimeSlice."
 eventRate="0"

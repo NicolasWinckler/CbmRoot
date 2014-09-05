@@ -7,7 +7,8 @@
 
 #include "CbmDigiConverter.h"
 
-CbmDigiConverter::CbmDigiConverter() {
+CbmDigiConverter::CbmDigiConverter() : fPrint(false), fDigiToPrint(0)
+{
 }
 
 CbmDigiConverter::~CbmDigiConverter() {

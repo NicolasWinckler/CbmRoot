@@ -343,7 +343,5 @@ void CbmDataConverterTask::SetPrintOption(uint32_t DigiToPrint, bool print)
     fDigiToPrint=DigiToPrint;
     fStsConverter->SetPrintOption(fDigiToPrint,fPrint);
     fMuchConverter->SetPrintOption(fDigiToPrint,fPrint);
-    if(fPrint)
-        MQLOG(ERROR)<<"It PRINT";
 }
 

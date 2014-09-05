@@ -11,7 +11,7 @@
 
 template <typename TCbmDigi, typename TPayloadOut> 
 CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::CbmTimeSliceLoader() : FairMQSamplerTask("Load class TCbmDigi"),
-fDataConverterTask(new CbmDataConverterTask()), fLoopCounter(0)
+fDataConverterTask(new CbmDataConverterTask()), fLoopCounter(0), fNfakedigi(0)
 {
     TCbmDigi Digi;
     fDetID=(DetectorId)Digi.GetSystemId();
@@ -35,8 +35,11 @@ template <typename TCbmDigi, typename TPayloadOut>
 InitStatus CbmTimeSliceLoader<TCbmDigi,TPayloadOut>::Init()
 {
     FairRootManager* ioman = FairRootManager::Instance();
-    fCBMTimeSlice = reinterpret_cast<CbmTimeSlice*>(ioman->GetObject(fBranch.c_str())) ;
-
+    //fCBMTimeSlice = reinterpret_cast<CbmTimeSlice*>(ioman->GetObject(fBranch.c_str())) ;
+    stringstream(fBranch) >> fNfakedigi;
+    fCBMTimeSlice = reinterpret_cast<CbmTimeSlice*>(ioman->GetObject("TimeSlice."));
+    fDataConverterTask->SetNfakeDigi(fNfakedigi);
+    
     return kSUCCESS;
 }
 

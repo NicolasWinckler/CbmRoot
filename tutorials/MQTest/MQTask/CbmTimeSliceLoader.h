@@ -49,6 +49,7 @@ private :
     CbmMicroSlice fMicroSlice;
     DetectorId fDetID;
     int fLoopCounter;
+    int fNfakedigi;
     
 }; 
 

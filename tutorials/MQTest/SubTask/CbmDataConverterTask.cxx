@@ -30,6 +30,7 @@ CbmDataConverterTask::CbmDataConverterTask() : FairTask("CbmDataConverterTask"),
         fStsDigiPayloadSize=fStsConverter->GetDigiPayloadSize();
         fMuchDigiPayloadSize=fMuchConverter->GetDigiPayloadSize();
         fSamplerIndex=0;
+        fakeNdigi=0;
 }
 
 
@@ -192,7 +193,7 @@ CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(const fles::MicrosliceDescri
 CbmMicroSlice CbmDataConverterTask::BuildMicroSlice(DetectorId iDet, CbmTimeSlice* CbmTSlice)
 {
     CbmMicroSlice MicroSlice;
-    int DigiNumber=20000;
+    int DigiNumber=fakeNdigi;
     if(fPrint)
     {
         

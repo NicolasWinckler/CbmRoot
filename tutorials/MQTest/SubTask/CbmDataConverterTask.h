@@ -63,6 +63,7 @@ public:
     void WriteTreeToFile();
     
     void SetPrintOption(uint32_t DigiToPrint=0, bool print=true); //temporary
+    void SetNfakeDigi(int N) { fakeNdigi=N;}
     
 protected:
     
@@ -82,6 +83,7 @@ protected:
     size_t fStsDigiPayloadSize;
     size_t fMuchDigiPayloadSize;
     int fSamplerIndex;
+    int fakeNdigi;
     
 };
 
